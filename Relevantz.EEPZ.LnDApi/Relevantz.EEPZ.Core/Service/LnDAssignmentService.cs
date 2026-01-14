@@ -202,7 +202,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
 
             await _approvalRepository.AddAttachment(attachment);
-            await _baseRepository.SaveChangesAsync(); 
+            await _baseRepository.SaveChangesAsync();
 
             assignment.ProofFilePath = filePath;
             assignment.CompletionNotes = request.CompletionNotes;
@@ -353,64 +353,37 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         #region Assignment Retrieval
 
         /// <summary>Gets paginated assignments for the employee as mentee with overdue calculation.</summary>
+
         public async Task<ApiResponse<PaginatedResponse<AssignmentResponseModel>>> GetMyAssignments(
-            int employeeId,
-            AssignmentRequestModel request
-        )
+    int employeeId,
+    AssignmentRequestModel request
+)
         {
             Log.Information(
                 "GetMyAssignments started. EmployeeId={EmployeeId}, StatusFilter={StatusFilter}, Page={PageNumber}",
                 employeeId, request.StatusFilter ?? "all", request.PageNumber
             );
 
-            var (items, totalCount) = await _assignmentRepository.GetMyAssignments(
-                employeeId,
-                request
-            );
+            var (items, totalCount) = await _assignmentRepository.GetMyAssignments(employeeId, request);
 
             var today = DateTime.Now.Date;
 
-            var assignmentResponseModels = items
-                .Select(a =>
-                {
-                    var isOverdue =
-                        a.Deadline.HasValue
-                        && a.Deadline.Value.Date < today
-                        && a.Status != LnDConstants.ASSIGNMENT_STATUS.COMPLETED;
+            // **ONLY Overdue calculations remain** - Much simpler now
+            foreach (var item in items)
+            {
+                var isOverdue = item.Deadline.HasValue
+                    && item.Deadline.Value.Date < today
+                    && item.Status != LnDConstants.ASSIGNMENT_STATUS.COMPLETED;
 
-                    var daysOverdue =
-                        isOverdue && a.Deadline.HasValue
-                            ? (int)(today - a.Deadline.Value.Date).TotalDays
-                            : (int?)null;
-
-                    return new AssignmentResponseModel
-                    {
-                        AssignmentId = a.AssignmentId,
-                        MenteeEmployeeId = a.MenteeEmployeeId,
-                        MenteeName =
-                            $"{a.MenteeEmployee.Userprofile.FirstName} {a.MenteeEmployee.Userprofile.LastName}",
-                        SmeId = a.SmeId,
-                        SmeEmployeeId = a.Sme.EmployeeId,
-                        SmeName =
-                            $"{a.Sme.Employee.Userprofile.FirstName} {a.Sme.Employee.Userprofile.LastName}",
-                        SkillId = a.SkillId,
-                        SkillName = a.Skill.SkillName,
-                        Deadline = a.Deadline,
-                        Status = a.Status,
-                        ProofFilePath = a.ProofFilePath,
-                        CompletionNotes = a.CompletionNotes,
-                        CompletionRating = a.CompletionRating,
-                        CreatedOn = a.CreatedOn,
-                        UpdatedOn = a.UpdatedOn,
-                        IsOverdue = isOverdue,
-                        DaysOverdue = daysOverdue,
-                    };
-                })
-                .ToList();
+                item.IsOverdue = isOverdue;
+                item.DaysOverdue = isOverdue && item.Deadline.HasValue
+                    ? (int)(today - item.Deadline.Value.Date).TotalDays
+                    : null;
+            }
 
             Log.Information(
                 "GetMyAssignments succeeded. EmployeeId={EmployeeId}, ReturnedCount={Count}, TotalCount={TotalCount}",
-                employeeId, assignmentResponseModels.Count, totalCount
+                employeeId, items.Count, totalCount
             );
 
             return new ApiResponse<PaginatedResponse<AssignmentResponseModel>>
@@ -418,7 +391,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 Success = true,
                 Data = new PaginatedResponse<AssignmentResponseModel>
                 {
-                    Items = assignmentResponseModels,
+                    Items = items,  // Already AssignmentResponseModel
                     TotalCount = totalCount,
                     PageNumber = request.PageNumber,
                     PageSize = request.PageSize,
@@ -427,168 +400,109 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         /// <summary>Gets paginated assignments for manager's team members with overdue calculation.</summary>
-        public async Task<ApiResponse<PaginatedResponse<AssignmentResponseModel>>> GetTeamAssignments(
-            int managerId,
-            AssignmentRequestModel request
-        )
+       public async Task<ApiResponse<PaginatedResponse<AssignmentResponseModel>>> GetTeamAssignments(
+    int managerId,
+    AssignmentRequestModel request
+)
+{
+    Log.Information(
+        "GetTeamAssignments started. ManagerId={ManagerId}, StatusFilter={StatusFilter}, Page={PageNumber}",
+        managerId, request.StatusFilter ?? "all", request.PageNumber
+    );
+
+    var (items, totalCount) = await _assignmentRepository.GetTeamAssignments(managerId, request);
+
+    var today = DateTime.Now.Date;
+
+    
+    foreach (var item in items)
+    {
+        var isOverdue = item.Deadline.HasValue
+            && item.Deadline.Value.Date < today
+            && item.Status != LnDConstants.ASSIGNMENT_STATUS.COMPLETED;
+
+        item.IsOverdue = isOverdue;
+        item.DaysOverdue = isOverdue && item.Deadline.HasValue
+            ? (int)(today - item.Deadline.Value.Date).TotalDays
+            : null;
+    }
+
+    Log.Information(
+        "GetTeamAssignments succeeded. ManagerId={ManagerId}, ReturnedCount={Count}, TotalCount={TotalCount}",
+        managerId, items.Count, totalCount
+    );
+
+    return new ApiResponse<PaginatedResponse<AssignmentResponseModel>>
+    {
+        Success = true,
+        Data = new PaginatedResponse<AssignmentResponseModel>
         {
-            Log.Information(
-                "GetTeamAssignments started. ManagerId={ManagerId}, StatusFilter={StatusFilter}, Page={PageNumber}",
-                managerId, request.StatusFilter ?? "all", request.PageNumber
-            );
-
-            var (items, totalCount) = await _assignmentRepository.GetTeamAssignments(
-                managerId,
-                request
-            );
-
-            var today = DateTime.Now.Date;
-
-            var assignmentResponseModels = items
-                .Select(a =>
-                {
-                    var isOverdue =
-                        a.Deadline.HasValue
-                        && a.Deadline.Value.Date < today
-                        && a.Status != LnDConstants.ASSIGNMENT_STATUS.COMPLETED;
-
-                    var daysOverdue =
-                        isOverdue && a.Deadline.HasValue
-                            ? (int)(today - a.Deadline.Value.Date).TotalDays
-                            : (int?)null;
-
-                    return new AssignmentResponseModel
-                    {
-                        AssignmentId = a.AssignmentId,
-                        MenteeEmployeeId = a.MenteeEmployeeId,
-                        MenteeName =
-                            $"{a.MenteeEmployee.Userprofile.FirstName} {a.MenteeEmployee.Userprofile.LastName}",
-                        SmeId = a.SmeId,
-                        SmeEmployeeId = a.Sme.EmployeeId,
-                        SmeName =
-                            $"{a.Sme.Employee.Userprofile.FirstName} {a.Sme.Employee.Userprofile.LastName}",
-                        SkillId = a.SkillId,
-                        SkillName = a.Skill.SkillName,
-                        Deadline = a.Deadline,
-                        Status = a.Status,
-                        ProofFilePath = a.ProofFilePath,
-                        CompletionNotes = a.CompletionNotes,
-                        CompletionRating = a.CompletionRating,
-                        CreatedOn = a.CreatedOn,
-                        UpdatedOn = a.UpdatedOn,
-                        IsOverdue = isOverdue,
-                        DaysOverdue = daysOverdue,
-                    };
-                })
-                .ToList();
-
-            Log.Information(
-                "GetTeamAssignments succeeded. ManagerId={ManagerId}, ReturnedCount={Count}, TotalCount={TotalCount}",
-                managerId, assignmentResponseModels.Count, totalCount
-            );
-
-            return new ApiResponse<PaginatedResponse<AssignmentResponseModel>>
-            {
-                Success = true,
-                Data = new PaginatedResponse<AssignmentResponseModel>
-                {
-                    Items = assignmentResponseModels,
-                    TotalCount = totalCount,
-                    PageNumber = request.PageNumber,
-                    PageSize = request.PageSize,
-                },
-            };
-        }
+            Items = items,  
+            TotalCount = totalCount,
+            PageNumber = request.PageNumber,
+            PageSize = request.PageSize,
+        },
+    };
+}
 
         /// <summary>Gets paginated assignments where the employee is the assigned SME.</summary>
-        public async Task<ApiResponse<PaginatedResponse<AssignmentResponseModel>>> GetSmeAssignments(
-            int smeEmployeeId,
-            AssignmentRequestModel request
-        )
+       public async Task<ApiResponse<PaginatedResponse<AssignmentResponseModel>>> GetSmeAssignments(
+    int smeEmployeeId,
+    AssignmentRequestModel request
+)
+{
+    Log.Information(
+        "GetSmeAssignments started. SmeEmployeeId={SmeEmployeeId}, StatusFilter={StatusFilter}, SearchTerm={SearchTerm}, SortField={SortField}, SortOrder={SortOrder}, Page={PageNumber}, PageSize={PageSize}",
+        smeEmployeeId, request.StatusFilter ?? "all", request.SearchTerm ?? "none", request.SortField ?? "default", request.SortOrder ?? "default", request.PageNumber, request.PageSize
+    );
+
+    var (items, totalCount) = await _assignmentRepository.GetSmeAssignments(smeEmployeeId, request);
+
+    Log.Debug("GetSmeAssignments: Retrieved {ItemCount} items from repository. TotalCount={TotalCount}", items.Count, totalCount);
+
+    var today = DateTime.Now.Date;
+    Log.Debug("GetSmeAssignments: Current date for overdue calculation: {Today}", today);
+
+    // **ONLY Overdue calculations + logging remain**
+    int overdueCount = 0;
+    foreach (var item in items)
+    {
+        var deadlineDate = item.Deadline?.Date;
+        var isCompleted = item.Status == LnDConstants.ASSIGNMENT_STATUS.COMPLETED;
+        var isOverdue = deadlineDate.HasValue && deadlineDate.Value < today && !isCompleted;
+
+        item.IsOverdue = isOverdue;
+        item.DaysOverdue = isOverdue && deadlineDate.HasValue
+            ? (int)(today - deadlineDate.Value).TotalDays
+            : null;
+
+        if (isOverdue)
         {
-            Log.Information(
-                "GetSmeAssignments started. SmeEmployeeId={SmeEmployeeId}, StatusFilter={StatusFilter}, SearchTerm={SearchTerm}, SortField={SortField}, SortOrder={SortOrder}, Page={PageNumber}, PageSize={PageSize}",
-                smeEmployeeId, request.StatusFilter ?? "all", request.SearchTerm ?? "none", request.SortField ?? "default", request.SortOrder ?? "default", request.PageNumber, request.PageSize
-            );
-
-            var (items, totalCount) = await _assignmentRepository.GetSmeAssignments(
-                smeEmployeeId,
-                request
-            );
-
+            overdueCount++;
             Log.Debug(
-                "GetSmeAssignments: Retrieved {ItemCount} items from repository. TotalCount={TotalCount}",
-                items.Count, totalCount
+                "GetSmeAssignments: Overdue assignment detected. AssignmentId={AssignmentId}, Deadline={Deadline}, DaysOverdue={DaysOverdue}, Status={Status}",
+                item.AssignmentId, deadlineDate, item.DaysOverdue, item.Status
             );
-
-            var today = DateTime.Now.Date;
-            Log.Debug("GetSmeAssignments: Current date for overdue calculation: {Today}", today);
-
-            var assignmentResponseModels = items
-                .Select(a =>
-                {
-                    var deadlineDate = a.Deadline?.Date;
-                    var isCompleted = a.Status == LnDConstants.ASSIGNMENT_STATUS.COMPLETED;
-
-                    var isOverdue = deadlineDate.HasValue
-                        && deadlineDate.Value < today
-                        && !isCompleted;
-
-                    var daysOverdue = isOverdue && deadlineDate.HasValue
-                        ? (int)(today - deadlineDate.Value).TotalDays
-                        : (int?)null;
-
-                    if (isOverdue)
-                    {
-                        Log.Debug(
-                            "GetSmeAssignments: Overdue assignment detected. AssignmentId={AssignmentId}, Deadline={Deadline}, DaysOverdue={DaysOverdue}, Status={Status}",
-                            a.AssignmentId, deadlineDate, daysOverdue, a.Status
-                        );
-                    }    
-
-                    return new AssignmentResponseModel
-                    {
-                        AssignmentId = a.AssignmentId,
-                        MenteeEmployeeId = a.MenteeEmployeeId,
-                        MenteeName = $"{a.MenteeEmployee.Userprofile.FirstName} {a.MenteeEmployee.Userprofile.LastName}",
-                        SmeId = a.SmeId,
-                        SmeEmployeeId = a.Sme.EmployeeId,
-                        SmeName = $"{a.Sme.Employee.Userprofile.FirstName} {a.Sme.Employee.Userprofile.LastName}",
-                        SkillId = a.SkillId,
-                        SkillName = a.Skill.SkillName,
-                        Deadline = a.Deadline,
-                        Status = a.Status,
-                        ProofFilePath = a.ProofFilePath,
-                        CompletionNotes = a.CompletionNotes,
-                        CompletionRating = a.CompletionRating,
-                        CreatedOn = a.CreatedOn,
-                        UpdatedOn = a.UpdatedOn,
-                        IsOverdue = isOverdue,
-                        DaysOverdue = daysOverdue,
-                    };
-                })
-                .ToList();
-
-            Log.Information(
-                "GetSmeAssignments succeeded. SmeEmployeeId={SmeEmployeeId}, ReturnedCount={Count}, TotalCount={TotalCount}, OverdueCount={OverdueCount}",
-                smeEmployeeId,
-                assignmentResponseModels.Count,
-                totalCount,
-                assignmentResponseModels.Count(a => a.IsOverdue)
-            );
-
-            return new ApiResponse<PaginatedResponse<AssignmentResponseModel>>
-            {
-                Success = true,
-                Data = new PaginatedResponse<AssignmentResponseModel>
-                {
-                    Items = assignmentResponseModels,
-                    TotalCount = totalCount,
-                    PageNumber = request.PageNumber,
-                    PageSize = request.PageSize,
-                },
-            };
         }
+    }
+
+    Log.Information(
+        "GetSmeAssignments succeeded. SmeEmployeeId={SmeEmployeeId}, ReturnedCount={Count}, TotalCount={TotalCount}, OverdueCount={OverdueCount}",
+        smeEmployeeId, items.Count, totalCount, overdueCount
+    );
+
+    return new ApiResponse<PaginatedResponse<AssignmentResponseModel>>
+    {
+        Success = true,
+        Data = new PaginatedResponse<AssignmentResponseModel>
+        {
+            Items = items,  // Already AssignmentResponseModel
+            TotalCount = totalCount,
+            PageNumber = request.PageNumber,
+            PageSize = request.PageSize,
+        },
+    };
+}
 
         #endregion
 
@@ -609,7 +523,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 await _assignmentRepository.GetAllTeamAssignmentsForExport(
                     managerId,
                     request
-                ); 
+                );
 
             Log.Debug(
                 "ExportTeamAssignmentsToExcel: Retrieved {Count} assignments for export",

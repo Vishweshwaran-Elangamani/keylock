@@ -173,7 +173,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                             StringComparison.OrdinalIgnoreCase
                         )
                     )
-                    .ToList();  
+                    .ToList();
             }
 
             var totalCount = availableSmesWithCounts.Count;
@@ -192,51 +192,61 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>Gets paginated all active SMEs with employee and department details.</summary>
-        public async Task<(List<Lndsme> Items, int TotalCount)> GetAllActiveSmes(
-            ActiveSmesRequestModel request
-        )
+        public async Task<(List<SmeResponseModel> Items, int TotalCount)> GetAllActiveSmes(
+     ActiveSmesRequestModel request
+ )
         {
             Log.Information(
-                "GetAllActiveSmesAsync called. SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
+                "GetAllActiveSmesAsync started. SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
                 request.SearchTerm ?? "none", request.PageNumber, request.PageSize
             );
 
-            var query = _context
-                .Lndsmes.Where(s => s.IsActive.Value)
+            var query = _context.Lndsmes
                 .Include(s => s.Employee)
                 .ThenInclude(e => e.Userprofile)
                 .Include(s => s.Employee)
                 .ThenInclude(e => e.Employeedetailsmasters)
                 .ThenInclude(ed => ed.Department)
                 .Include(s => s.Skill)
-                .AsQueryable();
+                .Where(s => s.IsActive == true);
 
-            if (!string.IsNullOrEmpty(request.SearchTerm))
+            // Search filter 
+            if (!string.IsNullOrWhiteSpace(request.SearchTerm))
             {
                 var lowerSearchTerm = request.SearchTerm.ToLower();
-
                 query = query.Where(s =>
                     (s.Employee.Userprofile.FirstName + " " + s.Employee.Userprofile.LastName)
-                        .ToLower()
-                        .Contains(lowerSearchTerm)
+                        .ToLower().Contains(lowerSearchTerm)
                     || s.Skill.SkillName.ToLower().Contains(lowerSearchTerm)
-                    || s.Employee.Employeedetailsmasters.Any(edm =>
-                        edm.Department.DepartmentName.ToLower().Contains(lowerSearchTerm)
-                    )
                 );
             }
 
             var totalCount = await query.CountAsync();
-
             var items = await query
-                .OrderBy(s => s.Employee.Userprofile.FirstName)
-                .ThenBy(s => s.Employee.Userprofile.LastName)
                 .Skip((request.PageNumber - 1) * request.PageSize)
                 .Take(request.PageSize)
+                .Select(s => new SmeResponseModel
+                {
+                    SmeId = s.SmeId,
+                    EmployeeId = s.EmployeeId,
+                    EmployeeName = s.Employee.Userprofile.FirstName + " " + s.Employee.Userprofile.LastName,
+                    SkillId = s.SkillId,
+                    SkillName = s.Skill.SkillName,
+                    DepartmentName = s.Employee.Employeedetailsmasters.FirstOrDefault().Department != null
+                        ? s.Employee.Employeedetailsmasters.FirstOrDefault().Department.DepartmentName
+                        : null,
+                    IsActive = s.IsActive ?? false,
+                    ApprovedDate = s.ApprovedOn
+                })
                 .ToListAsync();
 
+            Log.Debug(
+                "GetAllActiveSmesAsync: Retrieved {ItemCount} SMEs. TotalCount={TotalCount}",
+                items.Count, totalCount
+            );
+
             Log.Information(
-                "GetAllActiveSmesAsync completed. ReturnedCount={Count}, TotalCount={TotalCount}",
+                "GetAllActiveSmesAsync succeeded. ReturnedCount={Count}, TotalCount={TotalCount}",
                 items.Count, totalCount
             );
 

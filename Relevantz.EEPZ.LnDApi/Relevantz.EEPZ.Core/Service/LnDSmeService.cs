@@ -240,8 +240,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         /// <summary>Gets paginated list of all active SMEs with department information.</summary>
         public async Task<ApiResponse<PaginatedResponse<SmeResponseModel>>> GetAllActiveSmes(
-            ActiveSmesRequestModel request
-        )
+      ActiveSmesRequestModel request
+  )
         {
             Log.Information(
                 "GetAllActiveSmes started. SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
@@ -250,46 +250,20 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             var (items, totalCount) = await _smeRepository.GetAllActiveSmes(request);
 
-            Log.Debug(
-                "GetAllActiveSmes: Retrieved {ItemCount} SMEs. TotalCount={TotalCount}",
-                items.Count, totalCount
-            );
-
-            var smeDtos = items
-                .Select(s => new SmeResponseModel
-                {
-                    SmeId = s.SmeId,
-                    EmployeeId = s.EmployeeId,
-                    EmployeeName =
-                        $"{s.Employee.Userprofile.FirstName} {s.Employee.Userprofile.LastName}",
-                    SkillId = s.SkillId,
-                    SkillName = s.Skill.SkillName,
-                    DepartmentName = s
-                        .Employee.Employeedetailsmasters.FirstOrDefault()
-                        ?.Department?.DepartmentName,
-                    IsActive = s.IsActive ?? false,
-                    ApprovedDate = s.ApprovedOn,
-                })
-                .ToList();
-
-            Log.Information(
-                "GetAllActiveSmes succeeded. ReturnedCount={Count}, TotalCount={TotalCount}",
-                smeDtos.Count, totalCount
-            );
-
             return new ApiResponse<PaginatedResponse<SmeResponseModel>>
             {
                 Success = true,
                 Message = $"Found {totalCount} active SME(s)",
                 Data = new PaginatedResponse<SmeResponseModel>
                 {
-                    Items = smeDtos,
+                    Items = items,
                     TotalCount = totalCount,
                     PageNumber = request.PageNumber,
                     PageSize = request.PageSize,
                 },
             };
         }
+
 
         #endregion
 

@@ -112,10 +112,10 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         /// Gets paginated approvals assigned to an employee as approver with filtering, sorting, and search.
         /// Returns list of approvals and total count for pagination.
         /// </summary>
-        public async Task<(List<Lndapproval> Items, int TotalCount)> GetMyApprovals(
-            int employeeId,
-            MyApprovalsRequestModel request
-        )
+        public async Task<(List<ApprovalResponseModel> Items, int TotalCount)> GetMyApprovals(
+      int employeeId,
+      MyApprovalsRequestModel request
+  )
         {
             Log.Information(
                 "GetMyApprovalsAsync called. EmployeeId={EmployeeId}, ApprovalType={ApprovalType}, Status={Status}, Page={PageNumber}, PageSize={PageSize}, SearchTerm={SearchTerm}",
@@ -215,6 +215,25 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             var items = await query
                 .Skip((request.PageNumber - 1) * request.PageSize)
                 .Take(request.PageSize)
+                .Select(a => new ApprovalResponseModel
+                {
+                    ApprovalId = a.ApprovalId,
+                    ApprovalType = a.ApprovalType,
+                    AssignmentId = a.AssignmentId,
+                    SkillId = a.SkillId,
+                    SkillName = a.Skill != null ? a.Skill.SkillName : null,
+                    RequesterEmployeeId = a.RequesterEmployeeId,
+                    RequesterName = a.RequesterEmployee.Userprofile.FirstName + " " + a.RequesterEmployee.Userprofile.LastName,
+                    ApproverEmployeeId = a.ApproverEmployeeId,
+                    ApproverName = a.ApproverEmployee != null
+                        ? a.ApproverEmployee.Userprofile.FirstName + " " + a.ApproverEmployee.Userprofile.LastName
+                        : null,
+                    Status = a.Status,
+                    Notes = a.Notes,
+                    RequestedOn = a.RequestedOn,
+                    UpdatedOn = a.UpdatedOn,
+                    AttachmentPath = a.Attachment != null ? a.Attachment.FilePath : null,
+                })
                 .ToListAsync();
 
             Log.Information(
@@ -229,10 +248,10 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         /// Gets complete approval history for an employee as requester or approver with filtering and pagination.
         /// Supports role-based filtering (requester/approver/all) and full-text search.
         /// </summary>
-        public async Task<(List<Lndapproval> Items, int TotalCount)> GetApprovalHistory(
-            int employeeId,
-            ApprovalHistoryRequestModel request
-        )
+        public async Task<(List<ApprovalResponseModel> Items, int TotalCount)> GetApprovalHistory(
+     int employeeId,
+     ApprovalHistoryRequestModel request
+ )
         {
             Log.Information(
                 "GetApprovalHistoryAsync called. EmployeeId={EmployeeId}, Role={Role}, ApprovalType={ApprovalType}, Status={Status}, Page={PageNumber}",
@@ -248,6 +267,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .Include(a => a.Attachment)
                 .AsQueryable();
 
+            // Role-based filtering
             if (!string.IsNullOrEmpty(request.Role) && request.Role.ToLower() != LnDConstants.ROLE_FILTERS.ALL)
             {
                 if (request.Role.ToLower() == LnDConstants.ROLE_FILTERS.REQUESTER)
@@ -261,9 +281,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             }
             else
             {
-                query = query.Where(a =>
-                    a.RequesterEmployeeId == employeeId || a.ApproverEmployeeId == employeeId
-                );
+                query = query.Where(a => a.RequesterEmployeeId == employeeId || a.ApproverEmployeeId == employeeId);
             }
 
             if (!string.IsNullOrEmpty(request.ApprovalType))
@@ -276,27 +294,16 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 query = query.Where(a => a.Status == request.Status);
             }
 
+            // Search filter
             if (!string.IsNullOrEmpty(request.SearchTerm))
             {
                 var lowerSearchTerm = request.SearchTerm.ToLower();
                 query = query.Where(a =>
-                    (
-                        a.RequesterEmployee.Userprofile.FirstName
-                        + " "
-                        + a.RequesterEmployee.Userprofile.LastName
-                    )
-                        .ToLower()
-                        .Contains(lowerSearchTerm)
-                    || (
-                        a.ApproverEmployee != null
-                        && (
-                            a.ApproverEmployee.Userprofile.FirstName
-                            + " "
-                            + a.ApproverEmployee.Userprofile.LastName
-                        )
-                            .ToLower()
-                            .Contains(lowerSearchTerm)
-                    )
+                    (a.RequesterEmployee.Userprofile.FirstName + " " + a.RequesterEmployee.Userprofile.LastName)
+                        .ToLower().Contains(lowerSearchTerm)
+                    || (a.ApproverEmployee != null &&
+                        (a.ApproverEmployee.Userprofile.FirstName + " " + a.ApproverEmployee.Userprofile.LastName)
+                        .ToLower().Contains(lowerSearchTerm))
                     || (a.Skill != null && a.Skill.SkillName.ToLower().Contains(lowerSearchTerm))
                     || (a.Notes != null && a.Notes.ToLower().Contains(lowerSearchTerm))
                     || a.ApprovalType.ToLower().Contains(lowerSearchTerm)
@@ -307,10 +314,28 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             var totalCount = await query.CountAsync();
 
             query = ApplyApprovalSorting(query, request.SortField, request.SortOrder);
-
             var items = await query
                 .Skip((request.PageNumber - 1) * request.PageSize)
                 .Take(request.PageSize)
+                .Select(a => new ApprovalResponseModel
+                {
+                    ApprovalId = a.ApprovalId,
+                    ApprovalType = a.ApprovalType,
+                    AssignmentId = a.AssignmentId,
+                    SkillId = a.SkillId,
+                    SkillName = a.Skill != null ? a.Skill.SkillName : null,
+                    RequesterEmployeeId = a.RequesterEmployeeId,
+                    RequesterName = a.RequesterEmployee.Userprofile.FirstName + " " + a.RequesterEmployee.Userprofile.LastName,
+                    ApproverEmployeeId = a.ApproverEmployeeId,
+                    ApproverName = a.ApproverEmployee != null
+                        ? a.ApproverEmployee.Userprofile.FirstName + " " + a.ApproverEmployee.Userprofile.LastName
+                        : null,
+                    Status = a.Status,
+                    Notes = a.Notes,
+                    RequestedOn = a.RequestedOn,
+                    UpdatedOn = a.UpdatedOn,
+                    AttachmentPath = a.Attachment != null ? a.Attachment.FilePath : null,
+                })
                 .ToListAsync();
 
             Log.Information(

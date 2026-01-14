@@ -25,9 +25,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         #region Employee Management
 
         /// <summary>Gets paginated list of all organization employees with department information.</summary>
-        public async Task<
-            ApiResponse<PaginatedResponse<SubordinateEmployeeResponseModel>>
-        > GetAllOrganizationEmployees(OrganizationEmployeesRequestModel request)
+        public async Task<ApiResponse<PaginatedResponse<SubordinateEmployeeResponseModel>>> GetAllOrganizationEmployees(
+    OrganizationEmployeesRequestModel request
+)
         {
             Log.Information(
                 "GetAllOrganizationEmployees started. SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
@@ -41,21 +41,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 items.Count, totalCount
             );
 
-            var employeeDtos = items
-                .Select(e => new SubordinateEmployeeResponseModel
-                {
-                    EmployeeId = e.EmployeeId,
-                    EmployeeName = $"{e.Userprofile?.FirstName} {e.Userprofile?.LastName}",
-                    Email = e.Userauthentication?.Email,
-                    DepartmentName = e
-                        .Employeedetailsmasters.FirstOrDefault()
-                        ?.Department?.DepartmentName,
-                })
-                .ToList();
-
             var paginatedResponse = new PaginatedResponse<SubordinateEmployeeResponseModel>
             {
-                Items = employeeDtos,
+                Items = items,
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize,
@@ -63,7 +51,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             Log.Information(
                 "GetAllOrganizationEmployees succeeded. ReturnedCount={Count}, TotalCount={TotalCount}",
-                employeeDtos.Count, totalCount
+                items.Count, totalCount
             );
 
             return new ApiResponse<PaginatedResponse<SubordinateEmployeeResponseModel>>

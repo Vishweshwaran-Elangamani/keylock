@@ -9,14 +9,15 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
         Task<Lndapproval?> GetPendingSmeRegistration(int employeeId, int skillId);
         Task<Lndapproval> AddApproval(Lndapproval approval);
         Task UpdateApproval(Lndapproval approval);
-        Task<(List<Lndapproval> Items, int TotalCount)> GetMyApprovals(
-            int employeeId,
-            MyApprovalsRequestModel request
-        );
-        Task<(List<Lndapproval> Items, int TotalCount)> GetApprovalHistory(
-            int employeeId,
-            ApprovalHistoryRequestModel request
-        );
+        Task<(List<ApprovalResponseModel> Items, int TotalCount)> GetMyApprovals(
+    int employeeId,
+    MyApprovalsRequestModel request
+);
+
+        Task<(List<ApprovalResponseModel> Items, int TotalCount)> GetApprovalHistory(
+       int employeeId,
+       ApprovalHistoryRequestModel request
+   );
         Task<Lndapproval?> GetPendingAssignmentApproval(int assignmentId, string approvalType);
         Task<Lndattachment> AddAttachment(Lndattachment attachment);
         Task<Lndattachment?> GetAttachmentById(int attachmentId);

@@ -134,11 +134,11 @@ namespace Relevantz.EEPZ.Common.DTOs
     /// </summary>
     public class ExportOrganizationAssignmentsRequestModel
     {
-        public string? StatusFilter { get; set; }
+        public string? StatusFilter { get; set; }   
         public string? SearchTerm { get; set; }
         public string? SortField { get; set; }
-        public string? SortOrder { get; set; }
-    }
+        public string? SortOrder { get; set; }    
+    }   
 
     /// <summary>
     /// Request model for organization employees with pagination
@@ -149,8 +149,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 9;
         public string ExcludeDepartment { get; set; }
-    }
-
+    }         
     /// <summary>
     /// Request model for employee skills by ID
     /// </summary>

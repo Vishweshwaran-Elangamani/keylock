@@ -5,9 +5,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
 {
     public interface ILnDHRRepository
     {
-        Task<(List<Employee> Items, int TotalCount)> GetAllOrganizationEmployees(
-            OrganizationEmployeesRequestModel request
-        );
+       Task<(List<SubordinateEmployeeResponseModel> Items, int TotalCount)> GetAllOrganizationEmployees(
+        OrganizationEmployeesRequestModel request
+    );
         Task<(List<Lndassignment> Items, int TotalCount)> GetAllOrganizationAssignments(
             OrganizationAssignmentsRequestModel request
         );

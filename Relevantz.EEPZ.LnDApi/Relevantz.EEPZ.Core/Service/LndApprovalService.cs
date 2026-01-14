@@ -8,7 +8,7 @@ using Serilog;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
-    public class LnDApprovalService : ILnDApprovalService 
+    public class LnDApprovalService : ILnDApprovalService
     {
         private readonly ILnDApprovalRepository _approvalRepository;
         private readonly ILnDSmeRepository _smeRepository;
@@ -41,61 +41,36 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         /// Gets approvals assigned to the specified employee as approver, with filtering, sorting and pagination.
         /// </summary>
         public async Task<ApiResponse<PaginatedResponse<ApprovalResponseModel>>> GetMyApprovals(
-            int employeeId,
-            MyApprovalsRequestModel request
-        )
+      int employeeId,
+      MyApprovalsRequestModel request
+  )
         {
             Log.Information(
                 "GetMyApprovals started. EmployeeId={EmployeeId}, ApprovalType={ApprovalType}, Status={Status}, Page={PageNumber}, PageSize={PageSize}, SearchTerm={SearchTerm}",
                 employeeId, request.ApprovalType ?? "all", request.Status ?? "all", request.PageNumber, request.PageSize, request.SearchTerm
             );
-            // Getting the approvals with the count for a particular employee
+
             var (items, totalCount) = await _approvalRepository.GetMyApprovals(
                 employeeId,
                 request
             );
-      
-            Log.Debug("GetMyApprovals fetched {ItemCount} items, TotalCount={TotalCount}", items.Count, totalCount);
 
-            var approvalResponseModels = items
-                .Select(a => new ApprovalResponseModel
-                {
-                    ApprovalId = a.ApprovalId,
-                    ApprovalType = a.ApprovalType,
-                    AssignmentId = a.AssignmentId,
-                    SkillId = a.SkillId,
-                    SkillName = a.Skill?.SkillName,
-                    RequesterEmployeeId = a.RequesterEmployeeId,
-                    RequesterName =
-                        $"{a.RequesterEmployee.Userprofile.FirstName} {a.RequesterEmployee.Userprofile.LastName}",
-                    ApproverEmployeeId = a.ApproverEmployeeId,
-                    ApproverName =
-                        a.ApproverEmployee != null
-                            ? $"{a.ApproverEmployee.Userprofile.FirstName} {a.ApproverEmployee.Userprofile.LastName}"
-                            : null,
-                    Status = a.Status,
-                    Notes = a.Notes,
-                    RequestedOn = a.RequestedOn,
-                    UpdatedOn = a.UpdatedOn,
-                    AttachmentPath = a.Attachment?.FilePath,
-                })
-                .ToList();
-            
             Log.Information("GetMyApprovals succeeded for EmployeeId={EmployeeId}. Returned={Returned}, Total={Total}",
-                employeeId, approvalResponseModels.Count, totalCount);
+                employeeId, items.Count, totalCount);
 
             return new ApiResponse<PaginatedResponse<ApprovalResponseModel>>
             {
                 Success = true,
                 Data = new PaginatedResponse<ApprovalResponseModel>
                 {
-                    Items = approvalResponseModels,
+                    Items = items,
                     TotalCount = totalCount,
                     PageNumber = request.PageNumber,
                     PageSize = request.PageSize,
                 },
             };
         }
+
 
         /// <summary>
         /// Processes an approval decision (approve or reject) and applies the corresponding business workflow.
@@ -148,7 +123,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             Log.Debug(
                 "ProcessApproval: Status updated. ApprovalId={ApprovalId}, NewStatus={NewStatus}",
-                request.ApprovalId, approval.Status 
+                request.ApprovalId, approval.Status
             );
 
             if (request.IsApproved)
@@ -339,9 +314,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         /// Gets complete approval history for the specified employee, with optional role, type, status and search filters.
         /// </summary>
         public async Task<ApiResponse<PaginatedResponse<ApprovalResponseModel>>> GetApprovalHistory(
-            int employeeId,
-            ApprovalHistoryRequestModel request
-        )
+     int employeeId,
+     ApprovalHistoryRequestModel request
+ )
         {
             Log.Information(
                 "GetApprovalHistory started. EmployeeId={EmployeeId}, Role={Role}, ApprovalType={ApprovalType}, Status={Status}, Page={PageNumber}, PageSize={PageSize}",
@@ -349,59 +324,22 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
 
             var pageSize = request.PageSize;
-            if (pageSize < 1)
-                pageSize = 10;
-            if (pageSize > 100)
-                pageSize = 100;
+            if (pageSize < 1) pageSize = 10;
+            if (pageSize > 100) pageSize = 100;
 
-            var (items, totalCount) = await _approvalRepository.GetApprovalHistory(
-                employeeId,
-                request
-            );
-
-            Log.Debug(
-                "GetApprovalHistory fetched {ItemCount} items, TotalCount={TotalCount}",
-                items.Count,
-                totalCount
-            );
-
-            var approvalResponseModels = items
-                .Select(a => new ApprovalResponseModel
-                {
-                    ApprovalId = a.ApprovalId,
-                    ApprovalType = a.ApprovalType,
-                    AssignmentId = a.AssignmentId,
-                    SkillId = a.SkillId,
-                    SkillName = a.Skill?.SkillName,
-                    RequesterEmployeeId = a.RequesterEmployeeId,
-                    RequesterName =
-                        $"{a.RequesterEmployee.Userprofile.FirstName} {a.RequesterEmployee.Userprofile.LastName}",
-                    ApproverEmployeeId = a.ApproverEmployeeId,
-                    ApproverName =
-                        a.ApproverEmployee != null
-                            ? $"{a.ApproverEmployee.Userprofile.FirstName} {a.ApproverEmployee.Userprofile.LastName}"
-                            : null,
-                    Status = a.Status,
-                    Notes = a.Notes,
-                    RequestedOn = a.RequestedOn,
-                    UpdatedOn = a.UpdatedOn,
-                    AttachmentPath = a.Attachment?.FilePath,
-                })
-                .ToList();
+            var (items, totalCount) = await _approvalRepository.GetApprovalHistory(employeeId, request);
 
             Log.Information(
                 "GetApprovalHistory succeeded for EmployeeId={EmployeeId}. Returned={Returned}, Total={Total}",
-                employeeId,
-                approvalResponseModels.Count,
-                totalCount
+                employeeId, items.Count, totalCount
             );
 
             return new ApiResponse<PaginatedResponse<ApprovalResponseModel>>
             {
-                Success = true, 
+                Success = true,
                 Data = new PaginatedResponse<ApprovalResponseModel>
                 {
-                    Items = approvalResponseModels,
+                    Items = items,
                     TotalCount = totalCount,
                     PageNumber = request.PageNumber,
                     PageSize = pageSize,
@@ -452,7 +390,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     Message = "You do not have access to this approval",
                 };
             }
-           // Geeting the approval details as response
+            // Geeting the approval details as response
             var details = new ApprovalDetailsResponseModel
             {
                 ApprovalId = approval.ApprovalId,
@@ -488,7 +426,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     approval.RequesterEmployeeId == employeeId ? LnDConstants.ROLE_FILTERS.REQUESTER : LnDConstants.ROLE_FILTERS.APPROVER,
                 CanDownloadAttachment = approval.Attachment != null,
             };
-             // Mapping the assignment details with approval
+            // Mapping the assignment details with approval
             if (approval.AssignmentId.HasValue && approval.Assignment != null)
             {
                 details.Assignment = new AssignmentDetailsResponseModel
@@ -514,7 +452,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
 
             return new ApiResponse<ApprovalDetailsResponseModel> { Success = true, Data = details };
-        }  
+        }
 
         /// <summary>
         /// Downloads the attachment associated with an approval, after validating access for the employee.
@@ -587,7 +525,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     FileSize = approval.Attachment.FileSize ?? 0,
                 },
             };
-        } 
+        }
 
         /// <summary>
         /// Downloads the proof document of an assignment, enforcing mentee, SME, or manager access control.
@@ -691,7 +629,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     "PreviewApprovalAttachment: Approval not found or access denied. ApprovalId={ApprovalId}, EmployeeId={EmployeeId}",
                     approvalId,
                     employeeId
-                );      
+                );
 
                 return new ApiResponse<FileDownloadResponseModel>
                 {
@@ -811,7 +749,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 },
             };
         }
-  
+
         #endregion
     }
 }

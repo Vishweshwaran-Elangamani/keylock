@@ -6,7 +6,7 @@ using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
-namespace Relevantz.EEPZ.Api.Controllers.Goals
+namespace Relevantz.EEPZ.Api.Controllers.Goals 
 {
     public class GoalProgressController : BaseGoalController
     {
@@ -21,7 +21,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             : base(baseService, logger)
         {
             _service = service;
-            _baseService = baseService;
+            _baseService = baseService; 
         }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Get team goal progress for manager (aggregated from subordinates)
         /// </summary>
-        [HttpGet("api/goal-progress/{goalId:int}/team")]
+        [HttpGet("api/goal-progress/{goalId:int}/team")] 
         [Authorize(
             Roles = $"{USER_ROLE.EMPLOYEE},{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD},{USER_ROLE.LEADERSHIP}"
         )]
@@ -188,9 +188,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
 
                 var response = ApiResponseModel<object>.SuccessResponse(
                     ResponseMessages.Codes.PROGRESS_CALCULATED_SUCCESS,
-                    new { cascadingProgress = progress },
-                    new { GoalId = goalId, UserId = userId }
-                );
+                    new { cascadingProgress = progress }, 
+                    new { GoalId = goalId, UserId = userId } 
+                ); 
 
                 return Ok(response);
             }
@@ -213,7 +213,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Get detailed hierarchical progress breakdown
         /// </summary>
-        [HttpGet("api/goal-progress/{goalId:int}/hierarchy")]
+        [HttpGet("api/goal-progress/{goalId:int}/hierarchy")] 
         public async Task<IActionResult> GetProgressHierarchy(int goalId)
         {
             try
@@ -245,5 +245,15 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                 return StatusCode(500, response);
             }
         }
-    }
+    }                                                                            
 }
+
+
+
+
+
+
+
+
+
+
