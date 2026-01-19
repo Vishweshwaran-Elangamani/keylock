@@ -32,9 +32,9 @@ const departmentService = {
       throw error.response?.data || error.message;
     }
   },
-  deleteDepartment: async (departmentId) => {
+  deleteDepartment: async (Id) => {
     try {
-      const response = await api.delete(`/RoleDepartmentManagement/department/${departmentId}`);
+      const response = await api.delete(`/RoleDepartmentManagement/department/${Id}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;

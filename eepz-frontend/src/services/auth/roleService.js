@@ -32,9 +32,9 @@ const roleService = {
       throw error.response?.data || error.message;
     }
   },
-  deleteRole: async (roleId) => {
+  deleteRole: async (Id) => {
     try {
-      const response = await api.delete(`/RoleDepartmentManagement/role/${roleId}`);
+      const response = await api.delete(`/RoleDepartmentManagement/role/${Id}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
