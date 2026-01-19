@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.DTOs;
 
 namespace eepzbackend.Controllers
@@ -12,81 +13,86 @@ namespace eepzbackend.Controllers
         /// Update the status of an action item
         /// </summary>
         [HttpPatch("action-items/{actionItemId}/status")]
-        public async Task<ActionResult> UpdateActionItemStatus(int actionItemId, [FromBody] string status)
+        public async Task<ActionResult<ApiResponse<object>>> UpdateActionItemStatus(
+            int actionItemId,
+            [FromBody] string status)
         {
-            try
-            {
-                var employeeId = GetEmployeeIdFromClaims();
+            var correlationId = HttpContext.TraceIdentifier;
 
-                var result = await _momService.UpdateActionItemStatusAsync(actionItemId, status, employeeId);
+            var employeeId = GetEmployeeIdFromClaims();
 
-                if (!result)
-                    return NotFound(new { success = false, message = "Action item not found" });
+            var result = await _momService.UpdateActionItemStatusAsync(actionItemId, status, employeeId);
 
-                return Ok(new { success = true, message = "Action item status updated successfully" });
-            }
-            catch (UnauthorizedAccessException ex)
+            Response.Headers.Add("X-Correlation-Id", correlationId);
+
+            if (!result)
             {
-                return StatusCode(403, new { success = false, message = ex.Message });
+                return NotFound(ApiResponse<object>.ErrorResponse(
+                    AppConstants.ExceptionMessages.ActionItemNotFound,
+                    correlationId));
             }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
+
+            return Ok(ApiResponse<object>.SuccessResponse(
+                null,
+                AppConstants.ResponseMessages.ActionItemUpdatedSuccessfully,
+                correlationId));
         }
 
         /// <summary>
         /// Get action items assigned to the current user
         /// </summary>
         [HttpGet("action-items/my-tasks")]
-        public async Task<ActionResult<List<ActionItemResponseDto>>> GetMyActionItems()
+        public async Task<ActionResult<ApiResponse<List<ActionItemResponseDto>>>> GetMyActionItems()
         {
-            try
-            {
-                var employeeId = GetEmployeeIdFromClaims();
-                var result = await _momService.GetMyActionItemsAsync(employeeId);
-                return Ok(new { success = true, data = result });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
+            var correlationId = HttpContext.TraceIdentifier;
+
+            var employeeId = GetEmployeeIdFromClaims();
+            var result = await _momService.GetMyActionItemsAsync(employeeId);
+
+            Response.Headers.Add("X-Correlation-Id", correlationId);
+
+            return Ok(ApiResponse<List<ActionItemResponseDto>>.SuccessResponse(
+                result,
+                AppConstants.ResponseMessages.ActionItemsRetrievedSuccessfully,
+                correlationId));
         }
 
         /// <summary>
         /// Get action items assigned by the current user
         /// </summary>
         [HttpGet("action-items/assigned-by-me")]
-        public async Task<ActionResult<List<ActionItemResponseDto>>> GetActionItemsAssignedByMe()
+        public async Task<ActionResult<ApiResponse<List<ActionItemResponseDto>>>> GetActionItemsAssignedByMe()
         {
-            try
-            {
-                var employeeId = GetEmployeeIdFromClaims();
-                var result = await _momService.GetActionItemsAssignedByMeAsync(employeeId);
-                return Ok(new { success = true, data = result });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
+            var correlationId = HttpContext.TraceIdentifier;
+
+            var employeeId = GetEmployeeIdFromClaims();
+            var result = await _momService.GetActionItemsAssignedByMeAsync(employeeId);
+
+            Response.Headers.Add("X-Correlation-Id", correlationId);
+
+            return Ok(ApiResponse<List<ActionItemResponseDto>>.SuccessResponse(
+                result,
+                AppConstants.ResponseMessages.ActionItemsRetrievedSuccessfully,
+                correlationId));
         }
 
         /// <summary>
         /// Get overdue action items for the current user
         /// </summary>
         [HttpGet("action-items/overdue")]
-        public async Task<ActionResult<List<ActionItemResponseDto>>> GetOverdueActionItems()
+        public async Task<ActionResult<ApiResponse<List<ActionItemResponseDto>>>> GetOverdueActionItems()
         {
-            try
-            {
-                var employeeId = GetEmployeeIdFromClaims();
-                var result = await _momService.GetOverdueActionItemsAsync(employeeId);
-                return Ok(new { success = true, data = result });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
+            var correlationId = HttpContext.TraceIdentifier;
+
+            var employeeId = GetEmployeeIdFromClaims();
+            var result = await _momService.GetOverdueActionItemsAsync(employeeId);
+
+            Response.Headers.Add("X-Correlation-Id", correlationId);
+
+            return Ok(ApiResponse<List<ActionItemResponseDto>>.SuccessResponse(
+                result,
+                AppConstants.ResponseMessages.ActionItemsRetrievedSuccessfully,
+                correlationId));
         }
     }
 }

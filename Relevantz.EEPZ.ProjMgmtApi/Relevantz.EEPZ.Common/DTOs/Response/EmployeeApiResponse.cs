@@ -8,7 +8,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public T? Data { get; set; }
         public List<string>? Errors { get; set; }
 
-        public static EmployeeApiResponse<T> SuccessResponse(T data, string code, string message = "Operation successful")
+        public static EmployeeApiResponse<T> SuccessResponse(T data, string code, string message)
         {
             return new EmployeeApiResponse<T>
             {

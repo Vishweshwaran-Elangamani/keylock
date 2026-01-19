@@ -1,14 +1,16 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Core.Services.Interfaces;
+using System.Security.Claims;
 
 namespace eepzbackend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
+    [Produces("application/json")]
     public partial class MomController : ControllerBase
     {
         private readonly IMomService _momService;
@@ -22,137 +24,150 @@ namespace eepzbackend.Controllers
         /// Create a new MOM
         /// </summary>
         [HttpPost("create")]
-        public async Task<ActionResult<MomResponseDto>> CreateMom([FromBody] CreateMomDto createMomDto)
+        public async Task<ActionResult<ApiResponse<MomResponseDto>>> CreateMom([FromBody] CreateMomDto createMomDto)
         {
-            try
-            {
-                var employeeId = GetEmployeeIdFromClaims();
-                var role = GetRoleFromClaims();
+            var correlationId = HttpContext.TraceIdentifier;
 
-                var result = await _momService.CreateMomAsync(createMomDto, employeeId, role);
-                return Ok(new { success = true, message = "MOM created successfully", data = result });
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return StatusCode(403, new { success = false, message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
+            var employeeId = GetEmployeeIdFromClaims();
+            var role = GetRoleFromClaims();
+
+            var result = await _momService.CreateMomAsync(createMomDto, employeeId, role);
+
+            Response.Headers.Add("X-Correlation-Id", correlationId);
+
+            return Ok(ApiResponse<MomResponseDto>.SuccessResponse(
+                result,
+                AppConstants.ResponseMessages.MomCreatedSuccessfully,
+                correlationId));
         }
 
         /// <summary>
         /// Update an existing MOM
         /// </summary>
         [HttpPut("update")]
-        public async Task<ActionResult<MomResponseDto>> UpdateMom([FromBody] UpdateMomDto updateMomDto)
+        public async Task<ActionResult<ApiResponse<MomResponseDto>>> UpdateMom([FromBody] UpdateMomDto updateMomDto)
         {
-            try
-            {
-                var employeeId = GetEmployeeIdFromClaims();
-                var role = GetRoleFromClaims();
+            var correlationId = HttpContext.TraceIdentifier;
 
-                var result = await _momService.UpdateMomAsync(updateMomDto, employeeId, role);
-                return Ok(new { success = true, message = "MOM updated successfully", data = result });
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return StatusCode(403, new { success = false, message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
+            var employeeId = GetEmployeeIdFromClaims();
+            var role = GetRoleFromClaims();
+
+            var result = await _momService.UpdateMomAsync(updateMomDto, employeeId, role);
+
+            Response.Headers.Add("X-Correlation-Id", correlationId);
+
+            return Ok(ApiResponse<MomResponseDto>.SuccessResponse(
+                result,
+                AppConstants.ResponseMessages.MomUpdatedSuccessfully,
+                correlationId));
         }
 
         /// <summary>
         /// Get MOMs submitted by the current user
         /// </summary>
         [HttpGet("my-moms")]
-        [Authorize(Roles = "Manager,Employee")]
-        public async Task<ActionResult<List<MomResponseDto>>> GetMyMoms()
+        [Authorize(Roles = AppConstants.Roles.Manager + "," + AppConstants.Roles.Employee)]
+        public async Task<ActionResult<ApiResponse<List<MomResponseDto>>>> GetMyMoms()
         {
-            try
-            {
-                var employeeId = GetEmployeeIdFromClaims();
-                var result = await _momService.GetMomsSubmittedByEmployeeAsync(employeeId);
-                return Ok(new { success = true, data = result });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
+            var correlationId = HttpContext.TraceIdentifier;
+
+            var employeeId = GetEmployeeIdFromClaims();
+            var result = await _momService.GetMomsSubmittedByEmployeeAsync(employeeId);
+
+            Response.Headers.Add("X-Correlation-Id", correlationId);
+
+            return Ok(ApiResponse<List<MomResponseDto>>.SuccessResponse(
+                result,
+                AppConstants.ResponseMessages.MomsRetrievedSuccessfully,
+                correlationId));
         }
 
         /// <summary>
         /// Get a specific MOM by ID
         /// </summary>
-        [HttpGet("{momId}")]
-        public async Task<ActionResult<MomResponseDto>> GetMomById(int momId)
+        [HttpGet("{momId:int}")]
+        public async Task<ActionResult<ApiResponse<MomResponseDto>>> GetMomById(int momId)
         {
-            try
-            {
-                var result = await _momService.GetMomByIdAsync(momId);
-                if (result == null)
-                    return NotFound(new { success = false, message = "MOM not found" });
+            var correlationId = HttpContext.TraceIdentifier;
 
-                return Ok(new { success = true, data = result });
-            }
-            catch (Exception ex)
+            if (momId <= 0)
             {
-                return BadRequest(new { success = false, message = ex.Message });
+                return BadRequest(ApiResponse<MomResponseDto>.ErrorResponse(
+                    AppConstants.ExceptionMessages.InvalidArgument,
+                    correlationId));
             }
+
+            var result = await _momService.GetMomByIdAsync(momId);
+
+            if (result == null)
+            {
+                return NotFound(ApiResponse<MomResponseDto>.ErrorResponse(
+                    AppConstants.ExceptionMessages.MomNotFound,
+                    correlationId));
+            }
+
+            Response.Headers.Add("X-Correlation-Id", correlationId);
+
+            return Ok(ApiResponse<MomResponseDto>.SuccessResponse(
+                result,
+                AppConstants.ResponseMessages.MomRetrievedSuccessfully,
+                correlationId));
         }
 
         /// <summary>
         /// Delete a MOM
         /// </summary>
-        [HttpDelete("{momId}")]
-        public async Task<ActionResult> DeleteMom(int momId)
+        [HttpDelete("{momId:int}")]
+        public async Task<ActionResult<ApiResponse<object>>> DeleteMom(int momId)
         {
-            try
-            {
-                var employeeId = GetEmployeeIdFromClaims();
-                var role = GetRoleFromClaims();
+            var correlationId = HttpContext.TraceIdentifier;
 
-                var result = await _momService.DeleteMomAsync(momId, employeeId, role);
-
-                if (!result)
-                    return NotFound(new { success = false, message = "MOM not found" });
-
-                return Ok(new { success = true, message = "MOM deleted successfully" });
-            }
-            catch (UnauthorizedAccessException ex)
+            if (momId <= 0)
             {
-                return StatusCode(403, new { success = false, message = ex.Message });
+                return BadRequest(ApiResponse<object>.ErrorResponse(
+                    AppConstants.ExceptionMessages.InvalidArgument,
+                    correlationId));
             }
-            catch (Exception ex)
+
+            var employeeId = GetEmployeeIdFromClaims();
+            var role = GetRoleFromClaims();
+
+            var result = await _momService.DeleteMomAsync(momId, employeeId, role);
+
+            if (!result)
             {
-                return BadRequest(new { success = false, message = ex.Message });
+                return NotFound(ApiResponse<object>.ErrorResponse(
+                    AppConstants.ExceptionMessages.MomNotFound,
+                    correlationId));
             }
+
+            Response.Headers.Add("X-Correlation-Id", correlationId);
+
+            return Ok(ApiResponse<object>.SuccessResponse(
+                null,
+                AppConstants.ResponseMessages.MomDeletedSuccessfully,
+                correlationId));
         }
+
+        #region Private Helper Methods
 
         /// <summary>
         /// Extract employee ID from JWT claims
         /// </summary>
         private int GetEmployeeIdFromClaims()
         {
-            var employeeIdClaim = User.FindFirst("empId");
+            var employeeIdClaim = User.FindFirst(AppConstants.ClaimTypes.EmployeeId);
 
             if (employeeIdClaim != null && int.TryParse(employeeIdClaim.Value, out int employeeId))
-            {
                 return employeeId;
-            }
 
-            var subClaim = User.FindFirst("sub") ?? User.FindFirst(ClaimTypes.NameIdentifier);
+            var subClaim = User.FindFirst(AppConstants.ClaimTypes.Sub) ??
+                           User.FindFirst(ClaimTypes.NameIdentifier);
 
             if (subClaim != null && int.TryParse(subClaim.Value, out int subId))
-            {
                 return subId;
-            }
 
-            throw new UnauthorizedAccessException("Employee ID not found in token");
+            throw new UnauthorizedAccessException(AppConstants.ExceptionMessages.UserIdNotFoundInToken);
         }
 
         /// <summary>
@@ -160,22 +175,14 @@ namespace eepzbackend.Controllers
         /// </summary>
         private string GetRoleFromClaims()
         {
-            var roleClaim = User.FindFirst("http://schemas.microsoft.com/ws/2008/06/identity/claims/role");
+            var roleClaim =
+                User.FindFirst(AppConstants.ClaimTypes.MsRoleSchema) ??
+                User.FindFirst(ClaimTypes.Role) ??
+                User.FindFirst(AppConstants.ClaimTypes.Role);
 
-            if (roleClaim != null)
-                return roleClaim.Value;
-
-            roleClaim = User.FindFirst(ClaimTypes.Role);
-
-            if (roleClaim != null)
-                return roleClaim.Value;
-
-            roleClaim = User.FindFirst("role");
-
-            if (roleClaim != null)
-                return roleClaim.Value;
-
-            return "Employee";
+            return roleClaim?.Value ?? AppConstants.Roles.Employee;
         }
+
+        #endregion
     }
 }

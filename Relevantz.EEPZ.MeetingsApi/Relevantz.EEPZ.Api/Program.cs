@@ -169,12 +169,12 @@ Log.Information(
 
 try
 {
-    Log.Information("MoM Application started successfully");
+    Log.Information("Meetings API started successfully");
     app.Run();
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "MoM Application terminated unexpectedly");
+    Log.Fatal(ex, "Meetings API terminated unexpectedly");
 }
 finally
 {

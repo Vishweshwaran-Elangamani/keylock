@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.DTOs;
 
 namespace eepzbackend.Controllers
@@ -13,8 +14,8 @@ namespace eepzbackend.Controllers
         /// Get all MOMs with filtering and pagination (HR only)
         /// </summary>
         [HttpGet("all-moms")]
-        // [Authorize(Roles = "HR")]
-        public async Task<ActionResult<PaginatedMomResponseDto>> GetAllMomsForHR(
+        [Authorize(Roles = AppConstants.Roles.HR)]
+        public async Task<ActionResult<ApiResponse<PaginatedMomResponseDto>>> GetAllMomsForHR(
             [FromQuery] string? searchTerm = null,
             [FromQuery] string? meetingType = null,
             [FromQuery] int? departmentId = null,
@@ -23,32 +24,42 @@ namespace eepzbackend.Controllers
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 20)
         {
-            try
-            {
-                var employeeId = GetEmployeeIdFromClaims();
-                var role = GetRoleFromClaims();
+            var correlationId = HttpContext.TraceIdentifier;
 
-                var result = await _momService.GetAllMomsForHRAsync(
-                    employeeId,
-                    role,
-                    searchTerm,
-                    meetingType,
-                    departmentId,
-                    startDate,
-                    endDate,
-                    pageNumber,
-                    pageSize);
+            if (pageNumber < 1 || pageSize < 1 || pageSize > 100)
+            {
+                return BadRequest(ApiResponse<PaginatedMomResponseDto>.ErrorResponse(
+                    AppConstants.ExceptionMessages.InvalidPagination,
+                    correlationId));
+            }
 
-                return Ok(new { success = true, data = result });
-            }
-            catch (UnauthorizedAccessException ex)
+            if (startDate.HasValue && endDate.HasValue && startDate.Value.Date > endDate.Value.Date)
             {
-                return StatusCode(403, new { success = false, message = ex.Message });
+                return BadRequest(ApiResponse<PaginatedMomResponseDto>.ErrorResponse(
+                    AppConstants.ExceptionMessages.InvalidDateRange,
+                    correlationId));
             }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
+
+            var employeeId = GetEmployeeIdFromClaims();
+            var role = GetRoleFromClaims();
+
+            var result = await _momService.GetAllMomsForHRAsync(
+                employeeId,
+                role,
+                searchTerm,
+                meetingType,
+                departmentId,
+                startDate,
+                endDate,
+                pageNumber,
+                pageSize);
+
+            Response.Headers.Add("X-Correlation-Id", correlationId);
+
+            return Ok(ApiResponse<PaginatedMomResponseDto>.SuccessResponse(
+                result,
+                AppConstants.ResponseMessages.MomsRetrievedSuccessfully,
+                correlationId));
         }
     }
 }

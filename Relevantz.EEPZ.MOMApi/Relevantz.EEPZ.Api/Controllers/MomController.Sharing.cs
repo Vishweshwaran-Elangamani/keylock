@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.DTOs;
 
 namespace eepzbackend.Controllers
@@ -12,54 +13,57 @@ namespace eepzbackend.Controllers
         /// Share a MOM with other employees
         /// </summary>
         [HttpPost("share")]
-        public async Task<ActionResult<List<MomSharingResponseDto>>> ShareMom([FromBody] ShareMomDto shareMomDto)
+        public async Task<ActionResult<ApiResponse<List<MomSharingResponseDto>>>> ShareMom([FromBody] ShareMomDto shareMomDto)
         {
-            try
-            {
-                var employeeId = GetEmployeeIdFromClaims();
-                var result = await _momService.ShareMomAsync(shareMomDto, employeeId);
-                return Ok(new { success = true, message = "MOM shared successfully", data = result });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
+            var correlationId = HttpContext.TraceIdentifier;
+
+            var employeeId = GetEmployeeIdFromClaims();
+            var result = await _momService.ShareMomAsync(shareMomDto, employeeId);
+
+            Response.Headers.Add("X-Correlation-Id", correlationId);
+
+            return Ok(ApiResponse<List<MomSharingResponseDto>>.SuccessResponse(
+                result,
+                AppConstants.ResponseMessages.MomSharedSuccessfully,
+                correlationId));
         }
 
         /// <summary>
         /// Get MOMs shared by the current user
         /// </summary>
         [HttpGet("shared-by-me")]
-        public async Task<ActionResult<List<MomSharingResponseDto>>> GetMomsSharedByMe()
+        public async Task<ActionResult<ApiResponse<List<MomSharingResponseDto>>>> GetMomsSharedByMe()
         {
-            try
-            {
-                var employeeId = GetEmployeeIdFromClaims();
-                var result = await _momService.GetMomsSharedByEmployeeAsync(employeeId);
-                return Ok(new { success = true, data = result });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
+            var correlationId = HttpContext.TraceIdentifier;
+
+            var employeeId = GetEmployeeIdFromClaims();
+            var result = await _momService.GetMomsSharedByEmployeeAsync(employeeId);
+
+            Response.Headers.Add("X-Correlation-Id", correlationId);
+
+            return Ok(ApiResponse<List<MomSharingResponseDto>>.SuccessResponse(
+                result,
+                AppConstants.ResponseMessages.SharedMomsRetrievedSuccessfully,
+                correlationId));
         }
 
         /// <summary>
         /// Get MOMs shared with the current user
         /// </summary>
         [HttpGet("shared-with-me")]
-        public async Task<ActionResult<List<MomResponseDto>>> GetMomsSharedWithMe()
+        public async Task<ActionResult<ApiResponse<List<MomResponseDto>>>> GetMomsSharedWithMe()
         {
-            try
-            {
-                var employeeId = GetEmployeeIdFromClaims();
-                var result = await _momService.GetMomsSharedWithEmployeeAsync(employeeId);
-                return Ok(new { success = true, data = result });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
+            var correlationId = HttpContext.TraceIdentifier;
+
+            var employeeId = GetEmployeeIdFromClaims();
+            var result = await _momService.GetMomsSharedWithEmployeeAsync(employeeId);
+
+            Response.Headers.Add("X-Correlation-Id", correlationId);
+
+            return Ok(ApiResponse<List<MomResponseDto>>.SuccessResponse(
+                result,
+                AppConstants.ResponseMessages.SharedMomsRetrievedSuccessfully,
+                correlationId));
         }
     }
 }

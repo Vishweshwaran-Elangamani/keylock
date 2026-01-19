@@ -37,7 +37,7 @@ namespace Relevantz.EEPZ.Common.Constants
         {
             public const string Employee = "Employee";
             public const string Manager = "Manager";
-            public const string Admin = "Admin";  // Added Admin role for future use
+            public const string Admin = "Admin"; 
         }
 
         public static class ClaimTypes
@@ -45,7 +45,7 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string Role = "role";
             public const string Sub = "sub";
             public const string MsRoleSchema = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role";
-            public const string EmployeeId = "empId"; // Added for retrieving EmployeeId from claims
+            public const string EmployeeId = "empId";
         }
 
         public static class ValidationMessages
@@ -55,6 +55,6 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string InvalidEmail = "Invalid email format";
         }
 
-        // Additional Constants can be added as needed...
+        
     }
 }
