@@ -2,988 +2,1189 @@
    NAVBAR - PROFESSIONAL DESIGN (NBD SCOPED)
    ============================================ */
 
-   .nbd-navbar {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    background: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    height: 74px;
+.nbd-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  height: 74px;
+}
+
+.nbd-navbar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  height: 100%;
+  max-width: 1920px;
+  margin: 0 auto;
+}
+
+/* ============================================
+   LEFT SECTION - WELCOME MESSAGE
+   ============================================ */
+.nbd-navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.nbd-welcome-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.nbd-welcome-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nbd-welcome-icon {
+  font-size: 18px;
+  color: #97247e;
+  flex-shrink: 0;
+}
+
+.nbd-welcome-text {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #97247e;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.nbd-welcome-date {
+  color: #6c757d;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  padding-left: 26px;
+}
+
+/* ============================================
+   RIGHT SECTION - ACTIONS
+   ============================================ */
+.nbd-navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* ============================================
+   MOBILE/DESKTOP VISIBILITY CONTROLS
+   ============================================ */
+.nbd-mobile-only {
+  display: none;
+}
+
+.nbd-desktop-only {
+  display: flex;
+}
+
+/* ============================================
+   INDIVIDUAL CONGRATULATIONS CARD (1-2 AWARDS)
+   ============================================ */
+.nbd-congrats-card {
+  position: relative;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: 2px solid #fbbf24;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+  min-width: 220px;
+}
+
+.nbd-congrats-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
+}
+
+.nbd-congrats-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(251, 191, 36, 0.4);
+  border-color: #f59e0b;
+}
+
+.nbd-congrats-card:active {
+  transform: translateY(-1px);
+}
+
+.nbd-congrats-icon {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+  animation: nbdPulse 2s ease-in-out infinite;
+}
+
+@keyframes nbdPulse {
+  0%,
+  100% {
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
   }
-  
+  50% {
+    box-shadow: 0 4px 20px rgba(245, 158, 11, 0.6);
+  }
+}
+
+.nbd-star-icon {
+  font-size: 18px;
+  color: #ffffff;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  animation: nbdRotate 3s linear infinite;
+}
+
+@keyframes nbdRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.nbd-congrats-content {
+  flex: 1;
+  text-align: left;
+  overflow: hidden;
+}
+
+.nbd-congrats-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #92400e;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+
+.nbd-congrats-subtitle {
+  font-size: 12px;
+  color: #b45309;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ============================================
+   AWARD DROPDOWN BADGE STYLES (3+ AWARDS)
+   ============================================ */
+
+.nbd-award-dropdown {
+  position: relative;
+}
+
+/* Award Badge Button */
+.nbd-award-badge-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fef08a 100%);
+  border: 2px solid #f59e0b;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: 700;
+  color: #92400e;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+  font-family: inherit;
+}
+
+.nbd-award-badge-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(251, 191, 36, 0.4);
+  background: linear-gradient(135deg, #fef08a 0%, #fcd34d 100%);
+}
+
+.nbd-award-badge-btn:active {
+  transform: translateY(0);
+}
+
+.nbd-award-badge-btn i.bi-trophy-fill {
+  font-size: 16px;
+  color: #f59e0b;
+  animation: nbdTrophyBounce 2s ease-in-out infinite;
+}
+
+@keyframes nbdTrophyBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.nbd-award-text {
+  font-weight: 700;
+  color: #92400e;
+  white-space: nowrap;
+}
+
+/* Award Count Badge */
+.nbd-award-count {
+  background: #f59e0b;
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+  animation: nbdCountPulse 2s ease-in-out infinite;
+}
+
+@keyframes nbdCountPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.nbd-chevron-icon {
+  font-size: 12px;
+  color: #92400e;
+  transition: transform 0.3s ease;
+}
+
+.nbd-award-badge-btn:hover .nbd-chevron-icon {
+  transform: translateY(2px);
+}
+
+/* Award Dropdown Menu */
+.nbd-award-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+  min-width: 380px;
+  max-height: 480px;
+  overflow: hidden;
+  z-index: 1001;
+  border: 2px solid #fde68a;
+  animation: nbdAwardDropdownSlideIn 0.3s ease;
+}
+
+@keyframes nbdAwardDropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Award Dropdown Header */
+.nbd-award-dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fef08a 100%);
+  border-bottom: 2px solid #fcd34d;
+}
+
+.nbd-award-dropdown-header i {
+  font-size: 24px;
+  color: #f59e0b;
+  animation: nbdHeaderTrophy 3s ease-in-out infinite;
+}
+
+@keyframes nbdHeaderTrophy {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(-10deg) scale(1.05);
+  }
+  75% {
+    transform: rotate(10deg) scale(1.05);
+  }
+}
+
+.nbd-award-dropdown-header h5 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: #92400e;
+  letter-spacing: -0.3px;
+}
+
+/* Award Dropdown Body */
+.nbd-award-dropdown-body {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 8px;
+  background: #ffffff;
+}
+
+.nbd-award-dropdown-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.nbd-award-dropdown-body::-webkit-scrollbar-track {
+  background: #f9fafb;
+  border-radius: 3px;
+}
+
+.nbd-award-dropdown-body::-webkit-scrollbar-thumb {
+  background: #f59e0b;
+  border-radius: 3px;
+}
+
+.nbd-award-dropdown-body::-webkit-scrollbar-thumb:hover {
+  background: #d97706;
+}
+
+/* Award Dropdown Item */
+.nbd-award-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid transparent;
+  background: #ffffff;
+}
+
+.nbd-award-dropdown-item:hover {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border-color: #fde68a;
+  transform: translateX(6px);
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
+}
+
+.nbd-award-dropdown-item:last-child {
+  margin-bottom: 0;
+}
+
+.nbd-award-dropdown-item:active {
+  transform: translateX(4px);
+}
+
+/* Award Item Icon */
+.nbd-award-item-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 2px solid #f59e0b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.nbd-award-dropdown-item:hover .nbd-award-item-icon {
+  transform: rotate(15deg) scale(1.1);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.nbd-award-item-icon i {
+  font-size: 22px;
+  color: #d97706;
+}
+
+/* Award Item Content */
+.nbd-award-item-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.nbd-award-item-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.nbd-award-item-subtitle {
+  font-size: 13px;
+  color: #666666;
+  font-weight: 500;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Award Item Arrow */
+.nbd-award-item-arrow {
+  font-size: 18px;
+  color: #d1d5db;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.nbd-award-dropdown-item:hover .nbd-award-item-arrow {
+  color: #f59e0b;
+  transform: translateX(6px);
+}
+
+/* Empty State */
+.nbd-award-empty-state {
+  padding: 60px 20px;
+  text-align: center;
+  color: #9ca3af;
+}
+
+.nbd-award-empty-state i {
+  font-size: 56px;
+  margin-bottom: 16px;
+  opacity: 0.3;
+  color: #d1d5db;
+}
+
+.nbd-award-empty-state p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+/* ============================================
+   PROFILE AVATAR
+   ============================================ */
+.nbd-profile-wrapper {
+  position: relative;
+}
+
+.nbd-profile-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  cursor: pointer;
+  background: linear-gradient(135deg, #ac5098 0%, #97247e 100%);
+  border: 2px solid #ffffff;
+  box-shadow: 0 4px 12px rgba(151, 36, 126, 0.3);
+  font-size: 14px;
+  padding: 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.nbd-profile-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(151, 36, 126, 0.4);
+}
+
+.nbd-profile-avatar:active {
+  transform: scale(0.98);
+}
+
+.nbd-profile-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.nbd-profile-initials {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+/* ============================================
+   DROPDOWN MENU
+   ============================================ */
+.nbd-dropdown-menu {
+  position: absolute;
+  top: 54px;
+  right: 0;
+  min-width: 300px;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+  padding: 0;
+  background: #ffffff;
+  z-index: 1001;
+  animation: nbdDropdownSlideIn 0.2s ease-out;
+}
+
+@keyframes nbdDropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   DROPDOWN HEADER
+   ============================================ */
+.nbd-dropdown-header {
+  padding: 1.5rem;
+  text-align: center;
+  border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
+  border-radius: 16px 16px 0 0;
+}
+
+.nbd-dropdown-avatar-wrapper {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 1rem;
+  display: inline-block;
+}
+
+.nbd-dropdown-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  background: linear-gradient(135deg, #ac5098 0%, #97247e 100%);
+  border: 3px solid #ffffff;
+  font-size: 24px;
+  box-shadow: 0 6px 20px rgba(151, 36, 126, 0.3);
+  overflow: hidden;
+}
+
+.nbd-dropdown-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.nbd-dropdown-initials {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.nbd-dropdown-name {
+  font-weight: 700;
+  margin-bottom: 0.375rem;
+  font-size: 17px;
+  color: #97247e;
+  line-height: 1.3;
+}
+
+.nbd-dropdown-email {
+  color: #6c757d;
+  margin-bottom: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+/* ============================================
+   DROPDOWN ACTIONS
+   ============================================ */
+.nbd-dropdown-actions {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.nbd-action-btn {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.nbd-action-btn-primary {
+  background: #27235c;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(63, 77, 143, 0.2);
+}
+
+.nbd-action-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(63, 77, 143, 0.3);
+}
+
+.nbd-action-btn-primary:active {
+  transform: translateY(0);
+}
+
+.nbd-action-btn-danger {
+  background: transparent;
+  color: #dc3545;
+  border: 2px solid #dc3545;
+}
+
+.nbd-action-btn-danger:hover {
+  background: #dc3545;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.nbd-action-btn-danger:active {
+  transform: translateY(0);
+}
+
+.nbd-action-btn i {
+  font-size: 16px;
+}
+
+/* ============================================
+   BACKDROP
+   ============================================ */
+.nbd-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+  background: transparent;
+}
+
+/* ============================================
+   MOBILE HAMBURGER BUTTON
+   ============================================ */
+.nbd-hamburger-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.nbd-hamburger-btn:hover {
+  background: rgba(151, 36, 126, 0.1);
+}
+
+.nbd-hamburger-line {
+  width: 24px;
+  height: 3px;
+  background: #97247e;
+  border-radius: 2px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nbd-hamburger-line:nth-child(1).nbd-open {
+  transform: translateY(9px) rotate(45deg);
+}
+
+.nbd-hamburger-line:nth-child(2).nbd-open {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+.nbd-hamburger-line:nth-child(3).nbd-open {
+  transform: translateY(-9px) rotate(-45deg);
+}
+
+/* ============================================
+   MOBILE MENU PANEL
+   ============================================ */
+.nbd-mobile-menu {
+  position: fixed;
+  top: 74px;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  max-height: calc(100vh - 74px);
+  overflow-y: auto;
+  transform: translateY(-100%);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  z-index: 998;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.nbd-mobile-menu.nbd-open {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Mobile Profile Section */
+.nbd-mobile-profile-section {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  background: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.nbd-mobile-profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  background: linear-gradient(135deg, #ac5098 0%, #97247e 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(151, 36, 126, 0.3);
+  border: 3px solid #ffffff;
+  overflow: hidden;
+}
+
+.nbd-mobile-profile-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nbd-mobile-profile-initials {
+  font-size: 28px;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.nbd-mobile-profile-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #97247e;
+  margin-bottom: 0.5rem;
+}
+
+.nbd-mobile-profile-email {
+  font-size: 14px;
+  color: #6c757d;
+  margin: 0;
+  word-break: break-word;
+}
+
+/* Mobile Awards Section */
+.nbd-mobile-awards-section {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border-bottom: 1px solid #fde68a;
+}
+
+.nbd-mobile-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 16px;
+  font-weight: 700;
+  color: #92400e;
+  margin-bottom: 1rem;
+}
+
+.nbd-mobile-section-title i {
+  font-size: 20px;
+  color: #f59e0b;
+}
+
+.nbd-mobile-award-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #ffffff;
+  border-radius: 12px;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.nbd-mobile-award-item:last-child {
+  margin-bottom: 0;
+}
+
+.nbd-mobile-award-item:active {
+  transform: scale(0.98);
+  background: #fef3c7;
+  border-color: #fde68a;
+}
+
+.nbd-mobile-award-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 2px solid #f59e0b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nbd-mobile-award-icon i {
+  font-size: 20px;
+  color: #d97706;
+}
+
+.nbd-mobile-award-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nbd-mobile-award-content strong {
+  font-size: 14px;
+  color: #1a1a1a;
+  font-weight: 700;
+}
+
+.nbd-mobile-award-content span {
+  font-size: 13px;
+  color: #666666;
+  font-weight: 500;
+}
+
+.nbd-mobile-award-item i.bi-chevron-right {
+  font-size: 16px;
+  color: #d1d5db;
+  flex-shrink: 0;
+}
+
+/* Mobile Actions */
+.nbd-mobile-actions {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.nbd-mobile-action-btn {
+  width: 100%;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: #27235c;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  box-shadow: 0 2px 8px rgba(39, 35, 92, 0.2);
+}
+
+.nbd-mobile-action-btn:active {
+  transform: scale(0.98);
+  box-shadow: 0 1px 4px rgba(39, 35, 92, 0.2);
+}
+
+.nbd-mobile-action-btn i {
+  font-size: 18px;
+}
+
+.nbd-mobile-logout-btn {
+  background: transparent;
+  color: #dc3545;
+  border: 2px solid #dc3545;
+  box-shadow: none;
+}
+
+.nbd-mobile-logout-btn:active {
+  background: #dc3545;
+  color: #ffffff;
+}
+
+/* Mobile Backdrop */
+.nbd-mobile-backdrop {
+  position: fixed;
+  top: 74px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 997;
+  animation: nbdMobileFadeIn 0.3s ease;
+}
+
+@keyframes nbdMobileFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 1024px) {
   .nbd-navbar-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 2rem;
-    height: 100%;
-    max-width: 1920px;
-    margin: 0 auto;
+    padding: 0 1.5rem;
   }
-  
-  /* ============================================
-     LEFT SECTION - WELCOME MESSAGE
-     ============================================ */
+
+  .nbd-congrats-card {
+    min-width: 200px;
+    padding: 0.625rem 0.875rem;
+  }
+
+  .nbd-congrats-title {
+    font-size: 13px;
+  }
+
+  .nbd-congrats-subtitle {
+    font-size: 11px;
+  }
+
+  .nbd-award-dropdown-menu {
+    min-width: 340px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Show mobile, hide desktop */
+  .nbd-mobile-only {
+    display: flex;
+  }
+
+  .nbd-desktop-only {
+    display: none;
+  }
+
+  .nbd-navbar {
+    height: auto;
+    min-height: 74px;
+  }
+
+  .nbd-navbar-container {
+    padding: 1rem 1.5rem;
+  }
+
+  .nbd-welcome-text {
+    font-size: 15px;
+  }
+
+  .nbd-welcome-date {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nbd-navbar-container {
+    padding: 0.75rem 1rem;
+  }
+
+  .nbd-welcome-icon {
+    font-size: 16px;
+  }
+
+  .nbd-welcome-text {
+    font-size: 14px;
+  }
+
+  .nbd-welcome-date {
+    font-size: 10px;
+    padding-left: 22px;
+  }
+
+  .nbd-hamburger-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .nbd-hamburger-line {
+    width: 22px;
+    height: 2.5px;
+  }
+
+  .nbd-mobile-profile-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .nbd-mobile-profile-avatar {
+    width: 70px;
+    height: 70px;
+  }
+
+  .nbd-mobile-profile-initials {
+    font-size: 24px;
+  }
+
+  .nbd-mobile-profile-name {
+    font-size: 16px;
+  }
+
+  .nbd-mobile-profile-email {
+    font-size: 13px;
+  }
+
+  .nbd-mobile-awards-section {
+    padding: 1.25rem 1rem;
+  }
+
+  .nbd-mobile-actions {
+    padding: 1.25rem 1rem;
+  }
+
+  .nbd-mobile-action-btn {
+    padding: 0.875rem;
+    font-size: 14px;
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+.nbd-profile-avatar:focus-visible,
+.nbd-action-btn:focus-visible,
+.nbd-congrats-card:focus-visible,
+.nbd-award-badge-btn:focus-visible,
+.nbd-award-dropdown-item:focus-visible,
+.nbd-hamburger-btn:focus-visible,
+.nbd-mobile-action-btn:focus-visible {
+  outline: 2px solid #97247e;
+  outline-offset: 2px;
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+@media print {
+  .nbd-navbar {
+    position: relative;
+    box-shadow: none;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .nbd-navbar-right {
+    display: none;
+  }
+
+  .nbd-mobile-menu {
+    display: none;
+  }
+}
+
+/* ADD THIS TO YOUR EXISTING NAVBAR.CSS */
+
+/* ============================================
+   MOBILE SIDEBAR TOGGLE BUTTON
+   ============================================ */
+.nbd-sidebar-toggle-mobile {
+  display: none; /* Hidden on desktop */
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ac5098 0%, #97247e 100%);
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(151, 36, 126, 0.3);
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+}
+
+.nbd-sidebar-toggle-mobile:active {
+  transform: scale(0.95);
+  box-shadow: 0 1px 4px rgba(151, 36, 126, 0.3);
+}
+
+.nbd-sidebar-toggle-mobile i {
+  font-size: 20px;
+  color: #ffffff;
+}
+
+@media (max-width: 768px) {
+  .nbd-sidebar-toggle-mobile {
+    display: flex;
+  }
+
   .nbd-navbar-left {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    flex-shrink: 0;
+    gap: 0;
   }
-  
+
   .nbd-welcome-section {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+    margin-left: 0;
   }
-  
-  .nbd-welcome-header {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+}
+
+@media (max-width: 480px) {
+  .nbd-sidebar-toggle-mobile {
+    width: 40px;
+    height: 40px;
+    margin-right: 0.5rem;
   }
-  
-  .nbd-welcome-icon {
+
+  .nbd-sidebar-toggle-mobile i {
     font-size: 18px;
-    color: #97247e;
-    flex-shrink: 0;
   }
-  
-  .nbd-welcome-text {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 700;
-    color: #97247e;
-    line-height: 1.2;
-    white-space: nowrap;
-  }
-  
-  .nbd-welcome-date {
-    color: #6c757d;
-    font-size: 12px;
-    font-weight: 500;
-    line-height: 1.2;
-    padding-left: 26px;
-  }
-  
-  /* ============================================
-     RIGHT SECTION - ACTIONS
-     ============================================ */
-  .nbd-navbar-right {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-  }
-  
-  /* ============================================
-     INDIVIDUAL CONGRATULATIONS CARD (1-2 AWARDS)
-     ============================================ */
-  .nbd-congrats-card {
-    position: relative;
-    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-    border-radius: 12px;
-    padding: 0.75rem 1rem;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    border: 2px solid #fbbf24;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
-    min-width: 220px;
-  }
-  
-  .nbd-congrats-card::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 100%);
-    pointer-events: none;
-  }
-  
-  .nbd-congrats-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(251, 191, 36, 0.4);
-    border-color: #f59e0b;
-  }
-  
-  .nbd-congrats-card:active {
-    transform: translateY(-1px);
-  }
-  
-  .nbd-congrats-icon {
-    position: relative;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
-    animation: nbdPulse 2s ease-in-out infinite;
-  }
-  
-  @keyframes nbdPulse {
-    0%,
-    100% {
-      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
-    }
-    50% {
-      box-shadow: 0 4px 20px rgba(245, 158, 11, 0.6);
-    }
-  }
-  
-  .nbd-star-icon {
-    font-size: 18px;
-    color: #ffffff;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-    animation: nbdRotate 3s linear infinite;
-  }
-  
-  @keyframes nbdRotate {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-  
-  .nbd-congrats-content {
-    flex: 1;
-    text-align: left;
-    overflow: hidden;
-  }
-  
-  .nbd-congrats-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: #92400e;
-    line-height: 1.3;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-bottom: 2px;
-  }
-  
-  .nbd-congrats-subtitle {
-    font-size: 12px;
-    color: #b45309;
-    font-weight: 600;
-    line-height: 1.3;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  
-  /* ============================================
-     AWARD DROPDOWN BADGE STYLES (3+ AWARDS)
-     ============================================ */
-  
-  .nbd-award-dropdown {
-    position: relative;
-  }
-  
-  /* Award Badge Button */
-  .nbd-award-badge-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    background: linear-gradient(135deg, #fef3c7 0%, #fef08a 100%);
-    border: 2px solid #f59e0b;
-    border-radius: 50px;
-    cursor: pointer;
-    font-weight: 700;
-    color: #92400e;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
-    font-family: inherit;
-  }
-  
-  .nbd-award-badge-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(251, 191, 36, 0.4);
-    background: linear-gradient(135deg, #fef08a 0%, #fcd34d 100%);
-  }
-  
-  .nbd-award-badge-btn:active {
-    transform: translateY(0);
-  }
-  
-  .nbd-award-badge-btn i.bi-trophy-fill {
-    font-size: 16px;
-    color: #f59e0b;
-    animation: nbdTrophyBounce 2s ease-in-out infinite;
-  }
-  
-  @keyframes nbdTrophyBounce {
-    0%, 100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-3px);
-    }
-  }
-  
-  .nbd-award-text {
-    font-weight: 700;
-    color: #92400e;
-    white-space: nowrap;
-  }
-  
-  /* Award Count Badge */
-  .nbd-award-count {
-    background: #f59e0b;
-    color: white;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: 800;
-    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
-    animation: nbdCountPulse 2s ease-in-out infinite;
-  }
-  
-  @keyframes nbdCountPulse {
-    0%, 100% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.1);
-    }
-  }
-  
-  .nbd-chevron-icon {
-    font-size: 12px;
-    color: #92400e;
-    transition: transform 0.3s ease;
-  }
-  
-  .nbd-award-badge-btn:hover .nbd-chevron-icon {
-    transform: translateY(2px);
-  }
-  
-  /* Award Dropdown Menu */
-  .nbd-award-dropdown-menu {
-    position: absolute;
-    top: calc(100% + 12px);
-    right: 0;
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
-    min-width: 380px;
-    max-height: 480px;
-    overflow: hidden;
-    z-index: 1001;
-    border: 2px solid #fde68a;
-    animation: nbdAwardDropdownSlideIn 0.3s ease;
-  }
-  
-  @keyframes nbdAwardDropdownSlideIn {
-    from {
-      opacity: 0;
-      transform: translateY(-15px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  /* Award Dropdown Header */
-  .nbd-award-dropdown-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 20px;
-    background: linear-gradient(135deg, #fef3c7 0%, #fef08a 100%);
-    border-bottom: 2px solid #fcd34d;
-  }
-  
-  .nbd-award-dropdown-header i {
-    font-size: 24px;
-    color: #f59e0b;
-    animation: nbdHeaderTrophy 3s ease-in-out infinite;
-  }
-  
-  @keyframes nbdHeaderTrophy {
-    0%, 100% {
-      transform: rotate(0deg) scale(1);
-    }
-    25% {
-      transform: rotate(-10deg) scale(1.05);
-    }
-    75% {
-      transform: rotate(10deg) scale(1.05);
-    }
-  }
-  
-  .nbd-award-dropdown-header h5 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 800;
-    color: #92400e;
-    letter-spacing: -0.3px;
-  }
-  
-  /* Award Dropdown Body */
-  .nbd-award-dropdown-body {
-    max-height: 400px;
-    overflow-y: auto;
-    padding: 8px;
-    background: #ffffff;
-  }
-  
-  .nbd-award-dropdown-body::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  .nbd-award-dropdown-body::-webkit-scrollbar-track {
-    background: #f9fafb;
-    border-radius: 3px;
-  }
-  
-  .nbd-award-dropdown-body::-webkit-scrollbar-thumb {
-    background: #f59e0b;
-    border-radius: 3px;
-  }
-  
-  .nbd-award-dropdown-body::-webkit-scrollbar-thumb:hover {
-    background: #d97706;
-  }
-  
-  /* Award Dropdown Item */
-  .nbd-award-dropdown-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 16px;
-    border-radius: 12px;
-    margin-bottom: 8px;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 2px solid transparent;
-    background: #ffffff;
-  }
-  
-  .nbd-award-dropdown-item:hover {
-    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-    border-color: #fde68a;
-    transform: translateX(6px);
-    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
-  }
-  
-  .nbd-award-dropdown-item:last-child {
-    margin-bottom: 0;
-  }
-  
-  .nbd-award-dropdown-item:active {
-    transform: translateX(4px);
-  }
-  
-  /* Award Item Icon */
-  .nbd-award-item-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-    border: 2px solid #f59e0b;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.3s ease;
-  }
-  
-  .nbd-award-dropdown-item:hover .nbd-award-item-icon {
-    transform: rotate(15deg) scale(1.1);
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-  }
-  
-  .nbd-award-item-icon i {
-    font-size: 22px;
-    color: #d97706;
-  }
-  
-  /* Award Item Content */
-  .nbd-award-item-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    overflow: hidden;
-  }
-  
-  .nbd-award-item-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin: 0;
-    line-height: 1.3;
-  }
-  
-  .nbd-award-item-subtitle {
-    font-size: 13px;
-    color: #666666;
-    font-weight: 500;
-    line-height: 1.3;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  
-  /* Award Item Arrow */
-  .nbd-award-item-arrow {
-    font-size: 18px;
-    color: #d1d5db;
-    transition: all 0.3s ease;
-    flex-shrink: 0;
-  }
-  
-  .nbd-award-dropdown-item:hover .nbd-award-item-arrow {
-    color: #f59e0b;
-    transform: translateX(6px);
-  }
-  
-  /* Empty State */
-  .nbd-award-empty-state {
-    padding: 60px 20px;
-    text-align: center;
-    color: #9ca3af;
-  }
-  
-  .nbd-award-empty-state i {
-    font-size: 56px;
-    margin-bottom: 16px;
-    opacity: 0.3;
-    color: #d1d5db;
-  }
-  
-  .nbd-award-empty-state p {
-    margin: 0;
-    font-size: 14px;
-    font-weight: 500;
-    color: #6b7280;
-  }
-  
-  /* ============================================
-     PROFILE AVATAR
-     ============================================ */
-  .nbd-profile-wrapper {
-    position: relative;
-  }
-  
-  .nbd-profile-avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    cursor: pointer;
-    background: linear-gradient(135deg, #ac5098 0%, #97247e 100%);
-    border: 2px solid #ffffff;
-    box-shadow: 0 4px 12px rgba(151, 36, 126, 0.3);
-    font-size: 14px;
-    padding: 0;
-    overflow: hidden;
-    transition: all 0.3s ease;
-  }
-  
-  .nbd-profile-avatar:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(151, 36, 126, 0.4);
-  }
-  
-  .nbd-profile-avatar:active {
-    transform: scale(0.98);
-  }
-  
-  .nbd-profile-photo {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
-  }
-  
-  .nbd-profile-initials {
-    font-size: 14px;
-    font-weight: 700;
-    color: #ffffff;
-    text-transform: uppercase;
-  }
-  
-  /* ============================================
-     DROPDOWN MENU
-     ============================================ */
-  .nbd-dropdown-menu {
-    position: absolute;
-    top: 54px;
-    right: 0;
-    min-width: 300px;
-    border-radius: 16px;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
-    padding: 0;
-    background: #ffffff;
-    z-index: 1001;
-    animation: nbdDropdownSlideIn 0.2s ease-out;
-  }
-  
-  @keyframes nbdDropdownSlideIn {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  /* ============================================
-     DROPDOWN HEADER
-     ============================================ */
-  .nbd-dropdown-header {
-    padding: 1.5rem;
-    text-align: center;
-    border-bottom: 1px solid #e5e7eb;
-    background: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
-    border-radius: 16px 16px 0 0;
-  }
-  
-  .nbd-dropdown-avatar-wrapper {
-    position: relative;
-    width: 72px;
-    height: 72px;
-    margin: 0 auto 1rem;
-    display: inline-block;
-  }
-  
-  .nbd-dropdown-avatar {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    background: linear-gradient(135deg, #ac5098 0%, #97247e 100%);
-    border: 3px solid #ffffff;
-    font-size: 24px;
-    box-shadow: 0 6px 20px rgba(151, 36, 126, 0.3);
-    overflow: hidden;
-  }
-  
-  .nbd-dropdown-photo {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
-  }
-  
-  .nbd-dropdown-initials {
-    font-size: 24px;
-    font-weight: 700;
-    color: #ffffff;
-    text-transform: uppercase;
-  }
-  
-  .nbd-dropdown-name {
-    font-weight: 700;
-    margin-bottom: 0.375rem;
-    font-size: 17px;
-    color: #97247e;
-    line-height: 1.3;
-  }
-  
-  .nbd-dropdown-email {
-    color: #6c757d;
-    margin-bottom: 0;
-    font-size: 13px;
-    line-height: 1.4;
-    word-break: break-word;
-  }
-  
-  /* ============================================
-     DROPDOWN ACTIONS
-     ============================================ */
-  .nbd-dropdown-actions {
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  
-  .nbd-action-btn {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    border: none;
-    border-radius: 10px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: inherit;
-  }
-  
-  .nbd-action-btn-primary {
-    background: #27235c;
-    color: #ffffff;
-    box-shadow: 0 2px 8px rgba(63, 77, 143, 0.2);
-  }
-  
-  .nbd-action-btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(63, 77, 143, 0.3);
-  }
-  
-  .nbd-action-btn-primary:active {
-    transform: translateY(0);
-  }
-  
-  .nbd-action-btn-danger {
-    background: transparent;
-    color: #dc3545;
-    border: 2px solid #dc3545;
-  }
-  
-  .nbd-action-btn-danger:hover {
-    background: #dc3545;
-    color: #ffffff;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
-  }
-  
-  .nbd-action-btn-danger:active {
-    transform: translateY(0);
-  }
-  
-  .nbd-action-btn i {
-    font-size: 16px;
-  }
-  
-  /* ============================================
-     BACKDROP
-     ============================================ */
-  .nbd-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 999;
-    background: transparent;
-  }
-  
-  /* ============================================
-     RESPONSIVE DESIGN
-     ============================================ */
-  @media (max-width: 1024px) {
-    .nbd-navbar-container {
-      padding: 0 1.5rem;
-    }
-  
-    .nbd-congrats-card {
-      min-width: 200px;
-      padding: 0.625rem 0.875rem;
-    }
-  
-    .nbd-congrats-title {
-      font-size: 13px;
-    }
-  
-    .nbd-congrats-subtitle {
-      font-size: 11px;
-    }
-  
-    .nbd-award-dropdown-menu {
-      min-width: 340px;
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .nbd-navbar {
-      height: auto;
-      min-height: 74px;
-    }
-  
-    .nbd-navbar-container {
-      padding: 1rem;
-      flex-direction: column;
-      gap: 1rem;
-      align-items: flex-start;
-    }
-  
-    .nbd-navbar-left {
-      width: 100%;
-    }
-  
-    .nbd-navbar-right {
-      width: 100%;
-      justify-content: space-between;
-    }
-  
-    .nbd-welcome-text {
-      font-size: 15px;
-    }
-  
-    .nbd-welcome-date {
-      font-size: 11px;
-    }
-  
-    .nbd-congrats-card {
-      flex: 1;
-      min-width: 0;
-    }
-  
-    .nbd-award-badge-btn {
-      padding: 8px 16px;
-      font-size: 13px;
-    }
-  
-    .nbd-award-text {
-      display: none;
-    }
-  
-    .nbd-award-count {
-      width: 22px;
-      height: 22px;
-      font-size: 11px;
-    }
-  
-    .nbd-award-dropdown-menu {
-      min-width: 320px;
-      max-width: calc(100vw - 32px);
-      right: 0;
-    }
-  
-    .nbd-award-dropdown-header {
-      padding: 16px;
-    }
-  
-    .nbd-award-dropdown-header h5 {
-      font-size: 16px;
-    }
-  
-    .nbd-award-dropdown-item {
-      padding: 14px;
-    }
-  
-    .nbd-award-item-icon {
-      width: 42px;
-      height: 42px;
-    }
-  
-    .nbd-award-item-icon i {
-      font-size: 20px;
-    }
-  
-    .nbd-award-item-title {
-      font-size: 13px;
-    }
-  
-    .nbd-award-item-subtitle {
-      font-size: 12px;
-    }
-  
-    .nbd-dropdown-menu {
-      right: 0;
-      left: auto;
-      min-width: 280px;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .nbd-navbar-container {
-      padding: 0.75rem;
-    }
-  
-    .nbd-navbar-right {
-      gap: 0.75rem;
-    }
-  
-    .nbd-welcome-icon {
-      font-size: 16px;
-    }
-  
-    .nbd-welcome-text {
-      font-size: 14px;
-    }
-  
-    .nbd-welcome-date {
-      font-size: 10px;
-      padding-left: 22px;
-    }
-  
-    .nbd-congrats-card {
-      padding: 0.5rem 0.75rem;
-      gap: 0.5rem;
-    }
-  
-    .nbd-congrats-icon {
-      width: 32px;
-      height: 32px;
-    }
-  
-    .nbd-star-icon {
-      font-size: 16px;
-    }
-  
-    .nbd-congrats-title {
-      font-size: 12px;
-    }
-  
-    .nbd-congrats-subtitle {
-      font-size: 10px;
-    }
-  
-    .nbd-award-badge-btn {
-      padding: 8px 12px;
-    }
-  
-    .nbd-award-badge-btn i.bi-trophy-fill {
-      font-size: 14px;
-    }
-  
-    .nbd-award-count {
-      width: 20px;
-      height: 20px;
-      font-size: 10px;
-    }
-  
-    .nbd-chevron-icon {
-      font-size: 11px;
-    }
-  
-    .nbd-award-dropdown-menu {
-      min-width: 290px;
-      right: -10px;
-    }
-  
-    .nbd-award-dropdown-header {
-      padding: 14px;
-    }
-  
-    .nbd-award-dropdown-header i {
-      font-size: 20px;
-    }
-  
-    .nbd-award-dropdown-header h5 {
-      font-size: 15px;
-    }
-  
-    .nbd-award-dropdown-body {
-      padding: 6px;
-    }
-  
-    .nbd-award-dropdown-item {
-      padding: 12px;
-      gap: 10px;
-    }
-  
-    .nbd-award-item-icon {
-      width: 38px;
-      height: 38px;
-    }
-  
-    .nbd-award-item-icon i {
-      font-size: 18px;
-    }
-  
-    .nbd-award-item-title {
-      font-size: 12px;
-    }
-  
-    .nbd-award-item-subtitle {
-      font-size: 11px;
-    }
-  
-    .nbd-award-item-arrow {
-      font-size: 16px;
-    }
-  
-    .nbd-profile-avatar {
-      width: 40px;
-      height: 40px;
-    }
-  
-    .nbd-dropdown-menu {
-      min-width: 260px;
-    }
-  
-    .nbd-dropdown-header {
-      padding: 1.25rem;
-    }
-  
-    .nbd-dropdown-avatar-wrapper {
-      width: 64px;
-      height: 64px;
-    }
-  
-    .nbd-dropdown-avatar {
-      width: 64px;
-      height: 64px;
-      font-size: 20px;
-    }
-  
-    .nbd-dropdown-name {
-      font-size: 16px;
-    }
-  
-    .nbd-dropdown-email {
-      font-size: 12px;
-    }
-  
-    .nbd-action-btn {
-      padding: 0.625rem 0.875rem;
-      font-size: 13px;
-    }
-  }
-  
-  /* ============================================
-     ACCESSIBILITY
-     ============================================ */
-  .nbd-profile-avatar:focus-visible,
-  .nbd-action-btn:focus-visible,
-  .nbd-congrats-card:focus-visible,
-  .nbd-award-badge-btn:focus-visible,
-  .nbd-award-dropdown-item:focus-visible {
-    outline: 2px solid #97247e;
-    outline-offset: 2px;
-  }
-  
-  /* ============================================
-     PRINT STYLES
-     ============================================ */
-  @media print {
-    .nbd-navbar {
-      position: relative;
-      box-shadow: none;
-      border-bottom: 1px solid #e5e7eb;
-    }
-  
-    .nbd-navbar-right {
-      display: none;
-    }
-  }
-  
+}

@@ -1,13 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import icon from "../assets/icon.png";
 import logodarkbarred from "../assets/logodarkbarred.png";
 import "../styles/layout_styles/Sidebar.css";
 
-const Sidebar = ({ allowedRoles = [], currentRole }) => {
+const Sidebar = ({ allowedRoles = [], currentRole, isOpen, onToggle, onClose }) => {
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Detect mobile screen size
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      if (!mobile) {
+        setSidebarExpanded(true); // Always expanded on desktop
+      }
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const allMenuItems = {
     Admin: [
@@ -285,11 +301,9 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
     if (allowedRoles.length === 0) {
       return allMenuItems[currentRole] || [];
     }
-    // If current role is in allowed roles, use it
     if (allowedRoles.includes(currentRole)) {
       return allMenuItems[currentRole] || [];
     }
-    // Otherwise, use the first allowed role
     return allMenuItems[allowedRoles[0]] || [];
   };
 
@@ -300,54 +314,83 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
   };
 
   const toggleSidebar = () => {
-    setSidebarExpanded(!sidebarExpanded);
+    if (isMobile) {
+      onToggle();
+    } else {
+      setSidebarExpanded(!sidebarExpanded);
+    }
   };
 
+  const handleMenuClick = (path) => {
+    navigate(path);
+    if (isMobile && onClose) {
+      onClose();
+    }
+  };
+
+  // Determine if sidebar should be shown
+  const showSidebar = isMobile ? isOpen : true;
+  const sidebarClass = isMobile 
+    ? `sbd-sidebar sbd-mobile ${isOpen ? "sbd-open" : ""}`
+    : `sbd-sidebar ${sidebarExpanded ? "sbd-expanded" : "sbd-collapsed"}`;
+
   return (
-    <aside className={`sbd-sidebar ${sidebarExpanded ? "sbd-expanded" : "sbd-collapsed"}`}>
-      {/* Logo Section */}
-      <div className="sbd-logo-section">
-        <img
-          src={sidebarExpanded ? logodarkbarred : icon}
-          alt="EEPZ Logo"
-          className="sbd-logo"
+    <>
+      <aside className={sidebarClass}>
+        {/* Logo Section */}
+        <div className="sbd-logo-section">
+          <img
+            src={(isMobile || sidebarExpanded) ? logodarkbarred : icon}
+            alt="EEPZ Logo"
+            className="sbd-logo"
+          />
+        </div>
+
+        {/* Toggle Button - Only show on desktop */}
+        {!isMobile && (
+          <button
+            className="sbd-toggle-btn"
+            onClick={toggleSidebar}
+            aria-label={sidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
+            title={sidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
+          >
+            <i className={`bi ${sidebarExpanded ? "bi-chevron-left" : "bi-chevron-right"}`}></i>
+          </button>
+        )}
+
+        {/* Navigation Menu */}
+        <nav className="sbd-nav">
+          <ul className="sbd-menu-list">
+            {menuItems.map((item, index) => {
+              const active = isActive(item.path);
+              return (
+                <li key={index} className="sbd-menu-item">
+                  <button
+                    onClick={() => handleMenuClick(item.path)}
+                    className={`sbd-menu-btn ${active ? "sbd-active" : ""}`}
+                    title={!sidebarExpanded && !isMobile ? item.label : ""}
+                  >
+                    {active && <div className="sbd-active-indicator" />}
+                    <i className={`bi ${item.icon} sbd-menu-icon`}></i>
+                    {(sidebarExpanded || isMobile) && <span className="sbd-menu-label">{item.label}</span>}
+                  </button>
+                  {/* Tooltip for collapsed state - desktop only */}
+                  {!sidebarExpanded && !isMobile && <div className="sbd-tooltip">{item.label}</div>}
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      </aside>
+
+      {/* Mobile Backdrop */}
+      {isMobile && isOpen && (
+        <div
+          className="sbd-mobile-backdrop"
+          onClick={onClose}
         />
-      </div>
-
-      {/* Toggle Button */}
-      <button
-        className="sbd-toggle-btn"
-        onClick={toggleSidebar}
-        aria-label={sidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
-        title={sidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
-      >
-        <i className={`bi ${sidebarExpanded ? "bi-chevron-left" : "bi-chevron-right"}`}></i>
-      </button>
-
-      {/* Navigation Menu */}
-      <nav className="sbd-nav">
-        <ul className="sbd-menu-list">
-          {menuItems.map((item, index) => {
-            const active = isActive(item.path);
-            return (
-              <li key={index} className="sbd-menu-item">
-                <button
-                  onClick={() => navigate(item.path)}
-                  className={`sbd-menu-btn ${active ? "sbd-active" : ""}`}
-                  title={!sidebarExpanded ? item.label : ""}
-                >
-                  {active && <div className="sbd-active-indicator" />}
-                  <i className={`bi ${item.icon} sbd-menu-icon`}></i>
-                  {sidebarExpanded && <span className="sbd-menu-label">{item.label}</span>}
-                </button>
-                {/* Tooltip for collapsed state */}
-                {!sidebarExpanded && <div className="sbd-tooltip">{item.label}</div>}
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
-    </aside>
+      )}
+    </>
   );
 };
 

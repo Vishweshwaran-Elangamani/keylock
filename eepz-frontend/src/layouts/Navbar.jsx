@@ -12,7 +12,7 @@ import EmployeeProfileService from "../services/auth/EmployeeProfileService";
 import { getEmployeeNominations } from "../services/performancemanagement/api/nominationapi";
 import "../styles/layout_styles/Navbar.css";
 
-const Navbar = () => {
+const Navbar = ({ onSidebarToggle, sidebarOpen }) => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showAwardDropdown, setShowAwardDropdown] = useState(false);
   const [showPhotoModal, setShowPhotoModal] = useState(false);
@@ -127,8 +127,20 @@ const Navbar = () => {
     <>
       <header className="nbd-navbar">
         <div className="nbd-navbar-container">
-          {/* Left Section */}
+          {/* Left Section with Hamburger */}
           <div className="nbd-navbar-left">
+            {/* Mobile Hamburger Button */}
+            <button
+              className="nbd-sidebar-toggle-mobile"
+              onClick={(e) => {
+                e.stopPropagation();
+                onSidebarToggle();
+              }}
+              aria-label="Toggle sidebar"
+            >
+              <i className={`bi ${sidebarOpen ? "bi-x-lg" : "bi-list"}`}></i>
+            </button>
+
             <div className="nbd-welcome-section">
               <div className="nbd-welcome-header">
                 <i className="bi bi-person-circle nbd-welcome-icon" />
