@@ -3,7 +3,7 @@ import api_meet from "../../services/meeting/index_meet";
 import axios from "axios";
 
 const meetingService = {
-  getAll: () => api_meet.get("/employeemanagement/all"),
+
 
   scheduleMeeting: async (meetingData) => {
     try {

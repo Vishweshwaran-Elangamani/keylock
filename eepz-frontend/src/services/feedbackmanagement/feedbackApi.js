@@ -151,30 +151,34 @@ const LND_API_URL = import.meta.env.VITE_LND_API_URL;
 export const employeeApi = {
   base: `${PROJECT_API_URL}/api/employees`,
 
-  getAll: () => axios.get(`${PROJECT_API_URL}/api/employees/allEmployees`),
+  getEmployees: (params = {}) =>
+    axios.get(`${PROJECT_API_URL}/api/employees`, { params }),
 
-  getManagers: () => axios.get(`${PROJECT_API_URL}/api/employees/managers`),
+  getAll: () => axios.get(`${PROJECT_API_URL}/api/employees`),
+
+  getManagers: () =>
+    axios.get(`${PROJECT_API_URL}/api/employees`, { params: { isManager: true } }),
 
   getById: (employeeId) =>
-    axios.get(`${PROJECT_API_URL}/api/employees/employeeId/${employeeId}`),
+    axios.get(`${PROJECT_API_URL}/api/employees/${employeeId}`),
 
   getByDepartment: (departmentId) =>
-    axios.get(`${PROJECT_API_URL}/api/employees/department/${departmentId}`),
+    axios.get(`${PROJECT_API_URL}/api/employees`, { params: { departmentId } }),
 
   getByRole: (roleId) =>
-    axios.get(`${PROJECT_API_URL}/api/employees/role/${roleId}`),
+    axios.get(`${PROJECT_API_URL}/api/employees`, { params: { roleId } }),
 
   search: (searchTerm) =>
-    axios.get(`${PROJECT_API_URL}/api/employees/search`, {
-      params: { searchTerm },
-    }),
+    axios.get(`${PROJECT_API_URL}/api/employees`, { params: { searchTerm } }),
 
-  getAllDepartments: () => axios.get(`${PROJECT_API_URL}/api/employees/departments`),
+  getAllDepartments: () =>
+    axios.get(`${PROJECT_API_URL}/api/employees/departments`),
 
   getAllBusinessUnits: () =>
     axios.get(`${PROJECT_API_URL}/api/employees/business-units`),
 
-  getInitialStage: () => axios.get(`${PROJECT_API_URL}/api/employees/initial-stage`),
+  getInitialStage: () =>
+    axios.get(`${PROJECT_API_URL}/api/employees/initial-stage`),
 
   mapToResourcePool: (employeeMasterIds) =>
     axios.post(`${PROJECT_API_URL}/api/employees/map-to-resource-pool`, {
@@ -187,6 +191,7 @@ export const employeeApi = {
   getSubordinates: async () => {
     try {
       const accessToken = localStorage.getItem("accessToken");
+
       const response = await axios.get(
         `${LND_API_URL}/api/lnd-skills/employees/subordinates`,
         {
@@ -195,6 +200,7 @@ export const employeeApi = {
           },
         }
       );
+
       return response.data;
     } catch (error) {
       console.error("Get subordinates error:", error);
@@ -202,6 +208,8 @@ export const employeeApi = {
     }
   },
 };
+
+
 export const goalsApi = {
   getAll: () => org_api.get("/Goals"),
   getById: (goalId) => org_api.get(`/Goals/${goalId}`),

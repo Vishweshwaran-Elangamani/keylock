@@ -8,11 +8,21 @@ const employeeService = {
     const res = await axios.get(`${PROJECT_API_URL}/api/employees/allEmployees`);
     return res.data;
   },
+  base: `${PROJECT_API_URL}/api/employees`,
+
+  getEmployees: (params = {}) =>
+    axios.get(`${PROJECT_API_URL}/api/employees`, { params }),
+
+  getAllEmployees: () => axios.get(`${PROJECT_API_URL}/api/employees`),
 
   getManagers: async () => {
     const res = await axios.get(`${PROJECT_API_URL}/api/employees/managers`);
     return res.data;
   },
+  getManagers: () =>
+    axios.get(`${PROJECT_API_URL}/api/employees`, {
+      params: { isManager: true },
+    }),
 
   getById: async (employeeId) => {
     const res = await axios.get(
@@ -20,6 +30,8 @@ const employeeService = {
     );
     return res.data;
   },
+  getById: (employeeId) =>
+    axios.get(`${PROJECT_API_URL}/api/employees/${employeeId}`),
 
   getByDepartment: async (departmentId) => {
     const res = await axios.get(
@@ -34,6 +46,10 @@ const employeeService = {
     );
     return res.data;
   },
+  getByRole: (roleId) =>
+    axios.get(`${PROJECT_API_URL}/api/employees`, {
+      params: { roleId },
+    }),
 
   search: async (searchTerm) => {
     const res = await axios.get(`${PROJECT_API_URL}/api/employees/search`, {

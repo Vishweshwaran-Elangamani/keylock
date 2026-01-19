@@ -112,31 +112,52 @@ const projectService = {
       );
     }
   },
-
-  /// EMPLOYEE DATA FOR DROPDOWNS
+/// EMPLOYEE DATA FOR DROPDOWNS
 
 /**
- * Get all active employees with details (for Resource Owner dropdown)
- * @returns {Promise} Array of all employees
+ * Get employees (default = all active employees).
+ * Supports optional filters:
+ * - isManager
+ * - departmentId
+ * - roleId
+ * - searchTerm
+ *
+ * @param {Object} params
+ * @returns {Promise} API response
  */
-getAllEmployees: async () => {
+getEmployees: async (params = {}) => {
   try {
-    const response = await apiClient.get("/employees/allEmployees");
+    const response = await apiClient.get("/employees", { params });
     return response.data;
   } catch (error) {
-    throw (
-      error.response?.data || { message: "Failed to fetch all employees" }
-    );
+    throw error.response?.data || { message: "Failed to fetch employees" };
   }
 },
 
 /**
- * Get managers only (for L1/L2 Approver dropdowns)
- * @returns {Promise} Array of managers
+ * Get all active employees with details (Resource Owner dropdown)
+ * OLD: /employees/allEmployees
+ * NEW: /employees
+ */
+getAllEmployees: async () => {
+  try {
+    const response = await apiClient.get("/employees");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Failed to fetch all employees" };
+  }
+},
+
+/**
+ * Get managers only (L1/L2 Approver dropdowns)
+ * OLD: /employees/managers
+ * NEW: /employees?isManager=true
  */
 getManagers: async () => {
   try {
-    const response = await apiClient.get("/employees/managers");
+    const response = await apiClient.get("/employees", {
+      params: { isManager: true },
+    });
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "Failed to fetch managers" };
@@ -145,26 +166,21 @@ getManagers: async () => {
 
 /**
  * Get employee by ID
- * @param {number} employeeId - Employee Master ID
- * @returns {Promise} Employee details
+ * NOTE: backend changed to GET /employees/{employeeId}
  */
 getEmployeeById: async (employeeId) => {
   try {
-    const response = await apiClient.get(`/employees/employeeId/${employeeId}`);
+    const response = await apiClient.get(`/employees/${employeeId}`);
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "Failed to fetch employee" };
   }
 },
 
-/**
- * Search employees by query
- * @param {string} searchTerm - Search query
- * @returns {Promise} Array of matching employees
- */
+
 searchEmployees: async (searchTerm) => {
   try {
-    const response = await apiClient.get("/employees/search", {
+    const response = await apiClient.get("/employees", {
       params: { searchTerm },
     });
     return response.data;
@@ -173,12 +189,8 @@ searchEmployees: async (searchTerm) => {
   }
 },
 
-// DEPARTMENT & BUSINESS UNIT DATA
 
-/**
- * Get all departments (for Department dropdown)
- * @returns {Promise} Array of departments
- */
+
 getAllDepartments: async () => {
   try {
     const response = await apiClient.get("/employees/departments");
@@ -188,11 +200,6 @@ getAllDepartments: async () => {
   }
 },
 
-/**
- * Get department by ID
- * @param {number} departmentId - Department ID
- * @returns {Promise} Department details
- */
 getDepartmentById: async (departmentId) => {
   try {
     const response = await apiClient.get(`/employees/departments/${departmentId}`);
@@ -202,61 +209,43 @@ getDepartmentById: async (departmentId) => {
   }
 },
 
-/**
- * Get all business units (for Business Unit dropdown)
- * @returns {Promise} Array of business units
- */
 getAllBusinessUnits: async () => {
   try {
     const response = await apiClient.get("/employees/business-units");
     return response.data;
   } catch (error) {
-    throw (
-      error.response?.data || { message: "Failed to fetch business units" }
-    );
+    throw error.response?.data || { message: "Failed to fetch business units" };
   }
 },
 
 /**
- * Get employees by department
- * @param {number} departmentId - Department ID
- * @returns {Promise} Array of employees in department
+
  */
 getEmployeesByDepartment: async (departmentId) => {
   try {
-    const response = await apiClient.get(`/employees/department/${departmentId}`);
+    const response = await apiClient.get("/employees", {
+      params: { departmentId },
+    });
     return response.data;
   } catch (error) {
-    throw (
-      error.response?.data || {
-        message: "Failed to fetch employees by department",
-      }
-    );
+    throw error.response?.data || { message: "Failed to fetch employees by department" };
   }
 },
 
-/**
- * Get employees by role
- * @param {number} roleId - Role ID
- * @returns {Promise} Array of employees with role
- */
+
 getEmployeesByRole: async (roleId) => {
   try {
-    const response = await apiClient.get(`/employees/role/${roleId}`);
+    const response = await apiClient.get("/employees", {
+      params: { roleId },
+    });
     return response.data;
   } catch (error) {
-    throw (
-      error.response?.data || { message: "Failed to fetch employees by role" }
-    );
+    throw error.response?.data || { message: "Failed to fetch employees by role" };
   }
 },
 
 // RESOURCE POOL OPERATIONS
 
-/**
- * Get employees with null reporting manager (Initial Stage Employees)
- * @returns {Promise} Array of initial stage employees
- */
 getInitialStageEmployees: async () => {
   try {
     const response = await apiClient.get("/employees/initial-stage");
@@ -271,11 +260,6 @@ getInitialStageEmployees: async () => {
   }
 },
 
-/**
- * Map employees to resource pool
- * @param {Array|Object} input - Array of employee master IDs or { employeeMasterIds: [...] }
- * @returns {Promise} Mapping result
- */
 mapToResourcePool: async (input) => {
   try {
     let employeeMasterIds = [];
