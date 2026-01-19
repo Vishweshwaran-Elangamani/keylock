@@ -1,17 +1,11 @@
 import React, { useMemo, useState, useEffect } from "react";
-import {
-  CheckCircle,
-  Send,
-  AlertTriangle,
-  ArrowLeft,
-  FileText,
-  Home,
-} from "lucide-react";
+import { CheckCircle, Send, AlertTriangle, Home } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   managerReviewApi,
   employeeApi,
 } from "../../../services/feedbackmanagement/feedbackApi";
+import CustomDropdown from "../../../components/project-management/common/CustomDropdown";
 import "../../../styles/feedback/components/CreateManagerReview.css";
 
 const RATING_LABELS = {
@@ -53,7 +47,6 @@ export default function CreateManagerReview() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [openEmployeeDropdown, setOpenEmployeeDropdown] = useState(false);
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -63,6 +56,7 @@ export default function CreateManagerReview() {
         const items = Array.isArray(res)
           ? res
           : res?.data?.items || res?.data || [];
+
         const normalized = items.map((item) => ({
           employeeId: item.employeeId,
           firstName: item.firstName || item.employeeName || "",
@@ -71,6 +65,7 @@ export default function CreateManagerReview() {
           roleName: item.roleName || "",
           departmentName: item.departmentName || "",
         }));
+
         setEmployees(normalized);
 
         const initialId =
@@ -78,6 +73,7 @@ export default function CreateManagerReview() {
           prefilledEmployee?.empId ||
           normalized[0]?.employeeId ||
           "";
+
         setForm((prev) => ({ ...prev, targetEmployeeId: initialId }));
       } catch (err) {
         console.error("Error fetching subordinates:", err);
@@ -88,6 +84,7 @@ export default function CreateManagerReview() {
     };
 
     fetchEmployees();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -100,6 +97,17 @@ export default function CreateManagerReview() {
     );
     setSelectedEmployee(found || null);
   }, [form.targetEmployeeId, employees]);
+
+  const employeeOptions = useMemo(() => {
+    return employees.map((e) => ({
+      value: e.employeeId,
+      label: `${e.firstName} ${e.lastName}${e.email ? ` (${e.email})` : ""}`,
+    }));
+  }, [employees]);
+
+  const handleDropdownChange = (name, value) => {
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -133,18 +141,6 @@ export default function CreateManagerReview() {
     }
   };
 
-  const selectedEmployeeLabel = (() => {
-    if (loadingEmployees) return "Loading employees...";
-    if (!form.targetEmployeeId) return "-- Choose an employee --";
-    const emp = employees.find(
-      (e) => String(e.employeeId) === String(form.targetEmployeeId)
-    );
-    if (!emp) return "-- Choose an employee --";
-    return `${emp.firstName} ${emp.lastName}${
-      emp.email ? ` (${emp.email})` : ""
-    }`;
-  })();
-
   return (
     <div className="cmr-page">
       <div className="cmr-container">
@@ -155,6 +151,7 @@ export default function CreateManagerReview() {
                 <button
                   className="cmr-breadcrumb-link"
                   onClick={() => navigate("/manager/dashboard/")}
+                  type="button"
                 >
                   <Home size={18} className="cmr-breadcrumb-icon" />
                 </button>
@@ -164,6 +161,7 @@ export default function CreateManagerReview() {
                 <button
                   className="cmr-breadcrumb-link"
                   onClick={() => navigate("/manager/dashboard/feedback")}
+                  type="button"
                 >
                   Feedback Management
                 </button>
@@ -183,7 +181,11 @@ export default function CreateManagerReview() {
               <strong className="cmr-alert-title">Error</strong>
               <p className="cmr-alert-text">{error}</p>
             </div>
-            <button className="cmr-alert-close" onClick={() => setError("")} />
+            <button
+              className="cmr-alert-close"
+              onClick={() => setError("")}
+              type="button"
+            />
           </div>
         )}
 
@@ -194,6 +196,7 @@ export default function CreateManagerReview() {
             <button
               className="cmr-alert-close"
               onClick={() => setSuccess("")}
+              type="button"
             />
           </div>
         )}
@@ -202,60 +205,21 @@ export default function CreateManagerReview() {
           <div className="cmr-card-body">
             <form onSubmit={handleSubmit} className="row g-4">
               <div className="col-12">
-                <label className="cmr-label">
-                  Select Employee <span className="cmr-required">*</span>
-                </label>
-
-                <div className="cmr-dropdown">
-                  <button
-                    type="button"
-                    className={`cmr-dropdown-trigger ${
-                      openEmployeeDropdown ? "cmr-dropdown-trigger-open" : ""
-                    }`}
-                    onClick={() =>
-                      !loadingEmployees &&
-                      setOpenEmployeeDropdown((prev) => !prev)
-                    }
-                    disabled={loadingEmployees}
-                  >
-                    <span className="cmr-dropdown-placeholder">
-                      {selectedEmployeeLabel}
-                    </span>
-                    <span className="cmr-dropdown-arrow" />
-                  </button>
-
-                  {openEmployeeDropdown && (
-                    <div className="cmr-dropdown-menu">
-                      {employees.map(
-                        ({ employeeId, firstName, lastName, email }) => {
-                          const label = `${firstName} ${lastName}${
-                            email ? ` (${email})` : ""
-                          }`;
-                          const isSelected =
-                            String(employeeId) ===
-                            String(form.targetEmployeeId);
-                          return (
-                            <div
-                              key={employeeId}
-                              className={`cmr-dropdown-item ${
-                                isSelected ? "cmr-dropdown-item-selected" : ""
-                              }`}
-                              onClick={() => {
-                                setForm((prev) => ({
-                                  ...prev,
-                                  targetEmployeeId: employeeId,
-                                }));
-                                setOpenEmployeeDropdown(false);
-                              }}
-                            >
-                              {label}
-                            </div>
-                          );
-                        }
-                      )}
-                    </div>
-                  )}
-                </div>
+                <CustomDropdown
+                  label="Select Employee"
+                  required
+                  name="targetEmployeeId"
+                  value={form.targetEmployeeId}
+                  options={employeeOptions}
+                  placeholder={
+                    loadingEmployees
+                      ? "Loading employees..."
+                      : "-- Choose an employee --"
+                  }
+                  disabled={loadingEmployees}
+                  onChange={handleDropdownChange}
+                  className="cmr-dd"
+                />
               </div>
 
               {selectedEmployee && (
@@ -271,6 +235,7 @@ export default function CreateManagerReview() {
                 <label className="cmr-label">
                   Rating <span className="cmr-required">*</span>
                 </label>
+
                 <div className="cmr-rating-row">
                   {[1, 2, 3, 4, 5].map((rating) => (
                     <button
@@ -279,7 +244,9 @@ export default function CreateManagerReview() {
                       className={`cmr-rating-btn ${
                         form.rating === rating ? "cmr-rating-btn-active" : ""
                       }`}
-                      onClick={() => setForm((prev) => ({ ...prev, rating }))}
+                      onClick={() =>
+                        setForm((prev) => ({ ...prev, rating: rating }))
+                      }
                     >
                       <div className="cmr-rating-content">
                         <div className="cmr-rating-number">{rating}</div>
@@ -316,8 +283,7 @@ export default function CreateManagerReview() {
 
               <div className="col-12">
                 <label className="cmr-label">
-                  Project Context{" "}
-                  <span className="cmr-optional">(Optional)</span>
+                  Project Context <span className="cmr-optional">(Optional)</span>
                 </label>
                 <textarea
                   className="cmr-textarea"

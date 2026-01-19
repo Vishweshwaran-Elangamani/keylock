@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { UserCog, X, CheckCircle, Search } from "lucide-react";
-import CustomDropdown from "../../../components/project_management_components/common/CustomDropdown";
+import CustomDropdown from "../../../components/project-management/common/CustomDropdown";
 import "../../../styles/projectmanagement/components/EmployeeSelectionModal.css";
 
 const EmployeeSelectionModal = ({

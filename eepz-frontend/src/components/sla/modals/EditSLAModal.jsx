@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { X, CheckCircle, AlertCircle } from "lucide-react";
-import CustomCalendar from "../../../components/project_management_components/common/CustomCalendar";
-import CustomDropdown from "../../../components/project_management_components/common/CustomDropdown";
+import CustomCalendar from "../../../components/project-management/common/CustomCalendar";
+import CustomDropdown from "../../../components/project-management/common/CustomDropdown";
 import "../../../styles/sla/modals/EditSLAModal.css";
 
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import meetingService from "../../services/meeting/meetingService";
 import toastr from "toastr";
 import { useNavigate } from "react-router-dom";
@@ -8,20 +8,33 @@ import {
   Users,
   Video,
   FileText,
-  Search,
   Check,
   X,
   Plus,
   Home,
-  ChevronDown,
-  ChevronUp,
 } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { employeeApi } from "../../services/feedbackmanagement/feedbackApi";
-import CustomCalendar from "../../components/project_management_components/common/CustomCalendar";
+import CustomCalendar from "../../components/project-management/common/CustomCalendar";
+import CustomDropdown from "../../components/project-management/common/CustomDropdown";
 import "../../styles/mom/components/ScheduleMeeting.css";
 
-const PRIMARY = "#27235C";
+const pad2 = (n) => String(n).padStart(2, "0");
+
+const to24Hour = (hour12, minute, meridian) => {
+  const h = parseInt(hour12, 10);
+  const m = parseInt(minute, 10);
+
+  if (!h || Number.isNaN(m)) return "";
+
+  let hour = h;
+  if (meridian === "AM") {
+    if (hour === 12) hour = 0;
+  } else if (meridian === "PM") {
+    if (hour !== 12) hour += 12;
+  }
+  return `${pad2(hour)}:${pad2(m)}`;
+};
 
 const ScheduleMeeting = () => {
   const navigate = useNavigate();
@@ -43,43 +56,44 @@ const ScheduleMeeting = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const [meetingTypeOpen, setMeetingTypeOpen] = useState(false);
-  const meetingTypeRef = useRef(null);
-
-  const [durationOpen, setDurationOpen] = useState(false);
-  const durationRef = useRef(null);
-
-  const [oneOnOneOpen, setOneOnOneOpen] = useState(false);
-  const oneOnOneRef = useRef(null);
-
   const [calendarOpen, setCalendarOpen] = useState(false);
   const calendarRef = useRef(null);
+
+  const [timeHour, setTimeHour] = useState("10");
+  const [timeMinute, setTimeMinute] = useState("00");
+  const [timeMeridian, setTimeMeridian] = useState("AM");
+
+  useEffect(() => {
+    const t = to24Hour(timeHour, timeMinute, timeMeridian);
+    setFormData((prev) => ({ ...prev, meetingTime: t }));
+  }, [timeHour, timeMinute, timeMeridian]);
 
   useEffect(() => {
     const fetchParticipants = async () => {
       if (formData.meetingType === "One-on-One") {
         try {
           const response = await employeeApi.getSubordinates();
-          if (response.success) {
-            const items = response.data.items.map((item) => ({
-              employeeId: item.employeeId,
-              firstName: item.employeeName,
-              lastName: "",
-              email: item.email,
-              roleName: "",
-              departmentName: item.departmentName,
+
+          const items = Array.isArray(response)
+            ? response
+            : response?.data?.items || response?.data || [];
+
+          const mapped = items.map((item) => ({
+            employeeId: item.employeeId,
+            firstName: item.employeeName || item.firstName || "",
+            lastName: item.lastName || "",
+            email: item.email || "",
+            roleName: item.roleName || "",
+            departmentName: item.departmentName || "",
+          }));
+
+          setEmployeeOptions(mapped);
+
+          if (mapped.length > 0) {
+            setFormData((prev) => ({
+              ...prev,
+              participantEmployeeIds: [mapped[0].employeeId],
             }));
-
-            setEmployeeOptions(items);
-
-            if (items.length > 0) {
-              setFormData((prev) => ({
-                ...prev,
-                participantEmployeeIds: [items[0].employeeId],
-              }));
-            }
-          } else {
-            toastr.error("Failed to fetch subordinates");
           }
         } catch (error) {
           toastr.error("Error fetching subordinates");
@@ -88,8 +102,8 @@ const ScheduleMeeting = () => {
       } else {
         try {
           const response = await meetingService.getAll();
-          if (response.success) {
-            setEmployeeOptions(response.data);
+          if (response?.success) {
+            setEmployeeOptions(response.data || []);
           } else {
             toastr.error("Failed to fetch employees");
           }
@@ -108,23 +122,6 @@ const ScheduleMeeting = () => {
     fetchParticipants();
   }, [formData.meetingType]);
 
-  useEffect(() => {
-    const handler = (e) => {
-      if (meetingTypeRef.current && !meetingTypeRef.current.contains(e.target)) {
-        setMeetingTypeOpen(false);
-      }
-      if (durationRef.current && !durationRef.current.contains(e.target)) {
-        setDurationOpen(false);
-      }
-      if (oneOnOneRef.current && !oneOnOneRef.current.contains(e.target)) {
-        setOneOnOneOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     if (type === "checkbox") {
@@ -134,10 +131,14 @@ const ScheduleMeeting = () => {
     }
   };
 
-  const handleOneOnOneChange = (empId) => {
+  const handleDropdownChange = (name, value) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleOneOnOneChange = (name, empId) => {
     setFormData((prev) => ({
       ...prev,
-      participantEmployeeIds: [empId],
+      participantEmployeeIds: empId ? [empId] : [],
     }));
   };
 
@@ -147,7 +148,9 @@ const ScheduleMeeting = () => {
       if (isSelected) {
         return {
           ...prev,
-          participantEmployeeIds: prev.participantEmployeeIds.filter((id) => id !== empId),
+          participantEmployeeIds: prev.participantEmployeeIds.filter(
+            (id) => id !== empId
+          ),
         };
       }
       return {
@@ -172,7 +175,9 @@ const ScheduleMeeting = () => {
       !formData.meetingTime ||
       formData.participantEmployeeIds.length === 0
     ) {
-      toastr.error("Please fill all required fields and select at least one participant.");
+      toastr.error(
+        "Please fill all required fields and select at least one participant."
+      );
       return;
     }
 
@@ -202,20 +207,68 @@ const ScheduleMeeting = () => {
     }
   };
 
-  const filteredEmployees = employeeOptions.filter((emp) => {
-    const fullName = `${emp.firstName} ${emp.lastName}`.toLowerCase();
-    return fullName.includes(searchTerm.toLowerCase());
-  });
+  const filteredEmployees = useMemo(() => {
+    return employeeOptions.filter((emp) => {
+      const fullName = `${emp.firstName || ""} ${emp.lastName || ""}`.toLowerCase();
+      return fullName.includes(searchTerm.toLowerCase());
+    });
+  }, [employeeOptions, searchTerm]);
 
-  const meetingTypeOptions = ["One-on-One", "Team Meeting", "Presentation", "Other"];
+  const meetingTypeOptions = useMemo(
+    () => [
+      { value: "One-on-One", label: "One-on-One" },
+      { value: "Team Meeting", label: "Team Meeting" },
+      { value: "Presentation", label: "Presentation" },
+      { value: "Other", label: "Other" },
+    ],
+    []
+  );
 
-  const durationOptions = [
-    { value: "0.5", label: "30 minutes" },
-    { value: "1", label: "1 hour" },
-    { value: "1.5", label: "1.5 hours" },
-    { value: "2", label: "2 hours" },
-    { value: "3", label: "3 hours" },
-  ];
+  const durationOptions = useMemo(
+    () => [
+      { value: "0.5", label: "30 minutes" },
+      { value: "1", label: "1 hour" },
+      { value: "1.5", label: "1.5 hours" },
+      { value: "2", label: "2 hours" },
+      { value: "3", label: "3 hours" },
+    ],
+    []
+  );
+
+  const oneOnOneEmployeeOptions = useMemo(() => {
+    return filteredEmployees.map((emp) => ({
+      value: emp.employeeId,
+      label: `${emp.firstName || ""} ${emp.lastName || ""}${
+        emp.departmentName ? ` - ${emp.departmentName}` : ""
+      }`,
+    }));
+  }, [filteredEmployees]);
+
+  const hourOptions = useMemo(
+    () =>
+      Array.from({ length: 12 }, (_, i) => {
+        const v = pad2(i + 1);
+        return { value: v, label: v };
+      }),
+    []
+  );
+
+  const minuteOptions = useMemo(
+    () =>
+      Array.from({ length: 60 }, (_, i) => {
+        const v = pad2(i);
+        return { value: v, label: v };
+      }),
+    []
+  );
+
+  const meridianOptions = useMemo(
+    () => [
+      { value: "AM", label: "AM" },
+      { value: "PM", label: "PM" },
+    ],
+    []
+  );
 
   const formatDisplayDate = (iso) => {
     if (!iso) return "";
@@ -243,25 +296,31 @@ const ScheduleMeeting = () => {
                   onClick={() => navigate("/manager/dashboard/")}
                   className="sched-breadcrumb-link"
                   style={{ display: "flex", alignItems: "center", padding: 0 }}
+                  type="button"
                 >
                   <Home size={18} />
                 </button>
               </li>
+
               <li className="sched-breadcrumb-separator" style={{ margin: "0 4px" }}>
                 /
               </li>
+
               <li className="breadcrumb-item d-flex align-items-center">
                 <button
                   onClick={() => navigate("/manager/dashboard/meetmom")}
                   className="sched-breadcrumb-link"
                   style={{ padding: 0, marginLeft: "2px" }}
+                  type="button"
                 >
                   Meeting and MoM
                 </button>
               </li>
+
               <li className="sched-breadcrumb-separator" style={{ margin: "0 4px" }}>
                 /
               </li>
+
               <li className="breadcrumb-item active d-flex align-items-center">
                 <span className="sched-breadcrumb-current" style={{ marginLeft: "2px" }}>
                   Schedule Meeting
@@ -273,208 +332,126 @@ const ScheduleMeeting = () => {
           <form onSubmit={handleSubmit}>
             <div className="card shadow-sm mb-4 border-0 rounded-3">
               <div className="card-body p-4">
-                <div className="row g-4">
+                <div className="row g-3 align-items-start">
                   <div className="col-md-6">
-                    <label className="form-label fw-semibold d-flex align-items-center gap-2">
-                      <Users size={20} /> Meeting Type
-                    </label>
-
-                    <div ref={meetingTypeRef} className="sched-dropdown-wrap">
-                      <button
-                        type="button"
-                        className="sched-dropdown-btn"
-                        onClick={() => setMeetingTypeOpen((prev) => !prev)}
-                      >
-                        <span className="sched-dropdown-label">{formData.meetingType}</span>
-                        {meetingTypeOpen ? (
-                          <ChevronUp size={18} color="#6B7280" />
-                        ) : (
-                          <ChevronDown size={18} color="#6B7280" />
-                        )}
-                      </button>
-
-                      {meetingTypeOpen && (
-                        <div className="sched-dropdown-menu">
-                          {meetingTypeOptions.map((opt) => {
-                            const active = opt === formData.meetingType;
-                            return (
-                              <div
-                                key={opt}
-                                className={`sched-dropdown-item${
-                                  active ? " sched-dropdown-item-active" : ""
-                                }`}
-                                onClick={() => {
-                                  setFormData((prev) => ({ ...prev, meetingType: opt }));
-                                  setMeetingTypeOpen(false);
-                                }}
-                              >
-                                {opt}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
+                    <CustomDropdown
+                      label={
+                        <span className="sched-dd-label">
+                          <Users size={20} /> Meeting Type
+                        </span>
+                      }
+                      name="meetingType"
+                      value={formData.meetingType}
+                      options={meetingTypeOptions}
+                      placeholder="Select meeting type"
+                      onChange={handleDropdownChange}
+                      className="sched-dd sched-dd-top"
+                    />
                   </div>
 
                   <div className="col-md-6">
-                    <label className="form-label fw-semibold d-flex align-items-center gap-2">
-                      <FileText size={20} /> Meeting Title <span className="text-danger">*</span>
+                    <label className="form-label fw-semibold d-flex align-items-left gap-2 sched-label-top">
+                      <FileText size={20} /> Meeting Title{" "}
+                      <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
                       name="meetingTitle"
                       value={formData.meetingTitle}
                       onChange={handleInputChange}
-                      className="form-control sched-input"
+                      className="sched-title-input"
                       placeholder="Enter meeting title..."
                       required
                     />
                   </div>
 
-                  <div className="col-md-6">
-                    <label className="form-label fw-semibold d-flex align-items-center gap-2">
-                      <Users size={20} /> Select Participant
-                      {formData.meetingType !== "One-on-One" ? "s" : ""}{" "}
-                      <span className="text-danger">*</span>
-                    </label>
+                  <div className="col-12">
+                    <div className="row g-3 align-items-start">
+                      <div className="col-md-6">
+                        <label className="form-label fw-semibold d-flex align-items-center gap-2 sched-label-top">
+                          <Users size={20} /> Select Participant{" "}
+                          <span className="text-danger">*</span>
+                        </label>
 
-                    <div className="input-group mb-3 sched-search-group">
-                      <span className="input-group-text bg-white border-end-0 sched-search-icon">
-                        <Search size={20} className="text-muted" />
-                      </span>
-                      <input
-                        type="text"
-                        className="form-control border-start-0 ps-0 sched-input"
-                        placeholder="Search employees..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                      />
-                    </div>
+                        {formData.meetingType === "One-on-One" ? (
+                          <CustomDropdown
+                            label={null}
+                            name="participantEmployeeIds"
+                            value={formData.participantEmployeeIds?.[0] || ""}
+                            options={oneOnOneEmployeeOptions}
+                            placeholder="Select employee"
+                            onChange={handleOneOnOneChange}
+                            className="sched-dd sched-dd-no-mb"
+                          />
+                        ) : (
+                          <>
+                            <div className="border rounded sched-multi-list">
+                              <table className="table table-hover mb-0">
+                                <thead className="table-light sched-table-head">
+                                  <tr>
+                                    <th className="text-start sched-th-select">Select</th>
+                                    <th className="text-start sched-th">Name</th>
+                                    <th className="text-start sched-th">Role</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {filteredEmployees.length === 0 ? (
+                                    <tr>
+                                      <td colSpan={3} className="text-center py-2 text-muted sched-td">
+                                        No employees found
+                                      </td>
+                                    </tr>
+                                  ) : (
+                                    filteredEmployees.map((emp) => (
+                                      <tr
+                                        key={emp.employeeId}
+                                        onClick={() => handleCheckboxChange(emp.employeeId)}
+                                        className="sched-row-click"
+                                      >
+                                        <td className="text-start">
+                                          <div className="form-check">
+                                            <input
+                                              className="form-check-input sched-check"
+                                              type="checkbox"
+                                              checked={formData.participantEmployeeIds.includes(
+                                                emp.employeeId
+                                              )}
+                                              onChange={() => handleCheckboxChange(emp.employeeId)}
+                                              onClick={(e) => e.stopPropagation()}
+                                            />
+                                          </div>
+                                        </td>
+                                        <td className="text-start sched-td">
+                                          {emp.firstName} {emp.lastName}
+                                        </td>
+                                        <td className="text-start">
+                                          <span className="badge bg-light text-dark border sched-role-badge">
+                                            {emp.roleName || emp.departmentName || "-"}
+                                          </span>
+                                        </td>
+                                      </tr>
+                                    ))
+                                  )}
+                                </tbody>
+                              </table>
+                            </div>
 
-                    {formData.meetingType === "One-on-One" ? (
-                      <div ref={oneOnOneRef} className="sched-dropdown-wrap">
-                        <button
-                          type="button"
-                          className="sched-dropdown-btn"
-                          onClick={() => setOneOnOneOpen((prev) => !prev)}
-                        >
-                          <span className="sched-dropdown-label">
-                            {(() => {
-                              const id = formData.participantEmployeeIds[0];
-                              const emp = employeeOptions.find((e) => e.employeeId === id);
-                              if (!emp) return "Select employee";
-                              return `${emp.firstName} ${emp.lastName || ""}${
-                                emp.departmentName ? ` - ${emp.departmentName}` : ""
-                              }`;
-                            })()}
-                          </span>
-
-                          {oneOnOneOpen ? (
-                            <ChevronUp size={18} color="#6B7280" />
-                          ) : (
-                            <ChevronDown size={18} color="#6B7280" />
-                          )}
-                        </button>
-
-                        {oneOnOneOpen && (
-                          <div className="sched-dropdown-menu">
-                            {filteredEmployees.length === 0 ? (
-                              <div className="sched-dropdown-empty">No employees found</div>
-                            ) : (
-                              filteredEmployees.map((emp) => {
-                                const active =
-                                  formData.participantEmployeeIds[0] === emp.employeeId;
-
-                                return (
-                                  <div
-                                    key={emp.employeeId}
-                                    className={`sched-dropdown-item${
-                                      active ? " sched-dropdown-item-active" : ""
-                                    }`}
-                                    onClick={() => {
-                                      handleOneOnOneChange(emp.employeeId);
-                                      setOneOnOneOpen(false);
-                                    }}
-                                  >
-                                    {emp.firstName} {emp.lastName}{" "}
-                                    {emp.departmentName && `- ${emp.departmentName}`}
-                                  </div>
-                                );
-                              })
-                            )}
-                          </div>
+                            <div className="alert alert-info mt-3 mb-0 d-flex align-items-center gap-2 sched-selected-alert">
+                              <Check size={20} />
+                              <span>
+                                <strong>{formData.participantEmployeeIds.length}</strong>{" "}
+                                participant
+                                {formData.participantEmployeeIds.length !== 1 ? "s" : ""} selected
+                              </span>
+                            </div>
+                          </>
                         )}
                       </div>
-                    ) : (
-                      <>
-                        <div className="border rounded sched-multi-list">
-                          <table className="table table-hover mb-0">
-                            <thead className="table-light sched-table-head">
-                              <tr>
-                                <th className="text-start sched-th-select">Select</th>
-                                <th className="text-start sched-th">Name</th>
-                                <th className="text-start sched-th">Role</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {filteredEmployees.length === 0 ? (
-                                <tr>
-                                  <td colSpan={3} className="text-center py-2 text-muted sched-td">
-                                    No employees found
-                                  </td>
-                                </tr>
-                              ) : (
-                                filteredEmployees.map((emp) => (
-                                  <tr
-                                    key={emp.employeeId}
-                                    onClick={() => handleCheckboxChange(emp.employeeId)}
-                                    className="sched-row-click"
-                                  >
-                                    <td className="text-start">
-                                      <div className="form-check">
-                                        <input
-                                          className="form-check-input sched-check"
-                                          type="checkbox"
-                                          checked={formData.participantEmployeeIds.includes(
-                                            emp.employeeId
-                                          )}
-                                          onChange={() => handleCheckboxChange(emp.employeeId)}
-                                          onClick={(e) => e.stopPropagation()}
-                                        />
-                                      </div>
-                                    </td>
-                                    <td className="text-start sched-td">
-                                      {emp.firstName} {emp.lastName}
-                                    </td>
-                                    <td className="text-start">
-                                      <span className="badge bg-light text-dark border sched-role-badge">
-                                        {emp.roleName || emp.departmentName || "-"}
-                                      </span>
-                                    </td>
-                                  </tr>
-                                ))
-                              )}
-                            </tbody>
-                          </table>
-                        </div>
 
-                        <div className="alert alert-info mt-3 mb-0 d-flex align-items-center gap-2 sched-selected-alert">
-                          <Check size={20} />
-                          <span>
-                            <strong>{formData.participantEmployeeIds.length}</strong> participant
-                            {formData.participantEmployeeIds.length !== 1 ? "s" : ""} selected
-                          </span>
-                        </div>
-                      </>
-                    )}
-                  </div>
-
-                  <div className="col-md-6">
-                    <div className="row">
-                      <div className="col-lg-6 mb-3 mb-lg-0">
-                        <label className="form-label fw-semibold d-flex align-items-center gap-2">
-                          <CalendarIcon size={20} /> Meeting Date <span className="text-danger">*</span>
+                      <div className="col-md-3">
+                        <label className="form-label fw-semibold d-flex align-items-center gap-2 sched-label-top">
+                          <CalendarIcon size={20} /> Meeting Date{" "}
+                          <span className="text-danger">*</span>
                         </label>
 
                         <div ref={calendarRef} className="sched-date-wrap">
@@ -485,11 +462,8 @@ const ScheduleMeeting = () => {
                             onClick={() => setCalendarOpen((o) => !o)}
                             disabled={loading}
                             placeholder="Select date"
-                            className={`sched-date-input${
-                              loading ? " sched-date-input-disabled" : ""
-                            }`}
+                            className={`sched-date-input${loading ? " sched-date-input-disabled" : ""}`}
                           />
-
                           <button
                             type="button"
                             onClick={() => setCalendarOpen((o) => !o)}
@@ -503,43 +477,10 @@ const ScheduleMeeting = () => {
                               viewBox="0 0 24 24"
                               fill="none"
                             >
-                              <rect
-                                x="4"
-                                y="5"
-                                width="16"
-                                height="15"
-                                rx="2"
-                                ry="2"
-                                stroke="currentColor"
-                                strokeWidth="1.8"
-                                fill="none"
-                              />
-                              <line
-                                x1="4"
-                                y1="9"
-                                x2="20"
-                                y2="9"
-                                stroke="currentColor"
-                                strokeWidth="1.8"
-                              />
-                              <line
-                                x1="9"
-                                y1="3"
-                                x2="9"
-                                y2="7"
-                                stroke="currentColor"
-                                strokeWidth="1.8"
-                                strokeLinecap="round"
-                              />
-                              <line
-                                x1="15"
-                                y1="3"
-                                x2="15"
-                                y2="7"
-                                stroke="currentColor"
-                                strokeWidth="1.8"
-                                strokeLinecap="round"
-                              />
+                              <rect x="4" y="5" width="16" height="15" rx="2" ry="2" stroke="currentColor" strokeWidth="1.8" fill="none" />
+                              <line x1="4" y1="9" x2="20" y2="9" stroke="currentColor" strokeWidth="1.8" />
+                              <line x1="9" y1="3" x2="9" y2="7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                              <line x1="15" y1="3" x2="15" y2="7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                             </svg>
                           </button>
                         </div>
@@ -556,90 +497,93 @@ const ScheduleMeeting = () => {
                         />
                       </div>
 
-                      <div className="col-lg-6">
-                        <label className="form-label fw-semibold d-flex align-items-center gap-2">
+                      <div className="col-md-3">
+                       <label className="form-label fw-semibold d-flex align-items-center gap-2 sched-label-top sched-time-label-shift">
                           <Clock size={20} /> Meeting Time <span className="text-danger">*</span>
+                       </label>
+
+                        <div className="sched-time-picker">
+                          <CustomDropdown
+                            label={null}
+                            name="hour"
+                            value={timeHour}
+                            options={hourOptions}
+                            placeholder="HH"
+                            onChange={(n, v) => setTimeHour(v)}
+                            className="sched-time-dd sched-dd-no-mb"
+                          />
+                          <CustomDropdown
+                            label={null}
+                            name="minute"
+                            value={timeMinute}
+                            options={minuteOptions}
+                            placeholder="MM"
+                            onChange={(n, v) => setTimeMinute(v)}
+                            className="sched-time-dd sched-dd-no-mb"
+                          />
+                          <CustomDropdown
+                            label={null}
+                            name="meridian"
+                            value={timeMeridian}
+                            options={meridianOptions}
+                            placeholder="AM/PM"
+                            onChange={(n, v) => setTimeMeridian(v)}
+                            className="sched-time-dd sched-dd-no-mb"
+                          />
+                        </div>
+
+                        {!formData.meetingTime ? (
+                          <div className="sched-time-error">Please select time</div>
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="col-12">
+                    <div className="row g-3 align-items-start">
+                      <div className="col-md-6">
+                        <label className="form-label fw-semibold d-flex align-items-center gap-2">
+                          <Video size={20} /> Meeting Link
                         </label>
-                        <input
-                          type="time"
-                          name="meetingTime"
-                          value={formData.meetingTime}
-                          onChange={handleInputChange}
-                          className="form-control sched-input"
-                          required
+
+                        <div className="input-group sched-link-group">
+                          <input
+                            type="url"
+                            name="meetingLink"
+                            value={formData.meetingLink}
+                            onChange={handleInputChange}
+                            className="form-control sched-input sched-link-input"
+                            placeholder="Enter meeting link or generate one"
+                          />
+                          <button
+                            type="button"
+                            onClick={generateTeamsLink}
+                            className="btn btn-outline-primary d-flex align-items-center gap-2 sched-generate-btn"
+                          >
+                            <Plus size={20} /> Generate
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="col-md-6">
+                        <CustomDropdown
+                          label={
+                            <span className="sched-dd-label">
+                              <Clock size={20} /> Duration
+                            </span>
+                          }
+                          name="duration"
+                          value={formData.duration}
+                          options={durationOptions}
+                          placeholder="Select duration"
+                          onChange={handleDropdownChange}
+                          className="sched-dd"
                         />
                       </div>
                     </div>
-
-                    <div className="mt-3" ref={durationRef}>
-                      <label className="form-label fw-semibold d-flex align-items-center gap-2">
-                        <Clock size={20} /> Duration
-                      </label>
-                      <div className="sched-dropdown-wrap">
-                        <button
-                          type="button"
-                          className="sched-dropdown-btn"
-                          onClick={() => setDurationOpen((prev) => !prev)}
-                        >
-                          <span className="sched-dropdown-label">
-                            {durationOptions.find((d) => d.value === formData.duration)?.label}
-                          </span>
-                          {durationOpen ? (
-                            <ChevronUp size={18} color="#6B7280" />
-                          ) : (
-                            <ChevronDown size={18} color="#6B7280" />
-                          )}
-                        </button>
-
-                        {durationOpen && (
-                          <div className="sched-dropdown-menu">
-                            {durationOptions.map((opt) => {
-                              const active = opt.value === formData.duration;
-                              return (
-                                <div
-                                  key={opt.value}
-                                  className={`sched-dropdown-item${
-                                    active ? " sched-dropdown-item-active" : ""
-                                  }`}
-                                  onClick={() => {
-                                    setFormData((prev) => ({ ...prev, duration: opt.value }));
-                                    setDurationOpen(false);
-                                  }}
-                                >
-                                  {opt.label}
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    </div>
                   </div>
 
-                  <div className="col-md-6">
-                    <label className="form-label fw-semibold d-flex align-items-center gap-2">
-                      <Video size={20} /> Meeting Link
-                    </label>
-                    <div className="input-group mb-3">
-                      <input
-                        type="url"
-                        name="meetingLink"
-                        value={formData.meetingLink}
-                        onChange={handleInputChange}
-                        className="form-control sched-input"
-                        placeholder="Enter meeting link or generate one..."
-                      />
-                      <button
-                        type="button"
-                        onClick={generateTeamsLink}
-                        className="btn btn-outline-primary d-flex align-items-center gap-2 sched-generate-btn"
-                      >
-                        <Plus size={20} /> Generate
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="col-md-6">
+                  <div className="col-12">
                     <label className="form-label fw-semibold d-flex align-items-center gap-2">
                       <FileText size={20} /> Agenda
                     </label>

@@ -10,7 +10,7 @@ import {
   UserCog,
   Info,
 } from "lucide-react";
-import CustomDropdown from "../../../components/project_management_components/common/CustomDropdown";
+import CustomDropdown from "../../../components/project-management/common/CustomDropdown";
 import "../../../styles/projectmanagement/modals/ManagerSelectionModal.css";
 
 const ManagerSelectionModal = ({

@@ -1,8 +1,31 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+:root {
+  --sched-placeholder: #9ca3af;
+  --sched-dark: #27235c;
+  --sched-hover: #f1f2f4;
+  --sched-selected: #27235c;
+  --sched-selected-text: #ffffff;
+  --sched-field-height: 44px;
+}
+
 .sched-page {
   background-color: #f8f9fa;
   min-height: 100vh;
   padding: 1.5rem 1.25rem;
   margin-top: -13px;
+}
+
+.sched-page,
+.sched-page * {
+  font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+}
+
+.sched-page input::placeholder,
+.sched-page textarea::placeholder {
+  color: var(--sched-placeholder) !important;
+  opacity: 1 !important;
+  font-weight: 400 !important;
 }
 
 .sched-breadcrumb-nav {
@@ -56,81 +79,154 @@
 
 .sched-input {
   font-size: 1rem;
-  padding: 0.6rem 0.75rem;
+  padding: 0.6rem 0.85rem;
 }
 
 .sched-textarea {
   font-size: 1rem;
-  padding: 0.6rem 0.75rem;
+  padding: 0.6rem 0.85rem;
   min-height: 90px;
 }
 
-.sched-dropdown-wrap {
-  position: relative;
-  width: 100%;
+.sched-page .cdrop-trigger,
+.sched-page .cdrop-value,
+.sched-page .cdrop-item {
+  font-size: 1rem !important;
 }
 
-.sched-dropdown-btn {
+.sched-page .cdrop-placeholder {
+  color: var(--sched-placeholder) !important;
+  font-weight: 400 !important;
+}
+
+.sched-page .cdrop-item:hover {
+  background: var(--sched-hover) !important;
+  color: #111827 !important;
+}
+
+.sched-page .cdrop-item-active {
+  background: var(--sched-selected) !important;
+  color: var(--sched-selected-text) !important;
+  font-weight: 600 !important;
+}
+
+.sched-dd {
   width: 100%;
-  text-align: left;
+  margin-top: -5px;
+}
+
+.sched-dd-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+}
+
+.sched-label-top {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.sched-dd-top .cdrop-label {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+}
+
+.sched-title-input {
+  width: 100%;
+  height: var(--sched-field-height);
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  outline: none;
+  transition: all 0.2s ease;
+  margin-top: 1px;
+}
+
+.sched-time-label-shift {
+  margin-left: -20px;
+}
+
+
+.sched-title-input:hover {
+  border-color: var(--sched-dark);
+  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.08);
+}
+
+.sched-title-input:focus {
+  border-color: var(--sched-dark);
+  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+}
+
+.sched-dd-top .cdrop-trigger {
+  height: var(--sched-field-height) !important;
+}
+
+.sched-date-wrap {
+  position: relative;
+  width: 90%;
+  margin-top: -3px;
+}
+
+.sched-date-input {
+  width: 100%;
+  padding: 0.6rem 2.5rem 0.6rem 0.85rem;
   border-radius: 10px;
   border: 1px solid #e5e7eb;
-  background-color: #ffffff;
-  padding: 0.6rem 0.85rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 0.95rem;
-  color: #111827;
-}
-
-.sched-dropdown-label {
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.sched-dropdown-menu {
-  position: absolute;
-  z-index: 20;
-  background-color: #ffffff;
-  border-radius: 0 0 12px 12px;
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
-  margin-top: 2px;
-  overflow: hidden;
-  width: 100%;
-  max-height: 260px;
-  overflow-y: auto;
-  text-align: left;
-}
-
-.sched-dropdown-item {
-  padding: 10px 16px;
+  font-size: 1rem;
+  box-sizing: border-box;
   cursor: pointer;
   background-color: #ffffff;
-  color: #111827;
-  font-weight: 400;
-  border-bottom: 1px solid #f3f4f6;
-  font-size: 0.95rem;
+  height: var(--sched-field-height);
+  
+  
 }
 
-.sched-dropdown-item:hover {
-  background-color: #27235c;
-  color: #ffffff;
+.sched-date-input-disabled {
+  cursor: not-allowed;
+  background-color: #f3f4f6;
 }
 
-.sched-dropdown-item-active {
-  background-color: #efefef;
-  color: #000;
-  font-weight: 600;
+.sched-date-icon-btn {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  left: auto;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  color: #27235c;
 }
 
-.sched-dropdown-empty {
-  padding: 10px 16px;
-  text-align: center;
-  font-size: 0.95rem;
-  color: #6b7280;
+.sched-calendar-svg {
+  display: block;
+}
+
+.sched-time-picker {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-left: -20px;
+}
+
+.sched-time-dd .cdrop-trigger {
+  height: var(--sched-field-height);
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+}
+
+.sched-time-error {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #dc2626;
 }
 
 .sched-multi-list {
@@ -174,58 +270,8 @@
   font-size: 1rem;
 }
 
-.sched-search-group .sched-search-icon {
-  padding-right: 0.25rem;
-}
-
-.sched-date-wrap {
-  position: relative;
-  width: 100%;
-}
-
-.sched-date-input {
-  width: 100%;
-  padding: 0.6rem 2.5rem 0.6rem 0.75rem;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-  font-size: 0.95rem;
-  box-sizing: border-box;
-  cursor: pointer;
-  background-color: #ffffff;
-}
-
-.sched-date-input-disabled {
-  cursor: not-allowed;
-  background-color: #f3f4f6;
-}
-
-.sched-date-icon-btn {
-  position: absolute;
-  top: 50%;
-  right: 10px;
-  transform: translateY(-50%);
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  padding: 0;
-  color: #27235C;
-}
-
-.sched-date-icon-btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.65;
-}
-
-.sched-calendar-svg {
-  display: block;
-}
-
 .sched-generate-btn {
   font-size: 1rem;
-}
-
-.sched-reminder-select {
-  min-width: 160px;
 }
 
 .sched-cancel-btn {
@@ -253,9 +299,32 @@
   cursor: not-allowed;
 }
 
+.card-body .row.g-3 {
+  margin-top: 0;
+}
+
+.input-group.sched-link-group {
+  margin-bottom: 0 !important;
+  height: var(--sched-field-height);
+}
+
+.input-group.sched-link-group .form-control {
+  height: var(--sched-field-height);
+}
+
+.input-group.sched-link-group .btn {
+  height: var(--sched-field-height);
+  display: inline-flex;
+  align-items: center;
+}
+
 @media (max-width: 768px) {
   .sched-page {
     padding: 1.25rem 1rem;
+  }
+
+  .sched-time-picker {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -263,4 +332,12 @@
   .sched-page {
     padding: 1rem 0.75rem;
   }
+}
+
+.sched-dd-no-mb {
+  margin-bottom: 0 !important;
+}
+
+.sched-dd-no-mb.cdrop-wrap {
+  margin-bottom: 0 !important;
 }

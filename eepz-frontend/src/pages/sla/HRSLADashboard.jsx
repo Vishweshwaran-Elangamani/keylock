@@ -20,7 +20,7 @@ import slaService from "../../services/sla/slaService";
 import EditSLAModal from "../../components/sla/modals/EditSLAModal";
 import CreateSLAModal from "../../components/sla/modals/CreateSLAModal";
 import ConfirmationModal from "../../components/goals/modals/ConfirmationModal";
-import CustomDropdown from "../../components/project_management_components/common/CustomDropdown";
+import CustomDropdown from "../../components/project-management/common/CustomDropdown";
 import "./../../styles/sla/components/HRSLADashboard.css";
 
 const HRSLADashboard = () => {

@@ -9,8 +9,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import hrFormApi from "../../../services/feedbackmanagement/hrFormApi";
 import FeedbackBreadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb";
-import CustomCalendar from "../../../components/project_management_components/common/CustomCalendar";
-import CustomDropdown from "../../../components/project_management_components/common/CustomDropdown";
+import CustomCalendar from "../../../components/project-management/common/CustomCalendar";
+import CustomDropdown from "../../../components/project-management/common/CustomDropdown";
 import "../../../styles/feedback/components/CreateFeedbackForm.css";
 
 export default function CreateFeedbackForm() {

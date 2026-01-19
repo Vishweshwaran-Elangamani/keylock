@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Search, Filter, Plus, Users, X } from "lucide-react";
-import CustomDropdown from "../../components/project_management_components/common/CustomDropdown";
+import CustomDropdown from "../../components/project-management/common/CustomDropdown";
 import "../../styles/projectmanagement/components/ProjectListFilterBar.css";
 
 const ProjectListFilterBar = ({

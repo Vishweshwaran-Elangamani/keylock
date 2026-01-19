@@ -6,9 +6,9 @@ import {
   UserCog,Home,
 } from "lucide-react";
 import projectService from "../../services/project_management/projectService";
-import EmployeeSelectionModal from "../../components/project_management_components/modals/EmployeeSelectionModal";
-import CustomCalendar from "../../components/project_management_components/common/CustomCalendar";
-import CustomDropdown from "../../components/project_management_components/common/CustomDropdown";
+import EmployeeSelectionModal from "../../components/project-management/modals/EmployeeSelectionModal";
+import CustomCalendar from "../../components/project-management/common/CustomCalendar";
+import CustomDropdown from "../../components/project-management/common/CustomDropdown";
 import "../../styles/projectmanagement/components/CreateProject.css";
 
 const CreateProject = () => {

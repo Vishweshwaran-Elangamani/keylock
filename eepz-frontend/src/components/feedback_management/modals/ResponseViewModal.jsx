@@ -2,75 +2,16 @@ import React, { useState, useEffect } from "react";
 import {
   User,
   Clock,
-  Lock,
-  Target,
-  Star,
-  MessageSquare,
-  Calendar,
+  Video,
+  FileText,
+  Check,
   X,
 } from "lucide-react";
 import axios from "axios";
 import "../../../styles/feedback/modals/ResponseViewModal.css";
+import { QUESTION_TEMPLATES } from "../../../constants/feedback_management/questionTemplates";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
-
-const QUESTION_TEMPLATES = {
-  PerformanceReview: [
-    { id: 1, text: "Quality of work delivered" },
-    { id: 2, text: "Meeting deadlines and commitments" },
-    { id: 3, text: "Technical skills and expertise" },
-    { id: 4, text: "Problem-solving and critical thinking" },
-    { id: 5, text: "Communication with team members" },
-    { id: 6, text: "Collaboration and teamwork" },
-    { id: 7, text: "Initiative and proactiveness" },
-    { id: 8, text: "Adaptability to change" },
-    { id: 9, text: "Leadership and mentoring (if applicable)" },
-    { id: 10, text: "Overall contribution to the team" },
-  ],
-  GeneralFeedback: [
-    { id: 1, text: "How would you rate overall performance?" },
-    { id: 2, text: "Communication effectiveness" },
-    { id: 3, text: "Teamwork and collaboration" },
-    { id: 4, text: "Work quality and attention to detail" },
-    { id: 5, text: "Reliability and dependability" },
-  ],
-  BiasReview: [
-    { id: 1, text: "Treats all team members fairly regardless of background" },
-    { id: 2, text: "Makes decisions based on merit, not personal preferences" },
-    { id: 3, text: "Respects diverse perspectives and opinions" },
-    { id: 4, text: "Provides equal opportunities to all team members" },
-    { id: 5, text: "Avoids stereotyping or making assumptions" },
-    { id: 6, text: "Handles conflicts impartially" },
-    { id: 7, text: "Creates an inclusive work environment" },
-  ],
-  ProfessionalismReview: [
-    { id: 1, text: "Maintains professional conduct at all times" },
-    { id: 2, text: "Respects workplace policies and guidelines" },
-    { id: 3, text: "Communicates professionally with colleagues" },
-    { id: 4, text: "Handles confidential information appropriately" },
-    { id: 5, text: "Demonstrates punctuality and attendance" },
-    { id: 6, text: "Maintains appropriate workplace boundaries" },
-    { id: 7, text: "Represents the organization positively" },
-    { id: 8, text: "Takes accountability for actions and decisions" },
-  ],
-  SurveyForm: [
-    { id: 1, text: "Job satisfaction level" },
-    { id: 2, text: "Work-life balance" },
-    { id: 3, text: "Team collaboration quality" },
-    { id: 4, text: "Management support" },
-    { id: 5, text: "Career growth opportunities" },
-    { id: 6, text: "Work environment and culture" },
-    { id: 7, text: "Resources and tools provided" },
-  ],
-  EvaluationForm: [
-    { id: 1, text: "Meets job expectations and requirements" },
-    { id: 2, text: "Demonstrates required competencies" },
-    { id: 3, text: "Shows continuous improvement" },
-    { id: 4, text: "Achieves set goals and objectives" },
-    { id: 5, text: "Contributes to team success" },
-    { id: 6, text: "Professional development and learning" },
-  ],
-};
 
 const RATING_LABELS = {
   1: "Poor",
@@ -117,14 +58,19 @@ const ResponseViewModal = ({ show, response, onClose, type }) => {
   const getQuestionText = (qId) => {
     const formType =
       formDetails?.formType || response?.formType || "GeneralFeedback";
-    const questions = QUESTION_TEMPLATES[formType] || [];
-    const q = questions.find((x) => x.id === Number(qId));
-    return q ? q.text : `Question ${qId}`;
+
+    const questionsForFormType = QUESTION_TEMPLATES[formType] || [];
+    const matchedQuestion = questionsForFormType.find(
+      (question) => question.id === Number(qId)
+    );
+
+    return matchedQuestion ? matchedQuestion.text : `Question ${qId}`;
   };
 
   const parseHRResponses = () => {
     if (!response?.formResponse || typeof response.formResponse !== "object")
       return [];
+
     const items = [];
     Object.keys(response.formResponse).forEach((key) => {
       if (key.startsWith("question_")) {
@@ -136,6 +82,7 @@ const ResponseViewModal = ({ show, response, onClose, type }) => {
         });
       }
     });
+
     return items.sort((a, b) => Number(a.qId) - Number(b.qId));
   };
 

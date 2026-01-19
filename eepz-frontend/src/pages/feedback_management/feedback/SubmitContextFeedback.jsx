@@ -17,7 +17,7 @@ import {
   goalsApi,
 } from "../../../services/feedbackmanagement/feedbackApi";
 
-import CustomDropdown from "../../../components/project_management_components/common/CustomDropdown"; // ✅ reuse
+import CustomDropdown from "../../../components/project-management/common/CustomDropdown";
 import "../../../styles/feedback/components/SubmitContextFeedback.css";
 
 const getRolePaths = (roleName) => {

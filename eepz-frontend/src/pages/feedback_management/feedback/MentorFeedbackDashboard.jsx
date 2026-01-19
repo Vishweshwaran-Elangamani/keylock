@@ -13,7 +13,7 @@ import { mentorFeedbackApi } from "../../../services/feedbackmanagement/feedback
 import axios from "axios";
 import "../../../styles/feedback/components/MentorFeedbackDashboard.css";
 
-import CustomDropdown from "../../../components/project_management_components/common/CustomDropdown";
+import CustomDropdown from "../../../components/project-management/common/CustomDropdown";
 
 const formatDate = (dateInput) => {
   if (!dateInput) return "—";

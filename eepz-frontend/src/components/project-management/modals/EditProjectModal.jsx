@@ -7,8 +7,8 @@ import {
   MessageSquare,
   Calendar,
 } from "lucide-react";
-import CustomCalendar from "../../../components/project_management_components/common/CustomCalendar";
-import CustomDropdown from "../../../components/project_management_components/common/CustomDropdown";
+import CustomCalendar from "../../../components/project-management/common/CustomCalendar";
+import CustomDropdown from "../../../components/project-management/common/CustomDropdown";
 import "../../../styles/projectmanagement/modals/EditProjectModal.css";
 
 const DateInput = ({

@@ -6,11 +6,11 @@ import { toast } from "sonner";
 import projectService from "../../services/project_management/projectService";
 import ProjectListFilterBar from "./ProjectListFilterBar";
 import "../../styles/projectmanagement/components/ProjectList.css";
-import EditProjectModal from "../../components/project_management_components/modals/EditProjectModal";
-import ManagerSelectionModal from "../../components/project_management_components/modals/ManagerSelectionModal";
-import EmployeeMappingModal from "../../components/project_management_components/modals/EmployeeMappingModal";
-import DeleteConfirmationModal from "../../components/project_management_components/modals/DeleteConfirmationModal";
-import CustomDropdown from "../../components/project_management_components/common/CustomDropdown";
+import EditProjectModal from "../../components/project-management/modals/EditProjectModal";
+import ManagerSelectionModal from "../../components/project-management/modals/ManagerSelectionModal";
+import EmployeeMappingModal from "../../components/project-management/modals/EmployeeMappingModal";
+import DeleteConfirmationModal from "../../components/project-management/modals/DeleteConfirmationModal";
+import CustomDropdown from "../../components/project-management/common/CustomDropdown";
 
 const ProjectList = () => {
   const navigate = useNavigate();

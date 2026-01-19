@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Plus, Loader, AlertCircle, X } from "lucide-react";
 import { toast } from "sonner";
 import slaService from "../../../services/sla/slaService";
-import CustomCalendar from "../../../components/project_management_components/common/CustomCalendar";
+import CustomCalendar from "../../../components/project-management/common/CustomCalendar";
 import "../../../styles/sla/modals/CreateSLAModal.css";
 
 const CreateSLAModal = ({ onClose, onSuccess }) => {
