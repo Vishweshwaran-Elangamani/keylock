@@ -1,9 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Save,X,AlertCircle,CheckCircle,
-  Users, Building, Calendar as CalendarIcon,
-  UserCog,Home,
+  Save,
+  X,
+  AlertCircle,
+  CheckCircle,
+  Users,
+  Building,
+  Calendar as CalendarIcon,
+  UserCog,
+  Home,
 } from "lucide-react";
 import projectService from "../../services/project_management/projectService";
 import EmployeeSelectionModal from "../../components/project-management/modals/EmployeeSelectionModal";
@@ -46,7 +52,14 @@ const CreateProject = () => {
   const endDateRef = useRef(null);
   const statusOptions = ["Active", "On Hold", "Completed", "Cancelled"];
 
-  const engagementModels = ["Fixed Price", "Time and Materials", "Agile - Scrum", "Agile - Kanban", "Consulting", "Retainer",];
+  const engagementModels = [
+    "Fixed Price",
+    "Time and Materials",
+    "Agile - Scrum",
+    "Agile - Kanban",
+    "Consulting",
+    "Retainer",
+  ];
 
   const PROJECTNAMEREGEX = /^ORG\.[A-Za-zA-Za-z0-9-]+\.[A-Za-zA-Za-z0-9-]+$/;
 
@@ -67,13 +80,22 @@ const CreateProject = () => {
           projectService.getAllBusinessUnits(),
         ]);
 
-      const employeesData = employeesRes?.data ?? employeesRes ?? [];
-      const departmentsData = departmentsRes?.data ?? departmentsRes ?? [];
-      const businessUnitsData = businessUnitsRes?.data ?? businessUnitsRes ?? [];
+      const employeesData = Array.isArray(employeesRes?.data)
+        ? employeesRes.data
+        : [];
+      const departmentsData = Array.isArray(departmentsRes?.data)
+        ? departmentsRes.data.map((dep) => ({
+            value: dep.departmentId, // departmentId as value
+            label: dep.departmentName, // departmentName as label
+          }))
+        : [];
+      const businessUnitsData = Array.isArray(businessUnitsRes?.data)
+        ? businessUnitsRes.data
+        : [];
 
-      setEmployees(Array.isArray(employeesData) ? employeesData : []);
-      setDepartments(Array.isArray(departmentsData) ? departmentsData : []);
-      setBusinessUnits(Array.isArray(businessUnitsData) ? businessUnitsData : []);
+      setEmployees(employeesData);
+      setDepartments(departmentsData); // Update with mapped department data
+      setBusinessUnits(businessUnitsData);
     } catch (error) {
       console.error("Dropdown Fetch Error:", error);
       setSubmitStatus({
@@ -170,13 +192,21 @@ const CreateProject = () => {
     setSubmitStatus(null);
 
     try {
+      // Get the department name before submitting
+      const selectedDepartment = departments.find(
+        (dep) => dep.value === formData.department,
+      );
+      const departmentName = selectedDepartment ? selectedDepartment.label : "";
+
       const projectData = {
         ...formData,
+        department: departmentName, // Send department name (not ID)
         startDate: new Date(formData.startDate).toISOString(),
         endDate: formData.endDate
           ? new Date(formData.endDate).toISOString()
           : null,
-        resourceOwnerEmployeeId: selectedResourceOwner?.employeeMasterId || null,
+        resourceOwnerEmployeeId:
+          selectedResourceOwner?.employeeMasterId || null,
         l1ApproverEmployeeId: selectedL1Approver?.employeeMasterId || null,
         l2ApproverEmployeeId: selectedL2Approver?.employeeMasterId || null,
       };
@@ -192,7 +222,8 @@ const CreateProject = () => {
     } catch (error) {
       setSubmitStatus({
         type: "error",
-        message: error?.message || "Failed to create project. Please try again.",
+        message:
+          error?.message || "Failed to create project. Please try again.",
       });
     } finally {
       setIsSubmitting(false);
@@ -295,9 +326,7 @@ const CreateProject = () => {
                       value={formData.projectName}
                       onChange={handleChange}
                       placeholder="Example: ORG.IT.INTRANET"
-                      className={`prj-form-input ${
-                        errors.projectName ? "error" : ""
-                      }`}
+                      className={`prj-form-input ${errors.projectName ? "error" : ""}`}
                     />
                     <div className="prj-form-hint">
                       Format:{" "}
@@ -322,9 +351,7 @@ const CreateProject = () => {
                       value={formData.clientName}
                       onChange={handleChange}
                       placeholder="Example: ACME CORPORATION"
-                      className={`prj-form-input ${
-                        errors.clientName ? "error" : ""
-                      }`}
+                      className={`prj-form-input ${errors.clientName ? "error" : ""}`}
                     />
                     {errors.clientName && (
                       <div className="prj-error-message">
@@ -589,7 +616,8 @@ const CreateProject = () => {
                 type="button"
                 onClick={handleReset}
                 disabled={isSubmitting}
-                className="prj-btn prj-btn-secondary">
+                className="prj-btn prj-btn-secondary"
+              >
                 <X size={18} />
                 <span>Reset</span>
               </button>
@@ -597,7 +625,8 @@ const CreateProject = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="prj-btn prj-btn-primary">
+                className="prj-btn prj-btn-primary"
+              >
                 {isSubmitting ? (
                   <>
                     <span className="prj-spinner-border prj-spinner-sm" />
@@ -625,7 +654,8 @@ const CreateProject = () => {
         selectedL1Approver={selectedL1Approver}
         selectedL2Approver={selectedL2Approver}
         onSelectManager={handleManagerSelect}
-        onConfirm={handleConfirmSelection}/>
+        onConfirm={handleConfirmSelection}
+      />
     </div>
   );
 };
