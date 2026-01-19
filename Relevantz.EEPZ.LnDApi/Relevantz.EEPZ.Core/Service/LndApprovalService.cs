@@ -604,7 +604,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         /// <summary>
         /// Returns a preview of an approval attachment for inline viewing, with access checks.
         /// </summary>
-        public async Task<ApiResponse<FileDownloadResponseModel>> PreviewApprovalAttachment(
+        public async Task<ApiResponse<FileDownloadResponseModel>> GetApprovalAttachmentPreview(
             int employeeId,
             int approvalId
         )
@@ -678,7 +678,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         /// <summary>
         /// Returns a preview of an assignment proof document for inline viewing, with access checks.
         /// </summary>
-        public async Task<ApiResponse<FileDownloadResponseModel>> PreviewAssignmentProof(
+        public async Task<ApiResponse<FileDownloadResponseModel>> GetAssignmentProofPreview(
             int employeeId,
             int assignmentId
         )
@@ -752,4 +752,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         #endregion
     }
-}
+} 
+
+
+

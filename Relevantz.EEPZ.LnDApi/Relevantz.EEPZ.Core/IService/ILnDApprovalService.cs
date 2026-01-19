@@ -28,13 +28,13 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             int employeeId, 
             int assignmentId
         );
-        Task<ApiResponse<FileDownloadResponseModel>> PreviewApprovalAttachment(
+        Task<ApiResponse<FileDownloadResponseModel>> GetApprovalAttachmentPreview(
             int employeeId,
             int approvalId
-        );
-        Task<ApiResponse<FileDownloadResponseModel>> PreviewAssignmentProof(
+        );  
+        Task<ApiResponse<FileDownloadResponseModel>> GetAssignmentProofPreview(
             int employeeId, 
             int assignmentId
-        );
+        );   
     }
 }

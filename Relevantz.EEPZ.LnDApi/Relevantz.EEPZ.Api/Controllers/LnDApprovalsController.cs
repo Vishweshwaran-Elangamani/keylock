@@ -172,7 +172,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Returns file with appropriate MIME type and content disposition header.
         /// </summary>
         [HttpGet("api/lnd-approvals/{approvalId}/download")]
-        public async Task<IActionResult> DownloadApprovalAttachment(int approvalId)
+        public async Task<IActionResult> GetApprovalAttachmentDownload(int approvalId)
         {
             var employeeId = GetCurrentEmployeeId();
 
@@ -209,7 +209,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Validates access for mentee, SME, or reporting manager only.
         /// </summary>
         [HttpGet("api/lnd-approvals/assignments/{assignmentId}/download-proof")]
-        public async Task<IActionResult> DownloadAssignmentProof(int assignmentId)
+        public async Task<IActionResult> GetAssignmentProofDownload(int assignmentId)
         {
             var employeeId = GetCurrentEmployeeId();
 
@@ -238,7 +238,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 assignmentId, fileName, fileBytes.Length
             );
 
-            return File(fileBytes, contentType, fileName);
+            return File(fileBytes, contentType, fileName); 
         }
 
         #endregion
@@ -259,7 +259,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 approvalId, employeeId
             );
 
-            var result = await _approvalService.PreviewApprovalAttachment(employeeId, approvalId);
+            var result = await _approvalService.GetApprovalAttachmentPreview(employeeId, approvalId);
 
             if (!result.Success)
             {
@@ -297,7 +297,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 assignmentId, employeeId
             );
 
-            var result = await _approvalService.PreviewAssignmentProof(employeeId, assignmentId);
+            var result = await _approvalService.GetAssignmentProofPreview(employeeId, assignmentId);
 
             if (!result.Success)
             {
