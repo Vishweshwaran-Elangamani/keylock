@@ -34,10 +34,10 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return BadRequest(result);
             return Ok(result);
         }
-        [HttpGet("role/{roleId}")]
-        public async Task<IActionResult> GetRoleById(int roleId)
+        [HttpGet("role/{Id}")]
+        public async Task<IActionResult> GetRoleById(int Id)
         {
-            var result = await _roleService.GetRoleByIdAsync(roleId);
+            var result = await _roleService.GetRoleByIdAsync(Id);
             if (!result.Success)
                 return NotFound(result);
             return Ok(result);
@@ -74,11 +74,11 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return BadRequest(result);
             return Ok(result);
         }
-        [HttpGet("department/{departmentId}")]
+        [HttpGet("department/{Id}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetDepartmentById(int departmentId)
+        public async Task<IActionResult> GetDepartmentById(int Id)
         {
-            var result = await _departmentService.GetDepartmentByIdAsync(departmentId);
+            var result = await _departmentService.GetDepartmentByIdAsync(Id);
             if (!result.Success)
                 return NotFound(result);
             return Ok(result);

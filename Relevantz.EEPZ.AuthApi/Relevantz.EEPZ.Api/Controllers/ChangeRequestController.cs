@@ -57,11 +57,11 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _changeRequestService.GetAllChangeRequestsAsync();
             return Ok(result);
         }
-        [HttpDelete("cancel/{requestId}")]
-        public async Task<IActionResult> CancelChangeRequest(int requestId)
+        [HttpDelete("cancel/{Id}")]
+        public async Task<IActionResult> CancelChangeRequest(int Id)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-            var result = await _changeRequestService.CancelChangeRequestAsync(userId, requestId);
+            var result = await _changeRequestService.CancelChangeRequestAsync(userId, Id);
             if (!result.Success)
                 return BadRequest(result);
             return Ok(result);

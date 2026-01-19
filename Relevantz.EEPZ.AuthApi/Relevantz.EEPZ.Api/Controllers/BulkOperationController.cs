@@ -53,7 +53,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(result);
         }
         [HttpGet("download-template")]
-        [Authorize]
         public async Task<IActionResult> DownloadExcelTemplate()
         {
             try
