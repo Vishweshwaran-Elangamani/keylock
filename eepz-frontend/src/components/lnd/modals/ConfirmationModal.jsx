@@ -79,7 +79,7 @@ const ConfirmationModal = ({
             </div>
             <button
               type="button"
-              class="btn-close-white"
+              className="btn-close btn-close-white"
               onClick={onClose}
               style={{
                 border: "none",
@@ -103,7 +103,7 @@ const ConfirmationModal = ({
                 e.currentTarget.style.color = "white";
               }}
             >
-              <i className="bi bi-x-lg"></i>
+             <X size={20} />
             </button>
           </div>
 

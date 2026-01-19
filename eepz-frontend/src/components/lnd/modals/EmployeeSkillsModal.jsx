@@ -234,7 +234,7 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
               type="button"
               onClick={onClose}
               disabled={loading}
-              className={`btn-close-white ${styles.btnClose}`}
+              className={`btn-close btn-close-white ${styles.btnClose}`}
             />
           </div>
 
