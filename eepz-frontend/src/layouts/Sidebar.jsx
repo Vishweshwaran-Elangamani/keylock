@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import icon from "../assets/icon.png";
 import logodarkbarred from "../assets/logodarkbarred.png";
-import logodarkbarredpongal from "../assets/logodarkbarredpongal.png";
 import "../styles/layout_styles/Sidebar.css";
 
 const Sidebar = ({ allowedRoles = [], currentRole }) => {
@@ -309,7 +308,7 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
       {/* Logo Section */}
       <div className="sbd-logo-section">
         <img
-          src={sidebarExpanded ? logodarkbarredpongal : icon}
+          src={sidebarExpanded ? logodarkbarred : icon}
           alt="EEPZ Logo"
           className="sbd-logo"
         />
