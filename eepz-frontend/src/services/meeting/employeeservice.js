@@ -5,7 +5,9 @@ const LND_API_URL = import.meta.env.VITE_LND_API_URL;
 
 const employeeService = {
   getAllEmployees: async () => {
-    const res = await axios.get(`${PROJECT_API_URL}/api/employees/allEmployees`);
+    const res = await axios.get(
+      `${PROJECT_API_URL}/api/employees/allEmployees`
+    );
     return res.data;
   },
   base: `${PROJECT_API_URL}/api/employees`,
@@ -59,9 +61,7 @@ const employeeService = {
   },
 
   getAllDepartments: async () => {
-    const res = await axios.get(
-      `${PROJECT_API_URL}/api/employees/departments`
-    );
+    const res = await axios.get(`${PROJECT_API_URL}/api/employees/departments`);
     return res.data;
   },
 

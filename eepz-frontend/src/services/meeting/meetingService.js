@@ -3,8 +3,6 @@ import api_meet from "../../services/meeting/index_meet";
 import axios from "axios";
 
 const meetingService = {
-
-
   scheduleMeeting: async (meetingData) => {
     try {
       const response = await api_meet.post("/Meeting/schedule", meetingData);

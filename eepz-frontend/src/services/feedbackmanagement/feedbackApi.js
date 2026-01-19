@@ -157,7 +157,9 @@ export const employeeApi = {
   getAll: () => axios.get(`${PROJECT_API_URL}/api/employees`),
 
   getManagers: () =>
-    axios.get(`${PROJECT_API_URL}/api/employees`, { params: { isManager: true } }),
+    axios.get(`${PROJECT_API_URL}/api/employees`, {
+      params: { isManager: true },
+    }),
 
   getById: (employeeId) =>
     axios.get(`${PROJECT_API_URL}/api/employees/${employeeId}`),
@@ -208,7 +210,6 @@ export const employeeApi = {
     }
   },
 };
-
 
 export const goalsApi = {
   getAll: () => org_api.get("/Goals"),

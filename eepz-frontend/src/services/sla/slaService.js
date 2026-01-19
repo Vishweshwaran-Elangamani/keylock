@@ -463,165 +463,167 @@ const slaService = {
   },
 
   getAllEmployees: async () => {
-  try {
-    return await employeeApi.get("/");
-  } catch (error) {
-    console.error("Error fetching employees:", error);
-    throw error;
-  }
-},
-
-getAllManagers: async () => {
-  try {
-    return await employeeApi.get("/", { params: { isManager: true } });
-  } catch (error) {
-    console.error("Error fetching managers:", error);
-    throw error;
-  }
-},
-
-getEmployeeById: async (id) => {
-  try {
-    return await employeeApi.get(`/${id}`);
-  } catch (error) {
-    console.error("Error fetching employee:", error);
-    throw error;
-  }
-},
-
-searchEmployees: async (searchTerm) => {
-  try {
-    return await employeeApi.get("/", { params: { searchTerm } });
-  } catch (error) {
-    console.error("Error searching:", error);
-    throw error;
-  }
-},
-
-getEmployeesByDepartment: async (deptId) => {
-  try {
-    return await employeeApi.get("/", { params: { departmentId: deptId } });
-  } catch (error) {
-    console.error("Error fetching department employees:", error);
-    throw error;
-  }
-},
-
-getEmployeesByRole: async (roleId) => {
-  try {
-    return await employeeApi.get("/", { params: { roleId } });
-  } catch (error) {
-    console.error("Error fetching by role:", error);
-    throw error;
-  }
-},
-
-getAllDepartments: async () => {
-  try {
-    return await employeeApi.get("/departments");
-  } catch (error) {
-    console.error("Error fetching departments:", error);
-    throw error;
-  }
-},
-
-getDepartmentDetails: async (deptId) => {
-  try {
-    return await employeeApi.get(`/departments/${deptId}`);
-  } catch (error) {
-    console.error("Error fetching department:", error);
-    throw error;
-  }
-},
-
-getDepartmentHeads: async (deptId) => {
-  try {
-    if (!deptId) {
-      console.warn("No departmentId provided");
-      return { success: false, data: [], message: "Department ID required" };
+    try {
+      return await employeeApi.get("/");
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+      throw error;
     }
+  },
 
-    const response = await employeeApi.get("/", {
-      params: { departmentId: deptId, isDepartmentHead: true },
-    });
-
-    return response;
-  } catch (error) {
-    console.error("Error fetching dept heads:", error);
-    return { success: false, data: [], message: error.message };
-  }
-},
-
-getAllDepartmentHeads: async () => {
-  try {
-    return await employeeApi.get("/", {
-      params: { roleId: ROLE_IDS.DEPARTMENT_HEAD },
-    });
-  } catch (error) {
-    console.error("Error fetching all dept heads:", error);
-    throw error;
-  }
-},
-
-getDepartmentHeadForEscalation: async (managerId) => {
-  try {
-    const managerResponse = await employeeApi.get(`/${managerId}`);
-
-    if (!managerResponse?.success || !managerResponse?.data) {
-      throw new Error("Manager not found");
+  getAllManagers: async () => {
+    try {
+      return await employeeApi.get("/", { params: { isManager: true } });
+    } catch (error) {
+      console.error("Error fetching managers:", error);
+      throw error;
     }
+  },
 
-    const manager = managerResponse.data;
-    const managerReportsTo = manager.reportsTo || manager.reportingToId;
-
-    if (!managerReportsTo) {
-      throw new Error("Manager has no reporting manager for escalation");
+  getEmployeeById: async (id) => {
+    try {
+      return await employeeApi.get(`/${id}`);
+    } catch (error) {
+      console.error("Error fetching employee:", error);
+      throw error;
     }
+  },
 
-    const deptHeadsResponse = await employeeApi.get("/", {
-      params: { roleId: ROLE_IDS.DEPARTMENT_HEAD },
-    });
-
-    if (!deptHeadsResponse?.success || !Array.isArray(deptHeadsResponse.data)) {
-      throw new Error("Failed to fetch department heads");
+  searchEmployees: async (searchTerm) => {
+    try {
+      return await employeeApi.get("/", { params: { searchTerm } });
+    } catch (error) {
+      console.error("Error searching:", error);
+      throw error;
     }
+  },
 
-    const validDeptHeads = deptHeadsResponse.data.filter((dh) => {
-      const dhId = dh.employeeId || dh.employeeMasterId;
-      return (
-        dhId === managerReportsTo ||
-        dhId?.toString() === managerReportsTo?.toString()
-      );
-    });
+  getEmployeesByDepartment: async (deptId) => {
+    try {
+      return await employeeApi.get("/", { params: { departmentId: deptId } });
+    } catch (error) {
+      console.error("Error fetching department employees:", error);
+      throw error;
+    }
+  },
 
-    if (validDeptHeads.length === 0) {
-      const directManager = await employeeApi.get(`/${managerReportsTo}`);
+  getEmployeesByRole: async (roleId) => {
+    try {
+      return await employeeApi.get("/", { params: { roleId } });
+    } catch (error) {
+      console.error("Error fetching by role:", error);
+      throw error;
+    }
+  },
 
-      if (directManager?.success && directManager?.data) {
-        return {
-          success: true,
-          data: [directManager.data],
-          message: "Direct manager fetched (not a registered dept head)",
-          warning: "Target is not a registered department head",
-        };
+  getAllDepartments: async () => {
+    try {
+      return await employeeApi.get("/departments");
+    } catch (error) {
+      console.error("Error fetching departments:", error);
+      throw error;
+    }
+  },
+
+  getDepartmentDetails: async (deptId) => {
+    try {
+      return await employeeApi.get(`/departments/${deptId}`);
+    } catch (error) {
+      console.error("Error fetching department:", error);
+      throw error;
+    }
+  },
+
+  getDepartmentHeads: async (deptId) => {
+    try {
+      if (!deptId) {
+        console.warn("No departmentId provided");
+        return { success: false, data: [], message: "Department ID required" };
       }
 
-      throw new Error(
-        `Manager's reporting manager (ID: ${managerReportsTo}) not found`
-      );
+      const response = await employeeApi.get("/", {
+        params: { departmentId: deptId, isDepartmentHead: true },
+      });
+
+      return response;
+    } catch (error) {
+      console.error("Error fetching dept heads:", error);
+      return { success: false, data: [], message: error.message };
     }
+  },
 
-    return {
-      success: true,
-      data: validDeptHeads,
-      message: "Department head verified as manager's reporting manager",
-    };
-  } catch (error) {
-    console.error("Error fetching escalation target:", error);
-    throw error;
-  }
-},
+  getAllDepartmentHeads: async () => {
+    try {
+      return await employeeApi.get("/", {
+        params: { roleId: ROLE_IDS.DEPARTMENT_HEAD },
+      });
+    } catch (error) {
+      console.error("Error fetching all dept heads:", error);
+      throw error;
+    }
+  },
 
+  getDepartmentHeadForEscalation: async (managerId) => {
+    try {
+      const managerResponse = await employeeApi.get(`/${managerId}`);
+
+      if (!managerResponse?.success || !managerResponse?.data) {
+        throw new Error("Manager not found");
+      }
+
+      const manager = managerResponse.data;
+      const managerReportsTo = manager.reportsTo || manager.reportingToId;
+
+      if (!managerReportsTo) {
+        throw new Error("Manager has no reporting manager for escalation");
+      }
+
+      const deptHeadsResponse = await employeeApi.get("/", {
+        params: { roleId: ROLE_IDS.DEPARTMENT_HEAD },
+      });
+
+      if (
+        !deptHeadsResponse?.success ||
+        !Array.isArray(deptHeadsResponse.data)
+      ) {
+        throw new Error("Failed to fetch department heads");
+      }
+
+      const validDeptHeads = deptHeadsResponse.data.filter((dh) => {
+        const dhId = dh.employeeId || dh.employeeMasterId;
+        return (
+          dhId === managerReportsTo ||
+          dhId?.toString() === managerReportsTo?.toString()
+        );
+      });
+
+      if (validDeptHeads.length === 0) {
+        const directManager = await employeeApi.get(`/${managerReportsTo}`);
+
+        if (directManager?.success && directManager?.data) {
+          return {
+            success: true,
+            data: [directManager.data],
+            message: "Direct manager fetched (not a registered dept head)",
+            warning: "Target is not a registered department head",
+          };
+        }
+
+        throw new Error(
+          `Manager's reporting manager (ID: ${managerReportsTo}) not found`
+        );
+      }
+
+      return {
+        success: true,
+        data: validDeptHeads,
+        message: "Department head verified as manager's reporting manager",
+      };
+    } catch (error) {
+      console.error("Error fetching escalation target:", error);
+      throw error;
+    }
+  },
 
   canEscalate: (sla) => sla && sla.status !== "Closed",
   canReopen: (sla) => sla && sla.status === "Closed",

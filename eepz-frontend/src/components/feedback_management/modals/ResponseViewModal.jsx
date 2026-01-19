@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  User,
-  Clock,
-  Video,
-  FileText,
-  Check,
-  X,
-} from "lucide-react";
+import { User, Clock, Video, FileText, Check, X } from "lucide-react";
 import axios from "axios";
 import "../../../styles/feedback/modals/ResponseViewModal.css";
 import { QUESTION_TEMPLATES } from "../../../constants/feedback_management/questionTemplates";
