@@ -8,10 +8,6 @@ namespace eepzbackend.Controllers
 {
     [Route("api/employees")]
     [ApiController]
-<<<<<<< Updated upstream
-    // [Authorize(Roles = "HR")]
-=======
->>>>>>> Stashed changes
     public class EmployeesController : ControllerBase
     {
         private readonly IEmployeeService _employeeService;
