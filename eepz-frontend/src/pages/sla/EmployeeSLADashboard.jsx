@@ -181,8 +181,7 @@ const EmployeeSLADashboard = () => {
   const safeTotal = filteredSLAs.length;
   const totalPages = Math.max(1, Math.ceil(safeTotal / itemsPerPage));
 
-  const startIndex =
-    safeTotal === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+  const startIndex = safeTotal === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
   const endIndex =
     safeTotal === 0 ? 0 : Math.min(currentPage * itemsPerPage, safeTotal);
 
@@ -321,7 +320,9 @@ const EmployeeSLADashboard = () => {
             ].map(({ key, label }) => (
               <button
                 key={key}
-                className={`emp-sla-tab-pill ${activeTab === key ? "active" : ""}`}
+                className={`emp-sla-tab-pill ${
+                  activeTab === key ? "active" : ""
+                }`}
                 onClick={() => setActiveTab(key)}
               >
                 {label}
@@ -331,7 +332,9 @@ const EmployeeSLADashboard = () => {
 
           <div className="emp-sla-view-switcher">
             <button
-              className={`emp-sla-view-btn ${viewMode === "table" ? "active" : ""}`}
+              className={`emp-sla-view-btn ${
+                viewMode === "table" ? "active" : ""
+              }`}
               onClick={() => {
                 setViewMode("table");
                 setItemsPerPage(10);
@@ -342,7 +345,9 @@ const EmployeeSLADashboard = () => {
               <i className="bi bi-table"></i>
             </button>
             <button
-              className={`emp-sla-view-btn ${viewMode === "grid" ? "active" : ""}`}
+              className={`emp-sla-view-btn ${
+                viewMode === "grid" ? "active" : ""
+              }`}
               onClick={() => {
                 setViewMode("grid");
                 setItemsPerPage(9);
@@ -407,7 +412,9 @@ const EmployeeSLADashboard = () => {
                             <td>
                               <span
                                 className={`emp-sla-badge ${
-                                  overdue ? "emp-sla-badge-overdue" : statusStyle.className
+                                  overdue
+                                    ? "emp-sla-badge-overdue"
+                                    : statusStyle.className
                                 }`}
                               >
                                 {overdue ? "OVERDUE" : sla.status}
@@ -471,7 +478,10 @@ const EmployeeSLADashboard = () => {
                     <div className="emp-sla-pagination-left">
                       <span className="emp-sla-pagination-text">Show</span>
 
-                      <div className="emp-sla-entries-dropdown" ref={dropdownRef}>
+                      <div
+                        className="emp-sla-entries-dropdown"
+                        ref={dropdownRef}
+                      >
                         <button
                           type="button"
                           className={`emp-sla-entries-selected ${
@@ -479,7 +489,9 @@ const EmployeeSLADashboard = () => {
                           }`}
                           onClick={() => setIsDropdownOpen((v) => !v)}
                         >
-                          <span className="emp-sla-entries-value">{itemsPerPage}</span>
+                          <span className="emp-sla-entries-value">
+                            {itemsPerPage}
+                          </span>
 
                           <svg
                             className={`emp-sla-entries-chevron ${
@@ -527,7 +539,8 @@ const EmployeeSLADashboard = () => {
 
                     <div className="emp-sla-pagination-center">
                       <span className="emp-sla-pagination-status">
-                        Showing {startIndex} to {endIndex} of {safeTotal} entries
+                        Showing {startIndex} to {endIndex} of {safeTotal}{" "}
+                        entries
                       </span>
                     </div>
 
@@ -601,21 +614,28 @@ const EmployeeSLADashboard = () => {
                   {paginatedSLAs.map((sla) => {
                     const overdue = isOverdue(sla);
                     const statusStyle = overdue
-                      ? { className: "emp-sla-status-overdue", icon: AlertTriangle }
+                      ? {
+                          className: "emp-sla-status-overdue",
+                          icon: AlertTriangle,
+                        }
                       : getStatusStyle(sla.status);
                     const IconComponent = statusStyle.icon;
 
                     return (
                       <div key={sla.key} className="emp-sla-card">
                         <div className="emp-sla-card-header">
-                          <div className={`emp-sla-card-icon ${statusStyle.className}`}>
+                          <div
+                            className={`emp-sla-card-icon ${statusStyle.className}`}
+                          >
                             <IconComponent size={20} strokeWidth={2} />
                           </div>
                           <div className="emp-sla-card-header-text">
                             <h6 className="emp-sla-card-title">
                               {sla.slatype || "SLA"}
                             </h6>
-                            <span className={`emp-sla-card-badge ${statusStyle.className}`}>
+                            <span
+                              className={`emp-sla-card-badge ${statusStyle.className}`}
+                            >
                               {overdue ? "OVERDUE" : sla.status}
                             </span>
                           </div>
@@ -630,10 +650,14 @@ const EmployeeSLADashboard = () => {
                           </div>
 
                           <div className="emp-sla-card-row">
-                            <span className="emp-sla-card-label">Days Remaining</span>
+                            <span className="emp-sla-card-label">
+                              Days Remaining
+                            </span>
                             <span
                               className={`emp-sla-card-value ${
-                                overdue ? "emp-sla-text-danger" : "emp-sla-text-success"
+                                overdue
+                                  ? "emp-sla-text-danger"
+                                  : "emp-sla-text-success"
                               }`}
                             >
                               {overdue
@@ -643,7 +667,9 @@ const EmployeeSLADashboard = () => {
                           </div>
 
                           <div className="emp-sla-card-row">
-                            <span className="emp-sla-card-label">Assigned To</span>
+                            <span className="emp-sla-card-label">
+                              Assigned To
+                            </span>
                             <span className="emp-sla-card-value emp-sla-truncate">
                               {sla.assignedToName || "-"}
                             </span>
@@ -651,7 +677,9 @@ const EmployeeSLADashboard = () => {
 
                           {sla.complianceStatus && (
                             <div className="emp-sla-card-row">
-                              <span className="emp-sla-card-label">Compliance</span>
+                              <span className="emp-sla-card-label">
+                                Compliance
+                              </span>
                               <span
                                 className={`emp-sla-badge emp-sla-badge-compliance-${sla.complianceStatus.toLowerCase()}`}
                               >

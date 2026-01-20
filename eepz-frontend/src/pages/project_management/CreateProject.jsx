@@ -85,8 +85,8 @@ const CreateProject = () => {
         : [];
       const departmentsData = Array.isArray(departmentsRes?.data)
         ? departmentsRes.data.map((dep) => ({
-            value: dep.departmentId, // departmentId as value
-            label: dep.departmentName, // departmentName as label
+            value: dep.departmentId,
+            label: dep.departmentName,
           }))
         : [];
       const businessUnitsData = Array.isArray(businessUnitsRes?.data)
@@ -94,7 +94,7 @@ const CreateProject = () => {
         : [];
 
       setEmployees(employeesData);
-      setDepartments(departmentsData); // Update with mapped department data
+      setDepartments(departmentsData);
       setBusinessUnits(businessUnitsData);
     } catch (error) {
       console.error("Dropdown Fetch Error:", error);
@@ -192,15 +192,14 @@ const CreateProject = () => {
     setSubmitStatus(null);
 
     try {
-      // Get the department name before submitting
       const selectedDepartment = departments.find(
-        (dep) => dep.value === formData.department,
+        (dep) => dep.value === formData.department
       );
       const departmentName = selectedDepartment ? selectedDepartment.label : "";
 
       const projectData = {
         ...formData,
-        department: departmentName, // Send department name (not ID)
+        department: departmentName,
         startDate: new Date(formData.startDate).toISOString(),
         endDate: formData.endDate
           ? new Date(formData.endDate).toISOString()
@@ -326,7 +325,9 @@ const CreateProject = () => {
                       value={formData.projectName}
                       onChange={handleChange}
                       placeholder="Example: ORG.IT.INTRANET"
-                      className={`prj-form-input ${errors.projectName ? "error" : ""}`}
+                      className={`prj-form-input ${
+                        errors.projectName ? "error" : ""
+                      }`}
                     />
                     <div className="prj-form-hint">
                       Format:{" "}
@@ -351,7 +352,9 @@ const CreateProject = () => {
                       value={formData.clientName}
                       onChange={handleChange}
                       placeholder="Example: ACME CORPORATION"
-                      className={`prj-form-input ${errors.clientName ? "error" : ""}`}
+                      className={`prj-form-input ${
+                        errors.clientName ? "error" : ""
+                      }`}
                     />
                     {errors.clientName && (
                       <div className="prj-error-message">

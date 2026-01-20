@@ -119,8 +119,7 @@ const ManagerSLADashboard = () => {
   };
 
   const filteredSlas = useMemo(() => {
-    let result =
-      activeTab === "team-escalation" ? managerEscalations : mySLAs;
+    let result = activeTab === "team-escalation" ? managerEscalations : mySLAs;
 
     if (activeTab === "my-escalation") {
       if (activeSearchTerm) {
@@ -266,8 +265,7 @@ const ManagerSLADashboard = () => {
   const totalPages = Math.max(1, Math.ceil(safeTotal / pageSize));
   const validCurrentPage = Math.min(currentPage, totalPages);
 
-  const startIndex =
-    safeTotal === 0 ? 0 : (validCurrentPage - 1) * pageSize;
+  const startIndex = safeTotal === 0 ? 0 : (validCurrentPage - 1) * pageSize;
 
   const endIndex =
     safeTotal === 0 ? 0 : Math.min(validCurrentPage * pageSize, safeTotal);
@@ -478,7 +476,9 @@ const ManagerSLADashboard = () => {
           ].map(({ key, label }) => (
             <button
               key={key}
-              className={`mgr-sla-tab-pill ${activeTab === key ? "active" : ""}`}
+              className={`mgr-sla-tab-pill ${
+                activeTab === key ? "active" : ""
+              }`}
               onClick={() => setActiveTab(key)}
               type="button"
             >

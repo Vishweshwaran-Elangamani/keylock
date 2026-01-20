@@ -56,7 +56,13 @@ const HRSLADashboard = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [activeSearchTerm, statusFilter, typeFilter, complianceFilter, itemsPerPage]);
+  }, [
+    activeSearchTerm,
+    statusFilter,
+    typeFilter,
+    complianceFilter,
+    itemsPerPage,
+  ]);
 
   const fetchSLAs = async () => {
     setLoading(true);
@@ -103,7 +109,9 @@ const HRSLADashboard = () => {
     }
 
     if (complianceFilter !== "All") {
-      filtered = filtered.filter((sla) => sla.complianceStatus === complianceFilter);
+      filtered = filtered.filter(
+        (sla) => sla.complianceStatus === complianceFilter
+      );
     }
 
     setFilteredSlas(filtered);
@@ -293,7 +301,8 @@ const HRSLADashboard = () => {
       for (let i = 1; i <= totalPages; i++) pages.push(i);
     } else {
       if (currentPage === 1) pages.push(1, 2);
-      else if (currentPage === totalPages) pages.push(totalPages - 1, totalPages);
+      else if (currentPage === totalPages)
+        pages.push(totalPages - 1, totalPages);
       else pages.push(currentPage, currentPage + 1);
     }
     return pages;
@@ -462,7 +471,10 @@ const HRSLADashboard = () => {
               <Download size={16} /> Export
             </button>
 
-            <button className="hr-sla-btn-create" onClick={() => setShowCreateModal(true)}>
+            <button
+              className="hr-sla-btn-create"
+              onClick={() => setShowCreateModal(true)}
+            >
               <Plus size={16} /> Create SLA
             </button>
           </div>
@@ -509,38 +521,58 @@ const HRSLADashboard = () => {
                     className="hr-sla-clickable-row"
                   >
                     <td>
-                      <div className="hr-sla-employee-name">{sla.employeeName}</div>
-                      <div className="hr-sla-employee-email">{sla.employeeEmail}</div>
+                      <div className="hr-sla-employee-name">
+                        {sla.employeeName}
+                      </div>
+                      <div className="hr-sla-employee-email">
+                        {sla.employeeEmail}
+                      </div>
                     </td>
 
                     <td>
-                      <span className="hr-sla-badge hr-sla-badge-type">{sla.slatype}</span>
+                      <span className="hr-sla-badge hr-sla-badge-type">
+                        {sla.slatype}
+                      </span>
                     </td>
 
                     <td>
                       {sla.assignedToName ? (
-                        <span className="hr-sla-assigned-name">{sla.assignedToName}</span>
+                        <span className="hr-sla-assigned-name">
+                          {sla.assignedToName}
+                        </span>
                       ) : (
-                        <span className="hr-sla-not-assigned">Not assigned</span>
+                        <span className="hr-sla-not-assigned">
+                          Not assigned
+                        </span>
                       )}
                     </td>
 
                     <td>
-                      <div className="hr-sla-deadline-date">{formatDate(sla.deadline)}</div>
+                      <div className="hr-sla-deadline-date">
+                        {formatDate(sla.deadline)}
+                      </div>
                       {sla.closedAt && (
-                        <div className="hr-sla-closed-date">Closed: {formatDate(sla.closedAt)}</div>
+                        <div className="hr-sla-closed-date">
+                          Closed: {formatDate(sla.closedAt)}
+                        </div>
                       )}
                     </td>
 
                     <td>
-                      <span className={`hr-sla-badge ${getStatusBadgeClass(sla.status)}`}>
+                      <span
+                        className={`hr-sla-badge ${getStatusBadgeClass(
+                          sla.status
+                        )}`}
+                      >
                         {sla.status}
                       </span>
                     </td>
 
                     <td>
                       <span
-                        className={`hr-sla-badge ${getComplianceBadgeClass(sla.complianceStatus)}`}
+                        className={`hr-sla-badge ${getComplianceBadgeClass(
+                          sla.complianceStatus
+                        )}`}
                       >
                         {sla.complianceStatus}
                       </span>
@@ -598,17 +630,23 @@ const HRSLADashboard = () => {
 
               <div className="hr-sla-pagination-center">
                 <span className="hr-sla-pagination-status">
-                  Showing {safeTotal === 0 ? 0 : startIndex + 1} to {endIndex} of {safeTotal}{" "}
-                  entries
+                  Showing {safeTotal === 0 ? 0 : startIndex + 1} to {endIndex}{" "}
+                  of {safeTotal} entries
                 </span>
               </div>
 
               <div className="hr-sla-pagination-right">
                 <ul className="hr-sla-pagination-list">
-                  <li className={`hr-sla-page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                  <li
+                    className={`hr-sla-page-item ${
+                      currentPage === 1 ? "disabled" : ""
+                    }`}
+                  >
                     <button
                       className="hr-sla-page-link"
-                      onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(1, prev - 1))
+                      }
                       disabled={currentPage === 1}
                       aria-label="Previous page"
                     >
@@ -619,18 +657,29 @@ const HRSLADashboard = () => {
                   {getVisiblePageNumbers().map((page) => (
                     <li
                       key={page}
-                      className={`hr-sla-page-item ${currentPage === page ? "active" : ""}`}
+                      className={`hr-sla-page-item ${
+                        currentPage === page ? "active" : ""
+                      }`}
                     >
-                      <button className="hr-sla-page-link" onClick={() => setCurrentPage(page)}>
+                      <button
+                        className="hr-sla-page-link"
+                        onClick={() => setCurrentPage(page)}
+                      >
                         {page}
                       </button>
                     </li>
                   ))}
 
-                  <li className={`hr-sla-page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                  <li
+                    className={`hr-sla-page-item ${
+                      currentPage === totalPages ? "disabled" : ""
+                    }`}
+                  >
                     <button
                       className="hr-sla-page-link"
-                      onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                      }
                       disabled={currentPage === totalPages}
                       aria-label="Next page"
                     >
