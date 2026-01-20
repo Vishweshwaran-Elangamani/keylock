@@ -348,10 +348,8 @@
   padding: 10px 20px;
   background-color: white;
   color: #27235c;
-  border-color: 1px solid #27235c;
+  border: 1px solid #27235c;
   border-radius: 12px;
-  font-size: 14px;
-  font-weight: 600;
   cursor: pointer;
   transition: opacity 0.2s;
   white-space: nowrap;
@@ -789,21 +787,77 @@
 }
 
 .empass-form-header {
+  position: relative;  /* ADD THIS */
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 14px;
+  padding: 16px 24px;  /* UPDATED padding */
   background: var(--card);
-  border-bottom: 2px solid var(--primary);
+  border-bottom: 2px solid #27235c;  /* MATCH reference */
   flex-shrink: 0;
   min-height: auto;
   position: relative;
 }
+.empass-modal-close {
+  position: absolute;
+  top: 20px;        /* Same as view-details */
+  right: 28px;      /* Same as view-details */
+  background: transparent !important;
+  border: none !important;
+  color: #6c757d;   /* Your theme color */
+  font-size: 24px;  /* Slightly smaller than 32px */
+  font-weight: 300;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;  /* Same transition */
+  opacity: 0.8;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.empass-modal-close:hover {
+  opacity: 1 !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  transform: rotate(90deg) !important;  /* EXACT SAME ROTATE */
+  color: #27235c !important;            /* Your theme color */
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.empass-modal-close:focus {
+  opacity: 1 !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #27235c !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.empass-modal-close:active {
+  background: rgba(255, 255, 255, 0.2) !important;
+  transform: rotate(90deg) !important;  /* ROTATE ON CLICK TOO */
+  color: #27235c !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.empass-modal-close:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;  /* No rotate when disabled */
+}
+
 
 .empass-logo-section {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;  /* Changed from center */
   gap: 2px;
   flex-shrink: 0;
   justify-content: center;
@@ -833,7 +887,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin-right: 100px;
+  margin-right: 80px;  /* Reduced from 100px to make space */
 }
 
 .empass-form-title {
@@ -921,6 +975,167 @@
   color: var(--text-light);
   text-align: center;
 }
+.empass-custom-rating-dropdown {
+  width: 110px !important;
+  position: relative;
+  padding: 0;
+  border-radius: 6px;
+  user-select: none;
+  height: 38px;
+  z-index: 1;
+  margin: 0 auto;
+  display: block;
+}
+
+.empass-custom-rating-selected {
+  width: 100% !important;
+  padding: 0.5rem 1.8rem 0.5rem 0.6rem !important;
+  height: 38px !important;
+  font-size: 0.85rem !important;
+  text-align: left !important;
+  display: flex;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  background: #ffffff;
+  border: 1px solid #2e2b5f;
+  border-radius: 6px;
+  font-weight: 500;
+  color: #23234c;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.empass-custom-rating-dropdown:focus-within .empass-custom-rating-selected,
+.empass-custom-rating-selected:focus {
+  border-color: #2e2b5f;
+  box-shadow: 0 0 0 2px rgba(46, 43, 95, 0.1);
+  z-index: 999998;
+}
+
+.empass-custom-rating-arrow {
+  position: absolute;
+  right: 0.5rem !important;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg) !important;
+  width: 6px !important;
+  height: 6px !important;
+  border-right: 2px solid #6c757d;
+  border-bottom: 2px solid #6c757d;
+  pointer-events: none;
+  transition: transform 0.2s ease;
+}
+
+.empass-custom-rating-dropdown:focus-within .empass-custom-rating-arrow {
+  transform: translateY(-50%) rotate(-135deg) !important;
+}
+
+.empass-custom-rating-menu {
+  width: 110px !important;
+  min-width: 110px !important;
+  max-width: 110px !important;
+  position: fixed !important;
+  background: #ffffff;
+  border: 1px solid #2e2b5f;
+  border-top: none !important;
+  border-radius: 0 0 6px 6px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  z-index: 999999 !important;
+  max-height: 240px;
+  overflow-y: auto;
+  animation: empassDropdownSlideDown 0.15s ease-out;
+}
+
+@keyframes empassDropdownSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.empass-custom-rating-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.empass-custom-rating-menu::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.empass-custom-rating-menu::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.empass-custom-rating-menu::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.empass-custom-rating-option {
+  padding: 0.6rem 0.5rem !important;
+  font-size: 0.8rem !important;
+  text-align: left !important;
+  cursor: pointer;
+  user-select: none;
+  color: #23234c;
+  transition: all 0.15s ease;
+  border-bottom: 1px solid #f3f4f6;
+  background: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.empass-custom-rating-option:last-child {
+  border-bottom: none;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+.empass-custom-rating-option:hover {
+  background: #2e2b5f;
+  color: white;
+}
+
+.empass-custom-rating-option-active {
+  background: rgba(46, 43, 95, 0.1);
+  color: #2e2b5f;
+  font-weight: 600;
+}
+
+.empass-custom-rating-option-active:hover {
+  background: #2e2b5f;
+  color: white;
+}
+
+/* Read-only rating display */
+.empass-read-only-text {
+  padding: 6px 10px;
+  background: #f3f4f6;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #374151;
+  font-weight: 500;
+  display: inline-block;
+  min-width: 50px;
+  text-align: center;
+}
+
+/* Table cell for perfect centering */
+.empass-rating-cell {
+  text-align: center !important;
+}
+
+/* Remove old select styling */
+.empass-form-select {
+  display: none !important;
+}
+
 
 .empass-form-table {
   width: 100%;
@@ -1527,6 +1742,7 @@
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
+
 
 @media (max-width: 1024px) {
   .empassper-container {

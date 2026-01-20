@@ -755,7 +755,7 @@ body {
   border-radius: 6px;
   user-select: none;
   height: 36px;
-  overflow: visible;
+  overflow: hidden !important;  /* ✅ ADD THIS */
   z-index: 1;
 }
 
@@ -763,9 +763,9 @@ body {
   min-width: 70px !important;
   max-width: 70px !important;
   width: 70px !important;
-  padding: 0.5rem 1.5rem 0.5rem 0.6rem !important;
+  padding: 0.3rem 0.6rem !important;  /* ✅ SMALLER padding */
   height: 36px !important;
-  font-size: 0.85rem !important;
+  font-size: 0.7rem !important;       /* ✅ SMALLER font */
   text-align: center !important;
   display: flex;
   align-items: center;
@@ -779,7 +779,11 @@ body {
   font-weight: 600;
   color: #27235c;
   transition: all 0.2s ease;
+  box-sizing: border-box !important;  /* ✅ CRITICAL */
+  line-height: 1.1 !important;
+  overflow: hidden !important;        /* ✅ HIDE overflow */
 }
+
 
 .custom-tl-pagination-dropdown:focus-within .custom-tl-selected,
 .custom-tl-selected:focus {
@@ -789,16 +793,17 @@ body {
 
 .custom-tl-arrow {
   position: absolute;
-  right: 0.4rem !important;
+  right: 0.2rem !important;  /* ✅ CLOSER to edge */
   top: 50%;
   transform: translateY(-50%) rotate(-135deg) !important;
-  width: 6px !important;
-  height: 6px !important;
-  border-right: 2px solid #6c757d;
-  border-bottom: 2px solid #6c757d;
+  width: 4px !important;     /* ✅ SMALLER arrow */
+  height: 4px !important;
+  border-right: 1.2px solid #6c757d;
+  border-bottom: 1.2px solid #6c757d;
   pointer-events: none;
   transition: transform 0.2s ease;
 }
+
 
 .custom-tl-pagination-dropdown:focus-within .custom-tl-arrow {
   transform: translateY(-50%) rotate(45deg) !important;
@@ -855,15 +860,18 @@ body {
 }
 
 .custom-tl-option {
-  padding: 0.5rem 0.5rem !important;
-  font-size: 0.85rem !important;
+  padding: 0.3rem 0.3rem !important;  /* ✅ SMALLER */
+  font-size: 0.7rem !important;      /* ✅ SMALLER */
   text-align: center !important;
   cursor: pointer;
   user-select: none;
   color: #27235c;
   transition: all 0.15s ease;
   border-bottom: 1px solid #f3f4f6;
+  white-space: nowrap !important;    /* ✅ NO WRAP */
+  overflow: hidden !important;
 }
+
 
 .custom-tl-option:first-child {
   border-top-left-radius: 6px;

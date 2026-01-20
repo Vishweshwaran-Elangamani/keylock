@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import ReactDOM from "react-dom";
+import { useNavigate } from "react-router-dom";
 import { Toaster, toast } from "sonner";
 import {
   getEmployeeAssignments,
@@ -10,6 +11,127 @@ import {
 import logoImage from "../../../assets/logodark.png";
 import "../../../styles/performancemanagement/employee/MyAssessments.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
+
+const CustomRatingDropdown = ({ value, onChange, isReadOnly, competencyName }) => {
+  const [open, setOpen] = useState(false);
+  const [menuPosition, setMenuPosition] = useState({
+    top: 0,
+    left: 0,
+    width: 0,
+  });
+  const dropdownRef = useRef(null);
+
+  const options = [
+    { value: "", label: "-" },
+    { value: "1", label: "1 - Poor" },
+    { value: "2", label: "2 - Fair" },
+    { value: "3", label: "3 - Good" },
+    { value: "4", label: "4 - Very Good" },
+    { value: "5", label: "5 - Excellent" },
+  ];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  const selectedLabel = options.find((opt) => opt.value === value)?.label || "-";
+
+  const handleToggle = (e) => {
+    e.stopPropagation();
+    if (!open && dropdownRef.current) {
+      const rect = dropdownRef.current.getBoundingClientRect();
+      setMenuPosition({
+        top: rect.bottom + window.scrollY + 2,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+      });
+    }
+    setOpen((prev) => !prev);
+  };
+
+  useEffect(() => {
+    if (!open) return;
+
+    const handleClickOutside = (e) => {
+      const menu = document.querySelector(".empass-custom-rating-menu");
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target) &&
+        menu &&
+        !menu.contains(e.target)
+      ) {
+        setOpen(false);
+      }
+    };
+
+    const timer = setTimeout(() => {
+      document.addEventListener("mousedown", handleClickOutside);
+    }, 100);
+
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [open]);
+
+  if (isReadOnly) {
+    return (
+      <span className="empass-read-only-text">
+        {value || "-"}
+      </span>
+    );
+  }
+
+  return (
+    <>
+      <div
+        ref={dropdownRef}
+        className="empass-custom-rating-dropdown"
+        tabIndex={0}
+      >
+        <div className="empass-custom-rating-selected" onClick={handleToggle}>
+          {selectedLabel}
+          <span className="empass-custom-rating-arrow" />
+        </div>
+      </div>
+
+      {open &&
+        ReactDOM.createPortal(
+          <div
+            className="empass-custom-rating-menu"
+            style={{
+              position: "fixed",
+              top: `${menuPosition.top}px`,
+              left: `${menuPosition.left}px`,
+              width: `${menuPosition.width}px`,
+              zIndex: 999999,
+            }}
+          >
+            {options.map((opt) => (
+              <div
+                key={opt.value}
+                className={
+                  "empass-custom-rating-option" +
+                  (opt.value === value
+                    ? " empass-custom-rating-option-active"
+                    : "")
+                }
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleSelect(opt.value);
+                }}
+              >
+                {opt.label}
+              </div>
+            ))}
+          </div>,
+          document.body
+        )}
+    </>
+  );
+};
 
 function getTimeLeft(deadline) {
   const now = new Date();
@@ -90,11 +212,9 @@ function MyAssessments() {
       "text/csv": ".csv",
       "text/plain": ".txt",
       "application/msword": ".doc",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-        ".docx",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document": ".docx",
       "application/vnd.ms-excel": ".xls",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-        ".xlsx",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": ".xlsx",
       "image/jpeg": ".jpg",
       "image/png": ".png",
       "image/gif": ".gif",
@@ -111,9 +231,7 @@ function MyAssessments() {
 
   function extractFilenameFromHeader(contentDisposition) {
     if (!contentDisposition) return null;
-    const matchUtf8 = contentDisposition.match(
-      /filename\*=(?:UTF-8'')?([^;]+)(?:;|$)/i
-    );
+    const matchUtf8 = contentDisposition.match(/filename\*=(?:UTF-8'')?([^;]+)(?:;|$)/i);
     if (matchUtf8 && matchUtf8[1]) {
       try {
         return decodeURIComponent(matchUtf8[1].replace(/"/g, "").trim());
@@ -657,36 +775,42 @@ function MyAssessments() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="empass-form-header">
-              <div className="empass-logo-section">
-                <img src={logoImage} alt="Logo" className="empass-logo-small" />
-                <div className="empass-appraisal-label">Appraisal Form</div>
-              </div>
-              <div className="empass-form-title-container">
-                <h2 className="empass-form-title">
-                  {currentAssignment?.formName}
-                </h2>
-                <p className="empass-form-subtitle">
-                  {currentAssignment?.formType} Assessment Form
-                </p>
-              </div>
+  <div className="empass-logo-section">
+    <img src={logoImage} alt="Logo" className="empass-logo-small" />
+  </div>
+  
+  <div className="empass-form-title-container">
+    <h2 className="empass-form-title">
+      {currentAssignment?.formName}
+    </h2>
+    <p className="empass-form-subtitle">
+      {currentAssignment?.formType} Assessment Form
+    </p>
+  </div>
 
-              {((modalMode === "submit" && attachments.length > 0) ||
-                (modalMode === "view" &&
-                  viewAttachments &&
-                  viewAttachments.length > 0)) && (
-                <div className="empass-attachment-badge">
-                  <span className="empass-attachment-badge-text">
-                    {modalMode === "submit"
-                      ? `${attachments.length} ${
-                          attachments.length === 1 ? "File" : "Files"
-                        }`
-                      : `${viewAttachments.length} ${
-                          viewAttachments.length === 1 ? "File" : "Files"
-                        }`}
-                  </span>
-                </div>
-              )}
-            </div>
+  {((modalMode === "submit" && attachments.length > 0) ||
+    (modalMode === "view" && viewAttachments && viewAttachments.length > 0)) && (
+    <div className="empass-attachment-badge">
+      <span className="empass-attachment-badge-text">
+        {modalMode === "submit"
+          ? `${attachments.length} ${attachments.length === 1 ? "File" : "Files"}`
+          : `${viewAttachments.length} ${viewAttachments.length === 1 ? "File" : "Files"}`}
+      </span>
+    </div>
+  )}
+
+  <button
+    className="empass-modal-close"
+    onClick={() => {
+      if (!submitting) setShowModal(false);
+    }}
+    aria-label="Close modal"
+    disabled={submitting}
+  >
+    <i className="bi bi-x-lg" />
+  </button>
+</div>
+
 
             <div className="empass-form-divider"></div>
 
@@ -723,30 +847,27 @@ function MyAssessments() {
                                 {item.rating} / 5
                               </span>
                             ) : (
-                              <select
-                                value={item.rating}
-                                onChange={(e) =>
-                                  updateAssessmentData(
-                                    item.competencyId,
-                                    "rating",
-                                    e.target.value
-                                  )
-                                }
-                                className="empass-form-select"
-                                disabled={submitting}
-                              >
-                                <option value="">-</option>
-                                <option value="1">1 - Poor</option>
-                                <option value="2">2 - Fair</option>
-                                <option value="3">3 - Good</option>
-                                <option value="4">4 - Very Good</option>
-                                <option value="5">5 - Excellent</option>
-                              </select>
+                              <CustomRatingDropdown
+  value={item.rating}
+  onChange={(val) =>
+    updateAssessmentData(
+      item.competencyId,
+      "rating",
+      val
+    )
+  }
+  isReadOnly={submitting}
+  competencyName={item.competencyName}
+/>
+
                             )}
                           </td>
                           <td>
                             {modalMode === "view" ? (
-                              <span>{item.comments || "-"}</span>
+                             <span className="empass-read-only-text">
+                             {item.rating || "-"}
+                           </span>
+                           
                             ) : (
                               <textarea
                                 value={item.comments}

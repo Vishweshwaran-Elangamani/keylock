@@ -62,20 +62,9 @@
   left: 0;
   right: 0;
   height: 4px;
-  /* background: linear-gradient(90deg, var(--manevap-primary), var(--manevap-accent)); */
   opacity: 0;
   transition: opacity 0.3s ease;
 }
-
-/* .mgr-stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(46, 43, 95, 0.18);
-  border-color: rgba(46, 43, 95, 0.1);
-} */
-
-/* .mgr-stat-card:hover::before {
-  opacity: 1;
-} */
 
 .mgr-stat-icon {
   width: 64px;
@@ -88,10 +77,6 @@
   flex-shrink: 0;
   transition: transform 0.3s ease;
 }
-/* 
-.mgr-stat-card:hover .mgr-stat-icon {
-  transform: scale(1.1) rotate(5deg);
-} */
 
 .mgr-stat-total .mgr-stat-icon {
   background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(124, 58, 237, 0.15));
@@ -127,8 +112,6 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
-
-/* ======================================== */
 
 .manevap-modal-cell-textarea {
   width: 100%;
@@ -196,10 +179,6 @@
   z-index: 12000;
 }
 
-/* .breadcrumb-wrapper {
-  width: 100%;
-  margin-bottom: 24px;
-} */
 
 .manevap-loading-state {
   display: flex;
@@ -376,7 +355,6 @@
   color: #fff;
 }
 
-/* ======================================== */
 
 .manevap-card {
   background-color: var(--manevap-card);
@@ -529,8 +507,6 @@
   color: var(--manevap-text-light);
   margin: 0;
 }
-
-/* ======================================== */
 
 .manevap-table-container {
   overflow-x: auto;
@@ -1342,7 +1318,6 @@
 
 .custom-modal-rating-menu {
   width: auto !important;
-  min-width: 180px !important;
   position: fixed !important;
   background: #ffffff;
   border: 1px solid  #27235c;

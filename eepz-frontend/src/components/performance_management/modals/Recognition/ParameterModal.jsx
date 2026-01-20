@@ -141,7 +141,7 @@ const ParameterModal = ({
                 Cancel
               </button>
               <button type="submit" className="parameter-modal-submit-btn">
-                Add Parameter
+                Add Parameter 
               </button>
             </div>
           </form>
