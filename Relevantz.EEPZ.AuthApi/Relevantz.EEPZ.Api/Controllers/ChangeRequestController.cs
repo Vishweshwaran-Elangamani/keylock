@@ -5,37 +5,78 @@ using Relevantz.EEPZ.Core.IService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+
 namespace Relevantz.EEPZ.Api.Controllers
 {
+    /// <summary>
+    /// Provides endpoints for submitting, processing, viewing,
+    /// and managing user change requests within the system.
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
     public class ChangeRequestController : ControllerBase
     {
         private readonly IChangeRequestService _changeRequestService;
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="ChangeRequestController"/>.
+        /// </summary>
+        /// <param name="changeRequestService">Service that handles change request operations.</param>
         public ChangeRequestController(IChangeRequestService changeRequestService)
         {
             _changeRequestService = changeRequestService;
         }
+
+        /// <summary>
+        /// Submits a new change request for the logged-in user.
+        /// </summary>
+        /// <param name="request">The change request details submitted by the user.</param>
+        /// <returns>
+        /// 200 OK if created successfully,  
+        /// 400 Bad Request if validation fails.
+        /// </returns>
         [HttpPost("submit")]
         public async Task<IActionResult> SubmitChangeRequest([FromBody] ChangeRequestDto request)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
             var result = await _changeRequestService.SubmitChangeRequestAsync(userId, request);
+
             if (!result.Success)
                 return BadRequest(result);
+
             return Ok(result);
         }
+
+        /// <summary>
+        /// Processes a pending change request (approve or reject).
+        /// Admin only.
+        /// </summary>
+        /// <param name="request">Payload containing request ID and decision information.</param>
+        /// <returns>
+        /// 200 OK on success,  
+        /// 400 Bad Request if the process action fails.
+        /// </returns>
         [Authorize(Roles = "Admin")]
         [HttpPost("process")]
         public async Task<IActionResult> ProcessChangeRequest([FromBody] ProcessChangeRequestDto request)
         {
             var adminUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
             var result = await _changeRequestService.ProcessChangeRequestAsync(request, adminUserId);
+
             if (!result.Success)
                 return BadRequest(result);
+
             return Ok(result);
         }
+
+        /// <summary>
+        /// Retrieves all pending change requests.
+        /// Admin only.
+        /// </summary>
+        /// <returns>
+        /// 200 OK with a list of pending change requests.
+        /// </returns>
         [Authorize(Roles = "Admin")]
         [HttpGet("pending")]
         public async Task<IActionResult> GetPendingRequests()
@@ -43,6 +84,13 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _changeRequestService.GetPendingRequestsAsync();
             return Ok(result);
         }
+
+        /// <summary>
+        /// Retrieves all change requests submitted by the logged-in user.
+        /// </summary>
+        /// <returns>
+        /// 200 OK with the user's change request history.
+        /// </returns>
         [HttpGet("my-requests")]
         public async Task<IActionResult> GetMyChangeRequests()
         {
@@ -50,6 +98,14 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _changeRequestService.GetUserChangeRequestsAsync(userId);
             return Ok(result);
         }
+
+        /// <summary>
+        /// Retrieves all change requests in the system.
+        /// Admin only.
+        /// </summary>
+        /// <returns>
+        /// 200 OK with the full change request list.
+        /// </returns>
         [Authorize(Roles = "Admin")]
         [HttpGet("all")]
         public async Task<IActionResult> GetAllChangeRequests()
@@ -57,15 +113,33 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _changeRequestService.GetAllChangeRequestsAsync();
             return Ok(result);
         }
-        [HttpDelete("cancel/{Id}")]
-        public async Task<IActionResult> CancelChangeRequest(int Id)
+
+        /// <summary>
+        /// Cancels a specific change request submitted by the logged-in user.
+        /// </summary>
+        /// <param name="requestId">The identifier of the request to cancel.</param>
+        /// <returns>
+        /// 200 OK if cancelled successfully,  
+        /// 400 Bad Request if cancellation is not allowed or fails.
+        /// </returns>
+        [HttpDelete("cancel/{requestId}")]
+        public async Task<IActionResult> CancelChangeRequest(int requestId)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-            var result = await _changeRequestService.CancelChangeRequestAsync(userId, Id);
+            var result = await _changeRequestService.CancelChangeRequestAsync(userId, requestId);
+
             if (!result.Success)
                 return BadRequest(result);
+
             return Ok(result);
         }
+
+        /// <summary>
+        /// Checks whether the logged-in user has any pending change requests.
+        /// </summary>
+        /// <returns>
+        /// 200 OK with a boolean indicating if a pending request exists.
+        /// </returns>
         [HttpGet("has-pending")]
         public async Task<IActionResult> HasPendingRequest()
         {
