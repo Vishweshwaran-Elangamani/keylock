@@ -39,9 +39,9 @@ const EmployeeProfileService = {
   /**
    * Get profile by specific user ID (Admin/HR use)
    */
-  getProfileById: async (userId) => {
+  getProfileById: async (Id) => {
     try {
-      const response = await api.get(`/User/profile/${userId}`);
+      const response = await api.get(`/User/profile/${Id}`);
       return response.data;
     } catch (error) {
       console.error("Error fetching profile by ID:", error);

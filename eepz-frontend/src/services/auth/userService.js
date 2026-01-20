@@ -33,17 +33,17 @@ const userService = {
       throw error.response?.data || error.message;
     }
   },
-  deactivateUser: async (userId) => {
+  deactivateUser: async (Id) => {
     try {
-      const response = await api.post(`/User/deactivate/${userId}`);
+      const response = await api.post(`/User/deactivate/${Id}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
     }
   },
-  activateUser: async (userId) => {
+  activateUser: async (Id) => {
     try {
-      const response = await api.post(`/User/activate/${userId}`);
+      const response = await api.post(`/User/activate/${Id}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
