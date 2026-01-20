@@ -4,7 +4,6 @@ using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.IService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
 namespace Relevantz.EEPZ.Api.Controllers
 {
     /// <summary>
@@ -18,7 +17,6 @@ namespace Relevantz.EEPZ.Api.Controllers
     {
         private readonly IRoleService _roleService;
         private readonly IDepartmentService _departmentService;
-
         /// <summary>
         /// Initializes a new instance of <see cref="RoleDepartmentManagementController"/>.
         /// </summary>
@@ -29,7 +27,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             _roleService = roleService;
             _departmentService = departmentService;
         }
-
         /// <summary>
         /// Creates a new role.
         /// </summary>
@@ -44,10 +41,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _roleService.CreateRoleAsync(request);
             if (!result.Success)
                 return BadRequest(result);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Updates an existing role.
         /// </summary>
@@ -62,10 +57,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _roleService.UpdateRoleAsync(request);
             if (!result.Success)
                 return BadRequest(result);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Retrieves a role by its identifier.
         /// </summary>
@@ -80,10 +73,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _roleService.GetRoleByIdAsync(Id);
             if (!result.Success)
                 return NotFound(result);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Retrieves all roles.
         /// </summary>
@@ -96,7 +87,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _roleService.GetAllRolesAsync();
             return Ok(result);
         }
-
         /// <summary>
         /// Deletes a role by its identifier.
         /// </summary>
@@ -111,10 +101,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _roleService.DeleteRoleAsync(roleId);
             if (!result.Success)
                 return BadRequest(result);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Creates a new department.
         /// </summary>
@@ -130,10 +118,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _departmentService.CreateDepartmentAsync(request);
             if (!result.Success)
                 return BadRequest(result);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Updates an existing department.
         /// </summary>
@@ -149,10 +135,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _departmentService.UpdateDepartmentAsync(request);
             if (!result.Success)
                 return BadRequest(result);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Retrieves a department by its identifier.
         /// </summary>
@@ -168,10 +152,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _departmentService.GetDepartmentByIdAsync(Id);
             if (!result.Success)
                 return NotFound(result);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Retrieves all departments.
         /// </summary>
@@ -185,7 +167,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _departmentService.GetAllDepartmentsAsync();
             return Ok(result);
         }
-
         /// <summary>
         /// Deletes a department by its identifier.
         /// </summary>
@@ -201,10 +182,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _departmentService.DeleteDepartmentAsync(departmentId);
             if (!result.Success)
                 return BadRequest(result);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Gets the department hierarchy as a tree starting from an optional root.
         /// </summary>
@@ -220,10 +199,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _departmentService.GetDepartmentHierarchyTreeAsync(rootDepartmentId);
             if (!result.Success)
                 return BadRequest(result);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Retrieves direct child departments of the specified department.
         /// </summary>
@@ -239,10 +216,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _departmentService.GetChildDepartmentsAsync(departmentId);
             if (!result.Success)
                 return BadRequest(result);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Retrieves root (top-level) departments.
         /// </summary>
@@ -256,7 +231,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _departmentService.GetRootDepartmentsAsync();
             return Ok(result);
         }
-
         /// <summary>
         /// Retrieves the full path (ancestry) from the root to the specified department.
         /// </summary>
@@ -272,10 +246,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _departmentService.GetDepartmentPathAsync(departmentId);
             if (!result.Success)
                 return NotFound(result);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Retrieves all active departments.
         /// </summary>
@@ -289,7 +261,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _departmentService.GetActiveDepartmentsAsync();
             return Ok(result);
         }
-
         /// <summary>
         /// Retrieves all inactive departments.
         /// </summary>
@@ -303,7 +274,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _departmentService.GetInactiveDepartmentsAsync();
             return Ok(result);
         }
-
         /// <summary>
         /// Updates the active/inactive status of a department.
         /// </summary>
@@ -320,10 +290,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _departmentService.UpdateDepartmentStatusAsync(departmentId, request.Status);
             if (!result.Success)
                 return BadRequest(result);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Retrieves departments managed by the specified Head of Department (HOD).
         /// </summary>
@@ -338,7 +306,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _departmentService.GetDepartmentsByHodAsync(hodEmployeeId);
             return Ok(result);
         }
-
         /// <summary>
         /// Assigns a Head of Department (HOD) to a department.
         /// </summary>
@@ -355,10 +322,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _departmentService.AssignHodAsync(departmentId, request.HodEmployeeId);
             if (!result.Success)
                 return BadRequest(result);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Removes the Head of Department (HOD) assignment from a department.
         /// </summary>
@@ -374,10 +339,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _departmentService.RemoveHodAsync(departmentId);
             if (!result.Success)
                 return BadRequest(result);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Searches departments by name or code.
         /// </summary>
@@ -392,11 +355,9 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
                 return BadRequest(new { Success = false, Message = "Search term is required" });
-
             var result = await _departmentService.SearchDepartmentsAsync(searchTerm);
             return Ok(result);
         }
-
         /// <summary>
         /// Retrieves a department by its unique code.
         /// </summary>
@@ -412,10 +373,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _departmentService.GetDepartmentByCodeAsync(departmentCode);
             if (!result.Success)
                 return NotFound(result);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Retrieves the total number of departments.
         /// </summary>
@@ -429,7 +388,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _departmentService.GetTotalDepartmentCountAsync();
             return Ok(result);
         }
-
         /// <summary>
         /// Retrieves the number of active departments.
         /// </summary>

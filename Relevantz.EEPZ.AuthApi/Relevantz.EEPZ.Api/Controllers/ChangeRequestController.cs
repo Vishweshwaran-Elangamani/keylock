@@ -5,7 +5,6 @@ using Relevantz.EEPZ.Core.IService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-
 namespace Relevantz.EEPZ.Api.Controllers
 {
     /// <summary>
@@ -18,7 +17,6 @@ namespace Relevantz.EEPZ.Api.Controllers
     public class ChangeRequestController : ControllerBase
     {
         private readonly IChangeRequestService _changeRequestService;
-
         /// <summary>
         /// Initializes a new instance of <see cref="ChangeRequestController"/>.
         /// </summary>
@@ -27,7 +25,6 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             _changeRequestService = changeRequestService;
         }
-
         /// <summary>
         /// Submits a new change request for the logged-in user.
         /// </summary>
@@ -41,13 +38,10 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
             var result = await _changeRequestService.SubmitChangeRequestAsync(userId, request);
-
             if (!result.Success)
                 return BadRequest(result);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Processes a pending change request (approve or reject).
         /// Admin only.
@@ -63,13 +57,10 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             var adminUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
             var result = await _changeRequestService.ProcessChangeRequestAsync(request, adminUserId);
-
             if (!result.Success)
                 return BadRequest(result);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Retrieves all pending change requests.
         /// Admin only.
@@ -84,7 +75,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _changeRequestService.GetPendingRequestsAsync();
             return Ok(result);
         }
-
         /// <summary>
         /// Retrieves all change requests submitted by the logged-in user.
         /// </summary>
@@ -98,7 +88,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _changeRequestService.GetUserChangeRequestsAsync(userId);
             return Ok(result);
         }
-
         /// <summary>
         /// Retrieves all change requests in the system.
         /// Admin only.
@@ -113,7 +102,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _changeRequestService.GetAllChangeRequestsAsync();
             return Ok(result);
         }
-
         /// <summary>
         /// Cancels a specific change request submitted by the logged-in user.
         /// </summary>
@@ -127,13 +115,10 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
             var result = await _changeRequestService.CancelChangeRequestAsync(userId, requestId);
-
             if (!result.Success)
                 return BadRequest(result);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Checks whether the logged-in user has any pending change requests.
         /// </summary>

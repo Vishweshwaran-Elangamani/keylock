@@ -5,7 +5,6 @@ using Relevantz.EEPZ.Core.IService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-
 namespace Relevantz.EEPZ.Api.Controllers
 {
     /// <summary>
@@ -20,7 +19,6 @@ namespace Relevantz.EEPZ.Api.Controllers
     {
         private readonly IProfileService _profileService;
         private readonly IUserManagementService _userManagementService;
-
         /// <summary>
         /// Initializes a new instance of <see cref="UserController"/>.
         /// </summary>
@@ -31,7 +29,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             _profileService = profileService;
             _userManagementService = userManagementService;
         }
-
         /// <summary>
         /// Gets the current logged-in user's profile.
         /// </summary>
@@ -51,13 +48,11 @@ namespace Relevantz.EEPZ.Api.Controllers
                 {
                     return Unauthorized(new { success = false, message = "Invalid user token" });
                 }
-
                 var result = await _profileService.GetProfileByUserIdAsync(userId);
                 if (!result.Success)
                 {
                     return BadRequest(result);
                 }
-
                 return Ok(result);
             }
             catch (Exception ex)
@@ -65,7 +60,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred while fetching profile", error = ex.Message });
             }
         }
-
         /// <summary>
         /// Gets the profile for a specific user by ID (Admin/HR only).
         /// </summary>
@@ -86,7 +80,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 {
                     return BadRequest(result);
                 }
-
                 return Ok(result);
             }
             catch (Exception ex)
@@ -94,7 +87,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred while fetching profile", error = ex.Message });
             }
         }
-
         /// <summary>
         /// Updates the current user's profile.
         /// </summary>
@@ -114,19 +106,16 @@ namespace Relevantz.EEPZ.Api.Controllers
                 {
                     return BadRequest(new { success = false, message = "Invalid request data", errors = ModelState });
                 }
-
                 var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
                 {
                     return Unauthorized(new { success = false, message = "Invalid user token" });
                 }
-
                 var result = await _profileService.UpdateProfileAsync(userId, request);
                 if (!result.Success)
                 {
                     return BadRequest(result);
                 }
-
                 return Ok(result);
             }
             catch (Exception ex)
@@ -134,7 +123,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred while updating profile", error = ex.Message });
             }
         }
-
         /// <summary>
         /// Uploads or updates the current user's profile photo.
         /// </summary>
@@ -155,13 +143,11 @@ namespace Relevantz.EEPZ.Api.Controllers
                 {
                     return Unauthorized(new { success = false, message = "Invalid user token" });
                 }
-
                 // Validate file presence
                 if (ProfilePhoto == null || ProfilePhoto.Length == 0)
                 {
                     return BadRequest(new { success = false, message = "No photo file provided" });
                 }
-
                 // Validate file type
                 var allowedTypes = new[] { "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp" };
                 if (!allowedTypes.Contains(ProfilePhoto.ContentType.ToLower()))
@@ -172,7 +158,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                         message = "Invalid file type. Only JPEG, PNG, GIF, and WEBP images are allowed."
                     });
                 }
-
                 // Validate file size (5MB max)
                 const long maxFileSize = 5 * 1024 * 1024;
                 if (ProfilePhoto.Length > maxFileSize)
@@ -183,23 +168,19 @@ namespace Relevantz.EEPZ.Api.Controllers
                         message = $"File size exceeds maximum limit of 5MB. Your file is {ProfilePhoto.Length / 1024 / 1024:F2}MB."
                     });
                 }
-
                 Console.WriteLine($"Photo upload for UserId: {userId}");
                 Console.WriteLine($"  File: {ProfilePhoto.FileName}");
                 Console.WriteLine($"  Size: {ProfilePhoto.Length} bytes ({ProfilePhoto.Length / 1024.0:F2} KB)");
                 Console.WriteLine($"  Type: {ProfilePhoto.ContentType}");
-
                 var request = new UpdateProfileRequestDto
                 {
                     ProfilePhoto = ProfilePhoto
                 };
-
                 var result = await _profileService.UpdateProfileAsync(userId, request);
                 if (!result.Success)
                 {
                     return BadRequest(result);
                 }
-
                 Console.WriteLine($"Photo uploaded successfully for UserId: {userId}");
                 return Ok(result);
             }
@@ -215,7 +196,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-
         /// <summary>
         /// Creates a new user (administrative operation).
         /// </summary>
@@ -231,10 +211,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _userManagementService.CreateUserAsync(request, createdByUserId);
             if (!result.Success)
                 return BadRequest(result);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Updates an existing user (administrative operation).
         /// </summary>
@@ -250,10 +228,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _userManagementService.UpdateUserAsync(request, updatedByUserId);
             if (!result.Success)
                 return BadRequest(result);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Retrieves a user by identifier.
         /// </summary>
@@ -268,10 +244,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _userManagementService.GetUserByIdAsync(userId);
             if (!result.Success)
                 return NotFound(result);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Retrieves all users.
         /// </summary>
@@ -284,7 +258,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _userManagementService.GetAllUsersAsync();
             return Ok(result);
         }
-
         /// <summary>
         /// Deactivates a user.
         /// </summary>
@@ -299,10 +272,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _userManagementService.DeactivateUserAsync(userId);
             if (!result.Success)
                 return BadRequest(result);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Activates a previously deactivated user.
         /// </summary>
@@ -317,10 +288,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _userManagementService.ActivateUserAsync(userId);
             if (!result.Success)
                 return BadRequest(result);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Retrieves employees who report to the specified manager. 
         /// Access is limited to the manager themselves, HR, or Admin.
@@ -339,16 +308,13 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
                 var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-
                 if (userRole != "HR" && userRole != "Admin" && currentUserId != managerId)
                 {
                     return Forbid("You can only view your own employees");
                 }
-
                 var result = await _userManagementService.GetEmployeesByManagerAsync(managerId);
                 if (!result.Success)
                     return NotFound(result);
-
                 return Ok(result);
             }
             catch (Exception ex)
@@ -356,7 +322,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { message = ex.Message });
             }
         }
-
         /// <summary>
         /// Assigns a role and department to a user.
         /// </summary>
@@ -371,10 +336,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _userManagementService.AssignRoleAndDepartmentAsync(request);
             if (!result.Success)
                 return BadRequest(result);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Gets the next available employee company ID (Admin/HR only).
         /// </summary>
