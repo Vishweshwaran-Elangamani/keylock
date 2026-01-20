@@ -38,6 +38,12 @@
   border: 0;
 }
 
+@keyframes dh-sla-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .dh-sla-error-alert {
   display: flex;
   gap: 0.75rem;
@@ -118,35 +124,35 @@
 }
 
 .dh-sla-stat-icon-total {
-  background-color: #E8F1FF;
+  background-color: #e8f1ff;
 }
 
 .dh-sla-stat-icon-total svg {
-  color: #5B93FF;
+  color: #5b93ff;
 }
 
 .dh-sla-stat-icon-month {
-  background-color: #D1FAE5;
+  background-color: #d1fae5;
 }
 
 .dh-sla-stat-icon-month svg {
-  color: #10B981;
+  color: #10b981;
 }
 
 .dh-sla-stat-icon-action {
-  background-color: #FEF3C7;
+  background-color: #fef3c7;
 }
 
 .dh-sla-stat-icon-action svg {
-  color: #F59E0B;
+  color: #f59e0b;
 }
 
 .dh-sla-stat-icon-overdue {
-  background-color: #FEE2E2;
+  background-color: #fee2e2;
 }
 
 .dh-sla-stat-icon-overdue svg {
-  color: #EF4444;
+  color: #ef4444;
 }
 
 .dh-sla-stat-content {
@@ -172,11 +178,340 @@
   letter-spacing: 0.5px;
 }
 
+.dh-sla-filters-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 1.1rem 1.25rem;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+  border: 1px solid #e5e7eb;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.dh-sla-filters-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  flex-wrap: nowrap;
+}
+
+.dh-sla-search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  background: #ffffff;
+  flex: 1 1 auto;
+  min-width: 420px;
+  max-width: 520px;
+  margin-top: -17px;
+  
+}
+
+.dh-sla-search-wrapper:focus-within {
+  border-color: #e5e7eb;
+  box-shadow: none;
+}
+
+.dh-sla-search-input:focus,
+.dh-sla-search-action-btn:focus {
+  outline: none;
+  box-shadow: none;
+  border: none;
+}
+
+.dh-sla-search-icon {
+  flex: 0 0 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+}
+
+.dh-sla-search-input {
+  flex: 1 1 auto;
+  border: none;
+  outline: none;
+  font-size: 0.875rem;
+  padding: 0.6rem 0.75rem;
+  color: #111827;
+  background: transparent;
+  min-width: 0;
+}
+
+.dh-sla-search-input::placeholder {
+  color: #9ca3af;
+}
+
+.dh-sla-search-separator {
+  width: 1px;
+  height: 20px;
+  background: #e5e7eb;
+  flex-shrink: 0;
+}
+
+.dh-sla-search-action-btn {
+  flex: 0 0 auto;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.58rem 1.1rem;
+  white-space: nowrap;
+}
+
+.dh-sla-search-btn {
+  background: #27235c;
+  color: #ffffff;
+  min-width: 120px;
+}
+
+.dh-sla-search-btn:hover {
+  background: #221e4f;
+}
+
+.dh-sla-search-clear-btn {
+  background: #4b5563;
+  color: #ffffff;
+  min-width: 120px;
+}
+
+.dh-sla-search-clear-btn:hover {
+  background: #374151;
+}
+
+.dh-sla-search-action-btn:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.dh-sla-filter-status,
+.dh-sla-filter-period {
+  flex: 0 0 auto;
+  min-width: 220px;
+  padding-top: 0;
+}
+
+.dh-sla-filter-actions {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: flex-end;
+  margin-left: auto;
+  min-width: 0;
+}
+
+.dh-sla-btn-clear {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.58rem 1.15rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-radius: 10px;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+  justify-content: center;
+  border: 1.5px solid #e5e7eb;
+  color: #374151;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.dh-sla-btn-clear:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.dh-sla-dd .cdrop-wrap {
+  width: 100%;
+}
+
+.dh-sla-dd .cdrop-trigger {
+  width: 100%;
+  padding: 0.6rem 2.8rem 0.6rem 1rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.18s ease;
+  text-align: left;
+  font-weight: 400;
+  line-height: 1.5;
+  min-height: 38px;
+  position: relative;
+}
+
+.dh-sla-dd .cdrop-trigger * {
+  transform: none !important;
+}
+
+.dh-sla-dd .cdrop-trigger:hover {
+  border-color: #d1d5db;
+  background-color: #f9fafb;
+}
+
+.dh-sla-dd .cdrop-trigger:focus,
+.dh-sla-dd .cdrop-trigger:active {
+  outline: none;
+  border-color: #d1d5db;
+  box-shadow: none;
+  background-color: #ffffff;
+}
+
+.dh-sla-dd .cdrop-value {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #111827;
+  text-align: left;
+  padding-right: 0.75rem;
+}
+
+.dh-sla-dd .cdrop-placeholder {
+  color: #9ca3af;
+}
+
+.dh-sla-dd .cdrop-icon,
+.dh-sla-dd .cdrop-chevron {
+  position: absolute !important;
+  right: 14px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: 18px !important;
+  height: 18px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  line-height: 0 !important;
+  pointer-events: none !important;
+}
+
+.dh-sla-dd .cdrop-icon svg,
+.dh-sla-dd .cdrop-chevron svg {
+  width: 18px !important;
+  height: 18px !important;
+  display: block !important;
+}
+
+.dh-sla-dd .cdrop-menu {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18);
+  z-index: 9999;
+  max-height: 280px;
+  overflow-y: auto;
+  animation: dh-sla-dropdownFadeIn 0.15s ease;
+}
+
+@keyframes dh-sla-dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dh-sla-dd .cdrop-item {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #374151;
+  transition: all 0.12s ease;
+  border-bottom: 1px solid #f3f4f6;
+  background: #ffffff;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.dh-sla-dd .cdrop-item:last-child {
+  border-bottom: none;
+}
+
+.dh-sla-dd .cdrop-item:hover {
+  background-color: #27235c;
+  color: #ffffff;
+}
+
+.dh-sla-dd .cdrop-item-active {
+  background-color: #efefef;
+  color: #000000;
+  font-weight: 600;
+}
+
+.dh-sla-dd .cdrop-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dh-sla-dd .cdrop-menu::-webkit-scrollbar-track {
+  background: #f9fafb;
+  border-radius: 8px;
+  margin: 4px 0;
+}
+
+.dh-sla-dd .cdrop-menu::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 8px;
+  border: 1px solid #f9fafb;
+}
+
+.dh-sla-tabs-wrapper {
+  margin: 0 0 1rem;
+}
+
+.dh-sla-tabs-container {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.dh-sla-tab-pill {
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.dh-sla-tab-pill:hover {
+  border-color: #d1d5db;
+  background: #f9fafb;
+}
+
+.dh-sla-tab-pill.active {
+  background: #27235c;
+  border-color: #27235c;
+  color: #ffffff;
+}
+
 .dh-sla-table-wrapper {
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  margin-top: 50px;
+  margin-top: 30px;
   overflow: visible;
   position: relative;
   z-index: 1;
@@ -401,7 +736,6 @@
   display: block;
 }
 
-/* UPDATED PAGINATION DROPDOWN STYLES - FIX FOR VISIBILITY */
 .dh-pagination-dropdown {
   position: relative;
   display: inline-block;
@@ -622,7 +956,6 @@
   from {
     opacity: 0;
   }
-
   to {
     opacity: 1;
   }
@@ -647,7 +980,6 @@
     opacity: 0;
     transform: translateY(20px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -858,15 +1190,42 @@
   animation: dh-sla-spin 0.6s linear infinite;
 }
 
-@keyframes dh-sla-spin {
-  to {
-    transform: rotate(360deg);
+@media (max-width: 1400px) {
+  .dh-sla-search-wrapper {
+    min-width: 380px;
+    max-width: 520px;
+  }
+
+  .dh-sla-filter-status,
+  .dh-sla-filter-period {
+    min-width: 200px;
   }
 }
 
 @media (max-width: 1200px) {
   .dh-sla-stats-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dh-sla-filters-row {
+    flex-wrap: wrap;
+  }
+
+  .dh-sla-search-wrapper {
+    flex: 1 1 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .dh-sla-filter-status,
+  .dh-sla-filter-period {
+    flex: 1 1 calc(50% - 0.5rem);
+    min-width: 0;
+  }
+
+  .dh-sla-filter-actions {
+    flex: 1 1 100%;
+    justify-content: flex-end;
   }
 }
 

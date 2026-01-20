@@ -94,7 +94,6 @@
   font-family: 'Poppins', sans-serif !important;
 }
 
-/* Rest of your existing styles unchanged */
 .scf-alert {
   display: flex;
   align-items: flex-start;
@@ -163,20 +162,17 @@
   opacity: 1;
 }
 
-/* ===========================================================
-   ✅ FIXED: Tabs toggle pill shape should NEVER change
-   =========================================================== */
 
 .scf-tabs {
   background: #27235c;
-  border-radius: 999px;             /* ✅ always perfect pill */
+  border-radius: 999px;          
   padding: 4px;
   display: inline-flex;
   gap: 4px;
   margin-bottom: 1.5rem;
   box-shadow: 0 2px 8px rgba(39, 35, 92, 0.15);
 
-  height: 48px;                    /* ✅ lock exact height */
+  height: 48px;                  
   align-items: center;
   box-sizing: border-box;
 }
@@ -185,9 +181,9 @@
   background: transparent;
   color: #fff;
   border: none;
-  border-radius: 999px;            /* ✅ pill ALWAYS */
-  height: 40px;                    /* ✅ lock button height */
-  padding: 0 24px;                 /* ✅ same size always */
+  border-radius: 999px;          
+  height: 40px;                  
+  padding: 0 24px;               
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
@@ -200,33 +196,24 @@
   font-family: 'Poppins', sans-serif !important;
   box-sizing: border-box;
   outline: none;
-
-  /* ✅ prevents tiny width shifts */
   min-width: 160px;
 }
 
 .scf-tab-button--active {
   background: #fff;
   color: #27235c;
-
-  /* ✅ IMPORTANT: keep pill shape exactly */
   border-radius: 999px !important;
   height: 40px !important;
   padding: 0 24px !important;
-
-  /* ✅ optional: keep consistent inner look */
   box-shadow: none;
 }
 
-/* ✅ remove focus border/outline causing shape look change */
 .scf-tab-button:focus,
 .scf-tab-button:focus-visible,
 .scf-tab-button:active {
   outline: none !important;
   box-shadow: none !important;
 }
-
-/* =========================================================== */
 
 .scf-card {
   background: white;
@@ -288,10 +275,6 @@
   color: #dc2626;
   font-family: 'Poppins', sans-serif !important;
 }
-
-/* ===========================================================
-   ✅ UPDATED: Reusable CustomDropdown (.cdrop-*) for SCF
-   =========================================================== */
 
 .scf-dd .cdrop-label {
   display: none;
@@ -367,7 +350,6 @@
   transform: translateY(-50%) rotate(180deg) !important;
 }
 
-/* Dropdown menu */
 .scf-dd .cdrop-menu {
   background: #ffffff;
   border: 1px solid #27235c;
@@ -387,7 +369,6 @@
   font-family: 'Poppins', sans-serif !important;
 }
 
-/* Option item */
 .scf-dd .cdrop-item {
   padding: 0.75rem 1rem;
   font-size: 0.9375rem;
@@ -417,8 +398,6 @@
   color: #000000;
   font-weight: 600;
 }
-
-/* =========================================================== */
 
 .scf-info-box {
   padding: 0.75rem;
@@ -624,7 +603,7 @@
   .scf-tabs {
     flex-direction: column;
     width: 100%;
-    height: auto;              /* ✅ allow stacking */
+    height: auto;            
     border-radius: 16px;
   }
 

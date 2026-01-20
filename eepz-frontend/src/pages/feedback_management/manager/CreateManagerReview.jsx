@@ -84,7 +84,6 @@ export default function CreateManagerReview() {
     };
 
     fetchEmployees();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

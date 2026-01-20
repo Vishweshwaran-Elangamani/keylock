@@ -305,10 +305,6 @@
   gap: 0.5rem;
 }
 
-/* ===========================================================
-   ✅ CustomDropdown overrides for Create Manager Review page
-   =========================================================== */
-
 .cmr-dd.cdrop-wrap {
   width: 100%;
 }
@@ -357,8 +353,6 @@
   background-color: #27235c;
   color: #ffffff;
 }
-
-/* ------------------------ RESPONSIVE ------------------------ */
 
 @media (max-width: 768px) {
   .cmr-page {

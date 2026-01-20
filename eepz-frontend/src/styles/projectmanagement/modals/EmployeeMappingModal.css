@@ -144,10 +144,6 @@
   font-family: Poppins, sans-serif;
 }
 
-/* ===========================
-   Search (MATCH DROPDOWN HEIGHT)
-   =========================== */
-
 .emm-search-wrapper {
   position: relative;
   display: flex;
@@ -233,9 +229,6 @@
   border-color: #4b5563;
 }
 
-/* ===========================
-   Dropdown (Employee Modal)
-   =========================== */
 
 .emm-dd-wrapper {
   position: relative;
@@ -356,10 +349,6 @@
     transform: translateY(0);
   }
 }
-
-/* ===========================
-   Selection Summary
-   =========================== */
 
 .emm-selection-summary {
   margin-bottom: 0.5rem;

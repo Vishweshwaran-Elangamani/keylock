@@ -112,7 +112,6 @@ const projectService = {
       );
     }
   },
-  /// EMPLOYEE DATA FOR DROPDOWNS
 
   /**
    * Get employees (default = all active employees).
@@ -134,11 +133,7 @@ const projectService = {
     }
   },
 
-  /**
-   * Get all active employees with details (Resource Owner dropdown)
-   * OLD: /employees/allEmployees
-   * NEW: /employees
-   */
+ 
   getAllEmployees: async () => {
     try {
       const response = await apiClient.get("/employees");
@@ -150,11 +145,7 @@ const projectService = {
     }
   },
 
-  /**
-   * Get managers only (L1/L2 Approver dropdowns)
-   * OLD: /employees/managers
-   * NEW: /employees?isManager=true
-   */
+
   getManagers: async () => {
     try {
       const response = await apiClient.get("/employees", {
@@ -166,10 +157,6 @@ const projectService = {
     }
   },
 
-  /**
-   * Get employee by ID
-   * NOTE: backend changed to GET /employees/{employeeId}
-   */
   getEmployeeById: async (employeeId) => {
     try {
       const response = await apiClient.get(`/employees/${employeeId}`);
@@ -221,9 +208,7 @@ const projectService = {
     }
   },
 
-  /**
 
- */
   getEmployeesByDepartment: async (departmentId) => {
     try {
       const response = await apiClient.get("/employees", {
@@ -252,7 +237,6 @@ const projectService = {
     }
   },
 
-  // RESOURCE POOL OPERATIONS
 
   getInitialStageEmployees: async () => {
     try {

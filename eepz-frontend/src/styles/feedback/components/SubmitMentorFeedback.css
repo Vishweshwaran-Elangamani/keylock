@@ -188,9 +188,6 @@
   transform: rotate(180deg);
 }
 
-/* ===========================================================
-   ✅ FIX HERE: remove bullets + reset UL defaults
-   =========================================================== */
 .smf-dropdown-list {
   position: absolute;
   top: 100%;
@@ -203,8 +200,6 @@
   max-height: 260px;
   overflow-y: auto;
   z-index: 1000;
-
-  /* ✅ This is the fix */
   list-style: none !important;
   margin: 0 !important;
   padding: 0 !important;
@@ -219,8 +214,6 @@
   border-bottom: 1px solid #e5e7eb;
   background: #ffffff;
   text-align: left;
-
-  /* ✅ extra safety */
   list-style: none !important;
 }
 

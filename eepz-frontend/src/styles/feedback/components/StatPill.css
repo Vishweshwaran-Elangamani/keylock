@@ -1,0 +1,25 @@
+.sp-pill {
+  border-radius: var(--radius-lg) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+.sp-pill__body {
+  padding: 1rem;
+}
+
+.sp-pill__icon-wrap {
+  background: color-mix(in srgb, var(--sp-color) 12%, transparent);
+}
+
+.sp-pill__icon {
+  color: var(--sp-color);
+}
+
+.sp-pill__value {
+  color: var(--color-primary-1);
+}
+
+.sp-pill__label {
+  color: var(--muted);
+}

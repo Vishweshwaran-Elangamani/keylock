@@ -11,8 +11,8 @@ export default function ConfirmDialog({
       <div className="modal-dialog modal-dialog-centered">
         <div
           className="modal-content"
-          style={{ borderRadius: "var(--radius-lg)" }}
-        >
+          style={{ borderRadius: "var(--radius-lg)" }}>
+            
           <div className="modal-header">
             <h6 className="modal-title">{title}</h6>
             <button

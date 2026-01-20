@@ -1,27 +1,18 @@
 import React from "react";
+import "../../../styles/feedback/components/StatPill.css";
 
 export default function StatPill({ label, value, Icon, color = "#525252" }) {
   return (
-    <div
-      className="card border-0"
-      style={{
-        borderRadius: "var(--radius-lg)",
-        border: "1px solid var(--border)",
-        boxShadow: "var(--shadow)",
-      }}
-    >
-      <div className="card-body">
-        <div className="d-flex justify-content-between mb-2">
-          <div className="rounded p-2" style={{ background: `${color}15` }}>
-            <Icon size={20} style={{ color }} />
+    <div className="card border-0 sp-pill" style={{ "--sp-color": color }}>
+      <div className="card-body sp-pill__body">
+        <div className="d-flex justify-content-between mb-2 sp-pill__top">
+          <div className="rounded p-2 sp-pill__icon-wrap">
+            <Icon size={20} className="sp-pill__icon" />
           </div>
         </div>
-        <h3 className="fw-bold" style={{ color: "var(--color-primary-1)" }}>
-          {value}
-        </h3>
-        <p className="mb-0 small" style={{ color: "var(--muted)" }}>
-          {label}
-        </p>
+
+        <h3 className="fw-bold sp-pill__value">{value}</h3>
+        <p className="mb-0 small sp-pill__label">{label}</p>
       </div>
     </div>
   );

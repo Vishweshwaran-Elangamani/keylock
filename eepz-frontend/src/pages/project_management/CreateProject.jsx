@@ -85,8 +85,13 @@ const CreateProject = () => {
         : [];
       const departmentsData = Array.isArray(departmentsRes?.data)
         ? departmentsRes.data.map((dep) => ({
+<<<<<<< Updated upstream
             value: dep.departmentId,
             label: dep.departmentName,
+=======
+            value: dep.departmentId, 
+            label: dep.departmentName, 
+>>>>>>> Stashed changes
           }))
         : [];
       const businessUnitsData = Array.isArray(businessUnitsRes?.data)
@@ -94,7 +99,11 @@ const CreateProject = () => {
         : [];
 
       setEmployees(employeesData);
+<<<<<<< Updated upstream
       setDepartments(departmentsData);
+=======
+      setDepartments(departmentsData); 
+>>>>>>> Stashed changes
       setBusinessUnits(businessUnitsData);
     } catch (error) {
       console.error("Dropdown Fetch Error:", error);
@@ -199,7 +208,11 @@ const CreateProject = () => {
 
       const projectData = {
         ...formData,
+<<<<<<< Updated upstream
         department: departmentName,
+=======
+        department: departmentName, 
+>>>>>>> Stashed changes
         startDate: new Date(formData.startDate).toISOString(),
         endDate: formData.endDate
           ? new Date(formData.endDate).toISOString()
@@ -544,7 +557,7 @@ const CreateProject = () => {
                                 {selectedResourceOwner.firstName}{" "}
                                 {selectedResourceOwner.lastName}
                               </div>
-                              <span className="prj-manager-role">
+                              <span className="prj-manager-role-res">
                                 {selectedResourceOwner.roleName}
                               </span>
                             </div>
@@ -570,7 +583,7 @@ const CreateProject = () => {
                                 {selectedL1Approver.firstName}{" "}
                                 {selectedL1Approver.lastName}
                               </div>
-                              <span className="prj-manager-role">
+                              <span className="prj-manager-role-l1">
                                 {selectedL1Approver.roleName}
                               </span>
                             </div>
@@ -596,7 +609,7 @@ const CreateProject = () => {
                                 {selectedL2Approver.firstName}{" "}
                                 {selectedL2Approver.lastName}
                               </div>
-                              <span className="prj-manager-role">
+                              <span className="prj-manager-role-l2">
                                 {selectedL2Approver.roleName}
                               </span>
                             </div>

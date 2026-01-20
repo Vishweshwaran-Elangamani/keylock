@@ -325,47 +325,6 @@ const EmployeeSelectionModal = ({
                 </tbody>
               </table>
             </div>
-
-            {totalPages > 1 && (
-              <div className="prj-pagination">
-                <button
-                  type="button"
-                  className="prj-page-btn"
-                  onClick={() => goToPage(currentPage - 1)}
-                  disabled={currentPage === 1}
-                >
-                  ‹
-                </button>
-
-                {getPageNumbers().map((page, idx) =>
-                  page === "..." ? (
-                    <span key={`dots-${idx}`} className="prj-page-dots">
-                      ...
-                    </span>
-                  ) : (
-                    <button
-                      key={page}
-                      type="button"
-                      className={`prj-page-btn ${
-                        currentPage === page ? "active" : ""
-                      }`}
-                      onClick={() => goToPage(page)}
-                    >
-                      {page}
-                    </button>
-                  )
-                )}
-
-                <button
-                  type="button"
-                  className="prj-page-btn"
-                  onClick={() => goToPage(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                >
-                  ›
-                </button>
-              </div>
-            )}
           </div>
 
           <div className="prj-modal-footer">

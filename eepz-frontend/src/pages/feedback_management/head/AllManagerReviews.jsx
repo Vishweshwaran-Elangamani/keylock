@@ -2,7 +2,6 @@ import React, { useEffect, useState, useMemo } from "react";
 import {
   RefreshCw,
   AlertTriangle,
-  Eye,
   Users,
   Calendar,
   User,
@@ -13,6 +12,7 @@ import {
   peerQueueApi,
 } from "../../../services/feedbackmanagement/feedbackApi";
 import FeedbackBreadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb";
+import CustomDropdown from "../../../components/project-management/common/CustomDropdown";
 import "../../../styles/feedback/components/AllManagerReviews.css";
 
 const Badge = ({ text, color = "#27235C" }) => (
@@ -37,7 +37,6 @@ export default function AllManagerReviews() {
   const [managerIds, setManagerIds] = useState([]);
   const [managers, setManagers] = useState([]);
   const [selectedManager, setSelectedManager] = useState("All");
-  const [isManagerOpen, setIsManagerOpen] = useState(false);
 
   const fetchEmployeeMap = async () => {
     try {
@@ -149,11 +148,12 @@ export default function AllManagerReviews() {
     return feedbackContent?.replace(/^\[[^\]]+\]\s*/, "") || feedbackContent;
   };
 
-  const selectedManagerLabel =
-    selectedManager === "All"
-      ? "All Managers"
-      : managers.find((m) => m.id === Number(selectedManager))?.name ||
-        "All Managers";
+  const managerDropdownOptions = useMemo(() => {
+    return [
+      { value: "All", label: "All Managers" },
+      ...managers.map((m) => ({ value: String(m.id), label: m.name })),
+    ];
+  }, [managers]);
 
   if (loading) {
     return (
@@ -211,50 +211,14 @@ export default function AllManagerReviews() {
         <div className="amr-filter-card">
           <div className="amr-filter-content">
             <div className="amr-filter-wrapper">
-              <div className="amr-dd">
-                <button
-                  type="button"
-                  className={`amr-dd-trigger ${
-                    isManagerOpen ? "amr-dd-open" : ""
-                  }`}
-                  onClick={() => setIsManagerOpen((o) => !o)}
-                >
-                  <span className="amr-dd-trigger-text">
-                    {" "}
-                    {selectedManagerLabel}
-                  </span>
-                  <span className="amr-dd-arrow" />
-                </button>
-
-                {isManagerOpen && (
-                  <div className="amr-dd-menu">
-                    <button
-                      type="button"
-                      className="amr-dd-item amr-dd-header"
-                      onClick={() => {
-                        setSelectedManager("All");
-                        setIsManagerOpen(false);
-                      }}
-                    >
-                      All Managers
-                    </button>
-
-                    {managers.map((m) => (
-                      <button
-                        key={m.id}
-                        type="button"
-                        className="amr-dd-item"
-                        onClick={() => {
-                          setSelectedManager(String(m.id));
-                          setIsManagerOpen(false);
-                        }}
-                      >
-                        {m.name}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <CustomDropdown
+                name="manager"
+                value={selectedManager}
+                options={managerDropdownOptions}
+                placeholder="Select manager"
+                onChange={(name, value) => setSelectedManager(value)}
+                className="amr-custom-dd"
+              />
             </div>
           </div>
         </div>

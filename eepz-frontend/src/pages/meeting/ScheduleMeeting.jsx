@@ -288,7 +288,7 @@ const ScheduleMeeting = () => {
   return (
     <div className="container-fluid sched-page">
       <div className="row justify-content-center">
-        <div className="col-lg-10 col-xl-9">
+        <div className="col-lg-11 col-xl-10">
           <nav aria-label="breadcrumb" className="sched-breadcrumb-nav">
             <ol className="breadcrumb mb-0 d-flex align-items-center sched-breadcrumb">
               <li className="breadcrumb-item d-flex align-items-center">
@@ -477,7 +477,17 @@ const ScheduleMeeting = () => {
                               viewBox="0 0 24 24"
                               fill="none"
                             >
-                              <rect x="4" y="5" width="16" height="15" rx="2" ry="2" stroke="currentColor" strokeWidth="1.8" fill="none" />
+                              <rect
+                                x="4"
+                                y="5"
+                                width="16"
+                                height="15"
+                                rx="2"
+                                ry="2"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
+                                fill="none"
+                              />
                               <line x1="4" y1="9" x2="20" y2="9" stroke="currentColor" strokeWidth="1.8" />
                               <line x1="9" y1="3" x2="9" y2="7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                               <line x1="15" y1="3" x2="15" y2="7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
@@ -498,9 +508,9 @@ const ScheduleMeeting = () => {
                       </div>
 
                       <div className="col-md-3">
-                       <label className="form-label fw-semibold d-flex align-items-center gap-2 sched-label-top sched-time-label-shift">
+                        <label className="form-label fw-semibold d-flex align-items-center gap-2 sched-label-top">
                           <Clock size={20} /> Meeting Time <span className="text-danger">*</span>
-                       </label>
+                        </label>
 
                         <div className="sched-time-picker">
                           <CustomDropdown
@@ -568,7 +578,7 @@ const ScheduleMeeting = () => {
                       <div className="col-md-6">
                         <CustomDropdown
                           label={
-                            <span className="sched-dd-label">
+                            <span className="sched-dd-label-durr">
                               <Clock size={20} /> Duration
                             </span>
                           }
@@ -577,7 +587,7 @@ const ScheduleMeeting = () => {
                           options={durationOptions}
                           placeholder="Select duration"
                           onChange={handleDropdownChange}
-                          className="sched-dd"
+                          className="sched-dd sched-dd-dur"
                         />
                       </div>
                     </div>

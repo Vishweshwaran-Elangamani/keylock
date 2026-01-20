@@ -18,7 +18,8 @@
 
 .sched-page,
 .sched-page * {
-  font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif !important;
 }
 
 .sched-page input::placeholder,
@@ -35,7 +36,7 @@
 .sched-breadcrumb {
   background-color: transparent;
   padding: 0;
-  margin-left: -150px;
+  margin-left: -120px;
   margin-top: -10px;
 }
 
@@ -88,10 +89,15 @@
   min-height: 90px;
 }
 
+.sched-page .cdrop-wrap,
 .sched-page .cdrop-trigger,
 .sched-page .cdrop-value,
 .sched-page .cdrop-item {
-  font-size: 1rem !important;
+  width: 100% !important;
+}
+
+.sched-page .cdrop-trigger {
+  height: var(--sched-field-height) !important;
 }
 
 .sched-page .cdrop-placeholder {
@@ -112,7 +118,11 @@
 
 .sched-dd {
   width: 100%;
-  margin-top: -5px;
+  margin-top: 0;
+}
+
+.sched-dd-label-durr{
+  margin-top: 10px;
 }
 
 .sched-dd-label {
@@ -121,12 +131,14 @@
   gap: 0.5rem;
   font-size: 1rem !important;
   font-weight: 600 !important;
+  margin-bottom: 10px;
 }
 
 .sched-label-top {
   font-size: 1rem !important;
   font-weight: 600 !important;
-  margin-bottom: 0.5rem !important;
+  margin-bottom: 10px !important;
+  line-height: 1.2;
 }
 
 .sched-dd-top .cdrop-label {
@@ -145,32 +157,13 @@
   border-radius: 6px;
   outline: none;
   transition: all 0.2s ease;
-  margin-top: 1px;
-}
-
-.sched-time-label-shift {
-  margin-left: -20px;
-}
-
-
-.sched-title-input:hover {
-  border-color: var(--sched-dark);
-  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.08);
-}
-
-.sched-title-input:focus {
-  border-color: var(--sched-dark);
-  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
-}
-
-.sched-dd-top .cdrop-trigger {
-  height: var(--sched-field-height) !important;
+  margin-top: 8px;
+  box-sizing: border-box;
 }
 
 .sched-date-wrap {
   position: relative;
-  width: 90%;
-  margin-top: -3px;
+  width: 100%;
 }
 
 .sched-date-input {
@@ -183,8 +176,6 @@
   cursor: pointer;
   background-color: #ffffff;
   height: var(--sched-field-height);
-  
-  
 }
 
 .sched-date-input-disabled {
@@ -196,7 +187,6 @@
   position: absolute;
   top: 50%;
   right: 10px;
-  left: auto;
   transform: translateY(-50%);
   border: none;
   background: transparent;
@@ -213,13 +203,18 @@
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
-  margin-left: -20px;
+  width: 100%;
+}
+
+.sched-time-dd {
+  width: 100%;
 }
 
 .sched-time-dd .cdrop-trigger {
   height: var(--sched-field-height);
   border-radius: 10px;
   border: 1px solid #e5e7eb;
+  width: 100% !important;
 }
 
 .sched-time-error {
@@ -306,6 +301,7 @@
 .input-group.sched-link-group {
   margin-bottom: 0 !important;
   height: var(--sched-field-height);
+  width: 100%;
 }
 
 .input-group.sched-link-group .form-control {
@@ -316,6 +312,35 @@
   height: var(--sched-field-height);
   display: inline-flex;
   align-items: center;
+}
+
+.sched-dd-dur {
+  width: 100% !important;
+  margin-top: -10px;
+}
+
+
+.sched-dd-dur .cdrop-label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+  margin: 0 0 8px 0 !important;
+  padding: 0 !important;
+}
+
+.sched-dd-dur .cdrop-wrap,
+.sched-dd-dur .cdrop-trigger {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  
+}
+
+.sched-dd-dur .cdrop-trigger {
+  height: var(--sched-field-height) !important;
+  border-radius: 10px !important;
+    margin-bottom: -10px;
+
 }
 
 @media (max-width: 768px) {

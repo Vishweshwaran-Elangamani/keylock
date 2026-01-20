@@ -1,0 +1,164 @@
+.sla-compliance-card {
+  background: #ffffff;
+  border: 1.5px solid #27235c;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sla-compliance-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(39, 35, 92, 0.15);
+}
+
+.sla-compliance-top-bar {
+  height: 4px;
+}
+
+.sla-compliance-body {
+  padding: 24px;
+}
+
+.sla-compliance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.sla-compliance-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #27235c;
+}
+
+.sla-compliance-date {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.sla-compliance-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid;
+}
+
+.sla-compliance-rate {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.sla-compliance-progress {
+  height: 10px;
+  background: #f1f1f1;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.sla-compliance-progress-fill {
+  height: 100%;
+  border-radius: 10px;
+}
+
+.sla-compliance-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.sla-stat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 12px;
+}
+
+.sla-stat span {
+  flex: 1;
+  font-size: 13px;
+}
+
+.sla-stat strong {
+  font-size: 18px;
+}
+
+.sla-stat.green {
+  background: #d1fae5;
+  color: #047857;
+}
+
+.sla-stat.red {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.sla-stat.amber {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.sla-stat.blue {
+  background: #e8f1ff;
+  color: #1e40af;
+}
+
+.sla-compliance-open {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #eff6ff;
+  color: #1e40af;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+.sla-compliance-updated {
+  text-align: center;
+  font-size: 12px;
+  color: #64748b;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+
+.sla-compliance-footer {
+  padding: 14px 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.sla-compliance-action {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #27235c;
+  background: transparent;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.sla-compliance-action:hover {
+  background: #27235c;
+  color: #ffffff;
+}

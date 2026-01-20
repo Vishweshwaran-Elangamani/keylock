@@ -1,33 +1,17 @@
 import React, { useState, useEffect, useMemo } from "react";
-import {
-  TrendingUp,
-  TrendingDown,
-  Download,
-  RefreshCw,
-  BarChart3,
-  PieChart,
-  Filter,
-  FileText,
-  AlertCircle,
-  Users,
-  CheckCircle,
-  Clock,
-} from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { FileText, AlertCircle, Users, CheckCircle, Clock } from "lucide-react";
 import ComplianceCard from "../../components/sla/cards/ComplianceCard";
 import Breadcrumb from "../../components/sla/common/Breadcrumbs";
 import slaService from "../../services/sla/slaService";
-import {
-  getComplianceSummary,
-  getComplianceRating,
-} from "../../utils/sla/slaCalculations";
+import { getComplianceSummary, getComplianceRating } from "../../utils/sla/slaCalculations";
 import "../../styles/sla/components/SLACompliance.css";
 
 const SLACompliance = () => {
   const [allSLAs, setAllSLAs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [viewMode, setViewMode] = useState("cards");
+  const [viewMode, setViewMode] = useState("table");
+
   const [sortBy, setSortBy] = useState("compliancePercentage");
   const [sortOrder, setSortOrder] = useState("desc");
 
@@ -73,8 +57,7 @@ const SLACompliance = () => {
         .sort((a, b) => a - b);
 
       const periodStartDate = dates.length > 0 ? dates[0] : new Date();
-      const periodEndDate =
-        dates.length > 0 ? dates[dates.length - 1] : new Date();
+      const periodEndDate = dates.length > 0 ? dates[dates.length - 1] : new Date();
 
       return {
         complianceId: `${deptId}`,
@@ -106,7 +89,6 @@ const SLACompliance = () => {
         onTimeSLAs: 0,
         breachedSLAs: 0,
         avgCompliance: 0,
-        excellentDepts: 0,
       };
     }
 
@@ -129,20 +111,13 @@ const SLACompliance = () => {
 
     const avgCompliance =
       complianceData.length > 0
-        ? complianceData.reduce(
-            (sum, dept) => sum + dept.compliancePercentage,
-            0
-          ) / complianceData.length
+        ? complianceData.reduce((sum, dept) => sum + dept.compliancePercentage, 0) /
+          complianceData.length
         : 0;
-
-    const excellentDepts = complianceData.filter(
-      (d) => d.compliancePercentage >= 90
-    ).length;
 
     return {
       ...totals,
       avgCompliance: avgCompliance.toFixed(1),
-      excellentDepts,
     };
   };
 
@@ -158,46 +133,11 @@ const SLACompliance = () => {
 
   const stats = calculateOverallStats();
 
-  const handleExportReport = () => {
-    const headers = [
-      "Department",
-      "Total SLAs",
-      "Closed",
-      "Open",
-      "On-Time",
-      "Breached",
-      "Extended",
-      "Compliance %",
-      "Rating",
-    ];
-    const rows = complianceData.map((dept) => [
-      dept.departmentName,
-      dept.totalSlas,
-      dept.closedSlas,
-      dept.openSlas,
-      dept.onTimeSlas,
-      dept.breachedSlas,
-      dept.extendedSlas,
-      dept.compliancePercentage.toFixed(1),
-      dept.complianceRating,
-    ]);
-
-    const csv = [headers.join(","), ...rows.map((row) => row.join(","))].join(
-      "\n"
-    );
-
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `SLA_Compliance_Report.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-  };
-
   return (
     <div className="sla-compliance-wrapper">
-      <Breadcrumb items={[{ label: "SLA Compliance" }]} />
+      <div className="sla-compliance-breadcrumbs">
+        <Breadcrumb items={[{ label: "SLA Compliance" }]} />
+      </div>
 
       <div className="sla-compliance-header">
         <div className="sla-compliance-header-text">
@@ -250,11 +190,7 @@ const SLACompliance = () => {
       </div>
 
       <div className="sla-compliance-view-toggle-wrapper">
-        <div
-          className="sla-compliance-view-toggle"
-          role="group"
-          aria-label="View switcher"
-        >
+        <div className="sla-compliance-view-toggle" role="group" aria-label="View switcher">
           <button
             type="button"
             className={`sla-compliance-toggle-btn ${
@@ -277,23 +213,21 @@ const SLACompliance = () => {
             title="Cards View"
             aria-pressed={viewMode === "cards"}
           >
-            <i
-              className="bi bi-grid-3x3-gap-fill sla-toggle-icon"
-              aria-hidden="true"
-            ></i>
+            <i className="bi bi-grid-3x3-gap-fill sla-toggle-icon" aria-hidden="true"></i>
             <span className="visually-hidden">Cards View</span>
           </button>
         </div>
+      </div>
+
+      <div className="sla-compliance-section-heading">
+        <h5 className="sla-compliance-section-title">Department Compliance Overview</h5>
       </div>
 
       {error && (
         <div className="sla-compliance-alert">
           <AlertCircle size={18} className="sla-compliance-alert-icon" />
           <span className="sla-compliance-alert-text">{error}</span>
-          <button
-            className="sla-compliance-alert-close"
-            onClick={() => setError(null)}
-          >
+          <button className="sla-compliance-alert-close" onClick={() => setError(null)}>
             ×
           </button>
         </div>
@@ -302,9 +236,7 @@ const SLACompliance = () => {
       {loading ? (
         <div className="sla-compliance-loading">
           <div className="sla-compliance-spinner" />
-          <p className="sla-compliance-loading-text">
-            Loading compliance data...
-          </p>
+          <p className="sla-compliance-loading-text">Loading compliance data...</p>
         </div>
       ) : (
         <>
@@ -314,9 +246,7 @@ const SLACompliance = () => {
                 <ComplianceCard
                   key={compliance.complianceId}
                   compliance={compliance}
-                  slaData={allSLAs.filter(
-                    (sla) => sla.departmentId === compliance.departmentId
-                  )}
+                  slaData={allSLAs.filter((sla) => sla.departmentId === compliance.departmentId)}
                   showActions={false}
                 />
               ))}
@@ -330,77 +260,45 @@ const SLACompliance = () => {
                   <thead className="sla-compliance-table-header">
                     <tr>
                       <th>Department</th>
-                      <th className="sla-compliance-table-header-center">
-                        Total
-                      </th>
-                      <th className="sla-compliance-table-header-center">
-                        Closed
-                      </th>
-                      <th className="sla-compliance-table-header-center">
-                        Open
-                      </th>
-                      <th className="sla-compliance-table-header-center">
-                        On‑Time
-                      </th>
-                      <th className="sla-compliance-table-header-center">
-                        Breached
-                      </th>
-                      <th className="sla-compliance-table-header-center">
-                        Extended
-                      </th>
-                      <th className="sla-compliance-table-header-center">
-                        Compliance
-                      </th>
-                      <th className="sla-compliance-table-header-center">
-                        Rating
-                      </th>
+                      <th className="sla-compliance-table-header-center">Total</th>
+                      <th className="sla-compliance-table-header-center">Closed</th>
+                      <th className="sla-compliance-table-header-center">Open</th>
+                      <th className="sla-compliance-table-header-center">On-Time</th>
+                      <th className="sla-compliance-table-header-center">Breached</th>
+                      <th className="sla-compliance-table-header-center">Extended</th>
+                      <th className="sla-compliance-table-header-center-compliance">Compliance</th>
+                      <th className="sla-compliance-table-header-center">Rating</th>
                     </tr>
                   </thead>
                   <tbody>
                     {sortedData.map((dept) => {
-                      const ratingObj = getComplianceRating(
-                        dept.compliancePercentage
-                      );
+                      const ratingObj = getComplianceRating(dept.compliancePercentage);
                       const ratingColor = ratingObj.color;
 
                       return (
                         <tr key={dept.complianceId}>
-                          <td className="sla-compliance-table-dept-name">
-                            {dept.departmentName}
+                          <td className="sla-compliance-table-dept-name">{dept.departmentName}</td>
+
+                          <td className="sla-compliance-table-cell-center">{dept.totalSlas}</td>
+
+                          <td className="sla-compliance-table-cell-center">           
+                              {dept.closedSlas}                    
+                          </td>
+
+                          <td className="sla-compliance-table-cell-center">                          
+                              {dept.openSlas}                            
+                         </td>
+
+                          <td className="sla-compliance-table-cell-center">                       
+                              {dept.onTimeSlas}                        
                           </td>
 
                           <td className="sla-compliance-table-cell-center">
-                            {dept.totalSlas}
-                          </td>
-
-                          <td className="sla-compliance-table-cell-center">
-                            <span className="sla-compliance-pill sla-compliance-pill-closed">
-                              {dept.closedSlas}
-                            </span>
-                          </td>
-
-                          <td className="sla-compliance-table-cell-center">
-                            <span className="sla-compliance-pill sla-compliance-pill-open">
-                              {dept.openSlas}
-                            </span>
-                          </td>
-
-                          <td className="sla-compliance-table-cell-center">
-                            <span className="sla-compliance-pill sla-compliance-pill-ontime">
-                              {dept.onTimeSlas}
-                            </span>
-                          </td>
-
-                          <td className="sla-compliance-table-cell-center">
-                            <span className="sla-compliance-pill sla-compliance-pill-breached">
                               {dept.breachedSlas}
-                            </span>
                           </td>
 
-                          <td className="sla-compliance-table-cell-center">
-                            <span className="sla-compliance-pill sla-compliance-pill-extended">
-                              {dept.extendedSlas}
-                            </span>
+                          <td className="sla-compliance-table-cell-center">                        
+                              {dept.extendedSlas}                         
                           </td>
 
                           <td className="sla-compliance-table-cell-center">
@@ -409,10 +307,7 @@ const SLACompliance = () => {
                                 <div
                                   className="sla-compliance-progress-fill"
                                   style={{
-                                    width: `${Math.min(
-                                      100,
-                                      dept.compliancePercentage
-                                    )}%`,
+                                    width: `${Math.min(100, dept.compliancePercentage)}%`,
                                     backgroundColor: ratingColor,
                                   }}
                                 />
@@ -427,16 +322,7 @@ const SLACompliance = () => {
                           </td>
 
                           <td className="sla-compliance-table-cell-center">
-                            <span
-                              className="sla-compliance-rating-pill"
-                              style={{
-                                backgroundColor: `${ratingColor}15`,
-                                color: ratingColor,
-                                borderColor: `${ratingColor}40`,
-                              }}
-                            >
-                              {dept.complianceRating}
-                            </span>
+                              {dept.complianceRating}                         
                           </td>
                         </tr>
                       );
@@ -453,9 +339,7 @@ const SLACompliance = () => {
         <div className="sla-compliance-empty">
           <FileText size={48} className="sla-compliance-empty-icon" />
           <h5 className="sla-compliance-empty-title">No Compliance Data</h5>
-          <p className="sla-compliance-empty-text">
-            No SLA data available to display
-          </p>
+          <p className="sla-compliance-empty-text">No SLA data available to display</p>
         </div>
       )}
     </div>

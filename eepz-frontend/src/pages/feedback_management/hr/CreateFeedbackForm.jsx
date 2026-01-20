@@ -40,7 +40,6 @@ export default function CreateFeedbackForm() {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const calendarRef = useRef(null);
 
-  // ✅ dropdown anchor (for portal positioning)
   const formTypeRef = useRef(null);
 
   const FORM_TYPES = [
@@ -209,7 +208,6 @@ export default function CreateFeedbackForm() {
               </small>
             </div>
 
-            {/* ✅ REUSED CustomDropdown */}
             <div className="cff-form-group" ref={formTypeRef}>
               <label className="cff-label">
                 Form Type <span className="cff-required">*</span>

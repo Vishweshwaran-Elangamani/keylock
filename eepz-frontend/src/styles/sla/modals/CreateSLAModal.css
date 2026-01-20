@@ -154,11 +154,6 @@
   opacity: 0.6;
 }
 
-/* ================================
-   DATE INPUT + ICON STYLES ONLY
-   (Calendar popup is handled by CustomCalendar.css)
-   ================================ */
-
 .csla-calendar-container {
   position: relative;
   width: 100%;
@@ -193,9 +188,6 @@
   display: block;
 }
 
-/* ================================
-   EMPLOYEE INFO
-   ================================ */
 
 .csla-employee-info {
   background-color: #ffffff;
@@ -219,10 +211,6 @@
   font-size: 0.8rem;
   text-align: left;
 }
-
-/* ================================
-   FOOTER BUTTONS
-   ================================ */
 
 .csla-footer {
   display: flex;
@@ -294,10 +282,6 @@
     transform: rotate(360deg);
   }
 }
-
-/* ================================
-   RESPONSIVE
-   ================================ */
 
 @media (max-width: 576px) {
   .csla-modal {

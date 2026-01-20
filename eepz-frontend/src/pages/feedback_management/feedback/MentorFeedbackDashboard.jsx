@@ -326,7 +326,6 @@ export default function MentorFeedbackDashboard() {
         ))}
       </div>
 
-      {/* ✅ Filters (using CustomDropdown) */}
       <div className="mfd-filters-card">
         <div className="mfd-filters-grid">
           <div className="mfd-filter-col">
@@ -459,12 +458,10 @@ export default function MentorFeedbackDashboard() {
               </table>
             </div>
 
-            {/* ✅ Pagination footer */}
             <div className="mfd-pagination-footer">
               <div className="mfd-pagination-left">
                 <span className="mfd-pagination-text">Show</span>
 
-                {/* ✅ entries dropdown now also CustomDropdown */}
                 <div className="mfd-entries-dd">
                   <CustomDropdown
                     name="entriesPerPage"
@@ -559,7 +556,6 @@ export default function MentorFeedbackDashboard() {
         </>
       )}
 
-      {/* ✅ Modal */}
       {selectedFeedback && (
         <>
           <div

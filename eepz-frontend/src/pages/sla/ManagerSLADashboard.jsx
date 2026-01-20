@@ -455,14 +455,6 @@ const ManagerSLADashboard = () => {
             }`}
           >
             <div className="mgr-sla-filter-actions">
-              <button
-                type="button"
-                className="mgr-sla-btn-clear"
-                onClick={clearFilters}
-              >
-                <Filter size={16} />
-                Clear Filters
-              </button>
             </div>
           </div>
         </div>

@@ -686,33 +686,33 @@ const ProjectList = () => {
                         {project.status}
                       </span>
                     </td>
-                    <td>
-                      <div className="prj-list-cell-with-icon">
-                        <div className="prj-list-icon-wrapper prj-list-icon-business">
-                          <Building size={16} className="prj-list-icon-filled" />
-                        </div>
-                        <span>{project.businessUnit || "N/A"}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="prj-list-cell-with-icon">
-                        <div className="prj-list-icon-wrapper prj-list-icon-department">
-                          <Briefcase
-                            size={16}
-                            className="prj-list-icon-filled"
-                          />
-                        </div>
-                        <span>{project.department || "N/A"}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="prj-list-cell-with-icon">
-                        <div className="prj-list-icon-wrapper prj-list-icon-calendar">
-                          <Calendar size={16} className="prj-list-icon-filled" />
-                        </div>
-                        <span>{formatDate(project.startDate)}</span>
-                      </div>
-                    </td>
+                   <td>
+  <div className="prj-list-cell-with-icon">
+    <div className="prj-list-icon-wrapper prj-list-icon-business">
+      <Building size={16} className="prj-list-icon-filled" />
+    </div>
+    <div className="prj-list-cell-text">{project.businessUnit || "N/A"}</div>
+  </div>
+</td>
+
+<td>
+  <div className="prj-list-cell-with-icon">
+    <div className="prj-list-icon-wrapper prj-list-icon-department">
+      <Briefcase size={16} className="prj-list-icon-filled" />
+    </div>
+    <div className="prj-list-cell-text">{project.department || "N/A"}</div>
+  </div>
+</td>
+
+<td>
+  <div className="prj-list-cell-with-icon">
+    <div className="prj-list-icon-wrapper prj-list-icon-calendar">
+      <Calendar size={16} className="prj-list-icon-filled" />
+    </div>
+    <div className="prj-list-cell-text">{formatDate(project.startDate)}</div>
+  </div>
+</td>
+
                     <td>
                       {project.resourceOwner ? (
                         <div className="prj-list-resource-owner">

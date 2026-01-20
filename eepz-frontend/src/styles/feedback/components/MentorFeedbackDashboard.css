@@ -10,8 +10,6 @@
   font-family: inherit;
 }
 
-/* ------------------------ LOADING ------------------------ */
-
 .mfd-loading-wrapper {
   display: flex;
   align-items: center;
@@ -40,8 +38,6 @@
   font-size: 0.875rem;
   font-family: inherit;
 }
-
-/* ------------------------ BREADCRUMB ------------------------ */
 
 .mfd-breadcrumb-nav {
   margin-top: -25px;
@@ -99,8 +95,6 @@
   font-family: inherit;
 }
 
-/* ------------------------ ALERT ------------------------ */
-
 .mfd-alert-error {
   background-color: #f8d7da;
   border: 1px solid #f5c2c7;
@@ -116,7 +110,6 @@
   font-family: inherit;
 }
 
-/* ------------------------ STATS ------------------------ */
 
 .mfd-stats-grid {
   display: grid;
@@ -328,8 +321,6 @@
   background-color: #252267;
   color: #ffffff;
 }
-
-/* ------------------------ TABLE ------------------------ */
 
 .mfd-table-wrapper {
   border-radius: 12px;
@@ -730,7 +721,6 @@
   font-family: inherit !important;
 }
 
-/* ------------------------ MODAL ------------------------ */
 
 .mfd-modal-backdrop {
   position: fixed;
@@ -905,8 +895,6 @@
   background-color: #d1d5db;
 }
 
-/* ------------------------ KEYFRAMES ------------------------ */
-
 @keyframes mfd-spin {
   from {
     transform: rotate(0deg);
@@ -916,7 +904,6 @@
   }
 }
 
-/* ------------------------ RESPONSIVE ------------------------ */
 
 @media (max-width: 991px) {
   .mfd-stats-grid {

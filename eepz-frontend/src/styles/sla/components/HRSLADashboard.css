@@ -190,23 +190,19 @@
 }
 
 .hr-sla-filters-card {
-  background: #ffffff;
-  border-radius: 14px;
-  padding: 1.1rem 1.25rem;
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+ background: #ffffff;
+  border-radius: 16px;
+  padding: 0.9rem 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   border: 1px solid #e5e7eb;
   margin-bottom: 1.5rem;
-  width: 100%;
-  max-width: 100%;
 }
 
 .hr-sla-filters-row {
   display: flex;
-  flex-wrap: wrap;
+  gap: 1rem;
   align-items: center;
-  gap: 0.75rem;
-  width: 100%;
-  max-width: 100%;
+  flex-wrap: nowrap;
 }
 
 .hr-sla-search-wrapper {

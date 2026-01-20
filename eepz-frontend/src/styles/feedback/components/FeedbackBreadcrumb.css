@@ -1,0 +1,80 @@
+.fb-breadcrumb {
+  margin-bottom: 1rem;
+  --fb-accent: var(--color-accent-1);
+}
+
+.fb-breadcrumb-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+}
+
+.fb-breadcrumb-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.fb-breadcrumb-slash {
+  color: var(--fb-accent);
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.fb-breadcrumb-home-link {
+  color: var(--fb-accent);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 700;
+  padding: 0.25rem;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+  background: transparent;
+}
+
+.fb-breadcrumb-home-link.is-hover {
+  background: rgba(151, 36, 126, 0.08);
+}
+
+.fb-breadcrumb-home-link:hover {
+  background: rgba(151, 36, 126, 0.08);
+}
+
+.fb-breadcrumb-home-link:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.fb-breadcrumb-home-icon {
+  color: var(--fb-accent);
+}
+
+.fb-breadcrumb-link {
+  color: var(--fb-accent);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.fb-breadcrumb-link:hover {
+  background: rgba(151, 36, 126, 0.08);
+}
+
+.fb-breadcrumb-link:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.fb-breadcrumb-current {
+  color: #000;
+  font-weight: 600;
+}

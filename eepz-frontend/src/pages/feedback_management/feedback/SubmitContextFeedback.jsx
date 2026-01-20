@@ -415,7 +415,6 @@ export default function SubmitContextFeedback() {
                     Select Organization Goal <span className="scf-required">*</span>
                   </label>
 
-                  {/* ✅ ANCHOR for portal dropdown */}
                   <div ref={goalAnchorRef} className="scf-dd">
                     <CustomDropdown
                       name="organizationObjectiveId"
@@ -545,7 +544,6 @@ export default function SubmitContextFeedback() {
                     Select Recipient <span className="scf-required">*</span>
                   </label>
 
-                  {/* ✅ ANCHOR for portal dropdown */}
                   <div ref={recipientAnchorRef} className="scf-dd">
                     <CustomDropdown
                       name="recipientEmployeeId"

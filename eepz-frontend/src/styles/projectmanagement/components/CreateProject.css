@@ -339,10 +339,25 @@
   margin-bottom: 0.25rem;
 }
 
-.prj-manager-role {
+.prj-manager-role-res {
   color: #8d8d8d;
   font-size: 0.8125rem;
   font-weight: 500;
+  margin-left: -29px;
+}
+
+.prj-manager-role-l1 {
+  color: #8d8d8d;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  margin-left: -37px;
+}
+
+.prj-manager-role-l2 {
+  color: #8d8d8d;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  margin-left: -100px;
 }
 
 .prj-manager-placeholder {

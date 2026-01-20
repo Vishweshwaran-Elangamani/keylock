@@ -27,7 +27,6 @@
     0 6px 18px rgba(16, 24, 40, 0.06);
 }
 
-/* ---------------- SEARCH ---------------- */
 .prj-list-search-wrapper {
   position: relative;
   flex: 1;
@@ -72,25 +71,18 @@
   border-color: #252267;
   box-shadow: 0 0 0 4px rgba(37, 34, 103, 0.12);
 }
-
-/* Search button like screenshot: dark + aligned inside input */
 .prj-list-search-btn {
   position: absolute;
   top: 5px;
   right: 5px;
   height: 36px;
-
   padding: 0 16px;
-
   border-radius: 10px;
   border: none;
-
   background: #252267;
   color: #ffffff;
-
   font-size: 14px;
   font-weight: 700;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -114,7 +106,6 @@
   background: #4b5563;
 }
 
-/* --------------- STATUS DROPDOWN --------------- */
 .prj-list-status-filter-wrapper {
   position: relative;
   height: 46px;
@@ -132,13 +123,11 @@
   z-index: 4;
 }
 
-/* wrapper that holds CustomDropdown */
 .prj-list-status-dropdown {
   width: 100%;
   height: 46px;
 }
 
-/* remove label spacing */
 .prj-list-status-dropdown-comp .cdrop-label {
   display: none !important;
 }
@@ -147,21 +136,16 @@
   margin-bottom: 0 !important;
 }
 
-/* make dropdown look like screenshot */
 .prj-list-status-dropdown-comp .cdrop-trigger {
   height: 46px !important;
   min-height: 46px !important;
-
   border-radius: 12px !important;
   border: 1px solid #e5e7eb !important;
-
   padding: 0 14px 0 42px !important;
-
   font-size: 14px !important;
   font-weight: 600 !important;
   color: #111827 !important;
   background: #ffffff !important;
-
   box-shadow: none !important;
 }
 
@@ -179,7 +163,6 @@
   color: #111827 !important;
 }
 
-/* ---------------- ACTION BUTTONS ---------------- */
 .prj-list-actions-group {
   display: flex;
   align-items: center;
@@ -212,8 +195,6 @@
   width: 20px;
   height: 20px;
 }
-
-/* Resource Pool = dark purple */
 .prj-list-btn-resource {
   background: #252267;
   color: #ffffff;
@@ -225,7 +206,6 @@
   transform: translateY(-1px);
 }
 
-/* Create Project = pink gradient */
 .prj-list-btn-create {
   background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
   color: #ffffff;
@@ -237,7 +217,6 @@
   box-shadow: 0 14px 28px rgba(151, 36, 126, 0.22);
 }
 
-/* ---------------- RESPONSIVE ---------------- */
 @media (max-width: 992px) {
   .prj-list-filter-bar-content {
     flex-direction: column;

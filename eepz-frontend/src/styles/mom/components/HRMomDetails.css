@@ -463,7 +463,6 @@ body {
   text-align: left;
 }
 
-/* UPDATED: Two Column Grid - Reduced gap and left-aligned */
 .hrmom-two-column-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

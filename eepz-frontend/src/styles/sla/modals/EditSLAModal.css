@@ -137,10 +137,6 @@
   color: #e01950;
 }
 
-/* ============================================================
-   ✅ Calendar input box + icon alignment
-   ============================================================ */
-
 .esla-calendar-container {
   position: relative;
   width: 100%;
@@ -220,10 +216,6 @@
   display: block;
 }
 
-/* ============================================================
-   ✅ DROPDOWN: make chevron small + align exactly like calendar icon
-   ============================================================ */
-
 .esla-dropdown .cdrop-wrap {
   width: 100%;
 }
@@ -232,15 +224,12 @@
   display: none;
 }
 
-/* ✅ same height + same right padding as calendar input */
 .esla-dropdown .cdrop-trigger {
   width: 100%;
   border-radius: 12px;
   border: 1px solid #e2e4f0;
   background: #ffffff;
   font-size: 0.95rem;
-
-  /* same vertical feel as calendar input */
   padding: 0.8rem 2.7rem 0.8rem 0.85rem;
 
   cursor: pointer;
@@ -252,8 +241,6 @@
   text-align: left;
   font-weight: 400;
   line-height: 1.6;
-
-  /* ✅ IMPORTANT: prevent tall trigger */
   min-height: 0 !important;
   height: auto !important;
 
@@ -261,7 +248,6 @@
   position: relative;
 }
 
-/* ✅ remove any forced scaling from dropdown component */
 .esla-dropdown .cdrop-trigger * {
   transform: none !important;
 }
@@ -284,7 +270,6 @@
   opacity: 0.6;
 }
 
-/* ✅ value text same */
 .esla-dropdown .cdrop-value {
   flex: 1;
   overflow: hidden;
@@ -299,7 +284,6 @@
   opacity: 0.6;
 }
 
-/* ✅ FIX: make dropdown icon exactly like calendar icon */
 .esla-dropdown .cdrop-icon,
 .esla-dropdown .cdrop-chevron,
 .esla-dropdown svg {
@@ -307,24 +291,20 @@
   height: 18px !important;
 }
 
-/* ✅ force icon to be aligned on same straight vertical line as calendar icon */
 .esla-dropdown .cdrop-icon {
   position: absolute !important;
-  right: 12px !important; /* SAME as calendar */
+  right: 12px !important; 
   top: 50% !important;
   transform: translateY(-50%) !important;
   pointer-events: none;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  /* ✅ prevents big box icon */
   padding: 0 !important;
   margin: 0 !important;
   line-height: 0 !important;
 }
 
-/* MENU */
 .esla-dropdown .cdrop-menu {
   background: #ffffff;
   border: 1px solid #d1d5db;
@@ -375,7 +355,6 @@
   font-weight: 600;
 }
 
-/* scrollbar */
 .esla-dropdown .cdrop-menu::-webkit-scrollbar {
   width: 6px;
 }
@@ -391,8 +370,6 @@
   border-radius: 8px;
   border: 1px solid #f9fafb;
 }
-
-/* ============================================================ */
 
 .esla-char-count {
   display: block;
