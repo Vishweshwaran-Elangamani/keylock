@@ -11,13 +11,13 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
     /// </summary>
     [ApiController]
     [Authorize]
-    public class LnDSkillsController : BaseLnDController
+    public class LnDEmployeeSkillsController : BaseLnDController
     {
         #region Dependencies
 
         private readonly ILnDEmployeeSkillService _employeeSkillService;
 
-        public LnDSkillsController(ILnDEmployeeSkillService employeeSkillService)
+        public LnDEmployeeSkillsController(ILnDEmployeeSkillService employeeSkillService)
         {
             _employeeSkillService = employeeSkillService;
         }

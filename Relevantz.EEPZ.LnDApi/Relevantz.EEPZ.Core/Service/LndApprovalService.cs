@@ -97,7 +97,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<bool>
                 {
                     Success = false,
-                    Message = "Approval not found or you are not the approver",
+                    Message = LnDConstants.RESPONSE_MESSAGES.APPROVAL_NOT_FOUND_OR_NOT_APPROVER,
+
                 };
             }
 
@@ -111,7 +112,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<bool>
                 {
                     Success = false,
-                    Message = "Approval has already been processed",
+                    Message = LnDConstants.RESPONSE_MESSAGES.APPROVAL_ALREADY_PROCESSED,
+
                 };
             }
 
@@ -171,7 +173,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         return new ApiResponse<bool>
                         {
                             Success = false,
-                            Message = "SME not found",
+                            Message = LnDConstants.RESPONSE_MESSAGES.SME_NOT_FOUND,
+
                         };
                     }
 
@@ -233,7 +236,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         return new ApiResponse<bool>
                         {
                             Success = false,
-                            Message = "Assignment not found",
+                            Message = LnDConstants.RESPONSE_MESSAGES.ASSIGNMENT_NOT_FOUND,
+
                         };
                     }
 
@@ -304,8 +308,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 Success = true,
                 Message = request.IsApproved
-                    ? "Approval processed successfully"
-                    : "Request rejected successfully",
+    ? LnDConstants.RESPONSE_MESSAGES.APPROVAL_PROCESSED_SUCCESS
+    : LnDConstants.RESPONSE_MESSAGES.APPROVAL_REJECTED_SUCCESS,
+
                 Data = true,
             };
         }
@@ -369,7 +374,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<ApprovalDetailsResponseModel>
                 {
                     Success = false,
-                    Message = "Approval not found",
+                    Message = LnDConstants.RESPONSE_MESSAGES.APPROVAL_NOT_FOUND,
+
                 };
             }
 
@@ -387,7 +393,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<ApprovalDetailsResponseModel>
                 {
                     Success = false,
-                    Message = "You do not have access to this approval",
+                    Message = LnDConstants.RESPONSE_MESSAGES.ACCESS_DENIED,
+
                 };
             }
 
@@ -486,7 +493,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<FileDownloadResponseModel>
                 {
                     Success = false,
-                    Message = "Approval not found or access denied",
+                    Message = LnDConstants.RESPONSE_MESSAGES.ATTACHMENT_ACCESS_DENIED,
+
                 };
             }
 
@@ -500,7 +508,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<FileDownloadResponseModel>
                 {
                     Success = false,
-                    Message = "No attachment found for this approval",
+                    Message = LnDConstants.RESPONSE_MESSAGES.ATTACHMENT_NOT_FOUND,
+
                 };
             }
 
@@ -560,7 +569,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<FileDownloadResponseModel>
                 {
                     Success = false,
-                    Message = "Assignment not found or access denied",
+                    Message = LnDConstants.RESPONSE_MESSAGES.ASSIGNMENT_ACCESS_DENIED,
+
                 };
             }
 
@@ -574,7 +584,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<FileDownloadResponseModel>
                 {
                     Success = false,
-                    Message = "No proof document found for this assignment",
+                    Message = LnDConstants.RESPONSE_MESSAGES.ASSIGNMENT_PROOF_NOT_FOUND,
+
                 };
             }
 
@@ -634,7 +645,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<FileDownloadResponseModel>
                 {
                     Success = false,
-                    Message = "Approval not found or access denied",
+                    Message = LnDConstants.RESPONSE_MESSAGES.ATTACHMENT_ACCESS_DENIED,
+
                 };
             }
 
@@ -648,7 +660,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<FileDownloadResponseModel>
                 {
                     Success = false,
-                    Message = "No attachment found",
+                    Message = LnDConstants.RESPONSE_MESSAGES.ATTACHMENT_NOT_FOUND,
+
                 };
             }
 
@@ -709,7 +722,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<FileDownloadResponseModel>
                 {
                     Success = false,
-                    Message = "Assignment not found or access denied",
+                    Message = LnDConstants.RESPONSE_MESSAGES.ASSIGNMENT_ACCESS_DENIED,
+
                 };
             }
 
@@ -723,7 +737,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<FileDownloadResponseModel>
                 {
                     Success = false,
-                    Message = "No proof document found",
+                    Message = LnDConstants.RESPONSE_MESSAGES.ASSIGNMENT_PROOF_NOT_FOUND,
+
                 };
             }
 
@@ -752,7 +767,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         #endregion
     }
-} 
+}
 
 
 

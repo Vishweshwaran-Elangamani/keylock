@@ -458,7 +458,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 Log.Debug("DeleteApprovalsAsync: Approvals marked for deletion");
             }
 
-            await Task.CompletedTask;
+            await Task.CompletedTask; 
         }
 
         /// <summary>Deletes multiple assignments from the database.</summary>

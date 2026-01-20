@@ -50,7 +50,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<PaginatedResponse<SubordinateEmployeeResponseModel>>
                 {
                     Success = false,
-                    Message = "Manager not found",
+                    Message = LnDConstants.RESPONSE_MESSAGES.MANAGER_NOT_FOUND,
+
                 };
             }
 
@@ -92,7 +93,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return new ApiResponse<PaginatedResponse<SubordinateEmployeeResponseModel>>
             {
                 Success = true,
-                Message = $"Found {totalCount} subordinate(s)",
+                Message = string.Format(
+    LnDConstants.RESPONSE_MESSAGES.SUBORDINATES_FOUND,
+    totalCount
+),
+
                 Data = paginatedResponse,
             };
         }
@@ -117,7 +122,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return new ApiResponse<List<SkillResponseModel>>
             {
                 Success = true,
-                Message = $"Found {skillResponseModels.Count} skill(s)",
+                Message = string.Format(
+    LnDConstants.RESPONSE_MESSAGES.SKILLS_FOUND,
+    skillResponseModels.Count
+),
+
                 Data = skillResponseModels,
             };
         }
@@ -142,7 +151,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>
                 {
                     Success = false,
-                    Message = "Manager not found",
+                    Message = LnDConstants.RESPONSE_MESSAGES.MANAGER_NOT_FOUND,
+
                 };
             }
 
@@ -272,7 +282,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<EmployeeSkillResponseModel>
                 {
                     Success = false,
-                    Message = "Employee not found or not your subordinate",
+                    Message = LnDConstants.RESPONSE_MESSAGES.EMPLOYEE_NOT_FOUND_OR_NOT_SUBORDINATE,
+
                 };
             }
 
@@ -285,7 +296,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<EmployeeSkillResponseModel>
                 {
                     Success = false,
-                    Message = "Skill not found",
+                    Message = LnDConstants.RESPONSE_MESSAGES.SKILL_NOT_FOUND,
+
                 };
             }
 
@@ -304,7 +316,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<EmployeeSkillResponseModel>
                 {
                     Success = false,
-                    Message = "Skill already recorded for this employee",
+                    Message = LnDConstants.RESPONSE_MESSAGES.SKILL_ALREADY_RECORDED,
+
                 };
             }
 
@@ -330,7 +343,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return new ApiResponse<EmployeeSkillResponseModel>
             {
                 Success = true,
-                Message = "Skill recorded successfully",
+                Message = LnDConstants.RESPONSE_MESSAGES.SKILL_RECORDED_SUCCESS,
+
                 Data = new EmployeeSkillResponseModel
                 {
                     MapperId = savedMapper.MapperId,
@@ -371,7 +385,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<List<EmployeeSkillResponseModel>>
                 {
                     Success = false,
-                    Message = "Employee not found or not your subordinate",
+                    Message = LnDConstants.RESPONSE_MESSAGES.EMPLOYEE_NOT_FOUND_OR_NOT_SUBORDINATE,
+
                 };
             }
 
@@ -448,7 +463,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return new ApiResponse<List<EmployeeSkillResponseModel>>
             {
                 Success = true,
-                Message = $"{results.Count} skills recorded successfully",
+                Message = LnDConstants.RESPONSE_MESSAGES.SKILL_RECORDED_SUCCESS,
+
                 Data = results,
             };
         }
@@ -476,7 +492,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<EmployeeSkillResponseModel>
                 {
                     Success = false,
-                    Message = "Skill mapping not found or employee not your subordinate",
+                    Message = LnDConstants.RESPONSE_MESSAGES.SKILL_MAPPING_NOT_FOUND_OR_UNAUTHORIZED,
+
                 };
             }
 
@@ -512,7 +529,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return new ApiResponse<EmployeeSkillResponseModel>
             {
                 Success = true,
-                Message = "Skill rating updated successfully",
+                Message = LnDConstants.RESPONSE_MESSAGES.SKILL_RATING_UPDATED_SUCCESS,
+
                 Data = new EmployeeSkillResponseModel
                 {
                     MapperId = mapper.MapperId,
@@ -550,7 +568,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<bool>
                 {
                     Success = false,
-                    Message = "Skill mapping not found or employee not your subordinate",
+                    Message = LnDConstants.RESPONSE_MESSAGES.SKILL_MAPPING_NOT_FOUND_OR_UNAUTHORIZED,
+
                 };
             }
 
@@ -623,7 +642,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return new ApiResponse<bool>
             {
                 Success = true,
-                Message = $"Skill deleted successfully. {relatedAssignments.Count} active assignment(s) removed. SME status deactivated if applicable.",
+                Message = string.Format(
+    LnDConstants.RESPONSE_MESSAGES.SKILL_DELETE_WITH_ASSIGNMENTS,
+    relatedAssignments.Count
+),
+
                 Data = true,
             };
         }

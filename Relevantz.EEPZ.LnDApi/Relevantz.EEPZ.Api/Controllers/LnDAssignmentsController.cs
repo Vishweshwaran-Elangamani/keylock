@@ -207,7 +207,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 );
                 return BadRequest(result);
             }
-        }
+        } 
 
         /// <summary>Gets assignments where the logged-in employee is the assigned SME with filtering and pagination.</summary>
         [HttpGet("api/lnd-assignments/sme")]

@@ -87,7 +87,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             );
 
             return (items, totalCount);
-        }
+        } 
 
 
         /// <summary>Gets paginated skills for a specific employee with SME data included.</summary>

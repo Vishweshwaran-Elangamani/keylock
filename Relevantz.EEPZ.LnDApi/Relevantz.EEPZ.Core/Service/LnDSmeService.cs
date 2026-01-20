@@ -82,8 +82,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<int>
                 {
                     Success = false,
-                    Message =
-                        $"You need a rating of at least {LnDConstants.MIN_SME_RATING} to become an SME",
+                    Message = string.Format(
+    LnDConstants.RESPONSE_MESSAGES.SME_MIN_RATING_REQUIRED,
+    LnDConstants.MIN_SME_RATING
+),
+
                 };
             }
 
@@ -102,7 +105,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<int>
                 {
                     Success = false,
-                    Message = "You are already an active SME for this skill",
+                    Message = LnDConstants.RESPONSE_MESSAGES.ALREADY_ACTIVE_SME,
+
                 };
             }
 
@@ -121,7 +125,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<int>
                 {
                     Success = false,
-                    Message = "You already have a pending SME registration request",
+                    Message = LnDConstants.RESPONSE_MESSAGES.SME_REGISTRATION_ALREADY_PENDING,
+
                 };
             }
 
@@ -167,7 +172,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return new ApiResponse<int>
             {
                 Success = true,
-                Message = "SME registration request submitted successfully",
+                Message = LnDConstants.RESPONSE_MESSAGES.SME_REGISTRATION_REQUEST_SUCCESS,
+
                 Data = approval.ApprovalId,
             };
         }
@@ -253,7 +259,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return new ApiResponse<PaginatedResponse<SmeResponseModel>>
             {
                 Success = true,
-                Message = $"Found {totalCount} active SME(s)",
+                Message = string.Format(
+    LnDConstants.RESPONSE_MESSAGES.ACTIVE_SMES_FOUND,
+    totalCount
+),
                 Data = new PaginatedResponse<SmeResponseModel>
                 {
                     Items = items,
@@ -288,12 +297,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             using (var workbook = new XLWorkbook())
             {
-                var worksheet = workbook.Worksheets.Add("Active SMEs");
+                var worksheet = workbook.Worksheets.Add(LnDConstants.ACTIVE_SMES_EXPORT.TITLE);
 
-                worksheet.Cell(1, 1).Value = "Employee Name";
-                worksheet.Cell(1, 2).Value = "Skill Name";
-                worksheet.Cell(1, 3).Value = "Department";
-                worksheet.Cell(1, 4).Value = "Approved Date";
+                worksheet.Cell(1, 1).Value = LnDConstants.ACTIVE_SMES_EXPORT.EMPLOYEE_NAME;
+                worksheet.Cell(1, 2).Value = LnDConstants.ACTIVE_SMES_EXPORT.SKILL_NAME;
+                worksheet.Cell(1, 3).Value = LnDConstants.ACTIVE_SMES_EXPORT.DEPARTMENT;
+                worksheet.Cell(1, 4).Value = LnDConstants.ACTIVE_SMES_EXPORT.APPROVED_DATE;
 
                 var headerRange = worksheet.Range(1, 1, 1, 4);
                 headerRange.Style.Font.Bold = true;

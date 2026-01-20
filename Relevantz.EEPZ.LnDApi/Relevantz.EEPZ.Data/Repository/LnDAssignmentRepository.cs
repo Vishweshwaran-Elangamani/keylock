@@ -64,7 +64,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             {
                 assignment.Status = LnDConstants.ASSIGNMENT_STATUS.OVERDUE;
                 assignment.UpdatedOn = DateOnly.FromDateTime(DateTime.Now);
-            }
+            } 
 
             _context.Lndassignments.UpdateRange(overdueAssignments);
             var count = await _context.SaveChangesAsync();
@@ -72,9 +72,8 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             Log.Information("MarkAssignmentsAsOverdueAsync completed. MarkedCount={Count}", count);
 
             return count;
-        }
-
-        #endregion
+        } 
+        #endregion                  
 
         #region Assignment Retrieval
 

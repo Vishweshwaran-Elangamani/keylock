@@ -50,7 +50,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return new ApiResponse<int>
             {
                 Success = true,
-                Message = $"{count} assignment(s) marked as overdue",
+                Message = $"{count} {LnDConstants.RESPONSE_MESSAGES.OVERDUE_ASSIGNMENTS_MARKED}",
+
                 Data = count,
             };
         }
@@ -78,7 +79,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<int>
                 {
                     Success = false,
-                    Message = "Employee not found or not your subordinate",
+                    Message = LnDConstants.RESPONSE_MESSAGES.EMPLOYEE_NOT_FOUND_OR_NOT_SUBORDINATE,
+
                 };
             }
 
@@ -100,8 +102,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<int>
                 {
                     Success = false,
-                    Message =
-                        $"Employee must have a skill rating below {LnDConstants.MIN_REQUEST_SME_RATING} to request SME assignment",
+                    Message = LnDConstants.RESPONSE_MESSAGES.SKILL_RATING_TOO_HIGH_FOR_SME_REQUEST,
+
                 };
             }
 
@@ -136,7 +138,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return new ApiResponse<int>
             {
                 Success = true,
-                Message = "SME assignment request sent successfully",
+                Message = LnDConstants.RESPONSE_MESSAGES.SME_ASSIGNMENT_REQUEST_SUCCESS,
+
                 Data = approval.ApprovalId,
             };
         }
@@ -166,7 +169,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<bool>
                 {
                     Success = false,
-                    Message = "Assignment not found",
+                    Message = LnDConstants.RESPONSE_MESSAGES.ASSIGNMENT_NOT_FOUND,
+
                 };
             }
 
@@ -180,7 +184,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<bool>
                 {
                     Success = false,
-                    Message = "Assignment is not in progress",
+                    Message = LnDConstants.RESPONSE_MESSAGES.ASSIGNMENT_NOT_IN_PROGRESS,
+
                 };
             }
 
@@ -234,8 +239,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return new ApiResponse<bool>
             {
                 Success = true,
-                Message =
-                    "Completion proof uploaded successfully. Awaiting SME acknowledgement.",
+                Message = LnDConstants.RESPONSE_MESSAGES.COMPLETION_PROOF_UPLOAD_SUCCESS,
+
                 Data = true,
             };
         }
@@ -268,7 +273,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<bool>
                 {
                     Success = false,
-                    Message = "Assignment not found or employee not your subordinate",
+                    Message = LnDConstants.RESPONSE_MESSAGES.ASSIGNMENT_ACCESS_DENIED,
+
                 };
             }
 
@@ -285,7 +291,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<bool>
                 {
                     Success = false,
-                    Message = "Assignment is not ready for completion",
+                    Message = LnDConstants.RESPONSE_MESSAGES.ASSIGNMENT_NOT_READY_FOR_COMPLETION,
+
                 };
             }
 
@@ -343,7 +350,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return new ApiResponse<bool>
             {
                 Success = true,
-                Message = "Assignment completed successfully",
+                Message = LnDConstants.RESPONSE_MESSAGES.ASSIGNMENT_COMPLETED_SUCCESS,
                 Data = true,
             };
         }
@@ -530,15 +537,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             using (var workbook = new XLWorkbook())
             {
-                var worksheet = workbook.Worksheets.Add("Team Assignments");
-                worksheet.Cell(1, 1).Value = "Employee Name";
-                worksheet.Cell(1, 2).Value = "Skill Name";
-                worksheet.Cell(1, 3).Value = "SME Assigned";
-                worksheet.Cell(1, 4).Value = "Assignment Status";
-                worksheet.Cell(1, 5).Value = "Start Date";
-                worksheet.Cell(1, 6).Value = "Due Date";
-                worksheet.Cell(1, 7).Value = "Score";
-                worksheet.Cell(1, 8).Value = "Comments";
+                var worksheet = workbook.Worksheets.Add(LnDConstants.TEAM_EXPORT.TITLE);
+                worksheet.Cell(1, 1).Value = LnDConstants.TEAM_EXPORT.EMPLOYEE_NAME;
+                worksheet.Cell(1, 2).Value = LnDConstants.TEAM_EXPORT.SKILL_NAME;
+                worksheet.Cell(1, 3).Value = LnDConstants.TEAM_EXPORT.SME_ASSIGNED;
+                worksheet.Cell(1, 4).Value = LnDConstants.TEAM_EXPORT.ASSIGNMENT_STATUS;
+                worksheet.Cell(1, 5).Value = LnDConstants.TEAM_EXPORT.START_DATE;
+                worksheet.Cell(1, 6).Value = LnDConstants.TEAM_EXPORT.DUE_DATE;
+                worksheet.Cell(1, 7).Value = LnDConstants.TEAM_EXPORT.SCORE;
+                worksheet.Cell(1, 8).Value = LnDConstants.TEAM_EXPORT.COMMENTS;
 
                 var headerRange = worksheet.Range(1, 1, 1, 8);
                 headerRange.Style.Font.Bold = true;

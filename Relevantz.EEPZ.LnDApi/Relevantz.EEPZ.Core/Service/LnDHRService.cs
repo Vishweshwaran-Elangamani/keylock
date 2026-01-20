@@ -57,7 +57,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return new ApiResponse<PaginatedResponse<SubordinateEmployeeResponseModel>>
             {
                 Success = true,
-                Message = $"Found {totalCount} employee(s)",
+                Message = string.Format(
+    LnDConstants.RESPONSE_MESSAGES.EMPLOYEES_FOUND,
+    totalCount
+),
+
                 Data = paginatedResponse,
             };
         }
@@ -195,7 +199,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return new ApiResponse<PaginatedResponse<AssignmentResponseModel>>
             {
                 Success = true,
-                Message = $"Found {totalCount} assignment(s)",
+                Message = string.Format(
+    LnDConstants.RESPONSE_MESSAGES.ASSIGNMENTS_FOUND,
+    totalCount
+),
+
                 Data = paginatedResponse,
             };
         }
@@ -224,17 +232,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             using (var workbook = new XLWorkbook())
             {
-                var worksheet = workbook.Worksheets.Add("Organization Assignments");
-
-                worksheet.Cell(1, 1).Value = "Employee Name";
-                worksheet.Cell(1, 2).Value = "Department";
-                worksheet.Cell(1, 3).Value = "Skill Name";
-                worksheet.Cell(1, 4).Value = "SME Assigned";
-                worksheet.Cell(1, 5).Value = "Assignment Status";
-                worksheet.Cell(1, 6).Value = "Start Date";
-                worksheet.Cell(1, 7).Value = "Due Date";
-                worksheet.Cell(1, 8).Value = "Score";
-                worksheet.Cell(1, 9).Value = "Comments";
+                var worksheet = workbook.Worksheets.Add(LnDConstants.ORG_EXPORT.TITLE);
+                worksheet.Cell(1, 1).Value = LnDConstants.ORG_EXPORT.EMPLOYEE_NAME;
+                worksheet.Cell(1, 2).Value = LnDConstants.ORG_EXPORT.SKILL_NAME;
+                worksheet.Cell(1, 3).Value = LnDConstants.ORG_EXPORT.SME_ASSIGNED;
+                worksheet.Cell(1, 4).Value = LnDConstants.ORG_EXPORT.ASSIGNMENT_STATUS;
+                worksheet.Cell(1, 5).Value = LnDConstants.ORG_EXPORT.START_DATE;
+                worksheet.Cell(1, 6).Value = LnDConstants.ORG_EXPORT.DUE_DATE;
+                worksheet.Cell(1, 7).Value = LnDConstants.ORG_EXPORT.SCORE;
+                worksheet.Cell(1, 8).Value = LnDConstants.ORG_EXPORT.COMMENTS;
 
                 var headerRange = worksheet.Range(1, 1, 1, 9);
                 headerRange.Style.Font.Bold = true;

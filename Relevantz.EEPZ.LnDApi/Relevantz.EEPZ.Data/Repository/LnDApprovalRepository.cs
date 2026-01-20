@@ -53,7 +53,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                     approvalId, approval.ApprovalType, approval.Status);
             }
 
-            return approval;
+            return approval;    
         }
 
         /// <summary>
