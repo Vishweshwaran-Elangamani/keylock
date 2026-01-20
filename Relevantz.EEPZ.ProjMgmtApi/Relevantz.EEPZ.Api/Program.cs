@@ -9,6 +9,7 @@ using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repository.Implementations;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using System.Text;
+using Relevantz.EEPZ.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -113,6 +114,8 @@ app.UseSerilogRequestLogging(options =>
         "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
     options.GetLevel = (httpContext, elapsed, ex) => LogEventLevel.Information;
 });
+
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 app.UseCors("AllowReactApp");

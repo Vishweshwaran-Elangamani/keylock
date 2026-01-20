@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Core.Services.Interfaces;
+using Relevantz.EEPZ.Common.DTOs.Request;
 
 namespace eepzbackend.Controllers
 {
@@ -26,21 +26,13 @@ namespace eepzbackend.Controllers
             [FromQuery] int? roleId = null,
             [FromQuery] string? searchTerm = null)
         {
-            _logger.LogInformation(
-                "Employees requested -> isManager: {IsManager}, departmentId: {DepartmentId}, roleId: {RoleId}, searchTerm: {SearchTerm}",
+            _logger.LogInformation("Employees requested -> isManager: {IsManager}, departmentId: {DepartmentId}, roleId: {RoleId}, searchTerm: {SearchTerm}",
                 isManager, departmentId, roleId, searchTerm);
 
             var result = await _employeeService.GetEmployeesAsync(isManager, departmentId, roleId, searchTerm);
 
             if (!result.Success)
-            {
-                if (result.Code == EmployeeResponseMessages.Codes.EMPLOYEE_SEARCH_QUERY_REQUIRED)
-                    return BadRequest(result);
-
-                if (result.Code == EmployeeResponseMessages.Codes.EMPLOYEE_NOT_FOUND ||
-                    result.Code == EmployeeResponseMessages.Codes.DEPARTMENT_NOT_FOUND)
-                    return NotFound(result);
-            }
+                return StatusCode(result.Code == EmployeeResponseMessages.Codes.EMPLOYEE_SEARCH_QUERY_REQUIRED ? 400 : 404, result);
 
             return Ok(result);
         }
@@ -52,10 +44,7 @@ namespace eepzbackend.Controllers
 
             var result = await _employeeService.GetEmployeeByIdAsync(employeeId);
 
-            if (!result.Success && result.Code == EmployeeResponseMessages.Codes.EMPLOYEE_NOT_FOUND)
-                return NotFound(result);
-
-            return Ok(result);
+            return result.Success ? Ok(result) : NotFound(result);
         }
 
         [HttpGet("departments")]
@@ -65,10 +54,7 @@ namespace eepzbackend.Controllers
 
             var result = await _employeeService.GetAllDepartmentsAsync();
 
-            if (!result.Success && result.Code == EmployeeResponseMessages.Codes.DEPARTMENT_NOT_FOUND)
-                return NotFound(result);
-
-            return Ok(result);
+            return result.Success ? Ok(result) : NotFound(result);
         }
 
         [HttpGet("departments/{departmentId:int}")]
@@ -78,10 +64,7 @@ namespace eepzbackend.Controllers
 
             var result = await _employeeService.GetDepartmentByIdAsync(departmentId);
 
-            if (!result.Success && result.Code == EmployeeResponseMessages.Codes.DEPARTMENT_NOT_FOUND)
-                return NotFound(result);
-
-            return Ok(result);
+            return result.Success ? Ok(result) : NotFound(result);
         }
 
         [HttpGet("business-units")]
@@ -91,10 +74,7 @@ namespace eepzbackend.Controllers
 
             var result = await _employeeService.GetAllBusinessUnitsAsync();
 
-            if (!result.Success && result.Code == EmployeeResponseMessages.Codes.INVALID_REQUEST)
-                return NotFound(result);
-
-            return Ok(result);
+            return result.Success ? Ok(result) : NotFound(result);
         }
 
         [HttpGet("initial-stage")]
@@ -104,25 +84,17 @@ namespace eepzbackend.Controllers
 
             var result = await _employeeService.GetInitialStageEmployeesAsync();
 
-            if (!result.Success && result.Code == EmployeeResponseMessages.Codes.EMPLOYEE_NOT_FOUND)
-                return NotFound(result);
-
-            return Ok(result);
+            return result.Success ? Ok(result) : NotFound(result);
         }
 
         [HttpPost("map-to-resource-pool")]
         public async Task<IActionResult> MapToResourcePool([FromBody] MapToResourcePoolRequest request)
         {
-            _logger.LogInformation(
-                "Resource pool mapping requested -> Count: {Count}",
-                request?.EmployeeMasterIds?.Count ?? 0);
+            _logger.LogInformation("Resource pool mapping requested -> Count: {Count}", request?.EmployeeMasterIds?.Count ?? 0);
 
             var result = await _employeeService.MapEmployeesToResourcePoolAsync(request?.EmployeeMasterIds ?? new List<int>());
 
-            if (!result.Success && result.Code == EmployeeResponseMessages.Codes.INVALID_REQUEST)
-                return BadRequest(result);
-
-            return Ok(result);
+            return result.Success ? Ok(result) : BadRequest(result);
         }
     }
 }

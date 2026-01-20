@@ -16,6 +16,9 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string EMPLOYEE_SEARCH_QUERY_REQUIRED = "EMPLOYEE_SEARCH_QUERY_REQUIRED";
             public const string DEPARTMENT_NOT_FOUND = "DEPARTMENT_NOT_FOUND";
             public const string INVALID_REQUEST = "INVALID_REQUEST";
+
+            // Adding the INTERNAL_SERVER_ERROR code
+            public const string INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR";
         }
 
         private static readonly Dictionary<string, string> Messages = new()
@@ -28,7 +31,10 @@ namespace Relevantz.EEPZ.Common.Constants
             { Codes.EMPLOYEE_NOT_FOUND, "Employee not found" },
             { Codes.EMPLOYEE_SEARCH_QUERY_REQUIRED, "Search query is required" },
             { Codes.DEPARTMENT_NOT_FOUND, "Department not found" },
-            { Codes.INVALID_REQUEST, "Invalid request" }
+            { Codes.INVALID_REQUEST, "Invalid request" },
+
+            // Adding the INTERNAL_SERVER_ERROR message
+            { Codes.INTERNAL_SERVER_ERROR, "An internal server error occurred" }
         };
 
         public static string GetMessage(string code)
