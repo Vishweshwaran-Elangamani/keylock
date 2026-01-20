@@ -1,6 +1,8 @@
 namespace Relevantz.EEPZ.Common.DTOs
 {
-
+    /// <summary>
+    /// Represents a paginated response containing items and pagination metadata.
+    /// </summary>
     public class PaginatedResponse<T>
     {
         public List<T> Items { get; set; }
@@ -12,6 +14,9 @@ namespace Relevantz.EEPZ.Common.DTOs
         public bool HasNextPage => PageNumber < TotalPages;
     }
 
+    /// <summary>
+    /// Represents a standard API response wrapper with success status, message, data, and errors.
+    /// </summary>
     public class ApiResponse<T>
     {
         public bool Success { get; set; }
@@ -20,7 +25,9 @@ namespace Relevantz.EEPZ.Common.DTOs
         public List<string> Errors { get; set; }
     }
 
-
+    /// <summary>
+    /// Detailed response model for an approval request, including requester, approver, status, and attachments.
+    /// </summary>
     public class ApprovalDetailsResponseModel
     {
         public int ApprovalId { get; set; }
@@ -48,6 +55,9 @@ namespace Relevantz.EEPZ.Common.DTOs
         public bool CanDownloadAttachment { get; set; }
     }
 
+    /// <summary>
+    /// Simplified response model for approval requests with basic details.
+    /// </summary>
     public class ApprovalResponseModel
     {
         public int ApprovalId { get; set; }
@@ -67,7 +77,9 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string OldAttachmentPath { get; set; }
     }
 
-
+    /// <summary>
+    /// Represents detailed information about an assignment, including mentee, SME, and completion details.
+    /// </summary>
     public class AssignmentDetailsResponseModel
     {
         public int AssignmentId { get; set; }
@@ -81,6 +93,9 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int? CompletionRating { get; set; }
     }
 
+    /// <summary>
+    /// Represents assignment information with metadata such as deadlines, status, and overdue tracking.
+    /// </summary>
     public class AssignmentResponseModel
     {
         public int AssignmentId { get; set; }
@@ -102,7 +117,9 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int? DaysOverdue { get; set; }
     }
 
-
+    /// <summary>
+    /// Represents an employee’s skill mapping, rating, and SME eligibility.
+    /// </summary>
     public class EmployeeSkillResponseModel
     {
         public int MapperId { get; set; }
@@ -117,6 +134,9 @@ namespace Relevantz.EEPZ.Common.DTOs
         public bool IsSme { get; set; }
     }
 
+    /// <summary>
+    /// Represents basic information about a subordinate employee.
+    /// </summary>
     public class SubordinateEmployeeResponseModel
     {
         public int EmployeeId { get; set; }
@@ -124,12 +144,19 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string Email { get; set; }
         public string DepartmentName { get; set; }
     }
+
+    /// <summary>
+    /// Represents a skill entity with its identifier and name.
+    /// </summary>
     public class SkillResponseModel
     {
         public int SkillId { get; set; }
         public string SkillName { get; set; }
     }
 
+    /// <summary>
+    /// Represents SME (Subject Matter Expert) details including skill, assignments, and approval status.
+    /// </summary>
     public class SmeResponseModel
     {
         public int SmeId { get; set; }
@@ -144,6 +171,9 @@ namespace Relevantz.EEPZ.Common.DTOs
         public DateOnly? ApprovedOn { get; set; }
     }
 
+    /// <summary>
+    /// Represents a file download response with file content and metadata.
+    /// </summary>
     public class FileDownloadResponseModel
     {
         public byte[] FileBytes { get; set; }
