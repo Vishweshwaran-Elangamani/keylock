@@ -1,67 +1,56 @@
 import apii from "./index_meet";
 
+const handleApiError = (error, context) => {
+  console.error(`${context} error:`, error);
+  const apiError = error?.response?.data;
+  throw apiError || error;
+};
+
 const rsvpService = {
   getMyInvitations: async () => {
     try {
-      const response = await apii.get("/Rsvp/my-invitations");
+      const response = await apii.get("/rsvp/my-invitations");
       return response.data;
     } catch (error) {
-      console.error("Get my invitations error:", error);
-      throw error.response?.data || error;
+      handleApiError(error, "Get my invitations");
     }
   },
 
   submitRsvp: async (rsvpData) => {
     try {
-      const response = await apii.post("/Rsvp/submit", rsvpData);
+      const response = await apii.post("/rsvp", rsvpData);
       return response.data;
     } catch (error) {
-      console.error("Submit RSVP error:", error);
-      throw error.response?.data || error;
+      handleApiError(error, "Submit RSVP");
     }
   },
 
-  updateRsvp: async (meetingId, rsvpData) => {
+  updateParticipantRsvp: async (participantId, rsvpData) => {
     try {
-      const response = await apii.put(`/Rsvp/${meetingId}/update`, rsvpData);
+      const response = await apii.put(`/rsvp/${participantId}`, rsvpData, {
+        headers: { "Content-Type": "application/json" },
+      });
       return response.data;
     } catch (error) {
-      console.error("Update RSVP error:", error);
-      throw error.response?.data || error;
+      handleApiError(error, "Update participant RSVP");
     }
   },
 
   getPendingRsvpCount: async () => {
     try {
-      const response = await apii.get("/Rsvp/pending-count");
+      const response = await apii.get("/rsvp/pending-count");
       return response.data;
     } catch (error) {
-      console.error("Get pending RSVP count error:", error);
-      throw error.response?.data || error;
+      handleApiError(error, "Get pending RSVP count");
     }
   },
 
   getMeetingRsvpSummary: async (meetingId) => {
     try {
-      const response = await apii.get(`/Rsvp/meeting/${meetingId}/summary`);
+      const response = await apii.get(`/rsvp/${meetingId}/summary`);
       return response.data;
     } catch (error) {
-      console.error("Get RSVP summary error:", error);
-      throw error.response?.data || error;
-    }
-  },
-
-  updateParticipantRsvp: async (participantId, rsvpStatus) => {
-    try {
-      const response = await apii.patch(
-        `/Rsvp/participant/${participantId}/update`,
-        { rsvpStatus },
-        { headers: { "Content-Type": "application/json" } }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Update participant RSVP error:", error);
-      throw error.response?.data || error;
+      handleApiError(error, "Get meeting RSVP summary");
     }
   },
 };

@@ -31,8 +31,10 @@ const MomPaginationDropdown = ({ value, onChange, options }) => {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
-        dropdownRef.current && !dropdownRef.current.contains(event.target) &&
-        triggerRef.current && !triggerRef.current.contains(event.target)
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target) &&
+        triggerRef.current &&
+        !triggerRef.current.contains(event.target)
       ) {
         setOpen(false);
       }
@@ -49,32 +51,57 @@ const MomPaginationDropdown = ({ value, onChange, options }) => {
 
   return (
     <div className="mom-pagination-dropdown">
-      <button  ref={triggerRef}  type="button"  className={`mom-pagination-dropdown-control ${open ? "open" : ""}`}
-        onClick={() => setOpen((p) => !p)}>
-      
+      <button
+        ref={triggerRef}
+        type="button"
+        className={`mom-pagination-dropdown-control ${open ? "open" : ""}`}
+        onClick={() => setOpen((p) => !p)}
+      >
         <span className="mom-pagination-dropdown-value">{selected}</span>
         <span className={`mom-pagination-dropdown-icon ${open ? "open" : ""}`}>
-          <svg  width="14"  height="14" viewBox="0 0 24 24"  fill="none" xmlns="http://www.w3.org/2000/svg">
-            <polyline  points="6 9 12 15 18 9"
-              stroke="currentColor" strokeWidth="2"
-              strokeLinecap="round" strokeLinejoin="round"/>
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <polyline
+              points="6 9 12 15 18 9"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </span>
       </button>
 
       {open && (
         <>
-          <div className="mom-pagination-dropdown-backdrop"onClick={() => setOpen(false)}/>
+          <div
+            className="mom-pagination-dropdown-backdrop"
+            onClick={() => setOpen(false)}
+          />
           <div
             ref={dropdownRef}
             className="mom-pagination-dropdown-menu"
-            style={{  top: `${position.top}px`, left: `${position.left}px`,
-            }}>
+            style={{
+              top: `${position.top}px`,
+              left: `${position.left}px`,
+            }}
+          >
             {options.map((opt) => (
-              <div  key={opt} className={`mom-pagination-dropdown-option ${opt === value ? "selected" : ""
+              <div
+                key={opt}
+                className={`mom-pagination-dropdown-option ${
+                  opt === value ? "selected" : ""
                 }`}
-                onClick={() => { onChange(opt); setOpen(false);
-                }}>
+                onClick={() => {
+                  onChange(opt);
+                  setOpen(false);
+                }}
+              >
                 {opt}
               </div>
             ))}
@@ -88,8 +115,10 @@ const MomPaginationDropdown = ({ value, onChange, options }) => {
 const ManagerMomDashboard = () => {
   const navigate = useNavigate();
   const [stats, setStats] = useState({
-    teamMomsCount: 0,oneOnOnesCount: 0,
-    overdueActionsCount: 0,totalMeetingsCount: 0,
+    teamMomsCount: 0,
+    oneOnOnesCount: 0,
+    overdueActionsCount: 0,
+    totalMeetingsCount: 0,
   });
   const [upcomingMeetings, setUpcomingMeetings] = useState([]);
   const [recentTeamMoms, setRecentTeamMoms] = useState([]);
@@ -124,11 +153,13 @@ const ManagerMomDashboard = () => {
 
       const [myMomsRes, meetingsRes, employeesRes, actionItemsAssignedByMeRes] =
         await Promise.all([
-          momService.getMyMoms(),meetingService.getMyMeetings(),
-          employeeService.getAllEmployees(),momService.getActionItemsAssignedByMe(),
+          momService.getMyMoms(),
+          meetingService.getMyMeetings(),
+          employeeService.getAllEmployees(),
+          momService.getActionItemsAssignedByMe(),
         ]);
 
-      if (employeesRes.success && employeesRes.data) {
+      if (employeesRes?.success && employeesRes?.data) {
         const nameMap = {};
         employeesRes.data.forEach((emp) => {
           nameMap[emp.employeeMasterId] = `${emp.firstName} ${emp.lastName}`;
@@ -136,28 +167,37 @@ const ManagerMomDashboard = () => {
         setEmployeeMap(nameMap);
       }
 
-      const allActionItems = actionItemsAssignedByMeRes.data || [];
+      const allActionItems = actionItemsAssignedByMeRes?.data || [];
       const overdueCount = allActionItems.filter((ai) => {
         const dueDate = new Date(ai.dueDate);
         return ai.status === "Pending" && dueDate < new Date();
       }).length;
 
+      const meetings = meetingsRes?.data?.meetings || [];
+
       setStats({
-        teamMomsCount: myMomsRes.data?.length || 0,
-        oneOnOnesCount: meetingsRes.data?.filter((m) => m.meetingType === "One-on-One")
-        .length || 0, overdueActionsCount: overdueCount,totalMeetingsCount: meetingsRes.data?.length || 0,
+        teamMomsCount: myMomsRes?.data?.length || 0,
+        oneOnOnesCount:
+          meetings.filter((m) => m.meetingType === "One-on-One").length || 0,
+        overdueActionsCount: overdueCount,
+        totalMeetingsCount:
+          meetingsRes?.data?.totalCount || meetings.length || 0,
       });
+
       setActionItems(allActionItems);
 
       const meetingsWithRsvp = await Promise.all(
-        (meetingsRes.data || []).map(async (meeting) => {
+        meetings.map(async (meeting) => {
           try {
             const rsvpSummaryResponse = await rsvpService.getMeetingRsvpSummary(
               meeting.meetingId
             );
-            const rsvpSummary = rsvpSummaryResponse.data;
-            return { ...meeting,
-              rsvpAcceptedCount: rsvpSummary?.acceptedCount || 0, rsvpTotalInvitations: rsvpSummary?.totalInvitations || 0,
+            const rsvpSummary = rsvpSummaryResponse?.data;
+
+            return {
+              ...meeting,
+              rsvpAcceptedCount: rsvpSummary?.acceptedCount || 0,
+              rsvpTotalInvitations: rsvpSummary?.totalInvitations || 0,
               rsvpParticipants: rsvpSummary?.participants || [],
             };
           } catch (error) {
@@ -176,7 +216,7 @@ const ManagerMomDashboard = () => {
       );
 
       setUpcomingMeetings(meetingsWithRsvp);
-      setRecentTeamMoms(myMomsRes.data?.slice(0, 5) || []);
+      setRecentTeamMoms(myMomsRes?.data?.slice(0, 5) || []);
     } catch (err) {
       toastr.error("Failed to load Manager MOM dashboard");
       console.error(err);
@@ -209,7 +249,9 @@ const ManagerMomDashboard = () => {
     if (!isoString) return "−";
     const date = new Date(isoString);
     return date.toLocaleDateString("en-US", {
-      year: "numeric",month: "short",day: "numeric",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
@@ -232,7 +274,7 @@ const ManagerMomDashboard = () => {
   const perPage = viewMode === "grid" ? 9 : itemsPerPage;
   const totalPages = Math.max(1, Math.ceil(safeTotal / perPage));
   const validCurrentPage = Math.min(currentPage, totalPages);
-const startIndex = safeTotal === 0 ? 0 : (validCurrentPage - 1) * perPage;
+  const startIndex = safeTotal === 0 ? 0 : (validCurrentPage - 1) * perPage;
   const endIndex =
     safeTotal === 0 ? 0 : Math.min(validCurrentPage * perPage, safeTotal);
   const paginatedMeetings = upcomingMeetings.slice(startIndex, endIndex);
@@ -270,7 +312,10 @@ const startIndex = safeTotal === 0 ? 0 : (validCurrentPage - 1) * perPage;
   if (loading) {
     return (
       <div className="managermom-loading">
-        <div className="spinner-border text-primary managermom-loading-spinner" role="status" >
+        <div
+          className="spinner-border text-primary managermom-loading-spinner"
+          role="status"
+        >
           <span className="visually-hidden">Loading...</span>
         </div>
       </div>
@@ -281,11 +326,19 @@ const startIndex = safeTotal === 0 ? 0 : (validCurrentPage - 1) * perPage;
     <div className="managermom-page">
       <div className="row justify-content-center">
         <div className="col-lg-10 col-xl-9">
-          <nav aria-label="breadcrumb"  className="sched-breadcrumb-nav" style={{ "--bs-breadcrumb-divider": "''" }}>
+          <nav
+            aria-label="breadcrumb"
+            className="sched-breadcrumb-nav"
+            style={{ "--bs-breadcrumb-divider": "''" }}
+          >
             <ol className="breadcrumb mb-0 d-flex align-items-center sched-breadcrumb">
               <li className="breadcrumb-item d-flex align-items-center">
-                <button type="button" onClick={() => navigate("/manager/dashboard")}
-                  className="sched-breadcrumb-link" aria-label="Dashboard">
+                <button
+                  type="button"
+                  onClick={() => navigate("/manager/dashboard")}
+                  className="sched-breadcrumb-link"
+                  aria-label="Dashboard"
+                >
                   <Home size={18} />
                 </button>
               </li>
@@ -293,9 +346,7 @@ const startIndex = safeTotal === 0 ? 0 : (validCurrentPage - 1) * perPage;
               <li className="breadcrumb-separator">/</li>
 
               <li className="breadcrumb-item active" aria-current="page">
-                <span className="sched-breadcrumb-active">
-                  Meetings and MoM
-                </span>
+                <span className="sched-breadcrumb-active">Meetings and MoM</span>
               </li>
             </ol>
           </nav>
@@ -304,41 +355,73 @@ const startIndex = safeTotal === 0 ? 0 : (validCurrentPage - 1) * perPage;
 
       <div className="managermom-container">
         <div className="row g-3 mb-4">
-          
-          <StatCard icon="bi-clock" variant="pending"
-          count={stats.teamMomsCount}label="Pending Forms"/>
-          
-          <StatCard icon="bi-check-circle" variant="submitted"
-          count={stats.oneOnOnesCount} label="Submitted Forms"/>
-          
-          <StatCard icon="bi-star" variant="reviews"
-          count={stats.overdueActionsCount}label="Reviews Received"/>
-          
-          <StatCard icon="bi-people" variant="peer"
-            count={stats.totalMeetingsCount} label="Peer Feedback"/>
+          <StatCard
+            icon="bi-clock"
+            variant="pending"
+            count={stats.teamMomsCount}
+            label="Pending Forms"
+          />
+
+          <StatCard
+            icon="bi-check-circle"
+            variant="submitted"
+            count={stats.oneOnOnesCount}
+            label="Submitted Forms"
+          />
+
+          <StatCard
+            icon="bi-star"
+            variant="reviews"
+            count={stats.overdueActionsCount}
+            label="Reviews Received"
+          />
+
+          <StatCard
+            icon="bi-people"
+            variant="peer"
+            count={stats.totalMeetingsCount}
+            label="Peer Feedback"
+          />
         </div>
 
         <div className="managermom-toolbar">
-          <div className="managermom-view-switch" role="group" aria-label="View switcher">
-            <button type="button" className={`mmview-btn ${viewMode === "table" ? "active" : ""}`}
-              onClick={() => {  setViewMode("table");
+          <div
+            className="managermom-view-switch"
+            role="group"
+            aria-label="View switcher"
+          >
+            <button
+              type="button"
+              className={`mmview-btn ${viewMode === "table" ? "active" : ""}`}
+              onClick={() => {
+                setViewMode("table");
                 setCurrentPage(1);
               }}
-              title="Table View"aria-pressed={viewMode === "table"}>
+              title="Table View"
+              aria-pressed={viewMode === "table"}
+            >
               <i className="bi bi-table"></i>
             </button>
 
-            <button type="button"className={`mmview-btn ${viewMode === "grid" ? "active" : ""}`}
-              onClick={() => {setViewMode("grid");
+            <button
+              type="button"
+              className={`mmview-btn ${viewMode === "grid" ? "active" : ""}`}
+              onClick={() => {
+                setViewMode("grid");
                 setCurrentPage(1);
               }}
-              title="Grid View"aria-pressed={viewMode === "grid"}>
+              title="Grid View"
+              aria-pressed={viewMode === "grid"}
+            >
               <i className="bi bi-grid-3x3-gap-fill"></i>
             </button>
           </div>
 
-      <div className="managermom-toolbar-right">
-        <button className="btn managermom-schedule-btn" onClick={() => navigate("/manager/dashboard/meetmom/schedule")}>
+          <div className="managermom-toolbar-right">
+            <button
+              className="btn managermom-schedule-btn"
+              onClick={() => navigate("/manager/dashboard/meetmom/schedule")}
+            >
               <i className="bi bi-calendar-plus"></i>
               Schedule Meeting
             </button>
@@ -347,7 +430,9 @@ const startIndex = safeTotal === 0 ? 0 : (validCurrentPage - 1) * perPage;
 
         <div className="managermom-upcoming-header">
           <h5 className="managermom-upcoming-title">Upcoming Meetings</h5>
-          <span className="badge managermom-upcoming-count">{upcomingMeetings.length} Meetings</span>
+          <span className="badge managermom-upcoming-count">
+            {upcomingMeetings.length} Meetings
+          </span>
         </div>
 
         {viewMode === "table" ? (
@@ -376,8 +461,11 @@ const startIndex = safeTotal === 0 ? 0 : (validCurrentPage - 1) * perPage;
                     </tr>
                   ) : (
                     paginatedMeetings.map((meeting) => (
-                      <tr key={meeting.meetingId} className="managermom-table-row"
-                      onClick={() => openMeetingDetails(meeting)}>
+                      <tr
+                        key={meeting.meetingId}
+                        className="managermom-table-row"
+                        onClick={() => openMeetingDetails(meeting)}
+                      >
                         <td>
                           <div className="managermom-meeting-title-cell">
                             <span className="fw-semibold">
@@ -398,14 +486,19 @@ const startIndex = safeTotal === 0 ? 0 : (validCurrentPage - 1) * perPage;
                         <td>
                           <div className="managermom-attendance">
                             <div className="progress managermom-progress">
-                              <div className="progress-bar bg-success"
+                              <div
+                                className="progress-bar bg-success"
                                 role="progressbar"
-                                style={{  width: `${
-                                    meeting.rsvpTotalInvitations > 0 ? (meeting.rsvpAcceptedCount /
-                                       meeting.rsvpTotalInvitations) *100: 0
+                                style={{
+                                  width: `${
+                                    meeting.rsvpTotalInvitations > 0
+                                      ? (meeting.rsvpAcceptedCount /
+                                          meeting.rsvpTotalInvitations) *
+                                        100
+                                      : 0
                                   }%`,
-                                }}>                   
-                            </div>
+                                }}
+                              ></div>
                             </div>
                             <small className="text-muted">
                               {meeting.rsvpAcceptedCount}/
@@ -414,19 +507,31 @@ const startIndex = safeTotal === 0 ? 0 : (validCurrentPage - 1) * perPage;
                           </div>
                         </td>
                         <td>
-                      {meeting.rsvpAcceptedCount === meeting.rsvpTotalInvitations && meeting.rsvpTotalInvitations > 0 ? (
-                       <span className="badge bg-success"> All Accepted</span>
+                          {meeting.rsvpAcceptedCount ===
+                            meeting.rsvpTotalInvitations &&
+                          meeting.rsvpTotalInvitations > 0 ? (
+                            <span className="badge bg-success">
+                              {" "}
+                              All Accepted
+                            </span>
                           ) : meeting.rsvpAcceptedCount > 0 ? (
-                            <span className="badge bg-warning text-dark">Pending</span>
+                            <span className="badge bg-warning text-dark">
+                              Pending
+                            </span>
                           ) : (
-                            <span className="badge bg-secondary">No Response</span>
+                            <span className="badge bg-secondary">
+                              No Response
+                            </span>
                           )}
                         </td>
                         <td>
-                          <button className="btn btn-sm managermom-view-btn"
-                            onClick={(e) => {  e.stopPropagation();
+                          <button
+                            className="btn btn-sm managermom-view-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
                               openMeetingDetails(meeting);
-                            }}>
+                            }}
+                          >
                             <i className="bi bi-eye me-1"></i>
                             View
                           </button>
@@ -442,11 +547,14 @@ const startIndex = safeTotal === 0 ? 0 : (validCurrentPage - 1) * perPage;
               <div className="managermom-pagination-footer">
                 <div className="managermom-pagination-left">
                   <span className="managermom-pagination-text">Show</span>
-                  <MomPaginationDropdown value={itemsPerPage}
-                   onChange={(val) => { setItemsPerPage(val);
-                    setCurrentPage(1);
+                  <MomPaginationDropdown
+                    value={itemsPerPage}
+                    onChange={(val) => {
+                      setItemsPerPage(val);
+                      setCurrentPage(1);
                     }}
-                    options={[5, 10, 25, 50]}/>
+                    options={[5, 10, 25, 50]}
+                  />
                   <span className="managermom-pagination-text">entries</span>
                 </div>
 
@@ -459,31 +567,53 @@ const startIndex = safeTotal === 0 ? 0 : (validCurrentPage - 1) * perPage;
 
                 <div className="managermom-pagination-right">
                   <ul className="managermom-pagination-list">
-                    <li className={`managermom-page-item ${   validCurrentPage === 1 ? "disabled" : "" }`}>
-                      
-                      <button className="managermom-page-link managermom-page-arrow"
-                       onClick={() => goToPage(validCurrentPage - 1)} disabled={validCurrentPage === 1} >
+                    <li
+                      className={`managermom-page-item ${
+                        validCurrentPage === 1 ? "disabled" : ""
+                      }`}
+                    >
+                      <button
+                        className="managermom-page-link managermom-page-arrow"
+                        onClick={() => goToPage(validCurrentPage - 1)}
+                        disabled={validCurrentPage === 1}
+                      >
                         <span className="managermom-arrow-icon">‹</span>
                       </button>
                     </li>
                     {getPageNumbers().map((page, idx) =>
                       page === "..." ? (
-                        <li key={`ellipsis-${idx}`} className="managermom-page-item disabled">
+                        <li
+                          key={`ellipsis-${idx}`}
+                          className="managermom-page-item disabled"
+                        >
                           <span className="managermom-page-link">...</span>
                         </li>
                       ) : (
-                        <li key={page} className={`managermom-page-item ${
-                            validCurrentPage === page ? "active" : ""}`} >
-                          
-                          <button className="managermom-page-link"onClick={() => goToPage(page)}>
+                        <li
+                          key={page}
+                          className={`managermom-page-item ${
+                            validCurrentPage === page ? "active" : ""
+                          }`}
+                        >
+                          <button
+                            className="managermom-page-link"
+                            onClick={() => goToPage(page)}
+                          >
                             {page}
                           </button>
                         </li>
                       )
                     )}
-                    <li className={`managermom-page-item ${ validCurrentPage === totalPages ? "disabled" : ""}`}>
-                      <button className="managermom-page-link managermom-page-arrow"
-                        onClick={() => goToPage(validCurrentPage + 1)}disabled={validCurrentPage === totalPages}>
+                    <li
+                      className={`managermom-page-item ${
+                        validCurrentPage === totalPages ? "disabled" : ""
+                      }`}
+                    >
+                      <button
+                        className="managermom-page-link managermom-page-arrow"
+                        onClick={() => goToPage(validCurrentPage + 1)}
+                        disabled={validCurrentPage === totalPages}
+                      >
                         <span className="managermom-arrow-icon">›</span>
                       </button>
                     </li>
@@ -503,15 +633,23 @@ const startIndex = safeTotal === 0 ? 0 : (validCurrentPage - 1) * perPage;
               ) : (
                 paginatedMeetings.map((meeting) => (
                   <div key={meeting.meetingId} className="col-lg-4 col-md-6">
-                    <div className="h-100 managermom-meeting-card"onClick={() => openMeetingDetails(meeting)}>
+                    <div
+                      className="h-100 managermom-meeting-card"
+                      onClick={() => openMeetingDetails(meeting)}
+                    >
                       <div className="card-body">
                         <div className="managermom-meeting-card-header">
                           <div className="managermom-card-avatar">
                             <i className="bi bi-calendar-event managermom-card-avatar-icon"></i>
                           </div>
-                          <span className="badge managermom-type-badge"> {meeting.meetingType || "General"}</span>
+                          <span className="badge managermom-type-badge">
+                            {" "}
+                            {meeting.meetingType || "General"}
+                          </span>
                         </div>
-                        <h6 className="card-title fw-semibold mb-2">{meeting.meetingTitle}</h6>
+                        <h6 className="card-title fw-semibold mb-2">
+                          {meeting.meetingTitle}
+                        </h6>
                         <p className="text-muted small mb-3">
                           <i className="bi bi-clock me-1"></i>
                           {formatDateTime(meeting.meetingDate)}
@@ -525,11 +663,19 @@ const startIndex = safeTotal === 0 ? 0 : (validCurrentPage - 1) * perPage;
                             </div>
                           </div>
                           <div className="progress managermom-card-progress">
-                            <div className="progress-bar bg-success" role="progressbar"
-                              style={{ width: `${ meeting.rsvpTotalInvitations > 0 ? (meeting.rsvpAcceptedCount /
-                               meeting.rsvpTotalInvitations) * 100: 0 }%`,
-                              }}>
-                              </div>
+                            <div
+                              className="progress-bar bg-success"
+                              role="progressbar"
+                              style={{
+                                width: `${
+                                  meeting.rsvpTotalInvitations > 0
+                                    ? (meeting.rsvpAcceptedCount /
+                                        meeting.rsvpTotalInvitations) *
+                                      100
+                                    : 0
+                                }%`,
+                              }}
+                            ></div>
                           </div>
                         </div>
                       </div>
@@ -543,29 +689,53 @@ const startIndex = safeTotal === 0 ? 0 : (validCurrentPage - 1) * perPage;
               <div className="managermom-grid-pagination-wrapper">
                 <div className="managermom-grid-pagination">
                   <ul className="managermom-pagination-list">
-                    <li className={`managermom-page-item ${   validCurrentPage === 1 ? "disabled" : "" }`}>
-                      <button className="managermom-page-link managermom-page-arrow"
-                        onClick={() => goToPage(validCurrentPage - 1)} disabled={validCurrentPage === 1}>
+                    <li
+                      className={`managermom-page-item ${
+                        validCurrentPage === 1 ? "disabled" : ""
+                      }`}
+                    >
+                      <button
+                        className="managermom-page-link managermom-page-arrow"
+                        onClick={() => goToPage(validCurrentPage - 1)}
+                        disabled={validCurrentPage === 1}
+                      >
                         <span className="managermom-arrow-icon">‹</span>
                       </button>
                     </li>
                     {getPageNumbers().map((page, idx) =>
                       page === "..." ? (
-                        <li key={`ellipsis-${idx}`} className="managermom-page-item disabled">
+                        <li
+                          key={`ellipsis-${idx}`}
+                          className="managermom-page-item disabled"
+                        >
                           <span className="managermom-page-link">...</span>
                         </li>
                       ) : (
-                      <li key={page} className={`managermom-page-item ${  validCurrentPage === page ? "active" : "" }`}>
-                          
-                          <button className="managermom-page-link" onClick={() => goToPage(page)}>
+                        <li
+                          key={page}
+                          className={`managermom-page-item ${
+                            validCurrentPage === page ? "active" : ""
+                          }`}
+                        >
+                          <button
+                            className="managermom-page-link"
+                            onClick={() => goToPage(page)}
+                          >
                             {page}
                           </button>
                         </li>
                       )
                     )}
-                    <li className={`managermom-page-item ${   validCurrentPage === totalPages ? "disabled" : "" }`}>
-                      <button className="managermom-page-link managermom-page-arrow"
-                        onClick={() => goToPage(validCurrentPage + 1)} disabled={validCurrentPage === totalPages}>
+                    <li
+                      className={`managermom-page-item ${
+                        validCurrentPage === totalPages ? "disabled" : ""
+                      }`}
+                    >
+                      <button
+                        className="managermom-page-link managermom-page-arrow"
+                        onClick={() => goToPage(validCurrentPage + 1)}
+                        disabled={validCurrentPage === totalPages}
+                      >
                         <span className="managermom-arrow-icon">›</span>
                       </button>
                     </li>
@@ -591,7 +761,9 @@ const StatCard = ({ icon, variant, count, label }) => (
   <div className="col-lg-3 col-md-6 col-sm-6">
     <div className="managermom-stat-card">
       <div className="managermom-stat-inner">
-        <div className={`managermom-stat-icon managermom-stat-icon-${variant}`}>
+        <div
+          className={`managermom-stat-icon managermom-stat-icon-${variant}`}
+        >
           <i className={`${icon} managermom-stat-icon-glyph`}></i>
         </div>
         <div className="managermom-stat-center">
