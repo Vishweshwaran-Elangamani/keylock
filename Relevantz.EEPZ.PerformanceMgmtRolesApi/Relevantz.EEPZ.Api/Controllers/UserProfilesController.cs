@@ -1,11 +1,13 @@
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.Services.Interfaces;
-using System.Threading.Tasks;
 
 namespace eepzbackend.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class UserProfilesController : ControllerBase
     {
@@ -14,7 +16,8 @@ namespace eepzbackend.Controllers
 
         public UserProfilesController(
             IUserProfilesService userProfilesService,
-            ILogger<UserProfilesController> logger)
+            ILogger<UserProfilesController> logger
+        )
         {
             _userProfilesService = userProfilesService;
             _logger = logger;
@@ -29,27 +32,18 @@ namespace eepzbackend.Controllers
 
                 if (result.Success)
                 {
-                    return Ok(new
-                    {
-                        success = true,
-                        data = result.Data
-                    });
+                    return Ok(new { success = true, data = result.Data });
                 }
 
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = string.Join(", ", result.Errors)
-                });
+                return StatusCode(
+                    500,
+                    new { success = false, message = string.Join(", ", result.Errors) }
+                );
             }
             catch (System.Exception ex)
             {
                 _logger.LogError($"Error in GetAllUserProfiles: {ex.Message}");
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = ex.Message
-                });
+                return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
     }

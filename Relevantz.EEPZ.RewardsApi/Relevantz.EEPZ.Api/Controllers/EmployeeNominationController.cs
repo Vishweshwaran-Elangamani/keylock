@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Relevantz.EEPZ.Core.Services.Interfaces;
@@ -7,6 +8,7 @@ using Relevantz.EEPZ.Core.Services.Interfaces;
 namespace Relevantz.EEPZ.API.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class EmployeeNominationController : ControllerBase
     {
@@ -15,7 +17,8 @@ namespace Relevantz.EEPZ.API.Controllers
 
         public EmployeeNominationController(
             IEmployeeNominationService service,
-            ILogger<EmployeeNominationController> logger)
+            ILogger<EmployeeNominationController> logger
+        )
         {
             _service = service;
             _logger = logger;
@@ -28,13 +31,16 @@ namespace Relevantz.EEPZ.API.Controllers
             {
                 var result = await _service.SearchEmployeeNotificationsAsync(employeeId);
 
-                if (!result.Success && string.Equals(result.Message, "Please enter a valid employee ID", StringComparison.OrdinalIgnoreCase))
+                if (
+                    !result.Success
+                    && string.Equals(
+                        result.Message,
+                        "Please enter a valid employee ID",
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                )
                 {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = result.Message
-                    });
+                    return BadRequest(new { success = false, message = result.Message });
                 }
 
                 if (!result.Success)
@@ -42,13 +48,15 @@ namespace Relevantz.EEPZ.API.Controllers
                     return StatusCode(500, new { success = false, message = result.Message });
                 }
 
-                return Ok(new
-                {
-                    success = true,
-                    data = result.Data,
-                    count = result.Count,
-                    message = result.Message
-                });
+                return Ok(
+                    new
+                    {
+                        success = true,
+                        data = result.Data,
+                        count = result.Count,
+                        message = result.Message,
+                    }
+                );
             }
             catch (Exception ex)
             {

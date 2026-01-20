@@ -1,12 +1,14 @@
-using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.DTOs.Request;
-using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Common.DTOs.Response;
+using Relevantz.EEPZ.Core.Services.Interfaces;
 
 namespace PerformanceManagement.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class AssignmentsController : ControllerBase
     {
@@ -15,7 +17,8 @@ namespace PerformanceManagement.Controllers
 
         public AssignmentsController(
             IAssignmentsService assignmentsService,
-            ILogger<AssignmentsController> logger)
+            ILogger<AssignmentsController> logger
+        )
         {
             _assignmentsService = assignmentsService;
             _logger = logger;
@@ -29,9 +32,10 @@ namespace PerformanceManagement.Controllers
 
                 if (string.IsNullOrEmpty(userIdClaim))
                 {
-                    userIdClaim = User.FindFirst("userId")?.Value
-                               ?? User.FindFirst("sub")?.Value
-                               ?? User.FindFirst("id")?.Value;
+                    userIdClaim =
+                        User.FindFirst("userId")?.Value
+                        ?? User.FindFirst("sub")?.Value
+                        ?? User.FindFirst("id")?.Value;
                 }
 
                 return int.TryParse(userIdClaim, out var userId) ? userId : 0;
@@ -46,8 +50,8 @@ namespace PerformanceManagement.Controllers
         {
             try
             {
-                var employeeIdClaim = User.FindFirst("employeeId")?.Value
-                                   ?? User.FindFirst("empId")?.Value;
+                var employeeIdClaim =
+                    User.FindFirst("employeeId")?.Value ?? User.FindFirst("empId")?.Value;
 
                 return int.TryParse(employeeIdClaim, out var employeeId) ? employeeId : 0;
             }
@@ -58,7 +62,9 @@ namespace PerformanceManagement.Controllers
         }
 
         [HttpPost("initiate")]
-        public async Task<IActionResult> InitiateAppraisal([FromBody] InitiateAppraisalRequestDto request)
+        public async Task<IActionResult> InitiateAppraisal(
+            [FromBody] InitiateAppraisalRequestDto request
+        )
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -68,7 +74,9 @@ namespace PerformanceManagement.Controllers
         }
 
         [HttpGet("upcoming-eligible")]
-        public async Task<IActionResult> GetUpcomingEligibleEmployees([FromQuery] int? formId = null)
+        public async Task<IActionResult> GetUpcomingEligibleEmployees(
+            [FromQuery] int? formId = null
+        )
         {
             var result = await _assignmentsService.GetUpcomingEligibleEmployeesAsync(formId);
             return Ok(result);
@@ -103,7 +111,10 @@ namespace PerformanceManagement.Controllers
         }
 
         [HttpPut("{assignmentId}")]
-        public async Task<IActionResult> UpdateDraft(int assignmentId, [FromBody] UpdateDraftRequestDto request)
+        public async Task<IActionResult> UpdateDraft(
+            int assignmentId,
+            [FromBody] UpdateDraftRequestDto request
+        )
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

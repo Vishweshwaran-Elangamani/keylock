@@ -1,10 +1,12 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Common.DTOs.Request;
+using Relevantz.EEPZ.Core.Services.Interfaces;
 
 namespace eepzbackend.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class FormProgressTrackerController : ControllerBase
     {
@@ -44,12 +46,17 @@ namespace eepzbackend.Controllers
         public async Task<IActionResult> Upsert([FromBody] FormProgressTrackerUpdateDto dto)
         {
             if (!ModelState.IsValid)
-                return BadRequest(new { success = false, message = "Invalid data.", errors = ModelState });
+                return BadRequest(
+                    new
+                    {
+                        success = false,
+                        message = "Invalid data.",
+                        errors = ModelState,
+                    }
+                );
 
             var result = await _service.UpsertAsync(dto);
             return Ok(result);
         }
     }
-
-    
 }

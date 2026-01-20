@@ -1,14 +1,16 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
-using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Core.IService;
+using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
-using Microsoft.Extensions.Logging;
 
 namespace PerformanceManagement.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class SelfAssessmentController : ControllerBase
     {
@@ -21,7 +23,8 @@ namespace PerformanceManagement.Controllers
             ISelfAssessmentService assessmentService,
             ISelfAssessmentRepository repository,
             IFileStorageService fileStorage,
-            ILogger<SelfAssessmentController> logger)
+            ILogger<SelfAssessmentController> logger
+        )
         {
             _assessmentService = assessmentService;
             _repository = repository;
@@ -30,7 +33,9 @@ namespace PerformanceManagement.Controllers
         }
 
         [HttpPost("submit")]
-        public async Task<IActionResult> SubmitSelfAssessment([FromBody] SubmitSelfAssessmentRequestDto request)
+        public async Task<IActionResult> SubmitSelfAssessment(
+            [FromBody] SubmitSelfAssessmentRequestDto request
+        )
         {
             if (!ModelState.IsValid)
                 return BadRequest(new { success = false, message = "Invalid data provided." });
@@ -41,7 +46,13 @@ namespace PerformanceManagement.Controllers
                 var userAuth = await _repository.GetUserByEmployeeIdAsync(employeeId);
 
                 if (userAuth == null)
-                    return BadRequest(new { success = false, message = $"No user found for employee ID {employeeId}" });
+                    return BadRequest(
+                        new
+                        {
+                            success = false,
+                            message = $"No user found for employee ID {employeeId}",
+                        }
+                    );
 
                 var actualUserId = userAuth.UserId;
 
@@ -51,15 +62,24 @@ namespace PerformanceManagement.Controllers
                     UserId = actualUserId,
                     Status = request.Status,
                     AssessmentDetails = request.AssessmentDetails,
-                    Attachments = request.Attachments
+                    Attachments = request.Attachments,
                 };
 
                 var result = await _assessmentService.SubmitSelfAssessmentAsync(convertedRequest);
 
                 if (result.Success)
-                    return Ok(new { success = true, data = result.Data, message = "Assessment submitted successfully." });
+                    return Ok(
+                        new
+                        {
+                            success = true,
+                            data = result.Data,
+                            message = "Assessment submitted successfully.",
+                        }
+                    );
 
-                return BadRequest(new { success = false, message = string.Join(", ", result.Errors) });
+                return BadRequest(
+                    new { success = false, message = string.Join(", ", result.Errors) }
+                );
             }
             catch (Exception ex)
             {
@@ -75,13 +95,24 @@ namespace PerformanceManagement.Controllers
             {
                 var userAuth = await _repository.GetUserByEmployeeIdAsync(employeeId);
                 if (userAuth == null)
-                    return NotFound(new { success = false, message = $"No user found for employee ID {employeeId}" });
+                    return NotFound(
+                        new
+                        {
+                            success = false,
+                            message = $"No user found for employee ID {employeeId}",
+                        }
+                    );
 
                 var userId = userAuth.UserId;
-                var assessment = await _repository.GetSelfAssessmentByFormAndUserWithDetailsAsync(formId, userId);
+                var assessment = await _repository.GetSelfAssessmentByFormAndUserWithDetailsAsync(
+                    formId,
+                    userId
+                );
 
                 if (assessment == null)
-                    return NotFound(new { success = false, message = "No submitted assessment found." });
+                    return NotFound(
+                        new { success = false, message = "No submitted assessment found." }
+                    );
 
                 var result = new
                 {
@@ -89,16 +120,18 @@ namespace PerformanceManagement.Controllers
                     formName = assessment.Form.Name,
                     status = assessment.Status,
                     submittedAt = assessment.SubmittedAt,
-                    details = assessment.Assessmentdetails.Select(ad => new
-                    {
-                        competencyId = ad.CompetencyId,
-                        competencyName = ad.Competency.Name,
-                        competencyDescription = ad.Competency.Description,
-                        rating = ad.EmployeeRating,
-                        comments = ad.EmployeeComments
-                    }).ToList(),
-                    attachments = assessment.Selfassessmentattachments
-                        .OrderBy(a => a.DisplayOrder)
+                    details = assessment
+                        .Assessmentdetails.Select(ad => new
+                        {
+                            competencyId = ad.CompetencyId,
+                            competencyName = ad.Competency.Name,
+                            competencyDescription = ad.Competency.Description,
+                            rating = ad.EmployeeRating,
+                            comments = ad.EmployeeComments,
+                        })
+                        .ToList(),
+                    attachments = assessment
+                        .Selfassessmentattachments.OrderBy(a => a.DisplayOrder)
                         .Select(a => new
                         {
                             attachmentId = a.AttachmentId,
@@ -107,8 +140,9 @@ namespace PerformanceManagement.Controllers
                             fileType = a.FileType,
                             fileSize = a.FileSize,
                             note = a.AttachmentNote,
-                            uploadedAt = a.UploadedAt
-                        }).ToList()
+                            uploadedAt = a.UploadedAt,
+                        })
+                        .ToList(),
                 };
 
                 return Ok(new { success = true, data = result });
@@ -116,7 +150,10 @@ namespace PerformanceManagement.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving assessment");
-                return StatusCode(500, new { success = false, message = $"Error retrieving assessment: {ex.Message}" });
+                return StatusCode(
+                    500,
+                    new { success = false, message = $"Error retrieving assessment: {ex.Message}" }
+                );
             }
         }
 
@@ -138,15 +175,26 @@ namespace PerformanceManagement.Controllers
             {
                 var userAuth = await _repository.GetUserByEmployeeIdAsync(employeeId);
                 if (userAuth == null)
-                    return NotFound(new { success = false, message = $"No user found for employee ID {employeeId}" });
+                    return NotFound(
+                        new
+                        {
+                            success = false,
+                            message = $"No user found for employee ID {employeeId}",
+                        }
+                    );
 
                 var userId = userAuth.UserId;
-                var result = await _assessmentService.GetSelfAssessmentByFormAndUserAsync(formId, userId);
+                var result = await _assessmentService.GetSelfAssessmentByFormAndUserAsync(
+                    formId,
+                    userId
+                );
 
                 if (result.Success)
                     return Ok(new { success = true, data = result.Data });
 
-                return NotFound(new { success = false, message = string.Join(", ", result.Errors) });
+                return NotFound(
+                    new { success = false, message = string.Join(", ", result.Errors) }
+                );
             }
             catch (Exception ex)
             {
@@ -173,7 +221,13 @@ namespace PerformanceManagement.Controllers
             {
                 var userAuth = await _repository.GetUserByEmployeeIdAsync(employeeId);
                 if (userAuth == null)
-                    return NotFound(new { success = false, message = $"No user found for employee ID {employeeId}" });
+                    return NotFound(
+                        new
+                        {
+                            success = false,
+                            message = $"No user found for employee ID {employeeId}",
+                        }
+                    );
 
                 var userId = userAuth.UserId;
                 var result = await _assessmentService.GetAssessmentsByUserAsync(userId);
@@ -181,7 +235,9 @@ namespace PerformanceManagement.Controllers
                 if (result.Success)
                     return Ok(new { success = true, data = result.Data });
 
-                return NotFound(new { success = false, message = string.Join(", ", result.Errors) });
+                return NotFound(
+                    new { success = false, message = string.Join(", ", result.Errors) }
+                );
             }
             catch (Exception ex)
             {
@@ -191,15 +247,28 @@ namespace PerformanceManagement.Controllers
         }
 
         [HttpPatch("{assessmentId}/status")]
-        public async Task<IActionResult> UpdateAssessmentStatus(int assessmentId, [FromBody] UpdateStatusDto statusDto)
+        public async Task<IActionResult> UpdateAssessmentStatus(
+            int assessmentId,
+            [FromBody] UpdateStatusDto statusDto
+        )
         {
             if (string.IsNullOrEmpty(statusDto?.Status))
                 return BadRequest(new { success = false, message = "Status is required." });
 
-            var result = await _assessmentService.UpdateAssessmentStatusAsync(assessmentId, statusDto.Status);
+            var result = await _assessmentService.UpdateAssessmentStatusAsync(
+                assessmentId,
+                statusDto.Status
+            );
 
             if (result.Success)
-                return Ok(new { success = true, data = result.Data, message = "Status updated successfully." });
+                return Ok(
+                    new
+                    {
+                        success = true,
+                        data = result.Data,
+                        message = "Status updated successfully.",
+                    }
+                );
 
             return BadRequest(new { success = false, message = string.Join(", ", result.Errors) });
         }
@@ -214,7 +283,9 @@ namespace PerformanceManagement.Controllers
                 if (result.Success)
                     return Ok(new { success = true, data = result.Data });
 
-                return NotFound(new { success = false, message = string.Join(", ", result.Errors) });
+                return NotFound(
+                    new { success = false, message = string.Join(", ", result.Errors) }
+                );
             }
             catch (Exception ex)
             {
@@ -233,7 +304,9 @@ namespace PerformanceManagement.Controllers
                 if (result.Success)
                     return Ok(new { success = true, message = "Attachment deleted successfully." });
 
-                return NotFound(new { success = false, message = string.Join(", ", result.Errors) });
+                return NotFound(
+                    new { success = false, message = string.Join(", ", result.Errors) }
+                );
             }
             catch (Exception ex)
             {
@@ -243,106 +316,124 @@ namespace PerformanceManagement.Controllers
         }
 
         [HttpGet("attachments/{attachmentId}/download")]
-public async Task<IActionResult> DownloadAttachment(int attachmentId)
-{
-    try
-    {
-        _logger.LogInformation("Download request for attachment {AttachmentId}", attachmentId);
-
-        var attachment = await _repository.GetAttachmentByIdAsync(attachmentId);
-
-        if (attachment == null)
+        public async Task<IActionResult> DownloadAttachment(int attachmentId)
         {
-            _logger.LogWarning("Attachment {AttachmentId} not found in database", attachmentId);
-            return NotFound(new { success = false, message = "Attachment not found." });
+            try
+            {
+                _logger.LogInformation(
+                    "Download request for attachment {AttachmentId}",
+                    attachmentId
+                );
+
+                var attachment = await _repository.GetAttachmentByIdAsync(attachmentId);
+
+                if (attachment == null)
+                {
+                    _logger.LogWarning(
+                        "Attachment {AttachmentId} not found in database",
+                        attachmentId
+                    );
+                    return NotFound(new { success = false, message = "Attachment not found." });
+                }
+
+                if (string.IsNullOrWhiteSpace(attachment.FilePath))
+                {
+                    _logger.LogWarning("Attachment {AttachmentId} has no file path", attachmentId);
+                    return NotFound(new { success = false, message = "File path missing." });
+                }
+
+                _logger.LogInformation(
+                    "Fetching file from MongoDB: AttachmentId={AttachmentId}, FileId={FileId}, FileName={FileName}",
+                    attachmentId,
+                    attachment.FilePath,
+                    attachment.FileName
+                );
+
+                // Get file from MongoDB GridFS using stored ObjectId
+                byte[] fileBytes;
+                string contentType;
+                string fileName;
+
+                try
+                {
+                    (fileBytes, contentType, fileName) = await _fileStorage.GetFileForPreviewAsync(
+                        attachment.FilePath
+                    );
+                }
+                catch (ArgumentException ex)
+                {
+                    _logger.LogError(ex, "Invalid file ID format: {FileId}", attachment.FilePath);
+                    return BadRequest(new { success = false, message = "Invalid file ID format." });
+                }
+                catch (FileNotFoundException ex)
+                {
+                    _logger.LogError(ex, "File not found in GridFS: {FileId}", attachment.FilePath);
+                    return NotFound(
+                        new { success = false, message = "File not found in storage." }
+                    );
+                }
+
+                // Use original filename from database or from GridFS
+                var downloadFileName = !string.IsNullOrEmpty(attachment.FileName)
+                    ? attachment.FileName
+                    : fileName;
+
+                // Ensure content type is set correctly
+                if (string.IsNullOrEmpty(contentType))
+                {
+                    contentType = GetContentTypeFromFileName(downloadFileName);
+                }
+
+                _logger.LogInformation(
+                    "Sending file: FileName={FileName}, ContentType={ContentType}, Size={Size} bytes",
+                    downloadFileName,
+                    contentType,
+                    fileBytes.Length
+                );
+
+                // Return file with proper headers
+                Response.Headers.Add(
+                    "Content-Disposition",
+                    $"attachment; filename=\"{downloadFileName}\""
+                );
+                Response.Headers.Add("X-Content-Type-Options", "nosniff");
+
+                return File(fileBytes, contentType, downloadFileName);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error downloading attachment {AttachmentId}", attachmentId);
+                return StatusCode(
+                    500,
+                    new { success = false, message = $"Error downloading file: {ex.Message}" }
+                );
+            }
         }
 
-        if (string.IsNullOrWhiteSpace(attachment.FilePath))
+        // Helper method to determine content type from file extension
+        private string GetContentTypeFromFileName(string fileName)
         {
-            _logger.LogWarning("Attachment {AttachmentId} has no file path", attachmentId);
-            return NotFound(new { success = false, message = "File path missing." });
+            if (string.IsNullOrEmpty(fileName))
+                return "application/octet-stream";
+
+            var extension = System.IO.Path.GetExtension(fileName).ToLowerInvariant();
+
+            return extension switch
+            {
+                ".pdf" => "application/pdf",
+                ".csv" => "text/csv",
+                ".txt" => "text/plain",
+                ".doc" => "application/msword",
+                ".docx" =>
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                ".xls" => "application/vnd.ms-excel",
+                ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                ".png" => "image/png",
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".gif" => "image/gif",
+                _ => "application/octet-stream",
+            };
         }
-
-        _logger.LogInformation(
-            "Fetching file from MongoDB: AttachmentId={AttachmentId}, FileId={FileId}, FileName={FileName}",
-            attachmentId,
-            attachment.FilePath,
-            attachment.FileName);
-
-        // Get file from MongoDB GridFS using stored ObjectId
-        byte[] fileBytes;
-        string contentType;
-        string fileName;
-
-        try
-        {
-            (fileBytes, contentType, fileName) = await _fileStorage.GetFileForPreviewAsync(attachment.FilePath);
-        }
-        catch (ArgumentException ex)
-        {
-            _logger.LogError(ex, "Invalid file ID format: {FileId}", attachment.FilePath);
-            return BadRequest(new { success = false, message = "Invalid file ID format." });
-        }
-        catch (FileNotFoundException ex)
-        {
-            _logger.LogError(ex, "File not found in GridFS: {FileId}", attachment.FilePath);
-            return NotFound(new { success = false, message = "File not found in storage." });
-        }
-
-        // Use original filename from database or from GridFS
-        var downloadFileName = !string.IsNullOrEmpty(attachment.FileName)
-            ? attachment.FileName
-            : fileName;
-
-        // Ensure content type is set correctly
-        if (string.IsNullOrEmpty(contentType))
-        {
-            contentType = GetContentTypeFromFileName(downloadFileName);
-        }
-
-        _logger.LogInformation(
-            "Sending file: FileName={FileName}, ContentType={ContentType}, Size={Size} bytes",
-            downloadFileName,
-            contentType,
-            fileBytes.Length);
-
-        // Return file with proper headers
-        Response.Headers.Add("Content-Disposition", $"attachment; filename=\"{downloadFileName}\"");
-        Response.Headers.Add("X-Content-Type-Options", "nosniff");
-        
-        return File(fileBytes, contentType, downloadFileName);
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, "Error downloading attachment {AttachmentId}", attachmentId);
-        return StatusCode(500, new { success = false, message = $"Error downloading file: {ex.Message}" });
-    }
-}
-
-// Helper method to determine content type from file extension
-private string GetContentTypeFromFileName(string fileName)
-{
-    if (string.IsNullOrEmpty(fileName))
-        return "application/octet-stream";
-
-    var extension = System.IO.Path.GetExtension(fileName).ToLowerInvariant();
-
-    return extension switch
-    {
-        ".pdf" => "application/pdf",
-        ".csv" => "text/csv",
-        ".txt" => "text/plain",
-        ".doc" => "application/msword",
-        ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        ".xls" => "application/vnd.ms-excel",
-        ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        ".png" => "image/png",
-        ".jpg" or ".jpeg" => "image/jpeg",
-        ".gif" => "image/gif",
-        _ => "application/octet-stream"
-    };
-}
-
     }
 
     public class UpdateStatusDto

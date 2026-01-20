@@ -1,13 +1,14 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Relevantz.EEPZ.Core.Services.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
-using Microsoft.Extensions.Configuration;
-
+using Relevantz.EEPZ.Core.Services.Interfaces;
 
 namespace eepzbackend.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/approver/{approverUserId:int}")]
     public class ApproverController : ControllerBase
     {
@@ -24,7 +25,8 @@ namespace eepzbackend.Controllers
         public async Task<IActionResult> GetSubmittedForms(
             int approverUserId,
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 25)
+            [FromQuery] int pageSize = 25
+        )
         {
             try
             {
@@ -38,21 +40,32 @@ namespace eepzbackend.Controllers
         }
 
         [HttpGet("submitted-l1-ratings")]
-        public async Task<IActionResult> GetSubmittedL1Ratings(int approverUserId, [FromQuery] int page = 1, [FromQuery] int pageSize = 25)
+        public async Task<IActionResult> GetSubmittedL1Ratings(
+            int approverUserId,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 25
+        )
         {
             var rows = await _service.GetSubmittedL1RatingsAsync(approverUserId, page, pageSize);
             return Ok(rows);
         }
 
         [HttpGet("rework-forms")]
-        public async Task<IActionResult> GetReworkForms(int approverUserId, [FromQuery] int page = 1, [FromQuery] int pageSize = 25)
+        public async Task<IActionResult> GetReworkForms(
+            int approverUserId,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 25
+        )
         {
             var rows = await _service.GetReworkFormsAsync(approverUserId, page, pageSize);
             return Ok(rows);
         }
 
         [HttpGet("assessment/{assessmentId:int}")]
-        public async Task<IActionResult> GetAssessmentForApprove(int approverUserId, int assessmentId)
+        public async Task<IActionResult> GetAssessmentForApprove(
+            int approverUserId,
+            int assessmentId
+        )
         {
             var dto = await _service.GetAssessmentAsync(approverUserId, assessmentId);
             if (dto is null)
@@ -61,32 +74,38 @@ namespace eepzbackend.Controllers
         }
 
         [HttpGet("assessments")]
-        public async Task<IActionResult> GetApproverAssessmentsWithDetails(int approverUserId, [FromQuery] int page = 1, [FromQuery] int pageSize = 25)
+        public async Task<IActionResult> GetApproverAssessmentsWithDetails(
+            int approverUserId,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 25
+        )
         {
-            var list = await _service.GetAssessmentsWithDetailsAsync(approverUserId, page, pageSize);
+            var list = await _service.GetAssessmentsWithDetailsAsync(
+                approverUserId,
+                page,
+                pageSize
+            );
             return Ok(list);
         }
 
         [HttpGet("assessment/{assessmentId:int}/decision")]
-        public async Task<IActionResult> GetLatestReviewerDecision(int approverUserId, int assessmentId)
+        public async Task<IActionResult> GetLatestReviewerDecision(
+            int approverUserId,
+            int assessmentId
+        )
         {
             var decision = await _service.GetLatestReviewerDecisionAsync(assessmentId);
             if (decision == null)
                 return NotFound();
 
-            return Ok(new
-            {
-                decision = decision.Decision,
-                note = decision.Note
-
-            });
+            return Ok(new { decision = decision.Decision, note = decision.Note });
         }
 
-
-
-
         [HttpPost("reviews")]
-        public async Task<IActionResult> PostApproverReviews(int approverUserId, [FromBody] SubmitReviewDto body)
+        public async Task<IActionResult> PostApproverReviews(
+            int approverUserId,
+            [FromBody] SubmitReviewDto body
+        )
         {
             if (body is null || body.Items is null || body.Items.Count == 0)
                 return BadRequest("No review items provided.");
@@ -99,16 +118,37 @@ namespace eepzbackend.Controllers
         }
 
         [HttpPost("decision")]
-        public async Task<IActionResult> PostDecision(int approverUserId, [FromQuery] int assessmentId, [FromQuery] string decision, [FromBody] string? approverComment = null)
+        public async Task<IActionResult> PostDecision(
+            int approverUserId,
+            [FromQuery] int assessmentId,
+            [FromQuery] string decision,
+            [FromBody] string? approverComment = null
+        )
         {
-            var ok = await _service.SetDecisionAsync(approverUserId, assessmentId, decision, approverComment);
+            var ok = await _service.SetDecisionAsync(
+                approverUserId,
+                assessmentId,
+                decision,
+                approverComment
+            );
             if (!ok)
                 return Forbid();
 
-            return Ok(new { assessmentId, decision = decision.Trim(), message = "Decision recorded successfully." });
+            return Ok(
+                new
+                {
+                    assessmentId,
+                    decision = decision.Trim(),
+                    message = "Decision recorded successfully.",
+                }
+            );
         }
+
         [HttpGet("assessment/{assessmentId:int}/attachments")]
-        public async Task<IActionResult> GetAssessmentAttachments(int approverUserId, int assessmentId)
+        public async Task<IActionResult> GetAssessmentAttachments(
+            int approverUserId,
+            int assessmentId
+        )
         {
             try
             {
@@ -117,43 +157,47 @@ namespace eepzbackend.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = $"Error retrieving attachments: {ex.Message}"
-                });
+                return StatusCode(
+                    500,
+                    new { success = false, message = $"Error retrieving attachments: {ex.Message}" }
+                );
             }
         }
 
-       [HttpGet("attachments/{attachmentId:int}/download")]
-public async Task<IActionResult> DownloadAttachment(int approverUserId, int attachmentId)
-{
-    try
-    {
-        var (success, fileBytes, contentType, fileName, errors) = await _service.DownloadAttachmentFromGridFSAsync(attachmentId);
-
-        if (!success)
+        [HttpGet("attachments/{attachmentId:int}/download")]
+        public async Task<IActionResult> DownloadAttachment(int approverUserId, int attachmentId)
         {
-            if (errors.Contains("ATTACHMENT_NOT_FOUND") || errors.Contains("FILE_NOT_FOUND"))
+            try
             {
-                return NotFound(new { success = false, message = string.Join(", ", errors) });
+                var (success, fileBytes, contentType, fileName, errors) =
+                    await _service.DownloadAttachmentFromGridFSAsync(attachmentId);
+
+                if (!success)
+                {
+                    if (
+                        errors.Contains("ATTACHMENT_NOT_FOUND") || errors.Contains("FILE_NOT_FOUND")
+                    )
+                    {
+                        return NotFound(
+                            new { success = false, message = string.Join(", ", errors) }
+                        );
+                    }
+                    return StatusCode(
+                        500,
+                        new { success = false, message = string.Join(", ", errors) }
+                    );
+                }
+
+                return File(fileBytes, contentType, fileName);
             }
-            return StatusCode(500, new { success = false, message = string.Join(", ", errors) });
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Download Error: {ex.Message}");
+                return StatusCode(
+                    500,
+                    new { success = false, message = $"Error downloading file: {ex.Message}" }
+                );
+            }
         }
-
-        return File(fileBytes, contentType, fileName);
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Download Error: {ex.Message}");
-        return StatusCode(500, new
-        {
-            success = false,
-            message = $"Error downloading file: {ex.Message}"
-        });
-    }
-}
-
-
     }
 }

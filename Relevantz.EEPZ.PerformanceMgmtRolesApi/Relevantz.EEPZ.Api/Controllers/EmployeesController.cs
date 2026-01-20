@@ -1,22 +1,28 @@
-using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Core.Services.Interfaces;
+
 namespace PerformanceManagement.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class EmployeesController : ControllerBase
     {
         private readonly IEmployeesService _employeesService;
         private readonly ILogger<EmployeesController> _logger;
- 
-        public EmployeesController(IEmployeesService employeesService, ILogger<EmployeesController> logger)
+
+        public EmployeesController(
+            IEmployeesService employeesService,
+            ILogger<EmployeesController> logger
+        )
         {
             _employeesService = employeesService;
             _logger = logger;
         }
- 
+
         [HttpGet("all-managers")]
         public async Task<IActionResult> GetAllManagers()
         {
@@ -25,7 +31,10 @@ namespace PerformanceManagement.Controllers
                 var result = await _employeesService.GetAllManagersAsync();
                 if (result.Success)
                     return Ok(new { success = true, data = result.Data });
-                return StatusCode(500, new { success = false, message = string.Join(", ", result.Errors) });
+                return StatusCode(
+                    500,
+                    new { success = false, message = string.Join(", ", result.Errors) }
+                );
             }
             catch (System.Exception ex)
             {
@@ -33,7 +42,7 @@ namespace PerformanceManagement.Controllers
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
- 
+
         [HttpGet("user/{userId}/role")]
         public async Task<IActionResult> GetUserRole(int userId)
         {
@@ -43,8 +52,13 @@ namespace PerformanceManagement.Controllers
                 if (result.Success)
                     return Ok(new { success = true, data = result.Data });
                 if (result.Errors.Contains("User not found"))
-                    return NotFound(new { success = false, message = string.Join(", ", result.Errors) });
-                return StatusCode(500, new { success = false, message = string.Join(", ", result.Errors) });
+                    return NotFound(
+                        new { success = false, message = string.Join(", ", result.Errors) }
+                    );
+                return StatusCode(
+                    500,
+                    new { success = false, message = string.Join(", ", result.Errors) }
+                );
             }
             catch (System.Exception ex)
             {
@@ -54,5 +68,3 @@ namespace PerformanceManagement.Controllers
         }
     }
 }
- 
- 

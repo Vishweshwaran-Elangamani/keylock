@@ -1,17 +1,17 @@
-using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
-using Relevantz.EEPZ.Data.DBContexts;
-using Relevantz.EEPZ.Common.Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
+using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Core.Services.Interfaces;
-using System.Security.Claims;
+using Relevantz.EEPZ.Data.DBContexts;
 
 namespace Relevantz.EEPZ.Api.Controllers
 {
-
     [ApiController]
-    [Authorize] 
+    [Authorize]
     [Route("api/[controller]")]
     public class FormManagementController : ControllerBase
     {
@@ -20,7 +20,8 @@ namespace Relevantz.EEPZ.Api.Controllers
 
         public FormManagementController(
             IFormManagementService formService,
-            ILogger<FormManagementController> logger)
+            ILogger<FormManagementController> logger
+        )
         {
             _formService = formService;
             _logger = logger;
@@ -28,8 +29,7 @@ namespace Relevantz.EEPZ.Api.Controllers
 
         private int GetCurrentUserId()
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier) 
-                ?? User.FindFirst("sub");
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier) ?? User.FindFirst("sub");
 
             if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
             {
@@ -46,7 +46,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         [HttpPost("create")]
-        [Authorize(Roles = "HR,Admin")] 
+        [Authorize(Roles = "HR,Admin")]
         public async Task<IActionResult> CreateForm([FromBody] CreateFormRequestDto request)
         {
             try
@@ -56,20 +56,31 @@ namespace Relevantz.EEPZ.Api.Controllers
 
                 _logger.LogInformation(
                     "Create Form Request | UserId: {UserId} | Role: {Role}",
-                    userId, userRole
+                    userId,
+                    userRole
                 );
 
                 if (!ModelState.IsValid)
                 {
                     _logger.LogWarning(" Invalid form data provided");
-                    return BadRequest(new { success = false, message = "Invalid form data", errors = ModelState });
+                    return BadRequest(
+                        new
+                        {
+                            success = false,
+                            message = "Invalid form data",
+                            errors = ModelState,
+                        }
+                    );
                 }
 
                 var result = await _formService.CreateFormAsync(request);
 
                 if (result.Success)
                 {
-                    _logger.LogInformation(" Form created successfully | FormId: {FormId}", result.Data?.FormId);
+                    _logger.LogInformation(
+                        " Form created successfully | FormId: {FormId}",
+                        result.Data?.FormId
+                    );
                     return Ok(result);
                 }
 
@@ -84,12 +95,15 @@ namespace Relevantz.EEPZ.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(" Error creating form: {Exception}", ex);
-                return StatusCode(500, new 
-                { 
-                    success = false, 
-                    message = "Internal server error",
-                    details = ex.Message 
-                });
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = false,
+                        message = "Internal server error",
+                        details = ex.Message,
+                    }
+                );
             }
         }
 
@@ -102,7 +116,8 @@ namespace Relevantz.EEPZ.Api.Controllers
 
                 _logger.LogInformation(
                     "Get Form By Id Request | UserId: {UserId} | FormId: {FormId}",
-                    userId, formId
+                    userId,
+                    formId
                 );
 
                 if (formId <= 0)
@@ -114,7 +129,10 @@ namespace Relevantz.EEPZ.Api.Controllers
 
                 if (result.Success)
                 {
-                    _logger.LogInformation(" Form retrieved successfully | FormId: {FormId}", formId);
+                    _logger.LogInformation(
+                        " Form retrieved successfully | FormId: {FormId}",
+                        formId
+                    );
                     return Ok(result);
                 }
 
@@ -124,12 +142,15 @@ namespace Relevantz.EEPZ.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(" Error retrieving form: {Exception}", ex);
-                return StatusCode(500, new 
-                { 
-                    success = false, 
-                    message = "Internal server error",
-                    details = ex.Message 
-                });
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = false,
+                        message = "Internal server error",
+                        details = ex.Message,
+                    }
+                );
             }
         }
 
@@ -143,15 +164,18 @@ namespace Relevantz.EEPZ.Api.Controllers
 
                 _logger.LogInformation(
                     "Get All Forms Request | UserId: {UserId} | Role: {Role}",
-                    userId, userRole
+                    userId,
+                    userRole
                 );
 
                 var result = await _formService.GetAllFormsAsync();
 
                 if (result.Success)
                 {
-                    _logger.LogInformation(" All forms retrieved successfully | Count: {Count}", 
-                        result.Data?.Count ?? 0);
+                    _logger.LogInformation(
+                        " All forms retrieved successfully | Count: {Count}",
+                        result.Data?.Count ?? 0
+                    );
                     return Ok(result);
                 }
 
@@ -161,18 +185,24 @@ namespace Relevantz.EEPZ.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(" Error retrieving all forms: {Exception}", ex);
-                return StatusCode(500, new 
-                { 
-                    success = false, 
-                    message = "Internal server error",
-                    details = ex.Message 
-                });
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = false,
+                        message = "Internal server error",
+                        details = ex.Message,
+                    }
+                );
             }
         }
 
         [HttpPut("{formId}")]
-        [Authorize(Roles = "HR,Admin")] 
-        public async Task<IActionResult> UpdateForm(int formId, [FromBody] CreateFormRequestDto request)
+        [Authorize(Roles = "HR,Admin")]
+        public async Task<IActionResult> UpdateForm(
+            int formId,
+            [FromBody] CreateFormRequestDto request
+        )
         {
             try
             {
@@ -181,7 +211,9 @@ namespace Relevantz.EEPZ.Api.Controllers
 
                 _logger.LogInformation(
                     "Update Form Request | UserId: {UserId} | Role: {Role} | FormId: {FormId}",
-                    userId, userRole, formId
+                    userId,
+                    userRole,
+                    formId
                 );
 
                 if (formId <= 0)
@@ -191,7 +223,14 @@ namespace Relevantz.EEPZ.Api.Controllers
 
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(new { success = false, message = "Invalid form data", errors = ModelState });
+                    return BadRequest(
+                        new
+                        {
+                            success = false,
+                            message = "Invalid form data",
+                            errors = ModelState,
+                        }
+                    );
                 }
 
                 var result = await _formService.UpdateFormAsync(formId, request);
@@ -213,17 +252,20 @@ namespace Relevantz.EEPZ.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(" Error updating form: {Exception}", ex);
-                return StatusCode(500, new 
-                { 
-                    success = false, 
-                    message = "Internal server error",
-                    details = ex.Message 
-                });
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = false,
+                        message = "Internal server error",
+                        details = ex.Message,
+                    }
+                );
             }
         }
 
         [HttpDelete("{formId}")]
-        [Authorize(Roles = "HR,Admin")] 
+        [Authorize(Roles = "HR,Admin")]
         public async Task<IActionResult> DeleteForm(int formId)
         {
             try
@@ -233,7 +275,9 @@ namespace Relevantz.EEPZ.Api.Controllers
 
                 _logger.LogInformation(
                     " Delete Form Request | UserId: {UserId} | Role: {Role} | FormId: {FormId}",
-                    userId, userRole, formId
+                    userId,
+                    userRole,
+                    formId
                 );
 
                 if (formId <= 0)
@@ -260,17 +304,20 @@ namespace Relevantz.EEPZ.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(" Error deleting form: {Exception}", ex);
-                return StatusCode(500, new 
-                { 
-                    success = false, 
-                    message = "Internal server error",
-                    details = ex.Message 
-                });
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = false,
+                        message = "Internal server error",
+                        details = ex.Message,
+                    }
+                );
             }
         }
 
         [HttpDelete("draft/{assignmentId}")]
-        [Authorize(Roles = "HR,Admin")] 
+        [Authorize(Roles = "HR,Admin")]
         public async Task<IActionResult> DeleteDraft(int assignmentId)
         {
             try
@@ -280,7 +327,9 @@ namespace Relevantz.EEPZ.Api.Controllers
 
                 _logger.LogInformation(
                     "Delete Draft Request | UserId: {UserId} | Role: {Role} | AssignmentId: {AssignmentId}",
-                    userId, userRole, assignmentId
+                    userId,
+                    userRole,
+                    assignmentId
                 );
 
                 if (assignmentId <= 0)
@@ -292,7 +341,10 @@ namespace Relevantz.EEPZ.Api.Controllers
 
                 if (result.Success)
                 {
-                    _logger.LogInformation(" Draft deleted successfully | AssignmentId: {AssignmentId}", assignmentId);
+                    _logger.LogInformation(
+                        " Draft deleted successfully | AssignmentId: {AssignmentId}",
+                        assignmentId
+                    );
                     return Ok(result);
                 }
 
@@ -307,12 +359,15 @@ namespace Relevantz.EEPZ.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(" Error deleting draft: {Exception}", ex);
-                return StatusCode(500, new 
-                { 
-                    success = false, 
-                    message = "Internal server error",
-                    details = ex.Message 
-                });
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = false,
+                        message = "Internal server error",
+                        details = ex.Message,
+                    }
+                );
             }
         }
     }

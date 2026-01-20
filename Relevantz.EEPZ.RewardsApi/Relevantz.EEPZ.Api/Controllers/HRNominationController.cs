@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.Services.Interfaces;
@@ -5,6 +6,7 @@ using Relevantz.EEPZ.Core.Services.Interfaces;
 namespace PerformanceManagement.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class HRNominationController : ControllerBase
     {
@@ -13,7 +15,8 @@ namespace PerformanceManagement.Controllers
 
         public HRNominationController(
             IHRNominationService service,
-            ILogger<HRNominationController> logger)
+            ILogger<HRNominationController> logger
+        )
         {
             _service = service;
             _logger = logger;
@@ -51,7 +54,13 @@ namespace PerformanceManagement.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"[NOMINATION_DETAILS] Error: {ex.Message}");
-                return StatusCode(500, ApiResponse<object>.ErrorResponse("Internal server error", new List<string> { ex.Message }));
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.ErrorResponse(
+                        "Internal server error",
+                        new List<string> { ex.Message }
+                    )
+                );
             }
         }
 
@@ -72,7 +81,13 @@ namespace PerformanceManagement.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"[HR_APPROVE] Error: {ex.Message}");
-                return StatusCode(500, ApiResponse<object>.ErrorResponse("Internal server error", new List<string> { ex.Message }));
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.ErrorResponse(
+                        "Internal server error",
+                        new List<string> { ex.Message }
+                    )
+                );
             }
         }
 
@@ -93,7 +108,13 @@ namespace PerformanceManagement.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"[REJECT_NOMINATIONS] Error: {ex.Message}");
-                return StatusCode(500, ApiResponse<object>.ErrorResponse("Internal server error", new List<string> { ex.Message }));
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.ErrorResponse(
+                        "Internal server error",
+                        new List<string> { ex.Message }
+                    )
+                );
             }
         }
 
@@ -173,11 +194,16 @@ namespace PerformanceManagement.Controllers
         }
 
         [HttpPut("reward-types/{rewardTypeId}")]
-        public async Task<IActionResult> UpdateRewardType(int rewardTypeId, [FromBody] UpdateRewardTypeDto dto)
+        public async Task<IActionResult> UpdateRewardType(
+            int rewardTypeId,
+            [FromBody] UpdateRewardTypeDto dto
+        )
         {
             try
             {
-                _logger.LogInformation($"[UPDATE_REWARD_TYPE] Starting update for RewardTypeId: {rewardTypeId}");
+                _logger.LogInformation(
+                    $"[UPDATE_REWARD_TYPE] Starting update for RewardTypeId: {rewardTypeId}"
+                );
 
                 var result = await _service.UpdateRewardTypeAsync(rewardTypeId, dto);
 
@@ -188,12 +214,15 @@ namespace PerformanceManagement.Controllers
                 _logger.LogError($"[UPDATE_REWARD_TYPE] Exception: {ex.Message}");
                 _logger.LogError($"[UPDATE_REWARD_TYPE] Stack: {ex.StackTrace}");
 
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "Error updating reward type",
-                    details = ex.Message
-                });
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = false,
+                        message = "Error updating reward type",
+                        details = ex.Message,
+                    }
+                );
             }
         }
 
@@ -227,41 +256,44 @@ namespace PerformanceManagement.Controllers
             }
         }
 
-       [HttpPut("parameters/{parameterId}")]
-public async Task<IActionResult> UpdateParameter(int parameterId, [FromBody] UpdateParameterDto dto)
-{
-    try
-    {
-        var result = await _service.UpdateParameterAsync(parameterId, dto);
-        
-        // Check if result is null
-        if (result == null)
+        [HttpPut("parameters/{parameterId}")]
+        public async Task<IActionResult> UpdateParameter(
+            int parameterId,
+            [FromBody] UpdateParameterDto dto
+        )
         {
-            return Ok(new { success = true, message = "Parameter updated successfully" });
-        }
-        
-        // Safe property check
-        var resultType = result.GetType();
-        var successProperty = resultType.GetProperty("success") ?? resultType.GetProperty("Success");
-        
-        if (successProperty != null)
-        {
-            var success = (bool)successProperty.GetValue(result);
-            if (!success)
+            try
             {
-                return NotFound(result);
+                var result = await _service.UpdateParameterAsync(parameterId, dto);
+
+                // Check if result is null
+                if (result == null)
+                {
+                    return Ok(new { success = true, message = "Parameter updated successfully" });
+                }
+
+                // Safe property check
+                var resultType = result.GetType();
+                var successProperty =
+                    resultType.GetProperty("success") ?? resultType.GetProperty("Success");
+
+                if (successProperty != null)
+                {
+                    var success = (bool)successProperty.GetValue(result);
+                    if (!success)
+                    {
+                        return NotFound(result);
+                    }
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"[UPDATE_PARAMETER] Error: {ex.Message}");
+                return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
-
-        return Ok(result);
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError($"[UPDATE_PARAMETER] Error: {ex.Message}");
-        return StatusCode(500, new { success = false, message = ex.Message });
-    }
-}
-
 
         [HttpDelete("parameters/{parameterId}")]
         public async Task<IActionResult> DeleteParameter(int parameterId)
@@ -270,28 +302,16 @@ public async Task<IActionResult> UpdateParameter(int parameterId, [FromBody] Upd
             {
                 await _service.DeleteParameterAsync(parameterId);
 
-                return Ok(new
-                {
-                    success = true,
-                    message = "Parameter deleted successfully"
-                });
+                return Ok(new { success = true, message = "Parameter deleted successfully" });
             }
             catch (KeyNotFoundException)
             {
-                return NotFound(new
-                {
-                    success = false,
-                    message = "Parameter not found"
-                });
+                return NotFound(new { success = false, message = "Parameter not found" });
             }
             catch (Exception ex)
             {
                 _logger.LogError($"[DELETE_PARAMETER] Error: {ex.Message}");
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = ex.Message
-                });
+                return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
 

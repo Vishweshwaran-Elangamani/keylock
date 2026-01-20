@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Business.Services.Interfaces;
 
 namespace PerformanceManagement.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class DepartmentHeadNominationController : ControllerBase
     {
@@ -12,7 +14,8 @@ namespace PerformanceManagement.Controllers
 
         public DepartmentHeadNominationController(
             IDepartmentHeadNominationService service,
-            ILogger<DepartmentHeadNominationController> logger)
+            ILogger<DepartmentHeadNominationController> logger
+        )
         {
             _service = service;
             _logger = logger;
@@ -23,10 +26,12 @@ namespace PerformanceManagement.Controllers
         {
             try
             {
-                var result = await _service.GetApprovedNominationsByDeptHeadAsync(deptHeadEmployeeId);
-                
+                var result = await _service.GetApprovedNominationsByDeptHeadAsync(
+                    deptHeadEmployeeId
+                );
+
                 var success = (bool)((dynamic)result).success;
-                
+
                 if (!success)
                 {
                     return NotFound(result);
@@ -47,9 +52,9 @@ namespace PerformanceManagement.Controllers
             try
             {
                 var result = await _service.GetNominationDetailsAsync(nominationId);
-                
+
                 var success = (bool)((dynamic)result).success;
-                
+
                 if (!success)
                 {
                     return NotFound(result);
@@ -70,9 +75,9 @@ namespace PerformanceManagement.Controllers
             try
             {
                 var result = await _service.GetDepartmentStatisticsAsync(deptHeadEmployeeId);
-                
+
                 var success = (bool)((dynamic)result).success;
-                
+
                 if (!success)
                 {
                     return NotFound(result);

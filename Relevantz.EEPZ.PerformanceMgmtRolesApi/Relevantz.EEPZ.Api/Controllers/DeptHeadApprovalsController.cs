@@ -1,12 +1,13 @@
-
-using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 
 namespace PerformanceManagement.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class DeptHeadApprovalsController : ControllerBase
     {
@@ -15,14 +16,17 @@ namespace PerformanceManagement.Controllers
 
         public DeptHeadApprovalsController(
             IDeptHeadApprovalsService deptHeadService,
-            ILogger<DeptHeadApprovalsController> logger)
+            ILogger<DeptHeadApprovalsController> logger
+        )
         {
             _deptHeadService = deptHeadService;
             _logger = logger;
         }
 
         [HttpPost("approve-employee")]
-        public async Task<IActionResult> ApproveDeptHeadEmployee([FromBody] ApprovalRequestDto request)
+        public async Task<IActionResult> ApproveDeptHeadEmployee(
+            [FromBody] ApprovalRequestDto request
+        )
         {
             if (!ModelState.IsValid)
                 return BadRequest(new { success = false, message = "Invalid data provided." });
@@ -30,24 +34,34 @@ namespace PerformanceManagement.Controllers
             try
             {
                 var deptHeadUserIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(deptHeadUserIdClaim) || !int.TryParse(deptHeadUserIdClaim, out int deptHeadUserId))
+                if (
+                    string.IsNullOrEmpty(deptHeadUserIdClaim)
+                    || !int.TryParse(deptHeadUserIdClaim, out int deptHeadUserId)
+                )
                 {
                     return Unauthorized(new { success = false, message = "Invalid token" });
                 }
 
-                var result = await _deptHeadService.ApproveDeptHeadEmployeeAsync(request, deptHeadUserId);
+                var result = await _deptHeadService.ApproveDeptHeadEmployeeAsync(
+                    request,
+                    deptHeadUserId
+                );
 
                 if (result.Success)
                 {
-                    return Ok(new
-                    {
-                        success = true,
-                        message = "Employee approved successfully",
-                        approvalId = result.Data
-                    });
+                    return Ok(
+                        new
+                        {
+                            success = true,
+                            message = "Employee approved successfully",
+                            approvalId = result.Data,
+                        }
+                    );
                 }
 
-                return BadRequest(new { success = false, message = string.Join(", ", result.Errors) });
+                return BadRequest(
+                    new { success = false, message = string.Join(", ", result.Errors) }
+                );
             }
             catch (Exception ex)
             {
@@ -57,7 +71,9 @@ namespace PerformanceManagement.Controllers
         }
 
         [HttpGet("submitted-ratings")]
-        public async Task<IActionResult> GetDeptHeadSubmittedRatings([FromQuery] int? departmentHeadId)
+        public async Task<IActionResult> GetDeptHeadSubmittedRatings(
+            [FromQuery] int? departmentHeadId
+        )
         {
             try
             {
@@ -66,23 +82,41 @@ namespace PerformanceManagement.Controllers
                 if (!deptHeadEmployeeId.HasValue)
                 {
                     var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                    if (!string.IsNullOrEmpty(userIdClaim) && int.TryParse(userIdClaim, out int userId))
+                    if (
+                        !string.IsNullOrEmpty(userIdClaim)
+                        && int.TryParse(userIdClaim, out int userId)
+                    )
                     {
-                        deptHeadEmployeeId = await _deptHeadService.GetEmployeeIdFromUserIdAsync(userId);
+                        deptHeadEmployeeId = await _deptHeadService.GetEmployeeIdFromUserIdAsync(
+                            userId
+                        );
                     }
                 }
 
-                var result = await _deptHeadService.GetDeptHeadSubmittedRatingsAsync(deptHeadEmployeeId);
+                var result = await _deptHeadService.GetDeptHeadSubmittedRatingsAsync(
+                    deptHeadEmployeeId
+                );
 
                 if (result.Success)
                     return Ok(new { success = true, data = result.Data });
 
-                return StatusCode(500, new { success = false, message = string.Join(", ", result.Errors) });
+                return StatusCode(
+                    500,
+                    new { success = false, message = string.Join(", ", result.Errors) }
+                );
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error in GetDeptHeadSubmittedRatings: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "Failed to fetch submitted ratings", error = ex.Message });
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = false,
+                        message = "Failed to fetch submitted ratings",
+                        error = ex.Message,
+                    }
+                );
             }
         }
 
@@ -90,7 +124,8 @@ namespace PerformanceManagement.Controllers
         public async Task<IActionResult> GetManagerApprovedEmployees(
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 5,
-            [FromQuery] int? departmentHeadId = null)
+            [FromQuery] int? departmentHeadId = null
+        )
         {
             try
             {
@@ -99,27 +134,42 @@ namespace PerformanceManagement.Controllers
                 if (!deptHeadEmployeeId.HasValue)
                 {
                     var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                    if (!string.IsNullOrEmpty(userIdClaim) && int.TryParse(userIdClaim, out int userId))
+                    if (
+                        !string.IsNullOrEmpty(userIdClaim)
+                        && int.TryParse(userIdClaim, out int userId)
+                    )
                     {
-                        deptHeadEmployeeId = await _deptHeadService.GetEmployeeIdFromUserIdAsync(userId);
+                        deptHeadEmployeeId = await _deptHeadService.GetEmployeeIdFromUserIdAsync(
+                            userId
+                        );
                     }
                 }
 
-                var (success, data, totalRecords, totalPages, errors) = await _deptHeadService.GetManagerApprovedEmployeesAsync(page, pageSize, deptHeadEmployeeId);
+                var (success, data, totalRecords, totalPages, errors) =
+                    await _deptHeadService.GetManagerApprovedEmployeesAsync(
+                        page,
+                        pageSize,
+                        deptHeadEmployeeId
+                    );
 
                 if (success)
                 {
-                    return Ok(new
-                    {
-                        success = true,
-                        data = data,
-                        totalRecords = totalRecords,
-                        currentPage = page,
-                        totalPages = totalPages
-                    });
+                    return Ok(
+                        new
+                        {
+                            success = true,
+                            data = data,
+                            totalRecords = totalRecords,
+                            currentPage = page,
+                            totalPages = totalPages,
+                        }
+                    );
                 }
 
-                return StatusCode(500, new { success = false, message = string.Join(", ", errors) });
+                return StatusCode(
+                    500,
+                    new { success = false, message = string.Join(", ", errors) }
+                );
             }
             catch (Exception ex)
             {
@@ -133,28 +183,38 @@ namespace PerformanceManagement.Controllers
         {
             try
             {
-                var employeeIdClaim = User.FindFirst("empMasterId")?.Value
-                                   ?? User.FindFirst("EmployeeId")?.Value
-                                   ?? User.FindFirst("employeeId")?.Value;
+                var employeeIdClaim =
+                    User.FindFirst("empMasterId")?.Value
+                    ?? User.FindFirst("EmployeeId")?.Value
+                    ?? User.FindFirst("employeeId")?.Value;
 
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                               ?? User.FindFirst("userId")?.Value
-                               ?? User.FindFirst("sub")?.Value;
+                var userIdClaim =
+                    User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? User.FindFirst("userId")?.Value
+                    ?? User.FindFirst("sub")?.Value;
 
                 int.TryParse(employeeIdClaim, out int employeeId);
                 int.TryParse(userIdClaim, out int userId);
 
                 if (employeeId == 0 && userId == 0)
                 {
-                    return Unauthorized(new { success = false, message = "Could not identify employee in token" });
+                    return Unauthorized(
+                        new { success = false, message = "Could not identify employee in token" }
+                    );
                 }
 
-                var result = await _deptHeadService.GetPendingAcknowledgmentsAsync(employeeId, userId);
+                var result = await _deptHeadService.GetPendingAcknowledgmentsAsync(
+                    employeeId,
+                    userId
+                );
 
                 if (result.Success)
                     return Ok(new { success = true, data = result.Data });
 
-                return StatusCode(500, new { success = false, message = string.Join(", ", result.Errors) });
+                return StatusCode(
+                    500,
+                    new { success = false, message = string.Join(", ", result.Errors) }
+                );
             }
             catch (Exception ex)
             {
@@ -168,35 +228,47 @@ namespace PerformanceManagement.Controllers
         {
             try
             {
-                var employeeIdClaim = User.FindFirst("empMasterId")?.Value
-                                   ?? User.FindFirst("EmployeeId")?.Value
-                                   ?? User.FindFirst("employeeId")?.Value;
+                var employeeIdClaim =
+                    User.FindFirst("empMasterId")?.Value
+                    ?? User.FindFirst("EmployeeId")?.Value
+                    ?? User.FindFirst("employeeId")?.Value;
 
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                               ?? User.FindFirst("userId")?.Value
-                               ?? User.FindFirst("sub")?.Value;
+                var userIdClaim =
+                    User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? User.FindFirst("userId")?.Value
+                    ?? User.FindFirst("sub")?.Value;
 
                 int.TryParse(employeeIdClaim, out int employeeId);
                 int.TryParse(userIdClaim, out int userId);
 
-                var result = await _deptHeadService.AcknowledgeRatingAsync(request, employeeId, userId);
+                var result = await _deptHeadService.AcknowledgeRatingAsync(
+                    request,
+                    employeeId,
+                    userId
+                );
 
                 if (result.Success)
                 {
-                    return Ok(new
-                    {
-                        success = true,
-                        message = "Rating acknowledged successfully",
-                        acknowledgedAt = result.Data
-                    });
+                    return Ok(
+                        new
+                        {
+                            success = true,
+                            message = "Rating acknowledged successfully",
+                            acknowledgedAt = result.Data,
+                        }
+                    );
                 }
 
                 if (result.Errors.Contains("NOT_FOUND"))
                 {
-                    return NotFound(new { success = false, message = string.Join(", ", result.Errors) });
+                    return NotFound(
+                        new { success = false, message = string.Join(", ", result.Errors) }
+                    );
                 }
 
-                return BadRequest(new { success = false, message = string.Join(", ", result.Errors) });
+                return BadRequest(
+                    new { success = false, message = string.Join(", ", result.Errors) }
+                );
             }
             catch (Exception ex)
             {
@@ -219,9 +291,10 @@ namespace PerformanceManagement.Controllers
 
                 if (managerId == 0)
                 {
-                    var managerIdClaim = User.FindFirst("empMasterId")?.Value
-                                      ?? User.FindFirst("EmployeeId")?.Value
-                                      ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    var managerIdClaim =
+                        User.FindFirst("empMasterId")?.Value
+                        ?? User.FindFirst("EmployeeId")?.Value
+                        ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
                     int.TryParse(managerIdClaim, out managerId);
                 }
@@ -231,7 +304,10 @@ namespace PerformanceManagement.Controllers
                 if (result.Success)
                     return Ok(new { success = true, data = result.Data });
 
-                return StatusCode(500, new { success = false, message = string.Join(", ", result.Errors) });
+                return StatusCode(
+                    500,
+                    new { success = false, message = string.Join(", ", result.Errors) }
+                );
             }
             catch (Exception ex)
             {
@@ -241,16 +317,24 @@ namespace PerformanceManagement.Controllers
         }
 
         [HttpGet("{deptHeadEmployeeId}/assessment/{assessmentId}/attachments")]
-        public async Task<IActionResult> GetDeptHeadAssessmentAttachments(int deptHeadEmployeeId, int assessmentId)
+        public async Task<IActionResult> GetDeptHeadAssessmentAttachments(
+            int deptHeadEmployeeId,
+            int assessmentId
+        )
         {
             try
             {
-                var result = await _deptHeadService.GetDeptHeadAssessmentAttachmentsAsync(assessmentId);
+                var result = await _deptHeadService.GetDeptHeadAssessmentAttachmentsAsync(
+                    assessmentId
+                );
 
                 if (result.Success)
                     return Ok(new { success = true, data = result.Data });
 
-                return StatusCode(500, new { success = false, message = string.Join(", ", result.Errors) });
+                return StatusCode(
+                    500,
+                    new { success = false, message = string.Join(", ", result.Errors) }
+                );
             }
             catch (Exception ex)
             {
@@ -260,19 +344,30 @@ namespace PerformanceManagement.Controllers
         }
 
         [HttpGet("{deptHeadEmployeeId}/attachments/{attachmentId}/download")]
-        public async Task<IActionResult> DownloadDeptHeadAttachment(int deptHeadEmployeeId, int attachmentId)
+        public async Task<IActionResult> DownloadDeptHeadAttachment(
+            int deptHeadEmployeeId,
+            int attachmentId
+        )
         {
             try
             {
-                var (success, fileBytes, contentType, fileName, errors) = await _deptHeadService.DownloadDeptHeadAttachmentAsync(attachmentId);
+                var (success, fileBytes, contentType, fileName, errors) =
+                    await _deptHeadService.DownloadDeptHeadAttachmentAsync(attachmentId);
 
                 if (!success)
                 {
-                    if (errors.Contains("ATTACHMENT_NOT_FOUND") || errors.Contains("FILE_NOT_FOUND"))
+                    if (
+                        errors.Contains("ATTACHMENT_NOT_FOUND") || errors.Contains("FILE_NOT_FOUND")
+                    )
                     {
-                        return NotFound(new { success = false, message = string.Join(", ", errors) });
+                        return NotFound(
+                            new { success = false, message = string.Join(", ", errors) }
+                        );
                     }
-                    return StatusCode(500, new { success = false, message = string.Join(", ", errors) });
+                    return StatusCode(
+                        500,
+                        new { success = false, message = string.Join(", ", errors) }
+                    );
                 }
 
                 return File(fileBytes, contentType, fileName);
@@ -294,7 +389,9 @@ namespace PerformanceManagement.Controllers
                 if (result.Success)
                     return Ok(new { success = true, data = result.Data });
 
-                return NotFound(new { success = false, message = string.Join(", ", result.Errors) });
+                return NotFound(
+                    new { success = false, message = string.Join(", ", result.Errors) }
+                );
             }
             catch (Exception ex)
             {
@@ -302,7 +399,5 @@ namespace PerformanceManagement.Controllers
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
-
     }
 }
-
