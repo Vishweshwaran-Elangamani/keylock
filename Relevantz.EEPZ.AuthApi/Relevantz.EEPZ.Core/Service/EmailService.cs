@@ -1,15 +1,11 @@
 using Relevantz.EEPZ.Core.IService;
-
 using Relevantz.EEPZ.Common.Utils;
-
 using MailKit.Net.Smtp;
-
 using MailKit.Security;
-
 using Microsoft.Extensions.Configuration;
-
 using MimeKit;
- 
+using Relevantz.EEPZ.Common.Constants;
+
 namespace Relevantz.EEPZ.Core.Service
 
 {

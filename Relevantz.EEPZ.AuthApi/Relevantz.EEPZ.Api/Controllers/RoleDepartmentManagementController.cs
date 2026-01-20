@@ -4,6 +4,8 @@ using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.IService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Relevantz.EEPZ.Common.Constants;
+
 namespace Relevantz.EEPZ.Api.Controllers
 {
     /// <summary>

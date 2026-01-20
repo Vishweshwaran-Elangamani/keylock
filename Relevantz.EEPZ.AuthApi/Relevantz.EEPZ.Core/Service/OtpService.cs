@@ -5,7 +5,8 @@ using Microsoft.Extensions.Configuration;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Common.Entities;
- 
+using Relevantz.EEPZ.Common.Constants;
+
 namespace Relevantz.EEPZ.Core.Service
 {
     public class OtpService : IOtpService

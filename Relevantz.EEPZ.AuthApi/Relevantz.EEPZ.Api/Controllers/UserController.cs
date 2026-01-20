@@ -2,6 +2,7 @@ using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.IService;
+using Relevantz.EEPZ.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -19,11 +20,7 @@ namespace Relevantz.EEPZ.Api.Controllers
     {
         private readonly IProfileService _profileService;
         private readonly IUserManagementService _userManagementService;
-        /// <summary>
-        /// Initializes a new instance of <see cref="UserController"/>.
-        /// </summary>
-        /// <param name="profileService">Service that handles user profile operations.</param>
-        /// <param name="userManagementService">Service that handles administrative user management operations.</param>
+
         public UserController(IProfileService profileService, IUserManagementService userManagementService)
         {
             _profileService = profileService;
@@ -32,12 +29,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         /// <summary>
         /// Gets the current logged-in user's profile.
         /// </summary>
-        /// <returns>
-        /// 200 OK with the profile data,  
-        /// 400 Bad Request if the lookup fails,  
-        /// 401 Unauthorized if the token is invalid,  
-        /// 500 Internal Server Error on unexpected errors.
-        /// </returns>
+        /// <returns>200 OK with profile, 400/401/500 on error</returns>
         [HttpGet("profile")]
         public async Task<IActionResult> GetMyProfile()
         {
@@ -46,7 +38,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
                 {
-                    return Unauthorized(new { success = false, message = "Invalid user token" });
+                    return Unauthorized(new { success = false, message = MessageConstants.InvalidUserToken });
                 }
                 var result = await _profileService.GetProfileByUserIdAsync(userId);
                 if (!result.Success)
@@ -57,25 +49,21 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { success = false, message = "An error occurred while fetching profile", error = ex.Message });
+                return StatusCode(500, new { success = false, message = MessageConstants.ErrorFetchingProfile, error = ex.Message });
             }
         }
         /// <summary>
-        /// Gets the profile for a specific user by ID (Admin/HR only).
+        /// Gets profile for specific user by ID (Admin/HR only).
         /// </summary>
-        /// <param name="userId">The user identifier to fetch profile for.</param>
-        /// <returns>
-        /// 200 OK with the profile data,  
-        /// 400 Bad Request if lookup fails,  
-        /// 500 Internal Server Error on unexpected errors.
-        /// </returns>
-        [HttpGet("profile/{userId}")]
+        /// <param name="Id">User identifier</param>
+        /// <returns>200 OK with profile, 400/500 on error</returns>
+        [HttpGet("profile/{Id}")]
         [Authorize(Roles = "Admin,HR")]
-        public async Task<IActionResult> GetProfileById(int userId)
+        public async Task<IActionResult> GetProfileById(int Id)
         {
             try
             {
-                var result = await _profileService.GetProfileByUserIdAsync(userId);
+                var result = await _profileService.GetProfileByUserIdAsync(Id);
                 if (!result.Success)
                 {
                     return BadRequest(result);
@@ -84,19 +72,14 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { success = false, message = "An error occurred while fetching profile", error = ex.Message });
+                return StatusCode(500, new { success = false, message = MessageConstants.ErrorFetchingProfile, error = ex.Message });
             }
         }
         /// <summary>
-        /// Updates the current user's profile.
+        /// Updates current user's profile.
         /// </summary>
-        /// <param name="request">The profile update payload.</param>
-        /// <returns>
-        /// 200 OK on success,  
-        /// 400 Bad Request if validation fails,  
-        /// 401 Unauthorized if the token is invalid,  
-        /// 500 Internal Server Error on unexpected errors.
-        /// </returns>
+        /// <param name="request">Profile update data</param>
+        /// <returns>200 OK on success, 400/401/500 on error</returns>
         [HttpPut("profile")]
         public async Task<IActionResult> UpdateMyProfile([FromBody] UpdateProfileRequestDto request)
         {
@@ -104,12 +87,12 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(new { success = false, message = "Invalid request data", errors = ModelState });
+                    return BadRequest(new { success = false, message = MessageConstants.InvalidRequestData, errors = ModelState });
                 }
                 var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
                 {
-                    return Unauthorized(new { success = false, message = "Invalid user token" });
+                    return Unauthorized(new { success = false, message = MessageConstants.InvalidUserToken });
                 }
                 var result = await _profileService.UpdateProfileAsync(userId, request);
                 if (!result.Success)
@@ -120,19 +103,14 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { success = false, message = "An error occurred while updating profile", error = ex.Message });
+                return StatusCode(500, new { success = false, message = MessageConstants.ErrorUpdatingProfile, error = ex.Message });
             }
         }
         /// <summary>
-        /// Uploads or updates the current user's profile photo.
+        /// Uploads/updates current user's profile photo (JPEG/PNG/GIF/WEBP, 5MB max).
         /// </summary>
-        /// <param name="ProfilePhoto">The image file (JPEG/PNG/GIF/WEBP) up to 5MB.</param>
-        /// <returns>
-        /// 200 OK on success,  
-        /// 400 Bad Request if file validation fails,  
-        /// 401 Unauthorized if the token is invalid,  
-        /// 500 Internal Server Error on unexpected errors.
-        /// </returns>
+        /// <param name="ProfilePhoto">Image file</param>
+        /// <returns>200 OK on success, 400/401/500 on error</returns>
         [HttpPut("profile/upload-photo")]
         public async Task<IActionResult> UploadProfilePhoto([FromForm] IFormFile ProfilePhoto)
         {
@@ -141,31 +119,27 @@ namespace Relevantz.EEPZ.Api.Controllers
                 var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
                 {
-                    return Unauthorized(new { success = false, message = "Invalid user token" });
+                    return Unauthorized(new { success = false, message = MessageConstants.InvalidUserToken });
                 }
-                // Validate file presence
+
                 if (ProfilePhoto == null || ProfilePhoto.Length == 0)
                 {
-                    return BadRequest(new { success = false, message = "No photo file provided" });
+                    return BadRequest(new { success = false, message = MessageConstants.NoPhotoProvided });
                 }
-                // Validate file type
+
                 var allowedTypes = new[] { "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp" };
                 if (!allowedTypes.Contains(ProfilePhoto.ContentType.ToLower()))
                 {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = "Invalid file type. Only JPEG, PNG, GIF, and WEBP images are allowed."
-                    });
+                    return BadRequest(new { success = false, message = MessageConstants.InvalidPhotoType });
                 }
-                // Validate file size (5MB max)
+
                 const long maxFileSize = 5 * 1024 * 1024;
                 if (ProfilePhoto.Length > maxFileSize)
                 {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = $"File size exceeds maximum limit of 5MB. Your file is {ProfilePhoto.Length / 1024 / 1024:F2}MB."
+                    return BadRequest(new 
+                    { 
+                        success = false, 
+                        message = $"{MessageConstants.PhotoTooLarge} Your file is {ProfilePhoto.Length / 1024 / 1024:F2}MB."
                     });
                 }
                 Console.WriteLine($"Photo upload for UserId: {userId}");
@@ -188,22 +162,14 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 Console.WriteLine($"Error uploading photo: {ex.Message}");
                 Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "An error occurred while uploading photo",
-                    error = ex.Message
-                });
+                return StatusCode(500, new { success = false, message = MessageConstants.ErrorUploadingPhoto, error = ex.Message });
             }
         }
         /// <summary>
-        /// Creates a new user (administrative operation).
+        /// Creates new user (Admin operation).
         /// </summary>
-        /// <param name="request">The user creation payload.</param>
-        /// <returns>
-        /// 200 OK on success,  
-        /// 400 Bad Request if creation fails.
-        /// </returns>
+        /// <param name="request">User creation data</param>
+        /// <returns>200 OK on success, 400 on error</returns>
         [HttpPost("create")]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserRequestDto request)
         {
@@ -214,13 +180,10 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(result);
         }
         /// <summary>
-        /// Updates an existing user (administrative operation).
+        /// Updates existing user (Admin operation).
         /// </summary>
-        /// <param name="request">The user update payload.</param>
-        /// <returns>
-        /// 200 OK on success,  
-        /// 400 Bad Request if update fails.
-        /// </returns>
+        /// <param name="request">User update data</param>
+        /// <returns>200 OK on success, 400 on error</returns>
         [HttpPut("update")]
         public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequestDto request)
         {
@@ -231,13 +194,10 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(result);
         }
         /// <summary>
-        /// Retrieves a user by identifier.
+        /// Gets user by identifier.
         /// </summary>
-        /// <param name="userId">The user identifier to query.</param>
-        /// <returns>
-        /// 200 OK with user data when found,  
-        /// 404 Not Found if the user does not exist.
-        /// </returns>
+        /// <param name="userId">User ID</param>
+        /// <returns>200 OK with user, 404 if not found</returns>
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetUserById(int userId)
         {
@@ -247,11 +207,9 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(result);
         }
         /// <summary>
-        /// Retrieves all users.
+        /// Gets all users.
         /// </summary>
-        /// <returns>
-        /// 200 OK with the full list of users.
-        /// </returns>
+        /// <returns>200 OK with users list</returns>
         [HttpGet("all")]
         public async Task<IActionResult> GetAllUsers()
         {
@@ -261,46 +219,34 @@ namespace Relevantz.EEPZ.Api.Controllers
         /// <summary>
         /// Deactivates a user.
         /// </summary>
-        /// <param name="userId">The identifier of the user to deactivate.</param>
-        /// <returns>
-        /// 200 OK on success,  
-        /// 400 Bad Request if the operation fails.
-        /// </returns>
-        [HttpPost("deactivate/{userId}")]
-        public async Task<IActionResult> DeactivateUser(int userId)
+        /// <param name="userId">User ID to deactivate</param>
+        /// <returns>200 OK on success, 400 on error</returns>
+        [HttpPost("deactivate/{Id}")]
+        public async Task<IActionResult> DeactivateUser(int Id)
         {
-            var result = await _userManagementService.DeactivateUserAsync(userId);
+            var result = await _userManagementService.DeactivateUserAsync(Id);
             if (!result.Success)
                 return BadRequest(result);
             return Ok(result);
         }
         /// <summary>
-        /// Activates a previously deactivated user.
+        /// Activates a deactivated user.
         /// </summary>
-        /// <param name="userId">The identifier of the user to activate.</param>
-        /// <returns>
-        /// 200 OK on success,  
-        /// 400 Bad Request if the operation fails.
-        /// </returns>
-        [HttpPost("activate/{userId}")]
-        public async Task<IActionResult> ActivateUser(int userId)
+        /// <param name="userId">User ID to activate</param>
+        /// <returns>200 OK on success, 400 on error</returns>
+        [HttpPost("activate/{Id}")]
+        public async Task<IActionResult> ActivateUser(int Id)
         {
-            var result = await _userManagementService.ActivateUserAsync(userId);
+            var result = await _userManagementService.ActivateUserAsync(Id);
             if (!result.Success)
                 return BadRequest(result);
             return Ok(result);
         }
         /// <summary>
-        /// Retrieves employees who report to the specified manager. 
-        /// Access is limited to the manager themselves, HR, or Admin.
+        /// Gets employees reporting to manager (Manager/HR/Admin only).
         /// </summary>
-        /// <param name="managerId">The manager's user identifier.</param>
-        /// <returns>
-        /// 200 OK with the list of employees,  
-        /// 403 Forbid if the caller is not allowed,  
-        /// 404 Not Found if no records are found,  
-        /// 500 Internal Server Error on unexpected errors.
-        /// </returns>
+        /// <param name="managerId">Manager user ID</param>
+        /// <returns>200 OK with employees, 403/404/500 on error</returns>
         [HttpGet("manager/{managerId}/employees")]
         public async Task<IActionResult> GetEmployeesByManager(int managerId)
         {
@@ -310,7 +256,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
                 if (userRole != "HR" && userRole != "Admin" && currentUserId != managerId)
                 {
-                    return Forbid("You can only view your own employees");
+                    return Forbid(MessageConstants.ManagerForbidden);
                 }
                 var result = await _userManagementService.GetEmployeesByManagerAsync(managerId);
                 if (!result.Success)
@@ -319,17 +265,14 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ex.Message });
+                return StatusCode(500, new { message = MessageConstants.ErrorFetchingProfile });
             }
         }
         /// <summary>
-        /// Assigns a role and department to a user.
+        /// Assigns role and department to user.
         /// </summary>
-        /// <param name="request">The assignment payload containing user, role, and department details.</param>
-        /// <returns>
-        /// 200 OK on success,  
-        /// 400 Bad Request if the assignment fails.
-        /// </returns>
+        /// <param name="request">Assignment data</param>
+        /// <returns>200 OK on success, 400 on error</returns>
         [HttpPost("assign-role-department")]
         public async Task<IActionResult> AssignRoleAndDepartment([FromBody] AssignRoleDepartmentRequestDto request)
         {
@@ -339,12 +282,9 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(result);
         }
         /// <summary>
-        /// Gets the next available employee company ID (Admin/HR only).
+        /// Gets next available employee company ID (Admin/HR only).
         /// </summary>
-        /// <returns>
-        /// 200 OK with the next ID in the response,  
-        /// 500 Internal Server Error if generation fails.
-        /// </returns>
+        /// <returns>200 OK with next ID, 500 on error</returns>
         [HttpGet("next-employee-id")]
         [Authorize(Roles = "Admin,HR")]
         public async Task<IActionResult> GetNextEmployeeCompanyId()
@@ -356,7 +296,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 {
                     success = true,
                     data = nextId,
-                    message = "Next Employee ID retrieved successfully"
+                    message = MessageConstants.NextEmpIdSuccess
                 });
             }
             catch (Exception ex)
@@ -364,7 +304,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new
                 {
                     success = false,
-                    message = "Failed to generate Employee ID",
+                    message = MessageConstants.NextEmpIdError,
                     error = ex.Message
                 });
             }

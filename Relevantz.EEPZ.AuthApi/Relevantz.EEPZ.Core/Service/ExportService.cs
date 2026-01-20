@@ -4,6 +4,7 @@ using Relevantz.EEPZ.Common.Utils;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
+using Relevantz.EEPZ.Common.Constants;
 
 namespace Relevantz.EEPZ.Core.Service
 {

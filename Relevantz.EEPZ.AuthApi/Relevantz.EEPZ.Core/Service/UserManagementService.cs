@@ -4,6 +4,7 @@ using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Data.IRepository;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Common.Utils;
+using Relevantz.EEPZ.Common.Constants;
 
 namespace Relevantz.EEPZ.Core.Service
 {

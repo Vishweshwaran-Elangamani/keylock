@@ -5,6 +5,7 @@ using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Common.Entities;
 using Microsoft.Extensions.Logging;
+using Relevantz.EEPZ.Common.Constants;
 
 namespace Relevantz.EEPZ.Core.Service
 {

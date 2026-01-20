@@ -6,6 +6,8 @@ using Relevantz.EEPZ.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Relevantz.EEPZ.Common.Constants;
+
 namespace Relevantz.EEPZ.Api.Controllers
 {
     /// <summary>
@@ -42,7 +44,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {
-            var maskedEmail = MaskEmail(request.Email);
+            var maskedEmail = EmailMaskingUtil.MaskEmail(request.Email);
             _logger.LogInformation("Login attempt initiated for {MaskedEmail}", maskedEmail);
             try
             {
@@ -83,7 +85,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpPost("verify-otp")]
         public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequestDto request)
         {
-            var maskedEmail = MaskEmail(request.Email);
+            var maskedEmail = EmailMaskingUtil.MaskEmail(request.Email);
             _logger.LogInformation("OTP verification attempt for {MaskedEmail}", maskedEmail);
             try
             {
@@ -121,7 +123,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto request)
         {
-            var maskedEmail = MaskEmail(request.Email);
+            var maskedEmail = EmailMaskingUtil.MaskEmail(request.Email);
             _logger.LogInformation("Password reset requested for {MaskedEmail}", maskedEmail);
             try
             {
@@ -162,7 +164,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto request)
         {
-            var maskedEmail = MaskEmail(request.Email);
+            var maskedEmail = EmailMaskingUtil.MaskEmail(request.Email);
             _logger.LogInformation("Password reset confirmation for {MaskedEmail}", maskedEmail);
             try
             {
@@ -271,23 +273,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 _logger.LogError(ex, "Logout exception occurred");
                 return StatusCode(500, new { success = false, message = "An error occurred during logout" });
             }
-        }
-        /// <summary>
-        /// Masks the local-part of an email address for logging purposes.
-        /// </summary>
-        /// <param name="email">The email address to mask.</param>
-        /// <returns>A masked email string preserving the domain.</returns>
-        private static string MaskEmail(string email)
-        {
-            if (string.IsNullOrWhiteSpace(email) || !email.Contains('@'))
-                return "***@***.***";
-            var parts = email.Split('@');
-            var username = parts[0];
-            var domain = parts[1];
-            var maskedUsername = username.Length > 2
-                ? username.Substring(0, 2) + new string('*', Math.Min(username.Length - 2, 5))
-                : new string('*', username.Length);
-            return $"{maskedUsername}@{domain}";
         }
     }
 }
