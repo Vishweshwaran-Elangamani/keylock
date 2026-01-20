@@ -1,24 +1,34 @@
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Relevantz.EEPZ.Core.Services.Implementations;
-using Relevantz.EEPZ.Core.Services.Interfaces;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Serilog;
+
+using Relevantz.EEPZ.Common.Configuration;
+using Relevantz.EEPZ.Data.DBContexts;
+
+// Repository interfaces & implementations
+using Relevantz.EEPZ.Data.Repository.Interfaces;
+using Relevantz.EEPZ.Data.Repository.Implementations;
+
+// Service interfaces & implementations
+using Relevantz.EEPZ.Core.Services.Interfaces;
+using Relevantz.EEPZ.Core.Services.Implementations;
+
+// File storage
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Core.Service;
-using Relevantz.EEPZ.Data.DBContexts;
-using System.IdentityModel.Tokens.Jwt;
-using Serilog;
-using Relevantz.EEPZ.Common.Configuration;
+
 var builder = WebApplication.CreateBuilder(args);
 
-var sharedUploadsPath = Path.GetFullPath(Path.Combine(
-    Directory.GetCurrentDirectory(), 
-    "..", "..", 
-    "SharedUploads"
-));
+// ==========================================================================
+// FILE UPLOAD DIRECTORY
+// ==========================================================================
+var sharedUploadsPath = Path.Combine(builder.Environment.ContentRootPath, "SharedUploads");
 
 if (!Directory.Exists(sharedUploadsPath))
 {
@@ -32,9 +42,18 @@ else
 
 builder.Services.AddSingleton(new FileUploadSettings { UploadPath = sharedUploadsPath });
 
+// ==========================================================================
+// SERILOG CONFIGURATION (DATE IN FILENAME ADDED AS REQUESTED)
+// ==========================================================================
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
+    .WriteTo.File(
+        path: $"Logs/log-{DateTime.Now:yyyy-MM-dd}.txt",   // <--- DATE INCLUDED IN FILENAME
+        rollingInterval: RollingInterval.Infinite,
+        retainedFileCountLimit: 30,
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
+    )
     .CreateLogger();
 
 builder.Host.UseSerilog();
@@ -42,6 +61,9 @@ builder.Host.UseSerilog();
 Log.Information("Starting EEPZ Performance Management Application...");
 Log.Information("Shared Uploads Path: {Path}", sharedUploadsPath);
 
+// ==========================================================================
+// CONTROLLERS + SWAGGER
+// ==========================================================================
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
@@ -61,7 +83,7 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Enter 'Bearer' followed by your JWT token"
+        Description = "Enter 'Bearer <token>'"
     });
 
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -69,35 +91,30 @@ builder.Services.AddSwaggerGen(options =>
         {
             new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
             },
             Array.Empty<string>()
         }
     });
 
-    options.CustomSchemaIds(type => type.FullName.Replace("+", "."));
+    options.CustomSchemaIds(t => t.FullName.Replace("+", "."));
 });
 
+// ==========================================================================
+// DATABASE
+// ==========================================================================
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
 builder.Services.AddDbContext<EEPZDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
+// ==========================================================================
+// JWT AUTHENTICATION SETUP
+// ==========================================================================
 var jwtSettings = builder.Configuration.GetSection("Jwt");
-var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey not configured");
+var secretKey = jwtSettings["SecretKey"] ?? throw new Exception("JWT SecretKey missing");
 
-Log.Information("JWT Issuer: {Issuer}", jwtSettings["Issuer"]);
-Log.Information("JWT Audience: {Audience}", jwtSettings["Audience"]);
-Log.Information("JWT SecretKey Length: {Length} characters", secretKey.Length);
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
@@ -113,64 +130,50 @@ builder.Services.AddAuthentication(options =>
         RoleClaimType = ClaimTypes.Role,
         NameClaimType = JwtRegisteredClaimNames.Sub
     };
+
     options.Events = new JwtBearerEvents
     {
         OnMessageReceived = context =>
         {
             var authHeader = context.Request.Headers["Authorization"].ToString();
+
             if (!string.IsNullOrEmpty(authHeader))
             {
                 var token = authHeader.Replace("Bearer ", "");
-                Log.Debug("Token received (first 30 chars): {Token}...", token.Substring(0, Math.Min(30, token.Length)));
+
+                if (token.Length >= 4)
+                    Log.Debug("Token received (...{Last4})", token[^4..]);
+                else
+                    Log.Debug("Token received (too short to log)");
             }
             else
             {
                 Log.Warning("No Authorization header found");
             }
+
             return Task.CompletedTask;
         },
-        
+
         OnAuthenticationFailed = context =>
         {
             Log.Error("Authentication failed: {Message}", context.Exception.Message);
-            
-            if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
-            {
-                Log.Warning("Token expired");
+
+            if (context.Exception is SecurityTokenExpiredException)
                 context.Response.Headers.Add("Token-Expired", "true");
-            }
-            else if (context.Exception.Message.Contains("signature"))
-            {
-                Log.Error("Signature validation failed - Check JWT SecretKey!");
-            }
-            
+
             return Task.CompletedTask;
         },
-        
+
         OnTokenValidated = context =>
         {
             Log.Information("Token validated successfully");
-            
-            var claims = context.Principal?.Claims.Select(c => $"{c.Type}={c.Value}");
-            Log.Debug("All Claims: {Claims}", string.Join(" | ", claims ?? new List<string>()));
-            
+
             var roleClaim = context.Principal?.FindFirst(ClaimTypes.Role);
-            
             if (roleClaim != null)
-            {
                 Log.Information("Role found: {Role}", roleClaim.Value);
-            }
             else
-            {
-                Log.Warning("No role claim found in token");
-            }
-            
-            return Task.CompletedTask;
-        },
-        
-        OnChallenge = context =>
-        {
-            Log.Warning("Authentication Challenge: {Error} - {ErrorDescription}", context.Error, context.ErrorDescription);
+                Log.Warning("No role claim found");
+
             return Task.CompletedTask;
         }
     };
@@ -178,45 +181,31 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
+// ==========================================================================
+// DEPENDENCY INJECTION
+// ==========================================================================
+
+// Repositories
+builder.Services.AddScoped<IAssessmentDetailsRepository, AssessmentDetailsRepository>();
+builder.Services.AddScoped<IAssignmentsRepository, AssignmentsRepository>();
+builder.Services.AddScoped<IFormManagementRepository, FormManagementRepository>();
+builder.Services.AddScoped<IFormProgressTrackerRepository, FormProgressTrackerRepository>();
+builder.Services.AddScoped<ISelfAssessmentRepository, SelfAssessmentRepository>();
+
+// Services
+builder.Services.AddScoped<IAssessmentDetailsService, AssessmentDetailsService>();
+builder.Services.AddScoped<IAssignmentsService, AssignmentsService>();
 builder.Services.AddScoped<IFormManagementService, FormManagementService>();
-
+builder.Services.AddScoped<IFormProgressTrackerService, FormProgressTrackerService>();
 builder.Services.AddScoped<ISelfAssessmentService, SelfAssessmentService>();
-builder.Services.AddScoped<Relevantz.EEPZ.Data.Repository.Interfaces.IAssessmentDetailsRepository,
-                           Relevantz.EEPZ.Data.Repository.Implementations.AssessmentDetailsRepository>();
 
-builder.Services.AddScoped<Relevantz.EEPZ.Core.Services.Interfaces.IAssessmentDetailsService,
-                           Relevantz.EEPZ.Core.Services.Implementations.AssessmentDetailsService>();
-
-
-builder.Services.AddScoped<Relevantz.EEPZ.Data.Repository.Interfaces.IAssignmentsRepository,
-                           Relevantz.EEPZ.Data.Repository.Implementations.AssignmentsRepository>();
-
-builder.Services.AddScoped<Relevantz.EEPZ.Core.Services.Interfaces.IAssignmentsService,
-                           Relevantz.EEPZ.Core.Services.Implementations.AssignmentsService>();
-
-builder.Services.AddScoped<Relevantz.EEPZ.Data.Repository.Interfaces.IFormProgressTrackerRepository,
-                           Relevantz.EEPZ.Data.Repository.Implementations.FormProgressTrackerRepository>();
-
-builder.Services.AddScoped<Relevantz.EEPZ.Core.Services.Interfaces.IFormProgressTrackerService,
-                           Relevantz.EEPZ.Core.Services.Implementations.FormProgressTrackerService>();
-
-builder.Services.AddScoped<Relevantz.EEPZ.Data.Repository.Interfaces.IFormManagementRepository,
-                           Relevantz.EEPZ.Data.Repository.Implementations.FormManagementRepository>();
-
-builder.Services.AddScoped<Relevantz.EEPZ.Core.Services.Interfaces.IFormManagementService,
-                           Relevantz.EEPZ.Core.Services.Implementations.FormManagementService>();
-
-builder.Services.AddScoped<Relevantz.EEPZ.Data.Repository.Interfaces.ISelfAssessmentRepository,
-                           Relevantz.EEPZ.Data.Repository.Implementations.SelfAssessmentRepository>();
-
-builder.Services.AddScoped<Relevantz.EEPZ.Core.Services.Interfaces.ISelfAssessmentService,
-                           Relevantz.EEPZ.Core.Services.Implementations.SelfAssessmentService>();
-builder.Services.Configure<MongoDbSettings>(
-    builder.Configuration.GetSection("MongoDbSettings"));
-
-// Register File Storage Service (Singleton - MongoDB connection is thread-safe)
+// File storage (MongoDB)
+builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDbSettings"));
 builder.Services.AddSingleton<IFileStorageService, FileStorageService>();
 
+// ==========================================================================
+// CORS
+// ==========================================================================
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -228,6 +217,9 @@ builder.Services.AddCors(options =>
     });
 });
 
+// ==========================================================================
+// BUILD & RUN APP
+// ==========================================================================
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -235,27 +227,22 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "EEPZ Performance API v1");
-        c.RoutePrefix = string.Empty;
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "EEPZ API v1");
+        c.RoutePrefix = "";
     });
 }
-app.UseSerilogRequestLogging(options =>
-{
-    options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
-    options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
-    {
-        diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value);
-        diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
-    };
-});
+
+app.UseSerilogRequestLogging();
+
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
 try
 {
-    Log.Information("EEPZ Performance Management API started successfully on port 5108");
+    Log.Information("EEPZ Performance Management API started successfully");
     app.Run();
 }
 catch (Exception ex)
