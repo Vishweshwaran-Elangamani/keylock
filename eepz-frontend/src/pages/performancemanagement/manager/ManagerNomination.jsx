@@ -276,7 +276,7 @@ export default function ManagerNomination() {
             <thead>
               <tr>
                 <th className="col-index">
-                  <i className="bi bi-hash"></i> SNO
+                  SNO
                 </th>
                 <th className="col-name">
                   <i className="bi bi-person"></i> Name

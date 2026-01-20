@@ -24,9 +24,7 @@ body {
   background: var(--bg);
 }
 
-/* ========================================
-   PAGE LAYOUT
-   ======================================== */
+
 
 .mn-page {
   min-height: 100vh;
@@ -34,9 +32,6 @@ body {
   background: linear-gradient(135deg, #f8f9fc 0%, #f0f2f8 100%);
 }
 
-/* ========================================
-   STATISTICS CARDS
-   ======================================== */
 
 .mn-stats-grid {
   display: grid;
@@ -152,9 +147,8 @@ body {
   letter-spacing: 0.5px;
 }
 
-/* ========================================
-   CONTENT CARD
-   ======================================== */
+
+
 
 .mn-content {
   background: rgba(255, 255, 255, 0.98);
@@ -184,9 +178,7 @@ body {
   }
 }
 
-/* ========================================
-   SECTION HEADER - FIXED ALIGNMENT
-   ======================================== */
+
 
 .mn-section-header {
   display: flex;
@@ -305,9 +297,7 @@ body {
   transform: translateX(-2px);
 }
 
-/* ========================================
-   TAB BAR
-   ======================================== */
+
 
 .mn-tabs-bar {
   display: flex;
@@ -376,9 +366,6 @@ body {
   color: #27235c;
 }
 
-/* ========================================
-   TABLE STYLES
-   ======================================== */
 
 .mn-table-wrapper {
   overflow-x: auto;
@@ -476,7 +463,6 @@ body {
   text-align: left;
 }
 
-/* Employee Cell with Avatar */
 .mn-employee-cell {
   display: flex;
   align-items: center;
@@ -503,9 +489,6 @@ body {
   color: var(--text);
 }
 
-/* ========================================
-   BADGES
-   ======================================== */
 
 .mn-days-badge {
   display: inline-flex;
@@ -568,9 +551,6 @@ body {
   transform: scale(1.05);
 }
 
-/* ========================================
-   BUTTONS
-   ======================================== */
 
 .mn-bulk-btn {
   background: var(--action-grad);
@@ -606,9 +586,6 @@ body {
   outline: none;
 }
 
-/* ========================================
-   EMPTY STATE
-   ======================================== */
 
 .mn-empty-row {
   padding: 0;
@@ -643,9 +620,7 @@ body {
   margin: 0;
 }
 
-/* ========================================
-   PAGINATION STYLES
-   ======================================== */
+
 
 .mn-pagination-container {
   display: flex;
@@ -753,10 +728,6 @@ body {
   font-size: 12px;
   font-weight: 900;
 }
-
-/* ========================================
-   CUSTOM PAGINATION DROPDOWN
-   ======================================== */
 
 .custom-mn-pagination-dropdown {
   min-width: 70px !important;
@@ -904,9 +875,6 @@ body {
   color: white;
 }
 
-/* ========================================
-   RESPONSIVE DESIGN
-   ======================================== */
 
 @media (max-width: 1024px) {
   .mn-content {

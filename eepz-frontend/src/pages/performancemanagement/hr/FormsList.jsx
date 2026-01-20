@@ -200,7 +200,6 @@ function FormsList() {
     }
   }, []);
 
-  // eligible users for selected form
   useEffect(() => {
     if (!selectedFormId) {
       setUsers([]);
@@ -227,7 +226,6 @@ function FormsList() {
             ? managersRes.data.data
             : [];
         } else {
-          // NOTE: pass formId so backend returns only still-eligible users
           const usersRes = await api.get(
             `/Assignments/upcoming-eligible?formId=${selectedFormId}`
           );
@@ -251,7 +249,6 @@ function FormsList() {
           return role !== "HR" && role !== "ADMIN";
         });
 
-        // remove creator and already assigned
         filteredUsersData = filteredUsersData.filter(
           (u) =>
             u.userId !== creatorId &&

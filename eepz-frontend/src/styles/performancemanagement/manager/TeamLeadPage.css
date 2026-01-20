@@ -101,10 +101,6 @@ body {
   margin-right: 0;
 }
 
-/* ========================================
-   STATISTICS CARDS
-   ======================================== */
-
 .tl-stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -156,16 +152,6 @@ body {
   opacity: 0;
   transition: opacity 0.3s ease;
 }
-
-/* .tl-stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(39, 35, 92, 0.15);
-  border-color: rgba(39, 35, 92, 0.1);
-}
-
-.tl-stat-card:hover::before {
-  opacity: 1;
-} */
 
 .tl-stat-icon {
   width: 56px;
@@ -223,8 +209,6 @@ body {
   letter-spacing: 0.5px;
 }
 
-/* ======================================== */
-
 .cg-filter-section,
 .cg-filter-section * {
   display: none !important;
@@ -252,31 +236,31 @@ body {
   padding: 6px 8px;
   background: #27235c;
   border: 2px solid #27235c;
-  border-radius: 40px;  /* More rounded for pill effect */
+  border-radius: 40px;  
   margin-bottom: 20px;
   align-items: center;
-  justify-content: center;  /* CENTER THE TABS */
+  justify-content: center;  
   box-shadow: 0 4px 12px rgba(39, 35, 92, 0.12);
-  width: fit-content;  /* Shrink to content width */
-  margin-left: auto;  /* Center horizontally */
-  margin-right: auto;  /* Center horizontally */
-  max-width: 100%;  /* Prevent overflow */
+  width: fit-content; 
+  margin-left: auto;  
+  margin-right: auto;  
+  max-width: 100%;  
 }
 
 .tl-tab {
-  padding: 8px 16px;  /* Compact padding */
+  padding: 8px 16px;  
   font-weight: 700;
   background: transparent;
   border: none;
   color: #ffffff;
   cursor: pointer;
-  border-radius: 999px;  /* Full pill shape */
-  font-size: 11px;  /* Slightly smaller for compactness */
+  border-radius: 999px;  
+  font-size: 11px;  
   transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  white-space: nowrap;  /* Prevent text wrapping */
+  white-space: nowrap;  
 }
 
 .tl-tab i {
@@ -307,7 +291,7 @@ body {
   font-size: 10px;
   font-weight: 700;
   padding: 0 5px;
-  margin-left: 4px;  /* Tighter spacing */
+  margin-left: 4px;  
 }
 
 .tl-tab.active .tl-count {
@@ -315,19 +299,18 @@ body {
   color: #27235c;
 }
 
-/* Responsive adjustments for compact tabs */
 @media (max-width: 768px) {
   .tl-tabs-bar {
-    width: 100%;  /* Full width on mobile */
-    justify-content: flex-start;  /* Left align on mobile */
-    overflow-x: auto;  /* Allow horizontal scroll */
-    flex-wrap: nowrap;  /* Keep in single row */
+    width: 100%;  
+    justify-content: flex-start;  
+    overflow-x: auto;  
+    flex-wrap: nowrap; 
   }
 
   .tl-tab {
     padding: 6px 12px;
     font-size: 10px;
-    flex-shrink: 0;  /* Prevent shrinking */
+    flex-shrink: 0;  
   }
 
   .tl-count {
@@ -342,7 +325,6 @@ body {
     padding: 6px 10px;
   }
 
-  /* Optional: Hide icon on very small screens for more space */
   .tl-tab i {
     display: none;
   }
@@ -388,10 +370,6 @@ body {
   color: var(--text-light);
   margin: 0;
 }
-
-/* ========================================
-   TABLE STYLES
-   ======================================== */
 
 .tl-table-wrapper {
   overflow-x: auto;
@@ -451,7 +429,6 @@ body {
   vertical-align: middle;
 }
 
-/* Employee Cell with Avatar */
 .tl-employee-cell {
   display: flex;
   align-items: center;
@@ -477,8 +454,6 @@ body {
   font-weight: 600;
   color: var(--text);
 }
-
-/* ======================================== */
 
 .cg-days-badge {
   display: inline-flex;
@@ -620,10 +595,6 @@ body {
   box-shadow: 0 1px 3px rgba(39, 35, 92, 0.2);
 }
 
-/* ========================================
-   PAGINATION STYLES
-   ======================================== */
-
 .pagination-container {
   display: flex;
   justify-content: space-between;
@@ -733,7 +704,6 @@ body {
   font-weight: 900;
 }
 
-/* Ellipsis styling */
 .page-item.disabled .page-link {
   border: none;
   background: transparent;
@@ -742,9 +712,6 @@ body {
   font-weight: 700;
 }
 
-/* ========================================
-   CUSTOM PAGINATION DROPDOWN
-   ======================================== */
 
 .custom-tl-pagination-dropdown {
   min-width: 70px !important;
@@ -755,7 +722,7 @@ body {
   border-radius: 6px;
   user-select: none;
   height: 36px;
-  overflow: hidden !important;  /* ✅ ADD THIS */
+  overflow: hidden !important;  
   z-index: 1;
 }
 
@@ -763,9 +730,9 @@ body {
   min-width: 70px !important;
   max-width: 70px !important;
   width: 70px !important;
-  padding: 0.3rem 0.6rem !important;  /* ✅ SMALLER padding */
+  padding: 0.3rem 0.6rem !important; 
   height: 36px !important;
-  font-size: 0.7rem !important;       /* ✅ SMALLER font */
+  font-size: 0.7rem !important;      
   text-align: center !important;
   display: flex;
   align-items: center;
@@ -779,9 +746,9 @@ body {
   font-weight: 600;
   color: #27235c;
   transition: all 0.2s ease;
-  box-sizing: border-box !important;  /* ✅ CRITICAL */
+  box-sizing: border-box !important; 
   line-height: 1.1 !important;
-  overflow: hidden !important;        /* ✅ HIDE overflow */
+  overflow: hidden !important;        
 }
 
 
@@ -793,10 +760,10 @@ body {
 
 .custom-tl-arrow {
   position: absolute;
-  right: 0.2rem !important;  /* ✅ CLOSER to edge */
+  right: 0.2rem !important;  
   top: 50%;
   transform: translateY(-50%) rotate(-135deg) !important;
-  width: 4px !important;     /* ✅ SMALLER arrow */
+  width: 4px !important;    
   height: 4px !important;
   border-right: 1.2px solid #6c757d;
   border-bottom: 1.2px solid #6c757d;
@@ -860,15 +827,15 @@ body {
 }
 
 .custom-tl-option {
-  padding: 0.3rem 0.3rem !important;  /* ✅ SMALLER */
-  font-size: 0.7rem !important;      /* ✅ SMALLER */
+  padding: 0.3rem 0.3rem !important; 
+  font-size: 0.7rem !important;  
   text-align: center !important;
   cursor: pointer;
   user-select: none;
   color: #27235c;
   transition: all 0.15s ease;
   border-bottom: 1px solid #f3f4f6;
-  white-space: nowrap !important;    /* ✅ NO WRAP */
+  white-space: nowrap !important;    
   overflow: hidden !important;
 }
 
@@ -899,8 +866,6 @@ body {
   background: #27235c;
   color: white;
 }
-
-/* ======================================== */
 
 .tl-modal-overlay {
   position: fixed;
@@ -1261,10 +1226,6 @@ body {
   margin-top: 8px;
   margin-bottom: 12px;
 }
-
-/* ========================================
-   RESPONSIVE DESIGN
-   ======================================== */
 
 @media (max-width: 1024px) {
   .hrfcper-top-bar {

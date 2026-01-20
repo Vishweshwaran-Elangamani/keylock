@@ -15,10 +15,6 @@
   --manevap-info: #3b82f6;
 }
 
-/* ========================================
-   STATISTICS CARDS
-   ======================================== */
-
 .mgr-stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -272,10 +268,6 @@
   text-align: left;
 }
 
-/* ========================================
-   ENHANCED PILL TOGGLE
-   ======================================== */
-
 .mgrdash-pill-toggle {
   display: flex;
   justify-content: center;
@@ -470,9 +462,6 @@
   opacity: 0.5;
 }
 
-/* ========================================
-   ENHANCED EMPTY STATE
-   ======================================== */
 
 .manevap-empty-state {
   text-align: center;
@@ -739,9 +728,6 @@
   outline-offset: 2px;
 }
 
-/* ========================================
-   PAGINATION
-   ======================================== */
 
 .manevap-pagination-container {
   overflow: visible;
@@ -979,9 +965,6 @@
   color: white;
 }
 
-/* ========================================
-   MODAL
-   ======================================== */
 
 .manevap-modal-overlay {
   position: fixed;
@@ -1415,10 +1398,6 @@
   outline: 2px solid var(--manevap-blue);
   outline-offset: 2px;
 }
-
-/* ========================================
-   RESPONSIVE DESIGN
-   ======================================== */
 
 @media (max-width: 768px) {
   .manevap-container {

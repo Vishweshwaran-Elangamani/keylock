@@ -63,7 +63,6 @@ export default function Nominations() {
         setNominations(response.data.data || []);
         setShowConfetti(true);
 
-        // Set the first nomination as selected by default
         if (response.data.data && response.data.data.length > 0) {
           setSelectedNomination(response.data.data[0]);
         }
@@ -80,7 +79,6 @@ export default function Nominations() {
     }
   };
 
-  // Handle nomination card click from navbar
   useEffect(() => {
     if (location.state?.selectedNomination) {
       setSelectedNomination(location.state.selectedNomination);

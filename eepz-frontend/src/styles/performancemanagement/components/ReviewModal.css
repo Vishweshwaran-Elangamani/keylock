@@ -193,7 +193,6 @@
   text-align: center !important;
 }
 
-/* Column Width Adjustments - PROPERLY BALANCED */
 .tl-modal-table th:nth-child(1),
 .tl-modal-table td:nth-child(1) {
   width: 220px;
@@ -201,7 +200,6 @@
   max-width: 220px;
 }
 
-/* EMP RATING column */
 .tl-modal-table th:nth-child(2),
 .tl-modal-table td:nth-child(2) {
   width: 110px;
@@ -210,14 +208,12 @@
   text-align: center !important;
 }
 
-/* EMP COMMENTS column */
 .tl-modal-table th:nth-child(3),
 .tl-modal-table td:nth-child(3) {
   width: 280px;
   min-width: 280px;
 }
 
-/* L1 RATING column */
 .tl-modal-table th:nth-child(4),
 .tl-modal-table td:nth-child(4) {
   width: 130px;
@@ -228,14 +224,12 @@
   padding-right: 8px !important;
 }
 
-/* L1 COMMENTS column */
 .tl-modal-table th:nth-child(5),
 .tl-modal-table td:nth-child(5) {
   width: auto;
   min-width: 300px;
 }
 
-/* Custom Rating Dropdown - FIXED to match trigger width */
 .tl-custom-rating-dropdown {
   width: 110px !important;
   position: relative;
@@ -373,7 +367,6 @@
   color: white;
 }
 
-/* Manager Comments Textarea */
 .tl-input-text {
   width: 100%;
   max-width: 100%;

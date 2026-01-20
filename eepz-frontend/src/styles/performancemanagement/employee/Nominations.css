@@ -82,7 +82,6 @@
   margin: 0 auto;
 }
 
-/* Decorative Shield Icon */
 .nom-decorative-bg-1 {
   position: absolute;
   top: -30px;
@@ -98,7 +97,6 @@
   animation: bounce 3s ease-in-out infinite;
 }
 
-/* Main Award Card */
 .nom-main-card {
   position: relative;
   z-index: 1;
@@ -112,7 +110,6 @@
   overflow: visible;
 }
 
-/* Floating Star Icons */
 .nom-main-card::before,
 .nom-main-card::after {
   content: "";
@@ -141,7 +138,6 @@
   animation: pulse 5s ease-in-out infinite;
 }
 
-/* Content Grid - Compact Vertical */
 .nom-card-grid {
   display: flex;
   flex-direction: column;
@@ -224,7 +220,6 @@
   animation: twinkle 3s ease-in-out infinite 0.5s;
 }
 
-/* Label - Compact */
 .nom-label {
   display: inline-flex;
   align-items: center;
@@ -246,7 +241,6 @@
   font-size: 12px;
 }
 
-/* Title - Compact */
 .nom-title {
   font-size: 38px;
   font-weight: 900;
@@ -259,7 +253,6 @@
   display: inline-block;
 }
 
-/* Subtitle - Compact */
 .nom-subtitle {
   font-size: 15px;
   color: #666666;

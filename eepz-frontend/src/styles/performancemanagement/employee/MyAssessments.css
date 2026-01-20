@@ -787,25 +787,25 @@
 }
 
 .empass-form-header {
-  position: relative;  /* ADD THIS */
+  position: relative;  
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 16px 24px;  /* UPDATED padding */
+  padding: 16px 24px;  
   background: var(--card);
-  border-bottom: 2px solid #27235c;  /* MATCH reference */
+  border-bottom: 2px solid #27235c; 
   flex-shrink: 0;
   min-height: auto;
   position: relative;
 }
 .empass-modal-close {
   position: absolute;
-  top: 20px;        /* Same as view-details */
-  right: 28px;      /* Same as view-details */
+  top: 20px;        
+  right: 28px;      
   background: transparent !important;
   border: none !important;
-  color: #6c757d;   /* Your theme color */
-  font-size: 24px;  /* Slightly smaller than 32px */
+  color: #6c757d;   
+  font-size: 24px;  
   font-weight: 300;
   line-height: 1;
   cursor: pointer;
@@ -816,7 +816,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 4px;
-  transition: all 0.2s ease;  /* Same transition */
+  transition: all 0.2s ease; 
   opacity: 0.8;
   outline: none !important;
   box-shadow: none !important;
@@ -825,8 +825,8 @@
 .empass-modal-close:hover {
   opacity: 1 !important;
   background: rgba(255, 255, 255, 0.1) !important;
-  transform: rotate(90deg) !important;  /* EXACT SAME ROTATE */
-  color: #27235c !important;            /* Your theme color */
+  transform: rotate(90deg) !important; 
+  color: #27235c !important;            
   outline: none !important;
   box-shadow: none !important;
 }
@@ -841,7 +841,7 @@
 
 .empass-modal-close:active {
   background: rgba(255, 255, 255, 0.2) !important;
-  transform: rotate(90deg) !important;  /* ROTATE ON CLICK TOO */
+  transform: rotate(90deg) !important; 
   color: #27235c !important;
   outline: none !important;
   box-shadow: none !important;
@@ -850,14 +850,14 @@
 .empass-modal-close:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  transform: none !important;  /* No rotate when disabled */
+  transform: none !important; 
 }
 
 
 .empass-logo-section {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;  /* Changed from center */
+  align-items: flex-start;  
   gap: 2px;
   flex-shrink: 0;
   justify-content: center;
@@ -887,7 +887,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin-right: 80px;  /* Reduced from 100px to make space */
+  margin-right: 80px; 
 }
 
 .empass-form-title {
@@ -1113,7 +1113,7 @@
   color: white;
 }
 
-/* Read-only rating display */
+
 .empass-read-only-text {
   padding: 6px 10px;
   background: #f3f4f6;
@@ -1126,12 +1126,10 @@
   text-align: center;
 }
 
-/* Table cell for perfect centering */
 .empass-rating-cell {
   text-align: center !important;
 }
 
-/* Remove old select styling */
 .empass-form-select {
   display: none !important;
 }

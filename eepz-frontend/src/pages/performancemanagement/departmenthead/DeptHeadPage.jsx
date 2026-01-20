@@ -301,7 +301,6 @@ export default function DeptHeadPage() {
     }
   };
 
-  // ← NEW: Handle approved details with attachments
   const handleViewApprovedDetails = async (approvalId) => {
     setApprovedLoading(true);
     try {
@@ -311,7 +310,6 @@ export default function DeptHeadPage() {
         setApprovedDetails(data);
         setShowDetailsModal(true);
 
-        // Try ALL possible assessment ID field names
         const assessmentId =
           data.assessmentId ||
           data.AssessmentId ||

@@ -419,9 +419,7 @@
   font-weight: 500;
 }
 
-/* ============================================
-   CUSTOM DROPDOWN STYLES
-   ============================================ */
+
 
 .custom-fc-dropdown {
   position: relative;
@@ -559,9 +557,7 @@
   box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.14) !important;
 }
 
-/* ============================================
-   END CUSTOM DROPDOWN STYLES
-   ============================================ */
+
 
 .pmhr-fc-btn-add-comp {
   display: flex;
