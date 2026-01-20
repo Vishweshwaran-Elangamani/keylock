@@ -37,7 +37,7 @@ namespace Relevantz.EEPZ.Common.Constants
         {
             public const string Employee = "Employee";
             public const string Manager = "Manager";
-            public const string Admin = "Admin"; 
+            public const string Admin = "Admin";
         }
 
         public static class ClaimTypes
@@ -55,6 +55,28 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string InvalidEmail = "Invalid email format";
         }
 
-        
+        public static class MeetingTypes
+        {
+            public const string OneOnOne = "One-on-One";
+        }
+
+        public static class MeetingStatusValues
+        {
+            public const string Scheduled = "Scheduled";
+            public const string InProgress = "InProgress";
+            public const string Completed = "Completed";
+            public const string Cancelled = "Cancelled";
+        }
+
+        public static class RsvpStatusValues
+        {
+            public const string Pending = "Pending";
+            public const string Accepted = "Accepted";
+            public const string Declined = "Declined";
+            public const string Tentative = "Tentative";
+        }
+
+
+
     }
 }

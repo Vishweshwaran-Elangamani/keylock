@@ -1,8 +1,9 @@
+using Relevantz.EEPZ.Common.DTOs;
+using Relevantz.EEPZ.Common.Entities;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Relevantz.EEPZ.Common.Entities;
 
 namespace Relevantz.EEPZ.Data.Repository.Interfaces
 {
@@ -18,6 +19,12 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
 
         Task<List<Meeting>> GetMeetingsByManagerIdAsync(
             int managerId,
+            int pageNumber,
+            int pageSize,
+            CancellationToken cancellationToken = default);
+
+        Task<int> GetMeetingsByManagerCountAsync(
+            int managerId,
             CancellationToken cancellationToken = default);
 
         Task<Meeting?> GetMeetingByIdAsync(
@@ -25,6 +32,12 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
             CancellationToken cancellationToken = default);
 
         Task<List<Meeting>> GetMeetingsByParticipantIdAsync(
+            int participantId,
+            int pageNumber,
+            int pageSize,
+            CancellationToken cancellationToken = default);
+
+        Task<int> GetMeetingsByParticipantCountAsync(
             int participantId,
             CancellationToken cancellationToken = default);
 
@@ -41,8 +54,8 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
 
         Task<List<Employee>> GetTeamMembersByManagerIdAsync(
             int managerId,
-            int pageNumber = 1,
-            int pageSize = 20,
+            int pageNumber,
+            int pageSize,
             CancellationToken cancellationToken = default);
 
         Task<int> GetTeamMembersCountAsync(
@@ -54,9 +67,10 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
             int employeeId,
             CancellationToken cancellationToken = default);
 
+
         Task<Meetingparticipant> UpdateRsvpStatusAsync(
             int participantId,
-            string rsvpStatus,
+            RsvpStatus rsvpStatus,
             string? rsvpComments,
             CancellationToken cancellationToken = default);
 

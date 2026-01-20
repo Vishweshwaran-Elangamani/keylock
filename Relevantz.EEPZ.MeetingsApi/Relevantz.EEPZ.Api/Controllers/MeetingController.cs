@@ -1,20 +1,21 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Relevantz.EEPZ.Common.Constants;
+using Relevantz.EEPZ.Common.DTOs;
+using Relevantz.EEPZ.Common.Utils;
+using Relevantz.EEPZ.Core.Services.Interfaces;
+using Relevantz.EEPZ.Data.Repository.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.DTOs;
-using Relevantz.EEPZ.Core.Services.Interfaces;
-using System.Security.Claims;
-using Relevantz.EEPZ.Data.Repository.Interfaces;
 
 namespace eepzbackend.Controllers
 {
     [ApiController]
-    [Route("api/Meeting")]
+    [Route("api/meetings")]
     [Authorize]
     [Produces("application/json")]
     public class MeetingController : ControllerBase
@@ -33,7 +34,9 @@ namespace eepzbackend.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        [HttpPost("schedule")]
+       
+    
+        [HttpPost]
         [Authorize(Roles = AppConstants.Roles.Manager)]
         [ProducesResponseType(typeof(ApiResponse<MeetingResponseDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
@@ -49,28 +52,47 @@ namespace eepzbackend.Controllers
             {
                 var errors = ModelState
                     .Where(x => x.Value?.Errors.Count > 0)
-                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToArray() ?? Array.Empty<string>());
-                return BadRequest(ApiResponse<MeetingResponseDto>.ErrorResponse(AppConstants.ExceptionMessages.ValidationFailed, correlationId, errors));
+                    .ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToArray() ?? Array.Empty<string>());
+
+                return BadRequest(ApiResponse<MeetingResponseDto>.ErrorResponse(
+                    AppConstants.ExceptionMessages.ValidationFailed,
+                    correlationId,
+                    errors));
             }
 
-            var employeeId = await _userAuthRepo.GetEmployeeIdByUserIdAsync(GetUserIdFromClaims(), cancellationToken);
-            var role = GetRoleFromClaims();
+            var userId = ClaimsUtility.GetUserId(User);
+            var role = ClaimsUtility.GetRole(User);
+            var employeeId = await _userAuthRepo.GetEmployeeIdByUserIdAsync(userId, cancellationToken);
 
-            _logger.LogInformation("Scheduling meeting: {MeetingTitle} by employee {EmployeeId}. CorrelationId: {CorrelationId}",
-                scheduleMeetingDto.MeetingTitle, employeeId, correlationId);
+            _logger.LogInformation(
+                "Scheduling meeting: {MeetingTitle} by EmployeeId={EmployeeId}. CorrelationId={CorrelationId}",
+                scheduleMeetingDto.MeetingTitle,
+                employeeId,
+                correlationId);
 
-            var result = await _meetingService.ScheduleMeetingAsync(scheduleMeetingDto, employeeId, role, cancellationToken);
+            var result = await _meetingService.ScheduleMeetingAsync(
+                scheduleMeetingDto,
+                employeeId,
+                role,
+                cancellationToken);
 
             Response.Headers.Add("X-Correlation-Id", correlationId);
-            return Ok(ApiResponse<MeetingResponseDto>.SuccessResponse(result, AppConstants.ResponseMessages.MeetingScheduledSuccessfully, correlationId));
+
+            return Ok(ApiResponse<MeetingResponseDto>.SuccessResponse(
+                result,
+                AppConstants.ResponseMessages.MeetingScheduledSuccessfully,
+                correlationId));
         }
 
-        [HttpGet("my-meetings")]
+
+        [HttpGet("my")]
         [Authorize(Roles = AppConstants.Roles.Employee + "," + AppConstants.Roles.Manager)]
-        [ProducesResponseType(typeof(ApiResponse<List<MeetingResponseDto>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<PaginatedMeetingResponseDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ApiResponse<List<MeetingResponseDto>>>> GetMyMeetings(
+        public async Task<ActionResult<ApiResponse<PaginatedMeetingResponseDto>>> GetMyMeetings(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 20,
             CancellationToken cancellationToken = default)
@@ -79,27 +101,32 @@ namespace eepzbackend.Controllers
 
             if (pageNumber < 1 || pageSize < 1 || pageSize > 100)
             {
-                return BadRequest(ApiResponse<List<MeetingResponseDto>>.ErrorResponse(AppConstants.ExceptionMessages.InvalidPagination, correlationId));
+                return BadRequest(ApiResponse<PaginatedMeetingResponseDto>.ErrorResponse(
+                    AppConstants.ExceptionMessages.InvalidPagination,
+                    correlationId));
             }
 
-            var employeeId = await _userAuthRepo.GetEmployeeIdByUserIdAsync(GetUserIdFromClaims(), cancellationToken);
-            var result = await _meetingService.GetMeetingsByManagerIdAsync(employeeId, cancellationToken);
+            var userId = ClaimsUtility.GetUserId(User);
+            var employeeId = await _userAuthRepo.GetEmployeeIdByUserIdAsync(userId, cancellationToken);
 
-            var paginatedResult = result
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
+            var pagedResult = await _meetingService.GetMeetingsByManagerIdAsync(
+                employeeId,
+                pageNumber,
+                pageSize,
+                cancellationToken);
 
             Response.Headers.Add("X-Correlation-Id", correlationId);
-            Response.Headers.Add("X-Total-Count", result.Count.ToString());
-            Response.Headers.Add("X-Page-Number", pageNumber.ToString());
-            Response.Headers.Add("X-Page-Size", pageSize.ToString());
 
-            return Ok(ApiResponse<List<MeetingResponseDto>>.SuccessResponse(paginatedResult, AppConstants.ResponseMessages.MeetingsRetrievedSuccessfully, correlationId));
+            return Ok(ApiResponse<PaginatedMeetingResponseDto>.SuccessResponse(
+                pagedResult,
+                AppConstants.ResponseMessages.MeetingsRetrievedSuccessfully,
+                correlationId));
         }
+
 
         [HttpGet("{meetingId:int}")]
         [ProducesResponseType(typeof(ApiResponse<MeetingResponseDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ApiResponse<MeetingResponseDto>>> GetMeetingById(
@@ -110,19 +137,28 @@ namespace eepzbackend.Controllers
 
             if (meetingId <= 0)
             {
-                return BadRequest(ApiResponse<MeetingResponseDto>.ErrorResponse(AppConstants.ExceptionMessages.InvalidMeetingId, correlationId));
+                return BadRequest(ApiResponse<MeetingResponseDto>.ErrorResponse(
+                    AppConstants.ExceptionMessages.InvalidMeetingId,
+                    correlationId));
             }
 
             var result = await _meetingService.GetMeetingByIdAsync(meetingId, cancellationToken);
 
             if (result == null)
             {
-                return NotFound(ApiResponse<MeetingResponseDto>.ErrorResponse(AppConstants.ExceptionMessages.MeetingNotFound, correlationId));
+                return NotFound(ApiResponse<MeetingResponseDto>.ErrorResponse(
+                    AppConstants.ExceptionMessages.MeetingNotFound,
+                    correlationId));
             }
 
             Response.Headers.Add("X-Correlation-Id", correlationId);
-            return Ok(ApiResponse<MeetingResponseDto>.SuccessResponse(result, AppConstants.ResponseMessages.MeetingRetrievedSuccessfully, correlationId));
+
+            return Ok(ApiResponse<MeetingResponseDto>.SuccessResponse(
+                result,
+                AppConstants.ResponseMessages.MeetingRetrievedSuccessfully,
+                correlationId));
         }
+
 
         [HttpPost("rsvp")]
         [ProducesResponseType(typeof(ApiResponse<MeetingInvitationDto>), StatusCodes.Status200OK)]
@@ -138,17 +174,33 @@ namespace eepzbackend.Controllers
             {
                 var errors = ModelState
                     .Where(x => x.Value?.Errors.Count > 0)
-                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToArray() ?? Array.Empty<string>());
-                return BadRequest(ApiResponse<MeetingInvitationDto>.ErrorResponse(AppConstants.ExceptionMessages.ValidationFailed, correlationId, errors));
+                    .ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToArray() ?? Array.Empty<string>());
+
+                return BadRequest(ApiResponse<MeetingInvitationDto>.ErrorResponse(
+                    AppConstants.ExceptionMessages.ValidationFailed,
+                    correlationId,
+                    errors));
             }
 
-            var employeeId = await _userAuthRepo.GetEmployeeIdByUserIdAsync(GetUserIdFromClaims(), cancellationToken);
-            var result = await _meetingService.SubmitRsvpAsync(rsvpDto, employeeId, cancellationToken);
+            var userId = ClaimsUtility.GetUserId(User);
+            var employeeId = await _userAuthRepo.GetEmployeeIdByUserIdAsync(userId, cancellationToken);
+
+            var result = await _meetingService.SubmitRsvpAsync(
+                rsvpDto,
+                employeeId,
+                cancellationToken);
 
             Response.Headers.Add("X-Correlation-Id", correlationId);
-            return Ok(ApiResponse<MeetingInvitationDto>.SuccessResponse(result, AppConstants.ResponseMessages.RsvpSubmittedSuccessfully, correlationId));
+
+            return Ok(ApiResponse<MeetingInvitationDto>.SuccessResponse(
+                result,
+                AppConstants.ResponseMessages.RsvpSubmittedSuccessfully,
+                correlationId));
         }
 
+       
         [HttpGet("invitations")]
         [ProducesResponseType(typeof(ApiResponse<List<MeetingInvitationDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
@@ -157,35 +209,17 @@ namespace eepzbackend.Controllers
         {
             var correlationId = HttpContext.TraceIdentifier;
 
-            var employeeId = await _userAuthRepo.GetEmployeeIdByUserIdAsync(GetUserIdFromClaims(), cancellationToken);
+            var userId = ClaimsUtility.GetUserId(User);
+            var employeeId = await _userAuthRepo.GetEmployeeIdByUserIdAsync(userId, cancellationToken);
+
             var result = await _meetingService.GetMyMeetingInvitationsAsync(employeeId, cancellationToken);
 
             Response.Headers.Add("X-Correlation-Id", correlationId);
-            return Ok(ApiResponse<List<MeetingInvitationDto>>.SuccessResponse(result, AppConstants.ResponseMessages.InvitationsRetrievedSuccessfully, correlationId));
+
+            return Ok(ApiResponse<List<MeetingInvitationDto>>.SuccessResponse(
+                result,
+                AppConstants.ResponseMessages.InvitationsRetrievedSuccessfully,
+                correlationId));
         }
-
-        #region Private Helper Methods
-
-        private int GetUserIdFromClaims()
-        {
-            var subClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (subClaim == null || !int.TryParse(subClaim.Value, out int userId))
-            {
-                throw new UnauthorizedAccessException(AppConstants.ExceptionMessages.UserIdNotFoundInToken);
-            }
-
-            return userId;
-        }
-
-        private string GetRoleFromClaims()
-        {
-            var roleClaim = User.FindFirst(AppConstants.ClaimTypes.MsRoleSchema) ??
-                            User.FindFirst(ClaimTypes.Role) ??
-                            User.FindFirst(AppConstants.ClaimTypes.Role);
-
-            return roleClaim?.Value ?? AppConstants.Roles.Employee;
-        }
-
-        #endregion
     }
 }

@@ -1,8 +1,7 @@
+using Relevantz.EEPZ.Common.DTOs;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Relevantz.EEPZ.Common.DTOs;
 
 namespace Relevantz.EEPZ.Core.Services.Interfaces
 {
@@ -14,8 +13,11 @@ namespace Relevantz.EEPZ.Core.Services.Interfaces
             string role,
             CancellationToken cancellationToken = default);
 
-        Task<List<MeetingResponseDto>> GetMeetingsByManagerIdAsync(
+        // ✅ returns paginated dto
+        Task<PaginatedMeetingResponseDto> GetMeetingsByManagerIdAsync(
             int managerId,
+            int pageNumber,
+            int pageSize,
             CancellationToken cancellationToken = default);
 
         Task<MeetingResponseDto?> GetMeetingByIdAsync(

@@ -141,7 +141,7 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.UseMiddleware<Relevantz.EEPZ.Common.Middleware.GlobalExceptionMiddleware>();
+app.UseMiddleware<Relevantz.EEPZ.Api.Middleware.GlobalExceptionMiddleware>();
 
 using (var scope = app.Services.CreateScope())
 {
