@@ -1,3 +1,4 @@
+
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -10,6 +11,10 @@ using Relevantz.EEPZ.Core.IService;
 
 namespace Relevantz.EEPZ.Api.Controllers
 {
+    /// <summary>
+    /// Provides endpoints for retrieving employee-related insights such as goal tracking data,
+    /// compliance metrics, department details, and policy access based on user permissions.
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class EmployeeDataController : ControllerBase
@@ -17,6 +22,11 @@ namespace Relevantz.EEPZ.Api.Controllers
         private readonly IEmployeeDataService _employeeDataService;
         private readonly ILogger<EmployeeDataController> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="EmployeeDataController"/>.
+        /// </summary>
+        /// <param name="employeeDataService">Service for retrieving employee analytics and related data.</param>
+        /// <param name="logger">Logger instance for audit and error tracking.</param>
         public EmployeeDataController(
             IEmployeeDataService employeeDataService,
             ILogger<EmployeeDataController> logger)
@@ -25,6 +35,10 @@ namespace Relevantz.EEPZ.Api.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Retrieves a high-level compliance overview for goals across the organization.
+        /// </summary>
+        /// <returns>200 OK with compliance overview statistics.</returns>
         [HttpGet("goal-tracking/overview")]
         public async Task<IActionResult> GetComplianceOverview()
         {
@@ -32,14 +46,22 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Retrieves employees who have not submitted or set their goals.
+        /// </summary>
+        /// <returns>
+        /// 200 OK with employee list and metadata,  
+        /// 500 Internal Server Error if processing fails.
+        /// </returns>
         [HttpGet("goal-tracking/employees-without-goals")]
         public async Task<IActionResult> GetEmployeesWithoutGoals()
         {
             try
             {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                    ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
-                    ?? User.FindFirst("sub")?.Value;
+                var userIdClaim =
+                    User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
+                    User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value ??
+                    User.FindFirst("sub")?.Value;
 
                 int? currentUserId = null;
 
@@ -73,6 +95,15 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Suggests a set of recommended goals for a specific user.
+        /// </summary>
+        /// <param name="userId">The user ID to generate suggestions for.</param>
+        /// <returns>
+        /// 200 OK with suggested goals,  
+        /// 404 Not Found if the user or context is invalid,  
+        /// 500 Internal Server Error if generation fails.
+        /// </returns>
         [HttpGet("goal-tracking/suggest-goals/{userId}")]
         public async Task<IActionResult> SuggestGoals(int userId)
         {
@@ -98,6 +129,15 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Sends goal reminders to employees who have pending or incomplete goals.
+        /// </summary>
+        /// <param name="request">Request containing reminder configuration.</param>
+        /// <returns>
+        /// 200 OK with reminder summary,  
+        /// 404 Not Found if criteria are invalid,  
+        /// 500 Internal Server Error on unexpected errors.
+        /// </returns>
         [HttpPost("goal-tracking/send-goal-reminders")]
         public async Task<IActionResult> SendGoalReminders([FromBody] SendGoalReminderRequestDto request)
         {
@@ -130,6 +170,13 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves the organization's goal adoption rate.
+        /// </summary>
+        /// <returns>
+        /// 200 OK with adoption statistics,  
+        /// 500 Internal Server Error on failure.
+        /// </returns>
         [HttpGet("goal-tracking/goal-adoption-rate")]
         public async Task<IActionResult> GetGoalAdoptionRate()
         {
@@ -145,6 +192,13 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves detailed statistics related to employee goal activity.
+        /// </summary>
+        /// <returns>
+        /// 200 OK with goal statistics data,  
+        /// 500 Internal Server Error if retrieval fails.
+        /// </returns>
         [HttpGet("goal-tracking/goal-statistics")]
         public async Task<IActionResult> GetGoalStatistics()
         {
@@ -160,6 +214,13 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves all departments available in the system.
+        /// </summary>
+        /// <returns>
+        /// 200 OK with department data,  
+        /// 400 Bad Request if service call fails.
+        /// </returns>
         [HttpGet("department/all")]
         public async Task<IActionResult> GetAllDepartments()
         {
@@ -185,6 +246,15 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves a specific department by its identifier.
+        /// </summary>
+        /// <param name="id">The department identifier.</param>
+        /// <returns>
+        /// 200 OK when found,  
+        /// 404 Not Found if the department does not exist,  
+        /// 400 Bad Request on failure.
+        /// </returns>
         [HttpGet("department/{id}")]
         public async Task<IActionResult> GetDepartmentById(int id)
         {
@@ -218,6 +288,13 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves all published policies accessible to the logged-in user.
+        /// </summary>
+        /// <returns>
+        /// 200 OK with a list of policies,  
+        /// 500 Internal Server Error if retrieval fails.
+        /// </returns>
         [HttpGet("policy/published")]
         [Authorize]
         public async Task<IActionResult> GetPublishedPolicies()
@@ -238,6 +315,15 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves a specific policy by ID for the logged-in user.
+        /// </summary>
+        /// <param name="policyId">The policy identifier.</param>
+        /// <returns>
+        /// 200 OK with policy details,  
+        /// 404 Not Found if access or policy is invalid,  
+        /// 500 Internal Server Error on unexpected errors.
+        /// </returns>
         [HttpGet("policy/{policyId}")]
         [Authorize]
         public async Task<IActionResult> GetPolicyById(int policyId)

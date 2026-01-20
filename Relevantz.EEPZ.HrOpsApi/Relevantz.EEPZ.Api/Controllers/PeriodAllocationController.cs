@@ -1,27 +1,43 @@
+
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Core.IService;
 
 namespace Relevantz.EEPZ.Api.Controllers
 {
+    /// <summary>
+    /// Provides endpoints for creating, updating, deleting, and retrieving
+    /// period-based budget allocations used in forecasting and financial planning.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class PeriodAllocationController : ControllerBase
     {
         private readonly IPeriodAllocationService _periodAllocationService;
-        private readonly ILogger<PeriodAllocationController> _logger; 
+        private readonly ILogger<PeriodAllocationController> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="PeriodAllocationController"/>.
+        /// </summary>
+        /// <param name="periodAllocationService">Service handling period allocation operations.</param>
+        /// <param name="logger">Logger instance for capturing operational logs and errors.</param>
         public PeriodAllocationController(
             IPeriodAllocationService periodAllocationService,
-            ILogger<PeriodAllocationController> logger) 
+            ILogger<PeriodAllocationController> logger)
         {
             _periodAllocationService = periodAllocationService;
-            _logger = logger; 
+            _logger = logger;
         }
 
         /// <summary>
-        /// Leadership: Create period-based budget allocation
+        /// Creates a new period-based budget allocation.
         /// </summary>
+        /// <param name="request">Payload containing allocation period, amount, and budget references.</param>
+        /// <returns>
+        /// 200 OK on success,  
+        /// 400 Bad Request if creation fails,  
+        /// 500 Internal Server Error on unexpected errors.
+        /// </returns>
         [HttpPost("create")]
         public async Task<IActionResult> CreatePeriodAllocation([FromBody] CreatePeriodAllocationDto request)
         {
@@ -30,11 +46,12 @@ namespace Relevantz.EEPZ.Api.Controllers
                 var result = await _periodAllocationService.CreatePeriodAllocationAsync(request);
                 if (!result.Success)
                     return BadRequest(result);
+
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error creating period allocation: {ex.Message}"); 
+                _logger.LogError($"Error creating period allocation: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,
@@ -45,8 +62,14 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Leadership: Update period allocation amount
+        /// Updates an existing period allocation amount or configuration.
         /// </summary>
+        /// <param name="request">Payload containing updated allocation information.</param>
+        /// <returns>
+        /// 200 OK on success,  
+        /// 400 Bad Request if update fails,  
+        /// 500 Internal Server Error on unexpected errors.
+        /// </returns>
         [HttpPut("update")]
         public async Task<IActionResult> UpdatePeriodAllocation([FromBody] UpdatePeriodAllocationDto request)
         {
@@ -55,11 +78,12 @@ namespace Relevantz.EEPZ.Api.Controllers
                 var result = await _periodAllocationService.UpdatePeriodAllocationAsync(request);
                 if (!result.Success)
                     return BadRequest(result);
+
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error updating period allocation: {ex.Message}"); 
+                _logger.LogError($"Error updating period allocation: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,
@@ -70,8 +94,15 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Leadership: Delete period allocation (only if no sub-allocations exist)
+        /// Deletes a period allocation based on its identifier.
+        /// Only possible if the allocation has no dependent sub-allocations.
         /// </summary>
+        /// <param name="periodAllocationId">The period allocation ID.</param>
+        /// <returns>
+        /// 200 OK on success,  
+        /// 400 Bad Request if deletion is restricted or fails,  
+        /// 500 Internal Server Error on unexpected errors.
+        /// </returns>
         [HttpDelete("{periodAllocationId}")]
         public async Task<IActionResult> DeletePeriodAllocation(int periodAllocationId)
         {
@@ -80,11 +111,12 @@ namespace Relevantz.EEPZ.Api.Controllers
                 var result = await _periodAllocationService.DeletePeriodAllocationAsync(periodAllocationId);
                 if (!result.Success)
                     return BadRequest(result);
+
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error deleting period allocation {periodAllocationId}: {ex.Message}"); 
+                _logger.LogError($"Error deleting period allocation {periodAllocationId}: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,
@@ -95,8 +127,14 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Get period allocation by ID
+        /// Retrieves a specific period allocation by its ID.
         /// </summary>
+        /// <param name="periodAllocationId">The allocation identifier.</param>
+        /// <returns>
+        /// 200 OK when found,  
+        /// 404 Not Found if no allocation exists for the given ID,  
+        /// 500 Internal Server Error on failure.
+        /// </returns>
         [HttpGet("{periodAllocationId}")]
         public async Task<IActionResult> GetPeriodAllocationById(int periodAllocationId)
         {
@@ -105,11 +143,12 @@ namespace Relevantz.EEPZ.Api.Controllers
                 var result = await _periodAllocationService.GetPeriodAllocationByIdAsync(periodAllocationId);
                 if (!result.Success)
                     return NotFound(result);
+
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error fetching period allocation {periodAllocationId}: {ex.Message}"); 
+                _logger.LogError($"Error fetching period allocation {periodAllocationId}: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,
@@ -120,8 +159,12 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Get all period allocations
+        /// Retrieves all period allocations in the system.
         /// </summary>
+        /// <returns>
+        /// 200 OK with the list of period allocations,  
+        /// 500 Internal Server Error on failure.
+        /// </returns>
         [HttpGet("all")]
         public async Task<IActionResult> GetAllPeriodAllocations()
         {
@@ -132,7 +175,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error fetching all period allocations: {ex.Message}"); 
+                _logger.LogError($"Error fetching all period allocations: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,
@@ -143,8 +186,13 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Get all period allocations for a specific budget
+        /// Retrieves all period allocations associated with a specific department budget.
         /// </summary>
+        /// <param name="budgetId">The budget identifier.</param>
+        /// <returns>
+        /// 200 OK with allocation list,  
+        /// 500 Internal Server Error on unexpected errors.
+        /// </returns>
         [HttpGet("by-budget/{budgetId}")]
         public async Task<IActionResult> GetPeriodAllocationsByBudget(int budgetId)
         {
@@ -155,7 +203,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error fetching period allocations by budget {budgetId}: {ex.Message}"); 
+                _logger.LogError($"Error fetching period allocations by budget {budgetId}: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,

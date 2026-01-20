@@ -1,3 +1,4 @@
+
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -9,6 +10,11 @@ using Relevantz.EEPZ.Core.IService;
 
 namespace Relevantz.EEPZ.Api.Controllers
 {
+    /// <summary>
+    /// Provides endpoints for managing policy violations and SLA escalations,
+    /// including reporting, resolving, viewing, and retrieving analytics.
+    /// Includes strict role-based access for HR, Admin, Managers, and Employees.
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
@@ -18,6 +24,12 @@ namespace Relevantz.EEPZ.Api.Controllers
         private readonly ISlaEscalationService _slaEscalationService;
         private readonly ILogger<ViolationController> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="ViolationController"/>.
+        /// </summary>
+        /// <param name="violationService">Service handling violation operations.</param>
+        /// <param name="slaEscalationService">Service managing SLA escalation logic.</param>
+        /// <param name="logger">Logger for operational and error tracking.</param>
         public ViolationController(
             IViolationService violationService,
             ISlaEscalationService slaEscalationService,
@@ -31,8 +43,10 @@ namespace Relevantz.EEPZ.Api.Controllers
         #region Violation Endpoints
 
         /// <summary>
-        /// Get all violations - HR ONLY
+        /// Retrieves all violations in the system.  
+        /// Restricted to Admin and HR roles.
         /// </summary>
+        /// <returns>List of violations or error response.</returns>
         [HttpGet("list")]
         [Authorize(Roles = "Admin,HR")]
         public async Task<IActionResult> GetAllViolations()
@@ -50,8 +64,11 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Get violation by ID - HR and Manager
+        /// Retrieves a specific violation by its ID.  
+        /// Accessible by Admin, HR, and Managers.
         /// </summary>
+        /// <param name="id">Violation ID.</param>
+        /// <returns>The violation details if found.</returns>
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin,HR,Manager")]
         public async Task<IActionResult> GetViolationById(int id)
@@ -72,27 +89,23 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Get violations by employee
-        /// Role-based access: HR sees all, Employee sees own only
+        /// Retrieves violations for a specific employee.  
+        /// HR/Admin can view all; Employees can only view their own.
         /// </summary>
+        /// <param name="EmployeeUserId">Employee user ID.</param>
         [HttpGet("employee/{EmployeeUserId}")]
         public async Task<IActionResult> GetViolationsByEmployee(int EmployeeUserId)
         {
             try
             {
-                // Get current user ID from JWT
                 var currentUserIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                     ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 
-                if (string.IsNullOrEmpty(currentUserIdClaim) || !int.TryParse(currentUserIdClaim, out int currentUserId))
-                {
+                if (!int.TryParse(currentUserIdClaim, out int currentUserId))
                     return Unauthorized(new { success = false, message = "Invalid user authentication" });
-                }
 
-                // Check if user has HR role
                 var isHR = User.IsInRole("Admin") || User.IsInRole("HR");
 
-                // If not HR, only allow viewing own violations
                 if (!isHR && currentUserId != EmployeeUserId)
                 {
                     _logger.LogWarning($"User {currentUserId} attempted to access violations of user {EmployeeUserId}");
@@ -110,8 +123,10 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Get violations by policy - HR ONLY
+        /// Retrieves violations linked to a specific policy.  
+        /// Restricted to Admin and HR.
         /// </summary>
+        /// <param name="policyId">Policy ID.</param>
         [HttpGet("policy/{policyId}")]
         [Authorize(Roles = "Admin,HR")]
         public async Task<IActionResult> GetViolationsByPolicy(int policyId)
@@ -129,28 +144,29 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Report violation - HR and Manager
+        /// Reports a new policy violation.  
+        /// Allowed for Admin, HR, and Managers.
         /// </summary>
+        /// <param name="request">Violation report details.</param>
         [HttpPost("report")]
         [Authorize(Roles = "Admin,HR,Manager")]
         public async Task<IActionResult> ReportViolation([FromBody] ReportViolationRequestDto request)
         {
             try
             {
-                // Get user ID from JWT token
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                     ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 
-                if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int reportedByUserId))
+                if (!int.TryParse(userIdClaim, out int reportedByUserId))
                 {
-                    _logger.LogWarning("Unable to extract user ID from JWT token for reporting violation");
+                    _logger.LogWarning("Unable to extract user ID for reporting violation");
                     return Unauthorized(new { success = false, message = "Invalid user authentication" });
                 }
 
-                _logger.LogInformation($"User {reportedByUserId} reporting violation for employee {request.EmployeeUserId}");
+                _logger.LogInformation($"User {reportedByUserId} reporting violation for {request.EmployeeUserId}");
 
                 var result = await _violationService.ReportViolationAsync(request, reportedByUserId);
-                
+
                 if (!result.Success)
                     return BadRequest(result);
 
@@ -164,25 +180,25 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Resolve violation - HR ONLY
+        /// Resolves an existing violation.  
+        /// Restricted to Admin and HR roles.
         /// </summary>
+        /// <param name="id">Violation ID.</param>
+        /// <param name="request">Resolution details.</param>
         [HttpPut("resolve/{id}")]
         [Authorize(Roles = "Admin,HR")]
         public async Task<IActionResult> ResolveViolation(int id, [FromBody] ResolveViolationRequestDto request)
         {
             try
             {
-                // Get user ID from JWT
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                     ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 
-                if (!string.IsNullOrEmpty(userIdClaim) && int.TryParse(userIdClaim, out int userId))
-                {
+                if (int.TryParse(userIdClaim, out int userId))
                     _logger.LogInformation($"User {userId} resolving violation {id}");
-                }
 
                 var result = await _violationService.ResolveViolationAsync(id, request);
-                
+
                 if (!result.Success)
                     return BadRequest(result);
 
@@ -196,7 +212,8 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Get violation statistics - HR ONLY
+        /// Retrieves aggregated violation statistics.  
+        /// Restricted to Admin and HR.
         /// </summary>
         [HttpGet("stats")]
         [Authorize(Roles = "Admin,HR")]
@@ -219,7 +236,8 @@ namespace Relevantz.EEPZ.Api.Controllers
         #region SLA Escalation Endpoints
 
         /// <summary>
-        /// Get all SLA escalations - HR ONLY
+        /// Retrieves all SLA escalations.  
+        /// Restricted to Admin and HR.
         /// </summary>
         [HttpGet("sla-escalations")]
         [Authorize(Roles = "Admin,HR")]
@@ -239,30 +257,26 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Get SLA escalations by employee
-        /// Role-based access: HR sees all, Employee sees own only
+        /// Retrieves SLA escalations for a specific employee.  
+        /// HR/Admin can view all employees; Employees can only view their own.
         /// </summary>
+        /// <param name="EmployeeUserId">Employee ID.</param>
         [HttpGet("sla-escalations/employee/{EmployeeUserId}")]
         public async Task<IActionResult> GetSlaEscalationsByEmployee(int EmployeeUserId)
         {
             try
             {
-                // Get current user ID from JWT
                 var currentUserIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                     ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 
-                if (string.IsNullOrEmpty(currentUserIdClaim) || !int.TryParse(currentUserIdClaim, out int currentUserId))
-                {
+                if (!int.TryParse(currentUserIdClaim, out int currentUserId))
                     return Unauthorized(new { success = false, message = "Invalid user authentication" });
-                }
 
-                // Check if user has HR role
                 var isHR = User.IsInRole("Admin") || User.IsInRole("HR");
 
-                // If not HR, only allow viewing own escalations
                 if (!isHR && currentUserId != EmployeeUserId)
                 {
-                    _logger.LogWarning($"User {currentUserId} attempted to access escalations of user {EmployeeUserId}");
+                    _logger.LogWarning($"Unauthorized SLA escalation access attempt by user {currentUserId}");
                     return Forbid("You can only view your own SLA escalations");
                 }
 
@@ -277,8 +291,10 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Get SLA escalation by ID - HR and assigned employees
+        /// Retrieves details for a specific SLA escalation.
+        /// HR/Admin can view all; employees can only view if assigned.
         /// </summary>
+        /// <param name="escalationId">SLA escalation ID.</param>
         [HttpGet("sla-escalations/{escalationId}")]
         public async Task<IActionResult> GetSlaEscalationById(int escalationId)
         {
@@ -287,27 +303,21 @@ namespace Relevantz.EEPZ.Api.Controllers
                 var result = await _slaEscalationService.GetSlaEscalationByIdAsync(escalationId);
 
                 if (!result.Success)
-                {
                     return NotFound(result);
-                }
 
-                // Authorization check
                 var currentUserIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                     ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 
-                if (!string.IsNullOrEmpty(currentUserIdClaim) && int.TryParse(currentUserIdClaim, out int currentUserId))
+                if (int.TryParse(currentUserIdClaim, out int currentUserId))
                 {
                     var isHR = User.IsInRole("Admin") || User.IsInRole("HR");
 
-                    // Check if user is the owner or escalated to
                     var escalation = result.Data;
-                    var isOwner = escalation?.SlaId != null; // You may need to check actual employee ID
-                    var isEscalatedTo = escalation?.EscalatedToEmployeeId == currentUserId;
+                    var isOwner = escalation?.SlaId != null;
+                    var isAssigned = escalation?.EscalatedToEmployeeId == currentUserId;
 
-                    if (!isHR && !isOwner && !isEscalatedTo)
-                    {
+                    if (!isHR && !isOwner && !isAssigned)
                         return Forbid("You don't have permission to view this escalation");
-                    }
                 }
 
                 return Ok(result);
@@ -320,7 +330,8 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Get combined violations and SLA escalations - HR ONLY
+        /// Retrieves combined violation and SLA escalation records.
+        /// Restricted to HR and Admin.
         /// </summary>
         [HttpGet("combined")]
         [Authorize(Roles = "Admin,HR")]
@@ -339,7 +350,8 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Get SLA escalation statistics - HR ONLY
+        /// Retrieves SLA escalation statistics.
+        /// Restricted to Admin and HR.
         /// </summary>
         [HttpGet("sla-escalations/stats")]
         [Authorize(Roles = "Admin,HR")]
