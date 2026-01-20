@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.ResponseCompression;
 using System.IO.Compression;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Relevantz.EEPZ.Api.Middleware;
 var builder = WebApplication.CreateBuilder(args);
 // Configure Serilog with structured logging
 Log.Logger = new LoggerConfiguration()
@@ -416,6 +417,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 // 11. Map Controllers
 app.MapControllers();
+app.UseMiddleware<GlobalExceptionMiddleware>();
 // 12. Health Check Endpoints
 app.MapHealthChecks("/health/live", new HealthCheckOptions
 {
