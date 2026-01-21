@@ -2,18 +2,19 @@ import { useState } from "react";
 import { useAuth } from "../contexts/auth/AuthContext";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
+import "../styles/layout_styles/DashboardLayout.css";
 
 const DashboardLayout = ({ children, role, allowedRoles = [] }) => {
   const { user } = useAuth();
-  const [sidebarOpen, setSidebarOpen] = useState(false); // NEW: Shared sidebar state
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const currentRole = user?.role || role;
 
   return (
-    <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
+    <div className="dashboard-layout">
       {/* SIDEBAR */}
-      <Sidebar 
-        allowedRoles={allowedRoles} 
+      <Sidebar
+        allowedRoles={allowedRoles}
         currentRole={currentRole}
         isOpen={sidebarOpen}
         onToggle={() => setSidebarOpen(!sidebarOpen)}
@@ -21,29 +22,15 @@ const DashboardLayout = ({ children, role, allowedRoles = [] }) => {
       />
 
       {/* MAIN CONTENT WRAPPER */}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          flex: 1,
-          overflow: "hidden",
-        }}
-      >
+      <div className="dashboard-main-wrapper">
         {/* NAVBAR */}
-        <Navbar 
+        <Navbar
           onSidebarToggle={() => setSidebarOpen(!sidebarOpen)}
           sidebarOpen={sidebarOpen}
         />
 
         {/* MAIN CONTENT */}
-        <main
-          style={{
-            flex: 1,
-            overflow: "auto",
-            background: "#f8f9fa",
-            padding: "1.5rem",
-          }}
-        >
+        <main className="dashboard-main-content">
           {children}
         </main>
       </div>
