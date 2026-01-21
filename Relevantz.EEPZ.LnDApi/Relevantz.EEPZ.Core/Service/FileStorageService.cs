@@ -9,11 +9,18 @@ using Relevantz.EEPZ.Core.Services.Interface;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
+    /// <summary>
+    /// Service implementation for handling file storage operations using MongoDB GridFS.
+    /// Provides methods to save, retrieve, delete, preview, and fetch metadata of files.
+    /// </summary>
     public class FileStorageService : IFileStorageService
     {
         private readonly GridFSBucket _gridFSBucket;
         private readonly MongoDbSettings _mongoSettings;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileStorageService"/> class with MongoDB settings.
+        /// </summary>
         public FileStorageService(IOptions<MongoDbSettings> mongoSettings)
         {
             _mongoSettings = mongoSettings.Value;
@@ -32,6 +39,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _gridFSBucket = new GridFSBucket(database, bucketOptions);
         }
 
+        /// <summary>
+        /// Saves a file to GridFS with metadata and returns its unique identifier.
+        /// </summary>
         public async Task<string> SaveFileAsync(IFormFile file, string subFolder)
         {
             if (file == null || file.Length == 0)
@@ -66,6 +76,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
+        /// <summary>
+        /// Retrieves a file from GridFS as a byte array using its identifier.
+        /// </summary>
         public async Task<byte[]> GetFileAsync(string fileId)
         {
             if (string.IsNullOrEmpty(fileId))
@@ -85,6 +98,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
+        /// <summary>
+        /// Deletes a file from GridFS using its identifier.
+        /// </summary>
         public async Task<bool> DeleteFileAsync(string fileId)
         {
             if (string.IsNullOrEmpty(fileId))
@@ -104,6 +120,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
+        /// <summary>
+        /// Retrieves a file for preview including its bytes, content type, and file name.
+        /// </summary>
         public async Task<(byte[] fileBytes, string contentType, string fileName)> GetFileForPreviewAsync(string fileId)
         {
             if (string.IsNullOrEmpty(fileId))
@@ -137,6 +156,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
+        /// <summary>
+        /// Retrieves metadata of a file stored in GridFS.
+        /// </summary>
         public async Task<FileMetadata?> GetFileMetadataAsync(string fileId)
         {
             if (string.IsNullOrEmpty(fileId))
@@ -174,6 +196,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
+        /// <summary>
+        /// Determines the MIME content type based on the file extension.
+        /// </summary>
         public string GetContentType(string fileName)
         {
             var extension = Path.GetExtension(fileName).ToLowerInvariant();
@@ -195,6 +220,3 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
     }
 }
-
-
-
