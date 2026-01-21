@@ -135,7 +135,7 @@ export default function MySubmissions() {
         setHrForms([]);
       }
       try {
-        const mentorRes = await mentorFeedbackApi.myFeedback(userEmpId);
+        const mentorRes = await mentorFeedbackApi.byMentee(userEmpId);
         const mentorData = Array.isArray(mentorRes?.data)  ? mentorRes.data  : mentorRes?.data?.data || [];
         const enriched = mentorData.map((m) => ({ ...m,
           mentorNameFull:employeeMap[m.mentorEmployeeId] || `Employee ${m.mentorEmployeeId}`,

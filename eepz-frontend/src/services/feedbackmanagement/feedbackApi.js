@@ -1,6 +1,7 @@
 import api from "./index_feedback";
 import axios from "axios";
 import org_api from "./index_org";
+
 export const managerReviewApi = {
   create: (body) => api.post("/managerreview/create", body),
   getById: (id) => api.get(`/managerreview/${id}`),
@@ -18,34 +19,47 @@ export const managerReviewApi = {
   byStatus: (status) => api.get(`/managerreview/status/${status}`),
 };
 
+export const goalsApi = {
+  getAll: () => org_api.get("/goals"),
+  getById: (goalId) => org_api.get(`/goals/${goalId}`),
+  getTeamAll: () => org_api.get("/goals/team"),
+  getOrganizationLevel: () => org_api.get("/goals/organization-level"),
+  getByProject: (projectId) => org_api.get(`/goals/project/${projectId}`),
+};
+
 export const mentorFeedbackApi = {
-  create: (body) => org_api.post("/mentorfeedback/create", body),
-
-  getById: (id) => org_api.get(`/mentorfeedback/track/${id}`),
-
-  aboutMe: (mentorId) => org_api.get(`/mentorfeedback/about-me/${mentorId}`),
-  myFeedback: (menteeId) =>
-    org_api.get(`/mentorfeedback/my-feedback/${menteeId}`),
-  update: (id, body) => org_api.put(`/mentorfeedback/${id}`, body),
-  acknowledge: (id) => org_api.post(`/mentorfeedback/${id}/acknowledge`),
-  remove: (id) => org_api.delete(`/mentorfeedback/${id}`),
-  list: (page = 1, size = 20) =>
-    org_api.get("/mentorfeedback/all", {
-      params: { pageNumber: page, pageSize: size },
-    }),
+  create: (body) => org_api.post("/mentor-feedback", body),
+  list: () => org_api.get("/mentor-feedback"),
+  getById: (id) => org_api.get(`/mentor-feedback/${id}`),
+  update: (id, body) => org_api.put(`/mentor-feedback/${id}`, body),
+  remove: (id) => org_api.delete(`/mentor-feedback/${id}`),
+  aboutMentor: (mentorEmployeeId) =>
+    org_api.get(`/mentor-feedback/mentor/${mentorEmployeeId}`),
+  byMentee: (menteeEmployeeId) =>
+    org_api.get(`/mentor-feedback/mentee/${menteeEmployeeId}`),
+  acknowledge: (id) => org_api.post(`/mentor-feedback/${id}/acknowledge`),
 };
 
 export const orgGoalFeedbackApi = {
-  create: (body) => org_api.post("/orggoalfeedback/create", body),
-  getById: (id) => org_api.get(`/orggoalfeedback/feedback/${id}`),
-  getByObjective: (objectiveId) =>
-    org_api.get(`/orggoalfeedback/goal/${objectiveId}`),
-  update: (id, body) => org_api.put(`/orggoalfeedback/feedback/${id}`, body),
-  remove: (id) => org_api.delete(`/orggoalfeedback/feedback/${id}`),
-  list: (page = 1, size = 20) =>
-    org_api.get("/orggoalfeedback/feedback", {
-      params: { pageNumber: page, pageSize: size },
-    }),
+  create: (body) => org_api.post("/org-goal-feedback", body),
+  list: () => org_api.get("/org-goal-feedback"),
+  getById: (id) => org_api.get(`/org-goal-feedback/${id}`),
+  update: (id, body) => org_api.put(`/org-goal-feedback/${id}`, body),
+  remove: (id) => org_api.delete(`/org-goal-feedback/${id}`),
+  getByGoal: (goalId) => org_api.get(`/org-goal-feedback/goal/${goalId}`),
+};
+
+export const orgwideObjectivesApi = {
+  getAll: () => org_api.get("/orgwide-objectives"),
+  dropdown: () => org_api.get("/orgwide-objectives/dropdown"),
+  getById: (objectiveId) =>
+    org_api.get(`/orgwide-objectives/${objectiveId}`),
+  active: () => org_api.get("/orgwide-objectives/active"),
+  byStatus: (status) => org_api.get(`/orgwide-objectives/status/${status}`),
+};
+
+export const smeApi = {
+  getActive: () => org_api.get("/smes/active"),
 };
 
 export const peerQueueApi = {
@@ -59,7 +73,7 @@ export const peerQueueApi = {
     api.post(`/peerfeedbackqueue/${id}/reject`, null, {
       params: { rejectedByHRId },
     }),
-  remove: (id) => api.delete(`/PeerFeedbackQueue/{queueId}${id}`),
+  remove: (id) => api.delete(`/peerfeedbackqueue/${id}`),
   pending: () => api.get("/peerfeedbackqueue/pending"),
   approved: () => api.get("/peerfeedbackqueue/approved"),
   list: (page = 1, size = 20) =>
@@ -91,38 +105,19 @@ export const hrFormApi = {
   deleteResponse: (id) => api.delete(`/hrfeedbackform/responses/${id}`),
 };
 
-export const smeApi = {
-  getActive: () => org_api.get("/sme/active"),
-  getById: (smeId) => org_api.get(`/sme/${smeId}`),
-  getBySkill: (skillId) => org_api.get(`/sme/skill/${skillId}`),
-  getMyMentors: (employeeId) => org_api.get(`/sme/mentors/${employeeId}`),
-  list: (page = 1, size = 20) =>
-    org_api.get("/sme/all", { params: { pageNumber: page, pageSize: size } }),
-};
-
 export const feedbackAnalysisApi = {
   analyze: async (sentence) => {
-    try {
-      const response = await fetch(
-        import.meta.env.VITE_AI_API_URL + "/analyze",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ sentence }),
-        }
-      );
+    const response = await fetch(import.meta.env.VITE_AI_API_URL + "/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sentence }),
+    });
 
-      if (!response.ok) {
-        throw new Error(`Analysis failed: ${response.statusText}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error("Error analyzing feedback:", error);
-      throw error;
+    if (!response.ok) {
+      throw new Error(`Analysis failed: ${response.statusText}`);
     }
+
+    return await response.json();
   },
 };
 
@@ -191,30 +186,17 @@ export const employeeApi = {
     axios.get(`${PROJECT_API_URL}/api/employees/departments/${departmentId}`),
 
   getSubordinates: async () => {
-    try {
-      const accessToken = localStorage.getItem("accessToken");
+    const accessToken = localStorage.getItem("accessToken");
 
-      const response = await axios.get(
-        `${LND_API_URL}/api/lnd-skills/employees/subordinates`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+    const response = await axios.get(
+      `${LND_API_URL}/api/lnd-skills/employees/subordinates`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
 
-      return response.data;
-    } catch (error) {
-      console.error("Get subordinates error:", error);
-      throw error.response?.data || error;
-    }
+    return response.data;
   },
-};
-
-export const goalsApi = {
-  getAll: () => org_api.get("/Goals"),
-  getById: (goalId) => org_api.get(`/Goals/${goalId}`),
-  getTeamAll: () => org_api.get("/Goals/team"),
-  getOrganizationLevel: () => org_api.get("/Goals/organization-level"),
-  getByProject: (projectId) => org_api.get(`/Goals/project/${projectId}`),
 };

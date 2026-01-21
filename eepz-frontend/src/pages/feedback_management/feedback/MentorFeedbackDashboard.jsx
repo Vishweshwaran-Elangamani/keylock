@@ -51,11 +51,8 @@ export default function MentorFeedbackDashboard() {
   const [selectedFeedback, setSelectedFeedback] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // ✅ entries dropdown also uses CustomDropdown
   const [entriesPerPage, setEntriesPerPage] = useState(5);
-
-  // ✅ Filter values
-  const [filters, setFilters] = useState({
+ const [filters, setFilters] = useState({
     status: "all",
     rating: "all",
     skill: "all",
@@ -83,7 +80,7 @@ export default function MentorFeedbackDashboard() {
 
     try {
       const empId = user?.empId || user?.employeeId || 1;
-      const response = await mentorFeedbackApi.aboutMe(empId);
+      const response = await mentorFeedbackApi.aboutMentor(empId);
 
       if (response.data?.success && Array.isArray(response.data.data)) {
         const enrichedPromises = response.data.data.map(async (feedback) => {
@@ -127,7 +124,6 @@ export default function MentorFeedbackDashboard() {
     fetchAllData();
   }, [fetchAllData]);
 
-  // ✅ Apply filters
   useEffect(() => {
     let filtered = [...feedbacks];
 
