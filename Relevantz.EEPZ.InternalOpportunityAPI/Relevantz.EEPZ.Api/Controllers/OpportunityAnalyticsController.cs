@@ -1,3 +1,4 @@
+
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -6,6 +7,10 @@ using Relevantz.EEPZ.Core.IService;
 
 namespace Relevantz.EEPZ.Api.Controllers
 {
+    /// <summary>
+    /// Provides analytics and statistical insights for internal opportunities.
+    /// Includes endpoints for aggregated statistics and graph-ready data.
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
@@ -18,6 +23,10 @@ namespace Relevantz.EEPZ.Api.Controllers
             _opportunityService = opportunityService;
         }
 
+        /// <summary>
+        /// Retrieves system-wide statistics related to internal opportunities.
+        /// Accessible by Employees, Managers, and HR.
+        /// </summary>
         [HttpGet("statistics")]
         [Authorize(Roles = "Employee,Manager,HR")]
         public async Task<IActionResult> GetOpportunityStatistics()
@@ -33,6 +42,10 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Returns aggregated graph-friendly data based on opportunity statistics.
+        /// Commonly used for dashboards and analytics visualizations.
+        /// </summary>
         [HttpGet("graph-data")]
         [Authorize(Roles = "Employee,Manager,HR")]
         public async Task<IActionResult> GetGraphData()

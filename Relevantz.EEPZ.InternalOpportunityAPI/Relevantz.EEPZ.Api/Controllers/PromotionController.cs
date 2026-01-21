@@ -1,3 +1,4 @@
+
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +9,10 @@ using Relevantz.EEPZ.Core.IService;
 
 namespace Relevantz.EEPZ.Api.Controllers
 {
+    /// <summary>
+    /// Manages promotion workflows including creation, retrieval, approvals, rejections,
+    /// and fetching employee-specific promotion data.
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
@@ -20,6 +25,13 @@ namespace Relevantz.EEPZ.Api.Controllers
             _promotionService = promotionService;
         }
 
+        /// <summary>
+        /// Creates a promotion request based on an approved nomination. (HR/Admin only)
+        /// </summary>
+        /// <remarks>
+        /// Extracts the acting user's ID from the token and persists a new promotion record.
+        /// Returns 201 with the created resource location on success.
+        /// </remarks>
         [HttpPost("create")]
         [Authorize(Roles = "HR,Admin")]
         public async Task<IActionResult> CreatePromotion([FromBody] CreatePromotionRequestDto request)
@@ -50,6 +62,10 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves a single promotion by its unique identifier.
+        /// </summary>
+        /// <param name="id">Promotion identifier</param>
         [HttpGet("{id}")]
         [Authorize]
         public async Task<IActionResult> GetPromotionById(int id)
@@ -65,6 +81,9 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves the list of all promotions. (HR/Admin only)
+        /// </summary>
         [HttpGet("list")]
         [Authorize(Roles = "HR,Admin")]
         public async Task<IActionResult> GetAllPromotions()
@@ -80,6 +99,9 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Returns promotions that are pending HR approval. (HR/Admin only)
+        /// </summary>
         [HttpGet("pending-hr-approval")]
         [Authorize(Roles = "HR,Admin")]
         public async Task<IActionResult> GetPendingHrApproval()
@@ -95,6 +117,10 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Approves a promotion with optional remarks. (HR/Admin only)
+        /// </summary>
+        /// <param name="id">Promotion identifier</param>
         [HttpPut("{id}/approve")]
         [Authorize(Roles = "HR,Admin")]
         public async Task<IActionResult> ApprovePromotion(int id, [FromBody] ApprovePromotionRequestDto request)
@@ -120,6 +146,10 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Rejects a promotion. (HR/Admin only)
+        /// </summary>
+        /// <param name="id">Promotion identifier</param>
         [HttpPut("{id}/reject")]
         [Authorize(Roles = "HR,Admin")]
         public async Task<IActionResult> RejectPromotion(int id)
@@ -145,6 +175,10 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves all promotions associated with the specified employee user ID.
+        /// </summary>
+        /// <param name="employeeUserId">Employee user identifier</param>
         [HttpGet("employee/{employeeUserId}")]
         [Authorize]
         public async Task<IActionResult> GetEmployeePromotions(int employeeUserId)
@@ -160,6 +194,10 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves promotion history for a given employee user ID.
+        /// </summary>
+        /// <param name="employeeUserId">Employee user identifier</param>
         [HttpGet("history/{employeeUserId}")]
         [Authorize]
         public async Task<IActionResult> GetPromotionHistory(int employeeUserId)
@@ -175,6 +213,9 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves promotions pending Leadership approval. (Leadership only)
+        /// </summary>
         [HttpGet("pending-leadership-approval")]
         [Authorize(Roles = "Leadership")]
         public async Task<IActionResult> GetPendingLeadershipApproval()
@@ -192,6 +233,10 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Leadership approval for a promotion with optional remarks. (Leadership only)
+        /// </summary>
+        /// <param name="id">Promotion identifier</param>
         [HttpPut("{id}/leadership-approve")]
         [Authorize(Roles = "Leadership")]
         public async Task<IActionResult> LeadershipApprovePromotion(int id, [FromBody] ApprovePromotionRequestDto request)
@@ -217,6 +262,10 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Leadership rejection for a promotion with optional remarks. (Leadership only)
+        /// </summary>
+        /// <param name="id">Promotion identifier</param>
         [HttpPut("{id}/leadership-reject")]
         [Authorize(Roles = "Leadership")]
         public async Task<IActionResult> LeadershipRejectPromotion(int id, [FromBody] ApprovePromotionRequestDto request)
@@ -241,6 +290,5 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { message = ex.InnerException?.Message ?? ex.Message });
             }
         }
-
     }
 }

@@ -1,3 +1,4 @@
+
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,7 +24,8 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Employee Self-Nomination
+        /// Allows an employee to submit a self-nomination for an active opportunity.
+        /// Validates eligibility and stores the nomination record.
         /// </summary>
         [HttpPost("self-nominate")]
         [Authorize(Roles = "Employee,Manager")]
@@ -58,7 +60,8 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Manager Nomination
+        /// Allows managers to nominate employees on their team.
+        /// Validates nominee information and saves the nomination.
         /// </summary>
         [HttpPost("manager-nominate")]
         [Authorize(Roles = "Manager")]
@@ -93,7 +96,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Get Nomination by ID
+        /// Retrieves a nomination by its unique nomination ID.
         /// </summary>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetNominationById(int id)
@@ -110,7 +113,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Get My Nominations (Employee) - Shows ONLY pending nominations
+        /// Returns the logged-in employee's pending nominations (Self or Manager nominated).
         /// </summary>
         [HttpGet("my-nominations")]
         [Authorize(Roles = "Employee,Manager")]
@@ -139,7 +142,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Get My Nomination History (Employee)
+        /// Fetches the nomination history for the logged-in user, optionally filtered by status.
         /// </summary>
         [HttpGet("my-history")]
         [Authorize(Roles = "Employee,Manager")]
@@ -167,7 +170,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Get Manager Team Nominations
+        /// Retrieves all nominations submitted by the manager's team, with optional status filtering.
         /// </summary>
         [HttpGet("manager-team-nominations")]
         [Authorize(Roles = "Manager")]
@@ -195,7 +198,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Get Pending Manager Review (L2 Manager)
+        /// Retrieves nominations that require the logged-in manager's (L2) review.
         /// </summary>
         [HttpGet("pending-manager-review")]
         [Authorize(Roles = "Manager")]
@@ -223,7 +226,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Get Pending DeptHead Review
+        /// Retrieves nominations requiring Department Head review, based on the logged-in user’s role.
         /// </summary>
         [HttpGet("pending-depthead-review")]
         [Authorize(Roles = "Department Head,DepartmentHead,DEPTHEAD")]
@@ -251,7 +254,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Get All Nominations
+        /// Retrieves all nominations in the system, optionally filtered by nomination status.
         /// </summary>
         [HttpGet("all-nominations")]
         [Authorize]
@@ -271,7 +274,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Manager Review (L2 Approve/Reject)
+        /// Allows L2 Managers to review a nomination and either approve or reject it.
         /// </summary>
         [HttpPut("{id}/manager-review")]
         [Authorize(Roles = "Manager")]
@@ -309,7 +312,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Department Head Review (Final Approve/Send Back to L2)
+        /// Allows Department Heads to perform the final review action (Approve / Reject) on a nomination.
         /// </summary>
         [HttpPut("{id}/department-head-review")]
         [Authorize(Roles = "Department Head,DepartmentHead,DEPTHEAD")]
@@ -371,7 +374,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Check Eligibility for Self-Nomination
+        /// Checks if the user is eligible to submit a self-nomination for a specific opportunity.
         /// </summary>
         [HttpPost("check-eligibility")]
         [Authorize(Roles = "Employee,Manager")]

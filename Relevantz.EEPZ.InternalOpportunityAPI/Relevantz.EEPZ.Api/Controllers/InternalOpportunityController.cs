@@ -1,3 +1,4 @@
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,6 +10,9 @@ using Relevantz.EEPZ.Core.IService;
 
 namespace Relevantz.EEPZ.Api.Controllers
 {
+    /// <summary>
+    /// Manages internal opportunities including creation, update, retrieval, statistics, and deletion.
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
@@ -21,6 +25,9 @@ namespace Relevantz.EEPZ.Api.Controllers
             _opportunityService = opportunityService;
         }
 
+        /// <summary>
+        /// Retrieves a simplified list of all internal opportunities.
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetAllOpportunities()
         {
@@ -35,6 +42,13 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Creates a new internal opportunity. (HR only)
+        /// </summary>
+        /// <remarks>
+        /// Validates the request payload and associates the created opportunity with the requesting HR user.
+        /// Returns 201 with the created resource location.
+        /// </remarks>
         [HttpPost("create")]
         [Authorize(Roles = "HR")]
         public async Task<IActionResult> CreateOpportunity([FromBody] CreateInternalOpportunityRequestDto request)
@@ -64,6 +78,10 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Updates an existing internal opportunity by ID. (HR only)
+        /// </summary>
+        /// <param name="id">Opportunity identifier</param>
         [HttpPut("update/{id}")]
         [Authorize(Roles = "HR")]
         public async Task<IActionResult> UpdateOpportunity(int id, [FromBody] UpdateInternalOpportunityRequestDto request)
@@ -80,6 +98,10 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves an internal opportunity by its ID.
+        /// </summary>
+        /// <param name="id">Opportunity identifier</param>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetOpportunityById(int id)
         {
@@ -94,6 +116,9 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves a simplified list of currently active opportunities.
+        /// </summary>
         [HttpGet("active")]
         public async Task<IActionResult> GetActiveOpportunities()
         {
@@ -108,6 +133,9 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Returns HR-facing statistics for internal opportunities. (HR only)
+        /// </summary>
         [HttpGet("statistics")]
         [Authorize(Roles = "HR")]
         public async Task<IActionResult> GetStatistics()
@@ -123,6 +151,10 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Deletes an internal opportunity by ID. (HR only)
+        /// </summary>
+        /// <param name="id">Opportunity identifier</param>
         [HttpDelete("{id}")]
         [Authorize(Roles = "HR")]
         public async Task<IActionResult> DeleteOpportunity(int id)
