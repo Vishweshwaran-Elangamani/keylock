@@ -16,7 +16,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             if (string.IsNullOrEmpty(employeeIdClaim))
             {
-                throw new UnauthorizedAccessException("Employee ID not found in token");
+                throw new UnauthorizedAccessException(LnDConstants.RESPONSE_MESSAGES.EMPLOYEE_ID_NOT_FOUND_TOKEN);
             }
 
             return int.Parse(employeeIdClaim);

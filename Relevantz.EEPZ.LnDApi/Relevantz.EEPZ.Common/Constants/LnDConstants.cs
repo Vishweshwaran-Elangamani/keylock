@@ -172,7 +172,7 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string TITLE = "Team Assignment";
             public const string EMPLOYEE_NAME = "Employee Name";
             public const string SKILL_NAME = "Skill Name";
-
+            public const string DEPARTMENT = "Department";
             public const string SME_ASSIGNED = "SME Assigned";
 
             public const string ASSIGNMENT_STATUS = "Assignment Status";
@@ -187,6 +187,7 @@ namespace Relevantz.EEPZ.Common.Constants
         public static class RESPONSE_MESSAGES
         {
             // Generic
+            public const string EMPLOYEE_ID_NOT_FOUND_TOKEN = "Employee ID not found in token";
             public const string SUCCESS = "Operation completed successfully";
             public const string FAILED = "Operation failed";
             public const string ACCESS_DENIED = "You do not have access to this resource";

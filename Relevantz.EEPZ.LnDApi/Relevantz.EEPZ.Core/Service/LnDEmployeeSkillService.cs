@@ -132,76 +132,83 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         /// <summary>Gets paginated skills for subordinate employees with optional employee filter.</summary>
-        public async Task<ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>> GetSubordinateSkills(
-            int managerId,
-            SubordinateSkillsRequestModel request
-        )
+     public async Task<ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>> GetSubordinateSkills(
+    int managerId,
+    SubordinateSkillsRequestModel request
+)
+{
+    Log.Information(
+        "GetSubordinateSkills started. ManagerId={ManagerId}, EmployeeId={EmployeeId}, SearchTerm={SearchTerm}, SortBy={SortBy}, Page={PageNumber}",
+        managerId,
+        request.EmployeeId?.ToString() ?? "all",
+        request.SearchTerm ?? "none",
+        request.SortBy ?? "default",
+        request.PageNumber
+    );
+
+    var manager = await _repository.GetEmployeeById(managerId);
+
+    if (manager == null)
+    {
+        Log.Warning(
+            "GetSubordinateSkills: Manager not found. ManagerId={ManagerId}",
+            managerId
+        );
+
+        return new ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>
         {
-            Log.Information(
-                "GetSubordinateSkills started. ManagerId={ManagerId}, EmployeeId={EmployeeId}, SearchTerm={SearchTerm}, SortBy={SortBy}, Page={PageNumber}",
-                managerId, request.EmployeeId?.ToString() ?? "all", request.SearchTerm ?? "none", request.SortBy ?? "default", request.PageNumber
-            );
+            Success = false,
+            Message = LnDConstants.RESPONSE_MESSAGES.MANAGER_NOT_FOUND
+        };
+    }
 
-            var manager = await _repository.GetEmployeeById(managerId);
+    var (items, totalCount) =
+        await _repository.GetSubordinateSkills(managerId, request);
 
-            if (manager == null)
-            {
-                Log.Warning("GetSubordinateSkills: Manager not found. ManagerId={ManagerId}", managerId);
+    var sortedItems = ApplySubordinateSkillSorting(
+        items.AsQueryable(),
+        request.SortBy
+    ).ToList();
 
-                return new ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>
-                {
-                    Success = false,
-                    Message = LnDConstants.RESPONSE_MESSAGES.MANAGER_NOT_FOUND,
-
-                };
-            }
-
-            var (items, totalCount) = await _repository.GetSubordinateSkills(
-                managerId,
-                request
-            );
-
-            Log.Debug(
-                "GetSubordinateSkills: Retrieved {ItemCount} skills. TotalCount={TotalCount}",
-                items.Count, totalCount
-            );
-
-            var skillResponseModels = items
-                .Select(m => new EmployeeSkillResponseModel
-                {
-                    MapperId = m.MapperId,
-                    EmployeeId = m.EmployeeId,
-                    EmployeeName =
-                        $"{m.Employee.Userprofile.FirstName} {m.Employee.Userprofile.LastName}",
-                    SkillId = m.SkillId,
-                    SkillName = m.Skill.SkillName,
-                    Rating = m.Rating,
-                    CreatedOn = m.CreatedOn,
-                    UpdatedOn = m.UpdatedOn,
-                    CanBecomeSme = m.Rating >= LnDConstants.MIN_SME_RATING,
-                    IsSme = m.Skill.Lndsmes.Any(s =>
-                        s.EmployeeId == m.EmployeeId && s.IsActive == true
-                    ),
-                })
-                .ToList();
-
-            Log.Information(
-                "GetSubordinateSkills succeeded. ManagerId={ManagerId}, ReturnedCount={Count}, TotalCount={TotalCount}",
-                managerId, skillResponseModels.Count, totalCount
-            );
-
-            return new ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>
-            {
-                Success = true,
-                Data = new PaginatedResponse<EmployeeSkillResponseModel>
-                {
-                    Items = skillResponseModels,
-                    TotalCount = totalCount,
-                    PageNumber = request.PageNumber,
-                    PageSize = 1_000_000,
-                },
-            };
+    var skillResponseModels = sortedItems.Select(m =>
+        new EmployeeSkillResponseModel
+        {
+            MapperId = m.MapperId,
+            EmployeeId = m.EmployeeId,
+            EmployeeName =
+                $"{m.Employee.Userprofile.FirstName} {m.Employee.Userprofile.LastName}",
+            SkillId = m.SkillId,
+            SkillName = m.Skill.SkillName,
+            Rating = m.Rating,
+            CreatedOn = m.CreatedOn,
+            UpdatedOn = m.UpdatedOn,
+            CanBecomeSme = m.Rating >= LnDConstants.MIN_SME_RATING,
+            IsSme = m.Skill.Lndsmes.Any(s =>
+                s.EmployeeId == m.EmployeeId && s.IsActive == true
+            )
         }
+    ).ToList();
+
+    Log.Information(
+        "GetSubordinateSkills succeeded. ManagerId={ManagerId}, ReturnedCount={Count}, TotalCount={TotalCount}",
+        managerId,
+        skillResponseModels.Count,
+        totalCount
+    );
+
+    return new ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>
+    {
+        Success = true,
+        Data = new PaginatedResponse<EmployeeSkillResponseModel>
+        {
+            Items = skillResponseModels,
+            TotalCount = totalCount,
+            PageNumber = request.PageNumber,
+            PageSize = 1_000_000
+        }
+    };
+}
+
 
         /// <summary>Gets paginated skills for the logged-in employee.</summary>
         public async Task<ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>> GetMySkills(
@@ -652,5 +659,27 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         #endregion
+
+        private IQueryable<Lndemployeeskillmapper> ApplySubordinateSkillSorting(
+    IQueryable<Lndemployeeskillmapper> query,
+    string? sortBy
+)
+{
+    return sortBy?.ToLower() switch
+    {
+        LnDConstants.SORT_FIELDS.SKILL_NAME =>
+            query.OrderBy(m => m.Skill.SkillName),
+
+        LnDConstants.SORT_FIELDS.RATING =>
+            query.OrderByDescending(m => m.Rating),
+
+        LnDConstants.SORT_FIELDS.CREATED_ON =>
+            query.OrderByDescending(m => m.CreatedOn),
+
+        _ =>
+            query.OrderBy(m => m.Employee.Userprofile.FirstName)
+    };
+}
+
     }
 }

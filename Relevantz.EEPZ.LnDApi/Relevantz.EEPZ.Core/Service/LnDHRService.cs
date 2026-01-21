@@ -3,6 +3,7 @@ using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repositories.Interface;
+using Relevantz.EEPZ.Common.Entities;
 using Serilog;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
@@ -57,72 +58,62 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return new ApiResponse<PaginatedResponse<SubordinateEmployeeResponseModel>>
             {
                 Success = true,
-                Message = string.Format(
-    LnDConstants.RESPONSE_MESSAGES.EMPLOYEES_FOUND,
-    totalCount
+                Message = string.Format(LnDConstants.RESPONSE_MESSAGES.EMPLOYEES_FOUND, totalCount
 ),
-
                 Data = paginatedResponse,
             };
         }
 
         /// <summary>Gets paginated skills for a specific employee with SME eligibility calculation.</summary>
-        public async Task<ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>> GetEmployeeSkillsById(
-            int employeeId,
-            EmployeeSkillsByIdRequestModel request
-        )
+        public async Task<ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>>
+     GetEmployeeSkillsById(
+         int employeeId,
+         EmployeeSkillsByIdRequestModel request
+     )
         {
             Log.Information(
                 "GetEmployeeSkillsById started. EmployeeId={EmployeeId}, Page={PageNumber}, SearchTerm={SearchTerm}, SortBy={SortBy}",
-                employeeId, request.PageNumber, request.SearchTerm ?? "none", request.SortBy ?? "default"
+                employeeId,
+                request.PageNumber,
+                request.SearchTerm ?? "none",
+                request.SortBy ?? "default"
             );
 
             var pageSize = 10;
 
-            var (items, totalCount) = await _hrRepository.GetEmployeeSkillsById(
-                employeeId,
-                request
-            );
+            var (items, totalCount) =
+                await _hrRepository.GetEmployeeSkillsById(employeeId, request);
+            var sortedItems = ApplySkillSorting(
+                items.AsQueryable(),
+                request.SortBy
+            ).ToList();
 
-            Log.Debug(
-                "GetEmployeeSkillsById: Retrieved {ItemCount} skills for EmployeeId={EmployeeId}. TotalCount={TotalCount}",
-                items.Count, employeeId, totalCount
-            );
-
-            var skillDtos = items
-                .Select(m => new EmployeeSkillResponseModel
-                {
-                    MapperId = m.MapperId,
-                    EmployeeId = m.EmployeeId,
-                    EmployeeName =
-                        $"{m.Employee.Userprofile.FirstName} {m.Employee.Userprofile.LastName}",
-                    SkillId = m.SkillId,
-                    SkillName = m.Skill.SkillName,
-                    Rating = m.Rating,
-                    CreatedOn = m.CreatedOn,
-                    UpdatedOn = m.UpdatedOn,
-                    CanBecomeSme = m.Rating >= LnDConstants.MIN_SME_RATING,
-                    IsSme = m.Skill.Lndsmes.Any(s =>
-                        s.EmployeeId == m.EmployeeId && s.IsActive == true
-                    ),
-                })
-                .ToList();
-
-            Log.Information(
-                "GetEmployeeSkillsById succeeded. EmployeeId={EmployeeId}, ReturnedCount={Count}, TotalCount={TotalCount}",
-                employeeId, skillDtos.Count, totalCount
-            );
+            var responseItems = sortedItems.Select(m => new EmployeeSkillResponseModel
+            {
+                MapperId = m.MapperId,
+                EmployeeId = m.EmployeeId,
+                EmployeeName =
+                    $"{m.Employee.Userprofile.FirstName} {m.Employee.Userprofile.LastName}",
+                SkillId = m.SkillId,
+                SkillName = m.Skill.SkillName,
+                Rating = m.Rating,
+                CreatedOn = m.CreatedOn,
+                UpdatedOn = m.UpdatedOn,
+                CanBecomeSme = m.Rating >= LnDConstants.MIN_SME_RATING,
+                IsSme = m.Skill.Lndsmes.Any(s =>
+                    s.EmployeeId == m.EmployeeId && s.IsActive == true)
+            }).ToList();
 
             return new ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>
             {
                 Success = true,
                 Data = new PaginatedResponse<EmployeeSkillResponseModel>
                 {
-                    Items = skillDtos,
+                    Items = responseItems,
                     TotalCount = totalCount,
                     PageNumber = request.PageNumber,
-                    PageSize = pageSize,
-                },
+                    PageSize = pageSize
+                }
             };
         }
 
@@ -131,37 +122,44 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         #region Assignment Management
 
         /// <summary>Gets paginated organization-wide assignments with filtering and search.</summary>
-        public async Task<
-            ApiResponse<PaginatedResponse<AssignmentResponseModel>>
-        > GetAllOrganizationAssignments(OrganizationAssignmentsRequestModel request)
+        public async Task<ApiResponse<PaginatedResponse<AssignmentResponseModel>>>
+      GetAllOrganizationAssignments(OrganizationAssignmentsRequestModel request)
         {
             Log.Information(
                 "GetAllOrganizationAssignments started. StatusFilter={StatusFilter}, SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
-                request.StatusFilter ?? "all", request.SearchTerm ?? "none", request.PageNumber, request.PageSize
+                request.StatusFilter ?? "all",
+                request.SearchTerm ?? "none",
+                request.PageNumber,
+                request.PageSize
             );
 
-            var (items, totalCount) = await _hrRepository.GetAllOrganizationAssignments(request);
+            var (items, totalCount) =
+                await _hrRepository.GetAllOrganizationAssignments(request);
 
-            Log.Debug(
-                "GetAllOrganizationAssignments: Retrieved {ItemCount} assignments. TotalCount={TotalCount}",
-                items.Count, totalCount
-            );
+            var sortedItems = ApplySorting(
+                items.AsQueryable(),
+                request.SortField,
+                request.SortOrder
+            ).ToList();
 
             var today = DateTime.Now.Date;
 
-            var assignmentResponseModels = items
+            var assignmentResponseModels = sortedItems
                 .Select(a =>
                 {
                     var deadlineDate = a.Deadline?.Date;
-                    var isCompleted = a.Status == LnDConstants.ASSIGNMENT_STATUS.COMPLETED;
+                    var isCompleted =
+                        a.Status == LnDConstants.ASSIGNMENT_STATUS.COMPLETED;
 
-                    var isOverdue = deadlineDate.HasValue
+                    var isOverdue =
+                        deadlineDate.HasValue
                         && deadlineDate.Value < today
                         && !isCompleted;
 
-                    var daysOverdue = isOverdue && deadlineDate.HasValue
-                        ? (int)(today - deadlineDate.Value).TotalDays
-                        : (int?)null;
+                    var daysOverdue =
+                        isOverdue && deadlineDate.HasValue
+                            ? (int)(today - deadlineDate.Value).TotalDays
+                            : (int?)null;
 
                     return new AssignmentResponseModel
                     {
@@ -178,7 +176,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         CompletionNotes = a.CompletionNotes,
                         ProofFilePath = a.ProofFilePath,
                         IsOverdue = isOverdue,
-                        DaysOverdue = daysOverdue,
+                        DaysOverdue = daysOverdue
                     };
                 })
                 .ToList();
@@ -188,25 +186,26 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 Items = assignmentResponseModels,
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
-                PageSize = request.PageSize,
+                PageSize = request.PageSize
             };
 
             Log.Information(
                 "GetAllOrganizationAssignments succeeded. ReturnedCount={Count}, TotalCount={TotalCount}",
-                assignmentResponseModels.Count, totalCount
+                assignmentResponseModels.Count,
+                totalCount
             );
 
             return new ApiResponse<PaginatedResponse<AssignmentResponseModel>>
             {
                 Success = true,
                 Message = string.Format(
-    LnDConstants.RESPONSE_MESSAGES.ASSIGNMENTS_FOUND,
-    totalCount
-),
-
-                Data = paginatedResponse,
+                    LnDConstants.RESPONSE_MESSAGES.ASSIGNMENTS_FOUND,
+                    totalCount
+                ),
+                Data = paginatedResponse
             };
         }
+
 
         #endregion
 
@@ -214,87 +213,194 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         /// <summary>Exports all organization assignments to Excel with department and employee details.</summary>
         public async Task<ApiResponse<byte[]>> ExportOrganizationAssignmentsToExcel(
-            ExportOrganizationAssignmentsRequestModel request
-        )
+       ExportOrganizationAssignmentsRequestModel request
+   )
         {
             Log.Information(
                 "ExportOrganizationAssignmentsToExcel started. StatusFilter={StatusFilter}, SearchTerm={SearchTerm}",
-                request.StatusFilter ?? "all", request.SearchTerm ?? "none"
+                request.StatusFilter ?? "all",
+                request.SearchTerm ?? "none"
             );
 
-            var allAssignments =
+            var assignments =
                 await _hrRepository.GetAllOrganizationAssignmentsForExport(request);
 
-            Log.Debug(
-                "ExportOrganizationAssignmentsToExcel: Retrieved {Count} assignments for export",
-                allAssignments.Count
-            );
+            var sortedAssignments = ApplyAssignmentSorting(
+                assignments.AsQueryable(),
+                request.SortField,
+                request.SortOrder
+            ).ToList();
 
-            using (var workbook = new XLWorkbook())
+            using var workbook = new XLWorkbook();
+            var worksheet = workbook.Worksheets.Add(LnDConstants.ORG_EXPORT.TITLE);
+
+            worksheet.Cell(1, 1).Value = LnDConstants.ORG_EXPORT.EMPLOYEE_NAME;
+            worksheet.Cell(1, 2).Value = LnDConstants.ORG_EXPORT.DEPARTMENT;
+            worksheet.Cell(1, 3).Value = LnDConstants.ORG_EXPORT.SKILL_NAME;
+            worksheet.Cell(1, 4).Value = LnDConstants.ORG_EXPORT.SME_ASSIGNED;
+            worksheet.Cell(1, 5).Value = LnDConstants.ORG_EXPORT.ASSIGNMENT_STATUS;
+            worksheet.Cell(1, 6).Value = LnDConstants.ORG_EXPORT.START_DATE;
+            worksheet.Cell(1, 7).Value = LnDConstants.ORG_EXPORT.DUE_DATE;
+            worksheet.Cell(1, 8).Value = LnDConstants.ORG_EXPORT.SCORE;
+            worksheet.Cell(1, 9).Value = LnDConstants.ORG_EXPORT.COMMENTS;
+
+            int row = 2;
+
+            foreach (var assignment in sortedAssignments)
             {
-                var worksheet = workbook.Worksheets.Add(LnDConstants.ORG_EXPORT.TITLE);
-                worksheet.Cell(1, 1).Value = LnDConstants.ORG_EXPORT.EMPLOYEE_NAME;
-                worksheet.Cell(1, 2).Value = LnDConstants.ORG_EXPORT.SKILL_NAME;
-                worksheet.Cell(1, 3).Value = LnDConstants.ORG_EXPORT.SME_ASSIGNED;
-                worksheet.Cell(1, 4).Value = LnDConstants.ORG_EXPORT.ASSIGNMENT_STATUS;
-                worksheet.Cell(1, 5).Value = LnDConstants.ORG_EXPORT.START_DATE;
-                worksheet.Cell(1, 6).Value = LnDConstants.ORG_EXPORT.DUE_DATE;
-                worksheet.Cell(1, 7).Value = LnDConstants.ORG_EXPORT.SCORE;
-                worksheet.Cell(1, 8).Value = LnDConstants.ORG_EXPORT.COMMENTS;
+                worksheet.Cell(row, 1).Value =
+                    $"{assignment.MenteeEmployee?.Userprofile?.FirstName} {assignment.MenteeEmployee?.Userprofile?.LastName}";
 
-                var headerRange = worksheet.Range(1, 1, 1, 9);
-                headerRange.Style.Font.Bold = true;
-                headerRange.Style.Fill.BackgroundColor = XLColor.FromArgb(39, 35, 92);
-                headerRange.Style.Font.FontColor = XLColor.White;
-                headerRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-                headerRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                worksheet.Cell(row, 2).Value =
+                    assignment.MenteeEmployee?.Employeedetailsmasters
+                        .FirstOrDefault()?.Department?.DepartmentName ?? "N/A";
 
-                int row = 2;
-                foreach (var assignment in allAssignments)
-                {
-                    var menteeName =
-                        $"{assignment.MenteeEmployee?.Userprofile?.FirstName ?? ""} {assignment.MenteeEmployee?.Userprofile?.LastName ?? ""}".Trim();
-                    var department =
-                        assignment
-                            .MenteeEmployee?.Employeedetailsmasters.FirstOrDefault()
-                            ?.Department?.DepartmentName ?? "N/A";
-                    var skillName = assignment.Skill?.SkillName ?? "N/A";
-                    var smeName =
-                        $"{assignment.Sme?.Employee?.Userprofile?.FirstName ?? ""} {assignment.Sme?.Employee?.Userprofile?.LastName ?? ""}".Trim();
+                worksheet.Cell(row, 3).Value = assignment.Skill?.SkillName ?? "N/A";
 
-                    worksheet.Cell(row, 1).Value = menteeName;
-                    worksheet.Cell(row, 2).Value = department;
-                    worksheet.Cell(row, 3).Value = skillName;
-                    worksheet.Cell(row, 4).Value = smeName;
-                    worksheet.Cell(row, 5).Value = assignment.Status ?? "N/A";
-                    worksheet.Cell(row, 6).Value =
-                        assignment.CreatedOn?.ToString("MM/dd/yyyy") ?? "";
-                    worksheet.Cell(row, 7).Value =
-                        assignment.Deadline?.ToString("MM/dd/yyyy") ?? "";
-                    worksheet.Cell(row, 8).Value =
-                        assignment.CompletionRating?.ToString() ?? "N/A";
-                    worksheet.Cell(row, 9).Value = assignment.CompletionNotes ?? "";
+                worksheet.Cell(row, 4).Value =
+                    $"{assignment.Sme?.Employee?.Userprofile?.FirstName} {assignment.Sme?.Employee?.Userprofile?.LastName}";
 
-                    row++;
-                }
+                worksheet.Cell(row, 5).Value = assignment.Status ?? "N/A";
+                worksheet.Cell(row, 6).Value = assignment.CreatedOn?.ToString("MM/dd/yyyy");
+                worksheet.Cell(row, 7).Value = assignment.Deadline?.ToString("MM/dd/yyyy");
+                worksheet.Cell(row, 8).Value = assignment.CompletionRating?.ToString() ?? "N/A";
+                worksheet.Cell(row, 9).Value = assignment.CompletionNotes ?? "";
 
-                worksheet.Columns().AdjustToContents();
-
-                using (var stream = new MemoryStream())
-                {
-                    workbook.SaveAs(stream);
-                    var fileBytes = stream.ToArray();
-
-                    Log.Information(
-                        "ExportOrganizationAssignmentsToExcel succeeded. AssignmentCount={Count}, FileSize={FileSize} bytes",
-                        allAssignments.Count, fileBytes.Length
-                    );
-
-                    return new ApiResponse<byte[]> { Success = true, Data = fileBytes };
-                }
+                row++;
             }
+
+            worksheet.Columns().AdjustToContents();
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+
+            return new ApiResponse<byte[]>
+            {
+                Success = true,
+                Data = stream.ToArray()
+            };
+        }
+        #endregion
+
+
+
+        private IQueryable<Lndassignment> ApplySorting(
+IQueryable<Lndassignment> query,
+string? sortField,
+string? sortOrder)
+        {
+            bool isAscending =
+                string.IsNullOrEmpty(sortOrder)
+                || sortOrder.Equals(
+                    LnDConstants.SORT_ORDER.ASC,
+                    StringComparison.OrdinalIgnoreCase
+                );
+
+            return sortField?.ToLower() switch
+            {
+                LnDConstants.SORT_FIELDS.SKILL_NAME =>
+                    isAscending
+                        ? query.OrderBy(a => a.Skill.SkillName)
+                        : query.OrderByDescending(a => a.Skill.SkillName),
+
+                LnDConstants.SORT_FIELDS.SME_NAME =>
+                    isAscending
+                        ? query
+                            .OrderBy(a => a.Sme.Employee.Userprofile.FirstName)
+                            .ThenBy(a => a.Sme.Employee.Userprofile.LastName)
+                        : query
+                            .OrderByDescending(a => a.Sme.Employee.Userprofile.FirstName)
+                            .ThenByDescending(a => a.Sme.Employee.Userprofile.LastName),
+
+                LnDConstants.SORT_FIELDS.STATUS =>
+                    isAscending
+                        ? query.OrderBy(a => a.Status)
+                        : query.OrderByDescending(a => a.Status),
+
+                LnDConstants.SORT_FIELDS.CREATED_ON =>
+                    isAscending
+                        ? query.OrderBy(a => a.CreatedOn)
+                        : query.OrderByDescending(a => a.CreatedOn),
+
+                LnDConstants.SORT_FIELDS.DEADLINE =>
+                    isAscending
+                        ? query.OrderBy(a => a.Deadline)
+                        : query.OrderByDescending(a => a.Deadline),
+
+                LnDConstants.SORT_FIELDS.COMPLETION_RATING =>
+                    isAscending
+                        ? query.OrderBy(a => a.CompletionRating ?? 0)
+                        : query.OrderByDescending(a => a.CompletionRating ?? 0),
+
+                _ => query.OrderByDescending(a => a.CreatedOn)
+            };
         }
 
+        #region privatehelper
+        private IQueryable<Lndemployeeskillmapper> ApplySkillSorting(
+    IQueryable<Lndemployeeskillmapper> query,
+    string? sortBy
+)
+        {
+            return sortBy?.ToLower() switch
+            {
+                LnDConstants.SORT_FIELDS.SKILL_NAME =>
+                    query.OrderBy(m => m.Skill.SkillName),
+
+                LnDConstants.SORT_FIELDS.RATING =>
+                    query.OrderByDescending(m => m.Rating),
+
+                LnDConstants.SORT_FIELDS.CREATED_ON =>
+                    query.OrderByDescending(m => m.CreatedOn),
+
+                _ =>
+                    query.OrderBy(m => m.Skill.SkillName)
+            };
+        }
+        private IQueryable<Lndassignment> ApplyAssignmentSorting(
+            IQueryable<Lndassignment> query,
+            string? sortField,
+            string? sortOrder
+        )
+        {
+            bool asc = string.IsNullOrEmpty(sortOrder)
+                || sortOrder.Equals(
+                    LnDConstants.SORT_ORDER.ASC,
+                    StringComparison.OrdinalIgnoreCase
+                );
+
+            return sortField?.ToLower() switch
+            {
+                LnDConstants.SORT_FIELDS.SKILL_NAME =>
+                    asc ? query.OrderBy(a => a.Skill.SkillName)
+                        : query.OrderByDescending(a => a.Skill.SkillName),
+
+                LnDConstants.SORT_FIELDS.SME_NAME =>
+                    asc
+                        ? query.OrderBy(a => a.Sme.Employee.Userprofile.FirstName)
+                               .ThenBy(a => a.Sme.Employee.Userprofile.LastName)
+                        : query.OrderByDescending(a => a.Sme.Employee.Userprofile.FirstName)
+                               .ThenByDescending(a => a.Sme.Employee.Userprofile.LastName),
+
+                LnDConstants.SORT_FIELDS.STATUS =>
+                    asc ? query.OrderBy(a => a.Status)
+                        : query.OrderByDescending(a => a.Status),
+
+                LnDConstants.SORT_FIELDS.CREATED_ON =>
+                    asc ? query.OrderBy(a => a.CreatedOn)
+                        : query.OrderByDescending(a => a.CreatedOn),
+
+                LnDConstants.SORT_FIELDS.DEADLINE =>
+                    asc ? query.OrderBy(a => a.Deadline)
+                        : query.OrderByDescending(a => a.Deadline),
+
+                LnDConstants.SORT_FIELDS.COMPLETION_RATING =>
+                    asc ? query.OrderBy(a => a.CompletionRating ?? 0)
+                        : query.OrderByDescending(a => a.CompletionRating ?? 0),
+
+                _ => query.OrderByDescending(a => a.CreatedOn)
+            };
+        }
         #endregion
     }
 }

@@ -717,7 +717,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     "PreviewAssignmentProof: Assignment not found or access denied. AssignmentId={AssignmentId}, EmployeeId={EmployeeId}",
                     assignmentId,
                     employeeId
-                );
+                ); 
 
                 return new ApiResponse<FileDownloadResponseModel>
                 {

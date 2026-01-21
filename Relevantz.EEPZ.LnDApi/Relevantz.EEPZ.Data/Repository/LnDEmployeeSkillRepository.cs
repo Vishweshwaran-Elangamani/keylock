@@ -137,56 +137,61 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         #region Skill Mapping Queries 
 
         /// <summary>Gets paginated subordinate skill mappings with optional employee filter and search.</summary>
-        public async Task<(
-            List<Lndemployeeskillmapper> Items,
-            int TotalCount
-        )> GetSubordinateSkills(
-            int managerId,
-            SubordinateSkillsRequestModel request
-        )
-        {
-            Log.Information(
-                "GetSubordinateSkillsAsync called. ManagerId={ManagerId}, EmployeeId={EmployeeId}, SearchTerm={SearchTerm}, SortBy={SortBy}, Page={PageNumber}",
-                managerId, request.EmployeeId?.ToString() ?? "all", request.SearchTerm ?? "none", request.SortBy ?? "default", request.PageNumber
-            );
+       /// <summary>Gets paginated subordinate skill mappings with optional employee filter and search.</summary>
+public async Task<(
+    List<Lndemployeeskillmapper> Items,
+    int TotalCount
+)> GetSubordinateSkills(
+    int managerId,
+    SubordinateSkillsRequestModel request
+)
+{
+    Log.Information(
+        "GetSubordinateSkillsAsync called. ManagerId={ManagerId}, EmployeeId={EmployeeId}, SearchTerm={SearchTerm}, Page={PageNumber}",
+        managerId,
+        request.EmployeeId?.ToString() ?? "all",
+        request.SearchTerm ?? "none",
+        request.PageNumber
+    );
 
-            var query = _context
-                .Lndemployeeskillmappers.Include(m => m.Employee)
-                .ThenInclude(e => e.Userprofile)
-                .Include(m => m.Skill)
-                .ThenInclude(s => s.Lndsmes)
-                .Where(m => m.Employee.ReportingManagerEmployeeId == managerId);
+    var query = _context.Lndemployeeskillmappers
+        .Include(m => m.Employee)
+            .ThenInclude(e => e.Userprofile)
+        .Include(m => m.Skill)
+            .ThenInclude(s => s.Lndsmes)
+        .AsNoTracking()
+        .Where(m => m.Employee.ReportingManagerEmployeeId == managerId);
 
-            if (request.EmployeeId.HasValue)
-                query = query.Where(m => m.EmployeeId == request.EmployeeId.Value);
+    if (request.EmployeeId.HasValue)
+    {
+        query = query.Where(m => m.EmployeeId == request.EmployeeId.Value);
+    }
 
-            if (!string.IsNullOrEmpty(request.SearchTerm))
-            {
-                query = query.Where(m =>
-                    m.Skill.SkillName.Contains(request.SearchTerm)
-                    || m.Employee.Userprofile.FirstName.Contains(request.SearchTerm)
-                    || m.Employee.Userprofile.LastName.Contains(request.SearchTerm)
-                );
-            }
+    if (!string.IsNullOrEmpty(request.SearchTerm))
+    {
+        query = query.Where(m =>
+            m.Skill.SkillName.Contains(request.SearchTerm)
+            || m.Employee.Userprofile.FirstName.Contains(request.SearchTerm)
+            || m.Employee.Userprofile.LastName.Contains(request.SearchTerm)
+        );
+    }
 
-            query = request.SortBy?.ToLower() switch
-            {
-                LnDConstants.SORT_FIELDS.SKILL_NAME => query.OrderBy(m => m.Skill.SkillName),
-                LnDConstants.SORT_FIELDS.RATING => query.OrderByDescending(m => m.Rating),
-                LnDConstants.SORT_FIELDS.CREATED_ON => query.OrderByDescending(m => m.CreatedOn),
-                _ => query.OrderBy(m => m.Employee.Userprofile.FirstName),
-            };
+    var totalCount = await query.CountAsync();
 
-            var totalCount = await query.CountAsync();
-            var items = await query.Skip((request.PageNumber - 1) * 1_000_000).Take(1_000_000).ToListAsync();
+    var items = await query
+        .Skip((request.PageNumber - 1) * 1_000_000)
+        .Take(1_000_000)
+        .ToListAsync();
 
-            Log.Information(
-                "GetSubordinateSkillsAsync completed. ManagerId={ManagerId}, ReturnedCount={Count}, TotalCount={TotalCount}",
-                managerId, items.Count, totalCount
-            );
+    Log.Information(
+        "GetSubordinateSkillsAsync completed. ManagerId={ManagerId}, ReturnedCount={Count}, TotalCount={TotalCount}",
+        managerId,
+        items.Count,
+        totalCount
+    );
 
-            return (items, totalCount);
-        }
+    return (items, totalCount);
+}
 
         /// <summary>Gets paginated skill mappings for a specific employee.</summary>
         public async Task<(List<Lndemployeeskillmapper> Items, int TotalCount)> GetMySkills(
