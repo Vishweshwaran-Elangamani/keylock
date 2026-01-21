@@ -64,7 +64,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Processes an approval decision (approve or reject).
         /// Triggers business workflows for SME registration, assignments, and acknowledgements.  
         /// </summary>
-        [HttpPost("api/lnd-approvals/process")] 
+        [HttpPost("api/lnd-approvals/process")]
         public async Task<IActionResult> ProcessApproval([FromBody] ApprovalDecisionRequestModel request)
         {
             var approverId = GetCurrentEmployeeId();
@@ -135,7 +135,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// <summary>
         /// Gets detailed approval information including all attachments and assignment details.
         /// Enforces access control for requester and approver only.
-        /// </summary>
+        /// </summary> 
         [HttpGet("api/approvals/{approvalId}/details")]
         public async Task<IActionResult> GetApprovalDetails(int approvalId)
         {
@@ -202,7 +202,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             );
 
             return File(fileBytes, contentType, fileName);
-        }                       
+        }
 
         /// <summary>
         /// Downloads assignment completion proof document.
@@ -238,7 +238,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 assignmentId, fileName, fileBytes.Length
             );
 
-            return File(fileBytes, contentType, fileName); 
+            return File(fileBytes, contentType, fileName);
         }
 
         #endregion

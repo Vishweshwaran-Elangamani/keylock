@@ -41,29 +41,43 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         /// Gets approvals assigned to the specified employee as approver, with filtering, sorting and pagination.
         /// </summary>
         public async Task<ApiResponse<PaginatedResponse<ApprovalResponseModel>>> GetMyApprovals(
-      int employeeId,
-      MyApprovalsRequestModel request
-  )
+        int employeeId,
+        MyApprovalsRequestModel request
+    )
         {
             Log.Information(
                 "GetMyApprovals started. EmployeeId={EmployeeId}, ApprovalType={ApprovalType}, Status={Status}, Page={PageNumber}, PageSize={PageSize}, SearchTerm={SearchTerm}",
-                employeeId, request.ApprovalType ?? "all", request.Status ?? "all", request.PageNumber, request.PageSize, request.SearchTerm
-            );
-
-            var (items, totalCount) = await _approvalRepository.GetMyApprovals(
                 employeeId,
-                request
+                request.ApprovalType ?? "all",
+                request.Status ?? "all",
+                request.PageNumber,
+                request.PageSize,
+                request.SearchTerm ?? "none"
             );
 
-            Log.Information("GetMyApprovals succeeded for EmployeeId={EmployeeId}. Returned={Returned}, Total={Total}",
-                employeeId, items.Count, totalCount);
+            var (items, totalCount) =
+                await _approvalRepository.GetMyApprovals(employeeId, request);
+
+
+            var sortedItems = ApplyApprovalSorting(
+                items.AsQueryable(),
+                request.SortField,
+                request.SortOrder
+            ).ToList();
+
+            Log.Information(
+                "GetMyApprovals succeeded. EmployeeId={EmployeeId}, Returned={Returned}, Total={Total}",
+                employeeId,
+                sortedItems.Count,
+                totalCount
+            );
 
             return new ApiResponse<PaginatedResponse<ApprovalResponseModel>>
             {
                 Success = true,
                 Data = new PaginatedResponse<ApprovalResponseModel>
                 {
-                    Items = items,
+                    Items = sortedItems,
                     TotalCount = totalCount,
                     PageNumber = request.PageNumber,
                     PageSize = request.PageSize,
@@ -315,28 +329,44 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
+        
+
         /// <summary>
-        /// Gets complete approval history for the specified employee, with optional role, type, status and search filters.
+        /// Gets complete approval history for an employee as requester or approver with filtering and pagination.
+        /// Supports role-based filtering (requester/approver/all) and full-text search.
         /// </summary>
         public async Task<ApiResponse<PaginatedResponse<ApprovalResponseModel>>> GetApprovalHistory(
-     int employeeId,
-     ApprovalHistoryRequestModel request
- )
+int employeeId,
+ApprovalHistoryRequestModel request
+)
         {
             Log.Information(
                 "GetApprovalHistory started. EmployeeId={EmployeeId}, Role={Role}, ApprovalType={ApprovalType}, Status={Status}, Page={PageNumber}, PageSize={PageSize}",
-                employeeId, request.Role ?? "all", request.ApprovalType ?? "all", request.Status ?? "all", request.PageNumber, request.PageSize
+                employeeId,
+                request.Role ?? "all",
+                request.ApprovalType ?? "all",
+                request.Status ?? "all",
+                request.PageNumber,
+                request.PageSize
             );
 
             var pageSize = request.PageSize;
             if (pageSize < 1) pageSize = 10;
             if (pageSize > 100) pageSize = 100;
 
-            var (items, totalCount) = await _approvalRepository.GetApprovalHistory(employeeId, request);
+            var (items, totalCount) =
+                await _approvalRepository.GetApprovalHistory(employeeId, request);
+            var sortedItems = ApplyApprovalSorting(
+                items.AsQueryable(),
+                request.SortField,
+                request.SortOrder
+            ).ToList();
 
             Log.Information(
                 "GetApprovalHistory succeeded for EmployeeId={EmployeeId}. Returned={Returned}, Total={Total}",
-                employeeId, items.Count, totalCount
+                employeeId,
+                sortedItems.Count,
+                totalCount
             );
 
             return new ApiResponse<PaginatedResponse<ApprovalResponseModel>>
@@ -344,13 +374,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 Success = true,
                 Data = new PaginatedResponse<ApprovalResponseModel>
                 {
-                    Items = items,
+                    Items = sortedItems,
                     TotalCount = totalCount,
                     PageNumber = request.PageNumber,
                     PageSize = pageSize,
                 },
             };
         }
+
 
         /// <summary>
         /// Gets detailed information about a specific approval, including assignment and attachment details, enforcing access control.
@@ -438,7 +469,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 details.Assignment = new AssignmentDetailsResponseModel
                 {
-                    AssignmentId = approval.Assignment.AssignmentId,
+                    AssignmentId = approval.Assignment.AssignmentId, 
                     MenteeName =
                         $"{approval.Assignment.MenteeEmployee.Userprofile.FirstName} {approval.Assignment.MenteeEmployee.Userprofile.LastName}",
                     SmeName =
@@ -536,6 +567,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
+
         /// <summary>
         /// Downloads the proof document of an assignment, enforcing mentee, SME, or manager access control.
         /// </summary>
@@ -558,7 +590,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     && assignment.Sme.EmployeeId != employeeId
                     && assignment.MenteeEmployee.ReportingManagerEmployeeId != employeeId
                 )
-            )
+            ) 
             {
                 Log.Warning(
                     "GetAssignmentProof: Assignment not found or access denied. AssignmentId={AssignmentId}, EmployeeId={EmployeeId}",
@@ -717,7 +749,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     "PreviewAssignmentProof: Assignment not found or access denied. AssignmentId={AssignmentId}, EmployeeId={EmployeeId}",
                     assignmentId,
                     employeeId
-                ); 
+                );
 
                 return new ApiResponse<FileDownloadResponseModel>
                 {
@@ -766,6 +798,54 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         #endregion
+
+        private IQueryable<ApprovalResponseModel> ApplyApprovalSorting(
+    IQueryable<ApprovalResponseModel> query,
+    string? sortField,
+    string? sortOrder
+)
+        {
+            bool isAscending =
+                string.IsNullOrEmpty(sortOrder)
+                || sortOrder.Equals(
+                    LnDConstants.SORT_ORDER.ASC,
+                    StringComparison.OrdinalIgnoreCase
+                );
+
+            return sortField?.ToLower() switch
+            {
+                LnDConstants.SORT_FIELDS.APPROVAL_TYPE =>
+                    isAscending
+                        ? query.OrderBy(a => a.ApprovalType)
+                        : query.OrderByDescending(a => a.ApprovalType),
+
+                LnDConstants.SORT_FIELDS.REQUESTER_NAME =>
+                    isAscending
+                        ? query.OrderBy(a => a.RequesterName)
+                        : query.OrderByDescending(a => a.RequesterName),
+
+                LnDConstants.SORT_FIELDS.APPROVER_NAME =>
+                    isAscending
+                        ? query.OrderBy(a => a.ApproverName)
+                        : query.OrderByDescending(a => a.ApproverName),
+
+                LnDConstants.SORT_FIELDS.REQUESTED_ON =>
+                    isAscending
+                        ? query.OrderBy(a => a.RequestedOn)
+                        : query.OrderByDescending(a => a.RequestedOn),
+
+                LnDConstants.SORT_FIELDS.STATUS =>
+                    isAscending
+                        ? query.OrderBy(a => a.Status)
+                        : query.OrderByDescending(a => a.Status),
+
+                _ =>
+                    query.OrderByDescending(a => a.RequestedOn)
+            };
+        }
+
+
+
     }
 }
 
