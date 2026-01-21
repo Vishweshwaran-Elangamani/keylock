@@ -4,91 +4,97 @@ using Relevantz.EEPZ.Common.DTOs.Response;
 namespace Relevantz.EEPZ.Core.Services.Interfaces
 {
     /// <summary>
-    /// Service interface for Feedback business logic
+    /// Service interface for feedback business logic.
     /// </summary>
     public interface IFeedbackService
     {
-
         /// <summary>
-        /// Submit feedback
+        /// Creates a new feedback entry.
         /// </summary>
-        Task<FeedbackResponseDto> CreateFeedbackAsync(CreateFeedbackRequestDto dto);
+        Task<FeedbackResponseDto?> CreateFeedbackAsync(CreateFeedbackRequestDto dto);
 
         /// <summary>
-        /// Get feedback by ID with all question responses
+        /// Retrieves feedback by feedback identifier.
         /// </summary>
-        Task<FeedbackResponseDto> GetFeedbackByIdAsync(int feedbackId);
+        Task<FeedbackResponseDto?> GetFeedbackByIdAsync(int feedbackId);
 
         /// <summary>
-        /// Get all feedback submitted BY current user
+        /// Retrieves all feedback submitted by the given employee.
         /// </summary>
         Task<List<FeedbackResponseDto>> GetMyFeedbackAsync(int employeeId);
 
         /// <summary>
-        /// Get all feedback received BY current user (as recipient)        
+        /// Retrieves all feedback received by the given employee (as recipient).
         /// </summary>
         Task<List<FeedbackResponseDto>> GetFeedbackAsRecipientAsync(int employeeId);
 
         /// <summary>
-        /// Get team feedback (from team members)
+        /// Retrieves team feedback for the given manager.
         /// </summary>
         Task<List<FeedbackResponseDto>> GetTeamFeedbackAsync(int managerId);
 
         /// <summary>
-        /// Get feedback form structure for specific feedback type
+        /// Retrieves feedback form structure for a given feedback type.
         /// </summary>
-        Task<FeedbackFormDto> GetFeedbackFormAsync(string feedbackType);
+        Task<FeedbackFormDto?> GetFeedbackFormAsync(string feedbackType);
+
+        /// <summary>
+        /// Retrieves feedback entries flagged for bias/fairness.
+        /// </summary>
         Task<List<FeedbackResponseDto>> GetFlaggedFeedbackAsync(bool? isBias = null, bool? isFairness = null);
 
         /// <summary>
-        /// Get anonymous feedback
+        /// Retrieves all anonymous feedback entries.
         /// </summary>
         Task<List<FeedbackResponseDto>> GetAnonymousFeedbackAsync();
 
         /// <summary>
-        /// Get feedback pending HR review
+        /// Retrieves feedback entries pending HR review.
         /// </summary>
         Task<List<FeedbackResponseDto>> GetPendingHRReviewAsync();
 
+        /// <summary>
+        /// Retrieves all feedback entries (paged).
+        /// </summary>
         Task<List<FeedbackResponseDto>> GetAllFeedbackAsync(int pageNumber = 1, int pageSize = 20);
 
         /// <summary>
-        /// Get feedback for specific goal
+        /// Retrieves feedback entries for a given goal.
         /// </summary>
         Task<List<FeedbackResponseDto>> GetFeedbackByGoalAsync(int goalId);
 
         /// <summary>
-        /// Get feedback for specific project
+        /// Retrieves feedback entries for a given project.
         /// </summary>
         Task<List<FeedbackResponseDto>> GetFeedbackByProjectAsync(int projectId);
 
         /// <summary>
-        /// Update feedback (content, rating, comments)
+        /// Updates feedback details (rating/comments/question responses).
         /// </summary>
-        Task<FeedbackResponseDto> UpdateFeedbackAsync(int feedbackId, UpdateFeedbackRequestDto dto);
+        Task<FeedbackResponseDto?> UpdateFeedbackAsync(int feedbackId, UpdateFeedbackRequestDto dto);
 
         /// <summary>
-        /// Submit feedback (change status from Draft to Submitted)
+        /// Submits feedback (changes status from Draft to Submitted).
         /// </summary>
         Task<bool> SubmitFeedbackAsync(int feedbackId);
 
         /// <summary>
-        /// Flag feedback for bias/fairness review
+        /// Flags feedback for HR review based on bias/fairness.
         /// </summary>
         Task<bool> FlagFeedbackForBiasAsync(int feedbackId, bool isBias, bool isFairness, int reviewedByHRId);
 
         /// <summary>
-        /// Set HR review on feedback
+        /// Sets HR review comments and reviewer for feedback.
         /// </summary>
         Task<bool> SetHRReviewAsync(int feedbackId, string hrComments, int reviewedByHRId);
 
         /// <summary>
-        /// Delete feedback (only if Draft status)
+        /// Deletes feedback entry (only if Draft).
         /// </summary>
         Task<bool> DeleteFeedbackAsync(int feedbackId);
 
         /// <summary>
-        /// Check if employee can edit feedback
+        /// Checks whether feedback can be edited.
         /// </summary>
         Task<bool> CanEditFeedbackAsync(int feedbackId);
     }

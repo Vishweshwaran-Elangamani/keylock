@@ -1,28 +1,16 @@
-using Relevantz.EEPZ.Data.Repository.Interfaces;
-using Relevantz.EEPZ.Common.Entities;
 using Microsoft.EntityFrameworkCore;
-using Relevantz.EEPZ.Data.DBContexts;
 using Microsoft.Extensions.Logging;
+using Relevantz.EEPZ.Common.Constants;
+using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Data.DBContexts;
+using Relevantz.EEPZ.Data.Repository.Interfaces;
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
-    /// <summary>
-    /// Repository implementation for MentorFeedbackTracking entity
-    /// Handles mentor feedback linked to SME (mentor + skill)
-    /// </summary>
     public class MentorFeedbackRepository : IMentorFeedbackRepository
     {
         private readonly EEPZDbContext _context;
         private readonly ILogger<MentorFeedbackRepository> _logger;
-
-        private const string STATUS_SUBMITTED = "Submitted";
-        private const string STATUS_ACKNOWLEDGED = "Acknowledged";
-        private const string STATUS_REVIEWED = "Reviewed";
-        private const string STATUS_ARCHIVED = "Archived";
-
-        private const string FEEDBACK_FROM_MENTEE = "Mentee";
-        private const string FEEDBACK_FROM_HR = "HR";
-        private const string FEEDBACK_FROM_MANAGER = "Manager";
 
         public MentorFeedbackRepository(EEPZDbContext context, ILogger<MentorFeedbackRepository> logger)
         {
@@ -32,238 +20,158 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
         public async Task<int> CreateMentorFeedbackAsync(Mentorfeedbacktracking feedback)
         {
-            if (feedback == null)
-                throw new ArgumentNullException(nameof(feedback));
+            ArgumentNullException.ThrowIfNull(feedback);
 
-            using var transaction = await _context.Database.BeginTransactionAsync();
-            try
-            {
-                if (feedback.SmeId <= 0)
-                    throw new ArgumentException("Invalid SmeId", nameof(feedback));
-                if (feedback.MentorEmployeeId <= 0)
-                    throw new ArgumentException("Invalid MentorEmployeeId", nameof(feedback));
-                if (feedback.MenteeEmployeeId <= 0)
-                    throw new ArgumentException("Invalid MenteeEmployeeId", nameof(feedback));
-                if (feedback.SkillIdReference <= 0)
-                    throw new ArgumentException("Invalid SkillIdReference", nameof(feedback));
+            if (feedback.SmeId <= 0) throw new ArgumentException("Invalid SmeId", nameof(feedback));
+            if (feedback.MentorEmployeeId <= 0) throw new ArgumentException("Invalid MentorEmployeeId", nameof(feedback));
+            if (feedback.MenteeEmployeeId <= 0) throw new ArgumentException("Invalid MenteeEmployeeId", nameof(feedback));
+            if (feedback.SkillIdReference <= 0) throw new ArgumentException("Invalid SkillIdReference", nameof(feedback));
 
-                feedback.CreatedAt = DateTime.UtcNow;
-                feedback.Status = STATUS_SUBMITTED;
+            feedback.CreatedAt = DateTime.UtcNow;
+            feedback.Status = MentorFeedbackConstants.Status.Submitted;
 
-                _context.Mentorfeedbacktrackings.Add(feedback);
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
+            _context.Mentorfeedbacktrackings.Add(feedback);
+            await _context.SaveChangesAsync();
 
-                _logger.LogInformation($"Mentor feedback created: {feedback.TrackingId}");
-                return feedback.TrackingId;
-            }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                _logger.LogError(ex, $"Error creating mentor feedback");
-                throw;
-            }
+            _logger.LogInformation("Mentor feedback created: {TrackingId}", feedback.TrackingId);
+
+            return feedback.TrackingId;
         }
 
         public async Task<Mentorfeedbacktracking?> GetMentorFeedbackByIdAsync(int trackingId)
         {
-            try
-            {
-                if (trackingId <= 0)
-                    throw new ArgumentException("Invalid tracking ID", nameof(trackingId));
+            if (trackingId <= 0)
+                throw new ArgumentException("Invalid tracking ID", nameof(trackingId));
 
-                return await _context.Mentorfeedbacktrackings
-                    .Include(f => f.Sme)
-                    .Include(f => f.MentorEmployee)
-                    .Include(f => f.MenteeEmployee)
-                    .Include(f => f.SkillIdReferenceNavigation)
-                    .Include(f => f.SubmittedByEmployee)
-                    .Include(f => f.ReviewedByHr)
-                    .FirstOrDefaultAsync(f => f.TrackingId == trackingId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error getting mentor feedback by ID: {trackingId}");
-                throw;
-            }
+            return await _context.Mentorfeedbacktrackings
+                .AsNoTracking()
+                .Include(f => f.Sme)
+                .Include(f => f.MentorEmployee)
+                .Include(f => f.MenteeEmployee)
+                .Include(f => f.SkillIdReferenceNavigation)
+                .Include(f => f.SubmittedByEmployee)
+                .Include(f => f.ReviewedByHr)
+                .FirstOrDefaultAsync(f => f.TrackingId == trackingId);
         }
 
         public async Task<List<Mentorfeedbacktracking>> GetFeedbackByMentorAsync(int mentorEmployeeId)
         {
-            try
-            {
-                if (mentorEmployeeId <= 0)
-                    throw new ArgumentException("Invalid mentor employee ID", nameof(mentorEmployeeId));
+            if (mentorEmployeeId <= 0)
+                throw new ArgumentException("Invalid mentor employee ID", nameof(mentorEmployeeId));
 
-                return await _context.Mentorfeedbacktrackings
-                    .Where(f => f.MentorEmployeeId == mentorEmployeeId && f.Status != STATUS_ARCHIVED)
-                    .Include(f => f.MenteeEmployee)
-                    .Include(f => f.SkillIdReferenceNavigation)
-                    .OrderByDescending(f => f.CreatedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error getting feedback by mentor: {mentorEmployeeId}");
-                throw;
-            }
+            return await _context.Mentorfeedbacktrackings
+                .AsNoTracking()
+                .Where(f => f.MentorEmployeeId == mentorEmployeeId && f.Status != MentorFeedbackConstants.Status.Archived)
+                .Include(f => f.MenteeEmployee)
+                .Include(f => f.SkillIdReferenceNavigation)
+                .OrderByDescending(f => f.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<List<Mentorfeedbacktracking>> GetFeedbackByMenteeAsync(int menteeEmployeeId)
         {
-            try
-            {
-                if (menteeEmployeeId <= 0)
-                    throw new ArgumentException("Invalid mentee employee ID", nameof(menteeEmployeeId));
+            if (menteeEmployeeId <= 0)
+                throw new ArgumentException("Invalid mentee employee ID", nameof(menteeEmployeeId));
 
-                return await _context.Mentorfeedbacktrackings
-                    .Where(f => f.MenteeEmployeeId == menteeEmployeeId)
-                    .Include(f => f.MentorEmployee)
-                    .Include(f => f.SkillIdReferenceNavigation)
-                    .OrderByDescending(f => f.CreatedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error getting feedback by mentee: {menteeEmployeeId}");
-                throw;
-            }
+            return await _context.Mentorfeedbacktrackings
+                .AsNoTracking()
+                .Where(f => f.MenteeEmployeeId == menteeEmployeeId)
+                .Include(f => f.MentorEmployee)
+                .Include(f => f.SkillIdReferenceNavigation)
+                .OrderByDescending(f => f.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<List<Mentorfeedbacktracking>> GetFeedbackBySmeAsync(int smeId)
         {
-            try
-            {
-                if (smeId <= 0)
-                    throw new ArgumentException("Invalid SME ID", nameof(smeId));
+            if (smeId <= 0)
+                throw new ArgumentException("Invalid SME ID", nameof(smeId));
 
-                return await _context.Mentorfeedbacktrackings
-                    .Where(f => f.SmeId == smeId)
-                    .Include(f => f.MentorEmployee)
-                    .Include(f => f.MenteeEmployee)
-                    .Include(f => f.SkillIdReferenceNavigation)
-                    .OrderByDescending(f => f.CreatedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error getting feedback by SME: {smeId}");
-                throw;
-            }
+            return await _context.Mentorfeedbacktrackings
+                .AsNoTracking()
+                .Where(f => f.SmeId == smeId)
+                .Include(f => f.MentorEmployee)
+                .Include(f => f.MenteeEmployee)
+                .Include(f => f.SkillIdReferenceNavigation)
+                .OrderByDescending(f => f.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<List<Mentorfeedbacktracking>> GetPendingHRReviewAsync()
         {
-            try
-            {
-                return await _context.Mentorfeedbacktrackings
-                    .Where(f => f.Status == STATUS_SUBMITTED || f.Status == STATUS_ACKNOWLEDGED)
-                    .Include(f => f.MentorEmployee)
-                    .Include(f => f.MenteeEmployee)
-                    .Include(f => f.SkillIdReferenceNavigation)
-                    .OrderByDescending(f => f.CreatedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error getting pending HR review feedback");
-                throw;
-            }
+            return await _context.Mentorfeedbacktrackings
+                .AsNoTracking()
+                .Where(f => f.Status == MentorFeedbackConstants.Status.Submitted ||
+                            f.Status == MentorFeedbackConstants.Status.Acknowledged)
+                .Include(f => f.MentorEmployee)
+                .Include(f => f.MenteeEmployee)
+                .Include(f => f.SkillIdReferenceNavigation)
+                .OrderByDescending(f => f.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<List<Mentorfeedbacktracking>> GetAllMentorFeedbackAsync(int pageNumber = 1, int pageSize = 20)
         {
-            try
-            {
-                if (pageNumber <= 0)
-                    throw new ArgumentException("Page number must be greater than 0", nameof(pageNumber));
-                if (pageSize <= 0 || pageSize > 100)
-                    throw new ArgumentException("Page size must be between 1 and 100", nameof(pageSize));
+            pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+            pageSize = pageSize <= 0 ? 20 : pageSize;
+            pageSize = pageSize > 100 ? 100 : pageSize;
 
-                return await _context.Mentorfeedbacktrackings
-                    .Include(f => f.MentorEmployee)
-                    .Include(f => f.MenteeEmployee)
-                    .Include(f => f.SkillIdReferenceNavigation)
-                    .OrderByDescending(f => f.CreatedAt)
-                    .Skip((pageNumber - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error getting all mentor feedback (page {pageNumber})");
-                throw;
-            }
+            return await _context.Mentorfeedbacktrackings
+                .AsNoTracking()
+                .Include(f => f.MentorEmployee)
+                .Include(f => f.MenteeEmployee)
+                .Include(f => f.SkillIdReferenceNavigation)
+                .OrderByDescending(f => f.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
         }
 
         public async Task<List<Mentorfeedbacktracking>> GetFeedbackByStatusAsync(string status)
         {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(status))
-                    throw new ArgumentException("Status cannot be null or empty", nameof(status));
+            if (string.IsNullOrWhiteSpace(status))
+                throw new ArgumentException("Status cannot be null or empty", nameof(status));
 
-                var validStatuses = new[] { STATUS_SUBMITTED, STATUS_ACKNOWLEDGED, STATUS_REVIEWED, STATUS_ARCHIVED };
-                if (!validStatuses.Contains(status))
-                    throw new ArgumentException($"Invalid status: {status}", nameof(status));
+            if (!MentorFeedbackConstants.ValidStatuses.Contains(status))
+                throw new ArgumentException($"Invalid status: {status}", nameof(status));
 
-                return await _context.Mentorfeedbacktrackings
-                    .Where(f => f.Status == status)
-                    .Include(f => f.MentorEmployee)
-                    .Include(f => f.MenteeEmployee)
-                    .Include(f => f.SkillIdReferenceNavigation)
-                    .OrderByDescending(f => f.CreatedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error getting feedback by status: {status}");
-                throw;
-            }
+            return await _context.Mentorfeedbacktrackings
+                .AsNoTracking()
+                .Where(f => f.Status == status)
+                .Include(f => f.MentorEmployee)
+                .Include(f => f.MenteeEmployee)
+                .Include(f => f.SkillIdReferenceNavigation)
+                .OrderByDescending(f => f.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<List<Mentorfeedbacktracking>> GetFeedbackBySourceAsync(string feedbackFrom)
         {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(feedbackFrom))
-                    throw new ArgumentException("FeedbackFrom cannot be null or empty", nameof(feedbackFrom));
+            if (string.IsNullOrWhiteSpace(feedbackFrom))
+                throw new ArgumentException("FeedbackFrom cannot be null or empty", nameof(feedbackFrom));
 
-                var validSources = new[] { FEEDBACK_FROM_MENTEE, FEEDBACK_FROM_HR, FEEDBACK_FROM_MANAGER };
-                if (!validSources.Contains(feedbackFrom))
-                    throw new ArgumentException($"Invalid feedback source: {feedbackFrom}", nameof(feedbackFrom));
+            if (!MentorFeedbackConstants.ValidSources.Contains(feedbackFrom))
+                throw new ArgumentException($"Invalid feedback source: {feedbackFrom}", nameof(feedbackFrom));
 
-                return await _context.Mentorfeedbacktrackings
-                    .Where(f => f.FeedbackFrom == feedbackFrom)
-                    .Include(f => f.MentorEmployee)
-                    .Include(f => f.MenteeEmployee)
-                    .Include(f => f.SkillIdReferenceNavigation)
-                    .OrderByDescending(f => f.CreatedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error getting feedback by source: {feedbackFrom}");
-                throw;
-            }
+            return await _context.Mentorfeedbacktrackings
+                .AsNoTracking()
+                .Where(f => f.FeedbackFrom == feedbackFrom)
+                .Include(f => f.MentorEmployee)
+                .Include(f => f.MenteeEmployee)
+                .Include(f => f.SkillIdReferenceNavigation)
+                .OrderByDescending(f => f.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<List<Mentorfeedbacktracking>> GetAnonymousMentorFeedbackAsync()
         {
-            try
-            {
-                return await _context.Mentorfeedbacktrackings
-                    .Where(f => f.IsAnonymous && f.Status != STATUS_ARCHIVED)
-                    .Include(f => f.MentorEmployee)
-                    .Include(f => f.SkillIdReferenceNavigation)
-                    .OrderByDescending(f => f.CreatedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error getting anonymous mentor feedback");
-                throw;
-            }
+            return await _context.Mentorfeedbacktrackings
+                .AsNoTracking()
+                .Where(f => f.IsAnonymous && f.Status != MentorFeedbackConstants.Status.Archived)
+                .Include(f => f.MentorEmployee)
+                .Include(f => f.SkillIdReferenceNavigation)
+                .OrderByDescending(f => f.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<bool> UpdateMentorFeedbackAsync(Mentorfeedbacktracking feedback)
@@ -282,6 +190,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 }
 
                 _context.Entry(existingFeedback).CurrentValues.SetValues(feedback);
+
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
@@ -296,129 +205,92 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
         }
 
+
         public async Task<bool> UpdateFeedbackStatusAsync(int trackingId, string newStatus)
         {
             if (trackingId <= 0)
                 throw new ArgumentException("Invalid tracking ID", nameof(trackingId));
+
             if (string.IsNullOrWhiteSpace(newStatus))
                 throw new ArgumentException("Status cannot be null or empty", nameof(newStatus));
 
-            var validStatuses = new[] { STATUS_SUBMITTED, STATUS_ACKNOWLEDGED, STATUS_REVIEWED, STATUS_ARCHIVED };
-            if (!validStatuses.Contains(newStatus))
+            if (!MentorFeedbackConstants.ValidStatuses.Contains(newStatus))
                 throw new ArgumentException($"Invalid status: {newStatus}", nameof(newStatus));
 
-            using var transaction = await _context.Database.BeginTransactionAsync();
-            try
-            {
-                var feedback = await _context.Mentorfeedbacktrackings.FindAsync(trackingId);
-                if (feedback == null)
-                {
-                    _logger.LogWarning($"Mentor feedback not found: {trackingId}");
-                    return false;
-                }
+            var feedback = await _context.Mentorfeedbacktrackings
+                .FirstOrDefaultAsync(f => f.TrackingId == trackingId);
 
-                feedback.Status = newStatus;
+            if (feedback == null)
+                return false;
 
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
+           feedback.Status = newStatus;
 
-                _logger.LogInformation($"Mentor feedback status updated: {trackingId} → {newStatus}");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                _logger.LogError(ex, $"Error updating feedback status: {trackingId}");
-                throw;
-            }
+
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Mentor feedback status updated. TrackingId: {TrackingId}, Status: {Status}", trackingId, newStatus);
+
+            return true;
         }
 
         public async Task<bool> SetHRReviewAsync(int trackingId, string hrComments, int reviewedByHRId)
         {
             if (trackingId <= 0)
                 throw new ArgumentException("Invalid tracking ID", nameof(trackingId));
-            if (string.IsNullOrWhiteSpace(hrComments))
-                throw new ArgumentException("HR comments cannot be null or empty", nameof(hrComments));
+
             if (reviewedByHRId <= 0)
                 throw new ArgumentException("Invalid reviewer ID", nameof(reviewedByHRId));
 
-            using var transaction = await _context.Database.BeginTransactionAsync();
-            try
-            {
-                var feedback = await _context.Mentorfeedbacktrackings.FindAsync(trackingId);
-                if (feedback == null)
-                {
-                    _logger.LogWarning($"Mentor feedback not found: {trackingId}");
-                    return false;
-                }
+            var feedback = await _context.Mentorfeedbacktrackings
+                .FirstOrDefaultAsync(f => f.TrackingId == trackingId);
 
-                feedback.HrreviewComments = hrComments;
-                feedback.ReviewedByHrid = reviewedByHRId;
-                feedback.ReviewedAt = DateTime.UtcNow;
-                feedback.Status = STATUS_REVIEWED;
+            if (feedback == null)
+                return false;
 
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
+            feedback.HrreviewComments = hrComments;
+            feedback.ReviewedByHrid = reviewedByHRId;
+            feedback.ReviewedAt = DateTime.UtcNow;
+            feedback.Status = MentorFeedbackConstants.Status.Reviewed;
+         
 
-                _logger.LogInformation($"HR review set for mentor feedback: {trackingId}");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                _logger.LogError(ex, $"Error setting HR review: {trackingId}");
-                throw;
-            }
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("HR review set for mentor feedback: {TrackingId}", trackingId);
+
+            return true;
         }
+
         public async Task<bool> DeleteMentorFeedbackAsync(int trackingId)
         {
             if (trackingId <= 0)
                 throw new ArgumentException("Invalid tracking ID", nameof(trackingId));
 
-            using var transaction = await _context.Database.BeginTransactionAsync();
-            try
-            {
-                var feedback = await _context.Mentorfeedbacktrackings.FindAsync(trackingId);
-                if (feedback == null)
-                {
-                    _logger.LogWarning($"Mentor feedback not found: {trackingId}");
-                    return false;
-                }
+            var feedback = await _context.Mentorfeedbacktrackings
+                .FirstOrDefaultAsync(f => f.TrackingId == trackingId);
 
-                if (feedback.Status != STATUS_SUBMITTED)
-                {
-                    throw new InvalidOperationException(
-                        $"Cannot delete feedback in {feedback.Status} status. Only Submitted feedback can be deleted.");
-                }
+            if (feedback == null)
+                return false;
 
-                _context.Mentorfeedbacktrackings.Remove(feedback);
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
+            if (feedback.Status != MentorFeedbackConstants.Status.Submitted)
+                throw new InvalidOperationException(
+                    $"Cannot delete feedback in '{feedback.Status}' status. Only Submitted feedback can be deleted.");
 
-                _logger.LogInformation($"Mentor feedback deleted: {trackingId}");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                _logger.LogError(ex, $"Error deleting mentor feedback: {trackingId}");
-                throw;
-            }
+            _context.Mentorfeedbacktrackings.Remove(feedback);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Mentor feedback deleted: {TrackingId}", trackingId);
+
+            return true;
         }
+
         public async Task<bool> MentorFeedbackExistsAsync(int trackingId)
         {
             if (trackingId <= 0)
                 return false;
 
-            try
-            {
-                return await _context.Mentorfeedbacktrackings.AnyAsync(f => f.TrackingId == trackingId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error checking mentor feedback existence: {trackingId}");
-                throw;
-            }
+            return await _context.Mentorfeedbacktrackings
+                .AsNoTracking()
+                .AnyAsync(f => f.TrackingId == trackingId);
         }
     }
 }

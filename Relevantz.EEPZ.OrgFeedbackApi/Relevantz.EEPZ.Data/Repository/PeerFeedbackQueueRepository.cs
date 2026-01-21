@@ -1,14 +1,15 @@
-using Relevantz.EEPZ.Data.Repository.Interfaces;
-using Relevantz.EEPZ.Common.Entities;
 using Microsoft.EntityFrameworkCore;
-using Relevantz.EEPZ.Data.DBContexts;
 using Microsoft.Extensions.Logging;
+using Relevantz.EEPZ.Common.Constants;
+using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Data.DBContexts;
+using Relevantz.EEPZ.Data.Repository.Interfaces;
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
     /// <summary>
     /// Repository implementation for PeerFeedbackQueue entity
-    /// Manages peer feedback quality control workflow
+    /// Manages peer feedback quality control workflow.
     /// </summary>
     public class PeerFeedbackQueueRepository : IPeerFeedbackQueueRepository
     {
@@ -17,335 +18,237 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
         public PeerFeedbackQueueRepository(EEPZDbContext context, ILogger<PeerFeedbackQueueRepository> logger)
         {
-            _context = context;
-            _logger = logger;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<int> CreatePeerFeedbackAsync(Peerfeedbackqueue feedback)
         {
-            try
-            {
-                feedback.CreatedAt = DateTime.UtcNow;
-                feedback.Status = "Pending";
+            ArgumentNullException.ThrowIfNull(feedback);
 
-                _context.Peerfeedbackqueues.Add(feedback);
-                await _context.SaveChangesAsync();
+            feedback.CreatedAt = DateTime.UtcNow;
+            feedback.Status = PeerFeedbackConstants.Status.Pending;
 
-                _logger.LogInformation($"Peer feedback created in queue: {feedback.QueueId}");
-                return feedback.QueueId;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error creating peer feedback: {ex.Message}");
-                throw;
-            }
+            _context.Peerfeedbackqueues.Add(feedback);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Peer feedback created in queue: {QueueId}", feedback.QueueId);
+
+            return feedback.QueueId;
         }
 
-        public async Task<Peerfeedbackqueue> GetQueueItemByIdAsync(int queueId)
+        public async Task<Peerfeedbackqueue?> GetQueueItemByIdAsync(int queueId)
         {
-            try
-            {
-                return await _context.Peerfeedbackqueues
-                    .Include(f => f.SubmittedByEmployee)
-                    .Include(f => f.RecipientEmployee)
-                    .Include(f => f.ApprovedByHr)
-                    .FirstOrDefaultAsync(f => f.QueueId == queueId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting queue item by ID: {ex.Message}");
-                throw;
-            }
+            return await _context.Peerfeedbackqueues
+                .AsNoTracking()
+                .Include(f => f.SubmittedByEmployee)
+                .Include(f => f.RecipientEmployee)
+                .Include(f => f.ApprovedByHr)
+                .FirstOrDefaultAsync(f => f.QueueId == queueId);
         }
 
         public async Task<List<Peerfeedbackqueue>> GetPendingFeedbackAsync()
         {
-            try
-            {
-                return await _context.Peerfeedbackqueues
-                    .Where(f => f.Status == "Pending")
-                    .Include(f => f.SubmittedByEmployee)
-                    .Include(f => f.RecipientEmployee)
-                    .OrderByDescending(f => f.CreatedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting pending feedback: {ex.Message}");
-                throw;
-            }
+            return await _context.Peerfeedbackqueues
+                .AsNoTracking()
+                .Where(f => f.Status == PeerFeedbackConstants.Status.Pending)
+                .Include(f => f.SubmittedByEmployee)
+                .Include(f => f.RecipientEmployee)
+                .OrderByDescending(f => f.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<List<Peerfeedbackqueue>> GetUnderReviewFeedbackAsync()
         {
-            try
-            {
-                return await _context.Peerfeedbackqueues
-                    .Where(f => f.Status == "UnderHRReview")
-                    .Include(f => f.SubmittedByEmployee)
-                    .Include(f => f.RecipientEmployee)
-                    .OrderByDescending(f => f.CreatedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting under review feedback: {ex.Message}");
-                throw;
-            }
+            return await _context.Peerfeedbackqueues
+                .AsNoTracking()
+                .Where(f => f.Status == PeerFeedbackConstants.Status.UnderHRReview)
+                .Include(f => f.SubmittedByEmployee)
+                .Include(f => f.RecipientEmployee)
+                .OrderByDescending(f => f.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<List<Peerfeedbackqueue>> GetApprovedFeedbackAsync()
         {
-            try
-            {
-                return await _context.Peerfeedbackqueues
-                    .Where(f => f.Status == "Approved")
-                    .Include(f => f.SubmittedByEmployee)
-                    .Include(f => f.RecipientEmployee)
-                    .OrderByDescending(f => f.ApprovedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting approved feedback: {ex.Message}");
-                throw;
-            }
+            return await _context.Peerfeedbackqueues
+                .AsNoTracking()
+                .Where(f => f.Status == PeerFeedbackConstants.Status.Approved)
+                .Include(f => f.SubmittedByEmployee)
+                .Include(f => f.RecipientEmployee)
+                .OrderByDescending(f => f.ApprovedAt)
+                .ToListAsync();
         }
 
         public async Task<List<Peerfeedbackqueue>> GetRejectedFeedbackAsync()
         {
-            try
-            {
-                return await _context.Peerfeedbackqueues
-                    .Where(f => f.Status == "Rejected")
-                    .Include(f => f.SubmittedByEmployee)
-                    .Include(f => f.RecipientEmployee)
-                    .OrderByDescending(f => f.CreatedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting rejected feedback: {ex.Message}");
-                throw;
-            }
+            return await _context.Peerfeedbackqueues
+                .AsNoTracking()
+                .Where(f => f.Status == PeerFeedbackConstants.Status.Rejected)
+                .Include(f => f.SubmittedByEmployee)
+                .Include(f => f.RecipientEmployee)
+                .OrderByDescending(f => f.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<List<Peerfeedbackqueue>> GetFeedbackByRecipientAsync(int employeeId)
         {
-            try
-            {
-                return await _context.Peerfeedbackqueues
-                    .Where(f => f.RecipientEmployeeId == employeeId && f.Status == "Approved")
-                    .Include(f => f.SubmittedByEmployee)
-                    .OrderByDescending(f => f.ApprovedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting feedback by recipient: {ex.Message}");
-                throw;
-            }
+            return await _context.Peerfeedbackqueues
+                .AsNoTracking()
+                .Where(f => f.RecipientEmployeeId == employeeId && f.Status == PeerFeedbackConstants.Status.Approved)
+                .Include(f => f.SubmittedByEmployee)
+                .OrderByDescending(f => f.ApprovedAt)
+                .ToListAsync();
         }
 
         public async Task<List<Peerfeedbackqueue>> GetFeedbackBySubmitterAsync(int employeeId)
         {
-            try
-            {
-                return await _context.Peerfeedbackqueues
-                    .Where(f => f.SubmittedByEmployeeId == employeeId)
-                    .Include(f => f.RecipientEmployee)
-                    .OrderByDescending(f => f.CreatedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting feedback by submitter: {ex.Message}");
-                throw;
-            }
+            return await _context.Peerfeedbackqueues
+                .AsNoTracking()
+                .Where(f => f.SubmittedByEmployeeId == employeeId)
+                .Include(f => f.RecipientEmployee)
+                .OrderByDescending(f => f.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<List<Peerfeedbackqueue>> GetAllPeerFeedbackAsync(int pageNumber = 1, int pageSize = 20)
         {
-            try
-            {
-                return await _context.Peerfeedbackqueues
-                    .Include(f => f.SubmittedByEmployee)
-                    .Include(f => f.RecipientEmployee)
-                    .Include(f => f.ApprovedByHr)
-                    .OrderByDescending(f => f.CreatedAt)
-                    .Skip((pageNumber - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting all peer feedback: {ex.Message}");
-                throw;
-            }
+            pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+            pageSize = pageSize <= 0 ? 20 : pageSize;
+            pageSize = pageSize > 100 ? 100 : pageSize;
+
+            return await _context.Peerfeedbackqueues
+                .AsNoTracking()
+                .Include(f => f.SubmittedByEmployee)
+                .Include(f => f.RecipientEmployee)
+                .Include(f => f.ApprovedByHr)
+                .OrderByDescending(f => f.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
         }
 
         public async Task<List<Peerfeedbackqueue>> GetFeedbackByStatusAsync(string status)
         {
-            try
-            {
-                return await _context.Peerfeedbackqueues
-                    .Where(f => f.Status == status)
-                    .Include(f => f.SubmittedByEmployee)
-                    .Include(f => f.RecipientEmployee)
-                    .OrderByDescending(f => f.CreatedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting feedback by status: {ex.Message}");
-                throw;
-            }
+            if (string.IsNullOrWhiteSpace(status))
+                throw new ArgumentException("Status cannot be null or empty.", nameof(status));
+
+            return await _context.Peerfeedbackqueues
+                .AsNoTracking()
+                .Where(f => f.Status == status)
+                .Include(f => f.SubmittedByEmployee)
+                .Include(f => f.RecipientEmployee)
+                .OrderByDescending(f => f.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<List<Peerfeedbackqueue>> GetAnonymousPeerFeedbackAsync()
         {
-            try
-            {
-                return await _context.Peerfeedbackqueues
-                    .Where(f => f.IsAnonymous && f.Status == "Approved")
-                    .Include(f => f.RecipientEmployee)
-                    .OrderByDescending(f => f.ApprovedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting anonymous peer feedback: {ex.Message}");
-                throw;
-            }
+            return await _context.Peerfeedbackqueues
+                .AsNoTracking()
+                .Where(f => f.IsAnonymous && f.Status == PeerFeedbackConstants.Status.Approved)
+                .Include(f => f.RecipientEmployee)
+                .OrderByDescending(f => f.ApprovedAt)
+                .ToListAsync();
         }
 
         public async Task<bool> UpdatePeerFeedbackAsync(Peerfeedbackqueue feedback)
         {
-            try
-            {
-                _context.Peerfeedbackqueues.Update(feedback);
-                await _context.SaveChangesAsync();
+            ArgumentNullException.ThrowIfNull(feedback);
 
-                _logger.LogInformation($"Peer feedback updated: {feedback.QueueId}");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error updating peer feedback: {ex.Message}");
-                throw;
-            }
+            _context.Peerfeedbackqueues.Update(feedback);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Peer feedback updated: {QueueId}", feedback.QueueId);
+
+            return true;
         }
 
         public async Task<bool> ApprovePeerFeedbackAsync(int queueId, bool isProfessional, bool isRelevant, int approvedByHRId)
         {
-            try
-            {
-                var feedback = await _context.Peerfeedbackqueues.FindAsync(queueId);
-                if (feedback == null)
-                    return false;
+            var feedback = await _context.Peerfeedbackqueues
+                .FirstOrDefaultAsync(x => x.QueueId == queueId);
 
-                feedback.IsProfessional = isProfessional;
-                feedback.IsRelevant = isRelevant;
-                feedback.ApprovedByHrid = approvedByHRId;
-                feedback.Status = "Approved";
-                feedback.ApprovedAt = DateTime.UtcNow;
+            if (feedback == null)
+                return false;
 
-                _context.Peerfeedbackqueues.Update(feedback);
-                await _context.SaveChangesAsync();
+            feedback.IsProfessional = isProfessional;
+            feedback.IsRelevant = isRelevant;
+            feedback.ApprovedByHrid = approvedByHRId;
+            feedback.Status = PeerFeedbackConstants.Status.Approved;
+            feedback.ApprovedAt = DateTime.UtcNow;
 
-                _logger.LogInformation($"Peer feedback approved: {queueId}");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error approving peer feedback: {ex.Message}");
-                throw;
-            }
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Peer feedback approved: {QueueId}", queueId);
+
+            return true;
         }
 
         public async Task<bool> RejectPeerFeedbackAsync(int queueId, int rejectedByHRId)
         {
-            try
-            {
-                var feedback = await _context.Peerfeedbackqueues.FindAsync(queueId);
-                if (feedback == null)
-                    return false;
+            var feedback = await _context.Peerfeedbackqueues
+                .FirstOrDefaultAsync(x => x.QueueId == queueId);
 
-                feedback.ApprovedByHrid = rejectedByHRId;
-                feedback.Status = "Rejected";
-                feedback.ApprovedAt = DateTime.UtcNow;
+            if (feedback == null)
+                return false;
 
-                _context.Peerfeedbackqueues.Update(feedback);
-                await _context.SaveChangesAsync();
+            feedback.ApprovedByHrid = rejectedByHRId;
+            feedback.Status = PeerFeedbackConstants.Status.Rejected;
+            feedback.ApprovedAt = DateTime.UtcNow;
 
-                _logger.LogInformation($"Peer feedback rejected: {queueId}");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error rejecting peer feedback: {ex.Message}");
-                throw;
-            }
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Peer feedback rejected: {QueueId}", queueId);
+
+            return true;
         }
 
         public async Task<bool> UpdateFeedbackStatusAsync(int queueId, string newStatus)
         {
-            try
-            {
-                var feedback = await _context.Peerfeedbackqueues.FindAsync(queueId);
-                if (feedback == null)
-                    return false;
+            if (string.IsNullOrWhiteSpace(newStatus))
+                throw new ArgumentException("Status cannot be null or empty.", nameof(newStatus));
 
-                feedback.Status = newStatus;
+            var feedback = await _context.Peerfeedbackqueues
+                .FirstOrDefaultAsync(x => x.QueueId == queueId);
 
-                _context.Peerfeedbackqueues.Update(feedback);
-                await _context.SaveChangesAsync();
+            if (feedback == null)
+                return false;
 
-                _logger.LogInformation($"Peer feedback status updated: {queueId} → {newStatus}");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error updating feedback status: {ex.Message}");
-                throw;
-            }
+            feedback.Status = newStatus;
+
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Peer feedback status updated. QueueId: {QueueId}, Status: {Status}", queueId, newStatus);
+
+            return true;
         }
 
         public async Task<bool> DeleteQueueItemAsync(int queueId)
         {
-            try
-            {
-                var feedback = await _context.Peerfeedbackqueues.FindAsync(queueId);
-                if (feedback == null)
-                    return false;
+            var feedback = await _context.Peerfeedbackqueues
+                .FirstOrDefaultAsync(x => x.QueueId == queueId);
 
-                if (feedback.Status != "Pending")
-                    throw new InvalidOperationException($"Cannot delete feedback in {feedback.Status} status. Only Pending feedback can be deleted.");
+            if (feedback == null)
+                return false;
 
-                _context.Peerfeedbackqueues.Remove(feedback);
-                await _context.SaveChangesAsync();
+            if (feedback.Status != PeerFeedbackConstants.Status.Pending)
+                throw new InvalidOperationException(
+                    $"Cannot delete feedback in '{feedback.Status}' status. Only Pending feedback can be deleted.");
 
-                _logger.LogInformation($"Peer feedback deleted: {queueId}");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error deleting peer feedback: {ex.Message}");
-                throw;
-            }
+            _context.Peerfeedbackqueues.Remove(feedback);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Peer feedback deleted: {QueueId}", queueId);
+
+            return true;
         }
 
         public async Task<bool> QueueItemExistsAsync(int queueId)
         {
-            try
-            {
-                return await _context.Peerfeedbackqueues.AnyAsync(f => f.QueueId == queueId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error checking queue item existence: {ex.Message}");
-                throw;
-            }
+            return await _context.Peerfeedbackqueues
+                .AsNoTracking()
+                .AnyAsync(f => f.QueueId == queueId);
         }
     }
 }

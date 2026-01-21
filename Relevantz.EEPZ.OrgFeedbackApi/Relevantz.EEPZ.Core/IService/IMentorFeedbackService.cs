@@ -4,75 +4,72 @@ using Relevantz.EEPZ.Common.DTOs.Response;
 namespace Relevantz.EEPZ.Core.Services.Interfaces
 {
     /// <summary>
-    /// Service interface for MentorFeedbackTracking business logic
-    /// Handles mentor feedback operation
+    /// Service interface for Mentor Feedback business logic.
     /// </summary>
     public interface IMentorFeedbackService
     {
-
         /// <summary>
-        /// Create mentor feedback
+        /// Creates mentor feedback.
         /// </summary>
-        Task<MentorFeedbackResponseDto> CreateMentorFeedbackAsync(CreateMentorFeedbackRequestDto dto);
+        Task<MentorFeedbackResponseDto?> CreateMentorFeedbackAsync(CreateMentorFeedbackRequestDto dto);
 
         /// <summary>
-        /// Get mentor feedback by ID
+        /// Retrieves mentor feedback by tracking identifier.
         /// </summary>
-        Task<MentorFeedbackResponseDto> GetMentorFeedbackByIdAsync(int trackingId);
+        Task<MentorFeedbackResponseDto?> GetMentorFeedbackByIdAsync(int trackingId);
 
         /// <summary>
-        /// Get all feedback ABOUT a specific mentor
+        /// Retrieves all feedback about a mentor.
         /// </summary>
         Task<List<MentorFeedbackResponseDto>> GetFeedbackAboutMeAsync(int mentorEmployeeId);
 
         /// <summary>
-        /// Get all feedback GIVEN BY mentee about their mentor
+        /// Retrieves all mentor feedback submitted by a mentee.
         /// </summary>
         Task<List<MentorFeedbackResponseDto>> GetMyMentorFeedbackAsync(int menteeEmployeeId);
 
         /// <summary>
-        /// Get all mentor feedback (for HR)
+        /// Retrieves all mentor feedback (paged).
         /// </summary>
         Task<List<MentorFeedbackResponseDto>> GetAllMentorFeedbackAsync(int pageNumber = 1, int pageSize = 20);
 
         /// <summary>
-        /// Get feedback by status
+        /// Retrieves mentor feedback entries filtered by status.
         /// </summary>
         Task<List<MentorFeedbackResponseDto>> GetFeedbackByStatusAsync(string status);
 
         /// <summary>
-        /// Get pending HR review mentor feedback
+        /// Retrieves mentor feedback entries pending HR review.
         /// </summary>
         Task<List<MentorFeedbackResponseDto>> GetPendingHRReviewAsync();
 
         /// <summary>
-        /// Get anonymous mentor feedback
+        /// Retrieves anonymous mentor feedback entries.
         /// </summary>
         Task<List<MentorFeedbackResponseDto>> GetAnonymousMentorFeedbackAsync();
 
         /// <summary>
-        /// Update mentor feedback record
+        /// Updates mentor feedback record.
         /// </summary>
-        Task<MentorFeedbackResponseDto> UpdateMentorFeedbackAsync(int trackingId, UpdateMentorFeedbackRequestDto dto);
+        Task<MentorFeedbackResponseDto?> UpdateMentorFeedbackAsync(int trackingId, UpdateMentorFeedbackRequestDto dto);
 
         /// <summary>
-        /// Acknowledge mentor feedback
-        /// Used by: Mentor acknowledges feedback
+        /// Acknowledges mentor feedback.
         /// </summary>
         Task<bool> AcknowledgeMentorFeedbackAsync(int trackingId);
 
         /// <summary>
-        /// Set HR review on mentor feedback
+        /// Sets HR review comments on mentor feedback.
         /// </summary>
         Task<bool> SetHRReviewAsync(int trackingId, string hrComments, int reviewedByHRId);
 
         /// <summary>
-        /// Delete mentor feedback (only if Submitted status)
+        /// Deletes mentor feedback.
         /// </summary>
         Task<bool> DeleteMentorFeedbackAsync(int trackingId);
 
         /// <summary>
-        /// Check if mentor feedback exists
+        /// Checks whether mentor feedback exists.
         /// </summary>
         Task<bool> MentorFeedbackExistsAsync(int trackingId);
     }

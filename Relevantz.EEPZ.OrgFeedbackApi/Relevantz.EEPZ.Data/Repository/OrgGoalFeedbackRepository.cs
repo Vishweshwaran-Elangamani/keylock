@@ -1,271 +1,219 @@
-using Relevantz.EEPZ.Data.Repository.Interfaces;
-using Relevantz.EEPZ.Common.Entities;
 using Microsoft.EntityFrameworkCore;
-using Relevantz.EEPZ.Data.DBContexts;
 using Microsoft.Extensions.Logging;
+using Relevantz.EEPZ.Common.Constants;
+using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Data.DBContexts;
+using Relevantz.EEPZ.Data.Repository.Interfaces;
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
     /// <summary>
     /// Repository for Organization Goal Feedback
-    /// Filters Feedback table by Goal.GoalType = "Organization"
+    /// Filters Feedback table by RelatedGoal.GoalType = "org"
     /// </summary>
     public class OrgGoalFeedbackRepository : IOrgGoalFeedbackRepository
     {
         private readonly EEPZDbContext _context;
         private readonly ILogger<OrgGoalFeedbackRepository> _logger;
-        private const string ORG_GOAL_TYPE = "org";
 
         public OrgGoalFeedbackRepository(EEPZDbContext context, ILogger<OrgGoalFeedbackRepository> logger)
         {
-            _context = context;
-            _logger = logger;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<int> CreateOrgGoalFeedbackAsync(Feedback feedback)
         {
-            try
-            {
-                var goal = await _context.Goals
-                    .Where(g => g.GoalId == feedback.RelatedGoalId && g.GoalType == ORG_GOAL_TYPE)
-                    .FirstOrDefaultAsync();
+            ArgumentNullException.ThrowIfNull(feedback);
 
-                if (goal == null)
-                    throw new InvalidOperationException($"Goal {feedback.RelatedGoalId} is not an organization-level goal");
+            var goalId = feedback.RelatedGoalId;
+            if (!goalId.HasValue || goalId <= 0)
+                throw new ArgumentException("RelatedGoalId is required for organization goal feedback.", nameof(feedback));
 
-                feedback.CreatedAt = DateTime.UtcNow;
-                feedback.Status = "Submitted";
-                feedback.FeedbackType = "OrganizationalGoal";
+            var isOrgGoal = await _context.Goals
+                .AsNoTracking()
+                .AnyAsync(g => g.GoalId == goalId.Value && g.GoalType == GoalTypeConstants.Organization);
 
-                _context.Feedbacks.Add(feedback);
-                await _context.SaveChangesAsync();
+            if (!isOrgGoal)
+                throw new InvalidOperationException($"Goal {goalId} is not an organization-level goal.");
 
-                _logger.LogInformation($"Organization goal feedback created: {feedback.FeedbackId}");
-                return feedback.FeedbackId;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error creating org goal feedback: {ex.Message}");
-                throw;
-            }
+            feedback.CreatedAt = DateTime.UtcNow;
+            feedback.Status = FeedbackConstants.Status.Submitted;
+            feedback.FeedbackType = FeedbackConstants.Type.OrganizationalGoal;
+
+            _context.Feedbacks.Add(feedback);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Organization goal feedback created: {FeedbackId}", feedback.FeedbackId);
+
+            return feedback.FeedbackId;
         }
 
-        public async Task<Feedback> GetOrgGoalFeedbackByIdAsync(int feedbackId)
+        public async Task<Feedback?> GetOrgGoalFeedbackByIdAsync(int feedbackId)
         {
-            try
-            {
-                return await _context.Feedbacks
-                    .Include(f => f.RelatedGoal)
-                    .Include(f => f.SubmittedByEmployee)
-                    .Include(f => f.RecipientEmployee)
-                    .Where(f => f.FeedbackId == feedbackId
-                        && f.RelatedGoal != null
-                        && f.RelatedGoal.GoalType == ORG_GOAL_TYPE)
-                    .FirstOrDefaultAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting org goal feedback by ID: {ex.Message}");
-                throw;
-            }
+            return await _context.Feedbacks
+                .AsNoTracking()
+                .Include(f => f.RelatedGoal)
+                .Include(f => f.SubmittedByEmployee)
+                .Include(f => f.RecipientEmployee)
+                .Where(f =>
+                    f.FeedbackId == feedbackId &&
+                    f.RelatedGoal != null &&
+                    f.RelatedGoal.GoalType == GoalTypeConstants.Organization)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<List<Feedback>> GetFeedbackByOrgGoalAsync(int goalId)
         {
-            try
-            {
-                return await _context.Feedbacks
-                    .Include(f => f.RelatedGoal)
-                    .Include(f => f.SubmittedByEmployee)
-                    .Include(f => f.RecipientEmployee)
-                    .Where(f => f.RelatedGoalId == goalId
-                        && f.RelatedGoal.GoalType == ORG_GOAL_TYPE
-                        && f.Status != "Archived")
-                    .OrderByDescending(f => f.CreatedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting feedback by org goal: {ex.Message}");
-                throw;
-            }
+            return await _context.Feedbacks
+                .AsNoTracking()
+                .Include(f => f.RelatedGoal)
+                .Include(f => f.SubmittedByEmployee)
+                .Include(f => f.RecipientEmployee)
+                .Where(f =>
+                    f.RelatedGoalId == goalId &&
+                    f.RelatedGoal != null &&
+                    f.RelatedGoal.GoalType == GoalTypeConstants.Organization &&
+                    f.Status != FeedbackConstants.Status.Archived)
+                .OrderByDescending(f => f.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<List<Feedback>> GetFeedbackBySubmitterAsync(int employeeId)
         {
-            try
-            {
-                return await _context.Feedbacks
-                    .Include(f => f.RelatedGoal)
-                    .Include(f => f.RecipientEmployee)
-                    .Where(f => f.SubmittedByEmployeeId == employeeId
-                        && f.RelatedGoal != null
-                        && f.RelatedGoal.GoalType == ORG_GOAL_TYPE)
-                    .OrderByDescending(f => f.CreatedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting feedback by submitter: {ex.Message}");
-                throw;
-            }
+            return await _context.Feedbacks
+                .AsNoTracking()
+                .Include(f => f.RelatedGoal)
+                .Include(f => f.RecipientEmployee)
+                .Where(f =>
+                    f.SubmittedByEmployeeId == employeeId &&
+                    f.RelatedGoal != null &&
+                    f.RelatedGoal.GoalType == GoalTypeConstants.Organization)
+                .OrderByDescending(f => f.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<List<Feedback>> GetAllOrgGoalFeedbackAsync(int pageNumber = 1, int pageSize = 20)
         {
-            try
-            {
-                return await _context.Feedbacks
-                    .Include(f => f.RelatedGoal)
-                    .Include(f => f.SubmittedByEmployee)
-                    .Include(f => f.RecipientEmployee)
-                    .Where(f => f.RelatedGoal != null && f.RelatedGoal.GoalType == ORG_GOAL_TYPE)
-                    .OrderByDescending(f => f.CreatedAt)
-                    .Skip((pageNumber - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting all org goal feedback: {ex.Message}");
-                throw;
-            }
+            pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+            pageSize = pageSize <= 0 ? 20 : pageSize;
+            pageSize = pageSize > 100 ? 100 : pageSize;
+
+            return await _context.Feedbacks
+                .AsNoTracking()
+                .Include(f => f.RelatedGoal)
+                .Include(f => f.SubmittedByEmployee)
+                .Include(f => f.RecipientEmployee)
+                .Where(f => f.RelatedGoal != null && f.RelatedGoal.GoalType == GoalTypeConstants.Organization)
+                .OrderByDescending(f => f.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
         }
 
         public async Task<List<Feedback>> GetFeedbackByStatusAsync(string status)
         {
-            try
-            {
-                return await _context.Feedbacks
-                    .Include(f => f.RelatedGoal)
-                    .Include(f => f.SubmittedByEmployee)
-                    .Include(f => f.RecipientEmployee)
-                    .Where(f => f.Status == status
-                        && f.RelatedGoal != null
-                        && f.RelatedGoal.GoalType == ORG_GOAL_TYPE)
-                    .OrderByDescending(f => f.CreatedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting feedback by status: {ex.Message}");
-                throw;
-            }
+            if (string.IsNullOrWhiteSpace(status))
+                throw new ArgumentException("Status cannot be null or empty.", nameof(status));
+
+            return await _context.Feedbacks
+                .AsNoTracking()
+                .Include(f => f.RelatedGoal)
+                .Include(f => f.SubmittedByEmployee)
+                .Include(f => f.RecipientEmployee)
+                .Where(f =>
+                    f.Status == status &&
+                    f.RelatedGoal != null &&
+                    f.RelatedGoal.GoalType == GoalTypeConstants.Organization)
+                .OrderByDescending(f => f.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<List<Feedback>> GetAnonymousOrgGoalFeedbackAsync()
         {
-            try
-            {
-                return await _context.Feedbacks
-                    .Include(f => f.RelatedGoal)
-                    .Include(f => f.RecipientEmployee)
-                    .Where(f => f.IsAnonymous
-                        && f.Status != "Archived"
-                        && f.RelatedGoal != null
-                        && f.RelatedGoal.GoalType == ORG_GOAL_TYPE)
-                    .OrderByDescending(f => f.CreatedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting anonymous org goal feedback: {ex.Message}");
-                throw;
-            }
+            return await _context.Feedbacks
+                .AsNoTracking()
+                .Include(f => f.RelatedGoal)
+                .Include(f => f.RecipientEmployee)
+                .Where(f =>
+                    f.IsAnonymous &&
+                    f.Status != FeedbackConstants.Status.Archived &&
+                    f.RelatedGoal != null &&
+                    f.RelatedGoal.GoalType == GoalTypeConstants.Organization)
+                .OrderByDescending(f => f.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<bool> UpdateOrgGoalFeedbackAsync(Feedback feedback)
         {
-            try
-            {
-                _context.Feedbacks.Update(feedback);
-                feedback.UpdatedAt = DateTime.UtcNow;
-                await _context.SaveChangesAsync();
+            ArgumentNullException.ThrowIfNull(feedback);
 
-                _logger.LogInformation($"Organization goal feedback updated: {feedback.FeedbackId}");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error updating org goal feedback: {ex.Message}");
-                throw;
-            }
+            feedback.UpdatedAt = DateTime.UtcNow;
+
+            _context.Feedbacks.Update(feedback);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Organization goal feedback updated: {FeedbackId}", feedback.FeedbackId);
+
+            return true;
         }
 
         public async Task<bool> UpdateFeedbackStatusAsync(int feedbackId, string newStatus)
         {
-            try
-            {
-                var feedback = await _context.Feedbacks
-                    .Include(f => f.RelatedGoal)
-                    .Where(f => f.FeedbackId == feedbackId
-                        && f.RelatedGoal != null
-                        && f.RelatedGoal.GoalType == ORG_GOAL_TYPE)
-                    .FirstOrDefaultAsync();
+            if (string.IsNullOrWhiteSpace(newStatus))
+                throw new ArgumentException("Status cannot be null or empty.", nameof(newStatus));
 
-                if (feedback == null)
-                    return false;
+            var feedback = await _context.Feedbacks
+                .Include(f => f.RelatedGoal)
+                .FirstOrDefaultAsync(f =>
+                    f.FeedbackId == feedbackId &&
+                    f.RelatedGoal != null &&
+                    f.RelatedGoal.GoalType == GoalTypeConstants.Organization);
 
-                feedback.Status = newStatus;
-                feedback.UpdatedAt = DateTime.UtcNow;
+            if (feedback == null)
+                return false;
 
-                _context.Feedbacks.Update(feedback);
-                await _context.SaveChangesAsync();
+            feedback.Status = newStatus;
+            feedback.UpdatedAt = DateTime.UtcNow;
 
-                _logger.LogInformation($"Org goal feedback status updated: {feedbackId} → {newStatus}");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error updating feedback status: {ex.Message}");
-                throw;
-            }
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Org goal feedback status updated. FeedbackId: {FeedbackId}, Status: {Status}", feedbackId, newStatus);
+
+            return true;
         }
 
         public async Task<bool> DeleteOrgGoalFeedbackAsync(int feedbackId)
         {
-            try
-            {
-                var feedback = await _context.Feedbacks
-                    .Include(f => f.RelatedGoal)
-                    .Where(f => f.FeedbackId == feedbackId
-                        && f.RelatedGoal != null
-                        && f.RelatedGoal.GoalType == ORG_GOAL_TYPE)
-                    .FirstOrDefaultAsync();
+            var feedback = await _context.Feedbacks
+                .Include(f => f.RelatedGoal)
+                .FirstOrDefaultAsync(f =>
+                    f.FeedbackId == feedbackId &&
+                    f.RelatedGoal != null &&
+                    f.RelatedGoal.GoalType == GoalTypeConstants.Organization);
 
-                if (feedback == null)
-                    return false;
+            if (feedback == null)
+                return false;
 
-                if (feedback.Status != "Submitted")
-                    throw new InvalidOperationException($"Cannot delete feedback in {feedback.Status} status");
+            if (feedback.Status != FeedbackConstants.Status.Submitted)
+                throw new InvalidOperationException($"Cannot delete feedback in '{feedback.Status}' status.");
 
-                _context.Feedbacks.Remove(feedback);
-                await _context.SaveChangesAsync();
+            _context.Feedbacks.Remove(feedback);
+            await _context.SaveChangesAsync();
 
-                _logger.LogInformation($"Organization goal feedback deleted: {feedbackId}");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error deleting org goal feedback: {ex.Message}");
-                throw;
-            }
+            _logger.LogInformation("Organization goal feedback deleted: {FeedbackId}", feedbackId);
+
+            return true;
         }
+
         public async Task<bool> OrgGoalFeedbackExistsAsync(int feedbackId)
         {
-            try
-            {
-                return await _context.Feedbacks
-                    .Include(f => f.RelatedGoal)
-                    .AnyAsync(f => f.FeedbackId == feedbackId
-                        && f.RelatedGoal != null
-                        && f.RelatedGoal.GoalType == ORG_GOAL_TYPE);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error checking org goal feedback existence: {ex.Message}");
-                throw;
-            }
+            return await _context.Feedbacks
+                .AsNoTracking()
+                .AnyAsync(f =>
+                    f.FeedbackId == feedbackId &&
+                    f.RelatedGoal != null &&
+                    f.RelatedGoal.GoalType == GoalTypeConstants.Organization);
         }
     }
 }

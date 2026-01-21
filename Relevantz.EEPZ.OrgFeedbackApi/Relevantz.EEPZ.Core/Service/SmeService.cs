@@ -1,8 +1,10 @@
+using Microsoft.Extensions.Logging;
+using Relevantz.EEPZ.Common.Constants;
+using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Data.IRepository;
-using Relevantz.EEPZ.Common.DTOs.Response;
-using Relevantz.EEPZ.Common.Models;
-using Microsoft.Extensions.Logging;
+
+
 namespace Relevantz.EEPZ.Core.Service
 {
     public class SmeService : ISmeService
@@ -16,22 +18,16 @@ namespace Relevantz.EEPZ.Core.Service
             _logger = logger;
         }
 
-        public async Task<ApiResponse<List<SmeDto>>> GetActiveSmesAsync()
+        public async Task<ApiResponseDto<List<SmeResponseDto>>> GetActiveSmesAsync()
         {
-            try
-            {
-                _logger.LogInformation("Service: Retrieving active SMEs");
-                var smes = await _repository.GetActiveSmesAsync();
+            _logger.LogInformation("Retrieving active SMEs");
 
-                return ApiResponse<List<SmeDto>>.SuccessResponse(
-                    smes,
-                    $"Retrieved {smes.Count} active SMEs successfully.");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Service error retrieving active SMEs");
-                return ApiResponse<List<SmeDto>>.ErrorResponse($"Service error: {ex.Message}");
-            }
+            var smes = await _repository.GetActiveSmesAsync();
+
+            return ApiResponseDto<List<SmeResponseDto>>.SuccessResponse(
+                smes,
+                MessageConstants.OperationSuccessful
+            );
         }
     }
 }

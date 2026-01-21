@@ -1,13 +1,13 @@
-using Relevantz.EEPZ.Common.Models; 
+using Relevantz.EEPZ.Common.DTOs.Response;
 
 namespace Relevantz.EEPZ.Core.IService
 {
     public interface IOrgwideObjectivesService
     {
-        Task<ApiResponse<List<OrgObjectiveDto>>> GetAllObjectivesAsync();
-        Task<ApiResponse<List<OrgObjectiveDto>>> GetAllObjectivesForDropdownAsync();
-        Task<ApiResponse<OrgObjectiveDto>> GetObjectiveByIdAsync(int objectiveId);
-        Task<ApiResponse<List<OrgObjectiveDto>>> GetActiveObjectivesAsync();
-        Task<ApiResponse<List<OrgObjectiveDto>>> GetObjectivesByStatusAsync(string status);
+        Task<List<OrgObjectiveResponseDto>> GetAllObjectivesAsync();
+        Task<List<OrgObjectiveResponseDto>> GetAllObjectivesForDropdownAsync();
+        Task<OrgObjectiveResponseDto?> GetObjectiveByIdAsync(int objectiveId);
+        Task<List<OrgObjectiveResponseDto>> GetActiveObjectivesAsync();
+        Task<List<OrgObjectiveResponseDto>> GetObjectivesByStatusAsync(string status);
     }
 }

@@ -1,17 +1,15 @@
-using Microsoft.Extensions.Logging;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
+using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
-using Relevantz.EEPZ.Data.Repository.Interfaces;
-using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Core.Services.Interfaces;
+using Relevantz.EEPZ.Data.Repository.Interfaces;
+
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
-    /// <summary>
-    /// Service implementation for Feedback business logic
-    /// Handles all feedback operations with validation and mapping
-    /// </summary>
     public class FeedbackService : IFeedbackService
     {
         private readonly IFeedbackRepository _feedbackRepo;
@@ -23,512 +21,289 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             IFeedbackQuestionRepository questionRepo,
             ILogger<FeedbackService> logger)
         {
-            _feedbackRepo = feedbackRepo;
-            _questionRepo = questionRepo;
-            _logger = logger;
+            _feedbackRepo = feedbackRepo ?? throw new ArgumentNullException(nameof(feedbackRepo));
+            _questionRepo = questionRepo ?? throw new ArgumentNullException(nameof(questionRepo));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<FeedbackResponseDto> CreateFeedbackAsync(CreateFeedbackRequestDto dto)
+        public async Task<FeedbackResponseDto?> CreateFeedbackAsync(CreateFeedbackRequestDto dto)
         {
-            try
-            {
-                if (dto.QuestionResponses == null || !dto.QuestionResponses.Any())
-                    throw new ArgumentException("At least one question response is required");
+            ArgumentNullException.ThrowIfNull(dto);
 
-                var feedback = new Feedback
+            if (dto.QuestionResponses == null || dto.QuestionResponses.Count == 0)
+                throw new ArgumentException("At least one question response is required.", nameof(dto.QuestionResponses));
+
+            var feedback = new Feedback
+            {
+                FeedbackType = dto.FeedbackType,
+                SubmittedByEmployeeId = dto.IsAnonymous ? null : dto.SubmittedByEmployeeId,
+                RecipientEmployeeId = dto.RecipientEmployeeId,
+                RelatedGoalId = dto.RelatedGoalId,
+                RelatedProjectId = dto.RelatedProjectId,
+                RelatedMentorId = dto.RelatedMentorId,
+                RelatedOrganizationGoalId = dto.RelatedOrganizationGoalId,
+                Rating = dto.Rating,
+                Comments = dto.Comments,
+                IsAnonymous = dto.IsAnonymous,
+                Status = FeedbackConstants.Status.Draft
+            };
+
+            var feedbackId = await _feedbackRepo.CreateFeedbackAsync(feedback);
+
+            foreach (var responseDto in dto.QuestionResponses)
+            {
+                var questionResponse = new Feedbackquestionresponse
                 {
-                    FeedbackType = dto.FeedbackType,
-                    SubmittedByEmployeeId = dto.IsAnonymous ? null : dto.SubmittedByEmployeeId,
-                    RecipientEmployeeId = dto.RecipientEmployeeId,
-                    RelatedGoalId = dto.RelatedGoalId,
-                    RelatedProjectId = dto.RelatedProjectId,
-                    RelatedMentorId = dto.RelatedMentorId,
-                    RelatedOrganizationGoalId = dto.RelatedOrganizationGoalId,
-                    Rating = dto.Rating,
-                    Comments = dto.Comments,
-                    IsAnonymous = dto.IsAnonymous,
-                    Status = "Draft"
+                    FeedbackId = feedbackId,
+                    QuestionId = responseDto.QuestionId,
+                    RatingValue = responseDto.RatingValue,
+                    BooleanValue = responseDto.BooleanValue,
+                    TextValue = responseDto.TextValue,
+                    SelectedOptions = responseDto.SelectedOptions != null && responseDto.SelectedOptions.Count > 0
+                        ? JsonSerializer.Serialize(responseDto.SelectedOptions)
+                        : null
                 };
 
-                var feedbackId = await _feedbackRepo.CreateFeedbackAsync(feedback);
-
-                foreach (var responseDto in dto.QuestionResponses)
-                {
-                    var questionResponse = new Feedbackquestionresponse
-                    {
-                        FeedbackId = feedbackId,
-                        QuestionId = responseDto.QuestionId,
-                        RatingValue = responseDto.RatingValue,
-                        BooleanValue = responseDto.BooleanValue,
-                        TextValue = responseDto.TextValue,
-                        SelectedOptions = responseDto.SelectedOptions != null
-                            ? JsonSerializer.Serialize(responseDto.SelectedOptions)
-                            : null
-                    };
-
-                    await _feedbackRepo.CreateQuestionResponseAsync(questionResponse);
-                }
-
-                _logger.LogInformation($"Feedback created successfully: {feedbackId}");
-
-                return await GetFeedbackByIdAsync(feedbackId);
+                await _feedbackRepo.CreateQuestionResponseAsync(questionResponse);
             }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error creating feedback: {ex.Message}");
-                throw;
-            }
+
+            _logger.LogInformation("Feedback created successfully. FeedbackId: {FeedbackId}", feedbackId);
+
+            return await GetFeedbackByIdAsync(feedbackId);
         }
 
-        public async Task<FeedbackResponseDto> GetFeedbackByIdAsync(int feedbackId)
+        public async Task<FeedbackResponseDto?> GetFeedbackByIdAsync(int feedbackId)
         {
-            try
-            {
-                var feedback = await _feedbackRepo.GetFeedbackByIdAsync(feedbackId);
-                if (feedback == null)
-                    throw new KeyNotFoundException($"Feedback {feedbackId} not found");
+            var feedback = await _feedbackRepo.GetFeedbackByIdAsync(feedbackId);
+            if (feedback == null)
+                return null;
 
-                var responses = await _feedbackRepo.GetFeedbackResponsesAsync(feedbackId);
-
-                return MapToResponseDto(feedback, responses);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting feedback by ID: {ex.Message}");
-                throw;
-            }
+            var responses = await _feedbackRepo.GetFeedbackResponsesAsync(feedbackId);
+            return MapToFeedbackResponseDto(feedback, responses);
         }
 
         public async Task<List<FeedbackResponseDto>> GetMyFeedbackAsync(int employeeId)
         {
-            try
-            {
-                var feedbacks = await _feedbackRepo.GetFeedbackBySubmitterAsync(employeeId);
-                var result = new List<FeedbackResponseDto>();
-
-                foreach (var feedback in feedbacks)
-                {
-                    var responses = await _feedbackRepo.GetFeedbackResponsesAsync(feedback.FeedbackId);
-                    result.Add(MapToResponseDto(feedback, responses));
-                }
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting my feedback: {ex.Message}");
-                throw;
-            }
+            var feedbacks = await _feedbackRepo.GetFeedbackBySubmitterAsync(employeeId);
+            return await MapManyAsync(feedbacks);
         }
 
         public async Task<List<FeedbackResponseDto>> GetFeedbackAsRecipientAsync(int employeeId)
         {
-            try
-            {
-                var feedbacks = await _feedbackRepo.GetFeedbackByRecipientAsync(employeeId);
-                var result = new List<FeedbackResponseDto>();
-
-                foreach (var feedback in feedbacks)
-                {
-                    var responses = await _feedbackRepo.GetFeedbackResponsesAsync(feedback.FeedbackId);
-                    result.Add(MapToResponseDto(feedback, responses));
-                }
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting feedback as recipient: {ex.Message}");
-                throw;
-            }
+            var feedbacks = await _feedbackRepo.GetFeedbackByRecipientAsync(employeeId);
+            return await MapManyAsync(feedbacks);
         }
 
         public async Task<List<FeedbackResponseDto>> GetTeamFeedbackAsync(int managerId)
         {
-            try
-            {
-                var feedbacks = await _feedbackRepo.GetTeamFeedbackAsync(managerId);
-                var result = new List<FeedbackResponseDto>();
-
-                foreach (var feedback in feedbacks)
-                {
-                    var responses = await _feedbackRepo.GetFeedbackResponsesAsync(feedback.FeedbackId);
-                    result.Add(MapToResponseDto(feedback, responses));
-                }
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting team feedback: {ex.Message}");
-                throw;
-            }
+            var feedbacks = await _feedbackRepo.GetTeamFeedbackAsync(managerId);
+            return await MapManyAsync(feedbacks);
         }
 
-        public async Task<FeedbackFormDto> GetFeedbackFormAsync(string feedbackType)
+        public async Task<FeedbackFormDto?> GetFeedbackFormAsync(string feedbackType)
         {
-            try
-            {
-                var questions = await _questionRepo.GetQuestionsByTypeAsync(feedbackType);
+            if (string.IsNullOrWhiteSpace(feedbackType))
+                throw new ArgumentException("FeedbackType is required.", nameof(feedbackType));
 
-                var questionDtos = new List<FeedbackQuestionDto>();
-                foreach (var question in questions)
+            var questions = await _questionRepo.GetQuestionsByTypeAsync(feedbackType);
+
+            var questionDtos = questions
+                .Select(q => new FeedbackQuestionDto
                 {
-                    var questionDto = new FeedbackQuestionDto
-                    {
-                        QuestionId = question.QuestionId,
-                        QuestionCode = question.QuestionCode,
-                        QuestionText = question.QuestionText,
-                        QuestionDescription = question.QuestionDescription,
-                        ResponseType = question.ResponseType,
-                        DisplayOrder = question.DisplayOrder,
-                        IsRequired = question.IsRequired ?? true,
-                        IsActive = question.IsActive ?? true,
-                        RatingScaleMin = question.RatingScaleMin,
-                        RatingScaleMax = question.RatingScaleMax
-                    };
+                    QuestionId = q.QuestionId,
+                    QuestionCode = q.QuestionCode,
+                    QuestionText = q.QuestionText,
+                    QuestionDescription = q.QuestionDescription,
+                    ResponseType = q.ResponseType,
+                    DisplayOrder = q.DisplayOrder,
+                    IsRequired = q.IsRequired ?? true,
+                    IsActive = q.IsActive ?? true,
+                    RatingScaleMin = q.RatingScaleMin,
+                    RatingScaleMax = q.RatingScaleMax,
+                    RatingScaleLabels = ParseRatingLabels(q.RatingScaleLabels),
+                    ChoiceOptions = ParseChoiceOptions(q.ChoiceOptions)
+                })
+                .OrderBy(x => x.DisplayOrder)
+                .ToList();
 
-                    if (!string.IsNullOrEmpty(question.RatingScaleLabels))
-                    {
-                        questionDto.RatingScaleLabels = JsonSerializer.Deserialize<Dictionary<string, string>>(question.RatingScaleLabels);
-                    }
-
-                    if (!string.IsNullOrEmpty(question.ChoiceOptions))
-                    {
-                        var options = JsonSerializer.Deserialize<List<Dictionary<string, object>>>(question.ChoiceOptions);
-                        questionDto.ChoiceOptions = options?.Select(o => new ChoiceOptionDto
-                        {
-                            Value = Convert.ToInt32(o["value"]),
-                            Label = o["label"].ToString()
-                        }).ToList();
-                    }
-
-                    questionDtos.Add(questionDto);
-                }
-
-                return new FeedbackFormDto
-                {
-                    FeedbackType = feedbackType,
-                    FormTitle = $"{feedbackType} Feedback Form",
-                    FormDescription = $"Please complete the following questions for {feedbackType} feedback",
-                    Questions = questionDtos.OrderBy(q => q.DisplayOrder).ToList()
-                };
-            }
-            catch (Exception ex)
+            return new FeedbackFormDto
             {
-                _logger.LogError($"Error getting feedback form: {ex.Message}");
-                throw;
-            }
+                FeedbackType = feedbackType,
+                FormTitle = $"{feedbackType} Feedback Form",
+                FormDescription = $"Please complete the following questions for {feedbackType} feedback",
+                Questions = questionDtos
+            };
         }
 
         public async Task<List<FeedbackResponseDto>> GetFlaggedFeedbackAsync(bool? isBias = null, bool? isFairness = null)
         {
-            try
-            {
-                var feedbacks = await _feedbackRepo.GetFlaggedFeedbackAsync(isBias, isFairness);
-                var result = new List<FeedbackResponseDto>();
-
-                foreach (var feedback in feedbacks)
-                {
-                    var responses = await _feedbackRepo.GetFeedbackResponsesAsync(feedback.FeedbackId);
-                    result.Add(MapToResponseDto(feedback, responses));
-                }
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting flagged feedback: {ex.Message}");
-                throw;
-            }
+            var feedbacks = await _feedbackRepo.GetFlaggedFeedbackAsync(isBias, isFairness);
+            return await MapManyAsync(feedbacks);
         }
 
         public async Task<List<FeedbackResponseDto>> GetAnonymousFeedbackAsync()
         {
-            try
-            {
-                var feedbacks = await _feedbackRepo.GetAnonymousFeedbackAsync();
-                var result = new List<FeedbackResponseDto>();
-
-                foreach (var feedback in feedbacks)
-                {
-                    var responses = await _feedbackRepo.GetFeedbackResponsesAsync(feedback.FeedbackId);
-                    result.Add(MapToResponseDto(feedback, responses));
-                }
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting anonymous feedback: {ex.Message}");
-                throw;
-            }
+            var feedbacks = await _feedbackRepo.GetAnonymousFeedbackAsync();
+            return await MapManyAsync(feedbacks);
         }
 
         public async Task<List<FeedbackResponseDto>> GetPendingHRReviewAsync()
         {
-            try
-            {
-                var feedbacks = await _feedbackRepo.GetPendingHRReviewAsync();
-                var result = new List<FeedbackResponseDto>();
-
-                foreach (var feedback in feedbacks)
-                {
-                    var responses = await _feedbackRepo.GetFeedbackResponsesAsync(feedback.FeedbackId);
-                    result.Add(MapToResponseDto(feedback, responses));
-                }
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting pending HR review: {ex.Message}");
-                throw;
-            }
+            var feedbacks = await _feedbackRepo.GetPendingHRReviewAsync();
+            return await MapManyAsync(feedbacks);
         }
 
         public async Task<List<FeedbackResponseDto>> GetAllFeedbackAsync(int pageNumber = 1, int pageSize = 20)
         {
-            try
-            {
-                var feedbacks = await _feedbackRepo.GetAllFeedbackAsync(pageNumber, pageSize);
-                var result = new List<FeedbackResponseDto>();
-
-                foreach (var feedback in feedbacks)
-                {
-                    var responses = await _feedbackRepo.GetFeedbackResponsesAsync(feedback.FeedbackId);
-                    result.Add(MapToResponseDto(feedback, responses));
-                }
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting all feedback: {ex.Message}");
-                throw;
-            }
+            var feedbacks = await _feedbackRepo.GetAllFeedbackAsync(pageNumber, pageSize);
+            return await MapManyAsync(feedbacks);
         }
 
         public async Task<List<FeedbackResponseDto>> GetFeedbackByGoalAsync(int goalId)
         {
-            try
-            {
-                var feedbacks = await _feedbackRepo.GetFeedbackByGoalAsync(goalId);
-                var result = new List<FeedbackResponseDto>();
-
-                foreach (var feedback in feedbacks)
-                {
-                    var responses = await _feedbackRepo.GetFeedbackResponsesAsync(feedback.FeedbackId);
-                    result.Add(MapToResponseDto(feedback, responses));
-                }
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting feedback by goal: {ex.Message}");
-                throw;
-            }
+            var feedbacks = await _feedbackRepo.GetFeedbackByGoalAsync(goalId);
+            return await MapManyAsync(feedbacks);
         }
 
         public async Task<List<FeedbackResponseDto>> GetFeedbackByProjectAsync(int projectId)
         {
-            try
-            {
-                var feedbacks = await _feedbackRepo.GetFeedbackByProjectAsync(projectId);
-                var result = new List<FeedbackResponseDto>();
-
-                foreach (var feedback in feedbacks)
-                {
-                    var responses = await _feedbackRepo.GetFeedbackResponsesAsync(feedback.FeedbackId);
-                    result.Add(MapToResponseDto(feedback, responses));
-                }
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting feedback by project: {ex.Message}");
-                throw;
-            }
+            var feedbacks = await _feedbackRepo.GetFeedbackByProjectAsync(projectId);
+            return await MapManyAsync(feedbacks);
         }
 
-        public async Task<FeedbackResponseDto> UpdateFeedbackAsync(int feedbackId, UpdateFeedbackRequestDto dto)
+        public async Task<FeedbackResponseDto?> UpdateFeedbackAsync(int feedbackId, UpdateFeedbackRequestDto dto)
         {
-            try
+            ArgumentNullException.ThrowIfNull(dto);
+
+            var canEdit = await _feedbackRepo.CanEditFeedbackAsync(feedbackId);
+            if (!canEdit)
+                return null;
+
+            var feedback = await _feedbackRepo.GetFeedbackByIdAsync(feedbackId);
+            if (feedback == null)
+                return null;
+
+            feedback.Rating = dto.Rating ?? feedback.Rating;
+            feedback.Comments = dto.Comments ?? feedback.Comments;
+
+            await _feedbackRepo.UpdateFeedbackAsync(feedback);
+
+            if (dto.QuestionResponses != null && dto.QuestionResponses.Count > 0)
             {
-                var canEdit = await _feedbackRepo.CanEditFeedbackAsync(feedbackId);
-                if (!canEdit)
-                    throw new InvalidOperationException("Cannot edit feedback in current status. Only Draft feedback can be edited.");
+                var existingResponses = await _feedbackRepo.GetFeedbackResponsesAsync(feedbackId);
 
-                var feedback = await _feedbackRepo.GetFeedbackByIdAsync(feedbackId);
-                if (feedback == null)
-                    throw new KeyNotFoundException($"Feedback {feedbackId} not found");
-
-                feedback.Rating = dto.Rating ?? feedback.Rating;
-                feedback.Comments = dto.Comments ?? feedback.Comments;
-
-                await _feedbackRepo.UpdateFeedbackAsync(feedback);
-
-                if (dto.QuestionResponses != null && dto.QuestionResponses.Any())
+                foreach (var responseDto in dto.QuestionResponses)
                 {
-                    var existingResponses = await _feedbackRepo.GetFeedbackResponsesAsync(feedbackId);
+                    var existingResponse = existingResponses.FirstOrDefault(r => r.QuestionId == responseDto.QuestionId);
+                    if (existingResponse == null)
+                        continue;
 
-                    foreach (var responseDto in dto.QuestionResponses)
-                    {
-                        var existingResponse = existingResponses.FirstOrDefault(r => r.QuestionId == responseDto.QuestionId);
+                    existingResponse.RatingValue = responseDto.RatingValue;
+                    existingResponse.BooleanValue = responseDto.BooleanValue;
+                    existingResponse.TextValue = responseDto.TextValue;
+                    existingResponse.SelectedOptions = responseDto.SelectedOptions != null && responseDto.SelectedOptions.Count > 0
+                        ? JsonSerializer.Serialize(responseDto.SelectedOptions)
+                        : null;
 
-                        if (existingResponse != null)
-                        {
-                            existingResponse.RatingValue = responseDto.RatingValue;
-                            existingResponse.BooleanValue = responseDto.BooleanValue;
-                            existingResponse.TextValue = responseDto.TextValue;
-                            existingResponse.SelectedOptions = responseDto.SelectedOptions != null
-                                ? JsonSerializer.Serialize(responseDto.SelectedOptions)
-                                : null;
-
-                            await _feedbackRepo.UpdateQuestionResponseAsync(existingResponse);
-                        }
-                    }
+                    await _feedbackRepo.UpdateQuestionResponseAsync(existingResponse);
                 }
+            }
 
-                _logger.LogInformation($"Feedback updated: {feedbackId}");
-                return await GetFeedbackByIdAsync(feedbackId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error updating feedback: {ex.Message}");
-                throw;
-            }
+            _logger.LogInformation("Feedback updated. FeedbackId: {FeedbackId}", feedbackId);
+
+            return await GetFeedbackByIdAsync(feedbackId);
         }
 
         public async Task<bool> SubmitFeedbackAsync(int feedbackId)
         {
-            try
-            {
-                var result = await _feedbackRepo.UpdateFeedbackStatusAsync(feedbackId, "Submitted");
-                if (result)
-                    _logger.LogInformation($"Feedback submitted: {feedbackId}");
+            var result = await _feedbackRepo.UpdateFeedbackStatusAsync(feedbackId, FeedbackConstants.Status.Submitted);
 
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error submitting feedback: {ex.Message}");
-                throw;
-            }
+            if (result)
+                _logger.LogInformation("Feedback submitted. FeedbackId: {FeedbackId}", feedbackId);
+
+            return result;
         }
 
         public async Task<bool> FlagFeedbackForBiasAsync(int feedbackId, bool isBias, bool isFairness, int reviewedByHRId)
         {
-            try
-            {
-                var result = await _feedbackRepo.FlagFeedbackForBiasAsync(feedbackId, isBias, isFairness, reviewedByHRId);
-                if (result)
-                    _logger.LogInformation($"Feedback flagged for review: {feedbackId}");
+            var result = await _feedbackRepo.FlagFeedbackForBiasAsync(feedbackId, isBias, isFairness, reviewedByHRId);
 
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error flagging feedback: {ex.Message}");
-                throw;
-            }
+            if (result)
+                _logger.LogInformation("Feedback flagged for HR review. FeedbackId: {FeedbackId}", feedbackId);
+
+            return result;
         }
 
         public async Task<bool> SetHRReviewAsync(int feedbackId, string hrComments, int reviewedByHRId)
         {
-            try
-            {
-                var result = await _feedbackRepo.SetHRReviewAsync(feedbackId, hrComments, reviewedByHRId);
-                if (result)
-                    _logger.LogInformation($"HR review set: {feedbackId}");
+            var result = await _feedbackRepo.SetHRReviewAsync(feedbackId, hrComments, reviewedByHRId);
 
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error setting HR review: {ex.Message}");
-                throw;
-            }
+            if (result)
+                _logger.LogInformation("HR review updated. FeedbackId: {FeedbackId}", feedbackId);
+
+            return result;
         }
 
         public async Task<bool> DeleteFeedbackAsync(int feedbackId)
         {
-            try
-            {
-                var result = await _feedbackRepo.DeleteFeedbackAsync(feedbackId);
-                if (result)
-                    _logger.LogInformation($"Feedback deleted: {feedbackId}");
+            var result = await _feedbackRepo.DeleteFeedbackAsync(feedbackId);
 
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error deleting feedback: {ex.Message}");
-                throw;
-            }
+            if (result)
+                _logger.LogInformation("Feedback deleted. FeedbackId: {FeedbackId}", feedbackId);
+
+            return result;
         }
 
-        public async Task<bool> CanEditFeedbackAsync(int feedbackId)
+        public Task<bool> CanEditFeedbackAsync(int feedbackId)
         {
-            try
-            {
-                return await _feedbackRepo.CanEditFeedbackAsync(feedbackId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error checking if can edit: {ex.Message}");
-                throw;
-            }
+            return _feedbackRepo.CanEditFeedbackAsync(feedbackId);
         }
 
-        private FeedbackResponseDto MapToResponseDto(Feedback feedback, List<Feedbackquestionresponse> responses)
+        private async Task<List<FeedbackResponseDto>> MapManyAsync(List<Feedback> feedbacks)
+        {
+            if (feedbacks == null || feedbacks.Count == 0)
+                return new List<FeedbackResponseDto>();
+
+            var result = new List<FeedbackResponseDto>(feedbacks.Count);
+
+            foreach (var feedback in feedbacks)
+            {
+                var responses = await _feedbackRepo.GetFeedbackResponsesAsync(feedback.FeedbackId);
+                result.Add(MapToFeedbackResponseDto(feedback, responses));
+            }
+
+            return result;
+        }
+
+        private static FeedbackResponseDto MapToFeedbackResponseDto(Feedback feedback, List<Feedbackquestionresponse> responses)
         {
             var responseList = new List<FeedbackQuestionResponseDto>();
 
-            if (responses != null && responses.Any())
+            if (responses != null && responses.Count > 0)
             {
                 foreach (var response in responses)
                 {
-                    var selectedOptions = new List<int>();
-                    if (!string.IsNullOrEmpty(response.SelectedOptions))
-                    {
-                        try
-                        {
-                            selectedOptions = JsonSerializer.Deserialize<List<int>>(response.SelectedOptions) ?? new List<int>();
-                        }
-                        catch { }
-                    }
-
                     responseList.Add(new FeedbackQuestionResponseDto
                     {
                         ResponseId = response.ResponseId,
                         QuestionId = response.QuestionId,
-                        QuestionText = response.Question?.QuestionText ?? "",
-                        ResponseType = response.Question?.ResponseType ?? "",
+                        QuestionText = response.Question?.QuestionText ?? string.Empty,
+                        ResponseType = response.Question?.ResponseType ?? string.Empty,
                         RatingValue = response.RatingValue,
                         BooleanValue = response.BooleanValue,
                         TextValue = response.TextValue,
-                        SelectedOptions = selectedOptions,
+                        SelectedOptions = ParseSelectedOptions(response.SelectedOptions),
                         CreatedAt = response.CreatedAt
                     });
                 }
             }
 
+            var submitterName = feedback.IsAnonymous
+    ? "Anonymous"
+    : feedback.SubmittedByEmployee?.Userprofile?.FirstName ?? "Unknown";
 
-            string submitterName = "Anonymous";
-            if (feedback.SubmittedByEmployee != null)
-            {
+            var recipientName = feedback.RecipientEmployee?.Userprofile?.FirstName ?? "Unknown";
 
-                submitterName = "Unknown";
-            }
-
-            string recipientName = "Unknown";
-            if (feedback.RecipientEmployee != null)
-            {
-                recipientName = "Unknown";
-            }
 
             return new FeedbackResponseDto
             {
@@ -552,6 +327,62 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 HRReviewComments = feedback.HrreviewComments,
                 QuestionResponses = responseList
             };
+        }
+
+        private static List<int> ParseSelectedOptions(string? selectedOptionsJson)
+        {
+            if (string.IsNullOrWhiteSpace(selectedOptionsJson))
+                return new List<int>();
+
+            try
+            {
+                return JsonSerializer.Deserialize<List<int>>(selectedOptionsJson) ?? new List<int>();
+            }
+            catch
+            {
+                return new List<int>();
+            }
+        }
+
+        private static Dictionary<string, string>? ParseRatingLabels(string? json)
+        {
+            if (string.IsNullOrWhiteSpace(json))
+                return null;
+
+            try
+            {
+                return JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static List<ChoiceOptionDto>? ParseChoiceOptions(string? json)
+        {
+            if (string.IsNullOrWhiteSpace(json))
+                return null;
+
+            try
+            {
+                var options = JsonSerializer.Deserialize<List<Dictionary<string, object>>>(json);
+                if (options == null || options.Count == 0)
+                    return null;
+
+                return options
+                    .Where(o => o.ContainsKey("value") && o.ContainsKey("label"))
+                    .Select(o => new ChoiceOptionDto
+                    {
+                        Value = Convert.ToInt32(o["value"]),
+                        Label = o["label"]?.ToString() ?? string.Empty
+                    })
+                    .ToList();
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

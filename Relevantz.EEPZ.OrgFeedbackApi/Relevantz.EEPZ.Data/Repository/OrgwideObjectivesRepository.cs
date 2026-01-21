@@ -1,27 +1,29 @@
 using Microsoft.EntityFrameworkCore;
-using Relevantz.EEPZ.Data.IRepository;
+using Relevantz.EEPZ.Common.Constants;
+using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Data.DBContexts;
-using Relevantz.EEPZ.Common.Models;
+using Relevantz.EEPZ.Data.IRepository;
 
 namespace Relevantz.EEPZ.Data.Repository
 {
     public class OrgwideObjectivesRepository : IOrgwideObjectivesRepository
     {
         private readonly EEPZDbContext _context;
-        private const string ORG_GOAL_TYPE = "org";
 
         public OrgwideObjectivesRepository(EEPZDbContext context)
         {
             _context = context;
         }
 
-        public async Task<List<OrgObjectiveDto>> GetAllOrgObjectivesAsync()
+        public async Task<List<OrgObjectiveResponseDto>> GetAllOrgObjectivesAsync()
         {
             return await _context.Goals
-                .Where(g => g.GoalType == ORG_GOAL_TYPE &&
-                           (g.Goalstatus == "open" || g.Goalstatus == "inprogress"))
+                .AsNoTracking()
+                .Where(g =>
+                    g.GoalType == GoalTypeConstants.Organization &&
+                    (g.Goalstatus == "open" || g.Goalstatus == "inprogress"))
                 .OrderBy(g => g.GoalTitle)
-                .Select(g => new OrgObjectiveDto
+                .Select(g => new OrgObjectiveResponseDto
                 {
                     ObjectiveId = g.GoalId,
                     Title = g.GoalTitle,
@@ -33,12 +35,13 @@ namespace Relevantz.EEPZ.Data.Repository
                 .ToListAsync();
         }
 
-        public async Task<List<OrgObjectiveDto>> GetAllOrgObjectivesForDropdownAsync()
+        public async Task<List<OrgObjectiveResponseDto>> GetAllOrgObjectivesForDropdownAsync()
         {
             return await _context.Goals
-                .Where(g => g.GoalType == ORG_GOAL_TYPE)
+                .AsNoTracking()
+                .Where(g => g.GoalType == GoalTypeConstants.Organization)
                 .OrderByDescending(g => g.Goalcreatedat)
-                .Select(g => new OrgObjectiveDto
+                .Select(g => new OrgObjectiveResponseDto
                 {
                     ObjectiveId = g.GoalId,
                     Title = g.GoalTitle,
@@ -50,11 +53,14 @@ namespace Relevantz.EEPZ.Data.Repository
                 .ToListAsync();
         }
 
-        public async Task<OrgObjectiveDto> GetOrgObjectiveByIdAsync(int objectiveId)
+        public async Task<OrgObjectiveResponseDto?> GetOrgObjectiveByIdAsync(int objectiveId)
         {
             return await _context.Goals
-                .Where(g => g.GoalId == objectiveId && g.GoalType == ORG_GOAL_TYPE)
-                .Select(g => new OrgObjectiveDto
+                .AsNoTracking()
+                .Where(g =>
+                    g.GoalId == objectiveId &&
+                    g.GoalType == GoalTypeConstants.Organization)
+                .Select(g => new OrgObjectiveResponseDto
                 {
                     ObjectiveId = g.GoalId,
                     Title = g.GoalTitle,
@@ -66,28 +72,35 @@ namespace Relevantz.EEPZ.Data.Repository
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<List<OrgObjectiveDto>> GetActiveOrgObjectivesAsync()
+        public async Task<List<OrgObjectiveResponseDto>> GetActiveOrgObjectivesAsync()
         {
             return await _context.Goals
-                .Where(g => g.GoalType == ORG_GOAL_TYPE &&
-                           (g.Goalstatus == "open" || g.Goalstatus == "inprogress"))
+                .AsNoTracking()
+                .Where(g =>
+                    g.GoalType == GoalTypeConstants.Organization &&
+                    (g.Goalstatus == "open" || g.Goalstatus == "inprogress"))
                 .OrderBy(g => g.GoalTitle)
-                .Select(g => new OrgObjectiveDto
+                .Select(g => new OrgObjectiveResponseDto
                 {
                     ObjectiveId = g.GoalId,
                     Title = g.GoalTitle,
                     Description = g.GoalDescription,
-                    GoalStatus = g.Goalstatus
+                    GoalStatus = g.Goalstatus,
+                    CreatedAt = g.Goalcreatedat,
+                    EndDate = g.Goalendat
                 })
                 .ToListAsync();
         }
 
-        public async Task<List<OrgObjectiveDto>> GetOrgObjectivesByStatusAsync(string status)
+        public async Task<List<OrgObjectiveResponseDto>> GetOrgObjectivesByStatusAsync(string status)
         {
             return await _context.Goals
-                .Where(g => g.GoalType == ORG_GOAL_TYPE && g.Goalstatus == status)
+                .AsNoTracking()
+                .Where(g =>
+                    g.GoalType == GoalTypeConstants.Organization &&
+                    g.Goalstatus == status)
                 .OrderBy(g => g.GoalTitle)
-                .Select(g => new OrgObjectiveDto
+                .Select(g => new OrgObjectiveResponseDto
                 {
                     ObjectiveId = g.GoalId,
                     Title = g.GoalTitle,

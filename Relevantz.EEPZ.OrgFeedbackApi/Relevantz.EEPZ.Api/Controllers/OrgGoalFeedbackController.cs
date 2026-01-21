@@ -1,16 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
-using Relevantz.EEPZ.Common.DTOs.Response;
-using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.Constants;
+using Relevantz.EEPZ.Common.DTOs.Request;
+using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 
 namespace Relevantz.EEPZ.Api.Controllers
 {
-    /// <summary>
-    /// Controller for managing organization goal feedback operations
-    /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/org-goal-feedback")]
     public class OrgGoalFeedbackController : ControllerBase
     {
         private readonly IOrgGoalFeedbackService _service;
@@ -24,12 +21,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             _logger = logger;
         }
 
-        /// <summary>
-        /// Create new organization goal feedback
-        /// </summary>
-        /// <param name="dto">Organization goal feedback creation request</param>
-        /// <returns>Created organization goal feedback response</returns>
-        [HttpPost("create")]
+        [HttpPost]
         [ProducesResponseType(typeof(ApiResponseDto<OrgGoalFeedbackResponseDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponseDto<OrgGoalFeedbackResponseDto>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponseDto<OrgGoalFeedbackResponseDto>), StatusCodes.Status500InternalServerError)]
@@ -42,22 +34,17 @@ namespace Relevantz.EEPZ.Api.Controllers
                 MessageConstants.OrgGoalFeedbackCreated));
         }
 
-        /// <summary>
-        /// Get organization goal feedback by ID
-        /// </summary>
-        /// <param name="id">Feedback identifier</param>
-        /// <returns>Organization goal feedback details</returns>
-        [HttpGet("feedback/{id}")]
+        [HttpGet("{id:int}")]
         [ProducesResponseType(typeof(ApiResponseDto<OrgGoalFeedbackResponseDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponseDto<OrgGoalFeedbackResponseDto>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponseDto<OrgGoalFeedbackResponseDto>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetOrgGoalFeedback(int id)
+        public async Task<IActionResult> GetOrgGoalFeedbackById(int id)
         {
             var result = await _service.GetOrgGoalFeedbackByIdAsync(id);
 
             if (result == null)
             {
-                _logger.LogWarning("Organization goal feedback with ID {FeedbackId} not found", id);
+                _logger.LogWarning("Organization goal feedback not found. FeedbackId: {FeedbackId}", id);
                 return NotFound(ApiResponseDto<OrgGoalFeedbackResponseDto>.ErrorResponse(
                     MessageConstants.OrgGoalFeedbackNotFound));
             }
@@ -67,30 +54,19 @@ namespace Relevantz.EEPZ.Api.Controllers
                 MessageConstants.OrgGoalFeedbackRetrieved));
         }
 
-        /// <summary>
-        /// Get all feedback for a specific organization goal
-        /// </summary>
-        /// <param name="organizationObjectiveId">Organization objective identifier</param>
-        /// <returns>List of feedback for the organization goal</returns>
-        [HttpGet("goal/{organizationObjectiveId}")]
+        [HttpGet("goal/{goalId:int}")]
         [ProducesResponseType(typeof(ApiResponseDto<List<OrgGoalFeedbackResponseDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponseDto<List<OrgGoalFeedbackResponseDto>>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetFeedbackByOrgGoal(int organizationObjectiveId)
+        public async Task<IActionResult> GetFeedbackByGoal(int goalId)
         {
-            var result = await _service.GetFeedbackByOrgGoalAsync(organizationObjectiveId);
+            var result = await _service.GetFeedbackByOrgGoalAsync(goalId);
 
             return Ok(ApiResponseDto<List<OrgGoalFeedbackResponseDto>>.SuccessResponse(
                 result,
                 MessageConstants.OrgGoalFeedbackByGoalRetrieved));
         }
 
-        /// <summary>
-        /// Get all organization goal feedback with pagination
-        /// </summary>
-        /// <param name="pageNumber">Page number (default: 1)</param>
-        /// <param name="pageSize">Page size (default: 20)</param>
-        /// <returns>Paginated list of organization goal feedback</returns>
-        [HttpGet("feedback")]
+        [HttpGet]
         [ProducesResponseType(typeof(ApiResponseDto<List<OrgGoalFeedbackResponseDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponseDto<List<OrgGoalFeedbackResponseDto>>), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllOrgGoalFeedback(
@@ -104,26 +80,18 @@ namespace Relevantz.EEPZ.Api.Controllers
                 MessageConstants.AllOrgGoalFeedbackRetrieved));
         }
 
-        /// <summary>
-        /// Update existing organization goal feedback
-        /// </summary>
-        /// <param name="id">Feedback identifier</param>
-        /// <param name="dto">Organization goal feedback update request</param>
-        /// <returns>Updated organization goal feedback response</returns>
-        [HttpPut("feedback/{id}")]
+        [HttpPut("{id:int}")]
         [ProducesResponseType(typeof(ApiResponseDto<OrgGoalFeedbackResponseDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponseDto<OrgGoalFeedbackResponseDto>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponseDto<OrgGoalFeedbackResponseDto>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponseDto<OrgGoalFeedbackResponseDto>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateOrgGoalFeedback(
-            int id,
-            [FromBody] UpdateOrgGoalFeedbackRequestDto dto)
+        public async Task<IActionResult> UpdateOrgGoalFeedback(int id, [FromBody] UpdateOrgGoalFeedbackRequestDto dto)
         {
             var result = await _service.UpdateOrgGoalFeedbackAsync(id, dto);
 
             if (result == null)
             {
-                _logger.LogWarning("Cannot update - Organization goal feedback with ID {FeedbackId} not found", id);
+                _logger.LogWarning("Org goal feedback not found for update. FeedbackId: {FeedbackId}", id);
                 return NotFound(ApiResponseDto<OrgGoalFeedbackResponseDto>.ErrorResponse(
                     MessageConstants.OrgGoalFeedbackNotFound));
             }
@@ -133,12 +101,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 MessageConstants.OrgGoalFeedbackUpdated));
         }
 
-        /// <summary>
-        /// Delete organization goal feedback
-        /// </summary>
-        /// <param name="id">Feedback identifier</param>
-        /// <returns>Deletion status</returns>
-        [HttpDelete("feedback/{id}")]
+        [HttpDelete("{id:int}")]
         [ProducesResponseType(typeof(ApiResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponseDto<bool>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponseDto<bool>), StatusCodes.Status500InternalServerError)]
@@ -148,7 +111,7 @@ namespace Relevantz.EEPZ.Api.Controllers
 
             if (!result)
             {
-                _logger.LogWarning("Cannot delete - Organization goal feedback with ID {FeedbackId} not found", id);
+                _logger.LogWarning("Org goal feedback not found for delete. FeedbackId: {FeedbackId}", id);
                 return NotFound(ApiResponseDto<bool>.ErrorResponse(
                     MessageConstants.OrgGoalFeedbackNotFound));
             }

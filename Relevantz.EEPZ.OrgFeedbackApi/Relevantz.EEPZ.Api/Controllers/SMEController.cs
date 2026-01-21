@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Common.DTOs.Response;
-using Relevantz.EEPZ.Common.Models;
+using Relevantz.EEPZ.Core.IService;
+
 namespace Relevantz.EEPZ.Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/smes")]
     public class SmeController : ControllerBase
     {
         private readonly ISmeService _service;
@@ -17,11 +17,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             _logger = logger;
         }
 
-        /// <summary>
-        /// Get all active SMEs with Employee and Skill details
-        /// </summary>
         [HttpGet("active")]
-        [ProducesResponseType(typeof(ApiResponse<List<SmeDto>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponseDto<List<SmeResponseDto>>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetActiveSmes()
         {
             _logger.LogInformation("Retrieving active SMEs");

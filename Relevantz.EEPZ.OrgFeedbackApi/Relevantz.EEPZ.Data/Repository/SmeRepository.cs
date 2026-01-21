@@ -14,13 +14,13 @@ namespace Relevantz.EEPZ.Data.Repository
             _context = context;
         }
 
-        public async Task<List<SmeDto>> GetActiveSmesAsync()
+        public async Task<List<SmeResponseDto>> GetActiveSmesAsync()
         {
             return await _context.Lndsmes
                 .Where(s => s.IsActive == true)
                 .Include(s => s.Employee)
                 .Include(s => s.Skill)
-                .Select(s => new SmeDto
+                .Select(s => new SmeResponseDto
                 {
                     SmeId = s.SmeId,
                     EmployeeId = s.EmployeeId,
@@ -28,8 +28,10 @@ namespace Relevantz.EEPZ.Data.Repository
                     SkillIdReference = s.SkillId,
                     EmployeeName = s.Employee.EmployeeCompanyId,
                     IsActive = s.IsActive == true,
-                    ApprovedOn = s.ApprovedOn.HasValue ?
-                        DateTime.SpecifyKind(s.ApprovedOn.Value.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc)
+                    ApprovedOn = s.ApprovedOn.HasValue
+                        ? DateTime.SpecifyKind(
+                            s.ApprovedOn.Value.ToDateTime(TimeOnly.MinValue),
+                            DateTimeKind.Utc)
                         : null
                 })
                 .ToListAsync();

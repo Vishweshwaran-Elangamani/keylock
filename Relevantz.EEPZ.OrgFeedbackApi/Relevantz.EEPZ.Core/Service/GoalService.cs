@@ -1,14 +1,12 @@
 using Microsoft.Extensions.Logging;
 using Relevantz.EEPZ.Common.DTOs.Response;
+using Relevantz.EEPZ.Common.DTOs.Response.Employees;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Data.IRepository;
 
 namespace Relevantz.EEPZ.Core.Service
 {
-    /// <summary>
-    /// Service implementation for goal-related business operations
-    /// </summary>
     public class GoalService : IGoalService
     {
         private readonly IGoalRepository _goalRepository;
@@ -16,15 +14,11 @@ namespace Relevantz.EEPZ.Core.Service
 
         public GoalService(IGoalRepository goalRepository, ILogger<GoalService> logger)
         {
-            _goalRepository = goalRepository;
-            _logger = logger;
+            _goalRepository = goalRepository ?? throw new ArgumentNullException(nameof(goalRepository));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <summary>
-        /// Retrieves all goals segregated by type
-        /// </summary>
-        /// <returns>Segregated goals response containing team and organization level goals</returns>
-        public async Task<SegregatedGoalsResponse> GetAllGoalsAsync()
+        public async Task<SegregatedGoalsResponseDto> GetAllGoalsAsync()
         {
             _logger.LogInformation("Retrieving all goals segregated by type");
 
@@ -40,7 +34,7 @@ namespace Relevantz.EEPZ.Core.Service
                 .Select(MapToProjectGoalResponse)
                 .ToList();
 
-            return new SegregatedGoalsResponse
+            return new SegregatedGoalsResponseDto
             {
                 TeamGoals = teamGoals,
                 OrganizationLevelGoals = orgLevelGoals,
@@ -49,63 +43,41 @@ namespace Relevantz.EEPZ.Core.Service
             };
         }
 
-        /// <summary>
-        /// Retrieves a specific goal by its identifier
-        /// </summary>
-        /// <param name="goalId">The goal identifier</param>
-        /// <returns>Project goal response if found, otherwise null</returns>
-        public async Task<ProjectGoalResponse> GetGoalByIdAsync(int goalId)
+        public async Task<ProjectGoalResponseDto?> GetGoalByIdAsync(int goalId)
         {
             _logger.LogInformation("Retrieving goal with ID: {GoalId}", goalId);
 
             var goal = await _goalRepository.GetGoalByIdAsync(goalId);
-
-            return goal != null ? MapToProjectGoalResponse(goal) : null;
+            return goal == null ? null : MapToProjectGoalResponse(goal);
         }
 
-        /// <summary>
-        /// Retrieves all team goals
-        /// </summary>
-        /// <returns>List of team goal responses</returns>
-        public async Task<List<ProjectGoalResponse>> GetTeamGoalsAsync()
+        public async Task<List<ProjectGoalResponseDto>> GetTeamGoalsAsync()
         {
             _logger.LogInformation("Retrieving all team goals");
 
             var teamGoals = await _goalRepository.GetTeamGoalsAsync();
-
             return teamGoals.Select(MapToProjectGoalResponse).ToList();
         }
 
-        /// <summary>
-        /// Retrieves all organization level goals
-        /// </summary>
-        /// <returns>List of organization level goal responses</returns>
-        public async Task<List<ProjectGoalResponse>> GetOrganizationLevelGoalsAsync()
+        public async Task<List<ProjectGoalResponseDto>> GetOrganizationLevelGoalsAsync()
         {
             _logger.LogInformation("Retrieving organization level goals");
 
             var orgGoals = await _goalRepository.GetOrganizationLevelGoalsAsync();
-
             return orgGoals.Select(MapToProjectGoalResponse).ToList();
         }
 
-        /// <summary>
-        /// Retrieves goals for a specific project
-        /// </summary>
-        /// <param name="projectId">The project identifier</param>
-        /// <returns>List of project goal responses</returns>
-        public async Task<List<ProjectGoalResponse>> GetGoalsByProjectIdAsync(int projectId)
+        public async Task<List<ProjectGoalResponseDto>> GetGoalsByProjectIdAsync(int projectId)
         {
             _logger.LogInformation("Retrieving goals for project ID: {ProjectId}", projectId);
 
             var projectGoals = await _goalRepository.GetGoalsByProjectIdAsync(projectId);
-
             return projectGoals.Select(MapToProjectGoalResponse).ToList();
         }
 
-        private ProjectGoalResponse MapToProjectGoalResponse(Goal goal)
+        private static ProjectGoalResponseDto MapToProjectGoalResponse(Goal goal)
         {
-            return new ProjectGoalResponse
+            return new ProjectGoalResponseDto
             {
                 GoalId = goal.GoalId,
                 GoalTitle = goal.GoalTitle,
@@ -118,18 +90,18 @@ namespace Relevantz.EEPZ.Core.Service
             };
         }
 
-        private EmployeeBasicInfo MapToEmployeeBasicInfo(Employeedetailsmaster employee)
+        private static EmployeeBasicInfoDto MapToEmployeeBasicInfo(Employeedetailsmaster employee)
         {
-            return new EmployeeBasicInfo
+            return new EmployeeBasicInfoDto
             {
                 EmployeeMasterId = employee.EmployeeMasterId,
                 EmployeeId = employee.EmployeeId,
                 EmployeeCompanyId = employee.Employee?.EmployeeCompanyId ?? string.Empty,
-                FirstName = employee.Employee?.Userprofile?.FirstName,
-                LastName = employee.Employee?.Userprofile?.LastName,
-                Email = employee.Employee?.Userauthentication?.Email,
-                RoleName = employee.Role?.RoleName,
-                DepartmentName = employee.Department?.DepartmentName
+                FirstName = employee.Employee?.Userprofile?.FirstName ?? string.Empty,
+                LastName = employee.Employee?.Userprofile?.LastName ?? string.Empty,
+                Email = employee.Employee?.Userauthentication?.Email ?? string.Empty,
+                RoleName = employee.Role?.RoleName ?? string.Empty,
+                DepartmentName = employee.Department?.DepartmentName ?? string.Empty
             };
         }
     }

@@ -17,6 +17,8 @@ using Relevantz.EEPZ.Core.Services.Implementations;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Common;
 using Relevantz.EEPZ.Core.Service;
+using Relevantz.EEPZ.Api.Middleare;
+
 
 using Relevantz.EEPZ.Data.Repository;
 
@@ -47,10 +49,11 @@ try
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddExceptionHandler<GlobalExceptionMiddleware>();
 builder.Services.AddProblemDetails();
 
-Log.Information("Global Exception Handler configured");
+
+
 
     builder.Services.AddSwaggerGen(options =>
     {
@@ -254,6 +257,8 @@ Log.Information("Global Exception Handler configured");
     Log.Information("CORS configured");
 
     var app = builder.Build();
+    app.UseExceptionHandler();
+
 
     if (app.Environment.IsDevelopment())
     {

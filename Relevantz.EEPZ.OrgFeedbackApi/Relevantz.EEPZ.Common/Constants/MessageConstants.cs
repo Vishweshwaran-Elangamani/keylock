@@ -33,23 +33,21 @@ namespace Relevantz.EEPZ.Common.Constants
         public const string ProjectGoalsRetrievedSuccessfully = "Project goals retrieved successfully";
         #endregion
 
-        #region Generic Messages
-        public const string OperationSuccessful = "Operation completed successfully";
-        public const string OperationFailed = "Operation failed";
-        public const string ValidationError = "Validation error occurred";
-        public const string UnauthorizedAccess = "Unauthorized access";
-        public const string InternalServerError = "An internal server error occurred";
-
-        #endregion
-
-        // Organization Objectives Constants 
-        public const string OrganizationGoalType = "org";
+        #region Organization Objectives Messages
         public const string OrganizationObjectivesRetrieved = "Organization objectives retrieved successfully";
         public const string OrganizationObjectiveRetrieved = "Organization objective retrieved successfully";
         public const string OrganizationObjectiveNotFound = "Organization objective not found";
         public const string ActiveObjectivesRetrieved = "Active organization objectives retrieved successfully";
         public const string ObjectivesByStatusRetrieved = "Organization objectives by status retrieved successfully";
         public const string InvalidStatusProvided = "Invalid status provided";
+        #endregion
 
+        #region Generic Messages
+        public const string OperationSuccessful = "Operation completed successfully";
+        public const string OperationFailed = "Operation failed";
+        public const string ValidationError = "Validation error occurred";
+        public const string UnauthorizedAccess = "Unauthorized access";
+        public const string InternalServerError = "An internal server error occurred";
+        #endregion
     }
 }
