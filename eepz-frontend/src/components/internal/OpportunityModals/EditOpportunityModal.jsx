@@ -95,14 +95,12 @@ const EditOpportunityModal = ({
       });
     }
   }, [opportunity]);
-  // Department options WITHOUT placeholder (for Edit mode)
   const departmentOptions = useMemo(() => {
     return departments.map((dept) => ({
       label: dept.departmentName,
       value: dept.departmentId.toString(),
     }));
   }, [departments]);
-  // Status options WITHOUT placeholder (for Edit mode)
   const statusOptions = [
     { label: "Active", value: "Active" },
     { label: "Pending", value: "Pending" },
@@ -149,15 +147,21 @@ const EditOpportunityModal = ({
     }
     try {
       setLoading(true);
+      let formattedDeadline = formData.deadline;
+      if (formData.deadline) {
+        const date = new Date(formData.deadline);
+        formattedDeadline = date.toISOString().split("T")[0];
+      }
       const payload = {
         opportunityName: formData.opportunityName.trim(),
         departmentId: parseInt(formData.departmentId),
         description: formData.description.trim(),
         requirements: formData.requirements.trim(),
-        eligibilityCriteria: formData.eligibilityCriteria.trim() || null,
-        deadline: formData.deadline,
+        eligibilityCriteria: formData.eligibilityCriteria.trim(),
+        deadline: formattedDeadline,
         status: formData.status,
       };
+      console.log("Sending payload:", payload);
       const response = await internalOpportunityService.updateOpportunity(
         opportunity.opportunityId,
         payload
@@ -307,7 +311,7 @@ const EditOpportunityModal = ({
                 <label className="eom-form-label">Eligibility Criteria</label>
                 <textarea
                   name="eligibilityCriteria"
-                  placeholder="Eligibility criteria"
+                  placeholder="Update Eligibility criteria (optional)..."
                   value={formData.eligibilityCriteria}
                   onChange={handleChange}
                   rows={2}
