@@ -569,7 +569,6 @@ app.UseExceptionHandler(errorApp =>
 });
 
 
-
 // Database Migration and Initialization
 
 using (var scope = app.Services.CreateScope())
