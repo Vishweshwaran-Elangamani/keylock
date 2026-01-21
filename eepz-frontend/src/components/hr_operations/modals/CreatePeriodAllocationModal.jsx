@@ -254,7 +254,6 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
                   placeholder="Enter amount"
                   step="0.01"
                   min="0"
-                  max={availableBudget}
                   required
                   className={`cpam-form-input ${
                     errors.allocatedAmount ? "cpam-input-error" : ""
