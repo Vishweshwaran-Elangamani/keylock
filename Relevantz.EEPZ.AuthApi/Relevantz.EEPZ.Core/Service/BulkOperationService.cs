@@ -261,7 +261,6 @@ namespace Relevantz.EEPZ.Core.Service
         {
             var users = new List<CreateUserRequestDto>();
 
-            //   NO LICENSE CONTEXT NEEDED - ClosedXML is FREE!
             using var workbook = new XLWorkbook(fileStream);
             var worksheet = workbook.Worksheet(1);
 
@@ -272,8 +271,8 @@ namespace Relevantz.EEPZ.Core.Service
                     SuccessCount = 0,
                     FailureCount = 1,
                     TotalRecords = 0,
-                    Errors = new List<string> { "Excel file contains no worksheets" },
-                    Message = "Excel file contains no worksheets"
+                    Errors = new List<string> { ExcelMessages.NoWorksheetsError },
+                    Message = ExcelMessages.NoWorksheetsError
                 };
             }
 
@@ -285,19 +284,17 @@ namespace Relevantz.EEPZ.Core.Service
                     SuccessCount = 0,
                     FailureCount = 1,
                     TotalRecords = 0,
-                    Errors = new List<string> { "Excel file must contain at least one data row besides the header" },
-                    Message = "Excel file must contain at least one data row besides the header"
+                    Errors = new List<string> { ExcelMessages.NoDataRowsError },
+                    Message = ExcelMessages.NoDataRowsError
                 };
             }
 
             for (int row = 2; row <= rowCount; row++)
             {
-                //   FIX: Use IsEmpty() instead of comparing with null
                 var emailCell = worksheet.Cell(row, 1);
                 if (emailCell.IsEmpty() || string.IsNullOrWhiteSpace(emailCell.GetString()))
                     continue;
 
-                // Check if entire row is empty
                 bool isEmptyRow = true;
                 for (int col = 1; col <= 11; col++)
                 {
@@ -309,7 +306,6 @@ namespace Relevantz.EEPZ.Core.Service
                 }
                 if (isEmptyRow) continue;
 
-                //   FIX: Use GetString() instead of .Value?.ToString()
                 var mobileCell = worksheet.Cell(row, 10);
                 var mobileNumber = mobileCell.IsEmpty() 
                     ? null 
@@ -347,8 +343,8 @@ namespace Relevantz.EEPZ.Core.Service
                     SuccessCount = 0,
                     FailureCount = 1,
                     TotalRecords = 0,
-                    Errors = new List<string> { "No valid users found in Excel file" },
-                    Message = "No valid users found in Excel file"
+                    Errors = new List<string> { ExcelMessages.NoValidUsersError },
+                    Message = ExcelMessages.NoValidUsersError
                 };
             }
 
@@ -383,16 +379,22 @@ namespace Relevantz.EEPZ.Core.Service
 
             EEPZBusinessLog.Information($"Generating template with {availableRoles.Count} roles and {availableDepartments.Count} departments");
 
-            //   NO LICENSE CONTEXT - ClosedXML is FREE!
             using var workbook = new XLWorkbook();
             var worksheet = workbook.Worksheets.Add("Users");
 
-            // Headers
             var headers = new[]
             {
-                "Email", "FirstName", "LastName",
-                "EmploymentType", "EmploymentStatus", "JoiningDate",
-                "EmployeeType", "Role", "Department", "MobileNumber", "Gender"
+                ExcelHeaders.Email,
+                ExcelHeaders.FirstName,
+                ExcelHeaders.LastName,
+                ExcelHeaders.EmploymentType,
+                ExcelHeaders.EmploymentStatus,
+                ExcelHeaders.JoiningDate,
+                ExcelHeaders.EmployeeType,
+                ExcelHeaders.Role,
+                ExcelHeaders.Department,
+                ExcelHeaders.MobileNumber,
+                ExcelHeaders.Gender
             };
 
             for (int i = 0; i < headers.Length; i++)
@@ -421,7 +423,6 @@ namespace Relevantz.EEPZ.Core.Service
             worksheet.Column(10).Width = 15;
             worksheet.Column(11).Width = 18;
 
-            //   FIX: Use SetDataValidation() instead of .DataValidation property
             // Role dropdown (Column H)
             if (availableRoles.Any())
             {
@@ -449,50 +450,48 @@ namespace Relevantz.EEPZ.Core.Service
             // Employment Type dropdown
             var empTypeRange = worksheet.Range("D2:D1000");
             var empTypeValidation = empTypeRange.SetDataValidation();
-            empTypeValidation.List("\"Permanent\",\"Contract\",\"Temporary\",\"Intern\",\"Probation\"", true);
+            empTypeValidation.List(EmploymentTypeValues.GetCommaSeparated(), true);
             empTypeValidation.InCellDropdown = true;
 
             // Employment Status dropdown
             var empStatusRange = worksheet.Range("E2:E1000");
             var empStatusValidation = empStatusRange.SetDataValidation();
-            empStatusValidation.List("\"Active\",\"Inactive\",\"OnLeave\"", true);
+            empStatusValidation.List(EmploymentStatusValues.GetCommaSeparated(), true);
             empStatusValidation.InCellDropdown = true;
 
             // Employee Type dropdown
             var employeeTypeRange = worksheet.Range("G2:G1000");
             var employeeTypeValidation = employeeTypeRange.SetDataValidation();
-            employeeTypeValidation.List("\"FullTime\",\"PartTime\",\"Intern\"", true);
+            employeeTypeValidation.List(EmployeeTypeValues.GetCommaSeparated(), true);
             employeeTypeValidation.InCellDropdown = true;
 
             // Gender dropdown
             var genderRange = worksheet.Range("K2:K1000");
             var genderValidation = genderRange.SetDataValidation();
-            genderValidation.List("\"Male\",\"Female\",\"PreferNotToSay\"", true);
+            genderValidation.List(GenderValues.GetCommaSeparated(), true);
             genderValidation.IgnoreBlanks = true;
             genderValidation.InCellDropdown = true;
 
             // Instructions sheet
             var instructionSheet = workbook.Worksheets.Add("Instructions");
-            instructionSheet.Cell(1, 1).Value = "Bulk User Import Instructions";
+            instructionSheet.Cell(1, 1).Value = ExcelMessages.BulkImportInstructions;
             instructionSheet.Cell(1, 1).Style.Font.Bold = true;
             instructionSheet.Cell(1, 1).Style.Font.FontSize = 16;
 
-            instructionSheet.Cell(3, 1).Value = "IMPORTANT: Employee IDs are AUTO-GENERATED";
+            instructionSheet.Cell(3, 1).Value = ExcelMessages.EmployeeIdAutoGenerated;
             instructionSheet.Cell(3, 1).Style.Font.Bold = true;
             instructionSheet.Cell(3, 1).Style.Font.FontColor = XLColor.Red;
             instructionSheet.Cell(3, 1).Style.Font.FontSize = 14;
 
-            instructionSheet.Cell(4, 1).Value = "Do NOT include Employee ID column. IDs will be assigned automatically.";
+            instructionSheet.Cell(4, 1).Value = ExcelMessages.DoNotIncludeEmployeeId;
             instructionSheet.Cell(4, 1).Style.Font.FontColor = XLColor.Red;
 
-            //   FIX: Use AdjustToContents() instead of SetAutoFitColumns()
             worksheet.Columns().AdjustToContents();
             instructionSheet.Columns().AdjustToContents();
 
-            //   FIX: FreezeRows is a method, not a property
             worksheet.SheetView.FreezeRows(1);
 
-            EEPZBusinessLog.Information("Excel template generated successfully with ClosedXML");
+            EEPZBusinessLog.Information("Excel template generated successfully");
 
             using var stream = new MemoryStream();
             workbook.SaveAs(stream);
