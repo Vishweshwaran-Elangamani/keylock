@@ -34,8 +34,8 @@ namespace eepzbackend.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-       
-    
+
+
         [HttpPost]
         [Authorize(Roles = AppConstants.Roles.Manager)]
         [ProducesResponseType(typeof(ApiResponse<MeetingResponseDto>), StatusCodes.Status200OK)]
@@ -200,7 +200,7 @@ namespace eepzbackend.Controllers
                 correlationId));
         }
 
-       
+
         [HttpGet("invitations")]
         [ProducesResponseType(typeof(ApiResponse<List<MeetingInvitationDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]

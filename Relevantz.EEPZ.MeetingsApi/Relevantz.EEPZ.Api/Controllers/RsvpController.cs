@@ -59,7 +59,6 @@ namespace eepzbackend.Controllers
                 correlationId));
         }
 
-
         [HttpPost]
         [ProducesResponseType(typeof(ApiResponse<MeetingInvitationDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
@@ -109,7 +108,6 @@ namespace eepzbackend.Controllers
                 AppConstants.ResponseMessages.RsvpSubmittedSuccessfully,
                 correlationId));
         }
-
 
         [HttpPut("{meetingId:int}")]
         [ProducesResponseType(typeof(ApiResponse<MeetingInvitationDto>), StatusCodes.Status200OK)]
@@ -202,7 +200,6 @@ namespace eepzbackend.Controllers
                 correlationId));
         }
 
-
         [HttpGet("{meetingId:int}/summary")]
         [Authorize(Roles = AppConstants.Roles.Manager)]
         [ProducesResponseType(typeof(ApiResponse<MeetingRsvpSummaryDto>), StatusCodes.Status200OK)]
@@ -241,7 +238,6 @@ namespace eepzbackend.Controllers
         }
 
         #region Private (EmployeeId Resolver)
-
         private async Task<int> GetEmployeeIdAsync(CancellationToken cancellationToken)
         {
             var userId = ClaimsUtility.GetUserId(User);
