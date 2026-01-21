@@ -1,0 +1,48 @@
+namespace Relevantz.EEPZ.Common.Constants
+{
+    public static class MessageConstants
+    {
+        // Generic
+        public const string InvalidUserToken = "Invalid user token";
+        public const string InvalidRequestData = "Invalid request data";
+
+        // Profile
+        public const string ErrorFetchingProfile = "An error occurred while fetching profile";
+        public const string ErrorUpdatingProfile = "An error occurred while updating profile";
+
+        // Photo upload
+        public const string NoPhotoProvided = "No photo file provided";
+        public const string InvalidPhotoType = "Invalid file type. Only JPEG, PNG, GIF, and WEBP images are allowed.";
+        public const string PhotoTooLarge = "File size exceeds maximum limit of 5MB.";
+        public const string ErrorUploadingPhoto = "An error occurred while uploading photo";
+
+        // Manager / employees
+        public const string ManagerForbidden = "You can only view your own employees";
+
+        // Employee ID
+        public const string NextEmpIdSuccess = "Next Employee ID retrieved successfully";
+        public const string NextEmpIdError = "Failed to generate Employee ID";
+
+        // Authentication Messages
+        public const string InvalidCredentials = "Invalid email or password";
+        public const string AccountInactive = "Account is inactive. Please contact administrator.";
+        public const string OtpSent = "OTP sent to your email. Please check your inbox.";
+        public const string OtpInvalid = "Invalid or expired OTP";
+        public const string UserNotFound = "User not found";
+        public const string InvalidOrExpiredOtp = "Invalid or expired OTP";
+        public const string WeakPassword = "Password does not meet strength requirements";
+        public const string PasswordResetSuccess = "Password reset successful";
+        public const string PasswordChangedSuccess = "Password changed successfully";
+        public const string InvalidCurrentPassword = "Current password is incorrect";
+
+        // Hard-coded messages converted to constants
+        public const string FirstLoginMessage = "First login detected. Please reset your password. An OTP has been sent to your email.";
+        public const string PasswordResetComplete = "Password has been reset successfully. You can now login with your new password.";
+        public const string PasswordChangedComplete = "Password changed successfully";
+        public const string LogoutSuccess = "Logged out successfully";
+        public const string EmailNotRegistered = "This email address is not registered in our system. Please check your email or contact support.";
+        public const string PasswordResetBlocked = "Password reset is not allowed for this account. Please contact system administrator for assistance.";
+        public const string PasswordChangeBlocked = "Password changes are not allowed for this account. Please contact system administrator.";
+        public const string LoginSuccess = "Login successful";
+    }
+}

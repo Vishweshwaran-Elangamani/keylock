@@ -52,28 +52,28 @@ namespace Relevantz.EEPZ.Core.Service
 
             if (user == null)
             {
-                loginAttempt.FailureReason = Constants.Messages.InvalidCredentials;
+                loginAttempt.FailureReason = MessageConstants.InvalidCredentials;
                 await _loginAttemptRepository.CreateAsync(loginAttempt);
-                return ApiResponseDto<LoginResponseDto>.FailureResponse(Constants.Messages.InvalidCredentials);
+                return ApiResponseDto<LoginResponseDto>.FailureResponse(MessageConstants.InvalidCredentials);
             }
 
             if (user.Status == Constants.UserStatuses.Inactive)
             {
                 loginAttempt.UserId = user.UserId;
-                loginAttempt.FailureReason = Constants.Messages.AccountInactive;
+                loginAttempt.FailureReason = MessageConstants.AccountInactive;
                 await _loginAttemptRepository.CreateAsync(loginAttempt);
-                return ApiResponseDto<LoginResponseDto>.FailureResponse(Constants.Messages.AccountInactive);
+                return ApiResponseDto<LoginResponseDto>.FailureResponse(MessageConstants.AccountInactive);
             }
 
             if (!_passwordService.VerifyPassword(request.Password, user.PasswordHash))
             {
                 loginAttempt.UserId = user.UserId;
-                loginAttempt.FailureReason = Constants.Messages.InvalidCredentials;
+                loginAttempt.FailureReason = MessageConstants.InvalidCredentials;
                 await _loginAttemptRepository.CreateAsync(loginAttempt);
 
                 await CheckAndLockAccountAsync(user);
 
-                return ApiResponseDto<LoginResponseDto>.FailureResponse(Constants.Messages.InvalidCredentials);
+                return ApiResponseDto<LoginResponseDto>.FailureResponse(MessageConstants.InvalidCredentials);
             }
 
             var roleName = user.Employee?.Employeedetailsmasters?.FirstOrDefault()?.Role?.RoleName ?? Constants.Roles.User;
@@ -94,9 +94,8 @@ namespace Relevantz.EEPZ.Core.Service
                     {
                         RequiresTwoFactor = false,
                         RequiresPasswordReset = true,
-                        Message = "First login detected. Please reset your password. An OTP has been sent to your email."
-                    },
-                    "Password reset required");
+                        Message = MessageConstants.FirstLoginMessage
+                    });
             }
 
             if (roleName == Constants.Roles.Admin)
@@ -112,9 +111,8 @@ namespace Relevantz.EEPZ.Core.Service
                     {
                         RequiresTwoFactor = true,
                         RequiresPasswordReset = false,
-                        Message = Constants.Messages.OtpSent
-                    },
-                    Constants.Messages.OtpSent);
+                        Message = MessageConstants.OtpSent
+                    });
             }
 
             var accessToken = _tokenService.GenerateAccessToken(user, roleName);
@@ -141,9 +139,8 @@ namespace Relevantz.EEPZ.Core.Service
                     TokenExpiration = DateTime.UtcNow.AddMinutes(_configuration.GetValue<int>("Jwt:AccessTokenExpirationMinutes", 60)),
                     User = userResponse,
                     EmployeeMasterId = employeeMasterId,
-                    Message = "Login successful"
-                },
-                "Login successful");
+                    Message = MessageConstants.LoginSuccess
+                });
         }
 
         public async Task<ApiResponseDto<LoginResponseDto>> VerifyOtpAndLoginAsync(VerifyOtpRequestDto request)
@@ -152,13 +149,13 @@ namespace Relevantz.EEPZ.Core.Service
 
             if (!isValid)
             {
-                return ApiResponseDto<LoginResponseDto>.FailureResponse(Constants.Messages.OtpInvalid);
+                return ApiResponseDto<LoginResponseDto>.FailureResponse(MessageConstants.OtpInvalid);
             }
 
             var user = await _userAuthRepository.GetByEmailAsync(request.Email);
             if (user == null)
             {
-                return ApiResponseDto<LoginResponseDto>.FailureResponse(Constants.Messages.UserNotFound);
+                return ApiResponseDto<LoginResponseDto>.FailureResponse(MessageConstants.UserNotFound);
             }
 
             var roleName = user.Employee?.Employeedetailsmasters?.FirstOrDefault()?.Role?.RoleName ?? Constants.Roles.User;
@@ -182,9 +179,8 @@ namespace Relevantz.EEPZ.Core.Service
                     TokenExpiration = DateTime.UtcNow.AddMinutes(_configuration.GetValue<int>("Jwt:AccessTokenExpirationMinutes", 60)),
                     User = userResponse,
                     EmployeeMasterId = employeeMasterId,
-                    Message = "Login successful"
-                },
-                "Login successful");
+                    Message = MessageConstants.LoginSuccess
+                });
         }
 
         public async Task<ApiResponseDto<OtpResponseDto>> ForgotPasswordAsync(ForgotPasswordRequestDto request)
@@ -194,17 +190,13 @@ namespace Relevantz.EEPZ.Core.Service
             if (user == null)
             {
                 EEPZBusinessLog.Warning($"Password reset attempt for non-existent email: {request.Email}");
-                return ApiResponseDto<OtpResponseDto>.FailureResponse(
-                    "This email address is not registered in our system. Please check your email or contact support."
-                );
+                return ApiResponseDto<OtpResponseDto>.FailureResponse(MessageConstants.EmailNotRegistered);
             }
             var employeeCompanyId = user.Employee?.EmployeeCompanyId;
             if (!string.IsNullOrEmpty(employeeCompanyId) && employeeCompanyId == "1000")
             {
                 EEPZBusinessLog.Warning($"Password reset attempt blocked for protected employee: {user.Email} (EmployeeCompanyID: {employeeCompanyId})");
-                return ApiResponseDto<OtpResponseDto>.FailureResponse(
-                    "Password reset is not allowed for this account. Please contact system administrator for assistance."
-                );
+                return ApiResponseDto<OtpResponseDto>.FailureResponse(MessageConstants.PasswordResetBlocked);
             }
 
             await _otpService.GenerateOtpAsync(request.Email, Constants.OtpTypes.ForgotPassword);
@@ -215,9 +207,8 @@ namespace Relevantz.EEPZ.Core.Service
                 new OtpResponseDto
                 {
                     Success = true,
-                    Message = Constants.Messages.OtpSent
-                },
-                Constants.Messages.OtpSent);
+                    Message = MessageConstants.OtpSent
+                });
         }
 
         public async Task<ApiResponseDto<string>> ResetPasswordAsync(ResetPasswordRequestDto request)
@@ -225,28 +216,25 @@ namespace Relevantz.EEPZ.Core.Service
             var user = await _userAuthRepository.GetByEmailAsync(request.Email);
             if (user == null)
             {
-                return ApiResponseDto<string>.FailureResponse(Constants.Messages.UserNotFound);
+                return ApiResponseDto<string>.FailureResponse(MessageConstants.UserNotFound);
             }
 
-            //  CHECK IF USER IS PROTECTED EMPLOYEE (EmployeeCompanyID = 1000)
             var employeeCompanyId = user.Employee?.EmployeeCompanyId;
             if (!string.IsNullOrEmpty(employeeCompanyId) && employeeCompanyId == "1000")
             {
                 EEPZBusinessLog.Warning($"Password reset attempt blocked at reset stage for protected employee: {user.Email} (EmployeeCompanyID: {employeeCompanyId})");
-                return ApiResponseDto<string>.FailureResponse(
-                    "Password reset is not allowed for this account. Please contact system administrator."
-                );
+                return ApiResponseDto<string>.FailureResponse(MessageConstants.PasswordResetBlocked);
             }
 
             var isOtpValid = await _otpService.VerifyOtpAsync(request.Email, request.OtpCode, Constants.OtpTypes.ForgotPassword);
             if (!isOtpValid)
             {
-                return ApiResponseDto<string>.FailureResponse(Constants.Messages.InvalidOrExpiredOtp);
+                return ApiResponseDto<string>.FailureResponse(MessageConstants.InvalidOrExpiredOtp);
             }
 
             if (!_passwordService.ValidatePasswordStrength(request.NewPassword))
             {
-                return ApiResponseDto<string>.FailureResponse(Constants.Messages.WeakPassword);
+                return ApiResponseDto<string>.FailureResponse(MessageConstants.WeakPassword);
             }
 
             user.PasswordHash = _passwordService.HashPassword(request.NewPassword);
@@ -260,10 +248,7 @@ namespace Relevantz.EEPZ.Core.Service
 
             EEPZBusinessLog.Information($"Password reset successful for: {request.Email} - IsFirstLogin set to false");
 
-            return ApiResponseDto<string>.SuccessResponse(
-                "Password has been reset successfully. You can now login with your new password.",
-                Constants.Messages.PasswordResetSuccess
-            );
+            return ApiResponseDto<string>.SuccessResponse(MessageConstants.PasswordResetComplete);
         }
 
         public async Task<ApiResponseDto<string>> ChangePasswordAsync(int userId, ChangePasswordRequestDto request)
@@ -271,30 +256,27 @@ namespace Relevantz.EEPZ.Core.Service
             var user = await _userAuthRepository.GetByIdAsync(userId);
             if (user == null)
             {
-                return ApiResponseDto<string>.FailureResponse(Constants.Messages.UserNotFound);
+                return ApiResponseDto<string>.FailureResponse(MessageConstants.UserNotFound);
             }
 
-            //  CHECK IF USER IS PROTECTED EMPLOYEE (EmployeeCompanyID = 1000)
             var employeeCompanyId = user.Employee?.EmployeeCompanyId;
             if (!string.IsNullOrEmpty(employeeCompanyId) && employeeCompanyId == "1000")
             {
                 EEPZBusinessLog.Warning($"Password change attempt blocked for protected employee: UserId {userId} (EmployeeCompanyID: {employeeCompanyId})");
-                return ApiResponseDto<string>.FailureResponse(
-                    "Password changes are not allowed for this account. Please contact system administrator."
-                );
+                return ApiResponseDto<string>.FailureResponse(MessageConstants.PasswordChangeBlocked);
             }
 
             if (user.IsFirstLogin == false)
             {
                 if (!_passwordService.VerifyPassword(request.CurrentPassword, user.PasswordHash))
                 {
-                    return ApiResponseDto<string>.FailureResponse(Constants.Messages.InvalidCurrentPassword);
+                    return ApiResponseDto<string>.FailureResponse(MessageConstants.InvalidCurrentPassword);
                 }
             }
 
             if (!_passwordService.ValidatePasswordStrength(request.NewPassword))
             {
-                return ApiResponseDto<string>.FailureResponse(Constants.Messages.WeakPassword);
+                return ApiResponseDto<string>.FailureResponse(MessageConstants.WeakPassword);
             }
 
             user.PasswordHash = _passwordService.HashPassword(request.NewPassword);
@@ -305,17 +287,14 @@ namespace Relevantz.EEPZ.Core.Service
 
             EEPZBusinessLog.Information($"Password changed successfully for UserId: {userId} - IsFirstLogin set to false");
 
-            return ApiResponseDto<string>.SuccessResponse(
-                "Password changed successfully",
-                Constants.Messages.PasswordChangedSuccess
-            );
+            return ApiResponseDto<string>.SuccessResponse(MessageConstants.PasswordChangedComplete);
         }
 
         public async Task<ApiResponseDto<string>> LogoutAsync(int userId)
         {
             await _tokenService.RevokeAllUserTokensAsync(userId);
             EEPZBusinessLog.Information($"User logged out successfully: UserId {userId}");
-            return ApiResponseDto<string>.SuccessResponse("Logged out successfully", "Logged out successfully");
+            return ApiResponseDto<string>.SuccessResponse(MessageConstants.LogoutSuccess);
         }
 
         private async Task CheckAndLockAccountAsync(Userauthentication user)
