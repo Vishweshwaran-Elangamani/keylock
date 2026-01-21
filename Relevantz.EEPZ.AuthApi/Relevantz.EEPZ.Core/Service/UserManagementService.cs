@@ -61,10 +61,10 @@ namespace Relevantz.EEPZ.Core.Service
             if (!string.IsNullOrWhiteSpace(cleanedMobileNumber))
             {
                 cleanedMobileNumber = cleanedMobileNumber
-                    .Replace("+91-", "")
-                    .Replace("+91", "")
-                    .Replace("-", "")
-                    .Replace(" ", "")
+                    .Replace(UserManagementConstants.Prefixes.CountryCodeIndiaWithDash, UserManagementConstants.Separators.EmptyString)
+                    .Replace(UserManagementConstants.Prefixes.CountryCodeIndia, UserManagementConstants.Separators.EmptyString)
+                    .Replace(UserManagementConstants.Separators.Dash, UserManagementConstants.Separators.EmptyString)
+                    .Replace(UserManagementConstants.Separators.Space, UserManagementConstants.Separators.EmptyString)
                     .Trim();
             }
 
@@ -73,10 +73,10 @@ namespace Relevantz.EEPZ.Core.Service
             if (!string.IsNullOrWhiteSpace(cleanedAlternateNumber))
             {
                 cleanedAlternateNumber = cleanedAlternateNumber
-                    .Replace("+91-", "")
-                    .Replace("+91", "")
-                    .Replace("-", "")
-                    .Replace(" ", "")
+                    .Replace(UserManagementConstants.Prefixes.CountryCodeIndiaWithDash, UserManagementConstants.Separators.EmptyString)
+                    .Replace(UserManagementConstants.Prefixes.CountryCodeIndia, UserManagementConstants.Separators.EmptyString)
+                    .Replace(UserManagementConstants.Separators.Dash, UserManagementConstants.Separators.EmptyString)
+                    .Replace(UserManagementConstants.Separators.Space, UserManagementConstants.Separators.EmptyString)
                     .Trim();
             }
 
@@ -153,7 +153,40 @@ namespace Relevantz.EEPZ.Core.Service
 
             // Fetch complete user data
             var createdUser = await _userAuthRepository.GetByIdAsync(userAuth.UserId);
-            var userResponse = MapToUserResponse(createdUser!);
+            
+            // Ad-hoc mapping
+            var profile = createdUser!.Employee?.Userprofile;
+            var empDetails = createdUser.Employee?.Employeedetailsmasters?.FirstOrDefault();
+
+            var userResponse = new UserResponseDto
+            {
+                UserId = createdUser.UserId,
+                EmployeeId = createdUser.EmployeeId,
+                EmployeeCompanyId = createdUser.Employee?.EmployeeCompanyId ?? string.Empty,
+                Email = createdUser.Email,
+                Status = createdUser.Status,
+                IsFirstLogin = createdUser.IsFirstLogin ?? false,
+                LastLoginAt = createdUser.LastLoginAt,
+                EmploymentType = createdUser.Employee?.EmploymentType ?? string.Empty,
+                EmploymentStatus = createdUser.Employee?.EmploymentStatus ?? string.Empty,
+                JoiningDate = createdUser.Employee?.JoiningDate ?? DateOnly.MinValue,
+                ConfirmationDate = createdUser.Employee?.ConfirmationDate,
+                ExitDate = createdUser.Employee?.ExitDate,
+                WorkLocation = createdUser.Employee?.WorkLocation,
+                EmployeeType = createdUser.Employee?.EmployeeType ?? string.Empty,
+                NoticePeriodDays = createdUser.Employee?.NoticePeriodDays ?? 0,
+                IsActive = createdUser.Employee?.IsActive ?? false,
+                FirstName = profile?.FirstName ?? string.Empty,
+                MiddleName = profile?.MiddleName,
+                LastName = profile?.LastName ?? string.Empty,
+                CallingName = profile?.CallingName,
+                Gender = profile?.Gender,
+                DateOfBirthOfficial = profile?.DateOfBirthOfficial,
+                MobileNumber = profile?.MobileNumber,
+                PersonalEmail = profile?.PersonalEmail,
+                RoleName = empDetails?.Role?.RoleName,
+                DepartmentName = empDetails?.Department?.DepartmentName
+            };
 
             return ApiResponseDto<UserResponseDto>.SuccessResponse(userResponse, Constants.Messages.UserCreatedSuccess);
         }
@@ -189,7 +222,40 @@ namespace Relevantz.EEPZ.Core.Service
             EEPZBusinessLog.Information($"User updated successfully: UserId {request.UserId}");
 
             var updatedUser = await _userAuthRepository.GetByIdAsync(request.UserId);
-            var userResponse = MapToUserResponse(updatedUser!);
+            
+            // Ad-hoc mapping
+            var profile = updatedUser!.Employee?.Userprofile;
+            var empDetails = updatedUser.Employee?.Employeedetailsmasters?.FirstOrDefault();
+
+            var userResponse = new UserResponseDto
+            {
+                UserId = updatedUser.UserId,
+                EmployeeId = updatedUser.EmployeeId,
+                EmployeeCompanyId = updatedUser.Employee?.EmployeeCompanyId ?? string.Empty,
+                Email = updatedUser.Email,
+                Status = updatedUser.Status,
+                IsFirstLogin = updatedUser.IsFirstLogin ?? false,
+                LastLoginAt = updatedUser.LastLoginAt,
+                EmploymentType = updatedUser.Employee?.EmploymentType ?? string.Empty,
+                EmploymentStatus = updatedUser.Employee?.EmploymentStatus ?? string.Empty,
+                JoiningDate = updatedUser.Employee?.JoiningDate ?? DateOnly.MinValue,
+                ConfirmationDate = updatedUser.Employee?.ConfirmationDate,
+                ExitDate = updatedUser.Employee?.ExitDate,
+                WorkLocation = updatedUser.Employee?.WorkLocation,
+                EmployeeType = updatedUser.Employee?.EmployeeType ?? string.Empty,
+                NoticePeriodDays = updatedUser.Employee?.NoticePeriodDays ?? 0,
+                IsActive = updatedUser.Employee?.IsActive ?? false,
+                FirstName = profile?.FirstName ?? string.Empty,
+                MiddleName = profile?.MiddleName,
+                LastName = profile?.LastName ?? string.Empty,
+                CallingName = profile?.CallingName,
+                Gender = profile?.Gender,
+                DateOfBirthOfficial = profile?.DateOfBirthOfficial,
+                MobileNumber = profile?.MobileNumber,
+                PersonalEmail = profile?.PersonalEmail,
+                RoleName = empDetails?.Role?.RoleName,
+                DepartmentName = empDetails?.Department?.DepartmentName
+            };
 
             return ApiResponseDto<UserResponseDto>.SuccessResponse(userResponse, Constants.Messages.UserUpdatedSuccess);
         }
@@ -202,114 +268,11 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<UserResponseDto>.FailureResponse(Constants.Messages.UserNotFound);
             }
 
-            var userResponse = MapToUserResponse(user);
-            return ApiResponseDto<UserResponseDto>.SuccessResponse(userResponse, "User retrieved successfully");
-        }
-
-        public async Task<ApiResponseDto<List<UserResponseDto>>> GetAllUsersAsync()
-        {
-            var users = await _userAuthRepository.GetAllAsync();
-            var userResponses = users.Select(MapToUserResponse).ToList();
-            return ApiResponseDto<List<UserResponseDto>>.SuccessResponse(userResponses, "Users retrieved successfully");
-        }
-
-        public async Task<ApiResponseDto<string>> DeactivateUserAsync(int userId)
-        {
-            var user = await _userAuthRepository.GetByIdAsync(userId);
-            if (user == null)
-            {
-                return ApiResponseDto<string>.FailureResponse(Constants.Messages.UserNotFound);
-            }
-
-            user.Status = Constants.UserStatuses.Inactive;
-            user.Employee.IsActive = false;
-            await _userAuthRepository.UpdateAsync(user);
-
-            EEPZBusinessLog.Information($"User deactivated: UserId {userId}");
-            return ApiResponseDto<string>.SuccessResponse("User deactivated successfully", "User deactivated successfully");
-        }
-
-        public async Task<ApiResponseDto<string>> ActivateUserAsync(int userId)
-        {
-            var user = await _userAuthRepository.GetByIdAsync(userId);
-            if (user == null)
-            {
-                return ApiResponseDto<string>.FailureResponse(Constants.Messages.UserNotFound);
-            }
-
-            user.Status = Constants.UserStatuses.Active;
-            user.Employee.IsActive = true;
-            await _userAuthRepository.UpdateAsync(user);
-
-            EEPZBusinessLog.Information($"User activated: UserId {userId}");
-            return ApiResponseDto<string>.SuccessResponse("User activated successfully", "User activated successfully");
-        }
-
-        public async Task<ApiResponseDto<string>> AssignRoleAndDepartmentAsync(AssignRoleDepartmentRequestDto request)
-        {
-            var existingDetails = await _employeeDetailsRepository.GetByEmployeeIdAsync(request.EmployeeId);
-
-            if (existingDetails != null)
-            {
-                existingDetails.RoleId = request.RoleId;
-                existingDetails.DepartmentId = request.DepartmentId;
-                await _employeeDetailsRepository.UpdateAsync(existingDetails);
-            }
-            else
-            {
-                var newDetails = new Employeedetailsmaster
-                {
-                    EmployeeId = request.EmployeeId,
-                    RoleId = request.RoleId,
-                    DepartmentId = request.DepartmentId
-                };
-                await _employeeDetailsRepository.CreateAsync(newDetails);
-            }
-
-            EEPZBusinessLog.Information($"Role and Department assigned to EmployeeId: {request.EmployeeId}");
-            return ApiResponseDto<string>.SuccessResponse("Role and Department assigned successfully", "Role and Department assigned successfully");
-        }
-
-        public async Task<ApiResponseDto<List<UserResponseDto>>> GetEmployeesByManagerAsync(int managerId)
-        {
-            // Get the manager's employee record
-            var manager = await _employeeRepository.GetByIdAsync(managerId);
-            if (manager == null)
-            {
-                return ApiResponseDto<List<UserResponseDto>>.FailureResponse("Manager not found");
-            }
-
-            // Get all employees where ReportingManagerEmployeeId matches the manager's EmployeeId
-            var allEmployees = await _employeeRepository.GetAllAsync();
-            var reportingEmployees = allEmployees
-                .Where(e => e.ReportingManagerEmployeeId == manager.EmployeeId && e.IsActive == true)
-                .ToList();
-
-            // Get user authentication data for these employees
-            var userResponses = new List<UserResponseDto>();
-
-            foreach (var employee in reportingEmployees)
-            {
-                var userAuth = await _userAuthRepository.GetByEmployeeIdAsync(employee.EmployeeId);
-                if (userAuth != null)
-                {
-                    userResponses.Add(MapToUserResponse(userAuth));
-                }
-            }
-
-            EEPZBusinessLog.Information($"Retrieved {userResponses.Count} employees for manager: {managerId}");
-            return ApiResponseDto<List<UserResponseDto>>.SuccessResponse(
-                userResponses,
-                $"Found {userResponses.Count} employees"
-            );
-        }
-
-        private UserResponseDto MapToUserResponse(Userauthentication user)
-        {
+            // Ad-hoc mapping
             var profile = user.Employee?.Userprofile;
-            var employeeDetails = user.Employee?.Employeedetailsmasters?.FirstOrDefault();
+            var empDetails = user.Employee?.Employeedetailsmasters?.FirstOrDefault();
 
-            return new UserResponseDto
+            var userResponse = new UserResponseDto
             {
                 UserId = user.UserId,
                 EmployeeId = user.EmployeeId,
@@ -335,11 +298,182 @@ namespace Relevantz.EEPZ.Core.Service
                 DateOfBirthOfficial = profile?.DateOfBirthOfficial,
                 MobileNumber = profile?.MobileNumber,
                 PersonalEmail = profile?.PersonalEmail,
-                RoleName = employeeDetails?.Role?.RoleName,
-                DepartmentName = employeeDetails?.Department?.DepartmentName
+                RoleName = empDetails?.Role?.RoleName,
+                DepartmentName = empDetails?.Department?.DepartmentName
             };
+
+            return ApiResponseDto<UserResponseDto>.SuccessResponse(userResponse, UserManagementConstants.Messages.UserRetrievedSuccess);
         }
-        
+
+        public async Task<ApiResponseDto<List<UserResponseDto>>> GetAllUsersAsync()
+        {
+            var users = await _userAuthRepository.GetAllAsync();
+            
+            // Ad-hoc mapping for list
+            var userResponses = users.Select(user =>
+            {
+                var profile = user.Employee?.Userprofile;
+                var empDetails = user.Employee?.Employeedetailsmasters?.FirstOrDefault();
+
+                return new UserResponseDto
+                {
+                    UserId = user.UserId,
+                    EmployeeId = user.EmployeeId,
+                    EmployeeCompanyId = user.Employee?.EmployeeCompanyId ?? string.Empty,
+                    Email = user.Email,
+                    Status = user.Status,
+                    IsFirstLogin = user.IsFirstLogin ?? false,
+                    LastLoginAt = user.LastLoginAt,
+                    EmploymentType = user.Employee?.EmploymentType ?? string.Empty,
+                    EmploymentStatus = user.Employee?.EmploymentStatus ?? string.Empty,
+                    JoiningDate = user.Employee?.JoiningDate ?? DateOnly.MinValue,
+                    ConfirmationDate = user.Employee?.ConfirmationDate,
+                    ExitDate = user.Employee?.ExitDate,
+                    WorkLocation = user.Employee?.WorkLocation,
+                    EmployeeType = user.Employee?.EmployeeType ?? string.Empty,
+                    NoticePeriodDays = user.Employee?.NoticePeriodDays ?? 0,
+                    IsActive = user.Employee?.IsActive ?? false,
+                    FirstName = profile?.FirstName ?? string.Empty,
+                    MiddleName = profile?.MiddleName,
+                    LastName = profile?.LastName ?? string.Empty,
+                    CallingName = profile?.CallingName,
+                    Gender = profile?.Gender,
+                    DateOfBirthOfficial = profile?.DateOfBirthOfficial,
+                    MobileNumber = profile?.MobileNumber,
+                    PersonalEmail = profile?.PersonalEmail,
+                    RoleName = empDetails?.Role?.RoleName,
+                    DepartmentName = empDetails?.Department?.DepartmentName
+                };
+            }).ToList();
+
+            return ApiResponseDto<List<UserResponseDto>>.SuccessResponse(userResponses, UserManagementConstants.Messages.UsersRetrievedSuccess);
+        }
+
+        public async Task<ApiResponseDto<string>> DeactivateUserAsync(int userId)
+        {
+            var user = await _userAuthRepository.GetByIdAsync(userId);
+            if (user == null)
+            {
+                return ApiResponseDto<string>.FailureResponse(Constants.Messages.UserNotFound);
+            }
+
+            user.Status = Constants.UserStatuses.Inactive;
+            user.Employee.IsActive = false;
+            await _userAuthRepository.UpdateAsync(user);
+
+            EEPZBusinessLog.Information($"User deactivated: UserId {userId}");
+            return ApiResponseDto<string>.SuccessResponse(UserManagementConstants.Messages.UserDeactivatedSuccess, UserManagementConstants.Messages.UserDeactivatedSuccess);
+        }
+
+        public async Task<ApiResponseDto<string>> ActivateUserAsync(int userId)
+        {
+            var user = await _userAuthRepository.GetByIdAsync(userId);
+            if (user == null)
+            {
+                return ApiResponseDto<string>.FailureResponse(Constants.Messages.UserNotFound);
+            }
+
+            user.Status = Constants.UserStatuses.Active;
+            user.Employee.IsActive = true;
+            await _userAuthRepository.UpdateAsync(user);
+
+            EEPZBusinessLog.Information($"User activated: UserId {userId}");
+            return ApiResponseDto<string>.SuccessResponse(UserManagementConstants.Messages.UserActivatedSuccess, UserManagementConstants.Messages.UserActivatedSuccess);
+        }
+
+        public async Task<ApiResponseDto<string>> AssignRoleAndDepartmentAsync(AssignRoleDepartmentRequestDto request)
+        {
+            var existingDetails = await _employeeDetailsRepository.GetByEmployeeIdAsync(request.EmployeeId);
+
+            if (existingDetails != null)
+            {
+                existingDetails.RoleId = request.RoleId;
+                existingDetails.DepartmentId = request.DepartmentId;
+                await _employeeDetailsRepository.UpdateAsync(existingDetails);
+            }
+            else
+            {
+                var newDetails = new Employeedetailsmaster
+                {
+                    EmployeeId = request.EmployeeId,
+                    RoleId = request.RoleId,
+                    DepartmentId = request.DepartmentId
+                };
+                await _employeeDetailsRepository.CreateAsync(newDetails);
+            }
+
+            EEPZBusinessLog.Information($"Role and Department assigned to EmployeeId: {request.EmployeeId}");
+            return ApiResponseDto<string>.SuccessResponse(UserManagementConstants.Messages.RoleDepartmentAssignedSuccess, UserManagementConstants.Messages.RoleDepartmentAssignedSuccess);
+        }
+
+        public async Task<ApiResponseDto<List<UserResponseDto>>> GetEmployeesByManagerAsync(int managerId)
+        {
+            // Get the manager's employee record
+            var manager = await _employeeRepository.GetByIdAsync(managerId);
+            if (manager == null)
+            {
+                return ApiResponseDto<List<UserResponseDto>>.FailureResponse(UserManagementConstants.Messages.ManagerNotFound);
+            }
+
+            // Get all employees where ReportingManagerEmployeeId matches the manager's EmployeeId
+            var allEmployees = await _employeeRepository.GetAllAsync();
+            var reportingEmployees = allEmployees
+                .Where(e => e.ReportingManagerEmployeeId == manager.EmployeeId && e.IsActive == true)
+                .ToList();
+
+            // Get user authentication data for these employees
+            var userResponses = new List<UserResponseDto>();
+
+            foreach (var employee in reportingEmployees)
+            {
+                var userAuth = await _userAuthRepository.GetByEmployeeIdAsync(employee.EmployeeId);
+                if (userAuth != null)
+                {
+                    // Ad-hoc mapping
+                    var profile = userAuth.Employee?.Userprofile;
+                    var empDetails = userAuth.Employee?.Employeedetailsmasters?.FirstOrDefault();
+
+                    var userResponse = new UserResponseDto
+                    {
+                        UserId = userAuth.UserId,
+                        EmployeeId = userAuth.EmployeeId,
+                        EmployeeCompanyId = userAuth.Employee?.EmployeeCompanyId ?? string.Empty,
+                        Email = userAuth.Email,
+                        Status = userAuth.Status,
+                        IsFirstLogin = userAuth.IsFirstLogin ?? false,
+                        LastLoginAt = userAuth.LastLoginAt,
+                        EmploymentType = userAuth.Employee?.EmploymentType ?? string.Empty,
+                        EmploymentStatus = userAuth.Employee?.EmploymentStatus ?? string.Empty,
+                        JoiningDate = userAuth.Employee?.JoiningDate ?? DateOnly.MinValue,
+                        ConfirmationDate = userAuth.Employee?.ConfirmationDate,
+                        ExitDate = userAuth.Employee?.ExitDate,
+                        WorkLocation = userAuth.Employee?.WorkLocation,
+                        EmployeeType = userAuth.Employee?.EmployeeType ?? string.Empty,
+                        NoticePeriodDays = userAuth.Employee?.NoticePeriodDays ?? 0,
+                        IsActive = userAuth.Employee?.IsActive ?? false,
+                        FirstName = profile?.FirstName ?? string.Empty,
+                        MiddleName = profile?.MiddleName,
+                        LastName = profile?.LastName ?? string.Empty,
+                        CallingName = profile?.CallingName,
+                        Gender = profile?.Gender,
+                        DateOfBirthOfficial = profile?.DateOfBirthOfficial,
+                        MobileNumber = profile?.MobileNumber,
+                        PersonalEmail = profile?.PersonalEmail,
+                        RoleName = empDetails?.Role?.RoleName,
+                        DepartmentName = empDetails?.Department?.DepartmentName
+                    };
+
+                    userResponses.Add(userResponse);
+                }
+            }
+
+            EEPZBusinessLog.Information($"Retrieved {userResponses.Count} employees for manager: {managerId}");
+            return ApiResponseDto<List<UserResponseDto>>.SuccessResponse(
+                userResponses,
+                $"Found {userResponses.Count} employees"
+            );
+        }
+
         public async Task<string> GetNextEmployeeCompanyIdAsync()
         {
             return await _employeeRepository.GetNextEmployeeCompanyIdAsync();
