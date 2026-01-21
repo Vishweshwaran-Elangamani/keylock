@@ -210,7 +210,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .Include(s => s.Skill)
                 .Where(s => s.IsActive == true);
 
-            // Search filter 
+
             if (!string.IsNullOrWhiteSpace(request.SearchTerm))
             {
                 var lowerSearchTerm = request.SearchTerm.ToLower();

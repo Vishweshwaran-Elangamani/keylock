@@ -109,7 +109,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             if (!string.IsNullOrEmpty(request.Status))
                 query = query.Where(a => a.Status == request.Status);
 
-       
+
             query = query.OrderByDescending(a => a.RequestedOn);
 
             var totalCount = await query.CountAsync();

@@ -40,7 +40,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .ThenInclude(ed => ed.Department)
                 .Where(e => e.EmploymentStatus == "Active");
 
-            // Exclude department filter
+
             if (!string.IsNullOrEmpty(request.ExcludeDepartment))
             {
                 baseQuery = baseQuery.Where(e =>
@@ -48,7 +48,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 );
             }
 
-            // Search filter
+
             if (!string.IsNullOrEmpty(request.SearchTerm))
             {
                 var lowerSearchTerm = request.SearchTerm.ToLower();
@@ -114,7 +114,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .AsNoTracking()
                 .Where(m => m.EmployeeId == employeeId);
 
-            //  Search only (allowed in repo)
+
             if (!string.IsNullOrEmpty(request.SearchTerm))
             {
                 query = query.Where(m =>
@@ -161,13 +161,13 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .AsNoTracking()
                 .AsQueryable();
 
-            //  Status filter
+
             if (!string.IsNullOrEmpty(request.StatusFilter))
             {
                 query = query.Where(a => a.Status == request.StatusFilter);
             }
 
-            //  Search filter
+
             if (!string.IsNullOrEmpty(request.SearchTerm))
             {
                 var search = request.SearchTerm.ToLower();
@@ -216,13 +216,13 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .AsNoTracking()
                 .AsQueryable();
 
-            //  Status filter
+
             if (!string.IsNullOrEmpty(request.StatusFilter))
             {
                 query = query.Where(a => a.Status == request.StatusFilter);
             }
 
-            // Search filter
+
             if (!string.IsNullOrEmpty(request.SearchTerm))
             {
                 var lowerSearchTerm = request.SearchTerm.ToLower();

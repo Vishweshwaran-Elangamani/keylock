@@ -352,7 +352,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             return (items, totalCount);
         }
-        
+
 
         /// <summary>Gets all team assignments for Excel export without pagination.</summary>
         public async Task<List<Lndassignment>> GetAllTeamAssignmentsForExport(
@@ -397,7 +397,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                     || (a.Sme.Employee.Userprofile.FirstName ?? "").Contains(request.SearchTerm)
                     || (a.Sme.Employee.Userprofile.LastName ?? "").Contains(request.SearchTerm)
                 );
-            }       
+            }
 
             var items = await query.ToListAsync();
 
