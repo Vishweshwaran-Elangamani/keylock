@@ -34,7 +34,6 @@ namespace eepzbackend.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        // ✅ GET api/rsvp/my-invitations
         [HttpGet("my-invitations")]
         [ProducesResponseType(typeof(ApiResponse<List<MeetingInvitationDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
@@ -60,8 +59,7 @@ namespace eepzbackend.Controllers
                 correlationId));
         }
 
-        // ✅ POST api/rsvp
-        // renamed from "submit" -> clean REST
+
         [HttpPost]
         [ProducesResponseType(typeof(ApiResponse<MeetingInvitationDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
@@ -112,8 +110,7 @@ namespace eepzbackend.Controllers
                 correlationId));
         }
 
-        // ✅ PUT api/rsvp/{meetingId}
-        // Fix: Async suffix + clean route
+
         [HttpPut("{meetingId:int}")]
         [ProducesResponseType(typeof(ApiResponse<MeetingInvitationDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
@@ -180,7 +177,6 @@ namespace eepzbackend.Controllers
                 correlationId));
         }
 
-        // ✅ GET api/rsvp/pending-count
         [HttpGet("pending-count")]
         [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
@@ -206,8 +202,7 @@ namespace eepzbackend.Controllers
                 correlationId));
         }
 
-        // ✅ GET api/rsvp/{meetingId}/summary
-        // Fix comment: Use "{meeting:int}/summary" if prefix exists
+
         [HttpGet("{meetingId:int}/summary")]
         [Authorize(Roles = AppConstants.Roles.Manager)]
         [ProducesResponseType(typeof(ApiResponse<MeetingRsvpSummaryDto>), StatusCodes.Status200OK)]

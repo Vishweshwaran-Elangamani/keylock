@@ -13,7 +13,7 @@ namespace Relevantz.EEPZ.Core.Services.Interfaces
             string role,
             CancellationToken cancellationToken = default);
 
-        // ✅ returns paginated dto
+
         Task<PaginatedMeetingResponseDto> GetMeetingsByManagerIdAsync(
             int managerId,
             int pageNumber,
