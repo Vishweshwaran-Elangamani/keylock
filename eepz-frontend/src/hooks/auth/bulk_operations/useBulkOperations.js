@@ -118,64 +118,51 @@ const useBulkOperations = () => {
 
       toast.dismiss(loadingToastId);
 
-      if (result.success) {
-        const data = result.data;
+      // ✅ NEW: Handle direct response (no wrapper)
+      // Check if response has the direct data structure
+      const data = result.success ? result.data : result;
 
-        setUploadResult({
-          successCount: data.successCount || 0,
-          failureCount: data.failureCount || 0,
-          totalRecords: data.totalRecords || 0,
-          errors: data.errors || [],
-          successfulUsers: data.successfulUsers || [],
-          categorizedErrors:
-            data.errors && data.errors.length > 0
-              ? categorizeErrors(data.errors)
-              : null,
-        });
+      setUploadResult({
+        successCount: data.successCount || 0,
+        failureCount: data.failureCount || 0,
+        totalRecords: data.totalRecords || 0,
+        errors: data.errors || [],
+        successfulUsers: data.successfulUsers || [],
+        categorizedErrors:
+          data.errors && data.errors.length > 0
+            ? categorizeErrors(data.errors)
+            : null,
+      });
 
-        if (data.failureCount === 0) {
-          toast.success(
-            ` ${data.successCount} user${
-              data.successCount !== 1 ? "s" : ""
-            } added successfully!`,
-            {
-              duration: 6000,
-              description:
-                "All records have been imported and are now active in the system.",
-            }
-          );
-        } else if (data.successCount > 0) {
-          toast.success(
-            ` ${data.successCount} user${
-              data.successCount !== 1 ? "s" : ""
-            } added successfully!`,
-            { duration: 5000 }
-          );
-          toast.warning(
-            ` ${data.failureCount} record${
-              data.failureCount !== 1 ? "s" : ""
-            } failed. Check details below.`,
-            { duration: 8000 }
-          );
-        } else {
-          toast.error(
-            ` All ${data.totalRecords} records failed. Review errors below.`,
-            { duration: 8000 }
-          );
-        }
+      if (data.failureCount === 0) {
+        toast.success(
+          ` ${data.successCount} user${
+            data.successCount !== 1 ? "s" : ""
+          } added successfully!`,
+          {
+            duration: 6000,
+            description:
+              "All records have been imported and are now active in the system.",
+          }
+        );
+      } else if (data.successCount > 0) {
+        toast.success(
+          ` ${data.successCount} user${
+            data.successCount !== 1 ? "s" : ""
+          } added successfully!`,
+          { duration: 5000 }
+        );
+        toast.warning(
+          ` ${data.failureCount} record${
+            data.failureCount !== 1 ? "s" : ""
+          } failed. Check details below.`,
+          { duration: 8000 }
+        );
       } else {
-        toast.error(result.message || "Import failed", { duration: 5000 });
-
-        if (result.data?.errors) {
-          setUploadResult({
-            successCount: 0,
-            failureCount: result.data.failureCount || result.data.errors.length,
-            totalRecords: result.data.totalRecords || result.data.errors.length,
-            errors: result.data.errors,
-            successfulUsers: [],
-            categorizedErrors: categorizeErrors(result.data.errors),
-          });
-        }
+        toast.error(
+          ` All ${data.totalRecords} records failed. Review errors below.`,
+          { duration: 8000 }
+        );
       }
     } catch (error) {
       toast.dismiss(loadingToastId);
@@ -186,29 +173,21 @@ const useBulkOperations = () => {
 
       toast.error(errorMessage, { duration: 5000 });
 
-      if (
-        responseData?.data?.errors &&
-        Array.isArray(responseData.data.errors)
-      ) {
-        setUploadResult({
-          successCount: responseData.data.successCount || 0,
-          failureCount:
-            responseData.data.failureCount || responseData.data.errors.length,
-          totalRecords:
-            responseData.data.totalRecords || responseData.data.errors.length,
-          errors: responseData.data.errors,
-          successfulUsers: responseData.data.successfulUsers || [],
-          categorizedErrors: categorizeErrors(responseData.data.errors),
-        });
-      } else if (responseData?.errors && Array.isArray(responseData.errors)) {
-        setUploadResult({
-          successCount: 0,
-          failureCount: responseData.errors.length,
-          totalRecords: responseData.errors.length,
-          errors: responseData.errors,
-          successfulUsers: [],
-          categorizedErrors: categorizeErrors(responseData.errors),
-        });
+      // ✅ NEW: Handle error response (direct structure)
+      if (responseData) {
+        // Check if responseData itself contains the error data (direct response)
+        const errorData = responseData.data || responseData;
+
+        if (errorData.errors && Array.isArray(errorData.errors)) {
+          setUploadResult({
+            successCount: errorData.successCount || 0,
+            failureCount: errorData.failureCount || errorData.errors.length,
+            totalRecords: errorData.totalRecords || errorData.errors.length,
+            errors: errorData.errors,
+            successfulUsers: errorData.successfulUsers || [],
+            categorizedErrors: categorizeErrors(errorData.errors),
+          });
+        }
       }
     } finally {
       setLoading(false);
