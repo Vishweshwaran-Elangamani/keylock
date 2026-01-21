@@ -1,7 +1,5 @@
-using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
-using System.IO;
 
 namespace Relevantz.EEPZ.Core.IService
 {

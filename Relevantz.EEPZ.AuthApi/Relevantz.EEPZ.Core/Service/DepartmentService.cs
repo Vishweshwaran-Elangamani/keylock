@@ -30,7 +30,7 @@ namespace Relevantz.EEPZ.Core.Service
 
         #region Basic CRUD Operations
 
-        public async Task<ApiResponseDto<DepartmentResponseDto>> CreateDepartmentAsync(CreateDepartmentRequestDto request)
+        public async Task<DepartmentResponseDto> CreateDepartmentAsync(CreateDepartmentRequestDto request)
         {
             _logger.LogInformation("Creating department: {DepartmentName} (Code: {DepartmentCode})", request.DepartmentName, request.DepartmentCode);
 
@@ -38,14 +38,14 @@ namespace Relevantz.EEPZ.Core.Service
             if (await _departmentRepository.DepartmentNameExistsAsync(request.DepartmentName))
             {
                 _logger.LogWarning("Department name already exists: {DepartmentName}", request.DepartmentName);
-                return ApiResponseDto<DepartmentResponseDto>.FailureResponse("Department name already exists");
+                throw new InvalidOperationException(DepartmentMessages.DepartmentNameAlreadyExists);
             }
 
             // Validate department code uniqueness
             if (await _departmentRepository.DepartmentCodeExistsAsync(request.DepartmentCode))
             {
                 _logger.LogWarning("Department code already exists: {DepartmentCode}", request.DepartmentCode);
-                return ApiResponseDto<DepartmentResponseDto>.FailureResponse("Department code already exists");
+                throw new InvalidOperationException(DepartmentMessages.DepartmentCodeAlreadyExists);
             }
 
             // Validate parent department exists
@@ -55,13 +55,13 @@ namespace Relevantz.EEPZ.Core.Service
                 if (parentDepartment == null)
                 {
                     _logger.LogWarning("Parent department not found: {ParentDepartmentId}", request.ParentDepartmentId.Value);
-                    return ApiResponseDto<DepartmentResponseDto>.FailureResponse("Parent department not found");
+                    throw new KeyNotFoundException(DepartmentMessages.ParentDepartmentNotFound);
                 }
 
                 if (parentDepartment.Status == "Inactive")
                 {
                     _logger.LogWarning("Cannot add child department to inactive parent: {ParentDepartmentId}", request.ParentDepartmentId.Value);
-                    return ApiResponseDto<DepartmentResponseDto>.FailureResponse("Cannot add child department to an inactive parent");
+                    throw new InvalidOperationException(DepartmentMessages.CannotAddChildToInactiveParent);
                 }
             }
 
@@ -72,13 +72,13 @@ namespace Relevantz.EEPZ.Core.Service
                 if (hodEmployee == null)
                 {
                     _logger.LogWarning("HOD employee not found: {HodEmployeeId}", request.HodEmployeeId.Value);
-                    return ApiResponseDto<DepartmentResponseDto>.FailureResponse("HOD employee not found");
+                    throw new KeyNotFoundException(DepartmentMessages.HodEmployeeNotFound);
                 }
 
                 if (hodEmployee.EmploymentStatus != "Active")
                 {
                     _logger.LogWarning("HOD employee must be active: {HodEmployeeId}", request.HodEmployeeId.Value);
-                    return ApiResponseDto<DepartmentResponseDto>.FailureResponse("HOD employee must be in active status");
+                    throw new InvalidOperationException(DepartmentMessages.HodEmployeeMustBeActive);
                 }
             }
 
@@ -101,10 +101,10 @@ namespace Relevantz.EEPZ.Core.Service
             _logger.LogInformation("Department created successfully: {DepartmentName} (Code: {DepartmentCode})", request.DepartmentName, request.DepartmentCode);
             EEPZBusinessLog.Information($"Department created: {request.DepartmentName} (Code: {request.DepartmentCode})");
 
-            return ApiResponseDto<DepartmentResponseDto>.SuccessResponse(response, Constants.Messages.DepartmentCreatedSuccess);
+            return response;
         }
 
-        public async Task<ApiResponseDto<DepartmentResponseDto>> UpdateDepartmentAsync(UpdateDepartmentRequestDto request)
+        public async Task<DepartmentResponseDto> UpdateDepartmentAsync(UpdateDepartmentRequestDto request)
         {
             _logger.LogInformation("Updating department: {DepartmentId}", request.DepartmentId);
 
@@ -112,7 +112,7 @@ namespace Relevantz.EEPZ.Core.Service
             if (department == null)
             {
                 _logger.LogWarning("Department not found: {DepartmentId}", request.DepartmentId);
-                return ApiResponseDto<DepartmentResponseDto>.FailureResponse(Constants.Messages.DepartmentNotFound);
+                throw new KeyNotFoundException(Constants.Messages.DepartmentNotFound);
             }
 
             // Validate department name uniqueness (excluding current department)
@@ -121,7 +121,7 @@ namespace Relevantz.EEPZ.Core.Service
                 if (await _departmentRepository.DepartmentNameExistsAsync(request.DepartmentName, request.DepartmentId))
                 {
                     _logger.LogWarning("Department name already exists: {DepartmentName}", request.DepartmentName);
-                    return ApiResponseDto<DepartmentResponseDto>.FailureResponse("Department name already exists");
+                    throw new InvalidOperationException(DepartmentMessages.DepartmentNameAlreadyExists);
                 }
             }
 
@@ -131,7 +131,7 @@ namespace Relevantz.EEPZ.Core.Service
                 if (await _departmentRepository.DepartmentCodeExistsAsync(request.DepartmentCode, request.DepartmentId))
                 {
                     _logger.LogWarning("Department code already exists: {DepartmentCode}", request.DepartmentCode);
-                    return ApiResponseDto<DepartmentResponseDto>.FailureResponse("Department code already exists");
+                    throw new InvalidOperationException(DepartmentMessages.DepartmentCodeAlreadyExists);
                 }
             }
 
@@ -141,21 +141,21 @@ namespace Relevantz.EEPZ.Core.Service
                 if (request.ParentDepartmentId == request.DepartmentId)
                 {
                     _logger.LogWarning("Department cannot be its own parent: {DepartmentId}", request.DepartmentId);
-                    return ApiResponseDto<DepartmentResponseDto>.FailureResponse("Department cannot be its own parent");
+                    throw new InvalidOperationException(DepartmentMessages.DepartmentCannotBeItsOwnParent);
                 }
 
                 var parentDepartment = await _departmentRepository.GetByIdAsync(request.ParentDepartmentId.Value);
                 if (parentDepartment == null)
                 {
                     _logger.LogWarning("Parent department not found: {ParentDepartmentId}", request.ParentDepartmentId.Value);
-                    return ApiResponseDto<DepartmentResponseDto>.FailureResponse("Parent department not found");
+                    throw new KeyNotFoundException(DepartmentMessages.ParentDepartmentNotFound);
                 }
 
                 // Check for circular reference
                 if (await _departmentRepository.IsCircularReferenceAsync(request.DepartmentId, request.ParentDepartmentId.Value))
                 {
                     _logger.LogWarning("Circular reference detected for department: {DepartmentId}", request.DepartmentId);
-                    return ApiResponseDto<DepartmentResponseDto>.FailureResponse("Circular reference detected. A department cannot be a parent of its own ancestor.");
+                    throw new InvalidOperationException(DepartmentMessages.CircularReferenceDetected);
                 }
             }
 
@@ -166,13 +166,13 @@ namespace Relevantz.EEPZ.Core.Service
                 if (hodEmployee == null)
                 {
                     _logger.LogWarning("HOD employee not found: {HodEmployeeId}", request.HodEmployeeId.Value);
-                    return ApiResponseDto<DepartmentResponseDto>.FailureResponse("HOD employee not found");
+                    throw new KeyNotFoundException(DepartmentMessages.HodEmployeeNotFound);
                 }
 
                 if (hodEmployee.EmploymentStatus != "Active")
                 {
                     _logger.LogWarning("HOD employee must be active: {HodEmployeeId}", request.HodEmployeeId.Value);
-                    return ApiResponseDto<DepartmentResponseDto>.FailureResponse("HOD employee must be in active status");
+                    throw new InvalidOperationException(DepartmentMessages.HodEmployeeMustBeActive);
                 }
             }
 
@@ -186,7 +186,7 @@ namespace Relevantz.EEPZ.Core.Service
                     if (childDepartments.Any(c => c.Status == "Active"))
                     {
                         _logger.LogWarning("Cannot inactivate department with active children: {DepartmentId}", request.DepartmentId);
-                        return ApiResponseDto<DepartmentResponseDto>.FailureResponse("Cannot inactivate department with active child departments");
+                        throw new InvalidOperationException(DepartmentMessages.CannotInactivateDepartmentWithActiveChildren);
                     }
                 }
             }
@@ -208,10 +208,10 @@ namespace Relevantz.EEPZ.Core.Service
             _logger.LogInformation("Department updated successfully: {DepartmentId}", request.DepartmentId);
             EEPZBusinessLog.Information($"Department updated: DepartmentId {request.DepartmentId}");
 
-            return ApiResponseDto<DepartmentResponseDto>.SuccessResponse(response, Constants.Messages.DepartmentUpdatedSuccess);
+            return response;
         }
 
-        public async Task<ApiResponseDto<DepartmentResponseDto>> GetDepartmentByIdAsync(int departmentId)
+        public async Task<DepartmentResponseDto> GetDepartmentByIdAsync(int departmentId)
         {
             _logger.LogInformation("Retrieving department: {DepartmentId}", departmentId);
 
@@ -219,14 +219,14 @@ namespace Relevantz.EEPZ.Core.Service
             if (department == null)
             {
                 _logger.LogWarning("Department not found: {DepartmentId}", departmentId);
-                return ApiResponseDto<DepartmentResponseDto>.FailureResponse(Constants.Messages.DepartmentNotFound);
+                throw new KeyNotFoundException(Constants.Messages.DepartmentNotFound);
             }
 
             var response = await MapToDepartmentResponseAsync(department);
-            return ApiResponseDto<DepartmentResponseDto>.SuccessResponse(response, "Department retrieved successfully");
+            return response;
         }
 
-        public async Task<ApiResponseDto<List<DepartmentResponseDto>>> GetAllDepartmentsAsync()
+        public async Task<List<DepartmentResponseDto>> GetAllDepartmentsAsync()
         {
             _logger.LogInformation("Retrieving all departments");
 
@@ -238,10 +238,10 @@ namespace Relevantz.EEPZ.Core.Service
                 responses.Add(await MapToDepartmentResponseAsync(dept));
             }
 
-            return ApiResponseDto<List<DepartmentResponseDto>>.SuccessResponse(responses, "Departments retrieved successfully");
+            return responses;
         }
 
-        public async Task<ApiResponseDto<string>> DeleteDepartmentAsync(int departmentId)
+        public async Task DeleteDepartmentAsync(int departmentId)
         {
             _logger.LogInformation("Deleting department: {DepartmentId}", departmentId);
 
@@ -249,35 +249,33 @@ namespace Relevantz.EEPZ.Core.Service
             if (department == null)
             {
                 _logger.LogWarning("Department not found: {DepartmentId}", departmentId);
-                return ApiResponseDto<string>.FailureResponse(Constants.Messages.DepartmentNotFound);
+                throw new KeyNotFoundException(Constants.Messages.DepartmentNotFound);
             }
 
             // Check if department has child departments
             if (await _departmentRepository.HasChildDepartmentsAsync(departmentId))
             {
                 _logger.LogWarning("Cannot delete department with children: {DepartmentId}", departmentId);
-                return ApiResponseDto<string>.FailureResponse("Cannot delete department with child departments. Please delete or reassign child departments first.");
+                throw new InvalidOperationException(DepartmentMessages.CannotDeleteDepartmentWithChildren);
             }
 
             // Check if department has employees
             if (await _departmentRepository.HasEmployeesAsync(departmentId))
             {
                 _logger.LogWarning("Cannot delete department with employees: {DepartmentId}", departmentId);
-                return ApiResponseDto<string>.FailureResponse("Cannot delete department with assigned employees. Please reassign employees first.");
+                throw new InvalidOperationException(DepartmentMessages.CannotDeleteDepartmentWithEmployees);
             }
 
             await _departmentRepository.DeleteAsync(departmentId);
             _logger.LogInformation("Department deleted successfully: {DepartmentId}", departmentId);
             EEPZBusinessLog.Information($"Department deleted: DepartmentId {departmentId}");
-
-            return ApiResponseDto<string>.SuccessResponse("Department deleted successfully", "Department deleted successfully");
         }
 
         #endregion
 
         #region Hierarchy Operations
 
-        public async Task<ApiResponseDto<DepartmentHierarchyResponseDto>> GetDepartmentHierarchyTreeAsync(int? rootDepartmentId = null)
+        public async Task<DepartmentHierarchyResponseDto> GetDepartmentHierarchyTreeAsync(int? rootDepartmentId = null)
         {
             _logger.LogInformation("Retrieving department hierarchy tree. RootDepartmentId: {RootDepartmentId}", rootDepartmentId);
 
@@ -289,7 +287,7 @@ namespace Relevantz.EEPZ.Core.Service
                 if (rootDept == null)
                 {
                     _logger.LogWarning("Root department not found: {RootDepartmentId}", rootDepartmentId.Value);
-                    return ApiResponseDto<DepartmentHierarchyResponseDto>.FailureResponse("Root department not found");
+                    throw new KeyNotFoundException(DepartmentMessages.RootDepartmentNotFound);
                 }
                 rootDepartments = new List<Department> { rootDept };
             }
@@ -313,10 +311,10 @@ namespace Relevantz.EEPZ.Core.Service
                     Children = hierarchyTree
                 };
 
-            return ApiResponseDto<DepartmentHierarchyResponseDto>.SuccessResponse(result, "Department hierarchy retrieved successfully");
+            return result;
         }
 
-        public async Task<ApiResponseDto<List<DepartmentResponseDto>>> GetChildDepartmentsAsync(int parentDepartmentId)
+        public async Task<List<DepartmentResponseDto>> GetChildDepartmentsAsync(int parentDepartmentId)
         {
             _logger.LogInformation("Retrieving child departments for parent: {ParentDepartmentId}", parentDepartmentId);
 
@@ -328,10 +326,10 @@ namespace Relevantz.EEPZ.Core.Service
                 responses.Add(await MapToDepartmentResponseAsync(dept));
             }
 
-            return ApiResponseDto<List<DepartmentResponseDto>>.SuccessResponse(responses, "Child departments retrieved successfully");
+            return responses;
         }
 
-        public async Task<ApiResponseDto<List<DepartmentResponseDto>>> GetRootDepartmentsAsync()
+        public async Task<List<DepartmentResponseDto>> GetRootDepartmentsAsync()
         {
             _logger.LogInformation("Retrieving root departments");
 
@@ -343,10 +341,10 @@ namespace Relevantz.EEPZ.Core.Service
                 responses.Add(await MapToDepartmentResponseAsync(dept));
             }
 
-            return ApiResponseDto<List<DepartmentResponseDto>>.SuccessResponse(responses, "Root departments retrieved successfully");
+            return responses;
         }
 
-        public async Task<ApiResponseDto<List<DepartmentResponseDto>>> GetDepartmentPathAsync(int departmentId)
+        public async Task<List<DepartmentResponseDto>> GetDepartmentPathAsync(int departmentId)
         {
             _logger.LogInformation("Retrieving department path for: {DepartmentId}", departmentId);
 
@@ -354,7 +352,7 @@ namespace Relevantz.EEPZ.Core.Service
             if (!hierarchy.Any())
             {
                 _logger.LogWarning("Department not found: {DepartmentId}", departmentId);
-                return ApiResponseDto<List<DepartmentResponseDto>>.FailureResponse("Department not found");
+                throw new KeyNotFoundException(Constants.Messages.DepartmentNotFound);
             }
 
             var responses = new List<DepartmentResponseDto>();
@@ -363,14 +361,14 @@ namespace Relevantz.EEPZ.Core.Service
                 responses.Add(await MapToDepartmentResponseAsync(dept));
             }
 
-            return ApiResponseDto<List<DepartmentResponseDto>>.SuccessResponse(responses, "Department path retrieved successfully");
+            return responses;
         }
 
         #endregion
 
         #region Status Operations
 
-        public async Task<ApiResponseDto<List<DepartmentResponseDto>>> GetActiveDepartmentsAsync()
+        public async Task<List<DepartmentResponseDto>> GetActiveDepartmentsAsync()
         {
             _logger.LogInformation("Retrieving active departments");
 
@@ -382,10 +380,10 @@ namespace Relevantz.EEPZ.Core.Service
                 responses.Add(await MapToDepartmentResponseAsync(dept));
             }
 
-            return ApiResponseDto<List<DepartmentResponseDto>>.SuccessResponse(responses, "Active departments retrieved successfully");
+            return responses;
         }
 
-        public async Task<ApiResponseDto<List<DepartmentResponseDto>>> GetInactiveDepartmentsAsync()
+        public async Task<List<DepartmentResponseDto>> GetInactiveDepartmentsAsync()
         {
             _logger.LogInformation("Retrieving inactive departments");
 
@@ -397,10 +395,10 @@ namespace Relevantz.EEPZ.Core.Service
                 responses.Add(await MapToDepartmentResponseAsync(dept));
             }
 
-            return ApiResponseDto<List<DepartmentResponseDto>>.SuccessResponse(responses, "Inactive departments retrieved successfully");
+            return responses;
         }
 
-        public async Task<ApiResponseDto<string>> UpdateDepartmentStatusAsync(int departmentId, string status)
+        public async Task UpdateDepartmentStatusAsync(int departmentId, string status)
         {
             _logger.LogInformation("Updating department status: {DepartmentId} to {Status}", departmentId, status);
 
@@ -408,13 +406,13 @@ namespace Relevantz.EEPZ.Core.Service
             if (department == null)
             {
                 _logger.LogWarning("Department not found: {DepartmentId}", departmentId);
-                return ApiResponseDto<string>.FailureResponse(Constants.Messages.DepartmentNotFound);
+                throw new KeyNotFoundException(Constants.Messages.DepartmentNotFound);
             }
 
             if (status != "Active" && status != "Inactive")
             {
                 _logger.LogWarning("Invalid status: {Status}", status);
-                return ApiResponseDto<string>.FailureResponse("Invalid status. Must be 'Active' or 'Inactive'");
+                throw new ArgumentException(DepartmentMessages.InvalidStatus);
             }
 
             if (status == "Inactive")
@@ -423,7 +421,7 @@ namespace Relevantz.EEPZ.Core.Service
                 if (childDepartments.Any(c => c.Status == "Active"))
                 {
                     _logger.LogWarning("Cannot inactivate department with active children: {DepartmentId}", departmentId);
-                    return ApiResponseDto<string>.FailureResponse("Cannot inactivate department with active child departments");
+                    throw new InvalidOperationException(DepartmentMessages.CannotInactivateDepartmentWithActiveChildren);
                 }
             }
 
@@ -432,14 +430,13 @@ namespace Relevantz.EEPZ.Core.Service
 
             _logger.LogInformation("Department status updated: {DepartmentId} to {Status}", departmentId, status);
             EEPZBusinessLog.Information($"Department status updated: DepartmentId {departmentId} to {status}");
-            return ApiResponseDto<string>.SuccessResponse("Status updated successfully", $"Department status updated to {status}");
         }
 
         #endregion
 
         #region HOD Operations
 
-        public async Task<ApiResponseDto<List<DepartmentResponseDto>>> GetDepartmentsByHodAsync(int hodEmployeeId)
+        public async Task<List<DepartmentResponseDto>> GetDepartmentsByHodAsync(int hodEmployeeId)
         {
             _logger.LogInformation("Retrieving departments for HOD: {HodEmployeeId}", hodEmployeeId);
 
@@ -451,10 +448,10 @@ namespace Relevantz.EEPZ.Core.Service
                 responses.Add(await MapToDepartmentResponseAsync(dept));
             }
 
-            return ApiResponseDto<List<DepartmentResponseDto>>.SuccessResponse(responses, "HOD departments retrieved successfully");
+            return responses;
         }
 
-        public async Task<ApiResponseDto<string>> AssignHodAsync(int departmentId, int hodEmployeeId)
+        public async Task AssignHodAsync(int departmentId, int hodEmployeeId)
         {
             _logger.LogInformation("Assigning HOD: {HodEmployeeId} to department: {DepartmentId}", hodEmployeeId, departmentId);
 
@@ -462,20 +459,20 @@ namespace Relevantz.EEPZ.Core.Service
             if (department == null)
             {
                 _logger.LogWarning("Department not found: {DepartmentId}", departmentId);
-                return ApiResponseDto<string>.FailureResponse(Constants.Messages.DepartmentNotFound);
+                throw new KeyNotFoundException(Constants.Messages.DepartmentNotFound);
             }
 
             var employee = await _employeeRepository.GetByIdAsync(hodEmployeeId);
             if (employee == null)
             {
                 _logger.LogWarning("Employee not found: {HodEmployeeId}", hodEmployeeId);
-                return ApiResponseDto<string>.FailureResponse("Employee not found");
+                throw new KeyNotFoundException(DepartmentMessages.EmployeeNotFound);
             }
 
             if (employee.EmploymentStatus != "Active")
             {
                 _logger.LogWarning("Employee must be active to be HOD: {HodEmployeeId}", hodEmployeeId);
-                return ApiResponseDto<string>.FailureResponse("Employee must be in active status to be assigned as HOD");
+                throw new InvalidOperationException(DepartmentMessages.EmployeeMustBeActiveForHod);
             }
 
             department.HodEmployeeId = hodEmployeeId;
@@ -483,10 +480,9 @@ namespace Relevantz.EEPZ.Core.Service
 
             _logger.LogInformation("HOD assigned successfully: {HodEmployeeId} to {DepartmentId}", hodEmployeeId, departmentId);
             EEPZBusinessLog.Information($"HOD assigned: EmployeeId {hodEmployeeId} to DepartmentId {departmentId}");
-            return ApiResponseDto<string>.SuccessResponse("HOD assigned successfully", "Head of Department assigned successfully");
         }
 
-        public async Task<ApiResponseDto<string>> RemoveHodAsync(int departmentId)
+        public async Task RemoveHodAsync(int departmentId)
         {
             _logger.LogInformation("Removing HOD from department: {DepartmentId}", departmentId);
 
@@ -494,13 +490,13 @@ namespace Relevantz.EEPZ.Core.Service
             if (department == null)
             {
                 _logger.LogWarning("Department not found: {DepartmentId}", departmentId);
-                return ApiResponseDto<string>.FailureResponse(Constants.Messages.DepartmentNotFound);
+                throw new KeyNotFoundException(Constants.Messages.DepartmentNotFound);
             }
 
             if (department.HodEmployeeId == null)
             {
                 _logger.LogWarning("Department does not have HOD: {DepartmentId}", departmentId);
-                return ApiResponseDto<string>.FailureResponse("Department does not have an assigned HOD");
+                throw new InvalidOperationException(DepartmentMessages.DepartmentDoesNotHaveHod);
             }
 
             department.HodEmployeeId = null;
@@ -508,14 +504,13 @@ namespace Relevantz.EEPZ.Core.Service
 
             _logger.LogInformation("HOD removed successfully from department: {DepartmentId}", departmentId);
             EEPZBusinessLog.Information($"HOD removed from DepartmentId {departmentId}");
-            return ApiResponseDto<string>.SuccessResponse("HOD removed successfully", "Head of Department removed successfully");
         }
 
         #endregion
 
         #region Search and Filter
 
-        public async Task<ApiResponseDto<List<DepartmentResponseDto>>> SearchDepartmentsAsync(string searchTerm)
+        public async Task<List<DepartmentResponseDto>> SearchDepartmentsAsync(string searchTerm)
         {
             _logger.LogInformation("Searching departments with term: {SearchTerm}", searchTerm);
 
@@ -532,10 +527,10 @@ namespace Relevantz.EEPZ.Core.Service
                 responses.Add(await MapToDepartmentResponseAsync(dept));
             }
 
-            return ApiResponseDto<List<DepartmentResponseDto>>.SuccessResponse(responses, $"Found {responses.Count} departments matching '{searchTerm}'");
+            return responses;
         }
 
-        public async Task<ApiResponseDto<DepartmentResponseDto>> GetDepartmentByCodeAsync(string departmentCode)
+        public async Task<DepartmentResponseDto> GetDepartmentByCodeAsync(string departmentCode)
         {
             _logger.LogInformation("Retrieving department by code: {DepartmentCode}", departmentCode);
 
@@ -543,32 +538,31 @@ namespace Relevantz.EEPZ.Core.Service
             if (department == null)
             {
                 _logger.LogWarning("Department not found with code: {DepartmentCode}", departmentCode);
-                return ApiResponseDto<DepartmentResponseDto>.FailureResponse("Department not found with the specified code");
+                throw new KeyNotFoundException(DepartmentMessages.DepartmentNotFoundWithCode);
             }
 
             var response = await MapToDepartmentResponseAsync(department);
-            return ApiResponseDto<DepartmentResponseDto>.SuccessResponse(response, "Department retrieved successfully");
+            return response;
         }
 
         #endregion
 
         #region Statistics
 
-        public async Task<ApiResponseDto<int>> GetTotalDepartmentCountAsync()
+        public async Task<int> GetTotalDepartmentCountAsync()
         {
             _logger.LogInformation("Retrieving total department count");
 
             var count = await _departmentRepository.GetTotalDepartmentCountAsync();
-            return ApiResponseDto<int>.SuccessResponse(count, $"Total departments: {count}");
+            return count;
         }
 
-        public async Task<ApiResponseDto<int>> GetActiveDepartmentCountAsync()
+        public async Task<int> GetActiveDepartmentCountAsync()
         {
             _logger.LogInformation("Retrieving active department count");
 
             var departments = await _departmentRepository.GetActiveDepartmentsAsync();
-            var count = departments.Count;
-            return ApiResponseDto<int>.SuccessResponse(count, $"Active departments: {count}");
+            return departments.Count;
         }
 
         #endregion

@@ -129,7 +129,7 @@ namespace Relevantz.EEPZ.Core.Service
             var successCount = 0;
             var failureCount = 0;
             var errors = new List<string>();
-            var successfulUsers = new List<SuccessfulUserDto>();  
+            var successfulUsers = new List<SuccessfulUserDto>();
             var rowNumber = 1;
 
             var nextIdString = await _employeeRepository.GetNextEmployeeCompanyIdAsync();
@@ -155,9 +155,10 @@ namespace Relevantz.EEPZ.Core.Service
                     continue;
                 }
 
-                var result = await _userManagementService.CreateUserAsync(user, performedByUserId);
-                if (result.Success)
+                // ✅ CHANGED: Assume service throws exceptions instead of returning ApiResponseDto
+                try
                 {
+                    await _userManagementService.CreateUserAsync(user, performedByUserId);
                     successCount++;
 
                     var role = roles?.FirstOrDefault(r => r.RoleId == user.RoleId);
@@ -175,10 +176,11 @@ namespace Relevantz.EEPZ.Core.Service
 
                     EEPZBusinessLog.Information($"User created with Employee ID: {user.EmployeeCompanyId}");
                 }
-                else
+                catch (Exception ex)
                 {
                     failureCount++;
-                    errors.Add($"Row {rowNumber} ({user.Email}): {result.Message}");
+                    errors.Add($"Row {rowNumber} ({user.Email}): {ex.Message}");
+                    EEPZBusinessLog.Warning($"Failed to create user at row {rowNumber}: {ex.Message}");
                 }
             }
 
@@ -218,15 +220,17 @@ namespace Relevantz.EEPZ.Core.Service
 
             foreach (var userId in request.UserIds)
             {
-                var result = await _userManagementService.DeactivateUserAsync(userId);
-                if (result.Success)
+                // ✅ CHANGED: Assume service throws exceptions instead of returning ApiResponseDto
+                try
                 {
+                    await _userManagementService.DeactivateUserAsync(userId);
                     successCount++;
                 }
-                else
+                catch (Exception ex)
                 {
                     failureCount++;
-                    errors.Add($"UserId {userId}: {result.Message}");
+                    errors.Add($"UserId {userId}: {ex.Message}");
+                    EEPZBusinessLog.Warning($"Failed to deactivate user {userId}: {ex.Message}");
                 }
             }
 
@@ -266,27 +270,13 @@ namespace Relevantz.EEPZ.Core.Service
 
             if (worksheet == null)
             {
-                return new BulkOperationResponseDto
-                {
-                    SuccessCount = 0,
-                    FailureCount = 1,
-                    TotalRecords = 0,
-                    Errors = new List<string> { ExcelMessages.NoWorksheetsError },
-                    Message = ExcelMessages.NoWorksheetsError
-                };
+                throw new InvalidOperationException(ExcelMessages.NoWorksheetsError);
             }
 
             var rowCount = worksheet.LastRowUsed()?.RowNumber() ?? 0;
             if (rowCount < 2)
             {
-                return new BulkOperationResponseDto
-                {
-                    SuccessCount = 0,
-                    FailureCount = 1,
-                    TotalRecords = 0,
-                    Errors = new List<string> { ExcelMessages.NoDataRowsError },
-                    Message = ExcelMessages.NoDataRowsError
-                };
+                throw new InvalidOperationException(ExcelMessages.NoDataRowsError);
             }
 
             for (int row = 2; row <= rowCount; row++)
@@ -307,8 +297,8 @@ namespace Relevantz.EEPZ.Core.Service
                 if (isEmptyRow) continue;
 
                 var mobileCell = worksheet.Cell(row, 10);
-                var mobileNumber = mobileCell.IsEmpty() 
-                    ? null 
+                var mobileNumber = mobileCell.IsEmpty()
+                    ? null
                     : mobileCell.GetString().Replace("+91-", "").Replace("+91", "").Replace("-", "").Replace(" ", "").Trim();
 
                 var roleName = worksheet.Cell(row, 8).GetString().Trim();
@@ -338,14 +328,7 @@ namespace Relevantz.EEPZ.Core.Service
 
             if (users.Count == 0)
             {
-                return new BulkOperationResponseDto
-                {
-                    SuccessCount = 0,
-                    FailureCount = 1,
-                    TotalRecords = 0,
-                    Errors = new List<string> { ExcelMessages.NoValidUsersError },
-                    Message = ExcelMessages.NoValidUsersError
-                };
+                throw new InvalidOperationException(ExcelMessages.NoValidUsersError);
             }
 
             return await BulkCreateUsersAsync(users, performedByUserId);
@@ -402,7 +385,6 @@ namespace Relevantz.EEPZ.Core.Service
                 worksheet.Cell(1, i + 1).Value = headers[i];
             }
 
-            // Header styling
             var headerRange = worksheet.Range(1, 1, 1, headers.Length);
             headerRange.Style.Font.Bold = true;
             headerRange.Style.Font.FontSize = 12;
@@ -410,7 +392,6 @@ namespace Relevantz.EEPZ.Core.Service
             headerRange.Style.Font.FontColor = XLColor.White;
             headerRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
-            // Column widths
             worksheet.Column(1).Width = 28;
             worksheet.Column(2).Width = 15;
             worksheet.Column(3).Width = 15;
@@ -423,7 +404,6 @@ namespace Relevantz.EEPZ.Core.Service
             worksheet.Column(10).Width = 15;
             worksheet.Column(11).Width = 18;
 
-            // Role dropdown (Column H)
             if (availableRoles.Any())
             {
                 var roleRange = worksheet.Range("H2:H1000");
@@ -435,7 +415,6 @@ namespace Relevantz.EEPZ.Core.Service
                 roleValidation.InCellDropdown = true;
             }
 
-            // Department dropdown (Column I)
             if (availableDepartments.Any())
             {
                 var deptRange = worksheet.Range("I2:I1000");
@@ -447,32 +426,27 @@ namespace Relevantz.EEPZ.Core.Service
                 deptValidation.InCellDropdown = true;
             }
 
-            // Employment Type dropdown
             var empTypeRange = worksheet.Range("D2:D1000");
             var empTypeValidation = empTypeRange.SetDataValidation();
             empTypeValidation.List(EmploymentTypeValues.GetCommaSeparated(), true);
             empTypeValidation.InCellDropdown = true;
 
-            // Employment Status dropdown
             var empStatusRange = worksheet.Range("E2:E1000");
             var empStatusValidation = empStatusRange.SetDataValidation();
             empStatusValidation.List(EmploymentStatusValues.GetCommaSeparated(), true);
             empStatusValidation.InCellDropdown = true;
 
-            // Employee Type dropdown
             var employeeTypeRange = worksheet.Range("G2:G1000");
             var employeeTypeValidation = employeeTypeRange.SetDataValidation();
             employeeTypeValidation.List(EmployeeTypeValues.GetCommaSeparated(), true);
             employeeTypeValidation.InCellDropdown = true;
 
-            // Gender dropdown
             var genderRange = worksheet.Range("K2:K1000");
             var genderValidation = genderRange.SetDataValidation();
             genderValidation.List(GenderValues.GetCommaSeparated(), true);
             genderValidation.IgnoreBlanks = true;
             genderValidation.InCellDropdown = true;
 
-            // Instructions sheet
             var instructionSheet = workbook.Worksheets.Add("Instructions");
             instructionSheet.Cell(1, 1).Value = ExcelMessages.BulkImportInstructions;
             instructionSheet.Cell(1, 1).Style.Font.Bold = true;

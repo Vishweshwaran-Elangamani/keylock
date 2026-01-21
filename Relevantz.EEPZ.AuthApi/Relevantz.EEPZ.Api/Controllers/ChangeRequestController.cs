@@ -19,6 +19,7 @@ namespace Relevantz.EEPZ.Api.Controllers
     public class ChangeRequestController : ControllerBase
     {
         private readonly IChangeRequestService _changeRequestService;
+
         /// <summary>
         /// Initializes a new instance of <see cref="ChangeRequestController"/>.
         /// </summary>
@@ -27,6 +28,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             _changeRequestService = changeRequestService;
         }
+
         /// <summary>
         /// Submits a new change request for the logged-in user.
         /// </summary>
@@ -40,10 +42,9 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
             var result = await _changeRequestService.SubmitChangeRequestAsync(userId, request);
-            if (!result.Success)
-                return BadRequest(result);
-            return Ok(result);
+            return Ok(ApiResponseDto<ChangeRequestResponseDto>.SuccessResponse(result, Constants.Messages.ChangeRequestSubmitted));
         }
+
         /// <summary>
         /// Processes a pending change request (approve or reject).
         /// Admin only.
@@ -59,10 +60,9 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             var adminUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
             var result = await _changeRequestService.ProcessChangeRequestAsync(request, adminUserId);
-            if (!result.Success)
-                return BadRequest(result);
-            return Ok(result);
+            return Ok(ApiResponseDto<ChangeRequestResponseDto>.SuccessResponse(result, Constants.Messages.ChangeRequestProcessed));
         }
+
         /// <summary>
         /// Retrieves all pending change requests.
         /// Admin only.
@@ -75,8 +75,9 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> GetPendingRequests()
         {
             var result = await _changeRequestService.GetPendingRequestsAsync();
-            return Ok(result);
+            return Ok(ApiResponseDto<List<ChangeRequestResponseDto>>.SuccessResponse(result, "Pending requests retrieved successfully"));
         }
+
         /// <summary>
         /// Retrieves all change requests submitted by the logged-in user.
         /// </summary>
@@ -88,8 +89,9 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
             var result = await _changeRequestService.GetUserChangeRequestsAsync(userId);
-            return Ok(result);
+            return Ok(ApiResponseDto<List<ChangeRequestResponseDto>>.SuccessResponse(result, "User change requests retrieved successfully"));
         }
+
         /// <summary>
         /// Retrieves all change requests in the system.
         /// Admin only.
@@ -102,8 +104,9 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> GetAllChangeRequests()
         {
             var result = await _changeRequestService.GetAllChangeRequestsAsync();
-            return Ok(result);
+            return Ok(ApiResponseDto<List<ChangeRequestResponseDto>>.SuccessResponse(result, "All change requests retrieved successfully"));
         }
+
         /// <summary>
         /// Cancels a specific change request submitted by the logged-in user.
         /// </summary>
@@ -117,22 +120,27 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
             var result = await _changeRequestService.CancelChangeRequestAsync(userId, requestId);
-            if (!result.Success)
-                return BadRequest(result);
-            return Ok(result);
+            return Ok(ApiResponseDto<bool>.SuccessResponse(result, "Change request cancelled successfully"));
         }
+
         /// <summary>
         /// Checks whether the logged-in user has any pending change requests.
         /// </summary>
         /// <returns>
-        /// 200 OK with a boolean indicating if a pending request exists.
+        /// 200 OK with the pending request details or null if none exists.
         /// </returns>
         [HttpGet("has-pending")]
         public async Task<IActionResult> HasPendingRequest()
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
             var result = await _changeRequestService.HasPendingRequestAsync(userId);
-            return Ok(result);
+            
+            if (result != null)
+            {
+                return Ok(ApiResponseDto<ChangeRequestResponseDto?>.SuccessResponse(result, "Pending request found"));
+            }
+            
+            return Ok(ApiResponseDto<ChangeRequestResponseDto?>.SuccessResponse(null, "No pending request found"));
         }
     }
 }

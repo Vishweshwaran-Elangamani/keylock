@@ -17,16 +17,16 @@ namespace Relevantz.EEPZ.Core.Service
             _roleRepository = roleRepository;
         }
 
-        public async Task<ApiResponseDto<RoleResponseDto>> CreateRoleAsync(CreateRoleRequestDto request)
+        public async Task<RoleResponseDto> CreateRoleAsync(CreateRoleRequestDto request)
         {
             if (await _roleRepository.RoleNameExistsAsync(request.RoleName))
             {
-                return ApiResponseDto<RoleResponseDto>.FailureResponse("Role name already exists");
+                throw new InvalidOperationException("Role name already exists");
             }
 
             if (await _roleRepository.RoleCodeExistsAsync(request.RoleCode))
             {
-                return ApiResponseDto<RoleResponseDto>.FailureResponse("Role code already exists");
+                throw new InvalidOperationException("Role code already exists");
             }
 
             var role = new Role
@@ -43,70 +43,69 @@ namespace Relevantz.EEPZ.Core.Service
             var response = MapToRoleResponse(role);
             EEPZBusinessLog.Information($"Role created: {request.RoleName}");
 
-            return ApiResponseDto<RoleResponseDto>.SuccessResponse(response, Constants.Messages.RoleCreatedSuccess);
+            return response;
         }
 
-        public async Task<ApiResponseDto<RoleResponseDto>> UpdateRoleAsync(UpdateRoleRequestDto request)
+        public async Task<RoleResponseDto> UpdateRoleAsync(UpdateRoleRequestDto request)
         {
             var role = await _roleRepository.GetByIdAsync(request.RoleId);
             if (role == null)
             {
-                return ApiResponseDto<RoleResponseDto>.FailureResponse(Constants.Messages.RoleNotFound);
+                throw new KeyNotFoundException(MessageConstants.RoleNotFound); // ✅ CHANGED
             }
 
             if (role.IsSystemRole == true)
             {
-                return ApiResponseDto<RoleResponseDto>.FailureResponse("Cannot update system role");
+                throw new InvalidOperationException("Cannot update system role");
             }
 
             if (request.RoleName != null) role.RoleName = request.RoleName;
             if (request.RoleCode != null) role.RoleCode = request.RoleCode;
             if (request.Description != null) role.Description = request.Description;
+            role.UpdatedAt = DateTime.UtcNow;
 
             await _roleRepository.UpdateAsync(role);
 
             var response = MapToRoleResponse(role);
             EEPZBusinessLog.Information($"Role updated: RoleId {request.RoleId}");
 
-            return ApiResponseDto<RoleResponseDto>.SuccessResponse(response, Constants.Messages.RoleUpdatedSuccess);
+            return response;
         }
 
-        public async Task<ApiResponseDto<RoleResponseDto>> GetRoleByIdAsync(int roleId)
+        public async Task<RoleResponseDto> GetRoleByIdAsync(int roleId)
         {
             var role = await _roleRepository.GetByIdAsync(roleId);
             if (role == null)
             {
-                return ApiResponseDto<RoleResponseDto>.FailureResponse(Constants.Messages.RoleNotFound);
+                throw new KeyNotFoundException(MessageConstants.RoleNotFound); // ✅ CHANGED
             }
 
             var response = MapToRoleResponse(role);
-            return ApiResponseDto<RoleResponseDto>.SuccessResponse(response, "Role retrieved successfully");
+            return response;
         }
 
-        public async Task<ApiResponseDto<List<RoleResponseDto>>> GetAllRolesAsync()
+        public async Task<List<RoleResponseDto>> GetAllRolesAsync()
         {
             var roles = await _roleRepository.GetAllAsync();
             var responses = roles.Select(MapToRoleResponse).ToList();
-            return ApiResponseDto<List<RoleResponseDto>>.SuccessResponse(responses, "Roles retrieved successfully");
+            return responses;
         }
 
-        public async Task<ApiResponseDto<string>> DeleteRoleAsync(int roleId)
+        public async Task DeleteRoleAsync(int roleId)
         {
             var role = await _roleRepository.GetByIdAsync(roleId);
             if (role == null)
             {
-                return ApiResponseDto<string>.FailureResponse(Constants.Messages.RoleNotFound);
+                throw new KeyNotFoundException(MessageConstants.RoleNotFound); // ✅ CHANGED
             }
 
             if (role.IsSystemRole == true)
             {
-                return ApiResponseDto<string>.FailureResponse("Cannot delete system role");
+                throw new InvalidOperationException("Cannot delete system role");
             }
 
             await _roleRepository.DeleteAsync(roleId);
             EEPZBusinessLog.Information($"Role deleted: RoleId {roleId}");
-
-            return ApiResponseDto<string>.SuccessResponse("Role deleted successfully", "Role deleted successfully");
         }
 
         private RoleResponseDto MapToRoleResponse(Role role)

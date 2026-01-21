@@ -44,5 +44,31 @@ namespace Relevantz.EEPZ.Common.Constants
         public const string PasswordResetBlocked = "Password reset is not allowed for this account. Please contact system administrator for assistance.";
         public const string PasswordChangeBlocked = "Password changes are not allowed for this account. Please contact system administrator.";
         public const string LoginSuccess = "Login successful";
+
+        // General Messages
+        public const string Success = "Operation completed successfully";
+        public const string Failed = "Operation failed";
+        public const string NotFound = "Resource not found";
+        public const string InvalidRequest = "Invalid request";
+        public const string UnauthorizedAccess = "Unauthorized access";
+        
+        // Role Messages  
+        public const string RoleCreatedSuccess = "Role created successfully";
+        public const string RoleUpdatedSuccess = "Role updated successfully";
+        public const string RoleDeletedSuccess = "Role deleted successfully";
+        public const string RoleRetrievedSuccess = "Role retrieved successfully";
+        public const string RolesRetrievedSuccess = "Roles retrieved successfully";
+        public const string RoleNotFound = "Role not found";
+        public const string RoleAlreadyExists = "Role already exists";
+        
+        // Department Messages
+        public const string DepartmentCreatedSuccess = "Department created successfully";
+        public const string DepartmentUpdatedSuccess = "Department updated successfully";
+        public const string DepartmentDeletedSuccess = "Department deleted successfully";
+        public const string DepartmentRetrievedSuccess = "Department retrieved successfully";
+        public const string DepartmentsRetrievedSuccess = "Departments retrieved successfully";
+        public const string DepartmentNotFound = "Department not found";
+        public const string DepartmentAlreadyExists = "Department already exists";
+        
     }
 }
