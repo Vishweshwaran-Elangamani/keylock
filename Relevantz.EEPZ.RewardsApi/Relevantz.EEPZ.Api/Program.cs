@@ -13,7 +13,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Serilog;
 using Relevantz.EEPZ.Data.Repository;
 using Relevantz.EEPZ.Core.Services;
-
+using Relevantz.EEPZ.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -180,7 +180,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-
+builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 builder.Services.AddScoped<IHRNominationRepository, HRNominationRepository>();
 builder.Services.AddScoped<IHRNominationService, HRNominationService>();
 builder.Services.AddScoped<IManagerNominationRepository, ManagerNominationRepository>();
@@ -220,6 +220,7 @@ app.UseSerilogRequestLogging(options =>
 });
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
