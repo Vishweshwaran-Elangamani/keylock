@@ -1,13 +1,10 @@
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Relevantz.EEPZ.Common.DTOs.Request;
-using Relevantz.EEPZ.Common.DTOs.Response;
-using Relevantz.EEPZ.Common.Entities;
+using Microsoft.Extensions.Logging;
 using Relevantz.EEPZ.Core.Services.Interfaces;
-using Relevantz.EEPZ.Data.DBContexts;
 
-namespace eepzbackend.Controllers
+namespace Relevantz.EEPZ.Api.Controllers
 {
     [ApiController]
     [Authorize]
@@ -19,26 +16,30 @@ namespace eepzbackend.Controllers
 
         public RecognitionRewardController(
             IRecognitionRewardService service,
-            ILogger<RecognitionRewardController> logger
-        )
+            ILogger<RecognitionRewardController> logger)
         {
             _service = service;
             _logger = logger;
         }
 
+        /// <summary>
+        /// Get all recognition & reward items.
+        /// Unhandled exceptions are handled by global ExceptionHandlingMiddleware.
+        /// </summary>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetRecognitionRewards()
         {
-            try
+            _logger.LogInformation("[GET_RECOGNITION_REWARDS] Fetching recognition rewards");
+
+            var result = await _service.GetRecognitionRewardsAsync();
+
+            return Ok(new
             {
-                var result = await _service.GetRecognitionRewardsAsync();
-                return Ok(result);
-            }
-            catch (System.Exception ex)
-            {
-                _logger.LogError(ex, "Error fetching recognition and rewards");
-                return StatusCode(500, "Internal server error");
-            }
+                success = true,
+                data = result,
+                message = "Recognition and rewards fetched successfully"
+            });
         }
     }
 }
