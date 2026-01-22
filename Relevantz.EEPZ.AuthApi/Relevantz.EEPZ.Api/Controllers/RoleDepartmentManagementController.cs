@@ -9,7 +9,9 @@ using Relevantz.EEPZ.Common.Constants;
 namespace Relevantz.EEPZ.Api.Controllers
 {
     /// <summary>
-    /// Admin endpoints to manage Roles and Departments
+    /// Provides administrative endpoints to manage Roles and Departments.
+    /// Includes role CRUD operations, department CRUD operations, hierarchy queries,
+    /// status management, HOD assignment/removal, search, and statistics endpoints.
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
@@ -21,7 +23,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         private readonly ILogger<RoleDepartmentManagementController> _logger;
 
         public RoleDepartmentManagementController(
-            IRoleService roleService, 
+            IRoleService roleService,
             IDepartmentService departmentService,
             ILogger<RoleDepartmentManagementController> logger)
         {
@@ -32,6 +34,13 @@ namespace Relevantz.EEPZ.Api.Controllers
 
         #region Role Management
 
+        /// <summary>
+        /// Creates a new role. (Admin only)
+        /// </summary>
+        /// <remarks>
+        /// Accepts role details and persists a new role entry.
+        /// Returns a success response with the created role details.
+        /// </remarks>
         [HttpPost("role/create")]
         public async Task<IActionResult> CreateRole([FromBody] CreateRoleRequestDto request)
         {
@@ -40,6 +49,13 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(ApiResponseDto<RoleResponseDto>.SuccessResponse(result, MessageConstants.RoleCreatedSuccess)); // ✅ CHANGED
         }
 
+        /// <summary>
+        /// Updates an existing role. (Admin only)
+        /// </summary>
+        /// <remarks>
+        /// Accepts role ID and updated values, then updates the role in the system.
+        /// Returns a success response with the updated role details.
+        /// </remarks>
         [HttpPut("role/update")]
         public async Task<IActionResult> UpdateRole([FromBody] UpdateRoleRequestDto request)
         {
@@ -48,6 +64,10 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(ApiResponseDto<RoleResponseDto>.SuccessResponse(result, MessageConstants.RoleUpdatedSuccess)); // ✅ CHANGED
         }
 
+        /// <summary>
+        /// Retrieves a role by its unique identifier. (Admin only)
+        /// </summary>
+        /// <param name="Id">Role identifier</param>
         [HttpGet("role/{Id}")]
         public async Task<IActionResult> GetRoleById(int Id)
         {
@@ -56,6 +76,9 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(ApiResponseDto<RoleResponseDto>.SuccessResponse(result, "Role retrieved successfully"));
         }
 
+        /// <summary>
+        /// Retrieves all roles available in the system. (Admin only)
+        /// </summary>
         [HttpGet("role/all")]
         public async Task<IActionResult> GetAllRoles()
         {
@@ -64,6 +87,10 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(ApiResponseDto<List<RoleResponseDto>>.SuccessResponse(result, "Roles retrieved successfully"));
         }
 
+        /// <summary>
+        /// Deletes a role by its unique identifier. (Admin only)
+        /// </summary>
+        /// <param name="roleId">Role identifier</param>
         [HttpDelete("role/{roleId}")]
         public async Task<IActionResult> DeleteRole(int roleId)
         {
@@ -76,6 +103,13 @@ namespace Relevantz.EEPZ.Api.Controllers
 
         #region Department Management
 
+        /// <summary>
+        /// Creates a new department.
+        /// </summary>
+        /// <remarks>
+        /// NOTE: This endpoint is marked as AllowAnonymous and does not require authentication.
+        /// Creates a department entry and returns the created department data.
+        /// </remarks>
         [HttpPost("department/create")]
         [AllowAnonymous]
         public async Task<IActionResult> CreateDepartment([FromBody] CreateDepartmentRequestDto request)
@@ -85,6 +119,13 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(ApiResponseDto<DepartmentResponseDto>.SuccessResponse(result, MessageConstants.DepartmentCreatedSuccess)); // ✅ CHANGED
         }
 
+        /// <summary>
+        /// Updates an existing department.
+        /// </summary>
+        /// <remarks>
+        /// NOTE: This endpoint is marked as AllowAnonymous and does not require authentication.
+        /// Accepts department ID and updated values, then updates the department record.
+        /// </remarks>
         [HttpPut("department/update")]
         [AllowAnonymous]
         public async Task<IActionResult> UpdateDepartment([FromBody] UpdateDepartmentRequestDto request)
@@ -94,6 +135,13 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(ApiResponseDto<DepartmentResponseDto>.SuccessResponse(result, MessageConstants.DepartmentUpdatedSuccess)); // ✅ CHANGED
         }
 
+        /// <summary>
+        /// Retrieves a department by its unique identifier.
+        /// </summary>
+        /// <remarks>
+        /// NOTE: This endpoint is marked as AllowAnonymous and does not require authentication.
+        /// </remarks>
+        /// <param name="Id">Department identifier</param>
         [HttpGet("department/{Id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetDepartmentById(int Id)
@@ -103,6 +151,12 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(ApiResponseDto<DepartmentResponseDto>.SuccessResponse(result, DepartmentMessages.DepartmentRetrievedSuccess));
         }
 
+        /// <summary>
+        /// Retrieves all departments.
+        /// </summary>
+        /// <remarks>
+        /// NOTE: This endpoint is marked as AllowAnonymous and does not require authentication.
+        /// </remarks>
         [HttpGet("department/all")]
         [AllowAnonymous]
         public async Task<IActionResult> GetAllDepartments()
@@ -112,6 +166,13 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(ApiResponseDto<List<DepartmentResponseDto>>.SuccessResponse(result, DepartmentMessages.DepartmentsRetrievedSuccess));
         }
 
+        /// <summary>
+        /// Deletes a department by its unique identifier.
+        /// </summary>
+        /// <remarks>
+        /// NOTE: This endpoint is marked as AllowAnonymous and does not require authentication.
+        /// </remarks>
+        /// <param name="departmentId">Department identifier</param>
         [HttpDelete("department/{departmentId}")]
         [AllowAnonymous]
         public async Task<IActionResult> DeleteDepartment(int departmentId)
@@ -125,6 +186,14 @@ namespace Relevantz.EEPZ.Api.Controllers
 
         #region Department Hierarchy
 
+        /// <summary>
+        /// Retrieves the department hierarchy tree, optionally from a specified root department.
+        /// </summary>
+        /// <remarks>
+        /// NOTE: This endpoint is marked as AllowAnonymous and does not require authentication.
+        /// If <paramref name="rootDepartmentId"/> is null, the hierarchy tree is returned from all roots.
+        /// </remarks>
+        /// <param name="rootDepartmentId">Optional root department identifier</param>
         [HttpGet("department/hierarchy/tree")]
         [AllowAnonymous]
         public async Task<IActionResult> GetDepartmentHierarchyTree([FromQuery] int? rootDepartmentId = null)
@@ -134,6 +203,13 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(ApiResponseDto<DepartmentHierarchyResponseDto>.SuccessResponse(result, DepartmentMessages.DepartmentHierarchyRetrievedSuccess));
         }
 
+        /// <summary>
+        /// Retrieves all child departments for the specified parent department.
+        /// </summary>
+        /// <remarks>
+        /// NOTE: This endpoint is marked as AllowAnonymous and does not require authentication.
+        /// </remarks>
+        /// <param name="departmentId">Parent department identifier</param>
         [HttpGet("department/{departmentId}/children")]
         [AllowAnonymous]
         public async Task<IActionResult> GetChildDepartments(int departmentId)
@@ -143,6 +219,12 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(ApiResponseDto<List<DepartmentResponseDto>>.SuccessResponse(result, DepartmentMessages.ChildDepartmentsRetrievedSuccess));
         }
 
+        /// <summary>
+        /// Retrieves root-level departments (departments without a parent).
+        /// </summary>
+        /// <remarks>
+        /// NOTE: This endpoint is marked as AllowAnonymous and does not require authentication.
+        /// </remarks>
         [HttpGet("department/hierarchy/roots")]
         [AllowAnonymous]
         public async Task<IActionResult> GetRootDepartments()
@@ -152,6 +234,13 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(ApiResponseDto<List<DepartmentResponseDto>>.SuccessResponse(result, DepartmentMessages.RootDepartmentsRetrievedSuccess));
         }
 
+        /// <summary>
+        /// Retrieves the full department path from the root to the specified department.
+        /// </summary>
+        /// <remarks>
+        /// NOTE: This endpoint is marked as AllowAnonymous and does not require authentication.
+        /// </remarks>
+        /// <param name="departmentId">Department identifier</param>
         [HttpGet("department/{departmentId}/path")]
         [AllowAnonymous]
         public async Task<IActionResult> GetDepartmentPath(int departmentId)
@@ -165,6 +254,12 @@ namespace Relevantz.EEPZ.Api.Controllers
 
         #region Department Status
 
+        /// <summary>
+        /// Retrieves all active departments.
+        /// </summary>
+        /// <remarks>
+        /// NOTE: This endpoint is marked as AllowAnonymous and does not require authentication.
+        /// </remarks>
         [HttpGet("department/status/active")]
         [AllowAnonymous]
         public async Task<IActionResult> GetActiveDepartments()
@@ -174,6 +269,12 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(ApiResponseDto<List<DepartmentResponseDto>>.SuccessResponse(result, DepartmentMessages.ActiveDepartmentsRetrievedSuccess));
         }
 
+        /// <summary>
+        /// Retrieves all inactive departments.
+        /// </summary>
+        /// <remarks>
+        /// NOTE: This endpoint is marked as AllowAnonymous and does not require authentication.
+        /// </remarks>
         [HttpGet("department/status/inactive")]
         [AllowAnonymous]
         public async Task<IActionResult> GetInactiveDepartments()
@@ -183,6 +284,14 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(ApiResponseDto<List<DepartmentResponseDto>>.SuccessResponse(result, DepartmentMessages.InactiveDepartmentsRetrievedSuccess));
         }
 
+        /// <summary>
+        /// Updates the active/inactive status of a department.
+        /// </summary>
+        /// <remarks>
+        /// NOTE: This endpoint is marked as AllowAnonymous and does not require authentication.
+        /// The status value is taken from the request payload.
+        /// </remarks>
+        /// <param name="departmentId">Department identifier</param>
         [HttpPatch("department/{departmentId}/status")]
         [AllowAnonymous]
         public async Task<IActionResult> UpdateDepartmentStatus(int departmentId, [FromBody] UpdateStatusRequestDto request)
@@ -196,6 +305,13 @@ namespace Relevantz.EEPZ.Api.Controllers
 
         #region HOD Operations
 
+        /// <summary>
+        /// Retrieves departments assigned to the given Head of Department (HOD).
+        /// </summary>
+        /// <remarks>
+        /// NOTE: This endpoint is marked as AllowAnonymous and does not require authentication.
+        /// </remarks>
+        /// <param name="hodEmployeeId">HOD employee identifier</param>
         [HttpGet("department/hod/{hodEmployeeId}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetDepartmentsByHod(int hodEmployeeId)
@@ -205,6 +321,14 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(ApiResponseDto<List<DepartmentResponseDto>>.SuccessResponse(result, DepartmentMessages.HodDepartmentsRetrievedSuccess));
         }
 
+        /// <summary>
+        /// Assigns a Head of Department (HOD) to a department.
+        /// </summary>
+        /// <remarks>
+        /// NOTE: This endpoint is marked as AllowAnonymous and does not require authentication.
+        /// Assigns the provided employee as the HOD for the given department.
+        /// </remarks>
+        /// <param name="departmentId">Department identifier</param>
         [HttpPost("department/{departmentId}/hod/assign")]
         [AllowAnonymous]
         public async Task<IActionResult> AssignHod(int departmentId, [FromBody] AssignHodRequestDto request)
@@ -214,6 +338,13 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(ApiResponseDto<string>.SuccessResponse(DepartmentMessages.HodAssignedSuccess, DepartmentMessages.HodAssignedSuccess));
         }
 
+        /// <summary>
+        /// Removes the Head of Department (HOD) assignment from a department.
+        /// </summary>
+        /// <remarks>
+        /// NOTE: This endpoint is marked as AllowAnonymous and does not require authentication.
+        /// </remarks>
+        /// <param name="departmentId">Department identifier</param>
         [HttpDelete("department/{departmentId}/hod/remove")]
         [AllowAnonymous]
         public async Task<IActionResult> RemoveHod(int departmentId)
@@ -227,6 +358,14 @@ namespace Relevantz.EEPZ.Api.Controllers
 
         #region Search and Statistics
 
+        /// <summary>
+        /// Searches departments by a given search term (name/code matching based on service implementation).
+        /// </summary>
+        /// <remarks>
+        /// NOTE: This endpoint is marked as AllowAnonymous and does not require authentication.
+        /// Returns 400 if the search term is empty.
+        /// </remarks>
+        /// <param name="searchTerm">Text to search for</param>
         [HttpGet("department/search")]
         [AllowAnonymous]
         public async Task<IActionResult> SearchDepartments([FromQuery] string searchTerm)
@@ -239,6 +378,13 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(ApiResponseDto<List<DepartmentResponseDto>>.SuccessResponse(result, string.Format(DepartmentMessages.DepartmentsFoundBySearch, result.Count, searchTerm)));
         }
 
+        /// <summary>
+        /// Retrieves a department by its unique department code.
+        /// </summary>
+        /// <remarks>
+        /// NOTE: This endpoint is marked as AllowAnonymous and does not require authentication.
+        /// </remarks>
+        /// <param name="departmentCode">Department code</param>
         [HttpGet("department/code/{departmentCode}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetDepartmentByCode(string departmentCode)
@@ -248,6 +394,12 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(ApiResponseDto<DepartmentResponseDto>.SuccessResponse(result, DepartmentMessages.DepartmentRetrievedSuccess));
         }
 
+        /// <summary>
+        /// Retrieves the total number of departments in the system.
+        /// </summary>
+        /// <remarks>
+        /// NOTE: This endpoint is marked as AllowAnonymous and does not require authentication.
+        /// </remarks>
         [HttpGet("department/statistics/total")]
         [AllowAnonymous]
         public async Task<IActionResult> GetTotalDepartmentCount()
@@ -257,6 +409,12 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(ApiResponseDto<int>.SuccessResponse(count, string.Format(DepartmentMessages.TotalDepartmentsCount, count)));
         }
 
+        /// <summary>
+        /// Retrieves the total number of active departments in the system.
+        /// </summary>
+        /// <remarks>
+        /// NOTE: This endpoint is marked as AllowAnonymous and does not require authentication.
+        /// </remarks>
         [HttpGet("department/statistics/active-count")]
         [AllowAnonymous]
         public async Task<IActionResult> GetActiveDepartmentCount()
