@@ -179,13 +179,13 @@ getMySkills: async (params = {}) => {
 
   /**
    * Delete employee skill (Manager only)
-   * @param {number} mapperId - Skill mapper ID
+   * @param {number} skillMapperId - Skill mapper ID
    * @returns {Promise} API response
    */
-  deleteSkill: async (mapperId) => {
+  deleteSkill: async (skillMapperId) => {
     try {
       const response = await axios.delete(
-        `${API_BASE_URL}/lnd-skills/${mapperId}`,
+        `${API_BASE_URL}/lnd-skills/${skillMapperId}`,
         { headers: getHeaders() }
       );
       return response;

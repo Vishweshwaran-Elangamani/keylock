@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 import Pagination from "../../../components/lnd/common/Pagination";
-import StatusBadge from "../../../components/lnd/common/StatusBadge";
+import StatusBadge from "../../../components/lnd/common/StatusBadge";     
 import EmptyState from "../../../components/lnd/common/EmptyState";
 import ApprovalDecisionModal from "../../../components/lnd/modals/ApprovalDecisionModal";
 import { lndService, downloadFile } from "../../../services/lnd/lndService";
@@ -105,7 +105,8 @@ const PendingApprovals = () => {
         searchTerm: searchTerm,
       });
 
-      if (response.data.success) {
+      if (response.data.success) 
+        {
         setApprovals(response.data.data.items);
         setTotalItems(response.data.data.totalCount);
         setTotalPages(response.data.data.totalPages);
