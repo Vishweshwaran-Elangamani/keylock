@@ -10,7 +10,7 @@ namespace Relevantz.EEPZ.Core.Services.Interface
         Task<ApiResponse<PaginatedResponse<AssignmentResponseModel>>> GetAllOrganizationAssignments(
             OrganizationAssignmentsRequestModel request
         );
-        Task<ApiResponse<byte[]>> ExportOrganizationAssignmentsToExcel(
+        Task<ApiResponse<byte[]>> GetOrganizationAssignmentsForExport(
             ExportOrganizationAssignmentsRequestModel request
         );
         Task<ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>> GetEmployeeSkillsById(

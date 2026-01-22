@@ -47,32 +47,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             return assignments;
         }
 
-        /// <summary>Marks assignments as overdue and updates status in database.</summary>
-        public async Task<int> MarkAssignmentsAsOverdue()
-        {
-            Log.Information("MarkAssignmentsAsOverdueAsync started");
 
-            var overdueAssignments = await GetOverdueAssignments();
-
-            if (overdueAssignments.Count == 0)
-            {
-                Log.Information("MarkAssignmentsAsOverdueAsync: No overdue assignments found");
-                return 0;
-            }
-
-            foreach (var assignment in overdueAssignments)
-            {
-                assignment.Status = LnDConstants.ASSIGNMENT_STATUS.OVERDUE;
-                assignment.UpdatedOn = DateOnly.FromDateTime(DateTime.Now);
-            }
-
-            _context.Lndassignments.UpdateRange(overdueAssignments);
-            var count = await _context.SaveChangesAsync();
-
-            Log.Information("MarkAssignmentsAsOverdueAsync completed. MarkedCount={Count}", count);
-
-            return count;
-        }
         #endregion
 
         #region Assignment Retrieval

@@ -6,7 +6,6 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
     public interface ILnDAssignmentRepository
     {
         Task<List<Lndassignment>> GetOverdueAssignments();
-        Task<int> MarkAssignmentsAsOverdue();
         Task<Lndassignment?> GetAssignmentById(int assignmentId);
         Task<Lndassignment> AddAssignment(Lndassignment assignment);
         Task UpdateAssignment(Lndassignment assignment);

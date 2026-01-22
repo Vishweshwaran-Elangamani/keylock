@@ -247,7 +247,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// <summary>Exports team assignments to Excel file (manager only).</summary>
         [HttpGet("api/lnd-assignments/team/export")]
         [Authorize(Roles = LnDConstants.USER_ROLES.MANAGER)]
-        public async Task<IActionResult> ExportTeamAssignments([FromQuery] ExportAssignmentRequestModel request)
+        public async Task<IActionResult> GetTeamAssignmentsForExport([FromQuery] ExportAssignmentRequestModel request)
         {
             var managerId = GetCurrentEmployeeId();
 
@@ -256,7 +256,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 managerId, request.StatusFilter ?? "all"
             );
 
-            var result = await _assignmentService.ExportTeamAssignmentsToExcel(managerId, request);
+            var result = await _assignmentService.GetTeamAssignmentsForExport(managerId, request);
 
             if (!result.Success)
             {

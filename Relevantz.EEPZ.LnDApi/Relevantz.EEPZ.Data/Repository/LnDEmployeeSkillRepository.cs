@@ -260,19 +260,19 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>Gets a skill mapping by mapper ID.</summary>
-        public async Task<Lndemployeeskillmapper?> GetEmployeeSkillMappingById(int mapperId)
+        public async Task<Lndemployeeskillmapper?> GetEmployeeSkillMappingById(int skillMapperId)
         {
-            Log.Debug("GetEmployeeSkillMappingByIdAsync called. MapperId={MapperId}", mapperId);
+            Log.Debug("GetEmployeeSkillMappingByIdAsync called. MapperId={MapperId}", skillMapperId);
 
             var mapping = await _context
                 .Lndemployeeskillmappers.Include(m => m.Employee)
                 .ThenInclude(e => e.Userprofile)
                 .Include(m => m.Skill)
-                .FirstOrDefaultAsync(m => m.MapperId == mapperId);
+                .FirstOrDefaultAsync(m => m.MapperId == skillMapperId);
 
             if (mapping == null)
             {
-                Log.Warning("GetEmployeeSkillMappingByIdAsync: Mapping not found. MapperId={MapperId}", mapperId);
+                Log.Warning("GetEmployeeSkillMappingByIdAsync: Mapping not found. MapperId={MapperId}", skillMapperId);
             }
 
             return mapping;

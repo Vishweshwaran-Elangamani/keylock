@@ -279,19 +279,19 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         #region Export
 
         /// <summary>Exports all active SMEs to Excel with employee, skill, and department details.</summary>
-        public async Task<ApiResponse<byte[]>> ExportAllActiveSmesToExcel(
+        public async Task<ApiResponse<byte[]>> GetAllActiveSmesForExport(
             ExportActiveSmesRequestModel request
         )
         {
             Log.Information(
-                "ExportAllActiveSmesToExcel started. SearchTerm={SearchTerm}",
+                "GetAllActiveSmesForExport started. SearchTerm={SearchTerm}",
                 request.SearchTerm ?? "none"
             );
 
             var allSmes = await _smeRepository.GetAllActiveSmesForExport(request);
 
             Log.Debug(
-                "ExportAllActiveSmesToExcel: Retrieved {Count} SMEs for export",
+                "GetAllActiveSmesForExport: Retrieved {Count} SMEs for export",
                 allSmes.Count
             );
 
@@ -337,7 +337,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     var fileBytes = stream.ToArray();
 
                     Log.Information(
-                        "ExportAllActiveSmesToExcel succeeded. SmeCount={Count}, FileSize={FileSize} bytes",
+                        "GetAllActiveSmesForExport succeeded. SmeCount={Count}, FileSize={FileSize} bytes",
                         allSmes.Count, fileBytes.Length
                     );
 

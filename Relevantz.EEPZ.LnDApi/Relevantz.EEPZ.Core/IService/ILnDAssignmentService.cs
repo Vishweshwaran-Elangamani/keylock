@@ -26,7 +26,7 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             int managerId,
             CompleteAssignmentRequestModel request
         );
-        Task<ApiResponse<byte[]>> ExportTeamAssignmentsToExcel(
+        Task<ApiResponse<byte[]>> GetTeamAssignmentsForExport(
             int managerId,
             ExportAssignmentRequestModel request
         );

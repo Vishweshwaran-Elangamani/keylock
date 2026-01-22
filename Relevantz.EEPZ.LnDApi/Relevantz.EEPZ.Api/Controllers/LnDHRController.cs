@@ -62,21 +62,21 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
         /// <summary>Exports all organization assignments to Excel file (HR only).</summary>
         [HttpGet("api/lnd-hr/assignments/organization/export")]
-        public async Task<IActionResult> ExportOrganizationAssignments(
+        public async Task<IActionResult> GetOrganizationAssignmentsForExport(
             [FromQuery] ExportOrganizationAssignmentsRequestModel request
         )
         {
             Log.Information(
-                "ExportOrganizationAssignments API called. StatusFilter={StatusFilter}",
+                "GetOrganizationAssignmentsForExport API called. StatusFilter={StatusFilter}",
                 request.StatusFilter ?? "all"
             );
 
-            var result = await _hrService.ExportOrganizationAssignmentsToExcel(request);
+            var result = await _hrService.GetOrganizationAssignmentsForExport(request);
 
             if (!result.Success)
             {
                 Log.Warning(
-                    "ExportOrganizationAssignments API failed. Message={Message}",
+                    "GetOrganizationAssignmentsForExport API failed. Message={Message}",
                     result.Message
                 );
                 return BadRequest(result);
@@ -85,7 +85,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             var fileName = $"OrganizationalAssignments_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
 
             Log.Information(
-                "ExportOrganizationAssignments API succeeded. FileName={FileName}, FileSize={FileSize} bytes",
+                "GetOrganizationAssignmentsForExport API succeeded. FileName={FileName}, FileSize={FileSize} bytes",
                 fileName, result.Data.Length
             );
 
@@ -200,21 +200,21 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
         /// <summary>Exports all active SMEs to Excel file (HR only).</summary>
         [HttpGet("api/lnd-hr/smes/export")]
-        public async Task<IActionResult> ExportAllActiveSmes(
+        public async Task<IActionResult> GetAllActiveSmesForExport(
             [FromQuery] ExportActiveSmesRequestModel request
         )
         {
             Log.Information(
-                "ExportAllActiveSmes API called. SearchTerm={SearchTerm}",
+                "GetAllActiveSmesForExport API called. SearchTerm={SearchTerm}",
                 request.SearchTerm ?? "none"
             );
 
-            var result = await _smeService.ExportAllActiveSmesToExcel(request);
+            var result = await _smeService.GetAllActiveSmesForExport(request);
 
             if (!result.Success)
             {
                 Log.Warning(
-                    "ExportAllActiveSmes API failed. Message={Message}",
+                    "GetAllActiveSmesForExport API failed. Message={Message}",
                     result.Message
                 );
                 return BadRequest(result);
@@ -223,7 +223,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             var fileName = $"SMEDirectory_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
 
             Log.Information(
-                "ExportAllActiveSmes API succeeded. FileName={FileName}, FileSize={FileSize} bytes",
+                "GetAllActiveSmesForExport API succeeded. FileName={FileName}, FileSize={FileSize} bytes",
                 fileName, result.Data.Length
             );
 

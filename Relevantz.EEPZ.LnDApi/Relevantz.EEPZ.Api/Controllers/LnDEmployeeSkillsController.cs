@@ -241,23 +241,23 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         }
 
         /// <summary>Deletes an employee skill mapping by mapper ID.</summary>
-        [HttpDelete("api/lnd-skills/{mapperId}")]
-        public async Task<IActionResult> DeleteEmployeeSkill(int mapperId)
+        [HttpDelete("api/lnd-skills/{skillMapperId}")]
+        public async Task<IActionResult> DeleteEmployeeSkill(int skillMapperId)
         {
             var managerId = GetCurrentEmployeeId();
 
             Log.Information(
                 "DeleteEmployeeSkill API called. ManagerId={ManagerId}, MapperId={MapperId}",
-                managerId, mapperId
+                managerId, skillMapperId
             );
 
-            var result = await _employeeSkillService.DeleteEmployeeSkill(managerId, mapperId);
+            var result = await _employeeSkillService.DeleteEmployeeSkill(managerId, skillMapperId);
 
             if (result.Success)
             {
                 Log.Information(
                     "DeleteEmployeeSkill API succeeded. ManagerId={ManagerId}, MapperId={MapperId}",
-                    managerId, mapperId
+                    managerId, skillMapperId
                 );
                 return Ok(result);
             }
@@ -265,7 +265,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "DeleteEmployeeSkill API failed. ManagerId={ManagerId}, MapperId={MapperId}, Message={Message}",
-                    managerId, mapperId, result.Message
+                    managerId, skillMapperId, result.Message
                 );
                 return BadRequest(result);
             }

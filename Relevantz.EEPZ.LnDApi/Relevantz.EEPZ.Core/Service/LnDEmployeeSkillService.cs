@@ -556,20 +556,20 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         /// <summary>Deletes an employee skill mapping and deactivates associated SME status if active.</summary>
-        public async Task<ApiResponse<bool>> DeleteEmployeeSkill(int managerId, int mapperId)
+        public async Task<ApiResponse<bool>> DeleteEmployeeSkill(int managerId, int skillMapperId)
         {
             Log.Information(
                 "DeleteEmployeeSkill started. ManagerId={ManagerId}, MapperId={MapperId}",
-                managerId, mapperId
+                managerId, skillMapperId
             );
 
-            var mapper = await _repository.GetEmployeeSkillMappingById(mapperId);
+            var mapper = await _repository.GetEmployeeSkillMappingById(skillMapperId);
 
             if (mapper == null || mapper.Employee.ReportingManagerEmployeeId != managerId)
             {
                 Log.Warning(
                     "DeleteEmployeeSkill: Mapper validation failed. MapperId={MapperId}, ManagerId={ManagerId}",
-                    mapperId, managerId
+                    skillMapperId, managerId
                 );
 
                 return new ApiResponse<bool>
@@ -643,7 +643,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             Log.Information(
                 "DeleteEmployeeSkill succeeded. MapperId={MapperId}, EmployeeId={EmployeeId}, SkillId={SkillId}, DeletedAssignments={AssignmentCount}",
-                mapperId, mapper.EmployeeId, mapper.SkillId, relatedAssignments.Count
+                skillMapperId, mapper.EmployeeId, mapper.SkillId, relatedAssignments.Count
             );
 
             return new ApiResponse<bool>

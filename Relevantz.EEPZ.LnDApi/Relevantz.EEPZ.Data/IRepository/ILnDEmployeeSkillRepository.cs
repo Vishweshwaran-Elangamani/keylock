@@ -17,7 +17,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
             SubordinateSkillsRequestModel request
         );
         Task<Lndemployeeskillmapper?> GetEmployeeSkillMapping(int employeeId, int skillId);
-        Task<Lndemployeeskillmapper?> GetEmployeeSkillMappingById(int mapperId);
+        Task<Lndemployeeskillmapper?> GetEmployeeSkillMappingById(int skillMapperId);
         Task<Lndemployeeskillmapper> AddEmployeeSkill(Lndemployeeskillmapper mapper);
         Task<List<Lndemployeeskillmapper>> AddEmployeeSkills(
             List<Lndemployeeskillmapper> mappers

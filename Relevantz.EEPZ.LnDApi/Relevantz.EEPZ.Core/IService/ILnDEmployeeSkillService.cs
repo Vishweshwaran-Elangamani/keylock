@@ -25,7 +25,7 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             int managerId,
             UpdateSkillRatingRequestModel request
         );
-        Task<ApiResponse<bool>> DeleteEmployeeSkill(int managerId, int mapperId);
+        Task<ApiResponse<bool>> DeleteEmployeeSkill(int managerId, int skillMapperId);
         Task<ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>> GetMySkills(
             int employeeId,
             MySkillsRequestModel request

@@ -39,23 +39,46 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         #region Assignment Operations
 
         /// <summary>Checks and marks assignments as overdue based on deadline and current status.</summary>
+    
         public async Task<ApiResponse<int>> CheckAndMarkOverdueAssignments()
         {
             Log.Information("CheckAndMarkOverdueAssignments started");
 
-            var count = await _assignmentRepository.MarkAssignmentsAsOverdue();
+            var overdueAssignments = await _assignmentRepository.GetOverdueAssignments();
 
-            Log.Information("CheckAndMarkOverdueAssignments completed. OverdueCount={Count}", count);
+            if (!overdueAssignments.Any())
+            {
+                Log.Information("No overdue assignments found");
+
+                return new ApiResponse<int>
+                {
+                    Success = true,
+                    Message = LnDConstants.RESPONSE_MESSAGES.OVERDUE_ASSIGNMENTS_MARKED,
+                    Data = 0
+                }; 
+            } 
+
+            foreach (var assignment in overdueAssignments)
+            {
+                assignment.Status = LnDConstants.ASSIGNMENT_STATUS.OVERDUE;
+                assignment.UpdatedOn = DateOnly.FromDateTime(DateTime.Now);
+            }
+
+            await _baseRepository.SaveChangesAsync();
+
+            Log.Information(
+                "CheckAndMarkOverdueAssignments completed. OverdueCount={Count}",
+                overdueAssignments.Count
+            );
 
             return new ApiResponse<int>
             {
                 Success = true,
-                Message = $"{count} {LnDConstants.RESPONSE_MESSAGES.OVERDUE_ASSIGNMENTS_MARKED}",
-
-                Data = count,
+                Message = $"{overdueAssignments.Count} {LnDConstants.RESPONSE_MESSAGES.OVERDUE_ASSIGNMENTS_MARKED}",
+                Data = overdueAssignments.Count
             };
         }
-
+        
         /// <summary>Creates an SME assignment request for a team member requiring skill development.</summary>
         public async Task<ApiResponse<int>> RequestSmeAssignment(
             int managerId,
@@ -562,7 +585,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         #region Export
 
         /// <summary>Exports team assignments to Excel with formatted headers and data columns.</summary>
-        public async Task<ApiResponse<byte[]>> ExportTeamAssignmentsToExcel(
+        public async Task<ApiResponse<byte[]>> GetTeamAssignmentsForExport(
      int managerId,
      ExportAssignmentRequestModel request
  )

@@ -212,7 +212,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         #region Export
 
         /// <summary>Exports all organization assignments to Excel with department and employee details.</summary>
-        public async Task<ApiResponse<byte[]>> ExportOrganizationAssignmentsToExcel(
+        public async Task<ApiResponse<byte[]>> GetOrganizationAssignmentsForExport(
        ExportOrganizationAssignmentsRequestModel request
    )
         {
