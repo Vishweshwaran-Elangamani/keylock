@@ -14,6 +14,7 @@ using Relevantz.EEPZ.Core.Services.Implementations;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Core.Services;
 
+
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
 
@@ -185,6 +186,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<ISlaService, SlaService>();
 builder.Services.AddScoped<ISlaRepository, SlaRepository>();
+builder.Services.AddScoped<ISlaAutomationService, SlaAutomationService>();
 
 Log.Information("Dependency Injection configured - EmailService, ISlaService, ISlaRepository");
 
