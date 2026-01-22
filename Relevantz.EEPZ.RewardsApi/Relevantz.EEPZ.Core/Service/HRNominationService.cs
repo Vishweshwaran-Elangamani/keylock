@@ -19,87 +19,161 @@ namespace Relevantz.EEPZ.Core.Services
             _logger = logger;
         }
 
-        public async Task<object> GetAllManagerNominationsForHRAsync()
+        public async Task<object> GetAllManagerNominationsForHRAsync(
+    string? search,
+    string? status,
+    string? sortBy,
+    string? sortDirection,
+    int page = 1,
+    int pageSize = 10
+)
+{
+    try
+    {
+        var nominations = await _repository.GetPendingVisibleManagerNominationsAsync();
+
+        var nominationDtos = new List<dynamic>();
+
+        foreach (var n in nominations)
         {
-            try
+            var opportunity = await _repository.GetOpportunityByIdAsync(n.OpportunityId);
+            var nomineeDept = await _repository.GetEmployeeDepartmentDetailsAsync(n.NomineeEmployeeId);
+            var parameterValues = await _repository.GetNominationParameterValuesAsync(n.NominationId);
+
+            nominationDtos.Add(new
             {
-                var nominations = await _repository.GetPendingVisibleManagerNominationsAsync();
-
-                var nominationDtos = new List<object>();
-
-                foreach (var n in nominations)
+                n.NominationId,
+                n.OpportunityId,
+                OpportunityName = opportunity?.OpportunityName ?? "Unknown",
+                OpportunityDeadline = opportunity?.Deadline,
+                RewardType = opportunity?.RewardType != null ? new
                 {
-                    var opportunity = await _repository.GetOpportunityByIdAsync(n.OpportunityId);
-
-                    var nomineeDept = await _repository.GetEmployeeDepartmentDetailsAsync(n.NomineeEmployeeId);
-
-                    var parameterValues = await _repository.GetNominationParameterValuesAsync(n.NominationId);
-
-                    nominationDtos.Add(new
-                    {
-                        n.NominationId,
-                        n.OpportunityId,
-                        OpportunityName = opportunity?.OpportunityName ?? "Unknown",
-                        OpportunityDeadline = opportunity?.Deadline,
-                        RewardType = opportunity?.RewardType != null ? new
-                        {
-                            opportunity.RewardType.RewardTypeId,
-                            opportunity.RewardType.RewardName,
-                            opportunity.RewardType.RewardCategory
-                        } : null,
-                        NomineeEmployeeId = n.NomineeEmployeeId,
-                        NomineeName = n.NomineeEmployee.Userprofile.FirstName + " " + n.NomineeEmployee.Userprofile.LastName,
-                        NomineeEmail = n.NomineeEmployee.Userprofile.PersonalEmail,
-                        NomineeDepartmentId = nomineeDept?.DepartmentId,
-                        NomineeDepartmentName = nomineeDept?.Department?.DepartmentName ?? "Unknown",
-                        ManagerEmployeeId = n.NominatedByEmployeeId,
-                        ManagerName = n.NominatedByEmployee.Userprofile.FirstName + " " + n.NominatedByEmployee.Userprofile.LastName,
-                        n.Justification,
-                        n.SubmittedAt,
-                        n.Status,
-                        ParameterValues = parameterValues
-                    });
-                }
-
-                var groupedNominations = nominationDtos
-                    .GroupBy(n => new
-                    {
-                        ((dynamic)n).OpportunityId,
-                        ((dynamic)n).OpportunityName,
-                        ((dynamic)n).OpportunityDeadline,
-                        ((dynamic)n).RewardType
-                    })
-                    .Select(g => new
-                    {
-                        OpportunityId = g.Key.OpportunityId,
-                        OpportunityName = g.Key.OpportunityName,
-                        OpportunityDeadline = g.Key.OpportunityDeadline,
-                        RewardType = g.Key.RewardType,
-                        NominationCount = g.Count(),
-                        Nominations = g.ToList()
-                    })
-                    .ToList();
-
-                return new
-                {
-                    success = true,
-                    data = groupedNominations,
-                    totalNominations = nominationDtos.Count,
-                    totalOpportunities = groupedNominations.Count,
-                    message = $"Found {nominationDtos.Count} pending nominations"
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"[HR_ALL_NOMINATIONS] Error: {ex.Message}");
-                return new
-                {
-                    success = false,
-                    message = "Error retrieving nominations",
-                    details = ex.Message
-                };
-            }
+                    opportunity.RewardType.RewardTypeId,
+                    opportunity.RewardType.RewardName,
+                    opportunity.RewardType.RewardCategory
+                } : null,
+                NomineeEmployeeId = n.NomineeEmployeeId,
+                NomineeName = n.NomineeEmployee.Userprofile.FirstName + " " + n.NomineeEmployee.Userprofile.LastName,
+                NomineeEmail = n.NomineeEmployee.Userprofile.PersonalEmail,
+                NomineeDepartmentId = nomineeDept?.DepartmentId,
+                NomineeDepartmentName = nomineeDept?.Department?.DepartmentName ?? "Unknown",
+                ManagerEmployeeId = n.NominatedByEmployeeId,
+                ManagerName = n.NominatedByEmployee.Userprofile.FirstName + " " + n.NominatedByEmployee.Userprofile.LastName,
+                n.Justification,
+                n.SubmittedAt,
+                n.Status,
+                ParameterValues = parameterValues
+            });
         }
+
+        IEnumerable<dynamic> filtered = nominationDtos;
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var s = search.Trim().ToLowerInvariant();
+            filtered = filtered.Where(x =>
+                (x.OpportunityName != null && x.OpportunityName.ToString().ToLowerInvariant().Contains(s)) ||
+                (x.NomineeName != null && x.NomineeName.ToString().ToLowerInvariant().Contains(s)) ||
+                (x.ManagerName != null && x.ManagerName.ToString().ToLowerInvariant().Contains(s))
+            );
+        }
+
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            filtered = filtered.Where(x =>
+                x.Status != null &&
+                string.Equals(x.Status.ToString(), status, StringComparison.OrdinalIgnoreCase)
+            );
+        }
+
+        var grouped = filtered
+            .GroupBy(n => new
+            {
+                n.OpportunityId,
+                n.OpportunityName,
+                n.OpportunityDeadline,
+                n.RewardType
+            });
+
+        IOrderedEnumerable<IGrouping<dynamic, dynamic>> orderedGroups;
+
+        var dirDesc = string.Equals(sortDirection, "desc", StringComparison.OrdinalIgnoreCase);
+
+        switch (sortBy?.Trim())
+        {
+            case "OpportunityName":
+                orderedGroups = dirDesc
+                    ? grouped.OrderByDescending(g => g.Key.OpportunityName)
+                    : grouped.OrderBy(g => g.Key.OpportunityName);
+                break;
+
+            case "OpportunityDeadline":
+                orderedGroups = dirDesc
+                    ? grouped.OrderByDescending(g => g.Key.OpportunityDeadline)
+                    : grouped.OrderBy(g => g.Key.OpportunityDeadline);
+                break;
+
+            case "NominationCount":
+                orderedGroups = dirDesc
+                    ? grouped.OrderByDescending(g => g.Count())
+                    : grouped.OrderBy(g => g.Count());
+                break;
+
+            default:
+                orderedGroups = grouped.OrderBy(g => 0);
+                break;
+        }
+
+        var groupedNominations = orderedGroups
+            .Select(g => new
+            {
+                OpportunityId = g.Key.OpportunityId,
+                OpportunityName = g.Key.OpportunityName,
+                OpportunityDeadline = g.Key.OpportunityDeadline,
+                RewardType = g.Key.RewardType,
+                NominationCount = g.Count(),
+                Nominations = g.ToList()
+            })
+            .ToList();
+
+        var totalRecords = groupedNominations.Count;
+        var totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
+        page = Math.Max(1, page); 
+
+        var paginatedNominations = groupedNominations
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        return new
+        {
+            success = true,
+            data = paginatedNominations,
+            pagination = new
+            {
+                currentPage = page,
+                pageSize = pageSize,
+                totalRecords = totalRecords,
+                totalPages = totalPages,
+                hasNextPage = page < totalPages,
+                hasPreviousPage = page > 1
+            },
+            totalNominations = totalRecords,        
+            totalOpportunities = totalRecords,      
+            message = $"Page {page} of {totalPages} (showing {paginatedNominations.Count} of {totalRecords} opportunities)"
+        };
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError($"[HR_ALL_NOMINATIONS] Error: {ex.Message}");
+        return new
+        {
+            success = false,
+            message = "Error retrieving nominations",
+            details = ex.Message
+        };
+    }
+}
 
         public async Task<ApiResponse<object>> GetNominationDetailsAsync(int nominationId)
         {

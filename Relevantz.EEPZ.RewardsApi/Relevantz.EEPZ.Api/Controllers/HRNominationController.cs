@@ -22,21 +22,71 @@ namespace PerformanceManagement.Controllers
             _logger = logger;
         }
 
-        [HttpGet("hr/manager-nominations")]
-        public async Task<IActionResult> GetAllManagerNominationsForHR()
-        {
-            try
-            {
-                var result = await _service.GetAllManagerNominationsForHRAsync();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"[HR_ALL_NOMINATIONS] Error: {ex.Message}");
-                return StatusCode(500, new { success = false, message = $"Error: {ex.Message}" });
-            }
-        }
+      // GET api/HRNomination/hr/manager-nominations
+[HttpGet("hr/manager-nominations")]
+public async Task<IActionResult> GetAllManagerNominationsForHR(
+    [FromQuery] string? search = null,
+    [FromQuery] string? status = null,          
+    [FromQuery] string? sortBy = null,         
+    [FromQuery] string? sortDirection = "asc",
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 10
+)
+{
+    if (page < 1)
+    {
+        return BadRequest(new { success = false, message = "Page must be greater than 0" });
+    }
 
+    if (pageSize < 1 || pageSize > 100)
+    {
+        return BadRequest(new { success = false, message = "PageSize must be between 1 and 100" });
+    }
+
+    var validSortDirections = new[] { "asc", "desc" };
+    if (!string.IsNullOrEmpty(sortDirection) && !validSortDirections.Contains(sortDirection.ToLower()))
+    {
+        return BadRequest(new { success = false, message = "sortDirection must be 'asc' or 'desc'" });
+    }
+
+    var validSortBys = new[] { "OpportunityName", "OpportunityDeadline", "NominationCount" };
+    if (!string.IsNullOrEmpty(sortBy) && !validSortBys.Contains(sortBy))
+    {
+        return BadRequest(new { success = false, message = "sortBy must be one of: OpportunityName, OpportunityDeadline, NominationCount" });
+    }
+
+    if (!string.IsNullOrEmpty(status) && !new[] { "Pending", "Approved", "Rejected" }.Contains(status))
+    {
+        return BadRequest(new { success = false, message = "status must be Pending, Approved, or Rejected" });
+    }
+
+    if (!string.IsNullOrEmpty(search) && search.Length > 100)
+    {
+        return BadRequest(new { success = false, message = "search term cannot exceed 100 characters" });
+    }
+
+    try
+    {
+        var result = await _service.GetAllManagerNominationsForHRAsync(
+            search,
+            status,
+            sortBy,
+            sortDirection,
+            page,
+            pageSize  
+        );
+
+        return Ok(result);
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "[HR_ALL_NOMINATIONS] Error");
+        return StatusCode(500, new { success = false, message = $"Error: {ex.Message}" });
+    }
+}
+
+
+        // GET api/HRNomination/nomination-details/{nominationId}
         [HttpGet("nomination-details/{nominationId}")]
         public async Task<IActionResult> GetNominationDetails(int nominationId)
         {
@@ -53,7 +103,7 @@ namespace PerformanceManagement.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"[NOMINATION_DETAILS] Error: {ex.Message}");
+                _logger.LogError(ex, "[NOMINATION_DETAILS] Error");
                 return StatusCode(
                     500,
                     ApiResponse<object>.ErrorResponse(
@@ -64,6 +114,7 @@ namespace PerformanceManagement.Controllers
             }
         }
 
+        // POST api/HRNomination/hr/nominations/approve
         [HttpPost("hr/nominations/approve")]
         public async Task<IActionResult> ApproveNominations([FromBody] HRNominationApprovalDto dto)
         {
@@ -80,7 +131,7 @@ namespace PerformanceManagement.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"[HR_APPROVE] Error: {ex.Message}");
+                _logger.LogError(ex, "[HR_APPROVE] Error");
                 return StatusCode(
                     500,
                     ApiResponse<object>.ErrorResponse(
@@ -91,6 +142,7 @@ namespace PerformanceManagement.Controllers
             }
         }
 
+        // POST api/HRNomination/hr/nominations/reject
         [HttpPost("hr/nominations/reject")]
         public async Task<IActionResult> RejectNominations([FromBody] HRNominationRejectDto dto)
         {
@@ -107,7 +159,7 @@ namespace PerformanceManagement.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"[REJECT_NOMINATIONS] Error: {ex.Message}");
+                _logger.LogError(ex, "[REJECT_NOMINATIONS] Error");
                 return StatusCode(
                     500,
                     ApiResponse<object>.ErrorResponse(
@@ -118,6 +170,7 @@ namespace PerformanceManagement.Controllers
             }
         }
 
+        // GET api/HRNomination/approved-profiles
         [HttpGet("approved-profiles")]
         public async Task<IActionResult> GetApprovedProfiles()
         {
@@ -128,11 +181,12 @@ namespace PerformanceManagement.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"[APPROVED_PROFILES] Error: {ex.Message}");
+                _logger.LogError(ex, "[APPROVED_PROFILES] Error");
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
 
+        // GET api/HRNomination/rejected-profiles
         [HttpGet("rejected-profiles")]
         public async Task<IActionResult> GetRejectedProfiles()
         {
@@ -143,11 +197,12 @@ namespace PerformanceManagement.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"[REJECTED_PROFILES] Error: {ex.Message}");
+                _logger.LogError(ex, "[REJECTED_PROFILES] Error");
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
 
+        // GET api/HRNomination/statistics
         [HttpGet("statistics")]
         public async Task<IActionResult> GetStatistics()
         {
@@ -158,11 +213,12 @@ namespace PerformanceManagement.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"[STATISTICS] Error: {ex.Message}");
+                _logger.LogError(ex, "[STATISTICS] Error");
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
 
+        // GET api/HRNomination/reward-types
         [HttpGet("reward-types")]
         public async Task<IActionResult> GetAllRewardTypes([FromQuery] bool activeOnly = false)
         {
@@ -173,11 +229,12 @@ namespace PerformanceManagement.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"[GET_REWARD_TYPES] Error: {ex.Message}");
+                _logger.LogError(ex, "[GET_REWARD_TYPES] Error");
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
 
+        // POST api/HRNomination/reward-types
         [HttpPost("reward-types")]
         public async Task<IActionResult> CreateRewardType([FromBody] CreateRewardTypeDto dto)
         {
@@ -188,11 +245,12 @@ namespace PerformanceManagement.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"[CREATE_REWARD_TYPE] Error: {ex.Message}");
+                _logger.LogError(ex, "[CREATE_REWARD_TYPE] Error");
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
 
+        // PUT api/HRNomination/reward-types/{rewardTypeId}
         [HttpPut("reward-types/{rewardTypeId}")]
         public async Task<IActionResult> UpdateRewardType(
             int rewardTypeId,
@@ -202,7 +260,8 @@ namespace PerformanceManagement.Controllers
             try
             {
                 _logger.LogInformation(
-                    $"[UPDATE_REWARD_TYPE] Starting update for RewardTypeId: {rewardTypeId}"
+                    "[UPDATE_REWARD_TYPE] Starting update for RewardTypeId: {RewardTypeId}",
+                    rewardTypeId
                 );
 
                 var result = await _service.UpdateRewardTypeAsync(rewardTypeId, dto);
@@ -211,8 +270,8 @@ namespace PerformanceManagement.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"[UPDATE_REWARD_TYPE] Exception: {ex.Message}");
-                _logger.LogError($"[UPDATE_REWARD_TYPE] Stack: {ex.StackTrace}");
+                _logger.LogError(ex, "[UPDATE_REWARD_TYPE] Exception");
+                _logger.LogError("[UPDATE_REWARD_TYPE] Stack: {StackTrace}", ex.StackTrace);
 
                 return StatusCode(
                     500,
@@ -226,6 +285,7 @@ namespace PerformanceManagement.Controllers
             }
         }
 
+        // GET api/HRNomination/reward-types/{rewardTypeId}/parameters
         [HttpGet("reward-types/{rewardTypeId}/parameters")]
         public async Task<IActionResult> GetParametersByRewardType(int rewardTypeId)
         {
@@ -236,11 +296,12 @@ namespace PerformanceManagement.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"[GET_PARAMETERS] Error: {ex.Message}");
+                _logger.LogError(ex, "[GET_PARAMETERS] Error");
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
 
+        // POST api/HRNomination/parameters
         [HttpPost("parameters")]
         public async Task<IActionResult> CreateParameter([FromBody] CreateParameterDto dto)
         {
@@ -251,11 +312,12 @@ namespace PerformanceManagement.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"[CREATE_PARAMETER] Error: {ex.Message}");
+                _logger.LogError(ex, "[CREATE_PARAMETER] Error");
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
 
+        // PUT api/HRNomination/parameters/{parameterId}
         [HttpPut("parameters/{parameterId}")]
         public async Task<IActionResult> UpdateParameter(
             int parameterId,
@@ -266,13 +328,11 @@ namespace PerformanceManagement.Controllers
             {
                 var result = await _service.UpdateParameterAsync(parameterId, dto);
 
-                // Check if result is null
                 if (result == null)
                 {
                     return Ok(new { success = true, message = "Parameter updated successfully" });
                 }
 
-                // Safe property check
                 var resultType = result.GetType();
                 var successProperty =
                     resultType.GetProperty("success") ?? resultType.GetProperty("Success");
@@ -290,11 +350,12 @@ namespace PerformanceManagement.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"[UPDATE_PARAMETER] Error: {ex.Message}");
+                _logger.LogError(ex, "[UPDATE_PARAMETER] Error");
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
 
+        // DELETE api/HRNomination/parameters/{parameterId}
         [HttpDelete("parameters/{parameterId}")]
         public async Task<IActionResult> DeleteParameter(int parameterId)
         {
@@ -310,7 +371,7 @@ namespace PerformanceManagement.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"[DELETE_PARAMETER] Error: {ex.Message}");
+                _logger.LogError(ex, "[DELETE_PARAMETER] Error");
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }

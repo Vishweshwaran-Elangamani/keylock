@@ -4,8 +4,14 @@ namespace Relevantz.EEPZ.Core.Services.Interfaces
 {
     public interface IHRNominationService
     {
-        Task<object> GetAllManagerNominationsForHRAsync();
-     
+    Task<object> GetAllManagerNominationsForHRAsync(
+    string? search,
+    string? status,
+    string? sortBy,
+    string? sortDirection,
+    int page,
+    int pageSize
+);   
         Task<object> GetAllRewardTypesAsync(bool activeOnly);
         Task<object> CreateRewardTypeAsync(CreateRewardTypeDto dto);
         Task<object> UpdateRewardTypeAsync(int rewardTypeId, UpdateRewardTypeDto dto);
