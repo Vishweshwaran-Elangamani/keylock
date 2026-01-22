@@ -454,7 +454,7 @@ const DepartmentList = () => {
                 ))}
               </div>
               {/* GRID PAGINATION */}
-              {totalPages > 1 && (
+              {filteredDepartments.length > 0 && totalPages > 1 && (
                 <div className="dlm-pagination-wrapper">
                   <nav className="dlm-pagination">
                     <ul className="dlm-pagination-list">
@@ -583,7 +583,7 @@ const DepartmentList = () => {
                   </tbody>
                 </table>
               </div>
-              {totalPages > 1 && filteredDepartments.length > 0 && (
+              {filteredDepartments.length > 0 && (
                 <div className="dlm-pagination">
                   <div className="dlm-pagination-info">
                     <span>Show</span>
@@ -630,57 +630,59 @@ const DepartmentList = () => {
                     {Math.min(indexOfLastItem, filteredDepartments.length)} of{" "}
                     {filteredDepartments.length} entries
                   </div>
-                  <nav className="dlm-pagination-nav">
-                    <ul className="dlm-pagination-list">
-                      <li
-                        className={`dlm-page-item ${
-                          currentPage === 1 ? "disabled" : ""
-                        }`}
-                      >
-                        <button
-                          onClick={() =>
-                            setCurrentPage((prev) => Math.max(prev - 1, 1))
-                          }
-                          disabled={currentPage === 1}
-                        >
-                          <i className="bi bi-chevron-left"></i>
-                        </button>
-                      </li>
-                      {getPageNumbers().map((page, index) => (
+                  {totalPages > 1 && (
+                    <nav className="dlm-pagination-nav">
+                      <ul className="dlm-pagination-list">
                         <li
-                          key={index}
                           className={`dlm-page-item ${
-                            page === currentPage ? "active" : ""
-                          } ${typeof page !== "number" ? "disabled" : ""}`}
+                            currentPage === 1 ? "disabled" : ""
+                          }`}
                         >
                           <button
                             onClick={() =>
-                              typeof page === "number" && setCurrentPage(page)
+                              setCurrentPage((prev) => Math.max(prev - 1, 1))
                             }
-                            disabled={typeof page !== "number"}
+                            disabled={currentPage === 1}
                           >
-                            {page}
+                            <i className="bi bi-chevron-left"></i>
                           </button>
                         </li>
-                      ))}
-                      <li
-                        className={`dlm-page-item ${
-                          currentPage === totalPages ? "disabled" : ""
-                        }`}
-                      >
-                        <button
-                          onClick={() =>
-                            setCurrentPage((prev) =>
-                              Math.min(prev + 1, totalPages)
-                            )
-                          }
-                          disabled={currentPage === totalPages}
+                        {getPageNumbers().map((page, index) => (
+                          <li
+                            key={index}
+                            className={`dlm-page-item ${
+                              page === currentPage ? "active" : ""
+                            } ${typeof page !== "number" ? "disabled" : ""}`}
+                          >
+                            <button
+                              onClick={() =>
+                                typeof page === "number" && setCurrentPage(page)
+                              }
+                              disabled={typeof page !== "number"}
+                            >
+                              {page}
+                            </button>
+                          </li>
+                        ))}
+                        <li
+                          className={`dlm-page-item ${
+                            currentPage === totalPages ? "disabled" : ""
+                          }`}
                         >
-                          <i className="bi bi-chevron-right"></i>
-                        </button>
-                      </li>
-                    </ul>
-                  </nav>
+                          <button
+                            onClick={() =>
+                              setCurrentPage((prev) =>
+                                Math.min(prev + 1, totalPages)
+                              )
+                            }
+                            disabled={currentPage === totalPages}
+                          >
+                            <i className="bi bi-chevron-right"></i>
+                          </button>
+                        </li>
+                      </ul>
+                    </nav>
+                  )}
                 </div>
               )}
             </div>

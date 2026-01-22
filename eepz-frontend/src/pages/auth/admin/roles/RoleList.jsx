@@ -134,6 +134,10 @@ const RoleList = () => {
     }
   };
   const handleEdit = (role) => {
+    if (role.isSystemRole) {
+      toast.warning("System roles cannot be edited");
+      return;
+    }
     setSelectedRole(role);
     setShowEditModal(true);
   };
@@ -397,31 +401,46 @@ const RoleList = () => {
                     </div>
                     {/* Card Footer - Actions */}
                     <div className="rlm-card-footer">
-                      <button
-                        onClick={() => handleEdit(role)}
-                        title="Edit Role"
-                        className="rlm-action-edit"
-                      >
-                        <i className="bi bi-pencil-square"></i>
-                      </button>
-                      <button
-                        onClick={() => handleDelete(role)}
-                        disabled={role.isSystemRole}
-                        title={
-                          role.isSystemRole
-                            ? "Cannot delete system role"
-                            : "Delete Role"
-                        }
-                        className="rlm-action-delete"
-                      >
-                        <i className="bi bi-trash3"></i>
-                      </button>
+                      {role.isSystemRole ? (
+                        <button
+                          disabled
+                          title="Cannot edit system role"
+                          className="rlm-action-disabled"
+                        >
+                          <i className="bi bi-pencil-square"></i>
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleEdit(role)}
+                          title="Edit Role"
+                          className="rlm-action-edit"
+                        >
+                          <i className="bi bi-pencil-square"></i>
+                        </button>
+                      )}
+                      {role.isSystemRole ? (
+                        <button
+                          disabled
+                          title="Cannot delete system role"
+                          className="rlm-action-disabled"
+                        >
+                          <i className="bi bi-trash3"></i>
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleDelete(role)}
+                          title="Delete Role"
+                          className="rlm-action-delete"
+                        >
+                          <i className="bi bi-trash3"></i>
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
               </div>
               {/* GRID PAGINATION */}
-              {totalPages > 1 && (
+              {filteredRoles.length > 0 && totalPages > 1 && (
                 <div className="rlm-pagination-wrapper">
                   <nav className="rlm-pagination">
                     <ul className="rlm-pagination-list">
@@ -521,23 +540,40 @@ const RoleList = () => {
                         <td>{formatDate(role.createdAt)}</td>
                         <td>
                           <div className="rlm-table-actions">
-                            <button
-                              className="rlm-action-edit"
-                              onClick={() => handleEdit(role)}
-                              title="Edit"
-                            >
-                              <i className="bi bi-pencil-square"></i>
-                            </button>
-                            <button
-                              className="rlm-action-delete"
-                              onClick={() => handleDelete(role)}
-                              disabled={role.isSystemRole}
-                              title={
-                                role.isSystemRole ? "Cannot delete" : "Delete"
-                              }
-                            >
-                              <i className="bi bi-trash3"></i>
-                            </button>
+                            {role.isSystemRole ? (
+                              <button
+                                className="rlm-action-disabled"
+                                disabled
+                                title="Cannot edit system role"
+                              >
+                                <i className="bi bi-pencil-square"></i>
+                              </button>
+                            ) : (
+                              <button
+                                className="rlm-action-edit"
+                                onClick={() => handleEdit(role)}
+                                title="Edit"
+                              >
+                                <i className="bi bi-pencil-square"></i>
+                              </button>
+                            )}
+                            {role.isSystemRole ? (
+                              <button
+                                className="rlm-action-disabled"
+                                disabled
+                                title="Cannot delete system role"
+                              >
+                                <i className="bi bi-trash3"></i>
+                              </button>
+                            ) : (
+                              <button
+                                className="rlm-action-delete"
+                                onClick={() => handleDelete(role)}
+                                title="Delete"
+                              >
+                                <i className="bi bi-trash3"></i>
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -545,7 +581,7 @@ const RoleList = () => {
                   </tbody>
                 </table>
               </div>
-              {totalPages > 1 && filteredRoles.length > 0 && (
+              {filteredRoles.length > 0 && (
                 <div className="rlm-pagination">
                   <div className="rlm-pagination-info">
                     <span>Show</span>
@@ -592,57 +628,59 @@ const RoleList = () => {
                     {Math.min(indexOfLastItem, filteredRoles.length)} of{" "}
                     {filteredRoles.length} entries
                   </div>
-                  <nav className="rlm-pagination-nav">
-                    <ul className="rlm-pagination-list">
-                      <li
-                        className={`rlm-page-item ${
-                          currentPage === 1 ? "disabled" : ""
-                        }`}
-                      >
-                        <button
-                          onClick={() =>
-                            setCurrentPage((prev) => Math.max(prev - 1, 1))
-                          }
-                          disabled={currentPage === 1}
-                        >
-                          <i className="bi bi-chevron-left"></i>
-                        </button>
-                      </li>
-                      {getPageNumbers().map((page, index) => (
+                  {totalPages > 1 && (
+                    <nav className="rlm-pagination-nav">
+                      <ul className="rlm-pagination-list">
                         <li
-                          key={index}
                           className={`rlm-page-item ${
-                            page === currentPage ? "active" : ""
-                          } ${typeof page !== "number" ? "disabled" : ""}`}
+                            currentPage === 1 ? "disabled" : ""
+                          }`}
                         >
                           <button
                             onClick={() =>
-                              typeof page === "number" && setCurrentPage(page)
+                              setCurrentPage((prev) => Math.max(prev - 1, 1))
                             }
-                            disabled={typeof page !== "number"}
+                            disabled={currentPage === 1}
                           >
-                            {page}
+                            <i className="bi bi-chevron-left"></i>
                           </button>
                         </li>
-                      ))}
-                      <li
-                        className={`rlm-page-item ${
-                          currentPage === totalPages ? "disabled" : ""
-                        }`}
-                      >
-                        <button
-                          onClick={() =>
-                            setCurrentPage((prev) =>
-                              Math.min(prev + 1, totalPages)
-                            )
-                          }
-                          disabled={currentPage === totalPages}
+                        {getPageNumbers().map((page, index) => (
+                          <li
+                            key={index}
+                            className={`rlm-page-item ${
+                              page === currentPage ? "active" : ""
+                            } ${typeof page !== "number" ? "disabled" : ""}`}
+                          >
+                            <button
+                              onClick={() =>
+                                typeof page === "number" && setCurrentPage(page)
+                              }
+                              disabled={typeof page !== "number"}
+                            >
+                              {page}
+                            </button>
+                          </li>
+                        ))}
+                        <li
+                          className={`rlm-page-item ${
+                            currentPage === totalPages ? "disabled" : ""
+                          }`}
                         >
-                          <i className="bi bi-chevron-right"></i>
-                        </button>
-                      </li>
-                    </ul>
-                  </nav>
+                          <button
+                            onClick={() =>
+                              setCurrentPage((prev) =>
+                                Math.min(prev + 1, totalPages)
+                              )
+                            }
+                            disabled={currentPage === totalPages}
+                          >
+                            <i className="bi bi-chevron-right"></i>
+                          </button>
+                        </li>
+                      </ul>
+                    </nav>
+                  )}
                 </div>
               )}
             </div>

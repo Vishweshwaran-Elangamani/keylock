@@ -947,19 +947,43 @@
   transform: scale(1.08);
   box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
 }
+/* ========================================
+   ACTION BUTTONS - DISABLED STATE
+======================================== */
 
-.rlm-action-delete:disabled {
+/* Disabled button for both table and grid views */
+.rlm-action-disabled {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1.5px solid #6c757d;
+  background: rgba(108, 117, 125, 0.08);
+  cursor: not-allowed;
+  transition: none;
+  font-size: 1rem;
+  opacity: 0.4;
+  color: #6c757d;
+  pointer-events: none;
+}
+
+.rlm-action-disabled:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  background: rgba(108, 117, 125, 0.08) !important;
+  color: #6c757d !important;
+  border-color: #6c757d !important;
+  opacity: 0.4 !important;
+}
+
+.rlm-action-disabled:disabled {
   opacity: 0.4;
   cursor: not-allowed;
-  border-color: #6c757d;
-  color: #6c757d;
-  background: rgba(108, 117, 125, 0.08);
+  pointer-events: none;
 }
 
-.rlm-action-delete:disabled:hover {
-  transform: none;
-  box-shadow: none;
-}
 
 /* ========================================
    LOADING & EMPTY

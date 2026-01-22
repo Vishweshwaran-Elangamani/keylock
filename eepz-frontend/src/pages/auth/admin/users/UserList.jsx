@@ -457,13 +457,23 @@ const UserList = () => {
                     </td>
                     <td>
                       <div className="ul-table-actions">
-                        <button
-                          className="ul-action-edit"
-                          onClick={() => handleEditUser(user)}
-                          title="Edit User"
-                        >
-                          <i className="bi bi-pencil-square"></i>
-                        </button>
+                        {user.isActive ? (
+                          <button
+                            className="ul-action-edit"
+                            onClick={() => handleEditUser(user)}
+                            title="Edit User"
+                          >
+                            <i className="bi bi-pencil-square"></i>
+                          </button>
+                        ) : (
+                          <button
+                            className="ul-action-disabled"
+                            disabled
+                            title="Cannot Edit Inactive User"
+                          >
+                            <i className="bi bi-pencil-square"></i>
+                          </button>
+                        )}
                         {user.isActive ? (
                           <button
                             className="ul-action-delete"
@@ -489,7 +499,7 @@ const UserList = () => {
             </tbody>
           </table>
         </div>
-        {filteredUsers.length > 0 && totalPages > 1 && (
+        {filteredUsers.length > 0 && (
           <div className="ul-pagination">
             <div className="ul-pagination-info">
               <span>Show</span>
@@ -533,55 +543,59 @@ const UserList = () => {
               {Math.min(currentPage * rowsPerPage, filteredUsers.length)} of{" "}
               {filteredUsers.length} entries
             </div>
-            <nav className="ul-pagination-nav">
-              <ul className="ul-pagination-list">
-                <li
-                  className={`ul-page-item ${
-                    currentPage === 1 ? "disabled" : ""
-                  }`}
-                >
-                  <button
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(prev - 1, 1))
-                    }
-                    disabled={currentPage === 1}
-                  >
-                    <i className="bi bi-chevron-left"></i>
-                  </button>
-                </li>
-                {getPageNumbers().map((page, index) => (
+            {totalPages > 1 && (
+              <nav className="ul-pagination-nav">
+                <ul className="ul-pagination-list">
                   <li
-                    key={index}
                     className={`ul-page-item ${
-                      page === currentPage ? "active" : ""
-                    } ${typeof page !== "number" ? "disabled" : ""}`}
+                      currentPage === 1 ? "disabled" : ""
+                    }`}
                   >
                     <button
                       onClick={() =>
-                        typeof page === "number" && setCurrentPage(page)
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
                       }
-                      disabled={typeof page !== "number"}
+                      disabled={currentPage === 1}
                     >
-                      {page}
+                      <i className="bi bi-chevron-left"></i>
                     </button>
                   </li>
-                ))}
-                <li
-                  className={`ul-page-item ${
-                    currentPage === totalPages ? "disabled" : ""
-                  }`}
-                >
-                  <button
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                    }
-                    disabled={currentPage === totalPages}
+                  {getPageNumbers().map((page, index) => (
+                    <li
+                      key={index}
+                      className={`ul-page-item ${
+                        page === currentPage ? "active" : ""
+                      } ${typeof page !== "number" ? "disabled" : ""}`}
+                    >
+                      <button
+                        onClick={() =>
+                          typeof page === "number" && setCurrentPage(page)
+                        }
+                        disabled={typeof page !== "number"}
+                      >
+                        {page}
+                      </button>
+                    </li>
+                  ))}
+                  <li
+                    className={`ul-page-item ${
+                      currentPage === totalPages ? "disabled" : ""
+                    }`}
                   >
-                    <i className="bi bi-chevron-right"></i>
-                  </button>
-                </li>
-              </ul>
-            </nav>
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) =>
+                          Math.min(prev + 1, totalPages)
+                        )
+                      }
+                      disabled={currentPage === totalPages}
+                    >
+                      <i className="bi bi-chevron-right"></i>
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            )}
           </div>
         )}
       </div>

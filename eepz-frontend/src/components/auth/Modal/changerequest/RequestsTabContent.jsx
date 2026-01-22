@@ -243,7 +243,7 @@ export const PendingRequests = ({ requests, handleProcessClick }) => {
             </tbody>
           </table>
         </div>
-        {filteredRequests.length > 0 && totalPages > 1 && (
+        {filteredRequests.length > 0 && (
           <div className="crm-pagination">
             <div className="crm-pagination-info">
               <span>Show</span>
@@ -266,41 +266,43 @@ export const PendingRequests = ({ requests, handleProcessClick }) => {
               {Math.min(currentPage * rowsPerPage, filteredRequests.length)} of{" "}
               {filteredRequests.length} entries
             </div>
-            <nav className="crm-pagination-nav">
-              <ul className="crm-pagination-list">
-                <li className={`crm-page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                  <button
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                  >
-                    <i className="bi bi-chevron-left"></i>
-                  </button>
-                </li>
-                {getPageNumbers().map((page, index) => (
-                  <li
-                    key={index}
-                    className={`crm-page-item ${page === currentPage ? "active" : ""} ${
-                      typeof page !== "number" ? "disabled" : ""
-                    }`}
-                  >
+            {totalPages > 1 && (
+              <nav className="crm-pagination-nav">
+                <ul className="crm-pagination-list">
+                  <li className={`crm-page-item ${currentPage === 1 ? "disabled" : ""}`}>
                     <button
-                      onClick={() => typeof page === "number" && setCurrentPage(page)}
-                      disabled={typeof page !== "number"}
+                      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
                     >
-                      {page}
+                      <i className="bi bi-chevron-left"></i>
                     </button>
                   </li>
-                ))}
-                <li className={`crm-page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                  <button
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                  >
-                    <i className="bi bi-chevron-right"></i>
-                  </button>
-                </li>
-              </ul>
-            </nav>
+                  {getPageNumbers().map((page, index) => (
+                    <li
+                      key={index}
+                      className={`crm-page-item ${page === currentPage ? "active" : ""} ${
+                        typeof page !== "number" ? "disabled" : ""
+                      }`}
+                    >
+                      <button
+                        onClick={() => typeof page === "number" && setCurrentPage(page)}
+                        disabled={typeof page !== "number"}
+                      >
+                        {page}
+                      </button>
+                    </li>
+                  ))}
+                  <li className={`crm-page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                    <button
+                      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                      disabled={currentPage === totalPages}
+                    >
+                      <i className="bi bi-chevron-right"></i>
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            )}
           </div>
         )}
       </div>
@@ -520,7 +522,7 @@ export const AllRequests = ({ requests, handleProcessClick }) => {
             </tbody>
           </table>
         </div>
-        {filteredRequests.length > 0 && totalPages > 1 && (
+        {filteredRequests.length > 0 && (
           <div className="crm-pagination">
             <div className="crm-pagination-info">
               <span>Show</span>
@@ -543,41 +545,43 @@ export const AllRequests = ({ requests, handleProcessClick }) => {
               {Math.min(currentPage * rowsPerPage, filteredRequests.length)} of{" "}
               {filteredRequests.length} entries
             </div>
-            <nav className="crm-pagination-nav">
-              <ul className="crm-pagination-list">
-                <li className={`crm-page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                  <button
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                  >
-                    <i className="bi bi-chevron-left"></i>
-                  </button>
-                </li>
-                {getPageNumbers().map((page, index) => (
-                  <li
-                    key={index}
-                    className={`crm-page-item ${page === currentPage ? "active" : ""} ${
-                      typeof page !== "number" ? "disabled" : ""
-                    }`}
-                  >
+            {totalPages > 1 && (
+              <nav className="crm-pagination-nav">
+                <ul className="crm-pagination-list">
+                  <li className={`crm-page-item ${currentPage === 1 ? "disabled" : ""}`}>
                     <button
-                      onClick={() => typeof page === "number" && setCurrentPage(page)}
-                      disabled={typeof page !== "number"}
+                      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
                     >
-                      {page}
+                      <i className="bi bi-chevron-left"></i>
                     </button>
                   </li>
-                ))}
-                <li className={`crm-page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                  <button
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                  >
-                    <i className="bi bi-chevron-right"></i>
-                  </button>
-                </li>
-              </ul>
-            </nav>
+                  {getPageNumbers().map((page, index) => (
+                    <li
+                      key={index}
+                      className={`crm-page-item ${page === currentPage ? "active" : ""} ${
+                        typeof page !== "number" ? "disabled" : ""
+                      }`}
+                    >
+                      <button
+                        onClick={() => typeof page === "number" && setCurrentPage(page)}
+                        disabled={typeof page !== "number"}
+                      >
+                        {page}
+                      </button>
+                    </li>
+                  ))}
+                  <li className={`crm-page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                    <button
+                      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                      disabled={currentPage === totalPages}
+                    >
+                      <i className="bi bi-chevron-right"></i>
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            )}
           </div>
         )}
       </div>
