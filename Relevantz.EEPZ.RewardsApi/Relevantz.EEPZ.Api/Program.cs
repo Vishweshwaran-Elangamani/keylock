@@ -1,4 +1,4 @@
- 
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -14,23 +14,23 @@ using System.IdentityModel.Tokens.Jwt;
 using Serilog;
 using Relevantz.EEPZ.Data.Repository;
 using Relevantz.EEPZ.Core.Services;
- 
+
 // Health checks
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Diagnostics;
- 
-// ⭐ ADDED (metrics)
+
+// ADDED (metrics)
 using Prometheus;
- 
+
 var builder = WebApplication.CreateBuilder(args);
- 
+
 var sharedUploadsPath = Path.GetFullPath(Path.Combine(
     Directory.GetCurrentDirectory(),
     "..", "..",
     "SharedUploads"
 ));
- 
+
 if (!Directory.Exists(sharedUploadsPath))
 {
     Directory.CreateDirectory(sharedUploadsPath);
@@ -41,20 +41,20 @@ else
     Console.WriteLine($"Shared uploads directory exists at: {sharedUploadsPath}");
 }
 builder.Services.AddSingleton(new FileUploadSettings { UploadPath = sharedUploadsPath });
- 
+
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
     .CreateLogger();
- 
+
 builder.Host.UseSerilog();
- 
+
 Log.Information("Starting EEPZ Performance Management Application...");
 Log.Information("Shared Uploads Path: {Path}", sharedUploadsPath);
- 
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
- 
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -63,7 +63,7 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1",
         Description = "Performance Management API"
     });
- 
+
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -73,7 +73,7 @@ builder.Services.AddSwaggerGen(options =>
         In = ParameterLocation.Header,
         Description = "Enter 'Bearer' followed by your JWT token"
     });
- 
+
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -88,17 +88,17 @@ builder.Services.AddSwaggerGen(options =>
             Array.Empty<string>()
         }
     });
- 
+
     options.CustomSchemaIds(type => type.FullName.Replace("+", "."));
 });
- 
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<EEPZDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
- 
+
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey not configured");
- 
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -120,17 +120,17 @@ builder.Services.AddAuthentication(options =>
         NameClaimType = JwtRegisteredClaimNames.Sub
     };
 });
- 
+
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<DbContext>(sp => sp.GetRequiredService<EEPZDbContext>());
- 
+
 builder.Services.AddScoped<IHRNominationRepository, HRNominationRepository>();
 builder.Services.AddScoped<IHRNominationService, HRNominationService>();
 builder.Services.AddScoped<IManagerNominationRepository, ManagerNominationRepository>();
 builder.Services.AddScoped<IManagerNominationService, ManagerNominationService>();
 builder.Services.AddScoped<IEmployeeNominationRepository, EmployeeNominationRepository>();
 builder.Services.AddScoped<IEmployeeNominationService, EmployeeNominationService>();
- 
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -141,28 +141,20 @@ builder.Services.AddCors(options =>
               .WithExposedHeaders("Content-Disposition", "Content-Type");
     });
 });
- 
-/* ===========================
-   Health Checks (DI-based)
-   =========================== */
+
+
 builder.Services.AddHealthChecks()
     .AddCheck("self", () => HealthCheckResult.Healthy("App is running"), tags: new[] { "live" })
     .AddCheck<MySqlDbHealthCheck>("mysql-db", tags: new[] { "ready", "db", "mysql" });
- 
-/* ===========================
-   BUILD APP
-   =========================== */
+
+
 var app = builder.Build();
- 
-/* ===========================
-   ⭐ ADDED — METRICS MIDDLEWARE
-   =========================== */
-app.UseHttpMetrics();               // Collect HTTP metrics
-app.MapMetrics("/metrics");         // Expose /metrics endpoint
- 
-/* ===========================
-   Swagger
-   =========================== */
+
+
+app.UseHttpMetrics();
+app.MapMetrics("/metrics");
+
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -172,26 +164,24 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = string.Empty;
     });
 }
- 
+
 app.UseSerilogRequestLogging();
- 
-/* ===========================
-   Exception Handling
-   =========================== */
+
+
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
- 
+
 app.UseExceptionHandler(errorApp =>
 {
     errorApp.Run(async context =>
     {
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = 500;
- 
+
         var error = context.Features.Get<IExceptionHandlerFeature>()?.Error;
- 
+
         await context.Response.WriteAsJsonAsync(new
         {
             success = false,
@@ -200,20 +190,16 @@ app.UseExceptionHandler(errorApp =>
         });
     });
 });
- 
-/* ===========================
-   Pipeline
-   =========================== */
+
+
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
- 
+
 app.MapControllers();
- 
-/* ===========================
-   Health Endpoints
-   =========================== */
+
+
 app.MapHealthChecks("/health/live", new HealthCheckOptions
 {
     Predicate = check => check.Tags.Contains("live"),
@@ -229,7 +215,7 @@ app.MapHealthChecks("/health/live", new HealthCheckOptions
         });
     }
 }).AllowAnonymous();
- 
+
 app.MapHealthChecks("/health/ready", new HealthCheckOptions
 {
     Predicate = check => check.Tags.Contains("ready"),
@@ -252,7 +238,7 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions
         await context.Response.WriteAsJsonAsync(result);
     }
 }).AllowAnonymous();
- 
+
 try
 {
     Log.Information("EEPZ Performance Management API started successfully on port 5114");
@@ -267,22 +253,20 @@ finally
 {
     Log.CloseAndFlush();
 }
- 
-/* ===========================
-   Support Classes
-   =========================== */
- 
+
+
+
 public class FileUploadSettings
 {
     public string UploadPath { get; set; } = string.Empty;
 }
- 
+
 internal sealed class MySqlDbHealthCheck : IHealthCheck
 {
     private readonly EEPZDbContext _db;
- 
+
     public MySqlDbHealthCheck(EEPZDbContext db) => _db = db;
- 
+
     public async Task<HealthCheckResult> CheckHealthAsync(
         HealthCheckContext context,
         CancellationToken cancellationToken = default)
@@ -291,9 +275,9 @@ internal sealed class MySqlDbHealthCheck : IHealthCheck
         {
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             cts.CancelAfter(TimeSpan.FromSeconds(3));
- 
+
             var canConnect = await _db.Database.CanConnectAsync(cts.Token);
- 
+
             return canConnect
                 ? HealthCheckResult.Healthy("MySQL database reachable")
                 : HealthCheckResult.Unhealthy("MySQL database unreachable");
@@ -304,5 +288,4 @@ internal sealed class MySqlDbHealthCheck : IHealthCheck
         }
     }
 }
- 
- 
+
