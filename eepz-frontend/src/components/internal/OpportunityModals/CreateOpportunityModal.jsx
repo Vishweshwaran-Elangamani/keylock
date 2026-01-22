@@ -88,7 +88,6 @@ const CreateOpportunityModal = ({
     const max = `${aprilDeadlineYear}-04-30`;
     return { minDate: min, maxDate: max };
   }, []);
-  // Prepare department options with placeholder
   const departmentOptions = useMemo(() => {
     const placeholder = { label: "Select Department", value: "" };
     const deptOptions = departments.map((dept) => ({
@@ -97,11 +96,9 @@ const CreateOpportunityModal = ({
     }));
     return [placeholder, ...deptOptions];
   }, [departments]);
-  // Status options with placeholder
   const statusOptions = [
     { label: "Select Status", value: "" },
     { label: "Active", value: "Active" },
-    { label: "Pending", value: "Pending" },
     { label: "Closed", value: "Closed" },
   ];
   const handleChange = (e) => {
