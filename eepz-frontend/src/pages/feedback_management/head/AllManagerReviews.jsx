@@ -1,11 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import {
-  RefreshCw,
-  AlertTriangle,
-  Users,
-  Calendar,
-  User,
-} from "lucide-react";
+import { RefreshCw, AlertTriangle, Users, Calendar, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   employeeApi,
@@ -15,10 +9,8 @@ import FeedbackBreadcrumb from "../../../components/feedback_management/common/F
 import CustomDropdown from "../../../components/project-management/common/CustomDropdown";
 import "../../../styles/feedback/components/AllManagerReviews.css";
 
-const Badge = ({ text, color = "#27235C" }) => (
-  <span className="amr-badge" style={{ backgroundColor: `${color}20`, color }}>
-    {text}
-  </span>
+const Badge = ({ text, variant = "default" }) => (
+  <span className={`amr-badge amr-badge-${variant}`}>{text}</span>
 );
 
 export default function AllManagerReviews() {
@@ -168,11 +160,7 @@ export default function AllManagerReviews() {
       <FeedbackBreadcrumb
         items={[
           {
-            label: (
-              <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>
-                Manager Reviews
-              </span>
-            ),
+            label: <span className="amr-breadcrumb-title">Manager Reviews</span>,
           },
         ]}
       />
@@ -189,6 +177,7 @@ export default function AllManagerReviews() {
             onClick={fetchPeerFeedbacks}
             disabled={refreshing}
             className="amr-refresh-btn"
+            type="button"
           >
             <RefreshCw size={18} className={refreshing ? "amr-spin" : ""} />
             Refresh
@@ -202,7 +191,11 @@ export default function AllManagerReviews() {
               <strong>Error</strong>
               <p>{error}</p>
             </div>
-            <button onClick={() => setError("")} className="amr-alert-close">
+            <button
+              onClick={() => setError("")}
+              className="amr-alert-close"
+              type="button"
+            >
               ×
             </button>
           </div>
@@ -264,7 +257,7 @@ export default function AllManagerReviews() {
                   <div className="amr-card-field">
                     <div className="amr-field-header">
                       <Calendar size={14} />
-                      <span>
+                      <span className="amr-date">
                         {new Date(
                           feedback.createdAt || feedback.submittedAt
                         ).toLocaleDateString("en-US", {
@@ -278,7 +271,7 @@ export default function AllManagerReviews() {
 
                   <div className="amr-feedback-content">
                     {projectContext && (
-                      <Badge text={projectContext} color="#27235C" />
+                      <Badge text={projectContext} variant="primary" />
                     )}
                     <p className="amr-feedback-text">{feedbackText}</p>
                   </div>

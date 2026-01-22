@@ -29,73 +29,6 @@
   margin: 0 auto 12px;
 }
 
-.emp-momupdate-buttons-wrapper {
-  margin: 1.5rem 0 2rem;
-  display: flex;
-  justify-content: center;
-}
-
-.emp-momupdate-buttons-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(200px, 240px));
-  gap: 16px;
-  width: 100%;
-  max-width: 1000px;
-}
-
-.emp-momupdate-btn {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 12px;
-  padding: 16px 24px;
-  height: 56px;
-  border: none;
-  border-radius: 12px;
-  background: #3a4275;
-  color: #ffffff;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 2px 8px rgba(45, 53, 97, 0.25);
-}
-
-.emp-momupdate-btn-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.emp-momupdate-btn-icon .bi {
-  font-size: 1.4rem;
-  color: #ffffff;
-}
-
-.emp-momupdate-btn-label {
-  font-weight: 600;
-  letter-spacing: 0.3px;
-  white-space: nowrap;
-}
-
-.emp-momupdate-btn:hover {
-  background: #3a4275;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(45, 53, 97, 0.35);
-}
-
-
-
-.emp-momupdate-btn:active {
-  transform: translateY(0);
-}
-
-.emp-momupdate-btn:focus-visible {
-  outline: 3px solid #93c5fd;
-  outline-offset: 2px;
-}
-
 @keyframes emd-spin {
   to {
     transform: rotate(360deg);
@@ -198,6 +131,38 @@
   font-size: 1.7rem;
 }
 
+.emd-stat-icon-block-moms {
+  background-color: #edf3ff;
+}
+
+.emd-stat-icon-moms {
+  color: #246bff;
+}
+
+.emd-stat-icon-block-pending {
+  background-color: #f0eaff;
+}
+
+.emd-stat-icon-pending {
+  color: #a855f7;
+}
+
+.emd-stat-icon-block-invites {
+  background-color: #e9fbf4;
+}
+
+.emd-stat-icon-invites {
+  color: #16a34a;
+}
+
+.emd-stat-icon-block-shared {
+  background-color: #fff4df;
+}
+
+.emd-stat-icon-shared {
+  color: #f59e0b;
+}
+
 .emd-stat-center {
   flex: 1;
   display: flex;
@@ -222,89 +187,69 @@
   color: #4b5563;
 }
 
-.emd-actions-row {
-  margin-bottom: 24px;
+.emp-momupdate-buttons-wrapper {
+  margin: 1.5rem 0 2rem;
+  display: flex;
+  justify-content: center;
 }
 
-.emd-action-btn {
+.emp-momupdate-buttons-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(200px, 240px));
+  gap: 16px;
   width: 100%;
+  max-width: 1000px;
+}
+
+.emp-momupdate-btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 16px 24px;
+  height: 56px;
+  border: none;
   border-radius: 12px;
-  padding: 14px 22px;
-  background-color: #fbfcff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-width: 1.5px;
-  border-style: solid;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: background-color 0.2s, box-shadow 0.2s, transform 0.2s;
-}
-
-.emd-action-main {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.emd-action-icon {
-  font-size: 1rem;
-}
-
-.emd-action-primary {
-  border-color: #2f7bf6;
-  color: #2f7bf6;
-}
-
-.emd-action-info {
-  border-color: #1cc0d9;
-  color: #1cc0d9;
-}
-
-.emd-action-success {
-  border-color: #23a45a;
-  color: #23a45a;
-}
-
-.emd-action-warning {
-  border-color: #f5c14f;
-  color: #f6a917;
-}
-
-.emd-action-btn:hover {
-  background-color: #ffffff;
-  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
-  transform: translateY(-2px);
-}
-
-.emd-action-badge {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  font-size: 0.75rem;
+  background: #3a4275;
+  color: #ffffff;
   font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 8px rgba(45, 53, 97, 0.25);
+}
+
+.emp-momupdate-btn-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
   flex-shrink: 0;
 }
 
-.emd-badge-primary {
-  background-color: #2f3c65;
+.emp-momupdate-btn-icon .bi {
+  font-size: 1.4rem;
+  color: #ffffff;
 }
 
-.emd-badge-info {
-  background-color: #08b2cf;
+.emp-momupdate-btn-label {
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
 }
 
-.emd-badge-success {
-  background-color: #1c8f4c;
+.emp-momupdate-btn:hover {
+  background: #3a4275;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(45, 53, 97, 0.35);
 }
 
-.emd-badge-warning {
-  background-color: #ffb014;
-  color: #fff7e6;
+.emp-momupdate-btn:active {
+  transform: translateY(0);
+}
+
+.emp-momupdate-btn:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 2px;
 }
 
 .emd-card {
@@ -643,17 +588,6 @@
     width: 56px;
     height: 56px;
     border-radius: 16px;
-  }
-
-  .emd-action-btn {
-    padding: 12px 16px;
-    font-size: 0.85rem;
-  }
-
-  .emd-action-badge {
-    width: 22px;
-    height: 22px;
-    font-size: 0.7rem;
   }
 
   .emp-momupdate-buttons-wrapper {

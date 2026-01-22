@@ -217,8 +217,7 @@ const MeetingInvitations = () => {
           <nav
             aria-label="breadcrumb"
             className="mi-breadcrumb-nav"
-            style={{ "--bs-breadcrumb-divider": "''" }}
-          >
+            style={{ "--bs-breadcrumb-divider": "''" }}>
             <ol className="breadcrumb mb-0 d-flex align-items-center mi-breadcrumb">
               <li className="breadcrumb-item mi-breadcrumb-item">
                 <button

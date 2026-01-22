@@ -516,7 +516,8 @@ export default function EmployeeFillForm() {
             <li className="eaf-breadcrumb-item">
               <Link
                 to={feedbackDashboardPath.replace("/feedback", "")}
-                className="eaf-breadcrumb-link">
+                className="eaf-breadcrumb-link"
+              >
                 <Home size={18} className="eaf-breadcrumb-icon" />
                 Dashboard{" "}
               </Link>
@@ -529,7 +530,7 @@ export default function EmployeeFillForm() {
               </Link>
             </li>
             <li className="eaf-breadcrumb-separator">/</li>
-            <li className="eaf-breadcrumb-active">
+            <li className="eaf-breadcrumb-item eaf-breadcrumb-active">
               Assigned Forms{" "}
             </li>
           </ol>
@@ -564,7 +565,7 @@ export default function EmployeeFillForm() {
             <ol className="eaf-breadcrumb">
               <li className="eaf-breadcrumb-item">
                 <Link to={feedbackDashboardPath.replace("/feedback", "")} className="eaf-breadcrumb-link">
-                  <Home size={20} className="eaf-breadcrumb-icon" /></Link>
+                  <Home size={16} className="eaf-breadcrumb-icon" /></Link>
               </li>
               <li className="eaf-breadcrumb-separator">/</li>
               <li className="eaf-breadcrumb-item">

@@ -6,10 +6,10 @@ import {
   ArrowLeft,
   Edit,
   RefreshCw,
-  Star,
 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import "../../../styles/feedback/components/EditManagerReview.css";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -62,16 +62,13 @@ export default function EditManagerReview() {
       setError(
         err?.response?.data?.message || err.message || "Failed to load review"
       );
-      console.error("Error:", err);
     } finally {
       setLoadingData(false);
     }
   };
 
   useEffect(() => {
-    if (id) {
-      fetchReview();
-    }
+    if (id) fetchReview();
   }, [id]);
 
   const handleSubmit = async (e) => {
@@ -108,7 +105,6 @@ export default function EditManagerReview() {
       setError(
         err?.response?.data?.message || err.message || "Failed to update review"
       );
-      console.error("Error:", err);
     } finally {
       setLoading(false);
     }
@@ -116,10 +112,7 @@ export default function EditManagerReview() {
 
   if (loadingData) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "60vh" }}
-      >
+      <div className="emr-loading">
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
@@ -128,115 +121,95 @@ export default function EditManagerReview() {
   }
 
   return (
-    <div
-      className="d-flex justify-content-center py-4"
-      style={{ minHeight: "100vh", background: "#f9f9f9" }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "800px",
-          paddingLeft: "1rem",
-          paddingRight: "1rem",
-        }}
-      >
-        <div className="d-flex align-items-start mb-4">
+    <div className="emr-page">
+      <div className="emr-wrapper">
+        <div className="emr-header">
           <button
-            className="btn btn-outline-secondary me-2"
+            className="btn btn-outline-secondary emr-back-btn"
             onClick={() => navigate(-1)}
-            style={{ borderRadius: "var(--radius-md)" }}
+            type="button"
           >
             <ArrowLeft size={16} />
           </button>
-          <div className="flex-grow-1">
-            <h2
-              className="fw-bold mb-1"
-              style={{ color: "var(--color-primary-1)" }}
-            >
-              Edit Review
-            </h2>
-            <p className="mb-0 small text-muted">
+
+          <div className="emr-header-text">
+            <h2 className="emr-title">Edit Review</h2>
+            <p className="emr-subtitle">
               Make changes to your review. Changes will be saved when you click
               Save Changes.
             </p>
           </div>
+
           <button
-            className="btn btn-outline-secondary"
+            className="btn btn-outline-secondary emr-refresh-btn"
             onClick={fetchReview}
             disabled={loadingData}
             title="Refresh"
-            style={{ borderRadius: "var(--radius-md)" }}
+            type="button"
           >
             <RefreshCw
               size={18}
-              style={{
-                animation: loadingData ? "spin 1s linear infinite" : "none",
-              }}
+              className={loadingData ? "emr-spin" : ""}
             />
           </button>
         </div>
 
         {error && (
-          <div
-            className="alert alert-danger d-flex align-items-start gap-2 mb-3"
-            style={{ borderRadius: "var(--radius-md)" }}
-          >
-            <AlertTriangle size={18} className="mt-1 flex-shrink-0" />
-            <div className="flex-grow-1">
+          <div className="alert alert-danger emr-alert emr-alert-error">
+            <AlertTriangle size={18} className="emr-alert-icon" />
+            <div className="emr-alert-content">
               <strong>Error</strong>
               <p className="mb-0 small mt-1">{error}</p>
             </div>
-            <button className="btn-close" onClick={() => setError("")} />
+            <button
+              className="btn-close"
+              onClick={() => setError("")}
+              type="button"
+            />
           </div>
         )}
 
         {success && (
-          <div
-            className="alert alert-success d-flex align-items-center gap-2 mb-3"
-            style={{ borderRadius: "var(--radius-md)" }}
-          >
-            <CheckCircle size={18} className="flex-shrink-0" />
-            <div className="small flex-grow-1">{success}</div>
-            <button className="btn-close" onClick={() => setSuccess("")} />
+          <div className="alert alert-success emr-alert emr-alert-success">
+            <CheckCircle size={18} className="emr-alert-icon" />
+            <div className="small emr-alert-content">{success}</div>
+            <button
+              className="btn-close"
+              onClick={() => setSuccess("")}
+              type="button"
+            />
           </div>
         )}
 
-        <div
-          className="card border-0"
-          style={{
-            border: "1px solid var(--border)",
-            borderRadius: "var(--radius-lg)",
-            boxShadow: "var(--shadow)",
-          }}
-        >
-          <div className="card-body p-4">
+        <div className="card border-0 emr-card">
+          <div className="card-body emr-card-body">
             <form onSubmit={handleSubmit} className="row g-4">
               <div className="col-12">
                 <label className="form-label small fw-bold mb-2">
                   Rating <span className="text-danger">*</span>
                 </label>
-                <div className="d-flex gap-2">
-                  {[1, 2, 3, 4, 5].map((rating) => (
-                    <button
-                      key={rating}
-                      type="button"
-                      className={`btn flex-grow-1 ${
-                        form.rating === String(rating) || form.rating === rating
-                          ? "btn-primary"
-                          : "btn-outline-secondary"
-                      }`}
-                      onClick={() => setForm({ ...form, rating })}
-                      style={{
-                        borderRadius: "var(--radius-md)",
-                        padding: "0.5rem 0.25rem",
-                      }}
-                    >
-                      <div style={{ fontSize: "0.75rem", lineHeight: "1" }}>
-                        <div className="fw-bold">{rating}</div>
-                        <div>{RATING_LABELS[rating]}</div>
-                      </div>
-                    </button>
-                  ))}
+
+                <div className="emr-rating-row">
+                  {[1, 2, 3, 4, 5].map((rating) => {
+                    const isActive =
+                      form.rating === String(rating) || form.rating === rating;
+
+                    return (
+                      <button
+                        key={rating}
+                        type="button"
+                        className={`btn emr-rating-btn ${
+                          isActive ? "btn-primary" : "btn-outline-secondary"
+                        }`}
+                        onClick={() => setForm({ ...form, rating })}
+                      >
+                        <div className="emr-rating-content">
+                          <div className="fw-bold">{rating}</div>
+                          <div>{RATING_LABELS[rating]}</div>
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -244,8 +217,9 @@ export default function EditManagerReview() {
                 <label className="form-label small fw-bold">
                   Review Comment <span className="text-danger">*</span>
                 </label>
+
                 <textarea
-                  className="form-control"
+                  className="form-control emr-textarea"
                   rows={5}
                   value={form.reviewComment}
                   onChange={(e) =>
@@ -253,8 +227,8 @@ export default function EditManagerReview() {
                   }
                   placeholder="Provide detailed feedback on the employee's performance..."
                   required
-                  style={{ borderRadius: "var(--radius-md)" }}
                 />
+
                 <small className="text-muted">
                   {form.reviewComment.length} / 2000 characters
                 </small>
@@ -264,15 +238,15 @@ export default function EditManagerReview() {
                 <label className="form-label small fw-bold">
                   Project Context <span className="text-muted">(Optional)</span>
                 </label>
+
                 <textarea
-                  className="form-control"
+                  className="form-control emr-textarea"
                   rows={3}
                   value={form.projectContext}
                   onChange={(e) =>
                     setForm({ ...form, projectContext: e.target.value })
                   }
                   placeholder="Mention any relevant projects this review is about..."
-                  style={{ borderRadius: "var(--radius-md)" }}
                 />
               </div>
 
@@ -280,38 +254,33 @@ export default function EditManagerReview() {
                 <label className="form-label small fw-bold">
                   Goal Context <span className="text-muted">(Optional)</span>
                 </label>
+
                 <textarea
-                  className="form-control"
+                  className="form-control emr-textarea"
                   rows={3}
                   value={form.goalContext}
                   onChange={(e) =>
                     setForm({ ...form, goalContext: e.target.value })
                   }
                   placeholder="Mention any relevant goals or objectives this review is about..."
-                  style={{ borderRadius: "var(--radius-md)" }}
                 />
               </div>
 
-              <div className="col-12 d-flex gap-2">
+              <div className="col-12 emr-actions">
                 <button
                   type="submit"
-                  className="btn btn-primary flex-grow-1"
+                  className="btn btn-primary emr-save-btn"
                   disabled={loading}
-                  style={{ borderRadius: "var(--radius-md)" }}
                 >
-                  <Save
-                    size={16}
-                    className="me-2"
-                    style={{ display: "inline" }}
-                  />
+                  <Save size={16} className="me-2" />
                   {loading ? "Saving..." : "Save Changes"}
                 </button>
+
                 <button
                   type="button"
-                  className="btn btn-outline-secondary"
+                  className="btn btn-outline-secondary emr-cancel-btn"
                   onClick={() => navigate(-1)}
                   disabled={loading}
-                  style={{ borderRadius: "var(--radius-md)" }}
                 >
                   Cancel
                 </button>
@@ -320,20 +289,14 @@ export default function EditManagerReview() {
           </div>
         </div>
 
-        <div
-          className="card border-0 mt-4"
-          style={{
-            border: "1px solid var(--border)",
-            borderRadius: "var(--radius-lg)",
-            backgroundColor: "#f9f9f9",
-          }}
-        >
+        <div className="card border-0 emr-tips-card">
           <div className="card-body">
-            <div className="d-flex gap-2 mb-2">
-              <Edit size={16} style={{ color: "var(--color-primary-1)" }} />
+            <div className="emr-tips-header">
+              <Edit size={16} className="emr-tips-icon" />
               <h6 className="fw-bold mb-0">Editing Tips</h6>
             </div>
-            <ul className="small mb-0 ps-3">
+
+            <ul className="small mb-0 ps-3 emr-tips-list">
               <li>You can edit the rating, comment, and context information</li>
               <li>Required fields are marked with a red asterisk (*)</li>
               <li>Changes are saved when you click Save Changes</li>
@@ -343,8 +306,6 @@ export default function EditManagerReview() {
             </ul>
           </div>
         </div>
-
-        <style>{`@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}`}</style>
       </div>
     </div>
   );

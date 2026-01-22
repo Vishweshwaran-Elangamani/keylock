@@ -8,7 +8,6 @@
   margin-top: -20px;
 }
 
-
 .aim-loading {
   min-height: 100vh;
   background-color: #f8f9fa;
@@ -63,14 +62,8 @@
 }
 
 .aim-breadcrumb-link:hover {
-  color: #7a1d65;
+  color: #97247e;
   background: rgba(151, 36, 126, 0.08);
-
-
-}
-
-.aim-breadcrumb-home i {
-  font-size: 1rem;
 }
 
 .aim-breadcrumb-separator {
@@ -87,7 +80,7 @@
   font-weight: 600;
 }
 
-.aim-breadcrumb .breadcrumb-item+.breadcrumb-item::before {
+.aim-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
   display: none !important;
   content: none !important;
 }
@@ -95,7 +88,7 @@
 .aim-stat-card {
   cursor: pointer;
   transition: all 0.2s ease;
-  border: 1px solid #27235c;
+  border: 1px solid #000 !important;
   border-radius: 12px;
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
@@ -152,74 +145,110 @@
   font-weight: 500;
 }
 
-
 .aim-search-card {
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-  border: 1px solid #27235c;
+  border: 1px solid #000 !important;
   border-radius: 12px;
   margin-bottom: 16px;
 }
 
 .aim-search-card-body {
-  padding: 12px 16px;
+  padding: 0 !important;
 }
 
-.aim-search-shell {
+.aim-search-card-body > .row {
+  margin: 0 !important;
+  --bs-gutter-x: 0 !important;
+  --bs-gutter-y: 0 !important;
+}
+
+.aim-search-card-body > .row > [class*="col-"] {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+
+.aim-search-wrapper {
   display: flex;
-  align-items: stretch;
-  border-radius: 9999px;
+  align-items: center;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
   overflow: hidden;
-  border: 1px solid #e2e8f0;
-  background-color: #ffffff;
+  background: #ffffff;
+  width: 100%;
+  margin: 0;
+}
+
+.aim-search-wrapper:focus-within {
+  border-color: #e5e7eb;
+  box-shadow: none;
 }
 
 .aim-search-icon {
-  display: flex;
+  flex: 0 0 42px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0 12px;
   color: #9ca3af;
 }
 
 .aim-search-input {
-  border: none;
-  box-shadow: none;
-  border-radius: 0;
+  flex: 1 1 auto;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
   font-size: 0.9rem;
+  padding: 0.8rem 0.75rem;
+  color: #111827;
+  background: transparent;
 }
 
-.aim-search-input:focus {
-  box-shadow: none;
+.aim-search-input::placeholder {
+  color: #9ca3af;
+}
+
+.aim-search-separator {
+  width: 1px;
+  height: 22px;
+  background: #e5e7eb;
+  flex-shrink: 0;
+}
+
+.aim-search-action-btn {
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0 26px;
+  white-space: nowrap;
+  min-width: 140px;
+  height: 40px;
 }
 
 .aim-search-btn {
-  border: none;
-  outline: none;
-  padding: 0 18px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  border-radius: 0;
-  white-space: nowrap;
+  background: #27235c;
+  color: #ffffff;
 }
 
-.aim-search-btn-primary {
-  background-color: #47407a;
+.aim-search-btn:hover {
+  background: #221e4f;
+}
+
+.aim-search-clear-btn {
+  background: #4b5563;
   color: #ffffff;
-  border-left: 1px solid #47407a;
   border-top-right-radius: 9999px;
   border-bottom-right-radius: 9999px;
 }
 
-
-.aim-search-btn-cancel {
-  background-color: #5f6472;
-  color: #ffffff;
-  border-left: 1px solid #5f6472;
-  border-top-right-radius: 9999px;
-  border-bottom-right-radius: 9999px;
+.aim-search-clear-btn:hover {
+  background: #374151;
 }
 
 .aim-count-badge {
@@ -235,7 +264,7 @@
 }
 
 .aim-empty-card {
-  border: 1px solid #27235c;
+  border: 1px solid #000 !important;
   border-radius: 12px;
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
@@ -259,7 +288,7 @@
 
 .aim-item-card {
   transition: all 0.2s ease;
-  border: 1px solid #27235c;
+  border: 1px solid #000 !important;
   border-radius: 12px;
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
@@ -313,7 +342,6 @@
   font-weight: 600;
 }
 
-
 @media (max-width: 992px) {
   .aim-container {
     padding-left: 16px !important;
@@ -323,11 +351,16 @@
 
 @media (max-width: 768px) {
   .aim-search-card-body {
-    padding: 10px 12px;
+    padding: 0 12px;
   }
 
   .aim-count-badge {
     margin-top: 8px;
+  }
+
+  .aim-search-action-btn {
+    min-width: 120px;
+    padding: 0 18px;
   }
 }
 

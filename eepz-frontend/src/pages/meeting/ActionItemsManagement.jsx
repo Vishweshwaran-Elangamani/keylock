@@ -6,10 +6,7 @@ import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "../../styles/mom/components/ActionItemsManagement.css";
-
-import { Home } from "lucide-react";
-
-const PRIMARY = "#5E4B9A";
+import { Home, Search, X } from "lucide-react";
 
 const ActionItemsManagement = () => {
   const navigate = useNavigate();
@@ -96,8 +93,9 @@ const ActionItemsManagement = () => {
 
   const handleSearchClick = () => {
     const trimmed = searchInput.trim();
+    if (!trimmed) return;
     setSearchTerm(trimmed);
-    setIsSearching(trimmed.length > 0);
+    setIsSearching(true);
   };
 
   const handleCancelClick = () => {
@@ -121,14 +119,11 @@ const ActionItemsManagement = () => {
       </div>
     );
   }
+
   return (
     <div className="aim-page">
       <div className="aim-container container-fluid px-4 py-4">
-        <nav
-          aria-label="breadcrumb"
-          className="aim-breadcrumb"
-          style={{ "--bs-breadcrumb-divider": "''" }}
-        >
+        <nav aria-label="breadcrumb" className="aim-breadcrumb">
           <ol className="breadcrumb mb-0 d-flex align-items-center aim-breadcrumb-list">
             <li className="breadcrumb-item aim-breadcrumb-item">
               <button
@@ -204,10 +199,11 @@ const ActionItemsManagement = () => {
           <div className="card-body aim-search-card-body">
             <div className="row g-3 align-items-center">
               <div className="col-lg-9">
-                <div className="aim-search-shell">
+                <div className="aim-search-wrapper">
                   <span className="aim-search-icon">
-                    <i className="bi bi-search" />
+                    <Search size={18} />
                   </span>
+
                   <input
                     type="text"
                     className="form-control aim-search-input"
@@ -218,27 +214,31 @@ const ActionItemsManagement = () => {
                       if (e.key === "Enter") handleSearchClick();
                     }}
                   />
+
+                  <div className="aim-search-separator" />
+
                   {isSearching ? (
                     <button
                       type="button"
                       onClick={handleCancelClick}
-                      className="aim-search-btn aim-search-btn-cancel"
+                      className="aim-search-action-btn aim-search-clear-btn"
                     >
-                      <i className="bi bi-x" />
+                      <X size={14} />
                       Cancel
                     </button>
                   ) : (
                     <button
                       type="button"
                       onClick={handleSearchClick}
-                      className="aim-search-btn aim-search-btn-primary"
+                      className="aim-search-action-btn aim-search-btn"
                     >
-                      <i className="bi bi-search" />
+                      <Search size={16} />
                       Search
                     </button>
                   )}
                 </div>
               </div>
+
               <div className="col-lg-3 text-lg-end">
                 <span className="aim-count-badge">
                   Showing {filteredItems.length} of {actionItems.length} tasks
@@ -269,6 +269,7 @@ const ActionItemsManagement = () => {
                 {filteredItems.map((item) => {
                   const overdueStatus = isOverdue(item);
                   const meetingTitle = getMeetingTitle(item);
+
                   return (
                     <div key={item.actionItemId} className="col-lg-6 col-xl-4">
                       <div className="card aim-item-card h-100">
@@ -302,12 +303,24 @@ const ActionItemsManagement = () => {
                                 )}
                               </span>
                             </div>
+
                             {item.assignedByEmployeeName && (
                               <div className="aim-item-meta-row">
                                 <strong>Assigned by:</strong>
                                 <span>{item.assignedByEmployeeName}</span>
                               </div>
                             )}
+
+                            {!item.assignedByEmployeeName &&
+                              item.assignedByEmployeeId && (
+                                <div className="aim-item-meta-row">
+                                  <strong>Assigned by:</strong>
+                                  <span>
+                                    {employeeMap[item.assignedByEmployeeId] ||
+                                      "—"}
+                                  </span>
+                                </div>
+                              )}
                           </div>
                         </div>
                       </div>

@@ -13,20 +13,9 @@ import "../../styles/mom/components/ManagerMomDashboard.css";
 
 const MomPaginationDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
-  const [position, setPosition] = useState({ top: 0, left: 0 });
   const triggerRef = useRef(null);
   const dropdownRef = useRef(null);
   const selected = options.find((o) => o === value) || options[0];
-
-  useEffect(() => {
-    if (open && triggerRef.current) {
-      const rect = triggerRef.current.getBoundingClientRect();
-      setPosition({
-        top: rect.bottom + window.scrollY + 4,
-        left: rect.left + window.scrollX,
-      });
-    }
-  }, [open]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -40,17 +29,13 @@ const MomPaginationDropdown = ({ value, onChange, options }) => {
       }
     };
 
-    if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
+    if (open) document.addEventListener("mousedown", handleClickOutside);
 
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [open]);
 
   return (
-    <div className="mom-pagination-dropdown">
+    <div className={`mom-pagination-dropdown ${open ? "open" : ""}`}>
       <button
         ref={triggerRef}
         type="button"
@@ -78,35 +63,22 @@ const MomPaginationDropdown = ({ value, onChange, options }) => {
       </button>
 
       {open && (
-        <>
-          <div
-            className="mom-pagination-dropdown-backdrop"
-            onClick={() => setOpen(false)}
-          />
-          <div
-            ref={dropdownRef}
-            className="mom-pagination-dropdown-menu"
-            style={{
-              top: `${position.top}px`,
-              left: `${position.left}px`,
-            }}
-          >
-            {options.map((opt) => (
-              <div
-                key={opt}
-                className={`mom-pagination-dropdown-option ${
-                  opt === value ? "selected" : ""
-                }`}
-                onClick={() => {
-                  onChange(opt);
-                  setOpen(false);
-                }}
-              >
-                {opt}
-              </div>
-            ))}
-          </div>
-        </>
+        <div ref={dropdownRef} className="mom-pagination-dropdown-menu">
+          {options.map((opt) => (
+            <div
+              key={opt}
+              className={`mom-pagination-dropdown-option ${
+                opt === value ? "selected" : ""
+              }`}
+              onClick={() => {
+                onChange(opt);
+                setOpen(false);
+              }}
+            >
+              {opt}
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
@@ -145,11 +117,8 @@ const ManagerMomDashboard = () => {
 
   const loadDashboardData = async (silentRefresh = false) => {
     try {
-      if (!silentRefresh) {
-        setLoading(true);
-      } else {
-        setRefreshing(true);
-      }
+      if (!silentRefresh) setLoading(true);
+      else setRefreshing(true);
 
       const [myMomsRes, meetingsRes, employeesRes, actionItemsAssignedByMeRes] =
         await Promise.all([
@@ -226,13 +195,8 @@ const ManagerMomDashboard = () => {
     }
   };
 
-  const openMeetingDetails = (meeting) => {
-    setSelectedMeeting(meeting);
-  };
-
-  const closeMeetingDetails = () => {
-    setSelectedMeeting(null);
-  };
+  const openMeetingDetails = (meeting) => setSelectedMeeting(meeting);
+  const closeMeetingDetails = () => setSelectedMeeting(null);
 
   const formatDateTime = (isoString) => {
     if (!isoString) return "−";
@@ -245,30 +209,8 @@ const ManagerMomDashboard = () => {
     return `${dd}-${mm}-${yyyy} ${hh}:${min}`;
   };
 
-  const formatDate = (isoString) => {
-    if (!isoString) return "−";
-    const date = new Date(isoString);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
-  const isOverdue = (dueDate, status) => {
-    return status === "Pending" && new Date(dueDate) < new Date();
-  };
-
-  const getFilteredActionItems = () => {
-    return actionItems.filter((item) => {
-      if (actionItemFilter === "all") return true;
-      if (actionItemFilter === "pending") return item.status === "Pending";
-      if (actionItemFilter === "completed") return item.status === "Completed";
-      if (actionItemFilter === "overdue")
-        return isOverdue(item.dueDate, item.status);
-      return true;
-    });
-  };
+  const isOverdue = (dueDate, status) =>
+    status === "Pending" && new Date(dueDate) < new Date();
 
   const safeTotal = upcomingMeetings.length;
   const perPage = viewMode === "grid" ? 9 : itemsPerPage;
@@ -309,6 +251,13 @@ const ManagerMomDashboard = () => {
     return pages;
   };
 
+  const getProgressWidthClass = (accepted, total) => {
+    if (!total || total <= 0) return "mm-bar-w-0";
+    const pct = Math.round((accepted / total) * 100);
+    const safe = Math.max(0, Math.min(100, pct));
+    return `mm-bar-w-${safe}`;
+  };
+
   if (loading) {
     return (
       <div className="managermom-loading">
@@ -326,11 +275,7 @@ const ManagerMomDashboard = () => {
     <div className="managermom-page">
       <div className="row justify-content-center">
         <div className="col-lg-10 col-xl-9">
-          <nav
-            aria-label="breadcrumb"
-            className="sched-breadcrumb-nav"
-            style={{ "--bs-breadcrumb-divider": "''" }}
-          >
+          <nav aria-label="breadcrumb" className="sched-breadcrumb-nav">
             <ol className="breadcrumb mb-0 d-flex align-items-center sched-breadcrumb">
               <li className="breadcrumb-item d-flex align-items-center">
                 <button
@@ -361,21 +306,18 @@ const ManagerMomDashboard = () => {
             count={stats.teamMomsCount}
             label="Pending Forms"
           />
-
           <StatCard
             icon="bi-check-circle"
             variant="submitted"
             count={stats.oneOnOnesCount}
             label="Submitted Forms"
           />
-
           <StatCard
             icon="bi-star"
             variant="reviews"
             count={stats.overdueActionsCount}
             label="Reviews Received"
           />
-
           <StatCard
             icon="bi-people"
             variant="peer"
@@ -449,6 +391,7 @@ const ManagerMomDashboard = () => {
                     <th>Actions</th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {paginatedMeetings.length === 0 ? (
                     <tr>
@@ -460,84 +403,86 @@ const ManagerMomDashboard = () => {
                       </td>
                     </tr>
                   ) : (
-                    paginatedMeetings.map((meeting) => (
-                      <tr
-                        key={meeting.meetingId}
-                        className="managermom-table-row"
-                        onClick={() => openMeetingDetails(meeting)}
-                      >
-                        <td>
-                          <div className="managermom-meeting-title-cell">
-                            <span className="fw-semibold">
-                              {meeting.meetingTitle}
-                            </span>
-                          </div>
-                        </td>
-                        <td>
-                          <span className="text-muted">
-                            {formatDateTime(meeting.meetingDate)}
-                          </span>
-                        </td>
-                        <td>
-                          <span className="badge managermom-type-badge">
-                            {meeting.meetingType || "General"}
-                          </span>
-                        </td>
-                        <td>
-                          <div className="managermom-attendance">
-                            <div className="progress managermom-progress">
-                              <div
-                                className="progress-bar bg-success"
-                                role="progressbar"
-                                style={{
-                                  width: `${
-                                    meeting.rsvpTotalInvitations > 0
-                                      ? (meeting.rsvpAcceptedCount /
-                                          meeting.rsvpTotalInvitations) *
-                                        100
-                                      : 0
-                                  }%`,
-                                }}
-                              ></div>
+                    paginatedMeetings.map((meeting) => {
+                      const widthClass = getProgressWidthClass(
+                        meeting.rsvpAcceptedCount,
+                        meeting.rsvpTotalInvitations
+                      );
+
+                      return (
+                        <tr
+                          key={meeting.meetingId}
+                          className="managermom-table-row"
+                          onClick={() => openMeetingDetails(meeting)}
+                        >
+                          <td>
+                            <div className="managermom-meeting-title-cell">
+                              <span className="fw-semibold">
+                                {meeting.meetingTitle}
+                              </span>
                             </div>
-                            <small className="text-muted">
-                              {meeting.rsvpAcceptedCount}/
-                              {meeting.rsvpTotalInvitations}
-                            </small>
-                          </div>
-                        </td>
-                        <td>
-                          {meeting.rsvpAcceptedCount ===
-                            meeting.rsvpTotalInvitations &&
-                          meeting.rsvpTotalInvitations > 0 ? (
-                            <span className="badge bg-success">
-                              {" "}
-                              All Accepted
+                          </td>
+
+                          <td>
+                            <span className="text-muted">
+                              {formatDateTime(meeting.meetingDate)}
                             </span>
-                          ) : meeting.rsvpAcceptedCount > 0 ? (
-                            <span className="badge bg-warning text-dark">
-                              Pending
+                          </td>
+
+                          <td>
+                            <span className="badge managermom-type-badge">
+                              {meeting.meetingType || "General"}
                             </span>
-                          ) : (
-                            <span className="badge bg-secondary">
-                              No Response
-                            </span>
-                          )}
-                        </td>
-                        <td>
-                          <button
-                            className="btn btn-sm managermom-view-btn"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openMeetingDetails(meeting);
-                            }}
-                          >
-                            <i className="bi bi-eye me-1"></i>
-                            View
-                          </button>
-                        </td>
-                      </tr>
-                    ))
+                          </td>
+
+                          <td>
+                            <div className="managermom-attendance">
+                              <div className="progress managermom-progress">
+                                <div
+                                  className={`progress-bar bg-success ${widthClass}`}
+                                  role="progressbar"
+                                ></div>
+                              </div>
+                              <small className="text-muted">
+                                {meeting.rsvpAcceptedCount}/
+                                {meeting.rsvpTotalInvitations}
+                              </small>
+                            </div>
+                          </td>
+
+                          <td>
+                            {meeting.rsvpAcceptedCount ===
+                              meeting.rsvpTotalInvitations &&
+                            meeting.rsvpTotalInvitations > 0 ? (
+                              <span className="badge bg-success">
+                                All Accepted
+                              </span>
+                            ) : meeting.rsvpAcceptedCount > 0 ? (
+                              <span className="badge bg-warning text-dark">
+                                Pending
+                              </span>
+                            ) : (
+                              <span className="badge bg-secondary">
+                                No Response
+                              </span>
+                            )}
+                          </td>
+
+                          <td>
+                            <button
+                              className="btn btn-sm managermom-view-btn"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openMeetingDetails(meeting);
+                              }}
+                            >
+                              <i className="bi bi-eye me-1"></i>
+                              View
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
                   )}
                 </tbody>
               </table>
@@ -580,6 +525,7 @@ const ManagerMomDashboard = () => {
                         <span className="managermom-arrow-icon">‹</span>
                       </button>
                     </li>
+
                     {getPageNumbers().map((page, idx) =>
                       page === "..." ? (
                         <li
@@ -604,6 +550,7 @@ const ManagerMomDashboard = () => {
                         </li>
                       )
                     )}
+
                     <li
                       className={`managermom-page-item ${
                         validCurrentPage === totalPages ? "disabled" : ""
@@ -631,57 +578,58 @@ const ManagerMomDashboard = () => {
                   <p className="managermom-empty-text">No upcoming meetings</p>
                 </div>
               ) : (
-                paginatedMeetings.map((meeting) => (
-                  <div key={meeting.meetingId} className="col-lg-4 col-md-6">
-                    <div
-                      className="h-100 managermom-meeting-card"
-                      onClick={() => openMeetingDetails(meeting)}
-                    >
-                      <div className="card-body">
-                        <div className="managermom-meeting-card-header">
-                          <div className="managermom-card-avatar">
-                            <i className="bi bi-calendar-event managermom-card-avatar-icon"></i>
-                          </div>
-                          <span className="badge managermom-type-badge">
-                            {" "}
-                            {meeting.meetingType || "General"}
-                          </span>
-                        </div>
-                        <h6 className="card-title fw-semibold mb-2">
-                          {meeting.meetingTitle}
-                        </h6>
-                        <p className="text-muted small mb-3">
-                          <i className="bi bi-clock me-1"></i>
-                          {formatDateTime(meeting.meetingDate)}
-                        </p>
-                        <div className="managermom-meeting-card-footer">
-                          <div>
-                            <small className="text-muted">Attendance</small>
-                            <div className="fw-semibold">
-                              {meeting.rsvpAcceptedCount}/
-                              {meeting.rsvpTotalInvitations}
+                paginatedMeetings.map((meeting) => {
+                  const widthClass = getProgressWidthClass(
+                    meeting.rsvpAcceptedCount,
+                    meeting.rsvpTotalInvitations
+                  );
+
+                  return (
+                    <div key={meeting.meetingId} className="col-lg-4 col-md-6">
+                      <div
+                        className="h-100 managermom-meeting-card"
+                        onClick={() => openMeetingDetails(meeting)}
+                      >
+                        <div className="card-body">
+                          <div className="managermom-meeting-card-header">
+                            <div className="managermom-card-avatar">
+                              <i className="bi bi-calendar-event managermom-card-avatar-icon"></i>
                             </div>
+                            <span className="badge managermom-type-badge">
+                              {meeting.meetingType || "General"}
+                            </span>
                           </div>
-                          <div className="progress managermom-card-progress">
-                            <div
-                              className="progress-bar bg-success"
-                              role="progressbar"
-                              style={{
-                                width: `${
-                                  meeting.rsvpTotalInvitations > 0
-                                    ? (meeting.rsvpAcceptedCount /
-                                        meeting.rsvpTotalInvitations) *
-                                      100
-                                    : 0
-                                }%`,
-                              }}
-                            ></div>
+
+                          <h6 className="card-title fw-semibold mb-2">
+                            {meeting.meetingTitle}
+                          </h6>
+
+                          <p className="text-muted small mb-3">
+                            <i className="bi bi-clock me-1"></i>
+                            {formatDateTime(meeting.meetingDate)}
+                          </p>
+
+                          <div className="managermom-meeting-card-footer">
+                            <div>
+                              <small className="text-muted">Attendance</small>
+                              <div className="fw-semibold">
+                                {meeting.rsvpAcceptedCount}/
+                                {meeting.rsvpTotalInvitations}
+                              </div>
+                            </div>
+
+                            <div className="progress managermom-card-progress">
+                              <div
+                                className={`progress-bar bg-success ${widthClass}`}
+                                role="progressbar"
+                              ></div>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
 
@@ -702,6 +650,7 @@ const ManagerMomDashboard = () => {
                         <span className="managermom-arrow-icon">‹</span>
                       </button>
                     </li>
+
                     {getPageNumbers().map((page, idx) =>
                       page === "..." ? (
                         <li
@@ -726,6 +675,7 @@ const ManagerMomDashboard = () => {
                         </li>
                       )
                     )}
+
                     <li
                       className={`managermom-page-item ${
                         validCurrentPage === totalPages ? "disabled" : ""
@@ -761,9 +711,7 @@ const StatCard = ({ icon, variant, count, label }) => (
   <div className="col-lg-3 col-md-6 col-sm-6">
     <div className="managermom-stat-card">
       <div className="managermom-stat-inner">
-        <div
-          className={`managermom-stat-icon managermom-stat-icon-${variant}`}
-        >
+        <div className={`managermom-stat-icon managermom-stat-icon-${variant}`}>
           <i className={`${icon} managermom-stat-icon-glyph`}></i>
         </div>
         <div className="managermom-stat-center">

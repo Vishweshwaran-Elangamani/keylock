@@ -4,8 +4,6 @@ import rsvpService from "../../services/meeting/rsvpService";
 import employeeService from "../../services/meeting/employeeservice";
 import toastr from "toastr";
 import { useNavigate, useLocation } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap-icons/font/bootstrap-icons.css";
 import { Home } from "lucide-react";
 import MeetingDetailsModal from "../../components/meeting/modals/MeetingDetailsModal";
 import SharedMomsModal from "../../components/meeting/modals/SharedMomsModal";
@@ -61,6 +59,7 @@ const EmployeeMomDashboard = () => {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
+
       const [myMomsRes, actionItemsRes, invitationsRes, sharedRes] =
         await Promise.all([
           momService.getMyMoms(),
@@ -83,6 +82,7 @@ const EmployeeMomDashboard = () => {
       });
 
       const activity = [];
+
       if (myMomsRes.data) {
         myMomsRes.data.slice(0, 3).forEach((mom) => {
           activity.push({
@@ -96,6 +96,7 @@ const EmployeeMomDashboard = () => {
           });
         });
       }
+
       if (invitationsRes.data) {
         invitationsRes.data.slice(0, 2).forEach((inv) => {
           activity.push({
@@ -146,7 +147,7 @@ const EmployeeMomDashboard = () => {
     setShowSharedModal(false);
   };
 
-  if (loading)
+  if (loading) {
     return (
       <div className="emd-loading-container">
         <div className="emd-loading-content">
@@ -157,6 +158,7 @@ const EmployeeMomDashboard = () => {
         </div>
       </div>
     );
+  }
 
   return (
     <div className="emd-page">
@@ -182,8 +184,7 @@ const EmployeeMomDashboard = () => {
         <div className="row g-3 emd-stats-row">
           <StatCard
             icon="bi-file-text"
-            bgColor="#EDF3FF"
-            iconColor="#246BFF"
+            variant="moms"
             count={stats.myMoms}
             label="MY MOMS"
             onClick={() => navigate("/employee/dashboard/meetmom/my-moms")}
@@ -191,8 +192,7 @@ const EmployeeMomDashboard = () => {
 
           <StatCard
             icon="bi-clock-history"
-            bgColor="#F0EAFF"
-            iconColor="#A855F7"
+            variant="pending"
             count={stats.pendingActionItems}
             label="PENDING ACTIONS"
             onClick={() => navigate("/employee/dashboard/meetmom/action-items")}
@@ -200,8 +200,7 @@ const EmployeeMomDashboard = () => {
 
           <StatCard
             icon="bi-envelope-open"
-            bgColor="#E9FBF4"
-            iconColor="#16A34A"
+            variant="invites"
             count={stats.meetingInvitations}
             label="INVITATIONS"
             onClick={() => navigate("/employee/dashboard/meetmom/invitations")}
@@ -209,8 +208,7 @@ const EmployeeMomDashboard = () => {
 
           <StatCard
             icon="bi-share"
-            bgColor="#FFF4DF"
-            iconColor="#F59E0B"
+            variant="shared"
             count={stats.sharedMoms}
             label="SHARED MOMS"
             onClick={openSharedModal}
@@ -433,11 +431,11 @@ const EmployeeMomDashboard = () => {
   );
 };
 
-const StatCard = ({ icon, bgColor, iconColor, count, label, onClick }) => (
+const StatCard = ({ icon, variant, count, label, onClick }) => (
   <div className="col-xl-3 col-lg-6 col-md-6 col-sm-6 col-12">
     <div className="emd-stat-card-horizontal" onClick={onClick}>
-      <div className="emd-stat-icon-block" style={{ backgroundColor: bgColor }}>
-        <i className={`${icon} emd-stat-icon`} style={{ color: iconColor }} />
+      <div className={`emd-stat-icon-block emd-stat-icon-block-${variant}`}>
+        <i className={`${icon} emd-stat-icon emd-stat-icon-${variant}`} />
       </div>
       <div className="emd-stat-center">
         <div className="emd-stat-center-count">{count}</div>

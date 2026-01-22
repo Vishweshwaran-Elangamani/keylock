@@ -1,0 +1,178 @@
+.emr-page {
+  min-height: 100vh;
+  background: #f9f9f9;
+  display: flex;
+  justify-content: center;
+  padding: 1.25rem 0;
+}
+
+.emr-wrapper {
+  width: 100%;
+  max-width: 800px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.emr-loading {
+  min-height: 60vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.emr-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.emr-back-btn {
+  border-radius: var(--radius-md);
+}
+
+.emr-header-text {
+  flex: 1;
+}
+
+.emr-title {
+  margin: 0;
+  font-weight: 700;
+  color: var(--color-primary-1);
+  text-align: left;
+}
+
+.emr-subtitle {
+  margin: 0.2rem 0 0;
+  font-size: 0.8125rem;
+  color: #6b7280;
+  text-align: left;
+}
+
+.emr-refresh-btn {
+  border-radius: var(--radius-md);
+}
+
+.emr-spin {
+  animation: emr-spin 1s linear infinite;
+}
+
+@keyframes emr-spin {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Alerts */
+.emr-alert {
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.emr-alert-icon {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.emr-alert-content {
+  flex: 1;
+}
+
+/* Main Card */
+.emr-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.emr-card-body {
+  padding: 1.5rem;
+}
+
+/* Rating Buttons */
+.emr-rating-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.emr-rating-btn {
+  flex: 1;
+  border-radius: var(--radius-md);
+  padding: 0.5rem 0.25rem;
+}
+
+.emr-rating-content {
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+/* Textareas */
+.emr-textarea {
+  border-radius: var(--radius-md);
+}
+
+/* Actions */
+.emr-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.emr-save-btn {
+  flex: 1;
+  border-radius: var(--radius-md);
+}
+
+.emr-cancel-btn {
+  border-radius: var(--radius-md);
+}
+
+/* Tips Card */
+.emr-tips-card {
+  margin-top: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background-color: #f9f9f9;
+}
+
+.emr-tips-header {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.emr-tips-icon {
+  color: var(--color-primary-1);
+}
+
+.emr-tips-list {
+  text-align: left;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .emr-header {
+    flex-wrap: wrap;
+  }
+
+  .emr-rating-row {
+    flex-direction: column;
+  }
+
+  .emr-actions {
+    flex-direction: column;
+  }
+
+  .emr-save-btn {
+    width: 100%;
+  }
+
+  .emr-cancel-btn {
+    width: 100%;
+  }
+}

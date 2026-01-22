@@ -24,26 +24,7 @@ const HRMomDetails = () => {
   const [mom, setMom] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const accent = "#97247e";
-
-  const [homeStyle, setHomeStyle] = useState({
-    color: accent,
-    textDecoration: "none",
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "0.375rem",
-    fontWeight: 500,
-  });
-
-  const [meetStyle, setMeetStyle] = useState({
-    color: accent,
-    textDecoration: "none",
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "0.375rem",
-    fontWeight: 500,
-  });
 
   useEffect(() => {
     if (momId) {
@@ -56,12 +37,10 @@ const HRMomDetails = () => {
     setError(null);
     try {
       const response = await momService.getMomById(momId);
-
       let momData = null;
       if (response?.success && response?.data) momData = response.data;
       else if (response?.data) momData = response.data;
       else if (response) momData = response;
-
       setMom(momData);
     } catch (err) {
       console.error("Fetch MOM details error:", err);
@@ -201,11 +180,7 @@ const HRMomDetails = () => {
   return (
     <div className="hrmom-wrapper">
       <div className="hrmom-container">
-        <nav
-          aria-label="breadcrumb"
-          className="hrmom-breadcrumb-nav"
-          style={{ "--bs-breadcrumb-divider": "''" }}
-        >
+        <nav aria-label="breadcrumb" className="hrmom-breadcrumb-nav">
           <ol className="breadcrumb hrmom-breadcrumb">
             <li className="breadcrumb-item hrmom-breadcrumb-item">
               <a
@@ -214,21 +189,9 @@ const HRMomDetails = () => {
                   e.preventDefault();
                   navigate("/hr/dashboard");
                 }}
-                onMouseEnter={() =>
-                  setHomeStyle((s) => ({
-                    ...s,
-                    color: accent,
-                  }))
-                }
-                onMouseLeave={() =>
-                  setHomeStyle((s) => ({
-                    ...s,
-                    color: accent,
-                  }))
-                }
-                style={homeStyle}
+                className="hrmom-breadcrumb-link"
               >
-                <Home size={18} color={accent} />
+                <Home size={18} />
               </a>
               <span className="hrmom-breadcrumb-slash">/</span>
             </li>
@@ -240,19 +203,7 @@ const HRMomDetails = () => {
                   e.preventDefault();
                   navigate("/hr/dasboard/meetmom");
                 }}
-                onMouseEnter={() =>
-                  setMeetStyle((s) => ({
-                    ...s,
-                    color: accent,
-                  }))
-                }
-                onMouseLeave={() =>
-                  setMeetStyle((s) => ({
-                    ...s,
-                    color: accent,
-                  }))
-                }
-                style={meetStyle}
+                className="hrmom-breadcrumb-link"
               >
                 Meetings and MoM
               </a>
@@ -271,7 +222,7 @@ const HRMomDetails = () => {
         <div className="hrmom-stats-grid">
           <div className="hrmom-stat-card">
             <div className="hrmom-stat-content">
-              <MessageSquare size={24}className="hrmom-stat-icon hrmom-stat-icon-info"/>
+              <MessageSquare size={24} className="hrmom-stat-icon hrmom-stat-icon-info"/>
               <div className="hrmom-stat-info">
                 <div className="hrmom-stat-value">
                   {Array.isArray(mom.discussionPoints)
