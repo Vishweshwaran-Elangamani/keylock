@@ -454,8 +454,7 @@ const ManagerSLADashboard = () => {
                 : ""
             }`}
           >
-            <div className="mgr-sla-filter-actions">
-            </div>
+            <div className="mgr-sla-filter-actions"></div>
           </div>
         </div>
       </div>

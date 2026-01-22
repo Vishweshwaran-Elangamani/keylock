@@ -85,8 +85,8 @@ const CreateProject = () => {
         : [];
       const departmentsData = Array.isArray(departmentsRes?.data)
         ? departmentsRes.data.map((dep) => ({
-            value: dep.departmentId, 
-            label: dep.departmentName, 
+            value: dep.departmentId,
+            label: dep.departmentName,
           }))
         : [];
       const businessUnitsData = Array.isArray(businessUnitsRes?.data)
@@ -94,7 +94,7 @@ const CreateProject = () => {
         : [];
 
       setEmployees(employeesData);
-      setDepartments(departmentsData); 
+      setDepartments(departmentsData);
       setBusinessUnits(businessUnitsData);
     } catch (error) {
       console.error("Dropdown Fetch Error:", error);
@@ -199,7 +199,7 @@ const CreateProject = () => {
 
       const projectData = {
         ...formData,
-        department: departmentName, 
+        department: departmentName,
         startDate: new Date(formData.startDate).toISOString(),
         endDate: formData.endDate
           ? new Date(formData.endDate).toISOString()

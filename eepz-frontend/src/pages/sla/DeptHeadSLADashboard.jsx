@@ -108,7 +108,13 @@ const DeptHeadSLADashboard = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [activeSearchTerm, selectedStatus, selectedPeriod, activeTab, itemsPerPage]);
+  }, [
+    activeSearchTerm,
+    selectedStatus,
+    selectedPeriod,
+    activeTab,
+    itemsPerPage,
+  ]);
 
   const fetchAllData = async () => {
     setLoading(true);
@@ -316,7 +322,8 @@ const DeptHeadSLADashboard = () => {
         : allL2Escalations.filter((e) => e.period === selectedPeriod);
 
     const openCount = filteredByPeriod.filter(
-      (e) => e.escalationStatus === "Pending" || e.escalationStatus === "InProgress"
+      (e) =>
+        e.escalationStatus === "Pending" || e.escalationStatus === "InProgress"
     ).length;
 
     const approvedCount = filteredByPeriod.filter(
@@ -401,7 +408,9 @@ const DeptHeadSLADashboard = () => {
 
   return (
     <div className="dh-sla-container">
-      <Breadcrumb items={[{ label: "SLA Compliance" }, { label: "Department Head" }]} />
+      <Breadcrumb
+        items={[{ label: "SLA Compliance" }, { label: "Department Head" }]}
+      />
 
       {error && (
         <div className="dh-sla-error-alert">
@@ -556,7 +565,9 @@ const DeptHeadSLADashboard = () => {
                     <td>
                       <div className="dh-sla-employee-cell">
                         <div className="dh-sla-employee-info">
-                          <div className="dh-sla-employee-name">{esc.employeeName}</div>
+                          <div className="dh-sla-employee-name">
+                            {esc.employeeName}
+                          </div>
                           <div className="dh-sla-employee-email">
                             {esc.employeeEmail || "No email"}
                           </div>
@@ -565,7 +576,9 @@ const DeptHeadSLADashboard = () => {
                     </td>
 
                     <td>
-                      <div className="dh-sla-manager-name">{esc.managerName}</div>
+                      <div className="dh-sla-manager-name">
+                        {esc.managerName}
+                      </div>
                     </td>
 
                     <td>
@@ -596,7 +609,9 @@ const DeptHeadSLADashboard = () => {
                     </td>
 
                     <td>
-                      <div className="dh-sla-date">{formatDate(esc.submittedAt)}</div>
+                      <div className="dh-sla-date">
+                        {formatDate(esc.submittedAt)}
+                      </div>
                     </td>
 
                     <td>
@@ -656,7 +671,11 @@ const DeptHeadSLADashboard = () => {
 
             <div className="dh-sla-pagination-right">
               <ul className="dh-sla-pagination-list">
-                <li className={`dh-sla-page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                <li
+                  className={`dh-sla-page-item ${
+                    currentPage === 1 ? "disabled" : ""
+                  }`}
+                >
                   <button
                     className="dh-sla-page-link dh-sla-page-arrow"
                     onClick={() => goToPage(currentPage - 1)}
@@ -669,13 +688,18 @@ const DeptHeadSLADashboard = () => {
 
                 {getPageNumbers().map((page, idx) =>
                   page === "..." ? (
-                    <li key={`ellipsis-${idx}`} className="dh-sla-page-item disabled">
+                    <li
+                      key={`ellipsis-${idx}`}
+                      className="dh-sla-page-item disabled"
+                    >
                       <span className="dh-sla-page-link">…</span>
                     </li>
                   ) : (
                     <li
                       key={page}
-                      className={`dh-sla-page-item ${currentPage === page ? "active" : ""}`}
+                      className={`dh-sla-page-item ${
+                        currentPage === page ? "active" : ""
+                      }`}
                     >
                       <button
                         className="dh-sla-page-link"
@@ -710,7 +734,10 @@ const DeptHeadSLADashboard = () => {
 
       {showResolutionModal && selectedEscalation && (
         <>
-          <div className="dh-sla-modal-backdrop" onClick={handleCloseResolutionModal} />
+          <div
+            className="dh-sla-modal-backdrop"
+            onClick={handleCloseResolutionModal}
+          />
 
           <div className="dh-sla-modal-wrapper">
             <div className="dh-sla-modal-container">
