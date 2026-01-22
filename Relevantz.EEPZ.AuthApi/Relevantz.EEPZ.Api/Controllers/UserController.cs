@@ -28,6 +28,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             _profileService = profileService;
             _userManagementService = userManagementService;
         }
+
         /// <summary>
         /// Gets the current logged-in user's profile.
         /// </summary>
@@ -40,20 +41,22 @@ namespace Relevantz.EEPZ.Api.Controllers
                 var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
                 {
-                    return Unauthorized(new { success = false, message = MessageConstants.InvalidUserToken });
+                    return Unauthorized(ApiResponseDto<ProfileResponseDto>.FailureResponse(MessageConstants.InvalidUserToken));
                 }
-                var result = await _profileService.GetProfileByUserIdAsync(userId);
-                if (!result.Success)
-                {
-                    return BadRequest(result);
-                }
-                return Ok(result);
+
+                var profile = await _profileService.GetProfileByUserIdAsync(userId);
+                return Ok(ApiResponseDto<ProfileResponseDto>.SuccessResponse(profile, MessageConstants.ProfileRetrievedSuccess));
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ApiResponseDto<ProfileResponseDto>.FailureResponse(ex.Message));
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { success = false, message = MessageConstants.ErrorFetchingProfile, error = ex.Message });
+                return StatusCode(500, ApiResponseDto<ProfileResponseDto>.FailureResponse(MessageConstants.ErrorFetchingProfile));
             }
         }
+
         /// <summary>
         /// Gets profile for specific user by ID (Admin/HR only).
         /// </summary>
@@ -65,18 +68,19 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             try
             {
-                var result = await _profileService.GetProfileByUserIdAsync(Id);
-                if (!result.Success)
-                {
-                    return BadRequest(result);
-                }
-                return Ok(result);
+                var profile = await _profileService.GetProfileByUserIdAsync(Id);
+                return Ok(ApiResponseDto<ProfileResponseDto>.SuccessResponse(profile, MessageConstants.ProfileRetrievedSuccess));
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ApiResponseDto<ProfileResponseDto>.FailureResponse(ex.Message));
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { success = false, message = MessageConstants.ErrorFetchingProfile, error = ex.Message });
+                return StatusCode(500, ApiResponseDto<ProfileResponseDto>.FailureResponse(MessageConstants.ErrorFetchingProfile));
             }
         }
+
         /// <summary>
         /// Updates current user's profile.
         /// </summary>
@@ -89,25 +93,28 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(new { success = false, message = MessageConstants.InvalidRequestData, errors = ModelState });
+                    return BadRequest(ApiResponseDto<ProfileResponseDto>.FailureResponse(MessageConstants.InvalidRequestData));
                 }
+
                 var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
                 {
-                    return Unauthorized(new { success = false, message = MessageConstants.InvalidUserToken });
+                    return Unauthorized(ApiResponseDto<ProfileResponseDto>.FailureResponse(MessageConstants.InvalidUserToken));
                 }
-                var result = await _profileService.UpdateProfileAsync(userId, request);
-                if (!result.Success)
-                {
-                    return BadRequest(result);
-                }
-                return Ok(result);
+
+                var updatedProfile = await _profileService.UpdateProfileAsync(userId, request);
+                return Ok(ApiResponseDto<ProfileResponseDto>.SuccessResponse(updatedProfile, MessageConstants.ProfileUpdatedSuccess));
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ApiResponseDto<ProfileResponseDto>.FailureResponse(ex.Message));
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { success = false, message = MessageConstants.ErrorUpdatingProfile, error = ex.Message });
+                return StatusCode(500, ApiResponseDto<ProfileResponseDto>.FailureResponse(MessageConstants.ErrorUpdatingProfile));
             }
         }
+
         /// <summary>
         /// Uploads/updates current user's profile photo (JPEG/PNG/GIF/WEBP, 5MB max).
         /// </summary>
@@ -121,52 +128,54 @@ namespace Relevantz.EEPZ.Api.Controllers
                 var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
                 {
-                    return Unauthorized(new { success = false, message = MessageConstants.InvalidUserToken });
+                    return Unauthorized(ApiResponseDto<ProfileResponseDto>.FailureResponse(MessageConstants.InvalidUserToken));
                 }
 
                 if (ProfilePhoto == null || ProfilePhoto.Length == 0)
                 {
-                    return BadRequest(new { success = false, message = MessageConstants.NoPhotoProvided });
+                    return BadRequest(ApiResponseDto<ProfileResponseDto>.FailureResponse(MessageConstants.NoPhotoProvided));
                 }
 
                 var allowedTypes = new[] { "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp" };
                 if (!allowedTypes.Contains(ProfilePhoto.ContentType.ToLower()))
                 {
-                    return BadRequest(new { success = false, message = MessageConstants.InvalidPhotoType });
+                    return BadRequest(ApiResponseDto<ProfileResponseDto>.FailureResponse(MessageConstants.InvalidPhotoType));
                 }
 
                 const long maxFileSize = 5 * 1024 * 1024;
                 if (ProfilePhoto.Length > maxFileSize)
                 {
-                    return BadRequest(new 
-                    { 
-                        success = false, 
-                        message = $"{MessageConstants.PhotoTooLarge} Your file is {ProfilePhoto.Length / 1024 / 1024:F2}MB."
-                    });
+                    return BadRequest(ApiResponseDto<ProfileResponseDto>.FailureResponse(
+                        $"{MessageConstants.PhotoTooLarge} Your file is {ProfilePhoto.Length / 1024 / 1024:F2}MB."));
                 }
+
                 Console.WriteLine($"Photo upload for UserId: {userId}");
                 Console.WriteLine($"  File: {ProfilePhoto.FileName}");
                 Console.WriteLine($"  Size: {ProfilePhoto.Length} bytes ({ProfilePhoto.Length / 1024.0:F2} KB)");
                 Console.WriteLine($"  Type: {ProfilePhoto.ContentType}");
+
                 var request = new UpdateProfileRequestDto
                 {
                     ProfilePhoto = ProfilePhoto
                 };
-                var result = await _profileService.UpdateProfileAsync(userId, request);
-                if (!result.Success)
-                {
-                    return BadRequest(result);
-                }
+
+                var updatedProfile = await _profileService.UpdateProfileAsync(userId, request);
                 Console.WriteLine($"Photo uploaded successfully for UserId: {userId}");
-                return Ok(result);
+
+                return Ok(ApiResponseDto<ProfileResponseDto>.SuccessResponse(updatedProfile, MessageConstants.PhotoUploadedSuccess));
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ApiResponseDto<ProfileResponseDto>.FailureResponse(ex.Message));
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error uploading photo: {ex.Message}");
                 Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                return StatusCode(500, new { success = false, message = MessageConstants.ErrorUploadingPhoto, error = ex.Message });
+                return StatusCode(500, ApiResponseDto<ProfileResponseDto>.FailureResponse(MessageConstants.ErrorUploadingPhoto));
             }
         }
+
         /// <summary>
         /// Creates new user (Admin operation).
         /// </summary>
@@ -175,12 +184,22 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserRequestDto request)
         {
-            var createdByUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-            var result = await _userManagementService.CreateUserAsync(request, createdByUserId);
-            if (!result.Success)
-                return BadRequest(result);
-            return Ok(result);
+            try
+            {
+                var createdByUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+                var user = await _userManagementService.CreateUserAsync(request, createdByUserId);
+                return Ok(ApiResponseDto<UserResponseDto>.SuccessResponse(user, MessageConstants.UserCreatedSuccess));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ApiResponseDto<UserResponseDto>.FailureResponse(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponseDto<UserResponseDto>.FailureResponse(MessageConstants.ErrorCreatingUser));
+            }
         }
+
         /// <summary>
         /// Updates existing user (Admin operation).
         /// </summary>
@@ -189,12 +208,22 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpPut("update")]
         public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequestDto request)
         {
-            var updatedByUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-            var result = await _userManagementService.UpdateUserAsync(request, updatedByUserId);
-            if (!result.Success)
-                return BadRequest(result);
-            return Ok(result);
+            try
+            {
+                var updatedByUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+                var user = await _userManagementService.UpdateUserAsync(request, updatedByUserId);
+                return Ok(ApiResponseDto<UserResponseDto>.SuccessResponse(user, MessageConstants.UserUpdatedSuccess));
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ApiResponseDto<UserResponseDto>.FailureResponse(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponseDto<UserResponseDto>.FailureResponse(MessageConstants.ErrorUpdatingUser));
+            }
         }
+
         /// <summary>
         /// Gets user by identifier.
         /// </summary>
@@ -203,11 +232,21 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetUserById(int userId)
         {
-            var result = await _userManagementService.GetUserByIdAsync(userId);
-            if (!result.Success)
-                return NotFound(result);
-            return Ok(result);
+            try
+            {
+                var user = await _userManagementService.GetUserByIdAsync(userId);
+                return Ok(ApiResponseDto<UserResponseDto>.SuccessResponse(user, MessageConstants.UserRetrievedSuccess));
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ApiResponseDto<UserResponseDto>.FailureResponse(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponseDto<UserResponseDto>.FailureResponse(MessageConstants.ErrorFetchingUser));
+            }
         }
+
         /// <summary>
         /// Gets all users.
         /// </summary>
@@ -215,35 +254,63 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("all")]
         public async Task<IActionResult> GetAllUsers()
         {
-            var result = await _userManagementService.GetAllUsersAsync();
-            return Ok(result);
+            try
+            {
+                var users = await _userManagementService.GetAllUsersAsync();
+                return Ok(ApiResponseDto<List<UserResponseDto>>.SuccessResponse(users, MessageConstants.UsersRetrievedSuccess));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponseDto<List<UserResponseDto>>.FailureResponse(MessageConstants.ErrorFetchingUsers));
+            }
         }
+
         /// <summary>
         /// Deactivates a user.
         /// </summary>
-        /// <param name="userId">User ID to deactivate</param>
+        /// <param name="Id">User ID to deactivate</param>
         /// <returns>200 OK on success, 400 on error</returns>
         [HttpPost("deactivate/{Id}")]
         public async Task<IActionResult> DeactivateUser(int Id)
         {
-            var result = await _userManagementService.DeactivateUserAsync(Id);
-            if (!result.Success)
-                return BadRequest(result);
-            return Ok(result);
+            try
+            {
+                await _userManagementService.DeactivateUserAsync(Id);
+                return Ok(ApiResponseDto<object>.SuccessResponse(null, MessageConstants.UserDeactivatedSuccess));
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ApiResponseDto<object>.FailureResponse(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponseDto<object>.FailureResponse(MessageConstants.ErrorDeactivatingUser));
+            }
         }
+
         /// <summary>
         /// Activates a deactivated user.
         /// </summary>
-        /// <param name="userId">User ID to activate</param>
+        /// <param name="Id">User ID to activate</param>
         /// <returns>200 OK on success, 400 on error</returns>
         [HttpPost("activate/{Id}")]
         public async Task<IActionResult> ActivateUser(int Id)
         {
-            var result = await _userManagementService.ActivateUserAsync(Id);
-            if (!result.Success)
-                return BadRequest(result);
-            return Ok(result);
+            try
+            {
+                await _userManagementService.ActivateUserAsync(Id);
+                return Ok(ApiResponseDto<object>.SuccessResponse(null, MessageConstants.UserActivatedSuccess));
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ApiResponseDto<object>.FailureResponse(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponseDto<object>.FailureResponse(MessageConstants.ErrorActivatingUser));
+            }
         }
+
         /// <summary>
         /// Gets employees reporting to manager (Manager/HR/Admin only).
         /// </summary>
@@ -256,20 +323,25 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
                 var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+
                 if (userRole != "HR" && userRole != "Admin" && currentUserId != managerId)
                 {
-                    return Forbid(MessageConstants.ManagerForbidden);
+                    return StatusCode(403, ApiResponseDto<List<UserResponseDto>>.FailureResponse(MessageConstants.ManagerForbidden));
                 }
-                var result = await _userManagementService.GetEmployeesByManagerAsync(managerId);
-                if (!result.Success)
-                    return NotFound(result);
-                return Ok(result);
+
+                var employees = await _userManagementService.GetEmployeesByManagerAsync(managerId);
+                return Ok(ApiResponseDto<List<UserResponseDto>>.SuccessResponse(employees, MessageConstants.EmployeesRetrievedSuccess));
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ApiResponseDto<List<UserResponseDto>>.FailureResponse(ex.Message));
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = MessageConstants.ErrorFetchingProfile });
+                return StatusCode(500, ApiResponseDto<List<UserResponseDto>>.FailureResponse(MessageConstants.ErrorFetchingEmployees));
             }
         }
+
         /// <summary>
         /// Assigns role and department to user.
         /// </summary>
@@ -278,11 +350,21 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpPost("assign-role-department")]
         public async Task<IActionResult> AssignRoleAndDepartment([FromBody] AssignRoleDepartmentRequestDto request)
         {
-            var result = await _userManagementService.AssignRoleAndDepartmentAsync(request);
-            if (!result.Success)
-                return BadRequest(result);
-            return Ok(result);
+            try
+            {
+                await _userManagementService.AssignRoleAndDepartmentAsync(request);
+                return Ok(ApiResponseDto<object>.SuccessResponse(null, MessageConstants.RoleDepartmentAssignedSuccess));
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ApiResponseDto<object>.FailureResponse(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponseDto<object>.FailureResponse(MessageConstants.ErrorAssigningRoleDepartment));
+            }
         }
+
         /// <summary>
         /// Gets next available employee company ID (Admin/HR only).
         /// </summary>
@@ -294,21 +376,11 @@ namespace Relevantz.EEPZ.Api.Controllers
             try
             {
                 var nextId = await _userManagementService.GetNextEmployeeCompanyIdAsync();
-                return Ok(new
-                {
-                    success = true,
-                    data = nextId,
-                    message = MessageConstants.NextEmpIdSuccess
-                });
+                return Ok(ApiResponseDto<string>.SuccessResponse(nextId, MessageConstants.NextEmpIdSuccess));
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = MessageConstants.NextEmpIdError,
-                    error = ex.Message
-                });
+                return StatusCode(500, ApiResponseDto<string>.FailureResponse(MessageConstants.NextEmpIdError));
             }
         }
     }

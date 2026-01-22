@@ -6,14 +6,14 @@ namespace Relevantz.EEPZ.Core.IService
 {
     public interface IUserManagementService
     {
-        Task<ApiResponseDto<UserResponseDto>> CreateUserAsync(CreateUserRequestDto request, int createdByUserId);
-        Task<ApiResponseDto<UserResponseDto>> UpdateUserAsync(UpdateUserRequestDto request, int updatedByUserId);
-        Task<ApiResponseDto<UserResponseDto>> GetUserByIdAsync(int userId);
-        Task<ApiResponseDto<List<UserResponseDto>>> GetAllUsersAsync();
-        Task<ApiResponseDto<string>> DeactivateUserAsync(int userId);
-        Task<ApiResponseDto<string>> ActivateUserAsync(int userId);
-        Task<ApiResponseDto<string>> AssignRoleAndDepartmentAsync(AssignRoleDepartmentRequestDto request);
-        Task<ApiResponseDto<List<UserResponseDto>>> GetEmployeesByManagerAsync(int managerId);
+        Task<UserResponseDto> CreateUserAsync(CreateUserRequestDto request, int createdByUserId);
+        Task<UserResponseDto> UpdateUserAsync(UpdateUserRequestDto request, int updatedByUserId);
+        Task<UserResponseDto> GetUserByIdAsync(int userId);
+        Task<List<UserResponseDto>> GetAllUsersAsync();
+        Task DeactivateUserAsync(int userId);
+        Task ActivateUserAsync(int userId);
+        Task AssignRoleAndDepartmentAsync(AssignRoleDepartmentRequestDto request);
+        Task<List<UserResponseDto>> GetEmployeesByManagerAsync(int managerId);
         Task<string> GetNextEmployeeCompanyIdAsync();
     }
 }

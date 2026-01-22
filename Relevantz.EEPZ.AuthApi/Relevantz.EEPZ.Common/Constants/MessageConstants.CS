@@ -7,6 +7,8 @@ namespace Relevantz.EEPZ.Common.Constants
         public const string InvalidRequestData = "Invalid request data";
 
         // Profile
+        public const string ProfileRetrievedSuccess = "Profile retrieved successfully";
+        public const string ProfileUpdatedSuccess = "Profile updated successfully";
         public const string ErrorFetchingProfile = "An error occurred while fetching profile";
         public const string ErrorUpdatingProfile = "An error occurred while updating profile";
 
@@ -14,10 +16,33 @@ namespace Relevantz.EEPZ.Common.Constants
         public const string NoPhotoProvided = "No photo file provided";
         public const string InvalidPhotoType = "Invalid file type. Only JPEG, PNG, GIF, and WEBP images are allowed.";
         public const string PhotoTooLarge = "File size exceeds maximum limit of 5MB.";
+        public const string PhotoUploadedSuccess = "Profile photo uploaded successfully";
         public const string ErrorUploadingPhoto = "An error occurred while uploading photo";
+
+        // User Management
+        public const string UserCreatedSuccess = "User created successfully";
+        public const string ErrorCreatingUser = "An error occurred while creating user";
+        public const string UserUpdatedSuccess = "User updated successfully";
+        public const string ErrorUpdatingUser = "An error occurred while updating user";
+        public const string UserRetrievedSuccess = "User retrieved successfully";
+        public const string ErrorFetchingUser = "An error occurred while fetching user";
+        public const string UsersRetrievedSuccess = "Users retrieved successfully";
+        public const string ErrorFetchingUsers = "An error occurred while fetching users";
+        
+        // User Activation/Deactivation
+        public const string UserDeactivatedSuccess = "User deactivated successfully";
+        public const string ErrorDeactivatingUser = "An error occurred while deactivating user";
+        public const string UserActivatedSuccess = "User activated successfully";
+        public const string ErrorActivatingUser = "An error occurred while activating user";
 
         // Manager / employees
         public const string ManagerForbidden = "You can only view your own employees";
+        public const string EmployeesRetrievedSuccess = "Employees retrieved successfully";
+        public const string ErrorFetchingEmployees = "An error occurred while fetching employees";
+        
+        // Role and Department Assignment
+        public const string RoleDepartmentAssignedSuccess = "Role and department assigned successfully";
+        public const string ErrorAssigningRoleDepartment = "An error occurred while assigning role and department";
 
         // Employee ID
         public const string NextEmpIdSuccess = "Next Employee ID retrieved successfully";
@@ -69,6 +94,5 @@ namespace Relevantz.EEPZ.Common.Constants
         public const string DepartmentsRetrievedSuccess = "Departments retrieved successfully";
         public const string DepartmentNotFound = "Department not found";
         public const string DepartmentAlreadyExists = "Department already exists";
-        
     }
 }

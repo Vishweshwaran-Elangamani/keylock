@@ -32,7 +32,7 @@ namespace Relevantz.EEPZ.Core.Service
             _context = context;
         }
 
-        public async Task<ApiResponseDto<ProfileResponseDto>> GetProfileByUserIdAsync(int userId)
+        public async Task<ProfileResponseDto> GetProfileByUserIdAsync(int userId)
         {
             var user = await _context.Userauthentications
                 .Include(u => u.Employee)
@@ -49,7 +49,7 @@ namespace Relevantz.EEPZ.Core.Service
 
             if (user == null)
             {
-                return ApiResponseDto<ProfileResponseDto>.FailureResponse(Constants.Messages.UserNotFound);
+                throw new KeyNotFoundException(Constants.Messages.UserNotFound);
             }
 
             var employee = user.Employee;
@@ -57,7 +57,7 @@ namespace Relevantz.EEPZ.Core.Service
 
             if (profile == null)
             {
-                return ApiResponseDto<ProfileResponseDto>.FailureResponse(ProfileConstants.Messages.ProfileNotFound);
+                throw new KeyNotFoundException(ProfileConstants.Messages.ProfileNotFound);
             }
 
             var employeeDetails = employee.Employeedetailsmasters?.FirstOrDefault();
@@ -128,10 +128,10 @@ namespace Relevantz.EEPZ.Core.Service
                 } : null
             };
 
-            return ApiResponseDto<ProfileResponseDto>.SuccessResponse(response, ProfileConstants.Messages.ProfileRetrievedSuccess);
+            return response;
         }
 
-        public async Task<ApiResponseDto<ProfileResponseDto>> UpdateProfileAsync(int userId, UpdateProfileRequestDto request)
+        public async Task<ProfileResponseDto> UpdateProfileAsync(int userId, UpdateProfileRequestDto request)
         {
             EEPZBusinessLog.Information($"Updating profile for UserId: {userId}");
 
@@ -150,7 +150,7 @@ namespace Relevantz.EEPZ.Core.Service
 
             if (user == null)
             {
-                return ApiResponseDto<ProfileResponseDto>.FailureResponse(Constants.Messages.UserNotFound);
+                throw new KeyNotFoundException(Constants.Messages.UserNotFound);
             }
 
             var employee = user.Employee;
@@ -158,7 +158,7 @@ namespace Relevantz.EEPZ.Core.Service
 
             if (profile == null)
             {
-                return ApiResponseDto<ProfileResponseDto>.FailureResponse(ProfileConstants.Messages.ProfileNotFound);
+                throw new KeyNotFoundException(ProfileConstants.Messages.ProfileNotFound);
             }
 
             if (!string.IsNullOrEmpty(request.FirstName)) profile.FirstName = request.FirstName;
@@ -356,7 +356,7 @@ namespace Relevantz.EEPZ.Core.Service
 
             EEPZBusinessLog.Information($"Profile updated successfully for UserId: {userId}");
 
-            return ApiResponseDto<ProfileResponseDto>.SuccessResponse(response, Constants.Messages.ProfileUpdatedSuccess);
+            return response;
         }
     }
 }
