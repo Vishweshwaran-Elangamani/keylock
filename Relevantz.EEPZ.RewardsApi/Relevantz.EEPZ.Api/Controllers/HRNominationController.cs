@@ -95,11 +95,12 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return Problem(title: "Unexpected error while fetching manager nominations.",
                                statusCode: StatusCodes.Status500InternalServerError);
             }
-        }
+          }
+    
 
 
    // GET: api/HRNomination/nomination-details/{nominationId}
-        [HttpGet("nomination-details/{nominationId:int}")]
+            [HttpGet("nomination-details/{nominationId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

@@ -10,7 +10,19 @@ namespace Relevantz.EEPZ.Core.Services
     {
         private readonly IHRNominationRepository _repository;
         private readonly ILogger<HRNominationService> _logger;
-        
+        private const int MaxPageSize = 100;
+
+        private static readonly HashSet<string> AllowedSortBy =
+            new(StringComparer.OrdinalIgnoreCase)
+            { "SubmittedAt", "EmployeeName", "Status", "OpportunityName" };
+
+        private static readonly HashSet<string> AllowedSortDir =
+            new(StringComparer.OrdinalIgnoreCase)
+            { "asc", "desc" };
+
+        private static readonly HashSet<string> AllowedStatuses =
+            new(StringComparer.OrdinalIgnoreCase)
+            { "Pending", "Approved", "Rejected" };
 
         public HRNominationService(
             IHRNominationRepository repository,
