@@ -237,7 +237,6 @@ export const DetailsModal = ({
                       <th>L2 Reviewer</th>
                       <th>L2 Rating</th>
                       <th>L2 Comments</th>
-                      <th>Status</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -266,13 +265,6 @@ export const DetailsModal = ({
                             </strong>
                           </td>
                           <td>{c.l2Comments || "-"}</td>
-                          <td>
-                            <span
-                              className={`dp-status-badge status-${c.status?.toLowerCase()}`}
-                            >
-                              {c.status}
-                            </span>
-                          </td>
                         </tr>
                       ))
                     ) : (
