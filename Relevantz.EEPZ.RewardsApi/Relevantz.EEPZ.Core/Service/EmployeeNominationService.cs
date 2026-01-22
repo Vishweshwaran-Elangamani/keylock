@@ -1,14 +1,14 @@
+ 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using Relevantz.EEPZ.Common.DTOs.Response;
-using Relevantz.EEPZ.Data.Repository.Interfaces;
-using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Common.Entities;
- 
+using Relevantz.EEPZ.Core.Services.Interfaces;
+using Relevantz.EEPZ.Data.Repository.Interfaces;
  
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -16,19 +16,23 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
     {
         private readonly IEmployeeNominationRepository _repository;
         private readonly ILogger<EmployeeNominationService> _logger;
-        private readonly DbContext _dbContext; 
  
         public EmployeeNominationService(
             IEmployeeNominationRepository repository,
-            ILogger<EmployeeNominationService> logger,
-            DbContext dbContext)
+            ILogger<EmployeeNominationService> logger)
         {
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
-
-        public async Task<EmployeeNotificationSearchResultDto> SearchEmployeeNotificationsAsync(int employeeId)
+ 
+        /// <summary>
+        /// Searches for approved employee notifications for the given employee,
+        /// batch-fetches all related recognition details + reward types in one query,
+        /// and maps to DTOs.
+        /// </summary>
+        public async Task<EmployeeNotificationSearchResultDto> SearchEmployeeNotificationsAsync(
+            int employeeId,
+            CancellationToken cancellationToken = default)
         {
             var result = new EmployeeNotificationSearchResultDto();
  
@@ -39,40 +43,55 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return result;
             }
  
-            await using var transaction = await _dbContext.Database.BeginTransactionAsync();
             try
             {
                 _logger.LogInformation("[SEARCH] Starting search for employee notifications. EmployeeId={EmployeeId}", employeeId);
  
-                var approvedNominations = await _repository.GetApprovedNominationsByEmployeeAsync(employeeId);
+                // 1) Load all approved nominations for the employee
+                var approvedNominations = await _repository.GetApprovedNominationsByEmployeeAsync(
+                    employeeId, cancellationToken);
  
                 if (approvedNominations == null || approvedNominations.Count == 0)
                 {
                     _logger.LogInformation("[SEARCH] No approved notifications found for EmployeeId={EmployeeId}", employeeId);
                     result.Success = true;
                     result.Message = "No approved notifications found";
-                    await transaction.CommitAsync();
                     return result;
                 }
  
-                var tasks = new List<Task<EmployeeNotificationItemDto>>();
+                // 2) Batch-load all related recognition details (with RewardType) in a single query
+                var oppIds = approvedNominations
+                    .Select(n => n.OpportunityId)
+                    .Distinct()
+                    .ToList();
+ 
+                var details = await _repository.GetRecognitionDetailsWithRewardTypeByOppIdsAsync(
+                    oppIds, cancellationToken);
+ 
+                // 3) Index by OpportunityId for fast lookup
+                var detailByOppId = details.ToDictionary(d => d.OpportunityId);
+ 
+                // 4) Map nominations -> DTOs using the preloaded dictionary
+                var items = new List<EmployeeNotificationItemDto>(approvedNominations.Count);
                 foreach (var nomination in approvedNominations)
                 {
-                    tasks.Add(BuildNotificationItemAsync(nomination));
+                    detailByOppId.TryGetValue(nomination.OpportunityId, out var detail);
+ 
+                    items.Add(new EmployeeNotificationItemDto
+                    {
+                        NominationId = nomination.NominationId,
+                        RoleType = detail?.RewardType?.RewardName ?? "Opportunity"
+                    });
                 }
  
-                result.Data.AddRange(await Task.WhenAll(tasks));
- 
-                _logger.LogInformation("[SEARCH] Found {Count} approved notifications for EmployeeId={EmployeeId}", result.Data.Count, employeeId);
+                result.Data.AddRange(items);
                 result.Success = true;
- 
-                await transaction.CommitAsync();
+                _logger.LogInformation("[SEARCH] Found {Count} approved notifications for EmployeeId={EmployeeId}", result.Data.Count, employeeId);
                 return result;
             }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning(ex, "[SEARCH] Invalid argument provided for EmployeeId={EmployeeId}", employeeId);
-                await transaction.RollbackAsync();
                 result.Success = false;
                 result.Message = ex.Message;
                 return result;
@@ -80,7 +99,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             catch (InvalidOperationException ex)
             {
                 _logger.LogError(ex, "[SEARCH] Operation failed for EmployeeId={EmployeeId}", employeeId);
-                await transaction.RollbackAsync();
                 result.Success = false;
                 result.Message = "Operation failed. Please try again.";
                 return result;
@@ -88,26 +106,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             catch (Exception ex)
             {
                 _logger.LogError(ex, "[SEARCH] Unexpected error occurred for EmployeeId={EmployeeId}", employeeId);
-                await transaction.RollbackAsync();
                 result.Success = false;
                 result.Message = "An unexpected error occurred. Please contact support.";
                 return result;
             }
         }
- 
-        private async Task<EmployeeNotificationItemDto> BuildNotificationItemAsync(Recognitionstatus nomination)
-        {
-            var opportunity = await _repository.GetRecognitionDetailWithRewardTypeAsync(nomination.OpportunityId);
- 
-            return new EmployeeNotificationItemDto
-            {
-                NominationId = nomination.NominationId,
-                RoleType = opportunity?.RewardType?.RewardName ?? "Opportunity"
-            };
-        }
     }
 }
- 
- 
  
  

@@ -14,8 +14,11 @@ using System.IdentityModel.Tokens.Jwt;
 using Serilog;
 using Relevantz.EEPZ.Data.Repository;
 using Relevantz.EEPZ.Core.Services;
+<<<<<<< Updated upstream
 
 // Health checks
+=======
+>>>>>>> Stashed changes
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Diagnostics;
