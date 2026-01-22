@@ -57,14 +57,13 @@ namespace Relevantz.EEPZ.Core.Service
 
             if (profile == null)
             {
-                return ApiResponseDto<ProfileResponseDto>.FailureResponse("Profile not found");
+                return ApiResponseDto<ProfileResponseDto>.FailureResponse(ProfileConstants.Messages.ProfileNotFound);
             }
 
             var employeeDetails = employee.Employeedetailsmasters?.FirstOrDefault();
             var currentAddress = employee.Addresses?.FirstOrDefault(a => a.AddressType == Constants.AddressTypes.Current);
             var permanentAddress = employee.Addresses?.FirstOrDefault(a => a.AddressType == Constants.AddressTypes.Permanent);
 
-            // Retrieve profile photo from MongoDB
             string profilePhotoBase64 = null;
             var profileImage = await _profileImageRepository.GetImageAsync(employee.EmployeeId);
             if (profileImage != null && profileImage.ImageData != null)
@@ -73,9 +72,63 @@ namespace Relevantz.EEPZ.Core.Service
                 EEPZBusinessLog.Information($"Profile image retrieved from MongoDB for EmployeeId: {employee.EmployeeId}");
             }
 
-            var response = MapToProfileResponse(profile, user.Email, employee, employeeDetails, currentAddress, permanentAddress, profilePhotoBase64);
+            // Ad-hoc mapping
+            var response = new ProfileResponseDto
+            {
+                ProfileId = profile.ProfileId,
+                EmployeeId = profile.EmployeeId,
+                EmployeeCompanyId = employee.EmployeeCompanyId,
+                FirstName = profile.FirstName,
+                MiddleName = profile.MiddleName,
+                LastName = profile.LastName,
+                CallingName = profile.CallingName,
+                ReferredBy = profile.ReferredBy,
+                Gender = profile.Gender,
+                DateOfBirthOfficial = profile.DateOfBirthOfficial,
+                DateOfBirthActual = profile.DateOfBirthActual,
+                MobileNumber = profile.MobileNumber,
+                AlternateNumber = profile.AlternateNumber,
+                PersonalEmail = profile.PersonalEmail,
+                Email = user.Email,
+                DepartmentName = employeeDetails?.Department?.DepartmentName,
+                RoleName = employeeDetails?.Role?.RoleName,
+                EmploymentType = employee?.EmploymentType,
+                EmploymentStatus = employee?.EmploymentStatus,
+                JoiningDate = employee?.JoiningDate,
+                WorkLocation = employee?.WorkLocation,
+                EmployeeType = employee?.EmployeeType,
+                MaritalStatus = profile.MaritalStatus,
+                Nationality = profile.Nationality,
+                ProfilePhotoBase64 = profilePhotoBase64,
+                CurrentAddress = currentAddress != null ? new AddressDto
+                {
+                    AddressId = currentAddress.AddressId,
+                    AddressType = currentAddress.AddressType,
+                    DoorNumber = currentAddress.DoorNumber,
+                    Street = currentAddress.Street,
+                    Landmark = currentAddress.Landmark,
+                    Area = currentAddress.Area,
+                    City = currentAddress.City,
+                    State = currentAddress.State,
+                    Country = currentAddress.Country,
+                    PinCode = currentAddress.PinCode
+                } : null,
+                PermanentAddress = permanentAddress != null ? new AddressDto
+                {
+                    AddressId = permanentAddress.AddressId,
+                    AddressType = permanentAddress.AddressType,
+                    DoorNumber = permanentAddress.DoorNumber,
+                    Street = permanentAddress.Street,
+                    Landmark = permanentAddress.Landmark,
+                    Area = permanentAddress.Area,
+                    City = permanentAddress.City,
+                    State = permanentAddress.State,
+                    Country = permanentAddress.Country,
+                    PinCode = permanentAddress.PinCode
+                } : null
+            };
 
-            return ApiResponseDto<ProfileResponseDto>.SuccessResponse(response, "Profile retrieved successfully");
+            return ApiResponseDto<ProfileResponseDto>.SuccessResponse(response, ProfileConstants.Messages.ProfileRetrievedSuccess);
         }
 
         public async Task<ApiResponseDto<ProfileResponseDto>> UpdateProfileAsync(int userId, UpdateProfileRequestDto request)
@@ -105,10 +158,9 @@ namespace Relevantz.EEPZ.Core.Service
 
             if (profile == null)
             {
-                return ApiResponseDto<ProfileResponseDto>.FailureResponse("Profile not found");
+                return ApiResponseDto<ProfileResponseDto>.FailureResponse(ProfileConstants.Messages.ProfileNotFound);
             }
 
-            // Update profile information - only if values are provided
             if (!string.IsNullOrEmpty(request.FirstName)) profile.FirstName = request.FirstName;
             if (request.MiddleName != null) profile.MiddleName = request.MiddleName;
             if (!string.IsNullOrEmpty(request.LastName)) profile.LastName = request.LastName;
@@ -122,7 +174,6 @@ namespace Relevantz.EEPZ.Core.Service
             if (request.MaritalStatus != null) profile.MaritalStatus = request.MaritalStatus;
             if (request.Nationality != null) profile.Nationality = request.Nationality;
 
-            // Profile photo upload with optimization and MongoDB storage
             if (request.ProfilePhoto != null && request.ProfilePhoto.Length > 0)
             {
                 EEPZBusinessLog.Information($"Processing profile photo upload for UserId: {userId}, EmployeeId: {employee.EmployeeId}");
@@ -143,7 +194,7 @@ namespace Relevantz.EEPZ.Core.Service
                 await image.SaveAsJpegAsync(ms, new JpegEncoder { Quality = 85 });
                 byte[] compressedImageData = ms.ToArray();
 
-                await _profileImageRepository.UploadImageAsync(employee.EmployeeId, compressedImageData, request.ProfilePhoto.FileName ?? $"profile_{employee.EmployeeId}.jpg", "image/jpeg");
+                await _profileImageRepository.UploadImageAsync(employee.EmployeeId, compressedImageData, request.ProfilePhoto.FileName ?? $"profile_{employee.EmployeeId}.jpg", ProfileConstants.ImageTypes.Jpeg);
 
                 if (profile.ProfilePhoto != null && profile.ProfilePhoto.Length > 0)
                 {
@@ -154,7 +205,6 @@ namespace Relevantz.EEPZ.Core.Service
 
             await _userProfileRepository.UpdateAsync(profile);
 
-            // Update Current Address - only if provided
             if (request.CurrentAddress != null)
             {
                 var currentAddress = employee.Addresses?.FirstOrDefault(a => a.AddressType == Constants.AddressTypes.Current);
@@ -167,7 +217,7 @@ namespace Relevantz.EEPZ.Core.Service
                     currentAddress.Area = request.CurrentAddress.Area;
                     currentAddress.City = request.CurrentAddress.City;
                     currentAddress.State = request.CurrentAddress.State;
-                    currentAddress.Country = request.CurrentAddress.Country ?? "India";
+                    currentAddress.Country = request.CurrentAddress.Country ?? ProfileConstants.Defaults.DefaultCountry;
                     currentAddress.PinCode = request.CurrentAddress.PinCode;
                     currentAddress.UpdatedAt = DateTime.UtcNow;
 
@@ -185,7 +235,7 @@ namespace Relevantz.EEPZ.Core.Service
                         Area = request.CurrentAddress.Area,
                         City = request.CurrentAddress.City,
                         State = request.CurrentAddress.State,
-                        Country = request.CurrentAddress.Country ?? "India",
+                        Country = request.CurrentAddress.Country ?? ProfileConstants.Defaults.DefaultCountry,
                         PinCode = request.CurrentAddress.PinCode,
                         CreatedAt = DateTime.UtcNow
                     };
@@ -194,7 +244,6 @@ namespace Relevantz.EEPZ.Core.Service
                 }
             }
 
-            // Update Permanent Address - only if provided
             if (request.PermanentAddress != null)
             {
                 var permanentAddress = employee.Addresses?.FirstOrDefault(a => a.AddressType == Constants.AddressTypes.Permanent);
@@ -207,7 +256,7 @@ namespace Relevantz.EEPZ.Core.Service
                     permanentAddress.Area = request.PermanentAddress.Area;
                     permanentAddress.City = request.PermanentAddress.City;
                     permanentAddress.State = request.PermanentAddress.State;
-                    permanentAddress.Country = request.PermanentAddress.Country ?? "India";
+                    permanentAddress.Country = request.PermanentAddress.Country ?? ProfileConstants.Defaults.DefaultCountry;
                     permanentAddress.PinCode = request.PermanentAddress.PinCode;
                     permanentAddress.UpdatedAt = DateTime.UtcNow;
 
@@ -225,7 +274,7 @@ namespace Relevantz.EEPZ.Core.Service
                         Area = request.PermanentAddress.Area,
                         City = request.PermanentAddress.City,
                         State = request.PermanentAddress.State,
-                        Country = request.PermanentAddress.Country ?? "India",
+                        Country = request.PermanentAddress.Country ?? ProfileConstants.Defaults.DefaultCountry,
                         PinCode = request.PermanentAddress.PinCode,
                         CreatedAt = DateTime.UtcNow
                     };
@@ -249,23 +298,8 @@ namespace Relevantz.EEPZ.Core.Service
                 profilePhotoBase64 = Convert.ToBase64String(profileImage.ImageData);
             }
 
-            var response = MapToProfileResponse(profile, user.Email, employee, employeeDetails, updatedCurrentAddress, updatedPermanentAddress, profilePhotoBase64);
-
-            EEPZBusinessLog.Information($"Profile updated successfully for UserId: {userId}");
-
-            return ApiResponseDto<ProfileResponseDto>.SuccessResponse(response, Constants.Messages.ProfileUpdatedSuccess);
-        }
-
-        private ProfileResponseDto MapToProfileResponse(
-            Userprofile profile,
-            string email,
-            Employee employee,
-            Employeedetailsmaster employeeDetails,
-            Address currentAddress,
-            Address permanentAddress,
-            string profilePhotoBase64 = null)
-        {
-            return new ProfileResponseDto
+            // Ad-hoc mapping
+            var response = new ProfileResponseDto
             {
                 ProfileId = profile.ProfileId,
                 EmployeeId = profile.EmployeeId,
@@ -281,8 +315,7 @@ namespace Relevantz.EEPZ.Core.Service
                 MobileNumber = profile.MobileNumber,
                 AlternateNumber = profile.AlternateNumber,
                 PersonalEmail = profile.PersonalEmail,
-                Email = email,
-
+                Email = user.Email,
                 DepartmentName = employeeDetails?.Department?.DepartmentName,
                 RoleName = employeeDetails?.Role?.RoleName,
                 EmploymentType = employee?.EmploymentType,
@@ -290,41 +323,40 @@ namespace Relevantz.EEPZ.Core.Service
                 JoiningDate = employee?.JoiningDate,
                 WorkLocation = employee?.WorkLocation,
                 EmployeeType = employee?.EmployeeType,
-
                 MaritalStatus = profile.MaritalStatus,
                 Nationality = profile.Nationality,
-
-                // Profile photo from MongoDB as Base64
                 ProfilePhotoBase64 = profilePhotoBase64,
-
-                CurrentAddress = currentAddress != null ? new AddressDto
+                CurrentAddress = updatedCurrentAddress != null ? new AddressDto
                 {
-                    AddressId = currentAddress.AddressId,
-                    AddressType = currentAddress.AddressType,
-                    DoorNumber = currentAddress.DoorNumber,
-                    Street = currentAddress.Street,
-                    Landmark = currentAddress.Landmark,
-                    Area = currentAddress.Area,
-                    City = currentAddress.City,
-                    State = currentAddress.State,
-                    Country = currentAddress.Country,
-                    PinCode = currentAddress.PinCode
+                    AddressId = updatedCurrentAddress.AddressId,
+                    AddressType = updatedCurrentAddress.AddressType,
+                    DoorNumber = updatedCurrentAddress.DoorNumber,
+                    Street = updatedCurrentAddress.Street,
+                    Landmark = updatedCurrentAddress.Landmark,
+                    Area = updatedCurrentAddress.Area,
+                    City = updatedCurrentAddress.City,
+                    State = updatedCurrentAddress.State,
+                    Country = updatedCurrentAddress.Country,
+                    PinCode = updatedCurrentAddress.PinCode
                 } : null,
-
-                PermanentAddress = permanentAddress != null ? new AddressDto
+                PermanentAddress = updatedPermanentAddress != null ? new AddressDto
                 {
-                    AddressId = permanentAddress.AddressId,
-                    AddressType = permanentAddress.AddressType,
-                    DoorNumber = permanentAddress.DoorNumber,
-                    Street = permanentAddress.Street,
-                    Landmark = permanentAddress.Landmark,
-                    Area = permanentAddress.Area,
-                    City = permanentAddress.City,
-                    State = permanentAddress.State,
-                    Country = permanentAddress.Country,
-                    PinCode = permanentAddress.PinCode
+                    AddressId = updatedPermanentAddress.AddressId,
+                    AddressType = updatedPermanentAddress.AddressType,
+                    DoorNumber = updatedPermanentAddress.DoorNumber,
+                    Street = updatedPermanentAddress.Street,
+                    Landmark = updatedPermanentAddress.Landmark,
+                    Area = updatedPermanentAddress.Area,
+                    City = updatedPermanentAddress.City,
+                    State = updatedPermanentAddress.State,
+                    Country = updatedPermanentAddress.Country,
+                    PinCode = updatedPermanentAddress.PinCode
                 } : null
             };
+
+            EEPZBusinessLog.Information($"Profile updated successfully for UserId: {userId}");
+
+            return ApiResponseDto<ProfileResponseDto>.SuccessResponse(response, Constants.Messages.ProfileUpdatedSuccess);
         }
     }
 }

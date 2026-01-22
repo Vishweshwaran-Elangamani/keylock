@@ -3,7 +3,6 @@ using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Common.Utils;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
-using System.Drawing;
 using Relevantz.EEPZ.Common.Constants;
 
 namespace Relevantz.EEPZ.Core.Service
@@ -31,22 +30,22 @@ namespace Relevantz.EEPZ.Core.Service
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
             using var package = new ExcelPackage();
-            var worksheet = package.Workbook.Worksheets.Add("Roles");
+            var worksheet = package.Workbook.Worksheets.Add(ExportConstants.SheetNames.Roles);
 
-            worksheet.Cells[1, 1].Value = "Role ID";
-            worksheet.Cells[1, 2].Value = "Role Name";
-            worksheet.Cells[1, 3].Value = "Role Code";
-            worksheet.Cells[1, 4].Value = "Description";
-            worksheet.Cells[1, 5].Value = "Is System Role";
-            worksheet.Cells[1, 6].Value = "Created At";
-            worksheet.Cells[1, 7].Value = "Updated At";
+            worksheet.Cells[1, 1].Value = ExportConstants.ColumnHeaders.Roles.RoleId;
+            worksheet.Cells[1, 2].Value = ExportConstants.ColumnHeaders.Roles.RoleName;
+            worksheet.Cells[1, 3].Value = ExportConstants.ColumnHeaders.Roles.RoleCode;
+            worksheet.Cells[1, 4].Value = ExportConstants.ColumnHeaders.Roles.Description;
+            worksheet.Cells[1, 5].Value = ExportConstants.ColumnHeaders.Roles.IsSystemRole;
+            worksheet.Cells[1, 6].Value = ExportConstants.ColumnHeaders.Roles.CreatedAt;
+            worksheet.Cells[1, 7].Value = ExportConstants.ColumnHeaders.Roles.UpdatedAt;
 
             using (var range = worksheet.Cells[1, 1, 1, 7])
             {
                 range.Style.Font.Bold = true;
                 range.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                range.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(79, 129, 189));
-                range.Style.Font.Color.SetColor(Color.White);
+                range.Style.Fill.BackgroundColor.SetColor(ExportConstants.Styling.HeaderBackgroundColor);
+                range.Style.Font.Color.SetColor(ExportConstants.Styling.HeaderFontColor);
                 range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             }
 
@@ -56,10 +55,10 @@ namespace Relevantz.EEPZ.Core.Service
                 worksheet.Cells[row, 1].Value = role.RoleId;
                 worksheet.Cells[row, 2].Value = role.RoleName;
                 worksheet.Cells[row, 3].Value = role.RoleCode;
-                worksheet.Cells[row, 4].Value = role.Description ?? "N/A";
-                worksheet.Cells[row, 5].Value = role.IsSystemRole == true ? "Yes" : "No";
-                worksheet.Cells[row, 6].Value = role.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss");
-                worksheet.Cells[row, 7].Value = role.UpdatedAt?.ToString("yyyy-MM-dd HH:mm:ss") ?? "N/A";
+                worksheet.Cells[row, 4].Value = role.Description ?? ExportConstants.Defaults.NotAvailable;
+                worksheet.Cells[row, 5].Value = role.IsSystemRole == true ? ExportConstants.Defaults.Yes : ExportConstants.Defaults.No;
+                worksheet.Cells[row, 6].Value = role.CreatedAt.ToString(ExportConstants.DateFormats.DateTimeFormat);
+                worksheet.Cells[row, 7].Value = role.UpdatedAt?.ToString(ExportConstants.DateFormats.DateTimeFormat) ?? ExportConstants.Defaults.NotAvailable;
                 row++;
             }
 
@@ -73,7 +72,7 @@ namespace Relevantz.EEPZ.Core.Service
                 range.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
             }
 
-            EEPZBusinessLog.Information("Roles exported to Excel successfully");
+            EEPZBusinessLog.Information(ExportConstants.LogMessages.RolesExported);
             return package.GetAsByteArray();
         }
 
@@ -84,21 +83,21 @@ namespace Relevantz.EEPZ.Core.Service
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
             using var package = new ExcelPackage();
-            var worksheet = package.Workbook.Worksheets.Add("Departments");
+            var worksheet = package.Workbook.Worksheets.Add(ExportConstants.SheetNames.Departments);
 
-            worksheet.Cells[1, 1].Value = "Department ID";
-            worksheet.Cells[1, 2].Value = "Department Name";
-            worksheet.Cells[1, 3].Value = "Budget Allocated";
-            worksheet.Cells[1, 4].Value = "Cost Center";
-            worksheet.Cells[1, 5].Value = "Created At";
-            worksheet.Cells[1, 6].Value = "Updated At";
+            worksheet.Cells[1, 1].Value = ExportConstants.ColumnHeaders.Departments.DepartmentId;
+            worksheet.Cells[1, 2].Value = ExportConstants.ColumnHeaders.Departments.DepartmentName;
+            worksheet.Cells[1, 3].Value = ExportConstants.ColumnHeaders.Departments.BudgetAllocated;
+            worksheet.Cells[1, 4].Value = ExportConstants.ColumnHeaders.Departments.CostCenter;
+            worksheet.Cells[1, 5].Value = ExportConstants.ColumnHeaders.Departments.CreatedAt;
+            worksheet.Cells[1, 6].Value = ExportConstants.ColumnHeaders.Departments.UpdatedAt;
 
             using (var range = worksheet.Cells[1, 1, 1, 6])
             {
                 range.Style.Font.Bold = true;
                 range.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                range.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(79, 129, 189));
-                range.Style.Font.Color.SetColor(Color.White);
+                range.Style.Fill.BackgroundColor.SetColor(ExportConstants.Styling.HeaderBackgroundColor);
+                range.Style.Font.Color.SetColor(ExportConstants.Styling.HeaderFontColor);
                 range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             }
 
@@ -107,10 +106,10 @@ namespace Relevantz.EEPZ.Core.Service
             {
                 worksheet.Cells[row, 1].Value = dept.DepartmentId;
                 worksheet.Cells[row, 2].Value = dept.DepartmentName;
-                worksheet.Cells[row, 3].Value = dept.BudgetAllocated?.ToString("N2") ?? "N/A";
-                worksheet.Cells[row, 4].Value = dept.CostCenter ?? "N/A";
-                worksheet.Cells[row, 5].Value = dept.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss");
-                worksheet.Cells[row, 6].Value = dept.UpdatedAt?.ToString("yyyy-MM-dd HH:mm:ss") ?? "N/A";
+                worksheet.Cells[row, 3].Value = dept.BudgetAllocated?.ToString(ExportConstants.NumberFormats.DecimalFormat) ?? ExportConstants.Defaults.NotAvailable;
+                worksheet.Cells[row, 4].Value = dept.CostCenter ?? ExportConstants.Defaults.NotAvailable;
+                worksheet.Cells[row, 5].Value = dept.CreatedAt.ToString(ExportConstants.DateFormats.DateTimeFormat);
+                worksheet.Cells[row, 6].Value = dept.UpdatedAt?.ToString(ExportConstants.DateFormats.DateTimeFormat) ?? ExportConstants.Defaults.NotAvailable;
                 row++;
             }
 
@@ -124,7 +123,7 @@ namespace Relevantz.EEPZ.Core.Service
                 range.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
             }
 
-            EEPZBusinessLog.Information("Departments exported to Excel successfully");
+            EEPZBusinessLog.Information(ExportConstants.LogMessages.DepartmentsExported);
             return package.GetAsByteArray();
         }
 
@@ -135,38 +134,36 @@ namespace Relevantz.EEPZ.Core.Service
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
             using var package = new ExcelPackage();
-            var worksheet = package.Workbook.Worksheets.Add("Users");
+            var worksheet = package.Workbook.Worksheets.Add(ExportConstants.SheetNames.Users);
 
-            worksheet.Cells[1, 1].Value = "User ID";
-            worksheet.Cells[1, 2].Value = "Employee Company ID";
-            worksheet.Cells[1, 3].Value = "Email";
-            worksheet.Cells[1, 4].Value = "First Name";
-            worksheet.Cells[1, 5].Value = "Last Name";
-            worksheet.Cells[1, 6].Value = "Mobile Number";
-            worksheet.Cells[1, 7].Value = "Gender";
-            worksheet.Cells[1, 8].Value = "Employment Type";
-            worksheet.Cells[1, 9].Value = "Employment Status";
-            worksheet.Cells[1, 10].Value = "Employee Type";
-            worksheet.Cells[1, 11].Value = "Joining Date";
-            worksheet.Cells[1, 12].Value = "Work Location";
-            worksheet.Cells[1, 13].Value = "Role Name";
-            worksheet.Cells[1, 14].Value = "Department Name";
-            worksheet.Cells[1, 15].Value = "Status";
-            worksheet.Cells[1, 16].Value = "Is Active";
-            worksheet.Cells[1, 17].Value = "Last Login";
-            worksheet.Cells[1, 18].Value = "Created At";
+            worksheet.Cells[1, 1].Value = ExportConstants.ColumnHeaders.Users.UserId;
+            worksheet.Cells[1, 2].Value = ExportConstants.ColumnHeaders.Users.EmployeeCompanyId;
+            worksheet.Cells[1, 3].Value = ExportConstants.ColumnHeaders.Users.Email;
+            worksheet.Cells[1, 4].Value = ExportConstants.ColumnHeaders.Users.FirstName;
+            worksheet.Cells[1, 5].Value = ExportConstants.ColumnHeaders.Users.LastName;
+            worksheet.Cells[1, 6].Value = ExportConstants.ColumnHeaders.Users.MobileNumber;
+            worksheet.Cells[1, 7].Value = ExportConstants.ColumnHeaders.Users.Gender;
+            worksheet.Cells[1, 8].Value = ExportConstants.ColumnHeaders.Users.EmploymentType;
+            worksheet.Cells[1, 9].Value = ExportConstants.ColumnHeaders.Users.EmploymentStatus;
+            worksheet.Cells[1, 10].Value = ExportConstants.ColumnHeaders.Users.EmployeeType;
+            worksheet.Cells[1, 11].Value = ExportConstants.ColumnHeaders.Users.JoiningDate;
+            worksheet.Cells[1, 12].Value = ExportConstants.ColumnHeaders.Users.WorkLocation;
+            worksheet.Cells[1, 13].Value = ExportConstants.ColumnHeaders.Users.RoleName;
+            worksheet.Cells[1, 14].Value = ExportConstants.ColumnHeaders.Users.DepartmentName;
+            worksheet.Cells[1, 15].Value = ExportConstants.ColumnHeaders.Users.Status;
+            worksheet.Cells[1, 16].Value = ExportConstants.ColumnHeaders.Users.IsActive;
+            worksheet.Cells[1, 17].Value = ExportConstants.ColumnHeaders.Users.LastLogin;
+            worksheet.Cells[1, 18].Value = ExportConstants.ColumnHeaders.Users.CreatedAt;
 
-            // Style Header
             using (var range = worksheet.Cells[1, 1, 1, 18])
             {
                 range.Style.Font.Bold = true;
                 range.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                range.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(79, 129, 189));
-                range.Style.Font.Color.SetColor(Color.White);
+                range.Style.Fill.BackgroundColor.SetColor(ExportConstants.Styling.HeaderBackgroundColor);
+                range.Style.Font.Color.SetColor(ExportConstants.Styling.HeaderFontColor);
                 range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             }
 
-            // Data Rows
             int row = 2;
             foreach (var user in users)
             {
@@ -174,30 +171,28 @@ namespace Relevantz.EEPZ.Core.Service
                 var employeeDetails = user.Employee?.Employeedetailsmasters?.FirstOrDefault();
 
                 worksheet.Cells[row, 1].Value = user.UserId;
-                worksheet.Cells[row, 2].Value = user.Employee?.EmployeeCompanyId ?? "N/A";
+                worksheet.Cells[row, 2].Value = user.Employee?.EmployeeCompanyId ?? ExportConstants.Defaults.NotAvailable;
                 worksheet.Cells[row, 3].Value = user.Email;
-                worksheet.Cells[row, 4].Value = profile?.FirstName ?? "N/A";
-                worksheet.Cells[row, 5].Value = profile?.LastName ?? "N/A";
-                worksheet.Cells[row, 6].Value = profile?.MobileNumber ?? "N/A";
-                worksheet.Cells[row, 7].Value = profile?.Gender ?? "N/A";
-                worksheet.Cells[row, 8].Value = user.Employee?.EmploymentType ?? "N/A";
-                worksheet.Cells[row, 9].Value = user.Employee?.EmploymentStatus ?? "N/A";
-                worksheet.Cells[row, 10].Value = user.Employee?.EmployeeType ?? "N/A";
-                worksheet.Cells[row, 11].Value = user.Employee?.JoiningDate.ToString("yyyy-MM-dd") ?? "N/A";
-                worksheet.Cells[row, 12].Value = user.Employee?.WorkLocation ?? "N/A";
-                worksheet.Cells[row, 13].Value = employeeDetails?.Role?.RoleName ?? "N/A";
-                worksheet.Cells[row, 14].Value = employeeDetails?.Department?.DepartmentName ?? "N/A";
+                worksheet.Cells[row, 4].Value = profile?.FirstName ?? ExportConstants.Defaults.NotAvailable;
+                worksheet.Cells[row, 5].Value = profile?.LastName ?? ExportConstants.Defaults.NotAvailable;
+                worksheet.Cells[row, 6].Value = profile?.MobileNumber ?? ExportConstants.Defaults.NotAvailable;
+                worksheet.Cells[row, 7].Value = profile?.Gender ?? ExportConstants.Defaults.NotAvailable;
+                worksheet.Cells[row, 8].Value = user.Employee?.EmploymentType ?? ExportConstants.Defaults.NotAvailable;
+                worksheet.Cells[row, 9].Value = user.Employee?.EmploymentStatus ?? ExportConstants.Defaults.NotAvailable;
+                worksheet.Cells[row, 10].Value = user.Employee?.EmployeeType ?? ExportConstants.Defaults.NotAvailable;
+                worksheet.Cells[row, 11].Value = user.Employee?.JoiningDate.ToString(ExportConstants.DateFormats.DateFormat) ?? ExportConstants.Defaults.NotAvailable;
+                worksheet.Cells[row, 12].Value = user.Employee?.WorkLocation ?? ExportConstants.Defaults.NotAvailable;
+                worksheet.Cells[row, 13].Value = employeeDetails?.Role?.RoleName ?? ExportConstants.Defaults.NotAvailable;
+                worksheet.Cells[row, 14].Value = employeeDetails?.Department?.DepartmentName ?? ExportConstants.Defaults.NotAvailable;
                 worksheet.Cells[row, 15].Value = user.Status;
-                worksheet.Cells[row, 16].Value = user.Employee?.IsActive == true ? "Yes" : "No";
-                worksheet.Cells[row, 17].Value = user.LastLoginAt?.ToString("yyyy-MM-dd HH:mm:ss") ?? "Never";
-                worksheet.Cells[row, 18].Value = user.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss");
+                worksheet.Cells[row, 16].Value = user.Employee?.IsActive == true ? ExportConstants.Defaults.Yes : ExportConstants.Defaults.No;
+                worksheet.Cells[row, 17].Value = user.LastLoginAt?.ToString(ExportConstants.DateFormats.DateTimeFormat) ?? ExportConstants.Defaults.Never;
+                worksheet.Cells[row, 18].Value = user.CreatedAt.ToString(ExportConstants.DateFormats.DateTimeFormat);
                 row++;
             }
 
-            // Auto-fit columns
             worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
 
-            // Add borders
             using (var range = worksheet.Cells[1, 1, row - 1, 18])
             {
                 range.Style.Border.Top.Style = ExcelBorderStyle.Thin;
@@ -220,92 +215,81 @@ namespace Relevantz.EEPZ.Core.Service
 
             using var package = new ExcelPackage();
 
-            // ROLES SHEET
-            var rolesSheet = package.Workbook.Worksheets.Add("Roles");
+            var rolesSheet = package.Workbook.Worksheets.Add(ExportConstants.SheetNames.Roles);
 
-            // Header
-            rolesSheet.Cells[1, 1].Value = "Role ID";
-            rolesSheet.Cells[1, 2].Value = "Role Name";
-            rolesSheet.Cells[1, 3].Value = "Role Code";
-            rolesSheet.Cells[1, 4].Value = "Description";
-            rolesSheet.Cells[1, 5].Value = "Is System Role";
+            rolesSheet.Cells[1, 1].Value = ExportConstants.ColumnHeaders.Roles.RoleId;
+            rolesSheet.Cells[1, 2].Value = ExportConstants.ColumnHeaders.Roles.RoleName;
+            rolesSheet.Cells[1, 3].Value = ExportConstants.ColumnHeaders.Roles.RoleCode;
+            rolesSheet.Cells[1, 4].Value = ExportConstants.ColumnHeaders.Roles.Description;
+            rolesSheet.Cells[1, 5].Value = ExportConstants.ColumnHeaders.Roles.IsSystemRole;
 
-            // Style Header
             using (var range = rolesSheet.Cells[1, 1, 1, 5])
             {
                 range.Style.Font.Bold = true;
                 range.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                range.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(79, 129, 189));
-                range.Style.Font.Color.SetColor(Color.White);
+                range.Style.Fill.BackgroundColor.SetColor(ExportConstants.Styling.HeaderBackgroundColor);
+                range.Style.Font.Color.SetColor(ExportConstants.Styling.HeaderFontColor);
             }
 
-            // Data
             int roleRow = 2;
             foreach (var role in roles)
             {
                 rolesSheet.Cells[roleRow, 1].Value = role.RoleId;
                 rolesSheet.Cells[roleRow, 2].Value = role.RoleName;
                 rolesSheet.Cells[roleRow, 3].Value = role.RoleCode;
-                rolesSheet.Cells[roleRow, 4].Value = role.Description ?? "N/A";
-                rolesSheet.Cells[roleRow, 5].Value = role.IsSystemRole == true ? "Yes" : "No";
+                rolesSheet.Cells[roleRow, 4].Value = role.Description ?? ExportConstants.Defaults.NotAvailable;
+                rolesSheet.Cells[roleRow, 5].Value = role.IsSystemRole == true ? ExportConstants.Defaults.Yes : ExportConstants.Defaults.No;
                 roleRow++;
             }
             rolesSheet.Cells[rolesSheet.Dimension.Address].AutoFitColumns();
 
-            var deptSheet = package.Workbook.Worksheets.Add("Departments");
+            var deptSheet = package.Workbook.Worksheets.Add(ExportConstants.SheetNames.Departments);
 
-            // Header
-            deptSheet.Cells[1, 1].Value = "Department ID";
-            deptSheet.Cells[1, 2].Value = "Department Name";
-            deptSheet.Cells[1, 3].Value = "Budget Allocated";
-            deptSheet.Cells[1, 4].Value = "Cost Center";
+            deptSheet.Cells[1, 1].Value = ExportConstants.ColumnHeaders.Departments.DepartmentId;
+            deptSheet.Cells[1, 2].Value = ExportConstants.ColumnHeaders.Departments.DepartmentName;
+            deptSheet.Cells[1, 3].Value = ExportConstants.ColumnHeaders.Departments.BudgetAllocated;
+            deptSheet.Cells[1, 4].Value = ExportConstants.ColumnHeaders.Departments.CostCenter;
 
-            // Style Header
             using (var range = deptSheet.Cells[1, 1, 1, 4])
             {
                 range.Style.Font.Bold = true;
                 range.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                range.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(79, 129, 189));
-                range.Style.Font.Color.SetColor(Color.White);
+                range.Style.Fill.BackgroundColor.SetColor(ExportConstants.Styling.HeaderBackgroundColor);
+                range.Style.Font.Color.SetColor(ExportConstants.Styling.HeaderFontColor);
             }
 
-            // Data
             int deptRow = 2;
             foreach (var dept in departments)
             {
                 deptSheet.Cells[deptRow, 1].Value = dept.DepartmentId;
                 deptSheet.Cells[deptRow, 2].Value = dept.DepartmentName;
-                deptSheet.Cells[deptRow, 3].Value = dept.BudgetAllocated?.ToString("N2") ?? "N/A";
-                deptSheet.Cells[deptRow, 4].Value = dept.CostCenter ?? "N/A";
+                deptSheet.Cells[deptRow, 3].Value = dept.BudgetAllocated?.ToString(ExportConstants.NumberFormats.DecimalFormat) ?? ExportConstants.Defaults.NotAvailable;
+                deptSheet.Cells[deptRow, 4].Value = dept.CostCenter ?? ExportConstants.Defaults.NotAvailable;
                 deptRow++;
             }
             deptSheet.Cells[deptSheet.Dimension.Address].AutoFitColumns();
 
-            // USERS SHEET
-            var usersSheet = package.Workbook.Worksheets.Add("Users");
+            var usersSheet = package.Workbook.Worksheets.Add(ExportConstants.SheetNames.Users);
 
-            // Header
-            usersSheet.Cells[1, 1].Value = "User ID";
-            usersSheet.Cells[1, 2].Value = "Employee Company ID";
-            usersSheet.Cells[1, 3].Value = "Email";
-            usersSheet.Cells[1, 4].Value = "First Name";
-            usersSheet.Cells[1, 5].Value = "Last Name";
-            usersSheet.Cells[1, 6].Value = "Mobile";
-            usersSheet.Cells[1, 7].Value = "Role";
-            usersSheet.Cells[1, 8].Value = "Department";
-            usersSheet.Cells[1, 9].Value = "Status";
-            usersSheet.Cells[1, 10].Value = "Is Active";
+            usersSheet.Cells[1, 1].Value = ExportConstants.ColumnHeaders.Users.UserId;
+            usersSheet.Cells[1, 2].Value = ExportConstants.ColumnHeaders.Users.EmployeeCompanyId;
+            usersSheet.Cells[1, 3].Value = ExportConstants.ColumnHeaders.Users.Email;
+            usersSheet.Cells[1, 4].Value = ExportConstants.ColumnHeaders.Users.FirstName;
+            usersSheet.Cells[1, 5].Value = ExportConstants.ColumnHeaders.Users.LastName;
+            usersSheet.Cells[1, 6].Value = ExportConstants.ColumnHeaders.Users.Mobile;
+            usersSheet.Cells[1, 7].Value = ExportConstants.ColumnHeaders.Users.Role;
+            usersSheet.Cells[1, 8].Value = ExportConstants.ColumnHeaders.Users.Department;
+            usersSheet.Cells[1, 9].Value = ExportConstants.ColumnHeaders.Users.Status;
+            usersSheet.Cells[1, 10].Value = ExportConstants.ColumnHeaders.Users.IsActive;
 
-            // Style Header
             using (var range = usersSheet.Cells[1, 1, 1, 10])
             {
                 range.Style.Font.Bold = true;
                 range.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                range.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(79, 129, 189));
-                range.Style.Font.Color.SetColor(Color.White);
+                range.Style.Fill.BackgroundColor.SetColor(ExportConstants.Styling.HeaderBackgroundColor);
+                range.Style.Font.Color.SetColor(ExportConstants.Styling.HeaderFontColor);
             }
 
-            // Data
             int userRow = 2;
             foreach (var user in users)
             {
@@ -313,20 +297,20 @@ namespace Relevantz.EEPZ.Core.Service
                 var employeeDetails = user.Employee?.Employeedetailsmasters?.FirstOrDefault();
 
                 usersSheet.Cells[userRow, 1].Value = user.UserId;
-                usersSheet.Cells[userRow, 2].Value = user.Employee?.EmployeeCompanyId ?? "N/A";
+                usersSheet.Cells[userRow, 2].Value = user.Employee?.EmployeeCompanyId ?? ExportConstants.Defaults.NotAvailable;
                 usersSheet.Cells[userRow, 3].Value = user.Email;
-                usersSheet.Cells[userRow, 4].Value = profile?.FirstName ?? "N/A";
-                usersSheet.Cells[userRow, 5].Value = profile?.LastName ?? "N/A";
-                usersSheet.Cells[userRow, 6].Value = profile?.MobileNumber ?? "N/A";
-                usersSheet.Cells[userRow, 7].Value = employeeDetails?.Role?.RoleName ?? "N/A";
-                usersSheet.Cells[userRow, 8].Value = employeeDetails?.Department?.DepartmentName ?? "N/A";
+                usersSheet.Cells[userRow, 4].Value = profile?.FirstName ?? ExportConstants.Defaults.NotAvailable;
+                usersSheet.Cells[userRow, 5].Value = profile?.LastName ?? ExportConstants.Defaults.NotAvailable;
+                usersSheet.Cells[userRow, 6].Value = profile?.MobileNumber ?? ExportConstants.Defaults.NotAvailable;
+                usersSheet.Cells[userRow, 7].Value = employeeDetails?.Role?.RoleName ?? ExportConstants.Defaults.NotAvailable;
+                usersSheet.Cells[userRow, 8].Value = employeeDetails?.Department?.DepartmentName ?? ExportConstants.Defaults.NotAvailable;
                 usersSheet.Cells[userRow, 9].Value = user.Status;
-                usersSheet.Cells[userRow, 10].Value = user.Employee?.IsActive == true ? "Yes" : "No";
+                usersSheet.Cells[userRow, 10].Value = user.Employee?.IsActive == true ? ExportConstants.Defaults.Yes : ExportConstants.Defaults.No;
                 userRow++;
             }
             usersSheet.Cells[usersSheet.Dimension.Address].AutoFitColumns();
 
-            EEPZBusinessLog.Information("All data exported to Excel successfully");
+            EEPZBusinessLog.Information(ExportConstants.LogMessages.AllDataExported);
             return package.GetAsByteArray();
         }
     }

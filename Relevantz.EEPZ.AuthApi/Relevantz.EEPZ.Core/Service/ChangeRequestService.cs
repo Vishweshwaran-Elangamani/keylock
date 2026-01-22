@@ -149,7 +149,24 @@ namespace Relevantz.EEPZ.Core.Service
             var firstName = user.Employee?.Userprofile?.FirstName ?? "User";
             await _emailService.SendChangeRequestNotificationAsync(user.Email ?? "", firstName, request.ChangeType, newValue ?? string.Empty);
 
-            var response = MapToChangeRequestResponse(changeRequest);
+            // Ad-hoc mapping
+            var profile = changeRequest.Employee?.Userprofile;
+            var response = new ChangeRequestResponseDto
+            {
+                RequestId = changeRequest.RequestId,
+                EmployeeId = changeRequest.EmployeeId,
+                EmployeeCompanyId = changeRequest.Employee?.EmployeeCompanyId ?? string.Empty,
+                EmployeeName = profile != null ? $"{profile.FirstName} {profile.LastName}" : string.Empty,
+                ChangeType = changeRequest.ChangeType,
+                CurrentValue = changeRequest.CurrentValue,
+                NewValue = changeRequest.NewValue,
+                Reason = changeRequest.Reason,
+                Status = changeRequest.Status,
+                AdminRemarks = changeRequest.AdminRemarks,
+                RequestedAt = changeRequest.RequestedAt,
+                ProcessedAt = changeRequest.ProcessedAt
+            };
+
             EEPZBusinessLog.Information($"Change request submitted by UserId: {userId}, ChangeType: {request.ChangeType}");
 
             return response;
@@ -207,7 +224,24 @@ namespace Relevantz.EEPZ.Core.Service
 
             await _changeRequestRepository.UpdateAsync(changeRequest);
 
-            var response = MapToChangeRequestResponse(changeRequest);
+            // Ad-hoc mapping
+            var profile = changeRequest.Employee?.Userprofile;
+            var response = new ChangeRequestResponseDto
+            {
+                RequestId = changeRequest.RequestId,
+                EmployeeId = changeRequest.EmployeeId,
+                EmployeeCompanyId = changeRequest.Employee?.EmployeeCompanyId ?? string.Empty,
+                EmployeeName = profile != null ? $"{profile.FirstName} {profile.LastName}" : string.Empty,
+                ChangeType = changeRequest.ChangeType,
+                CurrentValue = changeRequest.CurrentValue,
+                NewValue = changeRequest.NewValue,
+                Reason = changeRequest.Reason,
+                Status = changeRequest.Status,
+                AdminRemarks = changeRequest.AdminRemarks,
+                RequestedAt = changeRequest.RequestedAt,
+                ProcessedAt = changeRequest.ProcessedAt
+            };
+
             EEPZBusinessLog.Information($"Change request processed: RequestId {request.RequestId}, Status: {request.Status}");
 
             return response;
@@ -217,7 +251,28 @@ namespace Relevantz.EEPZ.Core.Service
         {
             var requests = await _changeRequestRepository.GetPendingRequestsAsync();
             var pendingOnly = requests.Where(r => r.Status == Constants.RequestStatuses.Pending).ToList();
-            var responses = pendingOnly.Select(MapToChangeRequestResponse).ToList();
+            
+            // Ad-hoc mapping for list
+            var responses = pendingOnly.Select(changeRequest =>
+            {
+                var profile = changeRequest.Employee?.Userprofile;
+                return new ChangeRequestResponseDto
+                {
+                    RequestId = changeRequest.RequestId,
+                    EmployeeId = changeRequest.EmployeeId,
+                    EmployeeCompanyId = changeRequest.Employee?.EmployeeCompanyId ?? string.Empty,
+                    EmployeeName = profile != null ? $"{profile.FirstName} {profile.LastName}" : string.Empty,
+                    ChangeType = changeRequest.ChangeType,
+                    CurrentValue = changeRequest.CurrentValue,
+                    NewValue = changeRequest.NewValue,
+                    Reason = changeRequest.Reason,
+                    Status = changeRequest.Status,
+                    AdminRemarks = changeRequest.AdminRemarks,
+                    RequestedAt = changeRequest.RequestedAt,
+                    ProcessedAt = changeRequest.ProcessedAt
+                };
+            }).ToList();
+
             return responses;
         }
 
@@ -230,14 +285,56 @@ namespace Relevantz.EEPZ.Core.Service
             }
 
             var requests = await _changeRequestRepository.GetByEmployeeIdAsync(user.EmployeeId);
-            var responses = requests.Select(MapToChangeRequestResponse).ToList();
+            
+            // Ad-hoc mapping for list
+            var responses = requests.Select(changeRequest =>
+            {
+                var profile = changeRequest.Employee?.Userprofile;
+                return new ChangeRequestResponseDto
+                {
+                    RequestId = changeRequest.RequestId,
+                    EmployeeId = changeRequest.EmployeeId,
+                    EmployeeCompanyId = changeRequest.Employee?.EmployeeCompanyId ?? string.Empty,
+                    EmployeeName = profile != null ? $"{profile.FirstName} {profile.LastName}" : string.Empty,
+                    ChangeType = changeRequest.ChangeType,
+                    CurrentValue = changeRequest.CurrentValue,
+                    NewValue = changeRequest.NewValue,
+                    Reason = changeRequest.Reason,
+                    Status = changeRequest.Status,
+                    AdminRemarks = changeRequest.AdminRemarks,
+                    RequestedAt = changeRequest.RequestedAt,
+                    ProcessedAt = changeRequest.ProcessedAt
+                };
+            }).ToList();
+
             return responses;
         }
 
         public async Task<List<ChangeRequestResponseDto>> GetAllChangeRequestsAsync()
         {
             var requests = await _changeRequestRepository.GetAllAsync();
-            var responses = requests.Select(MapToChangeRequestResponse).ToList();
+            
+            // Ad-hoc mapping for list
+            var responses = requests.Select(changeRequest =>
+            {
+                var profile = changeRequest.Employee?.Userprofile;
+                return new ChangeRequestResponseDto
+                {
+                    RequestId = changeRequest.RequestId,
+                    EmployeeId = changeRequest.EmployeeId,
+                    EmployeeCompanyId = changeRequest.Employee?.EmployeeCompanyId ?? string.Empty,
+                    EmployeeName = profile != null ? $"{profile.FirstName} {profile.LastName}" : string.Empty,
+                    ChangeType = changeRequest.ChangeType,
+                    CurrentValue = changeRequest.CurrentValue,
+                    NewValue = changeRequest.NewValue,
+                    Reason = changeRequest.Reason,
+                    Status = changeRequest.Status,
+                    AdminRemarks = changeRequest.AdminRemarks,
+                    RequestedAt = changeRequest.RequestedAt,
+                    ProcessedAt = changeRequest.ProcessedAt
+                };
+            }).ToList();
+
             return responses;
         }
 
@@ -281,30 +378,26 @@ namespace Relevantz.EEPZ.Core.Service
 
             if (pendingRequest != null)
             {
-                return MapToChangeRequestResponse(pendingRequest);
+                // Ad-hoc mapping
+                var profile = pendingRequest.Employee?.Userprofile;
+                return new ChangeRequestResponseDto
+                {
+                    RequestId = pendingRequest.RequestId,
+                    EmployeeId = pendingRequest.EmployeeId,
+                    EmployeeCompanyId = pendingRequest.Employee?.EmployeeCompanyId ?? string.Empty,
+                    EmployeeName = profile != null ? $"{profile.FirstName} {profile.LastName}" : string.Empty,
+                    ChangeType = pendingRequest.ChangeType,
+                    CurrentValue = pendingRequest.CurrentValue,
+                    NewValue = pendingRequest.NewValue,
+                    Reason = pendingRequest.Reason,
+                    Status = pendingRequest.Status,
+                    AdminRemarks = pendingRequest.AdminRemarks,
+                    RequestedAt = pendingRequest.RequestedAt,
+                    ProcessedAt = pendingRequest.ProcessedAt
+                };
             }
 
             return null;
-        }
-
-        private ChangeRequestResponseDto MapToChangeRequestResponse(Changerequest changeRequest)
-        {
-            var profile = changeRequest.Employee?.Userprofile;
-            return new ChangeRequestResponseDto
-            {
-                RequestId = changeRequest.RequestId,
-                EmployeeId = changeRequest.EmployeeId,
-                EmployeeCompanyId = changeRequest.Employee?.EmployeeCompanyId ?? string.Empty,
-                EmployeeName = profile != null ? $"{profile.FirstName} {profile.LastName}" : string.Empty,
-                ChangeType = changeRequest.ChangeType,
-                CurrentValue = changeRequest.CurrentValue,
-                NewValue = changeRequest.NewValue,
-                Reason = changeRequest.Reason,
-                Status = changeRequest.Status,
-                AdminRemarks = changeRequest.AdminRemarks,
-                RequestedAt = changeRequest.RequestedAt,
-                ProcessedAt = changeRequest.ProcessedAt
-            };
         }
     }
 }

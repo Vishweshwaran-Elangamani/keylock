@@ -124,7 +124,40 @@ namespace Relevantz.EEPZ.Core.Service
             loginAttempt.UserId = user.UserId;
             await _loginAttemptRepository.CreateAsync(loginAttempt);
 
-            var userResponse = MapToUserResponse(user);
+            // Ad-hoc mapping
+            var profile = user.Employee?.Userprofile;
+            var employeeDetails = user.Employee?.Employeedetailsmasters?.FirstOrDefault();
+
+            var userResponse = new UserResponseDto
+            {
+                UserId = user.UserId,
+                EmployeeId = user.EmployeeId,
+                EmployeeCompanyId = user.Employee?.EmployeeCompanyId ?? string.Empty,
+                Email = user.Email,
+                Status = user.Status,
+                IsFirstLogin = user.IsFirstLogin ?? false,
+                LastLoginAt = user.LastLoginAt,
+                EmploymentType = user.Employee?.EmploymentType ?? string.Empty,
+                EmploymentStatus = user.Employee?.EmploymentStatus ?? string.Empty,
+                JoiningDate = user.Employee?.JoiningDate ?? DateOnly.MinValue,
+                ConfirmationDate = user.Employee?.ConfirmationDate,
+                ExitDate = user.Employee?.ExitDate,
+                WorkLocation = user.Employee?.WorkLocation,
+                EmployeeType = user.Employee?.EmployeeType ?? string.Empty,
+                NoticePeriodDays = user.Employee?.NoticePeriodDays ?? 0,
+                IsActive = user.Employee?.IsActive ?? false,
+                FirstName = profile?.FirstName ?? string.Empty,
+                MiddleName = profile?.MiddleName,
+                LastName = profile?.LastName ?? string.Empty,
+                CallingName = profile?.CallingName,
+                Gender = profile?.Gender,
+                DateOfBirthOfficial = profile?.DateOfBirthOfficial,
+                MobileNumber = profile?.MobileNumber,
+                PersonalEmail = profile?.PersonalEmail,
+                RoleName = employeeDetails?.Role?.RoleName,
+                DepartmentName = employeeDetails?.Department?.DepartmentName
+            };
+
             var employeeMasterId = user.Employee?.Employeedetailsmasters?.FirstOrDefault()?.EmployeeMasterId;
 
             EEPZBusinessLog.Information($"User logged in successfully: {user.Email}");
@@ -164,7 +197,40 @@ namespace Relevantz.EEPZ.Core.Service
 
             await _userAuthRepository.UpdateLastLoginAsync(user.UserId);
 
-            var userResponse = MapToUserResponse(user);
+            // Ad-hoc mapping
+            var profile = user.Employee?.Userprofile;
+            var employeeDetails = user.Employee?.Employeedetailsmasters?.FirstOrDefault();
+
+            var userResponse = new UserResponseDto
+            {
+                UserId = user.UserId,
+                EmployeeId = user.EmployeeId,
+                EmployeeCompanyId = user.Employee?.EmployeeCompanyId ?? string.Empty,
+                Email = user.Email,
+                Status = user.Status,
+                IsFirstLogin = user.IsFirstLogin ?? false,
+                LastLoginAt = user.LastLoginAt,
+                EmploymentType = user.Employee?.EmploymentType ?? string.Empty,
+                EmploymentStatus = user.Employee?.EmploymentStatus ?? string.Empty,
+                JoiningDate = user.Employee?.JoiningDate ?? DateOnly.MinValue,
+                ConfirmationDate = user.Employee?.ConfirmationDate,
+                ExitDate = user.Employee?.ExitDate,
+                WorkLocation = user.Employee?.WorkLocation,
+                EmployeeType = user.Employee?.EmployeeType ?? string.Empty,
+                NoticePeriodDays = user.Employee?.NoticePeriodDays ?? 0,
+                IsActive = user.Employee?.IsActive ?? false,
+                FirstName = profile?.FirstName ?? string.Empty,
+                MiddleName = profile?.MiddleName,
+                LastName = profile?.LastName ?? string.Empty,
+                CallingName = profile?.CallingName,
+                Gender = profile?.Gender,
+                DateOfBirthOfficial = profile?.DateOfBirthOfficial,
+                MobileNumber = profile?.MobileNumber,
+                PersonalEmail = profile?.PersonalEmail,
+                RoleName = employeeDetails?.Role?.RoleName,
+                DepartmentName = employeeDetails?.Department?.DepartmentName
+            };
+
             var employeeMasterId = user.Employee?.Employeedetailsmasters?.FirstOrDefault()?.EmployeeMasterId;
 
             EEPZBusinessLog.Information($"Admin logged in successfully with 2FA: {user.Email}");
@@ -312,42 +378,6 @@ namespace Relevantz.EEPZ.Core.Service
                 await _userAuthRepository.UpdateAsync(user);
                 EEPZBusinessLog.Warning($"Account locked due to multiple failed attempts: {user.Email}");
             }
-        }
-
-        private UserResponseDto MapToUserResponse(Userauthentication user)
-        {
-            var profile = user.Employee?.Userprofile;
-            var employeeDetails = user.Employee?.Employeedetailsmasters?.FirstOrDefault();
-
-            return new UserResponseDto
-            {
-                UserId = user.UserId,
-                EmployeeId = user.EmployeeId,
-                EmployeeCompanyId = user.Employee?.EmployeeCompanyId ?? string.Empty,
-                Email = user.Email,
-                Status = user.Status,
-                IsFirstLogin = user.IsFirstLogin ?? false,
-                LastLoginAt = user.LastLoginAt,
-                EmploymentType = user.Employee?.EmploymentType ?? string.Empty,
-                EmploymentStatus = user.Employee?.EmploymentStatus ?? string.Empty,
-                JoiningDate = user.Employee?.JoiningDate ?? DateOnly.MinValue,
-                ConfirmationDate = user.Employee?.ConfirmationDate,
-                ExitDate = user.Employee?.ExitDate,
-                WorkLocation = user.Employee?.WorkLocation,
-                EmployeeType = user.Employee?.EmployeeType ?? string.Empty,
-                NoticePeriodDays = user.Employee?.NoticePeriodDays ?? 0,
-                IsActive = user.Employee?.IsActive ?? false,
-                FirstName = profile?.FirstName ?? string.Empty,
-                MiddleName = profile?.MiddleName,
-                LastName = profile?.LastName ?? string.Empty,
-                CallingName = profile?.CallingName,
-                Gender = profile?.Gender,
-                DateOfBirthOfficial = profile?.DateOfBirthOfficial,
-                MobileNumber = profile?.MobileNumber,
-                PersonalEmail = profile?.PersonalEmail,
-                RoleName = employeeDetails?.Role?.RoleName,
-                DepartmentName = employeeDetails?.Department?.DepartmentName
-            };
         }
     }
 }

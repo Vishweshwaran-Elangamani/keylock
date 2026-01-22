@@ -29,14 +29,14 @@ namespace Relevantz.EEPZ.Core.Service
 
         public string GenerateAccessToken(Userauthentication user, string roleName)
         {
-            var issuer = _configuration["Jwt:Issuer"] ?? "EEPZ";
-            var audience = _configuration["Jwt:Audience"] ?? "EEPZUsers";
+            var issuer = _configuration[TokenConstants.ConfigKeys.JwtIssuer] ?? TokenConstants.Defaults.DefaultIssuer;
+            var audience = _configuration[TokenConstants.ConfigKeys.JwtAudience] ?? TokenConstants.Defaults.DefaultAudience;
             var secretKey =
-                _configuration["Jwt:SecretKey"]
-                ?? throw new InvalidOperationException("JWT Secret Key not configured");
+                _configuration[TokenConstants.ConfigKeys.JwtSecretKey]
+                ?? throw new InvalidOperationException(TokenConstants.ErrorMessages.SecretKeyNotConfigured);
             var expirationMinutes = _configuration.GetValue<int>(
-                "Jwt:AccessTokenExpirationMinutes",
-                60
+                TokenConstants.ConfigKeys.AccessTokenExpirationMinutes,
+                TokenConstants.Defaults.DefaultAccessTokenExpirationMinutes
             );
 
             var empId = _context
@@ -65,7 +65,10 @@ namespace Relevantz.EEPZ.Core.Service
         public async Task<string> GenerateRefreshTokenAsync(int userId, string? ipAddress)
         {
             var token = JwtHelper.GenerateRefreshToken();
-            var expirationDays = _configuration.GetValue<int>("Jwt:RefreshTokenExpirationDays", 7);
+            var expirationDays = _configuration.GetValue<int>(
+                TokenConstants.ConfigKeys.RefreshTokenExpirationDays,
+                TokenConstants.Defaults.DefaultRefreshTokenExpirationDays
+            );
 
             var refreshToken = new Refreshtoken
             {
@@ -101,7 +104,7 @@ namespace Relevantz.EEPZ.Core.Service
         public async Task RevokeRefreshTokenAsync(string token)
         {
             await _refreshTokenRepository.RevokeTokenAsync(token);
-            EEPZServiceLog.Information($"Refresh token revoked");
+            EEPZServiceLog.Information(TokenConstants.LogMessages.RefreshTokenRevoked);
         }
 
         public async Task RevokeAllUserTokensAsync(int userId)

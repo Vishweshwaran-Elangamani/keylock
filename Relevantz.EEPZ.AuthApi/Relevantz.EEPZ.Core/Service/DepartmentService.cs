@@ -28,27 +28,22 @@ namespace Relevantz.EEPZ.Core.Service
             _logger = logger;
         }
 
-        #region Basic CRUD Operations
-
         public async Task<DepartmentResponseDto> CreateDepartmentAsync(CreateDepartmentRequestDto request)
         {
             _logger.LogInformation("Creating department: {DepartmentName} (Code: {DepartmentCode})", request.DepartmentName, request.DepartmentCode);
 
-            // Validate department name uniqueness
             if (await _departmentRepository.DepartmentNameExistsAsync(request.DepartmentName))
             {
                 _logger.LogWarning("Department name already exists: {DepartmentName}", request.DepartmentName);
                 throw new InvalidOperationException(DepartmentMessages.DepartmentNameAlreadyExists);
             }
 
-            // Validate department code uniqueness
             if (await _departmentRepository.DepartmentCodeExistsAsync(request.DepartmentCode))
             {
                 _logger.LogWarning("Department code already exists: {DepartmentCode}", request.DepartmentCode);
                 throw new InvalidOperationException(DepartmentMessages.DepartmentCodeAlreadyExists);
             }
 
-            // Validate parent department exists
             if (request.ParentDepartmentId.HasValue)
             {
                 var parentDepartment = await _departmentRepository.GetByIdAsync(request.ParentDepartmentId.Value);
@@ -58,14 +53,13 @@ namespace Relevantz.EEPZ.Core.Service
                     throw new KeyNotFoundException(DepartmentMessages.ParentDepartmentNotFound);
                 }
 
-                if (parentDepartment.Status == "Inactive")
+                if (parentDepartment.Status == DepartmentConstants.DepartmentStatus.Inactive)
                 {
                     _logger.LogWarning("Cannot add child department to inactive parent: {ParentDepartmentId}", request.ParentDepartmentId.Value);
                     throw new InvalidOperationException(DepartmentMessages.CannotAddChildToInactiveParent);
                 }
             }
 
-            // Validate HOD employee exists
             if (request.HodEmployeeId.HasValue)
             {
                 var hodEmployee = await _employeeRepository.GetByIdAsync(request.HodEmployeeId.Value);
@@ -75,7 +69,7 @@ namespace Relevantz.EEPZ.Core.Service
                     throw new KeyNotFoundException(DepartmentMessages.HodEmployeeNotFound);
                 }
 
-                if (hodEmployee.EmploymentStatus != "Active")
+                if (hodEmployee.EmploymentStatus != EmployeeConstants.EmploymentStatus.Active)
                 {
                     _logger.LogWarning("HOD employee must be active: {HodEmployeeId}", request.HodEmployeeId.Value);
                     throw new InvalidOperationException(DepartmentMessages.HodEmployeeMustBeActive);
@@ -97,7 +91,34 @@ namespace Relevantz.EEPZ.Core.Service
 
             await _departmentRepository.CreateAsync(department);
 
-            var response = await MapToDepartmentResponseAsync(department);
+            // Ad-hoc mapping
+            var childCount = await _departmentRepository.GetChildCountAsync(department.DepartmentId);
+            string? hodEmployeeName = null;
+            if (department.HodEmployeeId.HasValue)
+            {
+                hodEmployeeName = await _userProfileRepository.GetFullNameByEmployeeIdAsync(department.HodEmployeeId.Value);
+            }
+
+            var response = new DepartmentResponseDto
+            {
+                DepartmentId = department.DepartmentId,
+                DepartmentName = department.DepartmentName,
+                DepartmentCode = department.DepartmentCode,
+                Description = department.Description,
+                Status = department.Status,
+                ParentDepartmentId = department.ParentDepartmentId,
+                ParentDepartmentName = department.ParentDepartment?.DepartmentName,
+                HodEmployeeId = department.HodEmployeeId,
+                HodEmployeeName = hodEmployeeName,
+                HodEmployeeCompanyId = department.HodEmployee?.EmployeeCompanyId,
+                BudgetAllocated = department.BudgetAllocated,
+                CostCenter = department.CostCenter,
+                CreatedAt = department.CreatedAt,
+                UpdatedAt = department.UpdatedAt,
+                ChildDepartmentCount = childCount,
+                HasChildren = childCount > 0
+            };
+
             _logger.LogInformation("Department created successfully: {DepartmentName} (Code: {DepartmentCode})", request.DepartmentName, request.DepartmentCode);
             EEPZBusinessLog.Information($"Department created: {request.DepartmentName} (Code: {request.DepartmentCode})");
 
@@ -115,7 +136,6 @@ namespace Relevantz.EEPZ.Core.Service
                 throw new KeyNotFoundException(Constants.Messages.DepartmentNotFound);
             }
 
-            // Validate department name uniqueness (excluding current department)
             if (request.DepartmentName != null && request.DepartmentName != department.DepartmentName)
             {
                 if (await _departmentRepository.DepartmentNameExistsAsync(request.DepartmentName, request.DepartmentId))
@@ -125,7 +145,6 @@ namespace Relevantz.EEPZ.Core.Service
                 }
             }
 
-            // Validate department code uniqueness (excluding current department)
             if (request.DepartmentCode != null && request.DepartmentCode != department.DepartmentCode)
             {
                 if (await _departmentRepository.DepartmentCodeExistsAsync(request.DepartmentCode, request.DepartmentId))
@@ -135,7 +154,6 @@ namespace Relevantz.EEPZ.Core.Service
                 }
             }
 
-            // Validate parent department and prevent circular reference
             if (request.ParentDepartmentId.HasValue)
             {
                 if (request.ParentDepartmentId == request.DepartmentId)
@@ -151,7 +169,6 @@ namespace Relevantz.EEPZ.Core.Service
                     throw new KeyNotFoundException(DepartmentMessages.ParentDepartmentNotFound);
                 }
 
-                // Check for circular reference
                 if (await _departmentRepository.IsCircularReferenceAsync(request.DepartmentId, request.ParentDepartmentId.Value))
                 {
                     _logger.LogWarning("Circular reference detected for department: {DepartmentId}", request.DepartmentId);
@@ -159,7 +176,6 @@ namespace Relevantz.EEPZ.Core.Service
                 }
             }
 
-            // Validate HOD employee (only if not null)
             if (request.HodEmployeeId.HasValue)
             {
                 var hodEmployee = await _employeeRepository.GetByIdAsync(request.HodEmployeeId.Value);
@@ -169,21 +185,19 @@ namespace Relevantz.EEPZ.Core.Service
                     throw new KeyNotFoundException(DepartmentMessages.HodEmployeeNotFound);
                 }
 
-                if (hodEmployee.EmploymentStatus != "Active")
+                if (hodEmployee.EmploymentStatus != EmployeeConstants.EmploymentStatus.Active)
                 {
                     _logger.LogWarning("HOD employee must be active: {HodEmployeeId}", request.HodEmployeeId.Value);
                     throw new InvalidOperationException(DepartmentMessages.HodEmployeeMustBeActive);
                 }
             }
 
-            // Validate status change
             if (request.Status != null && request.Status != department.Status)
             {
-                if (request.Status == "Inactive")
+                if (request.Status == DepartmentConstants.DepartmentStatus.Inactive)
                 {
-                    // Check if department has active child departments
                     var childDepartments = await _departmentRepository.GetChildDepartmentsAsync(request.DepartmentId);
-                    if (childDepartments.Any(c => c.Status == "Active"))
+                    if (childDepartments.Any(c => c.Status == DepartmentConstants.DepartmentStatus.Active))
                     {
                         _logger.LogWarning("Cannot inactivate department with active children: {DepartmentId}", request.DepartmentId);
                         throw new InvalidOperationException(DepartmentMessages.CannotInactivateDepartmentWithActiveChildren);
@@ -204,7 +218,34 @@ namespace Relevantz.EEPZ.Core.Service
 
             await _departmentRepository.UpdateAsync(department);
 
-            var response = await MapToDepartmentResponseAsync(department);
+            // Ad-hoc mapping
+            var childCount = await _departmentRepository.GetChildCountAsync(department.DepartmentId);
+            string? hodEmployeeName = null;
+            if (department.HodEmployeeId.HasValue)
+            {
+                hodEmployeeName = await _userProfileRepository.GetFullNameByEmployeeIdAsync(department.HodEmployeeId.Value);
+            }
+
+            var response = new DepartmentResponseDto
+            {
+                DepartmentId = department.DepartmentId,
+                DepartmentName = department.DepartmentName,
+                DepartmentCode = department.DepartmentCode,
+                Description = department.Description,
+                Status = department.Status,
+                ParentDepartmentId = department.ParentDepartmentId,
+                ParentDepartmentName = department.ParentDepartment?.DepartmentName,
+                HodEmployeeId = department.HodEmployeeId,
+                HodEmployeeName = hodEmployeeName,
+                HodEmployeeCompanyId = department.HodEmployee?.EmployeeCompanyId,
+                BudgetAllocated = department.BudgetAllocated,
+                CostCenter = department.CostCenter,
+                CreatedAt = department.CreatedAt,
+                UpdatedAt = department.UpdatedAt,
+                ChildDepartmentCount = childCount,
+                HasChildren = childCount > 0
+            };
+
             _logger.LogInformation("Department updated successfully: {DepartmentId}", request.DepartmentId);
             EEPZBusinessLog.Information($"Department updated: DepartmentId {request.DepartmentId}");
 
@@ -222,7 +263,34 @@ namespace Relevantz.EEPZ.Core.Service
                 throw new KeyNotFoundException(Constants.Messages.DepartmentNotFound);
             }
 
-            var response = await MapToDepartmentResponseAsync(department);
+            // Ad-hoc mapping
+            var childCount = await _departmentRepository.GetChildCountAsync(department.DepartmentId);
+            string? hodEmployeeName = null;
+            if (department.HodEmployeeId.HasValue)
+            {
+                hodEmployeeName = await _userProfileRepository.GetFullNameByEmployeeIdAsync(department.HodEmployeeId.Value);
+            }
+
+            var response = new DepartmentResponseDto
+            {
+                DepartmentId = department.DepartmentId,
+                DepartmentName = department.DepartmentName,
+                DepartmentCode = department.DepartmentCode,
+                Description = department.Description,
+                Status = department.Status,
+                ParentDepartmentId = department.ParentDepartmentId,
+                ParentDepartmentName = department.ParentDepartment?.DepartmentName,
+                HodEmployeeId = department.HodEmployeeId,
+                HodEmployeeName = hodEmployeeName,
+                HodEmployeeCompanyId = department.HodEmployee?.EmployeeCompanyId,
+                BudgetAllocated = department.BudgetAllocated,
+                CostCenter = department.CostCenter,
+                CreatedAt = department.CreatedAt,
+                UpdatedAt = department.UpdatedAt,
+                ChildDepartmentCount = childCount,
+                HasChildren = childCount > 0
+            };
+
             return response;
         }
 
@@ -235,7 +303,33 @@ namespace Relevantz.EEPZ.Core.Service
 
             foreach (var dept in departments)
             {
-                responses.Add(await MapToDepartmentResponseAsync(dept));
+                // Ad-hoc mapping
+                var childCount = await _departmentRepository.GetChildCountAsync(dept.DepartmentId);
+                string? hodEmployeeName = null;
+                if (dept.HodEmployeeId.HasValue)
+                {
+                    hodEmployeeName = await _userProfileRepository.GetFullNameByEmployeeIdAsync(dept.HodEmployeeId.Value);
+                }
+
+                responses.Add(new DepartmentResponseDto
+                {
+                    DepartmentId = dept.DepartmentId,
+                    DepartmentName = dept.DepartmentName,
+                    DepartmentCode = dept.DepartmentCode,
+                    Description = dept.Description,
+                    Status = dept.Status,
+                    ParentDepartmentId = dept.ParentDepartmentId,
+                    ParentDepartmentName = dept.ParentDepartment?.DepartmentName,
+                    HodEmployeeId = dept.HodEmployeeId,
+                    HodEmployeeName = hodEmployeeName,
+                    HodEmployeeCompanyId = dept.HodEmployee?.EmployeeCompanyId,
+                    BudgetAllocated = dept.BudgetAllocated,
+                    CostCenter = dept.CostCenter,
+                    CreatedAt = dept.CreatedAt,
+                    UpdatedAt = dept.UpdatedAt,
+                    ChildDepartmentCount = childCount,
+                    HasChildren = childCount > 0
+                });
             }
 
             return responses;
@@ -252,14 +346,12 @@ namespace Relevantz.EEPZ.Core.Service
                 throw new KeyNotFoundException(Constants.Messages.DepartmentNotFound);
             }
 
-            // Check if department has child departments
             if (await _departmentRepository.HasChildDepartmentsAsync(departmentId))
             {
                 _logger.LogWarning("Cannot delete department with children: {DepartmentId}", departmentId);
                 throw new InvalidOperationException(DepartmentMessages.CannotDeleteDepartmentWithChildren);
             }
 
-            // Check if department has employees
             if (await _departmentRepository.HasEmployeesAsync(departmentId))
             {
                 _logger.LogWarning("Cannot delete department with employees: {DepartmentId}", departmentId);
@@ -270,10 +362,6 @@ namespace Relevantz.EEPZ.Core.Service
             _logger.LogInformation("Department deleted successfully: {DepartmentId}", departmentId);
             EEPZBusinessLog.Information($"Department deleted: DepartmentId {departmentId}");
         }
-
-        #endregion
-
-        #region Hierarchy Operations
 
         public async Task<DepartmentHierarchyResponseDto> GetDepartmentHierarchyTreeAsync(int? rootDepartmentId = null)
         {
@@ -298,7 +386,6 @@ namespace Relevantz.EEPZ.Core.Service
 
             var hierarchyTree = await BuildHierarchyTreeAsync(rootDepartments, 0);
 
-            // If single root requested, return that node; otherwise wrap in virtual root
             var result = rootDepartmentId.HasValue && hierarchyTree.Any()
                 ? hierarchyTree.First()
                 : new DepartmentHierarchyResponseDto
@@ -306,7 +393,7 @@ namespace Relevantz.EEPZ.Core.Service
                     DepartmentId = 0,
                     DepartmentName = "Organization",
                     DepartmentCode = "ROOT",
-                    Status = "Active",
+                    Status = DepartmentConstants.DepartmentStatus.Active,
                     Level = -1,
                     Children = hierarchyTree
                 };
@@ -323,7 +410,33 @@ namespace Relevantz.EEPZ.Core.Service
 
             foreach (var dept in childDepartments)
             {
-                responses.Add(await MapToDepartmentResponseAsync(dept));
+                // Ad-hoc mapping
+                var childCount = await _departmentRepository.GetChildCountAsync(dept.DepartmentId);
+                string? hodEmployeeName = null;
+                if (dept.HodEmployeeId.HasValue)
+                {
+                    hodEmployeeName = await _userProfileRepository.GetFullNameByEmployeeIdAsync(dept.HodEmployeeId.Value);
+                }
+
+                responses.Add(new DepartmentResponseDto
+                {
+                    DepartmentId = dept.DepartmentId,
+                    DepartmentName = dept.DepartmentName,
+                    DepartmentCode = dept.DepartmentCode,
+                    Description = dept.Description,
+                    Status = dept.Status,
+                    ParentDepartmentId = dept.ParentDepartmentId,
+                    ParentDepartmentName = dept.ParentDepartment?.DepartmentName,
+                    HodEmployeeId = dept.HodEmployeeId,
+                    HodEmployeeName = hodEmployeeName,
+                    HodEmployeeCompanyId = dept.HodEmployee?.EmployeeCompanyId,
+                    BudgetAllocated = dept.BudgetAllocated,
+                    CostCenter = dept.CostCenter,
+                    CreatedAt = dept.CreatedAt,
+                    UpdatedAt = dept.UpdatedAt,
+                    ChildDepartmentCount = childCount,
+                    HasChildren = childCount > 0
+                });
             }
 
             return responses;
@@ -338,7 +451,33 @@ namespace Relevantz.EEPZ.Core.Service
 
             foreach (var dept in rootDepartments)
             {
-                responses.Add(await MapToDepartmentResponseAsync(dept));
+                // Ad-hoc mapping
+                var childCount = await _departmentRepository.GetChildCountAsync(dept.DepartmentId);
+                string? hodEmployeeName = null;
+                if (dept.HodEmployeeId.HasValue)
+                {
+                    hodEmployeeName = await _userProfileRepository.GetFullNameByEmployeeIdAsync(dept.HodEmployeeId.Value);
+                }
+
+                responses.Add(new DepartmentResponseDto
+                {
+                    DepartmentId = dept.DepartmentId,
+                    DepartmentName = dept.DepartmentName,
+                    DepartmentCode = dept.DepartmentCode,
+                    Description = dept.Description,
+                    Status = dept.Status,
+                    ParentDepartmentId = dept.ParentDepartmentId,
+                    ParentDepartmentName = dept.ParentDepartment?.DepartmentName,
+                    HodEmployeeId = dept.HodEmployeeId,
+                    HodEmployeeName = hodEmployeeName,
+                    HodEmployeeCompanyId = dept.HodEmployee?.EmployeeCompanyId,
+                    BudgetAllocated = dept.BudgetAllocated,
+                    CostCenter = dept.CostCenter,
+                    CreatedAt = dept.CreatedAt,
+                    UpdatedAt = dept.UpdatedAt,
+                    ChildDepartmentCount = childCount,
+                    HasChildren = childCount > 0
+                });
             }
 
             return responses;
@@ -358,15 +497,37 @@ namespace Relevantz.EEPZ.Core.Service
             var responses = new List<DepartmentResponseDto>();
             foreach (var dept in hierarchy)
             {
-                responses.Add(await MapToDepartmentResponseAsync(dept));
+                // Ad-hoc mapping
+                var childCount = await _departmentRepository.GetChildCountAsync(dept.DepartmentId);
+                string? hodEmployeeName = null;
+                if (dept.HodEmployeeId.HasValue)
+                {
+                    hodEmployeeName = await _userProfileRepository.GetFullNameByEmployeeIdAsync(dept.HodEmployeeId.Value);
+                }
+
+                responses.Add(new DepartmentResponseDto
+                {
+                    DepartmentId = dept.DepartmentId,
+                    DepartmentName = dept.DepartmentName,
+                    DepartmentCode = dept.DepartmentCode,
+                    Description = dept.Description,
+                    Status = dept.Status,
+                    ParentDepartmentId = dept.ParentDepartmentId,
+                    ParentDepartmentName = dept.ParentDepartment?.DepartmentName,
+                    HodEmployeeId = dept.HodEmployeeId,
+                    HodEmployeeName = hodEmployeeName,
+                    HodEmployeeCompanyId = dept.HodEmployee?.EmployeeCompanyId,
+                    BudgetAllocated = dept.BudgetAllocated,
+                    CostCenter = dept.CostCenter,
+                    CreatedAt = dept.CreatedAt,
+                    UpdatedAt = dept.UpdatedAt,
+                    ChildDepartmentCount = childCount,
+                    HasChildren = childCount > 0
+                });
             }
 
             return responses;
         }
-
-        #endregion
-
-        #region Status Operations
 
         public async Task<List<DepartmentResponseDto>> GetActiveDepartmentsAsync()
         {
@@ -377,7 +538,33 @@ namespace Relevantz.EEPZ.Core.Service
 
             foreach (var dept in departments)
             {
-                responses.Add(await MapToDepartmentResponseAsync(dept));
+                // Ad-hoc mapping
+                var childCount = await _departmentRepository.GetChildCountAsync(dept.DepartmentId);
+                string? hodEmployeeName = null;
+                if (dept.HodEmployeeId.HasValue)
+                {
+                    hodEmployeeName = await _userProfileRepository.GetFullNameByEmployeeIdAsync(dept.HodEmployeeId.Value);
+                }
+
+                responses.Add(new DepartmentResponseDto
+                {
+                    DepartmentId = dept.DepartmentId,
+                    DepartmentName = dept.DepartmentName,
+                    DepartmentCode = dept.DepartmentCode,
+                    Description = dept.Description,
+                    Status = dept.Status,
+                    ParentDepartmentId = dept.ParentDepartmentId,
+                    ParentDepartmentName = dept.ParentDepartment?.DepartmentName,
+                    HodEmployeeId = dept.HodEmployeeId,
+                    HodEmployeeName = hodEmployeeName,
+                    HodEmployeeCompanyId = dept.HodEmployee?.EmployeeCompanyId,
+                    BudgetAllocated = dept.BudgetAllocated,
+                    CostCenter = dept.CostCenter,
+                    CreatedAt = dept.CreatedAt,
+                    UpdatedAt = dept.UpdatedAt,
+                    ChildDepartmentCount = childCount,
+                    HasChildren = childCount > 0
+                });
             }
 
             return responses;
@@ -392,7 +579,33 @@ namespace Relevantz.EEPZ.Core.Service
 
             foreach (var dept in departments)
             {
-                responses.Add(await MapToDepartmentResponseAsync(dept));
+                // Ad-hoc mapping
+                var childCount = await _departmentRepository.GetChildCountAsync(dept.DepartmentId);
+                string? hodEmployeeName = null;
+                if (dept.HodEmployeeId.HasValue)
+                {
+                    hodEmployeeName = await _userProfileRepository.GetFullNameByEmployeeIdAsync(dept.HodEmployeeId.Value);
+                }
+
+                responses.Add(new DepartmentResponseDto
+                {
+                    DepartmentId = dept.DepartmentId,
+                    DepartmentName = dept.DepartmentName,
+                    DepartmentCode = dept.DepartmentCode,
+                    Description = dept.Description,
+                    Status = dept.Status,
+                    ParentDepartmentId = dept.ParentDepartmentId,
+                    ParentDepartmentName = dept.ParentDepartment?.DepartmentName,
+                    HodEmployeeId = dept.HodEmployeeId,
+                    HodEmployeeName = hodEmployeeName,
+                    HodEmployeeCompanyId = dept.HodEmployee?.EmployeeCompanyId,
+                    BudgetAllocated = dept.BudgetAllocated,
+                    CostCenter = dept.CostCenter,
+                    CreatedAt = dept.CreatedAt,
+                    UpdatedAt = dept.UpdatedAt,
+                    ChildDepartmentCount = childCount,
+                    HasChildren = childCount > 0
+                });
             }
 
             return responses;
@@ -409,16 +622,16 @@ namespace Relevantz.EEPZ.Core.Service
                 throw new KeyNotFoundException(Constants.Messages.DepartmentNotFound);
             }
 
-            if (status != "Active" && status != "Inactive")
+            if (status != DepartmentConstants.DepartmentStatus.Active && status != DepartmentConstants.DepartmentStatus.Inactive)
             {
                 _logger.LogWarning("Invalid status: {Status}", status);
                 throw new ArgumentException(DepartmentMessages.InvalidStatus);
             }
 
-            if (status == "Inactive")
+            if (status == DepartmentConstants.DepartmentStatus.Inactive)
             {
                 var childDepartments = await _departmentRepository.GetChildDepartmentsAsync(departmentId);
-                if (childDepartments.Any(c => c.Status == "Active"))
+                if (childDepartments.Any(c => c.Status == DepartmentConstants.DepartmentStatus.Active))
                 {
                     _logger.LogWarning("Cannot inactivate department with active children: {DepartmentId}", departmentId);
                     throw new InvalidOperationException(DepartmentMessages.CannotInactivateDepartmentWithActiveChildren);
@@ -432,10 +645,6 @@ namespace Relevantz.EEPZ.Core.Service
             EEPZBusinessLog.Information($"Department status updated: DepartmentId {departmentId} to {status}");
         }
 
-        #endregion
-
-        #region HOD Operations
-
         public async Task<List<DepartmentResponseDto>> GetDepartmentsByHodAsync(int hodEmployeeId)
         {
             _logger.LogInformation("Retrieving departments for HOD: {HodEmployeeId}", hodEmployeeId);
@@ -445,7 +654,33 @@ namespace Relevantz.EEPZ.Core.Service
 
             foreach (var dept in departments)
             {
-                responses.Add(await MapToDepartmentResponseAsync(dept));
+                // Ad-hoc mapping
+                var childCount = await _departmentRepository.GetChildCountAsync(dept.DepartmentId);
+                string? hodEmployeeName = null;
+                if (dept.HodEmployeeId.HasValue)
+                {
+                    hodEmployeeName = await _userProfileRepository.GetFullNameByEmployeeIdAsync(dept.HodEmployeeId.Value);
+                }
+
+                responses.Add(new DepartmentResponseDto
+                {
+                    DepartmentId = dept.DepartmentId,
+                    DepartmentName = dept.DepartmentName,
+                    DepartmentCode = dept.DepartmentCode,
+                    Description = dept.Description,
+                    Status = dept.Status,
+                    ParentDepartmentId = dept.ParentDepartmentId,
+                    ParentDepartmentName = dept.ParentDepartment?.DepartmentName,
+                    HodEmployeeId = dept.HodEmployeeId,
+                    HodEmployeeName = hodEmployeeName,
+                    HodEmployeeCompanyId = dept.HodEmployee?.EmployeeCompanyId,
+                    BudgetAllocated = dept.BudgetAllocated,
+                    CostCenter = dept.CostCenter,
+                    CreatedAt = dept.CreatedAt,
+                    UpdatedAt = dept.UpdatedAt,
+                    ChildDepartmentCount = childCount,
+                    HasChildren = childCount > 0
+                });
             }
 
             return responses;
@@ -469,7 +704,7 @@ namespace Relevantz.EEPZ.Core.Service
                 throw new KeyNotFoundException(DepartmentMessages.EmployeeNotFound);
             }
 
-            if (employee.EmploymentStatus != "Active")
+            if (employee.EmploymentStatus != EmployeeConstants.EmploymentStatus.Active)
             {
                 _logger.LogWarning("Employee must be active to be HOD: {HodEmployeeId}", hodEmployeeId);
                 throw new InvalidOperationException(DepartmentMessages.EmployeeMustBeActiveForHod);
@@ -506,10 +741,6 @@ namespace Relevantz.EEPZ.Core.Service
             EEPZBusinessLog.Information($"HOD removed from DepartmentId {departmentId}");
         }
 
-        #endregion
-
-        #region Search and Filter
-
         public async Task<List<DepartmentResponseDto>> SearchDepartmentsAsync(string searchTerm)
         {
             _logger.LogInformation("Searching departments with term: {SearchTerm}", searchTerm);
@@ -524,7 +755,33 @@ namespace Relevantz.EEPZ.Core.Service
 
             foreach (var dept in departments)
             {
-                responses.Add(await MapToDepartmentResponseAsync(dept));
+                // Ad-hoc mapping
+                var childCount = await _departmentRepository.GetChildCountAsync(dept.DepartmentId);
+                string? hodEmployeeName = null;
+                if (dept.HodEmployeeId.HasValue)
+                {
+                    hodEmployeeName = await _userProfileRepository.GetFullNameByEmployeeIdAsync(dept.HodEmployeeId.Value);
+                }
+
+                responses.Add(new DepartmentResponseDto
+                {
+                    DepartmentId = dept.DepartmentId,
+                    DepartmentName = dept.DepartmentName,
+                    DepartmentCode = dept.DepartmentCode,
+                    Description = dept.Description,
+                    Status = dept.Status,
+                    ParentDepartmentId = dept.ParentDepartmentId,
+                    ParentDepartmentName = dept.ParentDepartment?.DepartmentName,
+                    HodEmployeeId = dept.HodEmployeeId,
+                    HodEmployeeName = hodEmployeeName,
+                    HodEmployeeCompanyId = dept.HodEmployee?.EmployeeCompanyId,
+                    BudgetAllocated = dept.BudgetAllocated,
+                    CostCenter = dept.CostCenter,
+                    CreatedAt = dept.CreatedAt,
+                    UpdatedAt = dept.UpdatedAt,
+                    ChildDepartmentCount = childCount,
+                    HasChildren = childCount > 0
+                });
             }
 
             return responses;
@@ -541,46 +798,15 @@ namespace Relevantz.EEPZ.Core.Service
                 throw new KeyNotFoundException(DepartmentMessages.DepartmentNotFoundWithCode);
             }
 
-            var response = await MapToDepartmentResponseAsync(department);
-            return response;
-        }
-
-        #endregion
-
-        #region Statistics
-
-        public async Task<int> GetTotalDepartmentCountAsync()
-        {
-            _logger.LogInformation("Retrieving total department count");
-
-            var count = await _departmentRepository.GetTotalDepartmentCountAsync();
-            return count;
-        }
-
-        public async Task<int> GetActiveDepartmentCountAsync()
-        {
-            _logger.LogInformation("Retrieving active department count");
-
-            var departments = await _departmentRepository.GetActiveDepartmentsAsync();
-            return departments.Count;
-        }
-
-        #endregion
-
-        #region Helper Methods
-
-        private async Task<DepartmentResponseDto> MapToDepartmentResponseAsync(Department department)
-        {
+            // Ad-hoc mapping
             var childCount = await _departmentRepository.GetChildCountAsync(department.DepartmentId);
-
-            // Get HOD employee name from UserProfile repository
             string? hodEmployeeName = null;
             if (department.HodEmployeeId.HasValue)
             {
                 hodEmployeeName = await _userProfileRepository.GetFullNameByEmployeeIdAsync(department.HodEmployeeId.Value);
             }
 
-            return new DepartmentResponseDto
+            var response = new DepartmentResponseDto
             {
                 DepartmentId = department.DepartmentId,
                 DepartmentName = department.DepartmentName,
@@ -599,6 +825,24 @@ namespace Relevantz.EEPZ.Core.Service
                 ChildDepartmentCount = childCount,
                 HasChildren = childCount > 0
             };
+
+            return response;
+        }
+
+        public async Task<int> GetTotalDepartmentCountAsync()
+        {
+            _logger.LogInformation("Retrieving total department count");
+
+            var count = await _departmentRepository.GetTotalDepartmentCountAsync();
+            return count;
+        }
+
+        public async Task<int> GetActiveDepartmentCountAsync()
+        {
+            _logger.LogInformation("Retrieving active department count");
+
+            var departments = await _departmentRepository.GetActiveDepartmentsAsync();
+            return departments.Count;
         }
 
         private async Task<List<DepartmentHierarchyResponseDto>> BuildHierarchyTreeAsync(List<Department> departments, int level)
@@ -610,7 +854,6 @@ namespace Relevantz.EEPZ.Core.Service
                 var childDepartments = await _departmentRepository.GetChildDepartmentsAsync(dept.DepartmentId);
                 var children = await BuildHierarchyTreeAsync(childDepartments, level + 1);
 
-                // Get HOD employee name from UserProfile repository
                 string? hodEmployeeName = null;
                 if (dept.HodEmployeeId.HasValue)
                 {
@@ -652,7 +895,5 @@ namespace Relevantz.EEPZ.Core.Service
             var allChildren = await _departmentRepository.GetAllChildDepartmentsRecursiveAsync(departmentId);
             return allChildren.Count;
         }
-
-        #endregion
     }
 }
