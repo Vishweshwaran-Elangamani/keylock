@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
-namespace Relevantz.EEPZ.Common.DTOs
+namespace Relevantz.EEPZ.Common.Models
 {
     /// <summary>
     /// Request model for making an approval decision.

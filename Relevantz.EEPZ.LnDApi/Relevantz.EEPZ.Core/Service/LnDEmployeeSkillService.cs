@@ -1,5 +1,5 @@
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.DTOs;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repositories.Interface;
@@ -65,7 +65,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 items.Count, totalCount
             );
 
-            var employeeDtos = items
+            var employeeModels = items
                 .Select(e => new SubordinateEmployeeResponseModel
                 {
                     EmployeeId = e.EmployeeId,
@@ -79,7 +79,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             var paginatedResponse = new PaginatedResponse<SubordinateEmployeeResponseModel>
             {
-                Items = employeeDtos,
+                Items = employeeModels,
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize,
@@ -87,7 +87,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             Log.Information(
                 "GetSubordinateEmployees succeeded. ManagerId={ManagerId}, ReturnedCount={Count}, TotalCount={TotalCount}",
-                managerId, employeeDtos.Count, totalCount
+                managerId, employeeModels.Count, totalCount
             );
 
             return new ApiResponse<PaginatedResponse<SubordinateEmployeeResponseModel>>

@@ -1,4 +1,4 @@
-namespace Relevantz.EEPZ.Common.DTOs
+namespace Relevantz.EEPZ.Common.Models
 {
     /// <summary>
     /// Represents a paginated response containing items and pagination metadata.

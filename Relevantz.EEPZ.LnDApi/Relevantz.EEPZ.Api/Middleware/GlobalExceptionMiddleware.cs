@@ -1,6 +1,6 @@
 using System.Net;
 using System.Text.Json;
-using Relevantz.EEPZ.Common.DTOs;
+using Relevantz.EEPZ.Common.Models;
 using Serilog;
 
 namespace Relevantz.EEPZ.Api.Middleware

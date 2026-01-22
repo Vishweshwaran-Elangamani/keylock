@@ -1,6 +1,6 @@
 using ClosedXML.Excel;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.DTOs;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repositories.Interface;
@@ -203,14 +203,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 items.Count, totalCount
             );
 
-            var smeDtos = new List<SmeResponseModel>();
+            var smeModels = new List<SmeResponseModel>();
             foreach (var sme in items)
             {
                 var inProgressCount = await _smeRepository.GetSmeInProgressAssignmentCount(
                     sme.SmeId
                 );
 
-                smeDtos.Add(
+                smeModels.Add(
                     new SmeResponseModel
                     {
                         SmeId = sme.SmeId,
@@ -228,7 +228,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             Log.Information(
                 "GetAvailableSmes succeeded. SkillId={SkillId}, ReturnedCount={Count}, TotalCount={TotalCount}",
-                request.SkillId, smeDtos.Count, totalCount
+                request.SkillId, smeModels.Count, totalCount
             );
 
             return new ApiResponse<PaginatedResponse<SmeResponseModel>>
@@ -236,7 +236,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 Success = true,
                 Data = new PaginatedResponse<SmeResponseModel>
                 {
-                    Items = smeDtos,
+                    Items = smeModels,
                     TotalCount = totalCount,
                     PageNumber = request.PageNumber,
                     PageSize = request.PageSize,
