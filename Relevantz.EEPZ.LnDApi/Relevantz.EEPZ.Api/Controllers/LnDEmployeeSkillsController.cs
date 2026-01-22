@@ -26,8 +26,10 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
         #region Skill Retrieval
 
-        /// <summary>Gets all available skills for dropdown selection.</summary>
-        [HttpGet("api/lnd-skills/all")] 
+        /// <summary>
+        /// Gets all available skills for dropdown selection
+        /// </summary>
+        [HttpGet("api/lnd-skills/all")]
         public async Task<IActionResult> GetAllSkills()
         {
             Log.Information("GetAllSkills API called");
@@ -46,7 +48,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             }
         }
 
-        /// <summary>Gets paginated skills for the logged-in employee.</summary>
+        /// <summary>
+        /// Gets paginated skills for the logged-in employee
+        /// </summary>
         [HttpGet("api/lnd-skills/my-skills")]
         public async Task<IActionResult> GetMySkills([FromQuery] MySkillsRequestModel request)
         {
@@ -77,7 +81,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             }
         }
 
-        /// <summary>Gets skills for subordinate employees with optional employee filter and search.</summary>
+        /// <summary>
+        /// Gets skills for subordinate employees with optional employee filter and search
+        /// </summary>
         [HttpGet("api/lnd-skills/subordinates")]
         public async Task<IActionResult> GetSubordinateSkills([FromQuery] SubordinateSkillsRequestModel request)
         {
@@ -112,7 +118,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
         #region Employee Management
 
-        /// <summary>Gets paginated list of subordinate employees with search capability.</summary>
+        /// <summary>
+        /// Gets paginated list of subordinate employees with search capability
+        /// </summary>
         [HttpGet("api/lnd-skills/employees/subordinates")]
         public async Task<IActionResult> GetSubordinateEmployees([FromQuery] SubordinateEmployeesRequestModel request)
         {
@@ -147,7 +155,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
         #region Skill Modifications
 
-        /// <summary>Records a single skill rating for an employee.</summary>
+        /// <summary>
+        /// Records a single skill rating for an employee
+        /// </summary>
         [HttpPost("api/lnd-skills/record")]
         public async Task<IActionResult> RecordEmployeeSkill([FromBody] RecordSkillRequestModel request)
         {
@@ -178,7 +188,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             }
         }
 
-        /// <summary>Records multiple skill ratings for an employee in a single transaction.</summary>
+        /// <summary>
+        /// Records multiple skill ratings for an employee in a single transaction
+        /// </summary>
         [HttpPost("api/lnd-skills/record-bulk")]
         public async Task<IActionResult> BulkRecordEmployeeSkills([FromBody] BulkRecordSkillRequestModel request)
         {
@@ -209,7 +221,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             }
         }
 
-        /// <summary>Updates an existing employee skill rating.</summary>
+        /// <summary>
+        /// Updates an existing employee skill rating
+        /// </summary>
         [HttpPut("api/lnd-skills/rating")]
         public async Task<IActionResult> UpdateEmployeeSkillRating([FromBody] UpdateSkillRatingRequestModel request)
         {
@@ -240,7 +254,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             }
         }
 
-        /// <summary>Deletes an employee skill mapping by mapper ID.</summary>
+        /// <summary>
+        /// Deletes an employee skill mapping by mapper ID
+        /// </summary>
         [HttpDelete("api/lnd-skills/{skillMapperId}")]
         public async Task<IActionResult> DeleteEmployeeSkill(int skillMapperId)
         {

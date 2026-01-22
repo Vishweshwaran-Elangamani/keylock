@@ -27,7 +27,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
         #region Assignment Operations
 
-        /// <summary>Checks and marks overdue assignments (scheduled job endpoint for HR only).</summary>
+        /// <summary>
+        /// Checks and marks overdue assignments (scheduled job endpoint for HR only)
+        /// </summary>
         [HttpPost("api/lnd-assignments/check-overdue")]
         [Authorize(Roles = LnDConstants.USER_ROLES.HR)]
         public async Task<IActionResult> CheckOverdueAssignments()
@@ -46,7 +48,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             return Ok(result);
         }
 
-        /// <summary>Requests SME assignment for a team member (manager initiates request).</summary>
+        /// <summary>
+        /// Requests SME assignment for a team member (manager initiates request)
+        /// </summary>
         [HttpPost("api/lnd-assignments/request-sme")]
         public async Task<IActionResult> RequestSmeAssignment([FromBody] SmeRequestModel request)
         {
@@ -77,7 +81,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             }
         }
 
-        /// <summary>Uploads completion proof document for an assignment (mentee uploads proof).</summary>
+        /// <summary>
+        /// Uploads completion proof document for an assignment (mentee uploads proof)
+        /// </summary>
         [HttpPost("api/lnd-assignments/upload-proof")]
         public async Task<IActionResult> UploadCompletionProof(
             [FromForm] UploadCompletionProofRequestModel request
@@ -110,7 +116,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             }
         }
 
-        /// <summary>Completes an assignment with rating and acknowledgment (manager approves completion).</summary>
+        /// <summary>
+        /// Completes an assignment with rating and acknowledgment (manager approves completion)
+        /// </summary>
         [HttpPost("api/lnd-assignments/complete")]
         public async Task<IActionResult> CompleteAssignment(
             [FromBody] CompleteAssignmentRequestModel request
@@ -147,7 +155,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
         #region Assignment Retrieval
 
-        /// <summary>Gets assignments for the logged-in employee as mentee with filtering and pagination.</summary>
+        /// <summary>
+        /// Gets assignments for the logged-in employee as mentee with filtering and pagination
+        /// </summary>
         [HttpGet("api/lnd-assignments/my-assignments")]
         public async Task<IActionResult> GetMyAssignments([FromQuery] AssignmentRequestModel request)
         {
@@ -178,7 +188,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             }
         }
 
-        /// <summary>Gets assignments for the manager's team members with filtering and pagination.</summary>
+        /// <summary>
+        /// Gets assignments for the manager's team members with filtering and pagination
+        /// </summary>
         [HttpGet("api/lnd-assignments/team")]
         public async Task<IActionResult> GetTeamAssignments([FromQuery] AssignmentRequestModel request)
         {
@@ -207,9 +219,11 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 );
                 return BadRequest(result);
             }
-        } 
+        }
 
-        /// <summary>Gets assignments where the logged-in employee is the assigned SME with filtering and pagination.</summary>
+        /// <summary>
+        /// Gets assignments where the logged-in employee is the assigned SME with filtering and pagination
+        /// </summary>
         [HttpGet("api/lnd-assignments/sme")]
         public async Task<IActionResult> GetSmeAssignments([FromQuery] AssignmentRequestModel request)
         {
@@ -244,7 +258,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
         #region Export
 
-        /// <summary>Exports team assignments to Excel file (manager only).</summary>
+        /// <summary>
+        /// Exports team assignments to Excel file (manager only)
+        /// </summary>
         [HttpGet("api/lnd-assignments/team/export")]
         [Authorize(Roles = LnDConstants.USER_ROLES.MANAGER)]
         public async Task<IActionResult> GetTeamAssignmentsForExport([FromQuery] ExportAssignmentRequestModel request)

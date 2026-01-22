@@ -29,7 +29,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
         #region Assignment Management
 
-        /// <summary>Gets paginated organization-wide assignments with filtering and search (HR only).</summary>
+        /// <summary>
+        /// Gets paginated organization-wide assignments with filtering and search (HR only)
+        /// </summary>
         [HttpGet("api/lnd-hr/assignments/organization")]
         public async Task<IActionResult> GetAllOrganizationAssignments(
             [FromQuery] OrganizationAssignmentsRequestModel request
@@ -60,7 +62,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             }
         }
 
-        /// <summary>Exports all organization assignments to Excel file (HR only).</summary>
+        /// <summary>
+        /// Exports all organization assignments to Excel file (HR only)
+        /// </summary>
         [HttpGet("api/lnd-hr/assignments/organization/export")]
         public async Task<IActionResult> GetOrganizationAssignmentsForExport(
             [FromQuery] ExportOrganizationAssignmentsRequestModel request
@@ -100,7 +104,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
         #region Employee Management
 
-        /// <summary>Gets paginated list of all organization employees with search capability (HR only).</summary>
+        /// <summary>
+        /// Gets paginated list of all organization employees with search capability (HR only)
+        /// </summary>
         [HttpGet("api/lnd-hr/employees/organization")]
         public async Task<IActionResult> GetAllOrganizationEmployees(
             [FromQuery] OrganizationEmployeesRequestModel request
@@ -131,7 +137,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             }
         }
 
-        /// <summary>Gets paginated skills for a specific employee by ID (HR only).</summary>
+        /// <summary>
+        /// Gets paginated skills for a specific employee by ID (HR only)
+        /// </summary>
         [HttpGet("api/lnd-hr/skills/employee/{employeeId}")]
         public async Task<IActionResult> GetEmployeeSkillsById(
             int employeeId,
@@ -167,7 +175,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
         #region SME Management
 
-        /// <summary>Gets paginated list of all active SMEs with search capability (HR only).</summary>
+        /// <summary>
+        /// Gets paginated list of all active SMEs with search capability (HR only)
+        /// </summary>
         [HttpGet("api/lnd-hr/smes/all")]
         public async Task<IActionResult> GetAllActiveSmes(
             [FromQuery] ActiveSmesRequestModel request
@@ -198,7 +208,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             }
         }
 
-        /// <summary>Exports all active SMEs to Excel file (HR only).</summary>
+        /// <summary>
+        /// Exports all active SMEs to Excel file (HR only)
+        /// </summary>
         [HttpGet("api/lnd-hr/smes/export")]
         public async Task<IActionResult> GetAllActiveSmesForExport(
             [FromQuery] ExportActiveSmesRequestModel request

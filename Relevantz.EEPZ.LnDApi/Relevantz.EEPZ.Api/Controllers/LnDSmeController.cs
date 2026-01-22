@@ -26,7 +26,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
         #region SME Status
 
-        /// <summary>Checks if the logged-in employee has active SME status for any skill.</summary>
+        /// <summary>
+        /// Checks if the logged-in employee has active SME status for any skill
+        /// </summary>
         [HttpGet("api/lnd-sme/check")]
         public async Task<IActionResult> CheckIfEmployeeIsSme()
         {
@@ -58,7 +60,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
         #region SME Application
 
-        /// <summary>Submits an SME application with supporting documents for approval.</summary>
+        /// <summary>
+        /// Submits an SME application with supporting documents for approval
+        /// </summary>
         [HttpPost("api/lnd-sme/apply")]
         public async Task<IActionResult> ApplyToBecomeSme([FromForm] BecomeSmeRequestModel request)
         {
@@ -93,7 +97,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
         #region SME Directory
 
-        /// <summary>Gets available SMEs for a specific skill with pagination and search.</summary>
+        /// <summary>
+        /// Gets available SMEs for a specific skill with pagination and search
+        /// </summary>
         [HttpGet("api/lnd-sme/available")]
         public async Task<IActionResult> GetAvailableSmes([FromQuery] AvailableSmesRequestModel request)
         {

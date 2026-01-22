@@ -18,7 +18,7 @@ namespace Relevantz.EEPZ.Api.Middleware
         {
             try
             {
-                // Call the next middleware in the pipeline
+
                 await _next(context);
             }
             catch (Exception ex)
