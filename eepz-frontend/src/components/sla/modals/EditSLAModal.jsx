@@ -4,10 +4,9 @@ import CustomCalendar from "../../../components/project-management/common/Custom
 import CustomDropdown from "../../../components/project-management/common/CustomDropdown";
 import "../../../styles/sla/modals/EditSLAModal.css";
 
-
 const EditSLAModal = ({ sla, onClose, onUpdate }) => {
   const [deadline, setDeadline] = useState("");
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState("Open");
   const [updateReason, setUpdateReason] = useState("");
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState(null);
@@ -18,50 +17,30 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
   const calendarAnchorRef = useRef(null);
 
   useEffect(() => {
-    if (sla) {
-      const date = new Date(sla.deadline);
-      const formattedDate = date.toISOString().split("T")[0];
-      setDeadline(formattedDate);
-      setStatus(sla.status || "Open");
-      setUpdateReason("");
+    if (!sla) return;
+
+    const rawDeadline = sla?.deadline;
+    const d = rawDeadline ? new Date(rawDeadline) : null;
+
+    if (d && !Number.isNaN(d.getTime())) {
+      setDeadline(d.toISOString().split("T")[0]);
+    } else {
+      setDeadline("");
     }
+
+    setStatus(sla?.status || "Open");
+    setUpdateReason("");
+    setError(null);
   }, [sla]);
 
   useEffect(() => {
+    const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+
     return () => {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = prevOverflow || "unset";
     };
   }, []);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!deadline) {
-      setError("Deadline is required");
-      return;
-    }
-    if (!updateReason.trim()) {
-      setError("Update reason is required");
-      return;
-    }
-
-    setUpdating(true);
-    setError(null);
-
-    try {
-      const updateData = {
-        deadline: new Date(deadline).toISOString(),
-        status,
-        complianceStatus: status === "Closed" ? "OnTime" : sla.complianceStatus,
-      };
-      await onUpdate(sla.slaid, updateData);
-    } catch (err) {
-      setError(err.message || "Failed to update SLA");
-    } finally {
-      setUpdating(false);
-    }
-  };
 
   const formatDisplayDate = (iso) => {
     if (!iso) return "";
@@ -78,21 +57,59 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
     setCalendarOpen(false);
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (updating) return;
+
+    if (!deadline) {
+      setError("Deadline is required");
+      return;
+    }
+
+    if (!updateReason.trim()) {
+      setError("Update reason is required");
+      return;
+    }
+
+    setUpdating(true);
+    setError(null);
+
+    try {
+      const updateData = {
+        deadline: new Date(deadline).toISOString(),
+        status,
+        complianceStatus:
+          status === "Closed" ? "OnTime" : sla?.complianceStatus || null,
+      };
+
+      await onUpdate?.(sla?.slaid, updateData);
+    } catch (err) {
+      setError(err?.message || "Failed to update SLA");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   const statusOptions = [
     { value: "Open", label: "Open" },
     { value: "Closed", label: "Closed" },
   ];
 
   return (
-    <div className="esla-overlay" onClick={onClose}>
+    <div className="esla-overlay" onClick={onClose} role="presentation">
       <div className="esla-modal" onClick={(e) => e.stopPropagation()}>
         <div className="esla-header">
-          <h5 className="esla-title">Edit SLA - {sla?.employeeName}</h5>
+          <h5 className="esla-title">Edit SLA - {sla?.employeeName || "N/A"}</h5>
+
           <button
             type="button"
-            className={`esla-close-btn ${updating ? "esla-close-btn--disabled" : ""}`}
+            className={`esla-close-btn ${
+              updating ? "esla-close-btn--disabled" : ""
+            }`}
             onClick={onClose}
             disabled={updating}
+            aria-label="Close"
           >
             <X size={24} />
           </button>
@@ -109,8 +126,10 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
           <form className="esla-form" onSubmit={handleSubmit}>
             <div className="esla-sla-info">
               <small className="esla-sla-label">Current SLA</small>
-              <strong className="esla-sla-type">{sla?.slatype}</strong>
-              <small className="esla-sla-employee">Employee: {sla?.employeeName}</small>
+              <strong className="esla-sla-type">{sla?.slatype || "N/A"}</strong>
+              <small className="esla-sla-employee">
+                Employee: {sla?.employeeName || "N/A"}
+              </small>
             </div>
 
             <div className="esla-field">
@@ -126,14 +145,19 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
                   onClick={() => setCalendarOpen((o) => !o)}
                   disabled={updating}
                   placeholder="Select date"
-                  className={`esla-input esla-deadline-input ${updating ? "esla-input--disabled" : ""}`}
+                  className={`esla-input esla-deadline-input ${
+                    updating ? "esla-input--disabled" : ""
+                  }`}
                 />
 
                 <button
                   type="button"
-                  className={`esla-calendar-trigger ${updating ? "esla-calendar-trigger--disabled" : ""}`}
+                  className={`esla-calendar-trigger ${
+                    updating ? "esla-calendar-trigger--disabled" : ""
+                  }`}
                   onClick={() => setCalendarOpen((o) => !o)}
                   disabled={updating}
+                  aria-label="Open calendar"
                 >
                   <svg
                     className="esla-calendar-svg"
@@ -153,7 +177,14 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
                       strokeWidth="1.8"
                       fill="none"
                     />
-                    <line x1="4" y1="9" x2="20" y2="9" stroke="currentColor" strokeWidth="1.8" />
+                    <line
+                      x1="4"
+                      y1="9"
+                      x2="20"
+                      y2="9"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                    />
                     <line
                       x1="9"
                       y1="3"
@@ -216,18 +247,26 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
                 onChange={(e) => setUpdateReason(e.target.value)}
                 maxLength={250}
                 disabled={updating}
-                className={`esla-textarea ${updating ? "esla-textarea--disabled" : ""}`}
+                className={`esla-textarea ${
+                  updating ? "esla-textarea--disabled" : ""
+                }`}
               />
 
-              <small className="esla-char-count">{updateReason.length}/250 characters</small>
+              <small className="esla-char-count">
+                {updateReason.length}/250 characters
+              </small>
             </div>
+
+            <button type="submit" className="esla-hidden-submit" />
           </form>
         </div>
 
         <div className="esla-footer">
           <button
             type="button"
-            className={`esla-btn esla-btn--cancel ${updating ? "esla-btn--disabled" : ""}`}
+            className={`esla-btn esla-btn--cancel ${
+              updating ? "esla-btn--disabled" : ""
+            }`}
             onClick={onClose}
             disabled={updating}
           >
@@ -235,9 +274,11 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
           </button>
 
           <button
-            type="submit"
+            type="button"
             className={`esla-btn esla-btn--update ${
-              updating || !deadline || !updateReason.trim() ? "esla-btn--disabled" : ""
+              updating || !deadline || !updateReason.trim()
+                ? "esla-btn--disabled"
+                : ""
             }`}
             onClick={handleSubmit}
             disabled={updating || !deadline || !updateReason.trim()}

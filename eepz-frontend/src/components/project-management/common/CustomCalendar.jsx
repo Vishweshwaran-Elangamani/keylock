@@ -18,25 +18,10 @@ const CustomCalendar = ({
   const [calendarMonth, setCalendarMonth] = useState(null);
   const [calendarYear, setCalendarYear] = useState(null);
 
-  const [calendarPosition, setCalendarPosition] = useState({
-    top: 0,
-    left: 0,
-  });
+  const [calendarPosition, setCalendarPosition] = useState({ top: 0, left: 0 });
 
   const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+    "January","February","March","April","May","June","July","August","September","October","November","December",];
 
   const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
@@ -155,7 +140,6 @@ const CustomCalendar = ({
             left =
               anchorRect.left + anchorRect.width / 2 - calendarWidth / 2 + ox;
           }
-
           break;
         }
       }
@@ -186,6 +170,13 @@ const CustomCalendar = ({
       window.removeEventListener("resize", updatePosition);
     };
   }, [isOpen, anchorRef, position, align, offset]);
+
+  useLayoutEffect(() => {
+    if (!isOpen || !calendarRef.current) return;
+
+    calendarRef.current.style.top = `${calendarPosition.top}px`;
+    calendarRef.current.style.left = `${calendarPosition.left}px`;
+  }, [isOpen, calendarPosition]);
 
   useEffect(() => {
     const handler = (e) => {
@@ -303,16 +294,7 @@ const CustomCalendar = ({
   const minDateObj = minDate ? new Date(minDate) : null;
 
   const calendarContent = (
-    <div
-      className="csla-calendar-dropdown"
-      ref={calendarRef}
-      style={{
-        position: "fixed",
-        top: `${calendarPosition.top}px`,
-        left: `${calendarPosition.left}px`,
-        zIndex: 10002,
-      }}
-    >
+    <div className="csla-calendar-dropdown" ref={calendarRef}>
       <div className="csla-calendar-header">
         <button
           type="button"

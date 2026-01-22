@@ -1,0 +1,64 @@
+.sla-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 6px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  line-height: 1;
+}
+
+.sla-status-badge__icon {
+  flex-shrink: 0;
+}
+
+.sla-status-badge--sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+.sla-status-badge--md {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.813rem;
+}
+
+.sla-status-badge--lg {
+  padding: 0.5rem 1rem;
+  font-size: 0.938rem;
+}
+
+.sla-status-badge--open {
+  color: #0f62fe;
+  background-color: rgba(15, 98, 254, 0.08);
+  border-color: rgba(15, 98, 254, 0.18);
+}
+
+.sla-status-badge--inprogress {
+  color: #e2b93b;
+  background-color: rgba(226, 185, 59, 0.10);
+  border-color: rgba(226, 185, 59, 0.22);
+}
+
+.sla-status-badge--closed {
+  color: #24a148;
+  background-color: rgba(36, 161, 72, 0.10);
+  border-color: rgba(36, 161, 72, 0.22);
+}
+
+.sla-status-badge--breached {
+  color: #e01950;
+  background-color: rgba(224, 25, 80, 0.08);
+  border-color: rgba(224, 25, 80, 0.22);
+}
+
+.sla-status-badge--extended {
+  color: #ac5098;
+  background-color: rgba(172, 80, 152, 0.10);
+  border-color: rgba(172, 80, 152, 0.22);
+}
+
+.sla-status-badge--escalated {
+  color: #e2b93b;
+  background-color: rgba(226, 185, 59, 0.10);
+  border-color: rgba(226, 185, 59, 0.22);
+}

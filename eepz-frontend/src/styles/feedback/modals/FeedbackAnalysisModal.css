@@ -421,26 +421,7 @@
 .fa-vader-bar-fill {
   height: 100%;
   transition: width 0.3s ease;
-}
-
-.fa-vader-bar-fill--positive {
-  background: #198754;
-}
-
-.fa-vader-bar-fill--neutral {
-  background: #6c757d;
-}
-
-.fa-vader-bar-fill--negative {
-  background: #dc3545;
-}
-
-.fa-vader-bar-value {
-  min-width: 50px;
-  text-align: right;
-  font-size: 0.813rem;
-  font-weight: 600;
-  color: #333;
+  width: 0%;
 }
 
 .fa-emotion-card {
@@ -496,6 +477,7 @@
   height: 100%;
   background: #3d3a68;
   transition: width 0.3s ease;
+  width: 0%;
 }
 
 .fa-emotion-bar-value {
@@ -504,6 +486,18 @@
   font-size: 0.813rem;
   font-weight: 600;
   color: #333;
+}
+
+.fa-vader-bar-fill--positive {
+  background: #198754;
+}
+
+.fa-vader-bar-fill--neutral {
+  background: #6c757d;
+}
+
+.fa-vader-bar-fill--negative {
+  background: #dc3545;
 }
 
 .fa-bias-card {
@@ -781,11 +775,74 @@
   text-align: center;
 }
 
+.fa-w-0 {
+  width: 0%;
+}
+.fa-w-5 {
+  width: 5%;
+}
+.fa-w-10 {
+  width: 10%;
+}
+.fa-w-15 {
+  width: 15%;
+}
+.fa-w-20 {
+  width: 20%;
+}
+.fa-w-25 {
+  width: 25%;
+}
+.fa-w-30 {
+  width: 30%;
+}
+.fa-w-35 {
+  width: 35%;
+}
+.fa-w-40 {
+  width: 40%;
+}
+.fa-w-45 {
+  width: 45%;
+}
+.fa-w-50 {
+  width: 50%;
+}
+.fa-w-55 {
+  width: 55%;
+}
+.fa-w-60 {
+  width: 60%;
+}
+.fa-w-65 {
+  width: 65%;
+}
+.fa-w-70 {
+  width: 70%;
+}
+.fa-w-75 {
+  width: 75%;
+}
+.fa-w-80 {
+  width: 80%;
+}
+.fa-w-85 {
+  width: 85%;
+}
+.fa-w-90 {
+  width: 90%;
+}
+.fa-w-95 {
+  width: 95%;
+}
+.fa-w-100 {
+  width: 100%;
+}
+
 @keyframes fa-spin {
   from {
     transform: rotate(0deg);
   }
-
   to {
     transform: rotate(360deg);
   }

@@ -8,7 +8,8 @@ import {
   Eye,
   X,
   Search,
-  Filter,
+  Lock,
+  Clock,
 } from "lucide-react";
 import { toast } from "sonner";
 import slaService from "../../services/sla/slaService";
@@ -314,17 +315,23 @@ const DeptHeadSLADashboard = () => {
         ? allL2Escalations
         : allL2Escalations.filter((e) => e.period === selectedPeriod);
 
+    const openCount = filteredByPeriod.filter(
+      (e) => e.escalationStatus === "Pending" || e.escalationStatus === "InProgress"
+    ).length;
+
+    const approvedCount = filteredByPeriod.filter(
+      (e) => e.escalationStatus === "Resolved"
+    ).length;
+
+    const closedCount = filteredByPeriod.filter(
+      (e) => e.escalationStatus === "Rejected"
+    ).length;
+
     return {
       total: filteredByPeriod.length,
-      pending: filteredByPeriod.filter(
-        (e) =>
-          e.escalationStatus === "Pending" ||
-          e.escalationStatus === "InProgress"
-      ).length,
-      resolved: filteredByPeriod.filter((e) => e.escalationStatus === "Resolved")
-        .length,
-      rejected: filteredByPeriod.filter((e) => e.escalationStatus === "Rejected")
-        .length,
+      open: openCount,
+      approved: approvedCount,
+      closed: closedCount,
     };
   };
 
@@ -394,18 +401,13 @@ const DeptHeadSLADashboard = () => {
 
   return (
     <div className="dh-sla-container">
-      <Breadcrumb
-        items={[{ label: "SLA Compliance" }, { label: "Department Head" }]}
-      />
+      <Breadcrumb items={[{ label: "SLA Compliance" }, { label: "Department Head" }]} />
 
       {error && (
         <div className="dh-sla-error-alert">
           <AlertCircle size={20} />
           <span>{error}</span>
-          <button
-            onClick={() => setError(null)}
-            className="dh-sla-error-close"
-          >
+          <button onClick={() => setError(null)} className="dh-sla-error-close">
             <X size={18} />
           </button>
         </div>
@@ -418,37 +420,37 @@ const DeptHeadSLADashboard = () => {
           </div>
           <div className="dh-sla-stat-content">
             <h3 className="dh-sla-stat-value">{stats.total}</h3>
-            <p className="dh-sla-stat-label">TOTAL MOMS</p>
+            <p className="dh-sla-stat-label">TOTAL SLA</p>
           </div>
         </div>
 
         <div className="dh-sla-stat-card">
-          <div className="dh-sla-stat-icon-wrapper dh-sla-stat-icon-month">
-            <Calendar size={24} />
+          <div className="dh-sla-stat-icon-wrapper dh-sla-stat-icon-open">
+            <Clock size={24} />
           </div>
           <div className="dh-sla-stat-content">
-            <h3 className="dh-sla-stat-value">{stats.resolved}</h3>
-            <p className="dh-sla-stat-label">THIS MONTH</p>
+            <h3 className="dh-sla-stat-value">{stats.open}</h3>
+            <p className="dh-sla-stat-label">OPEN</p>
           </div>
         </div>
 
         <div className="dh-sla-stat-card">
-          <div className="dh-sla-stat-icon-wrapper dh-sla-stat-icon-action">
+          <div className="dh-sla-stat-icon-wrapper dh-sla-stat-icon-approved">
             <CheckCircle size={24} />
           </div>
           <div className="dh-sla-stat-content">
-            <h3 className="dh-sla-stat-value">{stats.pending}</h3>
-            <p className="dh-sla-stat-label">ACTION ITEMS</p>
+            <h3 className="dh-sla-stat-value">{stats.approved}</h3>
+            <p className="dh-sla-stat-label">APPROVED</p>
           </div>
         </div>
 
         <div className="dh-sla-stat-card">
-          <div className="dh-sla-stat-icon-wrapper dh-sla-stat-icon-overdue">
-            <AlertCircle size={24} />
+          <div className="dh-sla-stat-icon-wrapper dh-sla-stat-icon-closed">
+            <Lock size={24} />
           </div>
           <div className="dh-sla-stat-content">
-            <h3 className="dh-sla-stat-value">{stats.rejected}</h3>
-            <p className="dh-sla-stat-label">OVERDUE</p>
+            <h3 className="dh-sla-stat-value">{stats.closed}</h3>
+            <p className="dh-sla-stat-label">CLOSED</p>
           </div>
         </div>
       </div>
@@ -520,9 +522,7 @@ const DeptHeadSLADashboard = () => {
         </div>
       </div>
 
-      <div className="dh-sla-tabs-wrapper">
-       
-      </div>
+      <div className="dh-sla-tabs-wrapper"></div>
 
       <div className="dh-sla-table-wrapper">
         <div className="dh-sla-table-responsive">
@@ -556,9 +556,7 @@ const DeptHeadSLADashboard = () => {
                     <td>
                       <div className="dh-sla-employee-cell">
                         <div className="dh-sla-employee-info">
-                          <div className="dh-sla-employee-name">
-                            {esc.employeeName}
-                          </div>
+                          <div className="dh-sla-employee-name">{esc.employeeName}</div>
                           <div className="dh-sla-employee-email">
                             {esc.employeeEmail || "No email"}
                           </div>
@@ -658,11 +656,7 @@ const DeptHeadSLADashboard = () => {
 
             <div className="dh-sla-pagination-right">
               <ul className="dh-sla-pagination-list">
-                <li
-                  className={`dh-sla-page-item ${
-                    currentPage === 1 ? "disabled" : ""
-                  }`}
-                >
+                <li className={`dh-sla-page-item ${currentPage === 1 ? "disabled" : ""}`}>
                   <button
                     className="dh-sla-page-link dh-sla-page-arrow"
                     onClick={() => goToPage(currentPage - 1)}
@@ -675,18 +669,13 @@ const DeptHeadSLADashboard = () => {
 
                 {getPageNumbers().map((page, idx) =>
                   page === "..." ? (
-                    <li
-                      key={`ellipsis-${idx}`}
-                      className="dh-sla-page-item disabled"
-                    >
+                    <li key={`ellipsis-${idx}`} className="dh-sla-page-item disabled">
                       <span className="dh-sla-page-link">…</span>
                     </li>
                   ) : (
                     <li
                       key={page}
-                      className={`dh-sla-page-item ${
-                        currentPage === page ? "active" : ""
-                      }`}
+                      className={`dh-sla-page-item ${currentPage === page ? "active" : ""}`}
                     >
                       <button
                         className="dh-sla-page-link"
@@ -721,10 +710,7 @@ const DeptHeadSLADashboard = () => {
 
       {showResolutionModal && selectedEscalation && (
         <>
-          <div
-            className="dh-sla-modal-backdrop"
-            onClick={handleCloseResolutionModal}
-          />
+          <div className="dh-sla-modal-backdrop" onClick={handleCloseResolutionModal} />
 
           <div className="dh-sla-modal-wrapper">
             <div className="dh-sla-modal-container">

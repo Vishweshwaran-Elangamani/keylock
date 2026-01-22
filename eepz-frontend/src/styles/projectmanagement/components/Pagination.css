@@ -1,0 +1,26 @@
+.pg-wrap {
+  width: 100%;
+}
+
+.pg-nav-btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+}
+
+.pg-page-btn {
+  min-width: 32px;
+  height: 32px;
+  border-radius: 6px;
+}
+
+.pg-ellipsis {
+  min-width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+}

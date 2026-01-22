@@ -29,8 +29,9 @@
   font-weight: 400 !important;
 }
 
-.sched-breadcrumb-nav {
+.sched-breadcrumb-nav-meeting {
   margin-bottom: 1.5rem;
+  margin-left: 35px;
 }
 
 .sched-breadcrumb {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Bell, X, Check, AlertCircle } from "lucide-react";
 import slaService from "../../services/slaService";
+import "../../styles/sla/components/NotificationBell.css";
 
 const NotificationBell = () => {
   const [notifications, setNotifications] = useState([]);
@@ -60,29 +61,27 @@ const NotificationBell = () => {
   const getNotificationIcon = (type) => {
     switch (type) {
       case "Reminder":
-        return <AlertCircle size={16} color="#E2B93B" />;
+        return <AlertCircle size={16} className="nb-icon nb-icon-reminder" />;
       case "AutoClosure":
-        return <AlertCircle size={16} color="#E01950" />;
+        return <AlertCircle size={16} className="nb-icon nb-icon-autoclosure" />;
       case "Escalation":
-        return <AlertCircle size={16} color="#0F62FE" />;
+        return <AlertCircle size={16} className="nb-icon nb-icon-escalation" />;
       default:
-        return <Bell size={16} color="#6B7280" />;
+        return <Bell size={16} className="nb-icon nb-icon-default" />;
     }
   };
 
   return (
-    <div className="position-relative">
+    <div className="nb-scope">
       <button
-        className="btn btn-light position-relative rounded-circle p-2"
-        onClick={() => setShowDropdown(!showDropdown)}
-        style={{ width: "40px", height: "40px" }}
+        type="button"
+        className="nb-bell-btn"
+        onClick={() => setShowDropdown((p) => !p)}
+        aria-label="Notifications"
       >
         <Bell size={20} />
         {unreadCount > 0 && (
-          <span
-            className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-            style={{ fontSize: "0.65rem" }}
-          >
+          <span className="nb-badge">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
@@ -91,87 +90,76 @@ const NotificationBell = () => {
       {showDropdown && (
         <>
           <div
-            className="position-fixed top-0 start-0 w-100 h-100"
-            style={{ zIndex: 1040 }}
+            className="nb-backdrop"
             onClick={() => setShowDropdown(false)}
           />
-          <div
-            className="position-absolute end-0 mt-2 bg-white rounded shadow-lg"
-            style={{
-              width: "400px",
-              maxHeight: "500px",
-              zIndex: 1050,
-              borderRadius: "12px",
-            }}
-          >
-            <div className="d-flex justify-content-between align-items-center p-3 border-bottom">
-              <h6 className="mb-0 fw-semibold">Notifications</h6>
-              <div className="d-flex gap-2">
+
+          <div className="nb-dropdown">
+            <div className="nb-header">
+              <h6 className="nb-title">Notifications</h6>
+
+              <div className="nb-header-actions">
                 {notifications.length > 0 && (
                   <button
-                    className="btn btn-sm btn-link text-decoration-none p-0"
+                    type="button"
+                    className="nb-link-btn"
                     onClick={markAllAsRead}
                     disabled={loading}
                   >
-                    <Check size={16} /> Mark all read
+                    <Check size={16} />
+                    Mark all read
                   </button>
                 )}
+
                 <button
-                  className="btn btn-sm btn-link text-decoration-none p-0"
+                  type="button"
+                  className="nb-link-btn"
                   onClick={() => setShowDropdown(false)}
+                  aria-label="Close"
                 >
                   <X size={16} />
                 </button>
               </div>
             </div>
 
-            <div style={{ maxHeight: "400px", overflowY: "auto" }}>
+            <div className="nb-list">
               {notifications.length === 0 ? (
-                <div className="text-center py-5">
-                  <Bell size={48} className="text-muted mb-3" />
-                  <p className="text-muted mb-0">No new notifications</p>
+                <div className="nb-empty">
+                  <Bell size={48} className="nb-empty-icon" />
+                  <p className="nb-empty-text">No new notifications</p>
                 </div>
               ) : (
                 notifications.map((notification) => (
                   <div
                     key={notification.notificationId}
-                    className="border-bottom p-3 position-relative"
-                    style={{
-                      cursor: "pointer",
-                      transition: "background-color 0.2s",
-                    }}
-                    onMouseEnter={(e) =>
-                      (e.currentTarget.style.backgroundColor = "#f8f9fa")
-                    }
-                    onMouseLeave={(e) =>
-                      (e.currentTarget.style.backgroundColor = "white")
-                    }
+                    className="nb-item"
                   >
-                    <div className="d-flex gap-3">
-                      <div className="flex-shrink-0 mt-1">
+                    <div className="nb-item-inner">
+                      <div className="nb-item-icon">
                         {getNotificationIcon(notification.notificationType)}
                       </div>
-                      <div className="flex-grow-1">
-                        <div className="fw-semibold mb-1 small">
+
+                      <div className="nb-item-body">
+                        <div className="nb-item-subject">
                           {notification.subject}
                         </div>
-                        <p
-                          className="mb-2 small text-muted"
-                          style={{ fontSize: "0.813rem" }}
-                        >
+
+                        <p className="nb-item-message">
                           {notification.message}
                         </p>
-                        <div className="d-flex justify-content-between align-items-center">
-                          <small className="text-muted">
+
+                        <div className="nb-item-footer">
+                          <small className="nb-item-date">
                             {new Date(notification.sentAt).toLocaleDateString()}
                           </small>
+
                           <button
-                            className="btn btn-sm btn-outline-primary"
+                            type="button"
+                            className="nb-mark-btn"
                             onClick={(e) => {
                               e.stopPropagation();
                               markAsRead(notification.notificationId);
                             }}
-                            style={{ borderRadius: "6px", fontSize: "0.75rem" }}
                           >
                             Mark as read
                           </button>
@@ -184,8 +172,8 @@ const NotificationBell = () => {
             </div>
 
             {notifications.length > 0 && (
-              <div className="p-3 border-top text-center">
-                <button className="btn btn-sm btn-link text-decoration-none">
+              <div className="nb-footer">
+                <button type="button" className="nb-link-btn">
                   View all notifications
                 </button>
               </div>

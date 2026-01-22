@@ -11,6 +11,10 @@
   padding: 20px;
 }
 
+.smm-modal-open.modal.show.d-block {
+  display: flex !important;
+}
+
 .smm-dialog {
   margin: 0;
   width: 100%;
@@ -48,6 +52,11 @@
   margin-top: 0.5rem;
 }
 
+.smm-tabs-item {
+  display: flex;
+  align-items: center;
+}
+
 .smm-tab-btn {
   background-color: rgba(255, 255, 255, 0.2);
   color: #ffffff;
@@ -57,6 +66,11 @@
   padding-inline: 1.4rem;
   padding-block: 0.55rem;
   font-weight: 500;
+  cursor: pointer;
+}
+
+.smm-tab-btn:hover {
+  background-color: rgba(255, 255, 255, 0.3);
 }
 
 .smm-tab-btn.smm-tab-active {
@@ -65,12 +79,12 @@
   font-weight: 600;
 }
 
-.smm-tab-btn:hover {
-  background-color: rgba(255, 255, 255, 0.3);
-}
-
 .smm-tab-btn.smm-tab-active:hover {
   background-color: #d84796;
+}
+
+.smm-tab-btn-gap {
+  margin-left: 0.5rem;
 }
 
 .smm-body {

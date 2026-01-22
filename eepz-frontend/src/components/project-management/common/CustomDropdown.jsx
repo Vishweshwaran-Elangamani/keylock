@@ -1,9 +1,7 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ChevronDown } from "lucide-react";
 import "../../../styles/projectmanagement/components/CustomDropdown.css";
-
-const PRIMARY = "#27235C";
 
 const normalizeOptions = (options) => {
   if (!Array.isArray(options)) return [];
@@ -97,7 +95,15 @@ const CustomDropdown = ({
       window.removeEventListener("resize", onResize);
       window.removeEventListener("scroll", onResize, true);
     };
-  }, [open]);
+  }, [open, align, offset, anchorRef]);
+
+  useLayoutEffect(() => {
+    if (!open || !dropdownRef.current) return;
+
+    dropdownRef.current.style.top = `${pos.top}px`;
+    dropdownRef.current.style.left = `${pos.left}px`;
+    dropdownRef.current.style.width = `${pos.width}px`;
+  }, [open, pos]);
 
   useEffect(() => {
     const onClickOutside = (e) => {
@@ -122,15 +128,7 @@ const CustomDropdown = ({
 
   const dropdownContent =
     open && !disabled ? (
-      <div
-        ref={dropdownRef}
-        className="cdrop-menu"
-        style={{
-          top: `${pos.top}px`,
-          left: `${pos.left}px`,
-          width: `${pos.width}px`,
-        }}
-      >
+      <div ref={dropdownRef} className="cdrop-menu">
         {normalizedOptions.length === 0 ? (
           <div className="cdrop-empty">No options</div>
         ) : (
@@ -180,7 +178,6 @@ const CustomDropdown = ({
         <ChevronDown
           size={18}
           strokeWidth={2.4}
-          color={PRIMARY}
           className={`cdrop-icon ${open ? "cdrop-icon-open" : ""}`}
         />
       </button>

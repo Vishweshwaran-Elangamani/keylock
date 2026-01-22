@@ -4,8 +4,6 @@ import toastr from "toastr";
 import MomDetailsView from "./MomDetailsView";
 import "../../../styles/mom/modals/SharedMomsModal.css";
 
-const PRIMARY = "#27235C";
-
 const SharedMomsModal = ({ onClose }) => {
   const [activeTab, setActiveTab] = useState("sharedByMe");
   const [sharedByMeMoms, setSharedByMeMoms] = useState([]);
@@ -86,7 +84,7 @@ const SharedMomsModal = ({ onClose }) => {
   return (
     <>
       <div
-        className="smm-overlay modal fade show d-block"
+        className="smm-overlay modal fade show d-block smm-modal-open"
         tabIndex="-1"
         onClick={onClose}
       >
@@ -102,22 +100,12 @@ const SharedMomsModal = ({ onClose }) => {
                 </h5>
 
                 <ul className="smm-tabs nav nav-pills">
-                  <li className="nav-item">
+                  <li className="nav-item smm-tabs-item">
                     <button
-                      className="smm-tab-btn"
-                      style={{
-                        backgroundColor:
-                          activeTab === "sharedByMe"
-                            ? "#D84796"
-                            : "rgba(255,255,255,0.2)",
-                        color: "#ffffff",
-                        border: "none",
-                        borderRadius: "9999px",
-                        paddingInline: "1.4rem",
-                        paddingBlock: "0.55rem",
-                        fontWeight: activeTab === "sharedByMe" ? 600 : 500,
-                        transition: "all 0.2s ease",
-                      }}
+                      type="button"
+                      className={`smm-tab-btn ${
+                        activeTab === "sharedByMe" ? "smm-tab-active" : ""
+                      }`}
                       onClick={() => setActiveTab("sharedByMe")}
                     >
                       <i className="bi bi-share me-2" />
@@ -125,21 +113,10 @@ const SharedMomsModal = ({ onClose }) => {
                     </button>
 
                     <button
-                      className="smm-tab-btn"
-                      style={{
-                        backgroundColor:
-                          activeTab === "sharedWithMe"
-                            ? "#D84796"
-                            : "rgba(255,255,255,0.2)",
-                        color: "#ffffff",
-                        border: "none",
-                        borderRadius: "9999px",
-                        paddingInline: "1.4rem",
-                        paddingBlock: "0.55rem",
-                        fontWeight: activeTab === "sharedWithMe" ? 600 : 500,
-                        transition: "all 0.2s ease",
-                        marginLeft: "0.5rem",
-                      }}
+                      type="button"
+                      className={`smm-tab-btn smm-tab-btn-gap ${
+                        activeTab === "sharedWithMe" ? "smm-tab-active" : ""
+                      }`}
                       onClick={() => setActiveTab("sharedWithMe")}
                     >
                       <i className="bi bi-inbox me-2" />
@@ -152,9 +129,7 @@ const SharedMomsModal = ({ onClose }) => {
               <button
                 type="button"
                 className="btn-close btn-close-white"
-                onClick={() => {
-                  onClose();
-                }}
+                onClick={onClose}
                 aria-label="Close"
               />
             </div>
@@ -202,6 +177,7 @@ const SharedMomsModal = ({ onClose }) => {
                         </th>
                       </tr>
                     </thead>
+
                     <tbody>
                       {currentMoms.map((mom, index) => {
                         const meetingType = getMeetingType(mom);
@@ -217,6 +193,7 @@ const SharedMomsModal = ({ onClose }) => {
                               <div className="fw-semibold smm-title-cell">
                                 {mom.meetingTitle}
                               </div>
+
                               {mom.meetingDate && (
                                 <small className="text-muted smm-subtext">
                                   <i className="bi bi-calendar3 me-1" />
@@ -226,11 +203,13 @@ const SharedMomsModal = ({ onClose }) => {
                                 </small>
                               )}
                             </td>
+
                             <td className="px-4 py-3 smm-td">
                               <span className="badge bg-primary-subtle text-primary">
                                 {meetingType || "N/A"}
                               </span>
                             </td>
+
                             <td className="px-4 py-3 smm-td">
                               {activeTab === "sharedByMe"
                                 ? mom.sharedAt
@@ -242,6 +221,7 @@ const SharedMomsModal = ({ onClose }) => {
                                 ? new Date(mom.sharedAt).toLocaleDateString()
                                 : "N/A"}
                             </td>
+
                             <td className="px-4 py-3 smm-td">
                               <div className="d-flex align-items-center gap-2">
                                 <i className="bi bi-person-circle text-muted" />
@@ -254,8 +234,10 @@ const SharedMomsModal = ({ onClose }) => {
                                 </span>
                               </div>
                             </td>
+
                             <td className="px-4 py-3 text-center smm-td">
                               <button
+                                type="button"
                                 className="smm-view-btn btn btn-sm d-flex align-items-center gap-1 mx-auto"
                                 onClick={() => handleViewMom(mom.momId)}
                               >
@@ -278,11 +260,11 @@ const SharedMomsModal = ({ onClose }) => {
                 {activeTab === "sharedByMe" ? "shared" : "received"} MOM
                 {currentMoms.length !== 1 ? "s" : ""}
               </span>
+
               <button
+                type="button"
                 className="smm-close-btn btn btn-secondary px-4"
-                onClick={() => {
-                  onClose();
-                }}
+                onClick={onClose}
               >
                 Close
               </button>
@@ -297,12 +279,6 @@ const SharedMomsModal = ({ onClose }) => {
           onClose={() => setSelectedMom(null)}
         />
       )}
-
-      <style>{`
-        .modal.show.d-block {
-          display: flex !important;
-        }
-      `}</style>
     </>
   );
 };

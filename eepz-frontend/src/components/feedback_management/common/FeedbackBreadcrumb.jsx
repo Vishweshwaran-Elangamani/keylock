@@ -28,9 +28,7 @@ const FeedbackBreadcrumb = ({ items = [] }) => {
         <li className="fb-breadcrumb-item">
           <a
             href="#"
-            className={`fb-breadcrumb-home-link ${
-              homeHover ? "is-hover" : ""
-            }`}
+            className={`fb-breadcrumb-home-link ${homeHover ? "is-hover" : ""}`}
             onClick={(e) => {
               e.preventDefault();
               navigate(getHomeRoute());

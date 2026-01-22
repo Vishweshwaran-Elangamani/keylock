@@ -1,69 +1,54 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Home } from "lucide-react";
+import "../../../styles/projectmanagement/components/Breadcrumb.css";
 
-const Breadcrumb = ({ items }) => {
+const Breadcrumb = ({ items = [] }) => {
   const navigate = useNavigate();
 
   return (
-    <nav aria-label="breadcrumb" className="mb-3">
-      <ol
-        className="breadcrumb mb-0 p-3 rounded"
-        style={{
-          backgroundColor: "rgba(151, 36, 126, 0.05)",
-          fontSize: "0.875rem",
-        }}
-      >
-        <li className="breadcrumb-item">
+    <nav aria-label="breadcrumb" className="pm-bc">
+      <ol className="pm-bc__list breadcrumb">
+        <li className="pm-bc__item breadcrumb-item">
           <a
             href="#"
+            className="pm-bc__link pm-bc__link--home"
             onClick={(e) => {
               e.preventDefault();
               navigate("/project-management/dashboard");
             }}
-            style={{
-              color: "var(--color-primary-3)",
-              textDecoration: "none",
-              display: "flex",
-              alignItems: "center",
-              gap: "0.25rem",
-            }}
           >
-            <Home size={18} />
+            <Home size={18} className="pm-bc__home-icon" />
             Dashboard
           </a>
         </li>
-        {items.map((item, index) => (
-          <li
-            key={index}
-            className={`breadcrumb-item ${
-              index === items.length - 1 ? "active" : ""
-            }`}
-            aria-current={index === items.length - 1 ? "page" : undefined}
-          >
-            {index === items.length - 1 ? (
-              <span
-                style={{ color: "var(--color-primary-1)", fontWeight: 600 }}
-              >
-                {item.label}
-              </span>
-            ) : (
-              <a
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (item.path) navigate(item.path);
-                }}
-                style={{
-                  color: "#97247E",
-                  textDecoration: "none",
-                }}
-              >
-                {item.label}
-              </a>
-            )}
-          </li>
-        ))}
+
+        {items.map((item, index) => {
+          const isLast = index === items.length - 1;
+
+          return (
+            <li
+              key={index}
+              className={`pm-bc__item breadcrumb-item ${isLast ? "active" : ""}`}
+              aria-current={isLast ? "page" : undefined}
+            >
+              {isLast ? (
+                <span className="pm-bc__current">{item.label}</span>
+              ) : (
+                <a
+                  href="#"
+                  className="pm-bc__link"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (item.path) navigate(item.path);
+                  }}
+                >
+                  {item.label}
+                </a>
+              )}
+            </li>
+          );
+        })}
       </ol>
     </nav>
   );

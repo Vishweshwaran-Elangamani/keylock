@@ -1,0 +1,81 @@
+.sla-table-scope .sla-table-filter-card,
+.sla-table-scope .sla-table-card {
+  border-radius: 12px;
+}
+
+.sla-table-scope .sla-table-search-wrapper {
+  position: relative;
+}
+
+.sla-table-scope .sla-table-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7280;
+  pointer-events: none;
+}
+
+.sla-table-scope .sla-table-search-input {
+  border-radius: 8px;
+  padding-left: 44px;
+}
+
+.sla-table-scope .sla-table-filter-select {
+  border-radius: 8px;
+}
+
+.sla-table-scope .sla-table-head {
+  background-color: #f8f9fa;
+}
+
+.sla-table-scope .sla-table-th {
+  padding: 1rem;
+  white-space: nowrap;
+  vertical-align: middle;
+  font-weight: 700;
+  color: #111827;
+}
+
+.sla-table-scope .sla-table-th-sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.sla-table-scope .sla-table-th-actions {
+  text-align: center;
+}
+
+.sla-table-scope .sla-table-td {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+.sla-table-scope .sla-table-row {
+  cursor: pointer;
+}
+
+.sla-table-scope .sla-table-td-actions {
+  text-align: center;
+}
+
+.sla-table-scope .sla-table-view-btn {
+  border-radius: 6px;
+}
+
+.sla-table-scope .sla-table-employee-name {
+  line-height: 1.2;
+}
+
+.sla-table-scope .sla-table-employee-dept {
+  display: block;
+  margin-top: 2px;
+}
+
+.sla-table-scope .sla-table-empty {
+  border-top: 1px solid #e5e7eb;
+}
+
+.sla-table-scope .sla-table-empty-text {
+  font-weight: 500;
+}

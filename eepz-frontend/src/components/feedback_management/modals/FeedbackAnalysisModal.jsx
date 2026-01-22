@@ -1,7 +1,6 @@
 import React from "react";
 import {
   X,
-  Activity,
   AlertTriangle,
   CheckCircle,
   Heart,
@@ -11,18 +10,11 @@ import {
   Target,
   Lightbulb,
   BookOpen,
-  XCircle,
   AlertCircle,
 } from "lucide-react";
 import "../../../styles/feedback/modals/FeedbackAnalysisModal.css";
 
-const FeedbackAnalysisModal = ({
-  show,
-  onClose,
-  analysisData,
-  loading,
-  error,
-}) => {
+const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) => {
   if (!show) return null;
 
   const getSentimentColorClass = (sentiment) => {
@@ -41,6 +33,13 @@ const FeedbackAnalysisModal = ({
     return "neutral";
   };
 
+  const getWidthClass = (value) => {
+    const pct = Math.round((Number(value) || 0) * 100);
+    const clamped = Math.max(0, Math.min(100, pct));
+    const roundedTo5 = Math.round(clamped / 5) * 5;
+    return `fa-w-${roundedTo5}`;
+  };
+
   return (
     <div className="fa-modal-overlay" onClick={onClose}>
       <div className="fa-modal-container" onClick={(e) => e.stopPropagation()}>
@@ -49,6 +48,7 @@ const FeedbackAnalysisModal = ({
             <BarChart2 size={20} />
             <h2 className="fa-modal-title">Feedback Analysis</h2>
           </div>
+
           <button className="fa-modal-close-btn" onClick={onClose}>
             <X size={20} />
           </button>
@@ -59,9 +59,7 @@ const FeedbackAnalysisModal = ({
             <div className="fa-loading-container">
               <div className="fa-spinner"></div>
               <p className="fa-loading-text">Analyzing Feedback...</p>
-              <p className="fa-loading-subtext">
-                Running multi-engine analysis
-              </p>
+              <p className="fa-loading-subtext">Running multi-engine analysis</p>
             </div>
           )}
 
@@ -82,6 +80,7 @@ const FeedbackAnalysisModal = ({
                   <FileText size={16} />
                   <h3>ORIGINAL FEEDBACK</h3>
                 </div>
+
                 <div className="fa-feedback-box">
                   <p>
                     <strong>Project:</strong>{" "}
@@ -155,8 +154,8 @@ const FeedbackAnalysisModal = ({
                     <div className="fa-metric-value">
                       {analysisData.feedback_metrics
                         ? (
-                            analysisData.feedback_metrics
-                              .professionalism_score * 100
+                            analysisData.feedback_metrics.professionalism_score *
+                            100
                           ).toFixed(0)
                         : 0}
                       %
@@ -196,6 +195,7 @@ const FeedbackAnalysisModal = ({
                     <Heart size={16} />
                     <h3>SENTIMENT ANALYSIS</h3>
                   </div>
+
                   <div
                     className={`fa-sentiment-card fa-sentiment-card--${getSentimentColorClass(
                       analysisData.sentiment_analysis.sentiment
@@ -207,36 +207,32 @@ const FeedbackAnalysisModal = ({
                         {analysisData.sentiment_analysis.sentiment_category})
                       </div>
                       <div className="fa-sentiment-confidence">
-                        {(
-                          analysisData.sentiment_analysis.confidence * 100
-                        ).toFixed(0)}
+                        {(analysisData.sentiment_analysis.confidence * 100).toFixed(
+                          0
+                        )}
                         % Confidence
                       </div>
                     </div>
 
                     <div className="fa-sentiment-metrics">
                       <div className="fa-sentiment-metric-item">
-                        <div className="fa-sentiment-metric-label">
-                          Polarity
-                        </div>
+                        <div className="fa-sentiment-metric-label">Polarity</div>
                         <div className="fa-sentiment-metric-value">
                           {analysisData.sentiment_analysis.polarity.toFixed(2)}
                         </div>
                       </div>
+
                       <div className="fa-sentiment-metric-item">
                         <div className="fa-sentiment-metric-label">
                           Subjectivity
                         </div>
                         <div className="fa-sentiment-metric-value">
-                          {analysisData.sentiment_analysis.subjectivity.toFixed(
-                            2
-                          )}
+                          {analysisData.sentiment_analysis.subjectivity.toFixed(2)}
                         </div>
                       </div>
+
                       <div className="fa-sentiment-metric-item">
-                        <div className="fa-sentiment-metric-label">
-                          Intensity
-                        </div>
+                        <div className="fa-sentiment-metric-label">Intensity</div>
                         <div className="fa-sentiment-metric-value">
                           {analysisData.sentiment_analysis.intensity.toFixed(2)}
                         </div>
@@ -245,24 +241,20 @@ const FeedbackAnalysisModal = ({
 
                     <div className="fa-vader-section">
                       <div className="fa-vader-label">VADER Scores</div>
+
                       <div className="fa-vader-bars">
                         <div className="fa-vader-bar">
                           <span className="fa-vader-bar-label">Positive</span>
                           <div className="fa-vader-bar-track">
                             <div
-                              className="fa-vader-bar-fill fa-vader-bar-fill--positive"
-                              style={{
-                                width: `${
-                                  analysisData.sentiment_analysis
-                                    .vader_positive * 100
-                                }%`,
-                              }}
+                              className={`fa-vader-bar-fill fa-vader-bar-fill--positive ${getWidthClass(
+                                analysisData.sentiment_analysis.vader_positive
+                              )}`}
                             ></div>
                           </div>
                           <span className="fa-vader-bar-value">
                             {(
-                              analysisData.sentiment_analysis.vader_positive *
-                              100
+                              analysisData.sentiment_analysis.vader_positive * 100
                             ).toFixed(1)}
                             %
                           </span>
@@ -272,19 +264,14 @@ const FeedbackAnalysisModal = ({
                           <span className="fa-vader-bar-label">Neutral</span>
                           <div className="fa-vader-bar-track">
                             <div
-                              className="fa-vader-bar-fill fa-vader-bar-fill--neutral"
-                              style={{
-                                width: `${
-                                  analysisData.sentiment_analysis
-                                    .vader_neutral * 100
-                                }%`,
-                              }}
+                              className={`fa-vader-bar-fill fa-vader-bar-fill--neutral ${getWidthClass(
+                                analysisData.sentiment_analysis.vader_neutral
+                              )}`}
                             ></div>
                           </div>
                           <span className="fa-vader-bar-value">
                             {(
-                              analysisData.sentiment_analysis.vader_neutral *
-                              100
+                              analysisData.sentiment_analysis.vader_neutral * 100
                             ).toFixed(1)}
                             %
                           </span>
@@ -294,19 +281,14 @@ const FeedbackAnalysisModal = ({
                           <span className="fa-vader-bar-label">Negative</span>
                           <div className="fa-vader-bar-track">
                             <div
-                              className="fa-vader-bar-fill fa-vader-bar-fill--negative"
-                              style={{
-                                width: `${
-                                  analysisData.sentiment_analysis
-                                    .vader_negative * 100
-                                }%`,
-                              }}
+                              className={`fa-vader-bar-fill fa-vader-bar-fill--negative ${getWidthClass(
+                                analysisData.sentiment_analysis.vader_negative
+                              )}`}
                             ></div>
                           </div>
                           <span className="fa-vader-bar-value">
                             {(
-                              analysisData.sentiment_analysis.vader_negative *
-                              100
+                              analysisData.sentiment_analysis.vader_negative * 100
                             ).toFixed(1)}
                             %
                           </span>
@@ -323,6 +305,7 @@ const FeedbackAnalysisModal = ({
                     <Heart size={16} />
                     <h3>EMOTION ANALYSIS</h3>
                   </div>
+
                   <div className="fa-emotion-card">
                     <div className="fa-emotion-dominant">
                       <span className="fa-emotion-dominant-label">
@@ -337,14 +320,12 @@ const FeedbackAnalysisModal = ({
                     <div className="fa-emotion-single-bar">
                       <div className="fa-emotion-bar-track">
                         <div
-                          className="fa-emotion-bar-fill"
-                          style={{
-                            width: `${
-                              (analysisData.emotion_scores.neutral || 0) * 100
-                            }%`,
-                          }}
+                          className={`fa-emotion-bar-fill ${getWidthClass(
+                            analysisData.emotion_scores.neutral || 0
+                          )}`}
                         ></div>
                       </div>
+
                       <span className="fa-emotion-bar-value">
                         {(
                           (analysisData.emotion_scores.neutral || 0) * 100
@@ -362,6 +343,7 @@ const FeedbackAnalysisModal = ({
                     <Shield size={16} />
                     <h3>BIAS ANALYSIS</h3>
                   </div>
+
                   <div
                     className={`fa-bias-card ${
                       analysisData.bias_analysis.has_bias
@@ -383,14 +365,15 @@ const FeedbackAnalysisModal = ({
                           </>
                         )}
                       </div>
+
                       <div className="fa-bias-level">
                         Level: {analysisData.bias_analysis.bias_level}
                       </div>
                     </div>
+
                     <div className="fa-bias-score">
                       Score:{" "}
-                      {(analysisData.bias_analysis.bias_score * 100).toFixed(0)}
-                      %
+                      {(analysisData.bias_analysis.bias_score * 100).toFixed(0)}%
                     </div>
                   </div>
                 </div>
@@ -402,6 +385,7 @@ const FeedbackAnalysisModal = ({
                     <AlertTriangle size={16} />
                     <h3>TOXICITY ANALYSIS</h3>
                   </div>
+
                   <div
                     className={`fa-toxicity-card ${
                       analysisData.toxicity_analysis.is_toxic
@@ -423,6 +407,7 @@ const FeedbackAnalysisModal = ({
                           </>
                         )}
                       </div>
+
                       <div className="fa-toxicity-severity">
                         Severity: {analysisData.toxicity_analysis.severity}
                       </div>
@@ -437,39 +422,24 @@ const FeedbackAnalysisModal = ({
                     <Target size={16} />
                     <h3>CONSTRUCTIVENESS ANALYSIS</h3>
                   </div>
+
                   <div className="fa-constructiveness-card">
                     <div className="fa-constructiveness-items">
                       <div className="fa-constructiveness-item">
-                        {analysisData.constructiveness_analysis.is_constructive
-                          ? "○"
-                          : "○"}{" "}
-                        Constructive
+                        ○ Constructive
+                      </div>
+                      <div className="fa-constructiveness-item">○ Specific</div>
+                      <div className="fa-constructiveness-item">
+                        ○ Actionable
                       </div>
                       <div className="fa-constructiveness-item">
-                        {analysisData.constructiveness_analysis.is_specific
-                          ? "○"
-                          : "○"}{" "}
-                        Specific
-                      </div>
-                      <div className="fa-constructiveness-item">
-                        {analysisData.constructiveness_analysis.is_actionable
-                          ? "○"
-                          : "○"}{" "}
-                        Actionable
-                      </div>
-                      <div className="fa-constructiveness-item">
-                        {analysisData.constructiveness_analysis.has_examples
-                          ? "○"
-                          : "○"}{" "}
-                        Has Examples
+                        ○ Has Examples
                       </div>
                     </div>
+
                     <div className="fa-action-items">
                       <strong>Action Items:</strong>{" "}
-                      {
-                        analysisData.constructiveness_analysis
-                          .action_items_count
-                      }
+                      {analysisData.constructiveness_analysis.action_items_count}
                     </div>
                   </div>
                 </div>
@@ -481,6 +451,7 @@ const FeedbackAnalysisModal = ({
                     <BarChart2 size={16} />
                     <h3>FEEDBACK METRICS</h3>
                   </div>
+
                   <div className="fa-feedback-metrics-grid">
                     <div className="fa-feedback-metric-item">
                       <div className="fa-feedback-metric-label">Word Count</div>
@@ -488,6 +459,7 @@ const FeedbackAnalysisModal = ({
                         {analysisData.feedback_metrics.word_count}
                       </div>
                     </div>
+
                     <div className="fa-feedback-metric-item">
                       <div className="fa-feedback-metric-label">
                         Sentence Count
@@ -496,6 +468,7 @@ const FeedbackAnalysisModal = ({
                         {analysisData.feedback_metrics.sentence_count}
                       </div>
                     </div>
+
                     <div className="fa-feedback-metric-item">
                       <div className="fa-feedback-metric-label">
                         Average Word Length
@@ -506,44 +479,47 @@ const FeedbackAnalysisModal = ({
                         )}
                       </div>
                     </div>
+
                     <div className="fa-feedback-metric-item">
                       <div className="fa-feedback-metric-label">
                         Complexity Score
                       </div>
                       <div className="fa-feedback-metric-value">
-                        {(
-                          analysisData.feedback_metrics.complexity_score * 100
-                        ).toFixed(2)}
+                        {(analysisData.feedback_metrics.complexity_score * 100).toFixed(
+                          2
+                        )}
                       </div>
                     </div>
+
                     <div className="fa-feedback-metric-item">
                       <div className="fa-feedback-metric-label">
                         Formality Score
                       </div>
                       <div className="fa-feedback-metric-value">
-                        {(
-                          analysisData.feedback_metrics.formality_score * 100
-                        ).toFixed(2)}
+                        {(analysisData.feedback_metrics.formality_score * 100).toFixed(
+                          2
+                        )}
                       </div>
                     </div>
+
                     <div className="fa-feedback-metric-item">
                       <div className="fa-feedback-metric-label">
                         Clarity Score
                       </div>
                       <div className="fa-feedback-metric-value">
-                        {(
-                          analysisData.feedback_metrics.clarity_score * 100
-                        ).toFixed(2)}
+                        {(analysisData.feedback_metrics.clarity_score * 100).toFixed(
+                          2
+                        )}
                       </div>
                     </div>
+
                     <div className="fa-feedback-metric-item">
                       <div className="fa-feedback-metric-label">
                         Professionalism Score
                       </div>
                       <div className="fa-feedback-metric-value">
                         {(
-                          analysisData.feedback_metrics.professionalism_score *
-                          100
+                          analysisData.feedback_metrics.professionalism_score * 100
                         ).toFixed(2)}
                       </div>
                     </div>
@@ -551,20 +527,20 @@ const FeedbackAnalysisModal = ({
                 </div>
               )}
 
-              {analysisData.key_insights &&
-                analysisData.key_insights.length > 0 && (
-                  <div className="fa-section">
-                    <div className="fa-section-header">
-                      <BookOpen size={16} />
-                      <h3>KEY INSIGHTS</h3>
-                    </div>
-                    <ul className="fa-insights-list">
-                      {analysisData.key_insights.map((insight, idx) => (
-                        <li key={idx}>{insight}</li>
-                      ))}
-                    </ul>
+              {analysisData.key_insights && analysisData.key_insights.length > 0 && (
+                <div className="fa-section">
+                  <div className="fa-section-header">
+                    <BookOpen size={16} />
+                    <h3>KEY INSIGHTS</h3>
                   </div>
-                )}
+
+                  <ul className="fa-insights-list">
+                    {analysisData.key_insights.map((insight, idx) => (
+                      <li key={idx}>{insight}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               {analysisData.suggestions && (
                 <div className="fa-section">
@@ -572,6 +548,7 @@ const FeedbackAnalysisModal = ({
                     <Lightbulb size={16} />
                     <h3>IMPROVEMENT SUGGESTIONS</h3>
                   </div>
+
                   <div className="fa-suggestions-container">
                     {analysisData.suggestions.suggestions &&
                       analysisData.suggestions.suggestions.length > 0 && (
@@ -579,12 +556,11 @@ const FeedbackAnalysisModal = ({
                           <div className="fa-suggestions-heading">
                             Actionable Recommendations:
                           </div>
+
                           <ol className="fa-suggestions-list">
-                            {analysisData.suggestions.suggestions.map(
-                              (rec, idx) => (
-                                <li key={idx}>{rec}</li>
-                              )
-                            )}
+                            {analysisData.suggestions.suggestions.map((rec, idx) => (
+                              <li key={idx}>{rec}</li>
+                            ))}
                           </ol>
                         </div>
                       )}
@@ -595,6 +571,7 @@ const FeedbackAnalysisModal = ({
                           <Lightbulb size={14} />
                           Example Rewrite:
                         </div>
+
                         <div className="fa-example-rewrite">
                           {analysisData.suggestions.rewritten_example}
                         </div>
@@ -607,6 +584,7 @@ const FeedbackAnalysisModal = ({
                           <div className="fa-suggestions-heading">
                             Focus Areas for Improvement:
                           </div>
+
                           <div className="fa-focus-tags">
                             {analysisData.suggestions.improvement_areas.map(
                               (area, idx) => (

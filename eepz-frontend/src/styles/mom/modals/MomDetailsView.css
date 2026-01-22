@@ -11,6 +11,10 @@
   padding: 20px;
 }
 
+.mdv-modal-open.modal.show.d-block {
+  display: flex !important;
+}
+
 .mdv-dialog {
   position: relative;
   width: 100%;
@@ -55,7 +59,7 @@
   overflow-y: auto;
 }
 
-.text-muted {
+.mdv-muted {
   text-align: left;
 }
 

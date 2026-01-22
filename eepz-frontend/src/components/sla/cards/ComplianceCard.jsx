@@ -1,56 +1,41 @@
 import React, { useMemo } from "react";
-import {
-  TrendingUp,
-  AlertCircle,
-  CheckCircle,
-  Clock,
-  Award,
-  Eye,
-  Calendar,
-} from "lucide-react";
+import { Award, Calendar, CheckCircle, FileText, Lock, Unlock } from "lucide-react";
 import {
   getComplianceRating,
   getComplianceSummary,
 } from "../../../utils/sla/slaCalculations";
 import "../../../styles/sla/components/ComplianceCard.css";
 
-const ComplianceCard = ({
-  compliance,
-  slaData,
-  onClick,
-  showActions = false,
-}) => {
+const ComplianceCard = ({ compliance, slaData, onClick, showActions = false }) => {
   const calculatedCompliance = useMemo(() => {
-    if (!slaData || slaData.length === 0) return compliance;
+    if (!slaData?.length) return compliance;
 
-    const summary = getComplianceSummary(slaData);
+    const summary = getComplianceSummary?.(slaData);
 
     return {
-      ...compliance,
-      totalSlas: summary.totalSLAs,
-      closedSlas: summary.closedSLAs,
-      openSlas: summary.openSLAs,
-      onTimeSlas: summary.onTimeSLAs,
-      breachedSlas: summary.breachedSLAs,
-      extendedSlas: slaData.filter(
-        (s) => s.status === "Closed" && s.complianceStatus === "Extended"
-      ).length,
-      compliancePercentage: summary.compliancePercentage,
-      ratingLabel: summary.rating,
+      ...(compliance ?? {}),
+      totalSlas: summary?.totalSLAs ?? 0,
+      closedSlas: summary?.closedSLAs ?? 0,
+      openSlas: summary?.openSLAs ?? 0,
+      onTimeSlas: summary?.onTimeSLAs ?? 0,
+      breachedSlas: summary?.breachedSLAs ?? 0,
+      compliancePercentage: summary?.compliancePercentage ?? 0,
+      ratingLabel: summary?.rating ?? "",
     };
   }, [slaData, compliance]);
 
   if (!calculatedCompliance) {
     return (
-      <div className="sla-compliance-card">
-        <div className="sla-compliance-empty">No compliance data available</div>
+      <div className="cc-card cc-rating-critical">
+        <div className="cc-body">
+          <div className="cc-empty">No compliance data available</div>
+        </div>
       </div>
     );
   }
 
-  const rating = getComplianceRating(
-    calculatedCompliance.compliancePercentage || 0
-  );
+  const compliancePercentage = Number(calculatedCompliance?.compliancePercentage ?? 0);
+  const rating = getComplianceRating?.(compliancePercentage);
 
   const formatDate = (date) =>
     date
@@ -61,107 +46,114 @@ const ComplianceCard = ({
         })
       : "N/A";
 
-  return (
-    <div
-      className="sla-compliance-card"
-      onClick={onClick}
-    >
-      <div
-        className="sla-compliance-top-bar"
-        style={{ backgroundColor: rating.color }}
-      />
+  const ratingClass = (() => {
+    const label = String(rating?.label ?? rating?.rating ?? "").toLowerCase();
 
-      <div className="sla-compliance-body">
-        <div className="sla-compliance-header">
+    if (label.includes("excellent")) return "cc-rating-excellent";
+    if (label.includes("good")) return "cc-rating-good";
+    if (label.includes("fair")) return "cc-rating-fair";
+    if (label.includes("poor")) return "cc-rating-critical";
+    if (label.includes("critical")) return "cc-rating-critical";
+
+    if (compliancePercentage >= 90) return "cc-rating-excellent";
+    if (compliancePercentage >= 75) return "cc-rating-good";
+    if (compliancePercentage >= 50) return "cc-rating-fair";
+    return "cc-rating-critical";
+  })();
+
+  return (
+    <div className={`cc-card ${ratingClass}`} onClick={onClick}>
+      <div className="cc-top" />
+
+      <div className="cc-body">
+        <div className="cc-header">
           <div>
-            <h3 className="sla-compliance-title">
-              {calculatedCompliance.departmentName}
+            <h3 className="cc-title">
+              {calculatedCompliance?.departmentName ?? "N/A"}
             </h3>
-            <div className="sla-compliance-date">
+
+            <div className="cc-dates">
               <Calendar size={14} />
-              {formatDate(calculatedCompliance.periodStartDate)} –{" "}
-              {formatDate(calculatedCompliance.periodEndDate)}
+              <span>
+                {formatDate(calculatedCompliance?.periodStartDate)} –{" "}
+                {formatDate(calculatedCompliance?.periodEndDate)}
+              </span>
             </div>
           </div>
 
-          <span
-            className="sla-compliance-badge"
-            style={{
-              color: rating.color,
-              borderColor: rating.color,
-              backgroundColor: `${rating.color}15`,
-            }}
-          >
+          <div className="cc-badge">
             <Award size={14} />
-            {rating.label}
-          </span>
+            <span>{rating?.label ?? rating?.rating ?? "N/A"}</span>
+          </div>
         </div>
 
-        <div className="sla-compliance-rate">
+        <div className="cc-rate">
           <span>Compliance Rate</span>
-          <strong style={{ color: rating.color }}>
-            {calculatedCompliance.compliancePercentage.toFixed(1)}%
+          <strong className="cc-rate-value">
+            {Number(compliancePercentage ?? 0).toFixed(1)}%
           </strong>
         </div>
 
-        <div className="sla-compliance-progress">
+        <div className="cc-progress">
           <div
-            className="sla-compliance-progress-fill"
-            style={{
-              width: `${calculatedCompliance.compliancePercentage}%`,
-              backgroundColor: rating.color,
-            }}
+            className="cc-progress-fill"
+            data-progress={Math.max(0, Math.min(100, compliancePercentage)).toFixed(0)}
           />
         </div>
 
-        <div className="sla-compliance-stats">
-          <div className="sla-stat green">
-            <CheckCircle />
-            <span>On Time</span>
-            <strong>{calculatedCompliance.onTimeSlas}</strong>
-          </div>
-
-          <div className="sla-stat red">
-            <AlertCircle />
-            <span>Breached</span>
-            <strong>{calculatedCompliance.breachedSlas}</strong>
-          </div>
-
-          <div className="sla-stat amber">
-            <Clock />
-            <span>Extended</span>
-            <strong>{calculatedCompliance.extendedSlas}</strong>
-          </div>
-
-          <div className="sla-stat blue">
-            <TrendingUp />
+        <div className="cc-stats cc-stats--v2">
+          <div className="cc-stat cc-stat--total">
+            <div className="cc-stat-icon">
+              <FileText size={18} />
+            </div>
             <span>Total</span>
-            <strong>{calculatedCompliance.closedSlas}</strong>
+            <strong>{calculatedCompliance?.totalSlas ?? 0}</strong>
+          </div>
+
+          <div className="cc-stat cc-stat--closed">
+            <div className="cc-stat-icon">
+              <Lock size={18} />
+            </div>
+            <span>Closed</span>
+            <strong>{calculatedCompliance?.closedSlas ?? 0}</strong>
+          </div>
+
+          <div className="cc-stat cc-stat--open">
+            <div className="cc-stat-icon">
+              <Unlock size={18} />
+            </div>
+            <span>Open</span>
+            <strong>{calculatedCompliance?.openSlas ?? 0}</strong>
+          </div>
+
+          <div className="cc-stat cc-stat--ontime">
+            <div className="cc-stat-icon">
+              <CheckCircle size={18} />
+            </div>
+            <span>On-Time</span>
+            <strong>{calculatedCompliance?.onTimeSlas ?? 0}</strong>
           </div>
         </div>
 
-        {calculatedCompliance.openSlas > 0 && (
-          <div className="sla-compliance-open">
-            <Clock size={14} />
-            {calculatedCompliance.openSlas} SLA(s) currently open (not included
+        {(calculatedCompliance?.openSlas ?? 0) > 0 && (
+          <div className="cc-open">
+            {calculatedCompliance?.openSlas ?? 0} SLA(s) currently open (not included
             in compliance %)
           </div>
         )}
 
-        <div className="sla-compliance-updated">
-          <Clock size={12} />
+        <div className="cc-updated">
           Last Updated:{" "}
           {formatDate(
-            calculatedCompliance.calculatedAt ||
-              calculatedCompliance.updatedAt
+            calculatedCompliance?.calculatedAt ?? calculatedCompliance?.updatedAt
           )}
         </div>
       </div>
 
-      {showActions && onClick && (
-        <div className="sla-compliance-footer">
-          <button className="sla-compliance-action">
-            <Eye size={14} /> View Details
+      {showActions && typeof onClick === "function" && (
+        <div className="cc-footer">
+          <button className="cc-action" type="button">
+            View Details
           </button>
         </div>
       )}

@@ -3,6 +3,7 @@ import { Search, Filter, ArrowUpDown, Eye } from "lucide-react";
 import SLAStatusBadge from "./SLAStatusBadge";
 import UrgencyIndicator from "../badges/UrgencyIndicator";
 import { formatDate } from "../../utils/dateFormatter";
+import "../../styles/sla/components/SLATable.css";
 
 const SLATable = ({ slas, onViewDetails, onEscalate, showActions = true }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -41,43 +42,30 @@ const SLATable = ({ slas, onViewDetails, onEscalate, showActions = true }) => {
   };
 
   return (
-    <div>
-      <div
-        className="card border-0 shadow-sm mb-3"
-        style={{ borderRadius: "12px" }}
-      >
+    <div className="sla-table-scope">
+      <div className="sla-table-filter-card card border-0 shadow-sm mb-3">
         <div className="card-body p-3">
           <div className="row g-3">
             <div className="col-md-6">
-              <div className="position-relative">
-                <Search
-                  size={18}
-                  className="position-absolute"
-                  style={{
-                    left: "12px",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    color: "#6B7280",
-                  }}
-                />
+              <div className="sla-table-search-wrapper position-relative">
+                <Search size={18} className="sla-table-search-icon" />
                 <input
                   type="text"
-                  className="form-control ps-5"
+                  className="sla-table-search-input form-control"
                   placeholder="Search by type or employee..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  style={{ borderRadius: "8px" }}
                 />
               </div>
             </div>
+
             <div className="col-md-6">
-              <div className="d-flex align-items-center gap-2">
-                <Filter size={18} className="text-muted" />
+              <div className="sla-table-filter-wrapper d-flex align-items-center gap-2">
+                <Filter size={18} className="sla-table-filter-icon text-muted" />
                 <select
-                  className="form-select"
+                  className="sla-table-filter-select form-select"
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
-                  style={{ borderRadius: "8px" }}
                 >
                   <option value="All">All Status</option>
                   <option value="Open">Open</option>
@@ -91,85 +79,96 @@ const SLATable = ({ slas, onViewDetails, onEscalate, showActions = true }) => {
         </div>
       </div>
 
-      <div className="card border-0 shadow-sm" style={{ borderRadius: "12px" }}>
+      <div className="sla-table-card card border-0 shadow-sm">
         <div className="table-responsive">
-          <table className="table table-hover mb-0">
-            <thead style={{ backgroundColor: "#f8f9fa" }}>
+          <table className="sla-table table table-hover mb-0">
+            <thead className="sla-table-head">
               <tr>
                 <th
-                  style={{ padding: "1rem", cursor: "pointer" }}
+                  className="sla-table-th sla-table-th-sortable"
                   onClick={() => handleSort("slatype")}
                 >
-                  <div className="d-flex align-items-center gap-2">
+                  <div className="sla-table-th-content d-flex align-items-center gap-2">
                     SLA Type
-                    <ArrowUpDown size={14} className="text-muted" />
+                    <ArrowUpDown size={14} className="sla-table-sort-icon text-muted" />
                   </div>
                 </th>
+
                 <th
-                  style={{ padding: "1rem", cursor: "pointer" }}
+                  className="sla-table-th sla-table-th-sortable"
                   onClick={() => handleSort("employeeName")}
                 >
-                  <div className="d-flex align-items-center gap-2">
+                  <div className="sla-table-th-content d-flex align-items-center gap-2">
                     Employee
-                    <ArrowUpDown size={14} className="text-muted" />
+                    <ArrowUpDown size={14} className="sla-table-sort-icon text-muted" />
                   </div>
                 </th>
-                <th style={{ padding: "1rem" }}>Status</th>
+
+                <th className="sla-table-th">Status</th>
+
                 <th
-                  style={{ padding: "1rem", cursor: "pointer" }}
+                  className="sla-table-th sla-table-th-sortable"
                   onClick={() => handleSort("deadline")}
                 >
-                  <div className="d-flex align-items-center gap-2">
+                  <div className="sla-table-th-content d-flex align-items-center gap-2">
                     Deadline
-                    <ArrowUpDown size={14} className="text-muted" />
+                    <ArrowUpDown size={14} className="sla-table-sort-icon text-muted" />
                   </div>
                 </th>
-                <th style={{ padding: "1rem" }}>Urgency</th>
+
+                <th className="sla-table-th">Urgency</th>
+
                 {showActions && (
-                  <th style={{ padding: "1rem", textAlign: "center" }}>
-                    Actions
-                  </th>
+                  <th className="sla-table-th sla-table-th-actions">Actions</th>
                 )}
               </tr>
             </thead>
+
             <tbody>
               {sortedSLAs.map((sla) => (
                 <tr
                   key={sla.slaid}
-                  style={{ cursor: "pointer" }}
+                  className="sla-table-row"
                   onClick={() => onViewDetails(sla.slaid)}
                 >
-                  <td style={{ padding: "1rem" }}>
-                    <strong>{sla.slatype}</strong>
+                  <td className="sla-table-td">
+                    <strong className="sla-table-strong">{sla.slatype}</strong>
                   </td>
-                  <td style={{ padding: "1rem" }}>
-                    <div>
-                      <div className="fw-semibold">{sla.employeeName}</div>
-                      <small className="text-muted">{sla.departmentName}</small>
+
+                  <td className="sla-table-td">
+                    <div className="sla-table-employee">
+                      <div className="sla-table-employee-name fw-semibold">
+                        {sla.employeeName}
+                      </div>
+                      <small className="sla-table-employee-dept text-muted">
+                        {sla.departmentName}
+                      </small>
                     </div>
                   </td>
-                  <td style={{ padding: "1rem" }}>
+
+                  <td className="sla-table-td">
                     <SLAStatusBadge status={sla.status} size="sm" />
                   </td>
-                  <td style={{ padding: "1rem" }}>
-                    {formatDate(sla.deadline)}
-                  </td>
-                  <td style={{ padding: "1rem" }}>
+
+                  <td className="sla-table-td">{formatDate(sla.deadline)}</td>
+
+                  <td className="sla-table-td">
                     <UrgencyIndicator
                       urgencyStatus={sla.urgencyStatus}
                       daysUntilDeadline={sla.daysUntilDeadline}
                       showLabel={false}
                     />
                   </td>
+
                   {showActions && (
                     <td
-                      style={{ padding: "1rem", textAlign: "center" }}
+                      className="sla-table-td sla-table-td-actions"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <button
-                        className="btn btn-sm btn-primary d-inline-flex align-items-center gap-1"
+                        className="sla-table-view-btn btn btn-sm btn-primary d-inline-flex align-items-center gap-1"
                         onClick={() => onViewDetails(sla.slaid)}
-                        style={{ borderRadius: "6px" }}
+                        type="button"
                       >
                         <Eye size={14} />
                         View
@@ -183,8 +182,10 @@ const SLATable = ({ slas, onViewDetails, onEscalate, showActions = true }) => {
         </div>
 
         {sortedSLAs.length === 0 && (
-          <div className="text-center py-5">
-            <p className="text-muted">No SLAs found matching your criteria</p>
+          <div className="sla-table-empty text-center py-5">
+            <p className="sla-table-empty-text text-muted mb-0">
+              No SLAs found matching your criteria
+            </p>
           </div>
         )}
       </div>

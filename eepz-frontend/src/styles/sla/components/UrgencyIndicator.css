@@ -1,0 +1,47 @@
+.ui-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+}
+
+.ui-text {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.ui-icon {
+  flex-shrink: 0;
+}
+
+.ui-overdue {
+  background-color: #e0195015;
+  border-color: #e0195030;
+}
+
+.ui-overdue .ui-icon,
+.ui-overdue .ui-text {
+  color: #e01950;
+}
+
+.ui-due-soon {
+  background-color: #e2b93b15;
+  border-color: #e2b93b30;
+}
+
+.ui-due-soon .ui-icon,
+.ui-due-soon .ui-text {
+  color: #e2b93b;
+}
+
+.ui-on-track {
+  background-color: #24a14815;
+  border-color: #24a14830;
+}
+
+.ui-on-track .ui-icon,
+.ui-on-track .ui-text {
+  color: #24a148;
+}

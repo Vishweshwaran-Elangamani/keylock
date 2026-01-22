@@ -51,7 +51,7 @@
 }
 
 .cdrop-open {
-  border-color: #27235c !important;
+  border-color: #27235c;
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
 }
 
@@ -62,7 +62,7 @@
 }
 
 .cdrop-error {
-  border-color: #dc2626 !important;
+  border-color: #dc2626;
   background-color: #fef2f2;
 }
 
@@ -85,6 +85,7 @@
   flex-shrink: 0;
   transition: transform 0.2s ease;
   pointer-events: none;
+  color: #27235c;
 }
 
 .cdrop-icon-open {
@@ -101,6 +102,9 @@
 
 .cdrop-menu {
   position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
   background: #ffffff;
   border: 1px solid #e9e9ef;
   border-radius: 0 0 8px 8px;
@@ -111,7 +115,6 @@
   overflow-y: auto;
   animation: cdropFadeIn 0.18s ease;
 }
-
 
 .cdrop-menu,
 .cdrop-menu * {
@@ -132,19 +135,14 @@
 .cdrop-item {
   width: 100%;
   padding: 0.75rem 1rem;
-
   border: none;
   outline: none;
-
   background: #ffffff;
   color: #393939;
-
   cursor: pointer;
   text-align: left;
-
   font-size: 0.9375rem;
   font-weight: 400;
-
   transition: all 0.15s ease;
   border-bottom: 1px solid #f3f4f6;
 }

@@ -231,19 +231,16 @@
   background: #ffffff;
   font-size: 0.95rem;
   padding: 0.8rem 2.7rem 0.8rem 0.85rem;
-
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   transition: all 0.18s ease;
   text-align: left;
   font-weight: 400;
   line-height: 1.6;
   min-height: 0 !important;
   height: auto !important;
-
   box-shadow: 0 1px 0 rgba(15, 23, 42, 0.02);
   position: relative;
 }
@@ -293,7 +290,7 @@
 
 .esla-dropdown .cdrop-icon {
   position: absolute !important;
-  right: 12px !important; 
+  right: 12px !important;
   top: 50% !important;
   transform: translateY(-50%) !important;
   pointer-events: none;
@@ -353,22 +350,6 @@
   background-color: #27235c;
   color: #ffffff;
   font-weight: 600;
-}
-
-.esla-dropdown .cdrop-menu::-webkit-scrollbar {
-  width: 6px;
-}
-
-.esla-dropdown .cdrop-menu::-webkit-scrollbar-track {
-  background: #f9fafb;
-  border-radius: 8px;
-  margin: 4px 0;
-}
-
-.esla-dropdown .cdrop-menu::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 8px;
-  border: 1px solid #f9fafb;
 }
 
 .esla-char-count {
@@ -448,6 +429,10 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.esla-hidden-submit {
+  display: none;
 }
 
 @media (max-width: 576px) {

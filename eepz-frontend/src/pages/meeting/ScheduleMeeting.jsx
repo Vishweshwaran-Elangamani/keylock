@@ -289,7 +289,7 @@ const ScheduleMeeting = () => {
     <div className="container-fluid sched-page">
       <div className="row justify-content-center">
         <div className="col-lg-11 col-xl-10">
-          <nav aria-label="breadcrumb" className="sched-breadcrumb-nav">
+          <nav aria-label="breadcrumb" className="sched-breadcrumb-nav-meeting">
             <ol className="breadcrumb mb-0 d-flex align-items-center sched-breadcrumb">
               <li className="breadcrumb-item d-flex align-items-center">
                 <button

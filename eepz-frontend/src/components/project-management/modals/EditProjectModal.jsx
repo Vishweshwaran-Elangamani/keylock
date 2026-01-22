@@ -1,15 +1,13 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import ReactDOM from "react-dom";
-import {
-  CheckCircle,
-  AlertCircle,
-  X,
-  MessageSquare,
-  Calendar,
-} from "lucide-react";
+import { CheckCircle, AlertCircle, X, MessageSquare, Calendar } from "lucide-react";
 import CustomCalendar from "../../../components/project-management/common/CustomCalendar";
 import CustomDropdown from "../../../components/project-management/common/CustomDropdown";
 import "../../../styles/projectmanagement/modals/EditProjectModal.css";
+import {
+  PROJECT_STATUS_OPTIONS,
+  PROJECT_ENGAGEMENT_MODEL_OPTIONS,
+} from "../../../constants/project-management/projectConstants";
 
 const DateInput = ({
   label,
@@ -83,23 +81,6 @@ const EditProjectModal = ({
       document.body.style.overflow = "unset";
     };
   }, [show]);
-
-  const statusOptions = useMemo(
-    () => ["Active", "On Hold", "Completed", "Cancelled"],
-    []
-  );
-
-  const engagementModelOptions = useMemo(
-    () => [
-      "Fixed Price",
-      "Time and Materials",
-      "Agile - Scrum",
-      "Agile - Kanban",
-      "Consulting",
-      "Retainer",
-    ],
-    []
-  );
 
   const departmentOptions = useMemo(
     () =>
@@ -204,7 +185,7 @@ const EditProjectModal = ({
                       onChange={(name, val) =>
                         setFormData((prev) => ({ ...prev, [name]: val }))
                       }
-                      options={statusOptions}
+                      options={PROJECT_STATUS_OPTIONS}
                       placeholder="Select Status"
                       align="left"
                     />
@@ -271,7 +252,7 @@ const EditProjectModal = ({
                       onChange={(name, val) =>
                         setFormData((prev) => ({ ...prev, [name]: val }))
                       }
-                      options={engagementModelOptions}
+                      options={PROJECT_ENGAGEMENT_MODEL_OPTIONS}
                       placeholder="Select Model"
                       align="left"
                     />

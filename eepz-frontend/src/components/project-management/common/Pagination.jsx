@@ -1,5 +1,6 @@
 import React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import "../../../styles/projectmanagement/components/Pagination.css";
 
 const Pagination = ({
   currentPage,
@@ -38,34 +39,30 @@ const Pagination = ({
   if (totalPages <= 1) return null;
 
   return (
-    <div className="d-flex justify-content-between align-items-center mt-3 pt-3 border-top px-3">
-      <div className="text-muted small">
+    <div className="pg-wrap d-flex justify-content-between align-items-center mt-3 pt-3 border-top px-3">
+      <div className="pg-info text-muted small">
         Showing {startIndex + 1} to {Math.min(endIndex, totalItems)} of{" "}
         {totalItems}
       </div>
-      <nav>
-        <ul className="pagination pagination-sm mb-0">
+
+      <nav className="pg-nav">
+        <ul className="pagination pagination-sm mb-0 pg-pagination">
           <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
             <button
-              className="page-link d-flex align-items-center justify-content-center"
+              className="page-link d-flex align-items-center justify-content-center pg-nav-btn"
               onClick={() => onPageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              style={{
-                width: "32px",
-                height: "32px",
-                padding: 0,
-                border: "1px solid #dee2e6",
-                borderRadius: "6px",
-              }}
               aria-label="Previous page"
+              type="button"
             >
               <ChevronLeft size={16} />
             </button>
           </li>
+
           {getPageNumbers().map((page, index) =>
             page === "..." ? (
               <li key={`ellipsis-${index}`} className="page-item disabled">
-                <span className="page-link">...</span>
+                <span className="page-link pg-ellipsis">...</span>
               </li>
             ) : (
               <li
@@ -73,43 +70,35 @@ const Pagination = ({
                 className={`page-item ${currentPage === page ? "active" : ""}`}
               >
                 <button
-                  className="page-link"
+                  className="page-link pg-page-btn"
                   onClick={() => onPageChange(page)}
-                  style={{
-                    minWidth: "32px",
-                    height: "32px",
-                    borderRadius: "6px",
-                  }}
+                  type="button"
                 >
                   {page}
                 </button>
               </li>
             )
           )}
+
           <li
             className={`page-item ${
               currentPage === totalPages ? "disabled" : ""
             }`}
           >
             <button
-              className="page-link d-flex align-items-center justify-content-center"
+              className="page-link d-flex align-items-center justify-content-center pg-nav-btn"
               onClick={() => onPageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              style={{
-                width: "32px",
-                height: "32px",
-                padding: 0,
-                border: "1px solid #dee2e6",
-                borderRadius: "6px",
-              }}
               aria-label="Next page"
+              type="button"
             >
               <ChevronRight size={16} />
             </button>
           </li>
         </ul>
       </nav>
-      <div className="text-muted small">
+
+      <div className="pg-page-status text-muted small">
         Page {currentPage} of {totalPages}
       </div>
     </div>

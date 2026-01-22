@@ -1,16 +1,18 @@
 .csla-calendar-dropdown {
-  position: fixed !important;
+  position: fixed;
+  top: 0;
+  left: 0;
   background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
   border: 1px solid #e5e7eb;
   width: 260px;
   font-family: 'Poppins', sans-serif;
-  z-index: 999999 !important;
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  pointer-events: auto !important;
+  z-index: 10002;
+  display: block;
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .csla-calendar-header {
@@ -95,19 +97,19 @@
 }
 
 .csla-calendar-day--selected {
-  background-color: #27235C;
+  background-color: #27235c;
   color: #ffffff;
 }
 
 .csla-calendar-day--disabled {
-  color: #d1d5db !important;
-  cursor: not-allowed !important;
-  background-color: transparent !important;
+  color: #d1d5db;
+  cursor: not-allowed;
+  background-color: transparent;
   opacity: 0.5;
 }
 
 .csla-calendar-day--disabled:hover {
-  background-color: transparent !important;
+  background-color: transparent;
 }
 
 .csla-calendar-footer {
@@ -120,7 +122,7 @@
 .csla-today-btn {
   border: none;
   background: transparent;
-  color: #27235C;
+  color: #27235c;
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;

@@ -522,14 +522,15 @@
 
 .mgr-entries-dd .cdrop-trigger {
   width: 90px;
-  min-height: 36px;
-  height: 36px;
+  min-height: 34px;
+  height: 34px;
   padding: 8px 34px 8px 10px;
   border-radius: 6px;
   border: 1px solid #d1d5db;
   background: #fff;
   font-size: 0.875rem;
   position: relative;
+  margin-bottom: -10px;
 }
 
 .mgr-entries-dd .cdrop-open {
@@ -538,7 +539,7 @@
 }
 
 .mgr-entries-dd .cdrop-icon {
-  right: 10px !important;
+  right: 20px !important;
 }
 
 .mgr-sla-escalation-grid {

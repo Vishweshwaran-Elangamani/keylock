@@ -1,5 +1,6 @@
 import React from "react";
 import { Eye, Clock, AlertTriangle, CheckCircle } from "lucide-react";
+import "../../styles/sla/components/TeamReviewTable.css";
 
 const TeamReviewTable = ({ reviews, onViewDetails }) => {
   React.useEffect(() => {
@@ -51,130 +52,144 @@ const TeamReviewTable = ({ reviews, onViewDetails }) => {
   };
 
   return (
-    <div className="card border-0 shadow-sm" style={{ borderRadius: "12px" }}>
-      <div className="card-body p-0">
-        <div className="table-responsive">
-          <table className="table table-hover align-middle mb-0">
-            <thead style={{ backgroundColor: "#f8f9fa" }}>
-              <tr>
-                <th className="px-4 py-3">Employee</th>
-                <th className="py-3">Review Type</th>
-                <th className="py-3">Review Cycle</th>
-                <th className="py-3">Deadline</th>
-                <th className="py-3">Submitted</th>
-                <th className="py-3">Status</th>
-                <th className="py-3">Days Left</th>
-                <th className="px-4 py-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {reviews.length === 0 ? (
+    <div className="trt-scope">
+      <div className="trt-card card border-0 shadow-sm">
+        <div className="card-body p-0">
+          <div className="table-responsive">
+            <table className="table table-hover align-middle mb-0 trt-table">
+              <thead className="trt-thead">
                 <tr>
-                  <td colSpan="8" className="text-center py-5">
-                    <Clock size={48} className="text-muted mb-3" />
-                    <p className="text-muted mb-0">
-                      No team reviews for this period
-                    </p>
-                  </td>
+                  <th className="trt-th trt-th-employee">Employee</th>
+                  <th className="trt-th">Review Type</th>
+                  <th className="trt-th">Review Cycle</th>
+                  <th className="trt-th">Deadline</th>
+                  <th className="trt-th">Submitted</th>
+                  <th className="trt-th">Status</th>
+                  <th className="trt-th">Days Left</th>
+                  <th className="trt-th trt-th-actions">Actions</th>
                 </tr>
-              ) : (
-                reviews.map((review) => {
-                  const urgency = calculateUrgencyStatus(
-                    review.deadline,
-                    review.status,
-                    review.submittedAt
-                  );
+              </thead>
 
-                  const daysUntil = review.daysUntilDeadline;
+              <tbody>
+                {reviews.length === 0 ? (
+                  <tr>
+                    <td colSpan="8" className="trt-empty text-center py-5">
+                      <Clock size={48} className="text-muted mb-3" />
+                      <p className="text-muted mb-0">
+                        No team reviews for this period
+                      </p>
+                    </td>
+                  </tr>
+                ) : (
+                  reviews.map((review) => {
+                    const urgency = calculateUrgencyStatus(
+                      review.deadline,
+                      review.status,
+                      review.submittedAt
+                    );
 
-                  return (
-                    <tr key={review.reviewTrackingId || review.slaid}>
-                      <td className="px-4">
-                        <div>
-                          <strong>{review.employeeName}</strong>
-                          <br />
-                          <small className="text-muted">
-                            {review.employeeEmail}
-                          </small>
-                        </div>
-                      </td>
-                      <td>
-                        <span className="badge bg-info">
-                          {review.reviewType || "Manager"}
-                        </span>
-                      </td>
-                      <td>
-                        <small className="fw-semibold">
-                          {review.reviewCycle}
-                        </small>
-                      </td>
-                      <td>
-                        <div>
+                    return (
+                      <tr
+                        key={review.reviewTrackingId || review.slaid}
+                        className="trt-row"
+                      >
+                        <td className="trt-td trt-td-employee">
+                          <div className="trt-employee">
+                            <strong className="trt-employee-name">
+                              {review.employeeName}
+                            </strong>
+                            <small className="trt-employee-email text-muted">
+                              {review.employeeEmail}
+                            </small>
+                          </div>
+                        </td>
+
+                        <td className="trt-td">
+                          <span className="badge bg-info">
+                            {review.reviewType || "Manager"}
+                          </span>
+                        </td>
+
+                        <td className="trt-td">
                           <small className="fw-semibold">
-                            {formatDate(review.deadline).split(",")[0]}
+                            {review.reviewCycle}
                           </small>
-                          {review.submittedAt && (
-                            <>
-                              <br />
-                              <small className="text-success">
+                        </td>
+
+                        <td className="trt-td">
+                          <div className="trt-deadline">
+                            <small className="fw-semibold">
+                              {formatDate(review.deadline).split(",")[0]}
+                            </small>
+
+                            {review.submittedAt && (
+                              <small className="trt-submitted-inline text-success">
                                 Submitted:{" "}
                                 {formatDate(review.submittedAt).split(",")[0]}
                               </small>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                      <td>
-                        {review.submittedAt ? (
-                          <small className="text-success">
-                            ✓ {formatDate(review.submittedAt)}
-                          </small>
-                        ) : (
-                          <small className="text-muted">Not submitted</small>
-                        )}
-                      </td>
-                      <td>
-                        <span
-                          className={`badge ${getStatusBadgeClass(
-                            review.status
-                          )}`}
-                        >
-                          {review.status === "Submitted"
-                            ? "✓ Submitted"
-                            : review.status}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="d-flex align-items-center gap-1">
-                          {urgency.color === "danger" ? (
-                            <AlertTriangle size={14} className="text-danger" />
-                          ) : urgency.color === "warning" ? (
-                            <Clock size={14} className="text-warning" />
+                            )}
+                          </div>
+                        </td>
+
+                        <td className="trt-td">
+                          {review.submittedAt ? (
+                            <small className="text-success">
+                              ✓ {formatDate(review.submittedAt)}
+                            </small>
                           ) : (
-                            <CheckCircle size={14} className="text-success" />
+                            <small className="text-muted">Not submitted</small>
                           )}
-                          <small className={`text-${urgency.color}`}>
-                            {urgency.text}
-                          </small>
-                        </div>
-                      </td>
-                      <td className="px-4">
-                        <button
-                          className="btn btn-sm btn-outline-primary"
-                          onClick={() =>
-                            onViewDetails(review.slaid || review.slaId)
-                          }
-                          title="View details"
-                        >
-                          <Eye size={14} />
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+                        </td>
+
+                        <td className="trt-td">
+                          <span
+                            className={`badge ${getStatusBadgeClass(
+                              review.status
+                            )}`}
+                          >
+                            {review.status === "Submitted"
+                              ? "✓ Submitted"
+                              : review.status}
+                          </span>
+                        </td>
+
+                        <td className="trt-td">
+                          <div className="trt-urgency d-flex align-items-center gap-1">
+                            {urgency.color === "danger" ? (
+                              <AlertTriangle
+                                size={14}
+                                className="text-danger"
+                              />
+                            ) : urgency.color === "warning" ? (
+                              <Clock size={14} className="text-warning" />
+                            ) : (
+                              <CheckCircle size={14} className="text-success" />
+                            )}
+                            <small className={`text-${urgency.color}`}>
+                              {urgency.text}
+                            </small>
+                          </div>
+                        </td>
+
+                        <td className="trt-td trt-td-actions">
+                          <button
+                            className="btn btn-sm btn-outline-primary trt-action-btn"
+                            onClick={() =>
+                              onViewDetails(review.slaid || review.slaId)
+                            }
+                            title="View details"
+                            type="button"
+                          >
+                            <Eye size={14} />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

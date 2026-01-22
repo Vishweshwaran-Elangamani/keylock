@@ -962,9 +962,9 @@
 }
 
 .hr-sla-page-link:hover:not(:disabled) {
-  background-color: #3b82f6;
-  border-color: #3b82f6;
-  color: #ffffff;
+  background: rgba(39, 35, 92, 0.05);
+  border-color: #27235c;
+  color: #27235c;
 }
 
 .hr-sla-page-item.active .hr-sla-page-link {

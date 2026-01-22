@@ -13,25 +13,29 @@ import {
 import "../../../styles/sla/components/SLAHistoryTimeline.css";
 
 const SLAHistoryTimeline = ({ history }) => {
-  const getIconAndColor = (changeType) => {
+  const getConfig = (changeType) => {
     switch (changeType) {
       case "Created":
-        return { icon: FileText, color: "#16A34A", label: "Created" };
+        return { icon: FileText, label: "Created", variant: "created" };
       case "StatusChanged":
-        return { icon: TrendingUp, color: "#3B82F6", label: "Status Changed" };
+        return { icon: TrendingUp, label: "Status Changed", variant: "status" };
       case "Escalated":
       case "EscalatedToDeptHead":
-        return { icon: AlertTriangle, color: "#F59E0B", label: "Escalated" };
+        return { icon: AlertTriangle, label: "Escalated", variant: "escalated" };
       case "Reopened":
-        return { icon: RotateCcw, color: "#8B5CF6", label: "Reopened" };
+        return { icon: RotateCcw, label: "Reopened", variant: "reopened" };
       case "Closed":
-        return { icon: CheckCircle, color: "#10B981", label: "Closed" };
+        return { icon: CheckCircle, label: "Closed", variant: "closed" };
       case "ComplianceChanged":
-        return { icon: Clock, color: "#6B7280", label: "Compliance Changed" };
+        return {
+          icon: Clock,
+          label: "Compliance Changed",
+          variant: "compliance",
+        };
       case "AutoClosed":
-        return { icon: XCircle, color: "#EF4444", label: "Auto Closed" };
+        return { icon: XCircle, label: "Auto Closed", variant: "autoclosed" };
       default:
-        return { icon: FileText, color: "#6B7280", label: changeType };
+        return { icon: FileText, label: changeType, variant: "default" };
     }
   };
 
@@ -63,29 +67,31 @@ const SLAHistoryTimeline = ({ history }) => {
       <div className="sla-history-timeline-line" />
 
       {history.map((item, index) => {
-        const { icon: Icon, color, label } = getIconAndColor(item.changeType);
+        const { icon: Icon, label, variant } = getConfig(item.changeType);
 
         return (
-          <div key={item.historyId || index} className="sla-history-item">
+          <div
+            key={item.historyId || index}
+            className={`sla-history-item sla-history-variant-${variant}`}
+          >
             <div className="sla-history-content">
-              <div
-                className="sla-history-card"
-                style={{ borderLeftColor: color }}
-              >
+              <div className="sla-history-card">
                 <div className="sla-history-card-header">
                   <div className="sla-history-title-section">
-                    <div className="" style={{ borderColor: color }}>
-                      <Icon size={20} color={color} strokeWidth={2.5} />
+                    <div className="sla-history-title-row">
+                      <div className="sla-history-title-iconwrap">
+                        <Icon size={20} strokeWidth={2.5} />
+                      </div>
 
-                      <h3 className="sla-history-title" style={{ color }}>
-                        {label}
-                      </h3>
+                      <h3 className="sla-history-title">{label}</h3>
                     </div>
+
                     <div className="sla-history-meta">
                       <span className="sla-history-meta-item">
                         <Calendar size={14} />
                         {formatDateTime(item.createdAt)}
                       </span>
+
                       {item.changedByEmployeeName && (
                         <span className="sla-history-meta-item">
                           <User size={14} />
@@ -102,18 +108,13 @@ const SLAHistoryTimeline = ({ history }) => {
                           {item.changedFrom}
                         </span>
                       )}
+
                       {item.changedFrom && item.changedTo && (
                         <span className="sla-history-arrow">→</span>
                       )}
+
                       {item.changedTo && (
-                        <span
-                          className="sla-history-badge sla-history-badge-to"
-                          style={{
-                            backgroundColor: `${color}15`,
-                            color: color,
-                            borderColor: `${color}40`,
-                          }}
-                        >
+                        <span className="sla-history-badge sla-history-badge-to">
                           {item.changedTo}
                         </span>
                       )}

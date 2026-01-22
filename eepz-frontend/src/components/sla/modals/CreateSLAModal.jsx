@@ -28,10 +28,10 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
         setFetchLoading(true);
         const res = await slaService.getAllEmployees();
 
-        if (res?.success && Array.isArray(res.data)) {
+        if (res?.success && Array.isArray(res?.data)) {
           const uniqueEmployees = new Set();
           res.data.forEach((item) => {
-            if (item.employeeId) uniqueEmployees.add(item.employeeId);
+            if (item?.employeeId) uniqueEmployees.add(item.employeeId);
           });
           setEmployeeCount(uniqueEmployees.size);
         } else {
@@ -39,7 +39,6 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
           setError("Failed to load employee count");
         }
       } catch (err) {
-        console.error("Error:", err);
         toast.error("Failed to load employee count");
         setError("Failed to load employee count");
       } finally {
@@ -78,7 +77,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
     e.preventDefault();
     setError(null);
 
-    if (!formData.reviewType.trim()) {
+    if (!formData.reviewType?.trim()) {
       toast.error("Please enter a review type");
       setError("Please enter a review type");
       return;
@@ -107,17 +106,16 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
       const deadlineIso = new Date(formData.deadline).toISOString();
 
       const res = await slaService.getAllEmployees();
-      if (!res?.success || !Array.isArray(res.data)) {
+      if (!res?.success || !Array.isArray(res?.data)) {
         toast.dismiss(loadingToast);
         toast.error("Failed to fetch employees");
         setError("Failed to fetch employees");
-        setLoading(false);
         return;
       }
 
       const uniqueEmployees = new Map();
       res.data.forEach((item) => {
-        if (item.employeeId && !uniqueEmployees.has(item.employeeId)) {
+        if (item?.employeeId && !uniqueEmployees.has(item.employeeId)) {
           uniqueEmployees.set(item.employeeId, {
             employeeId: item.employeeId,
             employeeName:
@@ -146,11 +144,11 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
       toast.dismiss(loadingToast);
 
       if (response?.success) {
-        const resultData = response.data;
+        const resultData = response?.data;
         toast.success("SLA Created Successfully", { duration: 3000 });
 
         setTimeout(() => {
-          if (resultData.successfulInserts > 0) {
+          if ((resultData?.successfulInserts ?? 0) > 0) {
             onSuccess?.();
             onClose?.();
           }
@@ -160,7 +158,6 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
         setError(response?.message || "Failed to create SLAs");
       }
     } catch (err) {
-      console.error("Error:", err);
       toast.dismiss(loadingToast);
       toast.error("Failed to create SLAs");
       setError(err?.message || "Error creating SLAs");
@@ -170,209 +167,172 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
   };
 
   return (
-    <>
-      <div className="csla-overlay" onClick={onClose}>
-        <div className="csla-modal" onClick={(e) => e.stopPropagation()}>
-          <div className="csla-header">
-            <h5 className="csla-title">Create SLA</h5>
-            <button
-              className={`csla-close-btn ${
-                loading ? "csla-close-btn--disabled" : ""
-              }`}
-              onClick={onClose}
-              disabled={loading}
-            >
-              <X size={24} />
-            </button>
-          </div>
+    <div className="csla-overlay" onClick={onClose}>
+      <div className="csla-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="csla-header">
+          <h5 className="csla-title">Create SLA</h5>
+          <button
+            className={`csla-close-btn ${
+              loading ? "csla-close-btn--disabled" : ""
+            }`}
+            onClick={onClose}
+            disabled={loading}
+            type="button"
+          >
+            <X size={24} />
+          </button>
+        </div>
 
-          <div className="csla-body">
-            {fetchLoading ? (
-              <div className="csla-loading-container">
-                <Loader className="csla-loading-spinner" size={32} />
-                <p className="csla-loading-text">Loading employee count...</p>
-              </div>
-            ) : (
-              <form className="csla-form" onSubmit={handleSubmit}>
-                {error && (
-                  <div className="csla-error-alert">
-                    <AlertCircle className="csla-error-icon" size={20} />
-                    <p className="csla-error-text">{error}</p>
-                  </div>
-                )}
-
-                <div className="csla-field">
-                  <label className="csla-label">
-                    Review Type <span className="csla-required">*</span>
-                  </label>
-
-                  <input
-                    type="text"
-                    name="reviewType"
-                    value={formData.reviewType}
-                    onChange={handleChange}
-                    placeholder="E.g., Performance Form, Quarterly Review"
-                    required
-                    disabled={loading}
-                    className={`csla-input ${
-                      loading ? "csla-input--disabled" : ""
-                    }`}
-                  />
+        <div className="csla-body">
+          {fetchLoading ? (
+            <div className="csla-loading-container">
+              <Loader className="csla-loading-spinner" size={32} />
+              <p className="csla-loading-text">Loading employee count...</p>
+            </div>
+          ) : (
+            <form className="csla-form" onSubmit={handleSubmit}>
+              {error && (
+                <div className="csla-error-alert">
+                  <AlertCircle className="csla-error-icon" size={20} />
+                  <p className="csla-error-text">{error}</p>
                 </div>
-
-                <div className="csla-field">
-                  <label className="csla-label">
-                    Deadline <span className="csla-required">*</span>
-                  </label>
-
-                  <div
-                    ref={calendarAnchorRef}
-                    className="csla-calendar-container"
-                  >
-                    <input
-                      type="text"
-                      readOnly
-                      value={formatDisplayDate(formData.deadline)}
-                      onClick={() => setCalendarOpen((o) => !o)}
-                      disabled={loading}
-                      placeholder="Select date"
-                      className={`csla-input csla-deadline-input ${
-                        loading ? "csla-input--disabled" : ""
-                      }`}
-                    />
-
-                    <button
-                      type="button"
-                      className={`csla-calendar-trigger ${
-                        loading ? "csla-calendar-trigger--disabled" : ""
-                      }`}
-                      onClick={() => setCalendarOpen((o) => !o)}
-                      disabled={loading}
-                    >
-                      <svg
-                        className="csla-calendar-svg"
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                      >
-                        <rect
-                          x="4"
-                          y="5"
-                          width="16"
-                          height="15"
-                          rx="2"
-                          ry="2"
-                          stroke="currentColor"
-                          strokeWidth="1.8"
-                          fill="none"
-                        />
-                        <line
-                          x1="4"
-                          y1="9"
-                          x2="20"
-                          y2="9"
-                          stroke="currentColor"
-                          strokeWidth="1.8"
-                        />
-                        <line
-                          x1="9"
-                          y1="3"
-                          x2="9"
-                          y2="7"
-                          stroke="currentColor"
-                          strokeWidth="1.8"
-                          strokeLinecap="round"
-                        />
-                        <line
-                          x1="15"
-                          y1="3"
-                          x2="15"
-                          y2="7"
-                          stroke="currentColor"
-                          strokeWidth="1.8"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-
-                <CustomCalendar
-                  isOpen={calendarOpen}
-                  onClose={() => setCalendarOpen(false)}
-                  value={formData.deadline}
-                  onChange={handleDateChange}
-                  anchorRef={calendarAnchorRef}
-                  position="below-icon"
-                  align="right"
-                  offset={{ x: 0, y: 0 }}
-                  minDate={new Date().toISOString().slice(0, 10)}
-                />
-
-                <div className="csla-field">
-                  <label className="csla-label">Reason (Optional)</label>
-                  <input
-                    type="text"
-                    name="reason"
-                    value={formData.reason}
-                    onChange={handleChange}
-                    placeholder="Why assign this SLA?"
-                    disabled={loading}
-                    className={`csla-input ${
-                      loading ? "csla-input--disabled" : ""
-                    }`}
-                  />
-                </div>
-
-                <div className="csla-employee-info">
-                  <p className="csla-employee-count">
-                    {employeeCount} Employees
-                  </p>
-                  <small className="csla-employee-note">
-                    SLA will be displayed to all employees
-                  </small>
-                </div>
-              </form>
-            )}
-          </div>
-
-          <div className="csla-footer">
-            <button
-              className={`csla-btn csla-btn--cancel ${
-                loading ? "csla-btn--disabled" : ""
-              }`}
-              onClick={onClose}
-              disabled={loading}
-            >
-              Cancel
-            </button>
-
-            <button
-              className={`csla-btn csla-btn--create ${
-                loading || fetchLoading || employeeCount === 0
-                  ? "csla-btn--disabled"
-                  : ""
-              }`}
-              onClick={handleSubmit}
-              disabled={loading || fetchLoading || employeeCount === 0}
-            >
-              {loading ? (
-                <>
-                  <span className="csla-btn-spinner" />
-                  Creating...
-                </>
-              ) : (
-                <>
-                  <Plus size={18} />
-                  Create SLA
-                </>
               )}
-            </button>
-          </div>
+
+              <div className="csla-field">
+                <label className="csla-label">
+                  Review Type <span className="csla-required">*</span>
+                </label>
+
+                <input
+                  type="text"
+                  name="reviewType"
+                  value={formData.reviewType}
+                  onChange={handleChange}
+                  placeholder="E.g., Performance Form, Quarterly Review"
+                  required
+                  disabled={loading}
+                  className={`csla-input ${loading ? "csla-input--disabled" : ""}`}
+                />
+              </div>
+
+              <div className="csla-field">
+                <label className="csla-label">
+                  Deadline <span className="csla-required">*</span>
+                </label>
+
+                <div ref={calendarAnchorRef} className="csla-calendar-container">
+                  <input
+                    type="text"
+                    readOnly
+                    value={formatDisplayDate(formData.deadline)}
+                    onClick={() => setCalendarOpen((o) => !o)}
+                    disabled={loading}
+                    placeholder="Select date"
+                    className={`csla-input csla-deadline-input ${
+                      loading ? "csla-input--disabled" : ""
+                    }`}
+                  />
+
+                  <button
+                    type="button"
+                    className={`csla-calendar-trigger ${
+                      loading ? "csla-calendar-trigger--disabled" : ""
+                    }`}
+                    onClick={() => setCalendarOpen((o) => !o)}
+                    disabled={loading}>
+
+                    <svg className="csla-calendar-svg"
+                      width="18" height="18" viewBox="0 0 24 24" fill="none">
+
+                      <rect x="4" y="5" width="16" height="15" rx="2" ry="2"
+                        stroke="currentColor" strokeWidth="1.8"  fill="none" />
+
+                      <line  x1="4"  y1="9"  x2="20" y2="9"
+                        stroke="currentColor" strokeWidth="1.8" />
+                      
+                      <line x1="9" y1="3" x2="9" y2="7"
+                        stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                      
+                      <line x1="15" y1="3" x2="15" y2="7"
+                        stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                    
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <CustomCalendar
+                isOpen={calendarOpen}
+                onClose={() => setCalendarOpen(false)}
+                value={formData.deadline}
+                onChange={handleDateChange}
+                anchorRef={calendarAnchorRef}
+                position="below-icon"
+                align="right"
+                offset={{ x: 0, y: 0 }}
+                minDate={new Date().toISOString().slice(0, 10)}
+              />
+
+              <div className="csla-field">
+                <label className="csla-label">Reason (Optional)</label>
+                <input
+                  type="text"
+                  name="reason"
+                  value={formData.reason}
+                  onChange={handleChange}
+                  placeholder="Why assign this SLA?"
+                  disabled={loading}
+                  className={`csla-input ${loading ? "csla-input--disabled" : ""}`}
+                />
+              </div>
+
+              <div className="csla-employee-info">
+                <p className="csla-employee-count">{employeeCount} Employees</p>
+                <small className="csla-employee-note">
+                  SLA will be displayed to all employees
+                </small>
+              </div>
+            </form>
+          )}
+        </div>
+
+        <div className="csla-footer">
+          <button
+            type="button"
+            className={`csla-btn csla-btn--cancel ${
+              loading ? "csla-btn--disabled" : ""
+            }`}
+            onClick={onClose}
+            disabled={loading}
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            className={`csla-btn csla-btn--create ${
+              loading || fetchLoading || employeeCount === 0
+                ? "csla-btn--disabled"
+                : ""
+            }`}
+            onClick={handleSubmit}
+            disabled={loading || fetchLoading || employeeCount === 0}
+          >
+            {loading ? (
+              <>
+                <span className="csla-btn-spinner" />
+                Creating...
+              </>
+            ) : (
+              <>
+                <Plus size={18} />
+                Create SLA
+              </>
+            )}
+          </button>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

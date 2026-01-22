@@ -2,8 +2,6 @@ import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import "../../../styles/mom/modals/ManagerMeetingDetailsModal.css";
 
-const PRIMARY = "#27235C";
-
 const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -26,7 +24,8 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
   };
 
   const countAccepted =
-    meeting.rsvpParticipants?.filter((p) => p.rsvpStatus == 1).length || 0;
+    meeting.rsvpParticipants?.filter((p) => p.rsvpStatus === 1)?.length || 0;
+
   const totalParticipants = meeting.rsvpParticipants?.length || 0;
 
   const acceptedPercentage =
@@ -41,7 +40,7 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
             <i className="bi bi-calendar3"></i>
             {formatDateTime(meeting.meetingDate)}
           </p>
-          <button className="mmdm-close-icon" onClick={onClose}>
+          <button className="mmdm-close-icon" onClick={onClose} type="button">
             ×
           </button>
         </div>
@@ -55,6 +54,7 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
                   {countAccepted}
                 </div>
               </div>
+
               <div className="mmdm-stat">
                 <div className="mmdm-stat-label">Total Invited</div>
                 <div className="mmdm-stat-value mmdm-stat-total">
@@ -62,12 +62,13 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
                 </div>
               </div>
             </div>
-            <div className="mmdm-progress-bar">
-              <div
-                className="mmdm-progress-fill"
-                style={{ width: `${acceptedPercentage}%` }}
-              ></div>
-            </div>
+
+            <progress
+              className="mmdm-progress"
+              value={acceptedPercentage}
+              max="100"
+              aria-label="Accepted percentage"
+            />
           </div>
 
           {meeting.meetingLink && (
@@ -75,10 +76,9 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
               <div className="mmdm-meeting-link-card">
                 <div className="mmdm-meeting-link-header">
                   <i className="bi bi-link-45deg mmdm-meeting-link-icon"></i>
-                  <small className="mmdm-meeting-link-label">
-                    Meeting Link
-                  </small>
+                  <small className="mmdm-meeting-link-label">Meeting Link</small>
                 </div>
+
                 <a
                   href={meeting.meetingLink}
                   target="_blank"
@@ -97,6 +97,7 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
               <i className="bi bi-people mmdm-participants-icon"></i>
               Participants
             </span>
+
             {totalParticipants > 0 && (
               <span className="mmdm-participants-count">
                 {totalParticipants}
@@ -118,6 +119,7 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
                       <div className="mmdm-participant-name">
                         {p.employeeName}
                       </div>
+
                       {p.rsvpComments && (
                         <small className="mmdm-participant-comment">
                           <i className="bi bi-chat-dots"></i>
@@ -133,7 +135,7 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
         </div>
 
         <div className="mmdm-footer">
-          <button className="mmdm-close-btn" onClick={onClose}>
+          <button className="mmdm-close-btn" onClick={onClose} type="button">
             Close
           </button>
         </div>

@@ -1,12 +1,6 @@
 import React from "react";
-import {
-  FileText,
-  Target,
-  User,
-  Activity,
-  Building,
-  Briefcase,
-} from "lucide-react";
+import { FileText, Target, User, Activity, Building, Briefcase } from "lucide-react";
+import { getStatusColor } from "../../../common/constants/statusColorConstants";
 
 const ProjectBasicInfoCard = ({ project }) => {
   const clientName = project.clientName || project.ClientName || "N/A";
@@ -19,6 +13,7 @@ const ProjectBasicInfoCard = ({ project }) => {
           Basic Information
         </h5>
       </div>
+
       <div className="card-body">
         <div className="row g-4">
           <div className="col-md-6">
@@ -53,10 +48,8 @@ const ProjectBasicInfoCard = ({ project }) => {
               <div>
                 <label className="text-muted small mb-1">Status</label>
                 <div>
-                  <span
-                    className={`badge bg-${getStatusColor(project.status)}`}
-                  >
-                    {project.status}
+                  <span className={`badge bg-${getStatusColor(project.status)}`}>
+                    {project.status || "N/A"}
                   </span>
                 </div>
               </div>
@@ -70,9 +63,7 @@ const ProjectBasicInfoCard = ({ project }) => {
               </div>
               <div>
                 <label className="text-muted small mb-1">Business Unit</label>
-                <p className="mb-0 fw-semibold">
-                  {project.businessUnit || "N/A"}
-                </p>
+                <p className="mb-0 fw-semibold">{project.businessUnit || "N/A"}</p>
               </div>
             </div>
           </div>
@@ -84,9 +75,7 @@ const ProjectBasicInfoCard = ({ project }) => {
               </div>
               <div>
                 <label className="text-muted small mb-1">Department</label>
-                <p className="mb-0 fw-semibold">
-                  {project.department || "N/A"}
-                </p>
+                <p className="mb-0 fw-semibold">{project.department || "N/A"}</p>
               </div>
             </div>
           </div>
@@ -97,9 +86,7 @@ const ProjectBasicInfoCard = ({ project }) => {
                 <Target size={20} className="text-secondary" />
               </div>
               <div>
-                <label className="text-muted small mb-1">
-                  Engagement Model
-                </label>
+                <label className="text-muted small mb-1">Engagement Model</label>
                 <p className="mb-0 fw-semibold">
                   {project.engagementModel || "N/A"}
                 </p>
@@ -124,16 +111,6 @@ const ProjectBasicInfoCard = ({ project }) => {
       </div>
     </div>
   );
-};
-
-const getStatusColor = (status) => {
-  const colors = {
-    Active: "success",
-    "On Hold": "warning",
-    Completed: "info",
-    Cancelled: "danger",
-  };
-  return colors[status] || "secondary";
 };
 
 export default ProjectBasicInfoCard;

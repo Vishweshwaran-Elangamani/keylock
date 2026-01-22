@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { User, Clock, Video, FileText, Check, X } from "lucide-react";
+import { User, X, AlertCircle } from "lucide-react";
 import axios from "axios";
 import "../../../styles/feedback/modals/ResponseViewModal.css";
 import { QUESTION_TEMPLATES } from "../../../constants/feedback_management/questionTemplates";
@@ -14,14 +14,14 @@ const RATING_LABELS = {
   5: "Excellent",
 };
 
-const getRatingColor = (rating) => {
+const getRatingClass = (rating) => {
   const num = Number(rating);
-  if (num === 5) return "#24A148";
-  if (num === 4) return "#0F62FE";
-  if (num === 3) return "#E2B93B";
-  if (num === 2) return "#E89E14";
-  if (num === 1) return "#E01950";
-  return "#525252";
+  if (num === 5) return "rvm-rating--5";
+  if (num === 4) return "rvm-rating--4";
+  if (num === 3) return "rvm-rating--3";
+  if (num === 2) return "rvm-rating--2";
+  if (num === 1) return "rvm-rating--1";
+  return "rvm-rating--0";
 };
 
 const ResponseViewModal = ({ show, response, onClose, type }) => {
@@ -36,14 +36,15 @@ const ResponseViewModal = ({ show, response, onClose, type }) => {
           const res = await axios.get(
             `${API_BASE}/HrFeedbackForm/forms/${response.formId}`
           );
+
           if (res?.data?.success && res?.data?.data) {
             setFormDetails(res.data.data);
           }
-        } catch {
         } finally {
           setLoadingFormDetails(false);
         }
       };
+
       fetchFormDetails();
     }
   }, [show, type, response?.formId, formDetails]);
@@ -52,7 +53,7 @@ const ResponseViewModal = ({ show, response, onClose, type }) => {
     const formType =
       formDetails?.formType || response?.formType || "GeneralFeedback";
 
-    const questionsForFormType = QUESTION_TEMPLATES[formType] || [];
+    const questionsForFormType = QUESTION_TEMPLATES?.[formType] || [];
     const matchedQuestion = questionsForFormType.find(
       (question) => question.id === Number(qId)
     );
@@ -61,8 +62,9 @@ const ResponseViewModal = ({ show, response, onClose, type }) => {
   };
 
   const parseHRResponses = () => {
-    if (!response?.formResponse || typeof response.formResponse !== "object")
+    if (!response?.formResponse || typeof response.formResponse !== "object") {
       return [];
+    }
 
     const items = [];
     Object.keys(response.formResponse).forEach((key) => {
@@ -81,25 +83,30 @@ const ResponseViewModal = ({ show, response, onClose, type }) => {
 
   const formatDate = (dateInput) => {
     if (!dateInput) return "N/A";
-    try {
-      const dateObj = new Date(dateInput);
-      if (isNaN(dateObj.getTime())) return "N/A";
-      return dateObj.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    } catch {
-      return "N/A";
-    }
+
+    const dateObj = new Date(dateInput);
+    if (Number.isNaN(dateObj.getTime())) return "N/A";
+
+    return dateObj.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   if (!show || !response) return null;
 
   const hrResponses = type === "HR" ? parseHRResponses() : [];
-  const userComments = response.formResponse?.comments || null;
+  const userComments = response?.formResponse?.comments || null;
+
+  const fromName =
+    response?.submittedByName ||
+    response?.reviewerName ||
+    response?.submitterNameFull ||
+    response?.submitterName ||
+    "N/A";
 
   return (
     <div className="rvm-overlay" onClick={onClose}>
@@ -111,6 +118,7 @@ const ResponseViewModal = ({ show, response, onClose, type }) => {
             {type === "Peer" && "Peer Feedback"}
             {type === "Goal" && "Goal Feedback Details"}
           </h5>
+
           <button
             type="button"
             onClick={onClose}
@@ -126,17 +134,19 @@ const ResponseViewModal = ({ show, response, onClose, type }) => {
             <>
               <div className="rvm-section">
                 <h6 className="rvm-section__title">Form Information</h6>
+
                 <div className="rvm-grid">
                   <div className="rvm-grid__col">
                     <div className="rvm-field__label">Form Name</div>
                     <div className="rvm-field__value">
-                      {response.formName || "N/A"}
+                      {response?.formName || "N/A"}
                     </div>
                   </div>
+
                   <div className="rvm-grid__col">
                     <div className="rvm-field__label">Submitted</div>
                     <div className="rvm-field__value">
-                      {formatDate(response.submittedAt)}
+                      {formatDate(response?.submittedAt)}
                     </div>
                   </div>
                 </div>
@@ -147,36 +157,45 @@ const ResponseViewModal = ({ show, response, onClose, type }) => {
                   <h6 className="rvm-section__title">
                     Your Ratings ({hrResponses.length} questions)
                   </h6>
-                  {hrResponses.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="rvm-rating-item"
-                      style={{ borderLeftColor: getRatingColor(item.rating) }}
-                    >
-                      <div className="rvm-rating-item__header">
-                        <div className="rvm-rating-item__question">
-                          <small className="rvm-rating-item__question-number">
-                            Question {item.qId}
-                          </small>
-                          <p className="rvm-rating-item__question-text">
-                            {item.text}
-                          </p>
+
+                  {hrResponses.map((item, idx) => {
+                    const ratingClass = getRatingClass(item.rating);
+
+                    return (
+                      <div
+                        key={idx}
+                        className={`rvm-rating-item ${ratingClass}`}
+                      >
+                        <div className="rvm-rating-item__header">
+                          <div className="rvm-rating-item__question">
+                            <small className="rvm-rating-item__question-number">
+                              Question {item.qId}
+                            </small>
+                            <p className="rvm-rating-item__question-text">
+                              {item.text}
+                            </p>
+                          </div>
+
+                          <span
+                            className={`rvm-rating-item__badge ${ratingClass}`}
+                          >
+                            {item.rating}
+                          </span>
                         </div>
-                        <span
-                          className="rvm-rating-item__badge"
-                          style={{
-                            backgroundColor: `${getRatingColor(item.rating)}20`,
-                            color: getRatingColor(item.rating),
-                          }}
-                        >
-                          {item.rating}
-                        </span>
+
+                        <small className="rvm-rating-item__label">
+                          Rating: {RATING_LABELS[item.rating] || "N/A"}
+                        </small>
                       </div>
-                      <small className="rvm-rating-item__label">
-                        Rating: {RATING_LABELS[item.rating] || "N/A"}
-                      </small>
-                    </div>
-                  ))}
+                    );
+                  })}
+                </div>
+              )}
+
+              {loadingFormDetails && (
+                <div className="rvm-loading">
+                  <AlertCircle size={16} />
+                  Loading form details...
                 </div>
               )}
 
@@ -197,40 +216,31 @@ const ResponseViewModal = ({ show, response, onClose, type }) => {
                 <User size={16} className="rvm-field__icon" />
                 Feedback Details
               </h6>
+
               <div className="rvm-grid rvm-grid--spaced">
                 <div className="rvm-grid__col">
                   <div className="rvm-field__label">From</div>
-                  <div className="rvm-field__value">
-                    {response.submittedByName ||
-                      response.reviewerName ||
-                      response.submitterNameFull ||
-                      response.submitterName ||
-                      "N/A"}
-                  </div>
+                  <div className="rvm-field__value">{fromName}</div>
                 </div>
+
                 <div className="rvm-grid__col">
                   <div className="rvm-field__label">Submitted</div>
                   <div className="rvm-field__value">
-                    {formatDate(response.submittedAt)}
+                    {formatDate(response?.submittedAt)}
                   </div>
                 </div>
               </div>
 
-              {response.rating && (
-                <div className="rvm-rating-display">
-                  <p
-                    className="rvm-rating-display__value"
-                    style={{ color: getRatingColor(response.rating) }}
-                  >
-                    {response.rating}
-                  </p>
+              {response?.rating && (
+                <div className={`rvm-rating-display ${getRatingClass(response.rating)}`}>
+                  <p className="rvm-rating-display__value">{response.rating}</p>
                   <p className="rvm-rating-item__label">
                     {RATING_LABELS[response.rating] || "N/A"}
                   </p>
                 </div>
               )}
 
-              {response.comments && (
+              {response?.comments && (
                 <div className="rvm-comment-box rvm-comment-box--primary">
                   <p className="rvm-comment-box__text rvm-comment-box__text--pre">
                     {response.comments}
@@ -246,40 +256,31 @@ const ResponseViewModal = ({ show, response, onClose, type }) => {
                 <User size={16} className="rvm-field__icon" />
                 Feedback Details
               </h6>
+
               <div className="rvm-grid rvm-grid--spaced">
                 <div className="rvm-grid__col">
                   <div className="rvm-field__label">From</div>
-                  <div className="rvm-field__value">
-                    {response.submittedByName ||
-                      response.reviewerName ||
-                      response.submitterNameFull ||
-                      response.submitterName ||
-                      "N/A"}
-                  </div>
+                  <div className="rvm-field__value">{fromName}</div>
                 </div>
+
                 <div className="rvm-grid__col">
                   <div className="rvm-field__label">Submitted</div>
                   <div className="rvm-field__value">
-                    {formatDate(response.submittedAt)}
+                    {formatDate(response?.submittedAt)}
                   </div>
                 </div>
               </div>
 
-              {response.rating && (
-                <div className="rvm-rating-display">
-                  <p
-                    className="rvm-rating-display__value"
-                    style={{ color: getRatingColor(response.rating) }}
-                  >
-                    {response.rating}
-                  </p>
+              {response?.rating && (
+                <div className={`rvm-rating-display ${getRatingClass(response.rating)}`}>
+                  <p className="rvm-rating-display__value">{response.rating}</p>
                   <p className="rvm-rating-item__label">
                     {RATING_LABELS[response.rating] || "N/A"}
                   </p>
                 </div>
               )}
 
-              {response.comments && (
+              {response?.comments && (
                 <div className="rvm-comment-box rvm-comment-box--primary">
                   <p className="rvm-comment-box__text rvm-comment-box__text--pre">
                     {response.comments}

@@ -1,14 +1,12 @@
 import React from "react";
 import "../../../styles/mom/modals/MomDetailsView.css";
 
-const PRIMARY = "#27235C";
-
 const MomDetailsView = ({ mom, onClose }) => {
   if (!mom) return null;
 
   return (
     <div
-      className="mdv-overlay modal fade show d-block"
+      className="mdv-overlay modal fade show d-block mdv-modal-open"
       tabIndex="-1"
       onClick={onClose}
     >
@@ -21,6 +19,7 @@ const MomDetailsView = ({ mom, onClose }) => {
               </h5>
               <span className="mdv-type-pill">{mom.meetingType}</span>
             </div>
+
             <button
               type="button"
               className="btn-close btn-close-white"
@@ -35,9 +34,10 @@ const MomDetailsView = ({ mom, onClose }) => {
                 <h6 className="mdv-info-title fw-semibold mb-4">
                   Meeting Information
                 </h6>
+
                 <div className="row g-4">
                   <div className="col-md-6">
-                    <small className="text-muted d-block mb-1">
+                    <small className="mdv-muted text-muted d-block mb-1">
                       Meeting Date:
                     </small>
                     <div className="fw-semibold d-flex align-items-center gap-2">
@@ -48,7 +48,7 @@ const MomDetailsView = ({ mom, onClose }) => {
 
                   {mom.meetingLink && (
                     <div className="col-md-6">
-                      <small className="text-muted d-block mb-1">
+                      <small className="mdv-muted text-muted d-block mb-1">
                         Meeting Link:
                       </small>
                       <a
@@ -65,7 +65,7 @@ const MomDetailsView = ({ mom, onClose }) => {
                   )}
 
                   <div className="col-md-6">
-                    <small className="text-muted d-block mb-1">
+                    <small className="mdv-muted text-muted d-block mb-1">
                       Attendees:
                     </small>
                     <div className="fw-semibold d-flex align-items-center gap-2">
@@ -75,7 +75,7 @@ const MomDetailsView = ({ mom, onClose }) => {
                   </div>
 
                   <div className="col-md-6">
-                    <small className="text-muted d-block mb-1">
+                    <small className="mdv-muted text-muted d-block mb-1">
                       Submitted by:
                     </small>
                     <div className="fw-semibold d-flex align-items-center mdv-submitter">
@@ -111,6 +111,7 @@ const MomDetailsView = ({ mom, onClose }) => {
                   </span>
                 )}
               </h6>
+
               {mom.discussionPoints?.length > 0 ? (
                 <div className="d-flex flex-column gap-2">
                   {mom.discussionPoints.map((dp, index) => (
@@ -139,6 +140,7 @@ const MomDetailsView = ({ mom, onClose }) => {
                   </span>
                 )}
               </h6>
+
               {mom.actionItems?.length > 0 ? (
                 <div className="d-flex flex-column gap-3">
                   {mom.actionItems.map((ai, index) => (
@@ -148,6 +150,7 @@ const MomDetailsView = ({ mom, onClose }) => {
                           {ai.taskDescription}
                         </h6>
                       </div>
+
                       <div className="row g-2">
                         <div className="col-md-6">
                           <small className="text-muted d-flex align-items-center gap-2">
@@ -156,6 +159,7 @@ const MomDetailsView = ({ mom, onClose }) => {
                             {ai.assignedToEmployeeName || "N/A"}
                           </small>
                         </div>
+
                         <div className="col-md-6">
                           <small className="text-muted d-flex align-items-center gap-2">
                             <i className="bi bi-calendar-event text-danger"></i>
@@ -184,12 +188,6 @@ const MomDetailsView = ({ mom, onClose }) => {
           </div>
         </div>
       </div>
-
-      <style>{`
-        .modal.show.d-block {
-          display: flex !important;
-        }
-      `}</style>
     </div>
   );
 };

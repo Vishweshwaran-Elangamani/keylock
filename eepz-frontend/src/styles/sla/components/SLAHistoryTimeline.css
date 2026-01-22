@@ -6,11 +6,11 @@
 
 .sla-history-timeline-line {
   position: absolute;
-  right: .5rem;
+  right: 0.5rem;
   top: 2rem;
   bottom: 2rem;
   width: 3px;
-  background: linear-gradient(180deg, #27235C 0%, #97247E 50%, #E01950 100%);
+  background: linear-gradient(180deg, #27235c 0%, #97247e 50%, #e01950 100%);
   border-radius: 10px;
 }
 
@@ -26,32 +26,14 @@
   margin-bottom: 0;
 }
 
-.sla-history-icon-wrapper {
-  position: absolute;
-  left: 6rem;
-  top: 1.3rem;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: transparent;
-
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  z-index: 2;
-  flex-shrink: 0;
-}
-
 .sla-history-content {
   flex: 1;
 }
 
 .sla-history-card {
-  background: #FFFFFF;
-  border: 2px solid #27235C;
-  border-left-width: 4px;
+  background: #ffffff;
+  border: 2px solid #27235c;
+  border-left-width: 2px;
   border-radius: 10px;
   padding: 1.25rem;
   box-shadow: 0 2px 6px rgba(39, 35, 92, 0.08);
@@ -75,10 +57,27 @@
   flex: 1;
 }
 
+.sla-history-title-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.5rem;
+}
+
+.sla-history-title-iconwrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sla-history-title-iconwrap svg {
+  flex-shrink: 0;
+}
+
 .sla-history-title {
   font-size: 1.2rem;
   font-weight: 700;
-  margin: 0 0 0.5rem;
+  margin: 0;
   line-height: 1.4;
   text-align: left;
 }
@@ -94,7 +93,7 @@
   align-items: center;
   gap: 0.375rem;
   font-size: 0.8125rem;
-  color: #6B7280;
+  color: #6b7280;
   font-weight: 500;
 }
 
@@ -120,9 +119,9 @@
 }
 
 .sla-history-badge-from {
-  background: #F3F4F6;
-  color: #6B7280;
-  border: 1px solid #E5E7EB;
+  background: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid #e5e7eb;
 }
 
 .sla-history-badge-to {
@@ -130,18 +129,18 @@
 }
 
 .sla-history-arrow {
-  color: #9CA3AF;
+  color: #9ca3af;
   font-size: 0.875rem;
   font-weight: 600;
 }
 
 .sla-history-description {
   font-size: 0.875rem;
-  color: #4B5563;
+  color: #4b5563;
   line-height: 1.6;
   margin-top: 0.75rem;
   padding-top: 0.75rem;
-  border-top: 1px solid #E5E7EB;
+  border-top: 1px solid #e5e7eb;
   text-align: left;
 }
 
@@ -153,16 +152,16 @@
 .sla-history-reference {
   margin-top: 0.75rem;
   padding-top: 0.75rem;
-  border-top: 1px solid #E5E7EB;
+  border-top: 1px solid #e5e7eb;
 }
 
 .sla-history-reference-badge {
   display: inline-flex;
   align-items: center;
   padding: 0.375rem 0.75rem;
-  background: #E0E7FF;
-  color: #4338CA;
-  border: 1px solid #C7D2FE;
+  background: #e0e7ff;
+  color: #4338ca;
+  border: 1px solid #c7d2fe;
   border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 600;
@@ -174,16 +173,118 @@
 }
 
 .sla-history-empty-icon {
-  color: #D1D5DB;
+  color: #d1d5db;
   opacity: 0.4;
   margin-bottom: 1rem;
 }
 
 .sla-history-empty-text {
-  color: #6B7280;
+  color: #6b7280;
   font-weight: 500;
   font-size: 0.9375rem;
   margin: 0;
+}
+
+.sla-history-variant-created .sla-history-card {
+  border-left-color: #16a34a;
+}
+.sla-history-variant-created .sla-history-title,
+.sla-history-variant-created .sla-history-title-iconwrap svg {
+  color: #16a34a;
+}
+.sla-history-variant-created .sla-history-badge-to {
+  background: rgba(22, 163, 74, 0.08);
+  color: #16a34a;
+  border-color: rgba(22, 163, 74, 0.25);
+}
+
+.sla-history-variant-status .sla-history-card {
+  border-left-color: #3b82f6;
+}
+.sla-history-variant-status .sla-history-title,
+.sla-history-variant-status .sla-history-title-iconwrap svg {
+  color: #3b82f6;
+}
+.sla-history-variant-status .sla-history-badge-to {
+  background: rgba(59, 130, 246, 0.08);
+  color: #3b82f6;
+  border-color: rgba(59, 130, 246, 0.25);
+}
+
+
+.sla-history-variant-escalated .sla-history-title,
+.sla-history-variant-escalated .sla-history-title-iconwrap svg {
+  color: #f59e0b;
+}
+.sla-history-variant-escalated .sla-history-badge-to {
+  background: rgba(245, 158, 11, 0.08);
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.25);
+}
+
+.sla-history-variant-reopened .sla-history-card {
+  border-left-color: #8b5cf6;
+}
+.sla-history-variant-reopened .sla-history-title,
+.sla-history-variant-reopened .sla-history-title-iconwrap svg {
+  color: #8b5cf6;
+}
+.sla-history-variant-reopened .sla-history-badge-to {
+  background: rgba(139, 92, 246, 0.08);
+  color: #8b5cf6;
+  border-color: rgba(139, 92, 246, 0.25);
+}
+
+.sla-history-variant-closed .sla-history-card {
+  border-left-color: #10b981;
+}
+.sla-history-variant-closed .sla-history-title,
+.sla-history-variant-closed .sla-history-title-iconwrap svg {
+  color: #10b981;
+}
+.sla-history-variant-closed .sla-history-badge-to {
+  background: rgba(16, 185, 129, 0.08);
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
+.sla-history-variant-compliance .sla-history-card {
+  border-left-color: #6b7280;
+}
+.sla-history-variant-compliance .sla-history-title,
+.sla-history-variant-compliance .sla-history-title-iconwrap svg {
+  color: #6b7280;
+}
+.sla-history-variant-compliance .sla-history-badge-to {
+  background: rgba(107, 114, 128, 0.08);
+  color: #6b7280;
+  border-color: rgba(107, 114, 128, 0.25);
+}
+
+.sla-history-variant-autoclosed .sla-history-card {
+  border-left-color: #ef4444;
+}
+.sla-history-variant-autoclosed .sla-history-title,
+.sla-history-variant-autoclosed .sla-history-title-iconwrap svg {
+  color: #ef4444;
+}
+.sla-history-variant-autoclosed .sla-history-badge-to {
+  background: rgba(239, 68, 68, 0.08);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.sla-history-variant-default .sla-history-card {
+  border-left-color: #6b7280;
+}
+.sla-history-variant-default .sla-history-title,
+.sla-history-variant-default .sla-history-title-iconwrap svg {
+  color: #6b7280;
+}
+.sla-history-variant-default .sla-history-badge-to {
+  background: rgba(107, 114, 128, 0.08);
+  color: #6b7280;
+  border-color: rgba(107, 114, 128, 0.25);
 }
 
 @media (max-width: 768px) {
@@ -193,18 +294,6 @@
 
   .sla-history-timeline-line {
     left: 1rem;
-  }
-
-  .sla-history-icon-wrapper {
-    left: -2rem;
-    width: 40px;
-    height: 40px;
-    border-width: 2px;
-  }
-
-  .sla-history-icon-wrapper svg {
-    width: 16px;
-    height: 16px;
   }
 
   .sla-history-card {
@@ -242,12 +331,6 @@
   .sla-history-timeline-line {
     left: 0.75rem;
     width: 2px;
-  }
-
-  .sla-history-icon-wrapper {
-    left: -1.5rem;
-    width: 36px;
-    height: 36px;
   }
 
   .sla-history-card {

@@ -23,7 +23,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.35rem 1.75rem;
-  background-color: #27235C;
+  background-color: #27235c;
   border-radius: 18px 18px 0 0;
 }
 
@@ -71,7 +71,7 @@
 }
 
 .csla-loading-spinner {
-  color: #97247E;
+  color: #97247e;
   margin-bottom: 1rem;
   animation: csla-spin 1s linear infinite;
 }
@@ -97,7 +97,7 @@
 }
 
 .csla-error-icon {
-  color: #E01950;
+  color: #e01950;
   flex-shrink: 0;
   margin-top: 2px;
 }
@@ -123,7 +123,7 @@
 }
 
 .csla-required {
-  color: #E01950;
+  color: #e01950;
 }
 
 .csla-input {
@@ -144,7 +144,7 @@
 
 .csla-input:focus {
   outline: none;
-  border-color: #97247E;
+  border-color: #97247e;
   box-shadow: 0 0 0 1px rgba(151, 36, 126, 0.18);
 }
 
@@ -173,7 +173,7 @@
   background: transparent;
   cursor: pointer;
   padding: 0;
-  color: #27235C;
+  color: #27235c;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -187,7 +187,6 @@
 .csla-calendar-svg {
   display: block;
 }
-
 
 .csla-employee-info {
   background-color: #ffffff;
@@ -245,7 +244,7 @@
 
 .csla-btn--create {
   padding: 0.7rem 1.7rem;
-  background: linear-gradient(90deg, #97247E 0%, #E01950 100%);
+  background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
   color: white;
   box-shadow: 0 4px 12px rgba(151, 36, 126, 0.35);
 }

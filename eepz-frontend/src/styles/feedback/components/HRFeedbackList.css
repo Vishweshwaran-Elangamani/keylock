@@ -327,11 +327,6 @@
   width: 100%;
 }
 
-.hrfeedback-btn-analyze:hover {
-  background: #27235c;
-  color: white;
-}
-
 .hrfeedback-modal-overlay {
   position: fixed;
   top: 0;
