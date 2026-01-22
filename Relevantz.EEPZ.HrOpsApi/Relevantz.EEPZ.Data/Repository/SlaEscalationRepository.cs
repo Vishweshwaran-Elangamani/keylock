@@ -20,110 +20,62 @@ namespace Relevantz.EEPZ.Data.Repository
 
         public async Task<Slaescalation?> GetByIdAsync(int escalationId)
         {
-            try
-            {
-                if (escalationId <= 0)
-                    return null;
+            if (escalationId <= 0)
+                return null;
 
-                return await BaseQuery()
-                    .FirstOrDefaultAsync(e => e.EscalationId == escalationId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, RepositoryMessages.ErrorFetchingSlaEscalation, escalationId);
-                throw;
-            }
+            return await BaseQuery()
+                .FirstOrDefaultAsync(e => e.EscalationId == escalationId);
         }
 
         public async Task<List<Slaescalation>> GetAllAsync()
         {
-            try
-            {
-                return await BaseQuery()
-                    .OrderByDescending(e => e.SubmittedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, RepositoryMessages.ErrorFetchingAllSlaEscalations);
-                throw;
-            }
+            return await BaseQuery()
+                .OrderByDescending(e => e.SubmittedAt)
+                .ToListAsync();
         }
 
         public async Task<List<Slaescalation>> GetByEmployeeUserIdAsync(int EmployeeUserId)
         {
-            try
-            {
-                if (EmployeeUserId <= 0)
-                    return new List<Slaescalation>();
+            if (EmployeeUserId <= 0)
+                return new List<Slaescalation>();
 
-                return await BaseQuery()
-                    .Where(e => e.Sla.EmployeeId == EmployeeUserId)
-                    .OrderByDescending(e => e.SubmittedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, RepositoryMessages.ErrorFetchingSlaEscalationsByEmployee, EmployeeUserId);
-                throw;
-            }
+            return await BaseQuery()
+                .Where(e => e.Sla.EmployeeId == EmployeeUserId)
+                .OrderByDescending(e => e.SubmittedAt)
+                .ToListAsync();
         }
 
         public async Task<List<Slaescalation>> GetBySlaIdAsync(int slaId)
         {
-            try
-            {
-                if (slaId <= 0)
-                    return new List<Slaescalation>();
+            if (slaId <= 0)
+                return new List<Slaescalation>();
 
-                return await BaseSlaQuery()
-                    .Where(e => e.Slaid == slaId)
-                    .OrderByDescending(e => e.SubmittedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, RepositoryMessages.ErrorFetchingSlaEscalationsBySla, slaId);
-                throw;
-            }
+            return await BaseSlaQuery()
+                .Where(e => e.Slaid == slaId)
+                .OrderByDescending(e => e.SubmittedAt)
+                .ToListAsync();
         }
 
         public async Task<List<Slaescalation>> GetByEscalationLevelAsync(string escalationLevel)
         {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(escalationLevel))
-                    return new List<Slaescalation>();
+            if (string.IsNullOrWhiteSpace(escalationLevel))
+                return new List<Slaescalation>();
 
-                return await BaseQuery()
-                    .Where(e => e.EscalationLevel == escalationLevel)
-                    .OrderByDescending(e => e.SubmittedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, RepositoryMessages.ErrorFetchingSlaEscalationsByLevel, escalationLevel);
-                throw;
-            }
+            return await BaseQuery()
+                .Where(e => e.EscalationLevel == escalationLevel)
+                .OrderByDescending(e => e.SubmittedAt)
+                .ToListAsync();
         }
 
         public async Task<List<Slaescalation>> GetByEscalationStatusAsync(string escalationStatus)
         {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(escalationStatus))
-                    return new List<Slaescalation>();
+            if (string.IsNullOrWhiteSpace(escalationStatus))
+                return new List<Slaescalation>();
 
-                return await BaseQuery()
-                    .Where(e => e.EscalationStatus == escalationStatus)
-                    .OrderByDescending(e => e.SubmittedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, RepositoryMessages.ErrorFetchingSlaEscalationsByStatus, escalationStatus);
-                throw;
-            }
+            return await BaseQuery()
+                .Where(e => e.EscalationStatus == escalationStatus)
+                .OrderByDescending(e => e.SubmittedAt)
+                .ToListAsync();
         }
 
         private IQueryable<Slaescalation> BaseQuery()
@@ -151,7 +103,6 @@ namespace Relevantz.EEPZ.Data.Repository
 
         private IQueryable<Slaescalation> BaseSlaQuery()
         {
-            // For GetBySlaIdAsync - excludes Sla includes to avoid redundant loading
             return _context.Slaescalations
                 .Include(e => e.EscalatedToEmployee)
                     .ThenInclude(emp => emp.Userprofile)

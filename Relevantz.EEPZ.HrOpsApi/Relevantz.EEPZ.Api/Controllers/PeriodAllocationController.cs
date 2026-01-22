@@ -1,7 +1,7 @@
-
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Core.IService;
+using Microsoft.Extensions.Logging;
 
 namespace Relevantz.EEPZ.Api.Controllers
 {
@@ -41,24 +41,12 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> CreatePeriodAllocation([FromBody] CreatePeriodAllocationDto request)
         {
-            try
-            {
-                var result = await _periodAllocationService.CreatePeriodAllocationAsync(request);
-                if (!result.Success)
-                    return BadRequest(result);
+            var result = await _periodAllocationService.CreatePeriodAllocationAsync(request);
 
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error creating period allocation: {ex.Message}");
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "An error occurred while creating period allocation",
-                    data = (object?)null
-                });
-            }
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -73,24 +61,12 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpPut("update")]
         public async Task<IActionResult> UpdatePeriodAllocation([FromBody] UpdatePeriodAllocationDto request)
         {
-            try
-            {
-                var result = await _periodAllocationService.UpdatePeriodAllocationAsync(request);
-                if (!result.Success)
-                    return BadRequest(result);
+            var result = await _periodAllocationService.UpdatePeriodAllocationAsync(request);
 
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error updating period allocation: {ex.Message}");
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "An error occurred while updating period allocation",
-                    data = (object?)null
-                });
-            }
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -106,24 +82,12 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpDelete("{periodAllocationId}")]
         public async Task<IActionResult> DeletePeriodAllocation(int periodAllocationId)
         {
-            try
-            {
-                var result = await _periodAllocationService.DeletePeriodAllocationAsync(periodAllocationId);
-                if (!result.Success)
-                    return BadRequest(result);
+            var result = await _periodAllocationService.DeletePeriodAllocationAsync(periodAllocationId);
 
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error deleting period allocation {periodAllocationId}: {ex.Message}");
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "An error occurred while deleting period allocation",
-                    data = (object?)null
-                });
-            }
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -138,24 +102,12 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("{periodAllocationId}")]
         public async Task<IActionResult> GetPeriodAllocationById(int periodAllocationId)
         {
-            try
-            {
-                var result = await _periodAllocationService.GetPeriodAllocationByIdAsync(periodAllocationId);
-                if (!result.Success)
-                    return NotFound(result);
+            var result = await _periodAllocationService.GetPeriodAllocationByIdAsync(periodAllocationId);
 
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error fetching period allocation {periodAllocationId}: {ex.Message}");
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "An error occurred while fetching period allocation",
-                    data = (object?)null
-                });
-            }
+            if (!result.Success)
+                return NotFound(result);
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -168,21 +120,8 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("all")]
         public async Task<IActionResult> GetAllPeriodAllocations()
         {
-            try
-            {
-                var result = await _periodAllocationService.GetAllPeriodAllocationsAsync();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error fetching all period allocations: {ex.Message}");
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "An error occurred while fetching period allocations",
-                    data = (object?)null
-                });
-            }
+            var result = await _periodAllocationService.GetAllPeriodAllocationsAsync();
+            return Ok(result);
         }
 
         /// <summary>
@@ -196,21 +135,8 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("by-budget/{budgetId}")]
         public async Task<IActionResult> GetPeriodAllocationsByBudget(int budgetId)
         {
-            try
-            {
-                var result = await _periodAllocationService.GetPeriodAllocationsByBudgetAsync(budgetId);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error fetching period allocations by budget {budgetId}: {ex.Message}");
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "An error occurred while fetching period allocations by budget",
-                    data = (object?)null
-                });
-            }
+            var result = await _periodAllocationService.GetPeriodAllocationsByBudgetAsync(budgetId);
+            return Ok(result);
         }
     }
 }

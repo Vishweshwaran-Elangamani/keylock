@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Text;
 using System.IO.Compression;
+using Relevantz.EEPZ.Api.Middleware;
 using Serilog;
 var builder = WebApplication.CreateBuilder(args);
 // Configure Serilog with structured logging
@@ -391,6 +392,7 @@ Log.Information("CORS policy '{Policy}' applied", corsPolicy);
 // 10. Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<GlobalExceptionMiddleware>();
 // 11. Map Controllers
 app.MapControllers();
 // 12. Health Check Endpoints

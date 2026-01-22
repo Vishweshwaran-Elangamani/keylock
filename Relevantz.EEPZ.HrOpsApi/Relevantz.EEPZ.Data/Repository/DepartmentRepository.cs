@@ -20,150 +20,78 @@ namespace Relevantz.EEPZ.Data.Repository
 
         public async Task<Department?> GetByIdAsync(int departmentId)
         {
-            try
-            {
-                if (departmentId <= 0)
-                    return null;
+            if (departmentId <= 0)
+                return null;
 
-                return await _context.Departments.FindAsync(departmentId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, RepositoryMessages.ErrorFetchingDepartment, departmentId);
-                throw;
-            }
+            return await _context.Departments.FindAsync(departmentId);
         }
 
         public async Task<Department?> GetByNameAsync(string departmentName)
         {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(departmentName))
-                    return null;
+            if (string.IsNullOrWhiteSpace(departmentName))
+                return null;
 
-                return await _context.Departments
-                    .FirstOrDefaultAsync(d => d.DepartmentName == departmentName);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, RepositoryMessages.ErrorFetchingDepartmentByName, departmentName);
-                throw;
-            }
+            return await _context.Departments
+                .FirstOrDefaultAsync(d => d.DepartmentName == departmentName);
         }
 
         public async Task<List<Department>> GetAllAsync()
         {
-            try
-            {
-                return await _context.Departments.ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, RepositoryMessages.ErrorFetchingAllDepartments);
-                throw;
-            }
+            return await _context.Departments.ToListAsync();
         }
 
         public async Task<Department> CreateAsync(Department department)
         {
-            try
-            {
-                _context.Departments.Add(department);
-                await _context.SaveChangesAsync();
-                
-                _logger.LogInformation(RepositoryMessages.DepartmentCreated, department.DepartmentId);
-                
-                return department;
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(ex, RepositoryMessages.ErrorCreatingDepartment);
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, RepositoryMessages.ErrorCreatingDepartment);
-                throw;
-            }
+            _context.Departments.Add(department);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation(RepositoryMessages.DepartmentCreated, department.DepartmentId);
+
+            return department;
         }
 
         public async Task<Department> UpdateAsync(Department department)
         {
-            try
+            var existingDepartment = await _context.Departments.FindAsync(department.DepartmentId);
+            if (existingDepartment == null)
             {
-                // Check if entity exists before updating
-                var existingDepartment = await _context.Departments.FindAsync(department.DepartmentId);
-                if (existingDepartment == null)
-                {
-                    _logger.LogWarning(RepositoryMessages.DepartmentNotFound, department.DepartmentId);
-                    throw new InvalidOperationException($"Department with ID {department.DepartmentId} not found");
-                }
+                _logger.LogWarning(RepositoryMessages.DepartmentNotFound, department.DepartmentId);
+                throw new InvalidOperationException($"Department with ID {department.DepartmentId} not found");
+            }
 
-                department.UpdatedAt = DateTime.UtcNow;
-                _context.Departments.Update(department);
-                await _context.SaveChangesAsync();
-                
-                _logger.LogInformation(RepositoryMessages.DepartmentUpdated, department.DepartmentId);
-                
-                return department;
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(ex, RepositoryMessages.ErrorUpdatingDepartment, department.DepartmentId);
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, RepositoryMessages.ErrorUpdatingDepartment, department.DepartmentId);
-                throw;
-            }
+            department.UpdatedAt = DateTime.UtcNow;
+            _context.Departments.Update(department);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation(RepositoryMessages.DepartmentUpdated, department.DepartmentId);
+
+            return department;
         }
 
         public async Task<bool> DeleteAsync(int departmentId)
         {
-            try
-            {
-                if (departmentId <= 0)
-                    return false;
+            if (departmentId <= 0)
+                return false;
 
-                var department = await _context.Departments.FindAsync(departmentId);
-                if (department == null)
-                    return false;
+            var department = await _context.Departments.FindAsync(departmentId);
+            if (department == null)
+                return false;
 
-                _context.Departments.Remove(department);
-                await _context.SaveChangesAsync();
-                
-                _logger.LogInformation(RepositoryMessages.DepartmentDeleted, departmentId);
-                
-                return true;
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(ex, RepositoryMessages.ErrorDeletingDepartment, departmentId);
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, RepositoryMessages.ErrorDeletingDepartment, departmentId);
-                throw;
-            }
+            _context.Departments.Remove(department);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation(RepositoryMessages.DepartmentDeleted, departmentId);
+
+            return true;
         }
 
         public async Task<bool> DepartmentNameExistsAsync(string departmentName)
         {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(departmentName))
-                    return false;
+            if (string.IsNullOrWhiteSpace(departmentName))
+                return false;
 
-                return await _context.Departments
-                    .AnyAsync(d => d.DepartmentName == departmentName);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, RepositoryMessages.ErrorCheckingDepartmentNameExists, departmentName);
-                throw;
-            }
+            return await _context.Departments
+                .AnyAsync(d => d.DepartmentName == departmentName);
         }
     }
 }

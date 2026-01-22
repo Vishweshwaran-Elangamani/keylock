@@ -1,7 +1,5 @@
-
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.DTOs.Request;
@@ -47,30 +45,23 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "Admin,HR")]
         public async Task<IActionResult> CreatePolicy([FromBody] CreatePolicyRequestDto request)
         {
-            try
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                              ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int createdByUserId))
             {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                                  ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-
-                if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int createdByUserId))
-                {
-                    _logger.LogWarning("Unable to extract user ID from JWT token for policy creation");
-                    return Unauthorized(new { success = false, message = "Invalid user authentication" });
-                }
-
-                _logger.LogInformation($"User {createdByUserId} creating new policy");
-
-                var result = await _policyService.CreatePolicyAsync(request, createdByUserId);
-                if (!result.Success)
-                    return BadRequest(result);
-
-                return Ok(result);
+                _logger.LogWarning("Unable to extract user ID from JWT token for policy creation");
+                return Unauthorized(new { success = false, message = "Invalid user authentication" });
             }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error creating policy: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "An error occurred while creating policy" });
-            }
+
+            _logger.LogInformation($"User {createdByUserId} creating new policy");
+
+            var result = await _policyService.CreatePolicyAsync(request, createdByUserId);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -80,16 +71,8 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("list")]
         public async Task<IActionResult> GetAllPolicies()
         {
-            try
-            {
-                var result = await _policyService.GetAllPoliciesAsync();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error fetching all policies: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "An error occurred" });
-            }
+            var result = await _policyService.GetAllPoliciesAsync();
+            return Ok(result);
         }
 
         /// <summary>
@@ -99,16 +82,8 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("published")]
         public async Task<IActionResult> GetPublishedPolicies()
         {
-            try
-            {
-                var result = await _policyService.GetPublishedPoliciesAsync();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error fetching published policies: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "An error occurred" });
-            }
+            var result = await _policyService.GetPublishedPoliciesAsync();
+            return Ok(result);
         }
 
         /// <summary>
@@ -119,16 +94,8 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "Admin,HR")]
         public async Task<IActionResult> GetDraftPolicies()
         {
-            try
-            {
-                var result = await _policyService.GetDraftPoliciesAsync();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error fetching draft policies: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "An error occurred" });
-            }
+            var result = await _policyService.GetDraftPoliciesAsync();
+            return Ok(result);
         }
 
         /// <summary>
@@ -137,16 +104,8 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("active")]
         public async Task<IActionResult> GetActivePolicies()
         {
-            try
-            {
-                var result = await _policyService.GetActivePoliciesAsync();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error fetching active policies: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "An error occurred" });
-            }
+            var result = await _policyService.GetActivePoliciesAsync();
+            return Ok(result);
         }
 
         /// <summary>
@@ -155,16 +114,8 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("inactive")]
         public async Task<IActionResult> GetInactivePolicies()
         {
-            try
-            {
-                var result = await _policyService.GetInactivePoliciesAsync();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error fetching inactive policies: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "An error occurred" });
-            }
+            var result = await _policyService.GetInactivePoliciesAsync();
+            return Ok(result);
         }
 
         /// <summary>
@@ -174,19 +125,12 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPolicyById(int id)
         {
-            try
-            {
-                var result = await _policyService.GetPolicyByIdAsync(id);
-                if (!result.Success)
-                    return NotFound(result);
+            var result = await _policyService.GetPolicyByIdAsync(id);
 
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error fetching policy {id}: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "An error occurred" });
-            }
+            if (!result.Success)
+                return NotFound(result);
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -199,27 +143,20 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "Admin,HR")]
         public async Task<IActionResult> UpdatePolicy(int id, [FromBody] UpdatePolicyRequestDto request)
         {
-            try
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+            if (!string.IsNullOrEmpty(userIdClaim) && int.TryParse(userIdClaim, out int userId))
             {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                    ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-
-                if (!string.IsNullOrEmpty(userIdClaim) && int.TryParse(userIdClaim, out int userId))
-                {
-                    _logger.LogInformation($"User {userId} updating policy {id}");
-                }
-
-                var result = await _policyService.UpdatePolicyAsync(id, request);
-                if (!result.Success)
-                    return BadRequest(result);
-
-                return Ok(result);
+                _logger.LogInformation($"User {userId} updating policy {id}");
             }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error updating policy {id}: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "An error occurred while updating policy" });
-            }
+
+            var result = await _policyService.UpdatePolicyAsync(id, request);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -238,111 +175,94 @@ namespace Relevantz.EEPZ.Api.Controllers
             [FromForm] string? documentName,
             [FromForm] string? documentType)
         {
-            try
+            if (string.IsNullOrEmpty(documentType) || (documentType != "link" && documentType != "upload"))
+                return BadRequest(new { success = false, message = "Document type must be 'link' or 'upload'" });
+
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+            if (!int.TryParse(userIdClaim, out int userId))
+                return Unauthorized(new { success = false, message = "Invalid user authentication" });
+
+            if (documentType == "upload")
             {
-                // Validate document type
-                if (string.IsNullOrEmpty(documentType) || (documentType != "link" && documentType != "upload"))
-                    return BadRequest(new { success = false, message = "Document type must be 'link' or 'upload'" });
+                if (file == null || file.Length == 0)
+                    return BadRequest(new { success = false, message = "No file uploaded" });
 
-                // Get user ID
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                    ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+                var allowedExtensions = new[] { ".pdf", ".doc", ".docx" };
+                var extension = Path.GetExtension(file.FileName).ToLower();
 
-                if (!int.TryParse(userIdClaim, out int userId))
-                    return Unauthorized(new { success = false, message = "Invalid user authentication" });
+                if (!allowedExtensions.Contains(extension))
+                    return BadRequest(new { success = false, message = "Only PDF, DOC, DOCX files allowed" });
 
-                // Handle file upload to MongoDB
-                if (documentType == "upload")
+                const long maxFileSize = 5 * 1024 * 1024;
+                if (file.Length > maxFileSize)
+                    return BadRequest(new { success = false, message = "File size must be less than 5MB" });
+
+                byte[] fileData;
+                using (var memoryStream = new MemoryStream())
                 {
-                    if (file == null || file.Length == 0)
-                        return BadRequest(new { success = false, message = "No file uploaded" });
+                    await file.CopyToAsync(memoryStream);
+                    fileData = memoryStream.ToArray();
+                }
 
-                    var allowedExtensions = new[] { ".pdf", ".doc", ".docx" };
-                    var extension = Path.GetExtension(file.FileName).ToLower();
+                var contentType = extension switch
+                {
+                    ".pdf" => "application/pdf",
+                    ".doc" => "application/msword",
+                    ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    _ => "application/octet-stream"
+                };
 
-                    if (!allowedExtensions.Contains(extension))
-                        return BadRequest(new { success = false, message = "Only PDF, DOC, DOCX files allowed" });
+                var fileId = await _mongoDbService.UploadFileAsync(
+                    fileData,
+                    file.FileName,
+                    contentType,
+                    file.Length,
+                    userId
+                );
 
-                    const long maxFileSize = 5 * 1024 * 1024;
-                    if (file.Length > maxFileSize)
-                        return BadRequest(new { success = false, message = "File size must be less than 5MB" });
-
-                    byte[] fileData;
-                    using (var memoryStream = new MemoryStream())
+                return Ok(new
+                {
+                    success = true,
+                    message = "File uploaded successfully to MongoDB",
+                    data = new
                     {
-                        await file.CopyToAsync(memoryStream);
-                        fileData = memoryStream.ToArray();
+                        documentUrl = fileId,
+                        documentName = file.FileName,
+                        documentSize = file.Length,
+                        documentSizeFormatted = FormatFileSize(file.Length),
+                        documentType = "upload"
                     }
-
-                    var contentType = extension switch
-                    {
-                        ".pdf" => "application/pdf",
-                        ".doc" => "application/msword",
-                        ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                        _ => "application/octet-stream"
-                    };
-
-                    // Upload to MongoDB
-                    var fileId = await _mongoDbService.UploadFileAsync(
-                        fileData,
-                        file.FileName,
-                        contentType,
-                        file.Length,
-                        userId
-                    );
-
-                    _logger.LogInformation($"Document uploaded to MongoDB: {file.FileName} (ID: {fileId})");
-
-                    return Ok(new
-                    {
-                        success = true,
-                        message = "File uploaded successfully to MongoDB",
-                        data = new
-                        {
-                            documentUrl = fileId,
-                            documentName = file.FileName,
-                            documentSize = file.Length,
-                            documentSizeFormatted = FormatFileSize(file.Length),
-                            documentType = "upload"
-                        }
-                    });
-                }
-
-                // Handle document link
-                if (documentType == "link")
-                {
-                    if (string.IsNullOrEmpty(documentUrl))
-                        return BadRequest(new { success = false, message = "Document URL is required" });
-
-                    if (string.IsNullOrEmpty(documentName))
-                        return BadRequest(new { success = false, message = "Document name is required" });
-
-                    if (!Uri.TryCreate(documentUrl, UriKind.Absolute, out _))
-                        return BadRequest(new { success = false, message = "Invalid URL format" });
-
-                    _logger.LogInformation($"Document link stored: {documentUrl}");
-
-                    return Ok(new
-                    {
-                        success = true,
-                        message = "Document link added successfully",
-                        data = new
-                        {
-                            documentUrl,
-                            documentName,
-                            documentSize = (long?)null,
-                            documentType = "link"
-                        }
-                    });
-                }
-
-                return BadRequest(new { success = false, message = "Invalid request" });
+                });
             }
-            catch (Exception ex)
+
+            if (documentType == "link")
             {
-                _logger.LogError($"Error uploading document: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "Document upload failed" });
+                if (string.IsNullOrEmpty(documentUrl))
+                    return BadRequest(new { success = false, message = "Document URL is required" });
+
+                if (string.IsNullOrEmpty(documentName))
+                    return BadRequest(new { success = false, message = "Document name is required" });
+
+                if (!Uri.TryCreate(documentUrl, UriKind.Absolute, out _))
+                    return BadRequest(new { success = false, message = "Invalid URL format" });
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Document link added successfully",
+                    data = new
+                    {
+                        documentUrl,
+                        documentName,
+                        documentSize = (long?)null,
+                        documentType = "link"
+                    }
+                });
             }
+
+            return BadRequest(new { success = false, message = "Invalid request" });
         }
 
         /// <summary>
@@ -353,26 +273,18 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "Admin,HR")]
         public async Task<IActionResult> PublishPolicy(int id)
         {
-            try
-            {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                    ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 
-                if (!int.TryParse(userIdClaim, out int publishedBy))
-                    return Unauthorized(new { success = false, message = "Invalid user" });
+            if (!int.TryParse(userIdClaim, out int publishedBy))
+                return Unauthorized(new { success = false, message = "Invalid user" });
 
-                var result = await _policyService.PublishPolicyAsync(id, publishedBy);
+            var result = await _policyService.PublishPolicyAsync(id, publishedBy);
 
-                if (!result.Success)
-                    return BadRequest(result);
+            if (!result.Success)
+                return BadRequest(result);
 
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error publishing policy: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "Failed to publish policy" });
-            }
+            return Ok(result);
         }
 
         /// <summary>
@@ -383,21 +295,9 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "Admin,HR")]
         public async Task<IActionResult> UnpublishPolicy(int policyId)
         {
-            try
-            {
-                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-
-                var response = await _policyService.UnpublishPolicyAsync(policyId, userId);
-
-                _logger.LogInformation($"Policy {policyId} unpublished by user {userId}");
-
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error unpublishing policy: {ex.Message}");
-                return BadRequest(new { message = "Failed to unpublish policy" });
-            }
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var response = await _policyService.UnpublishPolicyAsync(policyId, userId);
+            return Ok(response);
         }
 
         /// <summary>
@@ -409,28 +309,20 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "Admin,HR")]
         public async Task<IActionResult> DeletePolicy(int id)
         {
-            try
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+            if (!string.IsNullOrEmpty(userIdClaim) && int.TryParse(userIdClaim, out int userId))
             {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                    ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-
-                if (!string.IsNullOrEmpty(userIdClaim) && int.TryParse(userIdClaim, out int userId))
-                {
-                    _logger.LogInformation($"User {userId} deleting policy {id}");
-                }
-
-                var result = await _policyService.DeletePolicyAsync(id);
-
-                if (!result.Success)
-                    return NotFound(result);
-
-                return Ok(result);
+                _logger.LogInformation($"User {userId} deleting policy {id}");
             }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error deleting policy {id}: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "An error occurred while deleting policy" });
-            }
+
+            var result = await _policyService.DeletePolicyAsync(id);
+
+            if (!result.Success)
+                return NotFound(result);
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -446,37 +338,22 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("document/{fileId}")]
         public async Task<IActionResult> GetPolicyDocument(string fileId)
         {
-            try
-            {
-                if (string.IsNullOrEmpty(fileId) || fileId.Contains("..") || fileId.Length != 24)
-                {
-                    _logger.LogWarning($"Invalid file ID attempt: {fileId}");
-                    return BadRequest(new { success = false, message = "Invalid file ID" });
-                }
+            if (string.IsNullOrEmpty(fileId) || fileId.Contains("..") || fileId.Length != 24)
+                return BadRequest(new { success = false, message = "Invalid file ID" });
 
-                var document = await _mongoDbService.GetFileAsync(fileId);
+            var document = await _mongoDbService.GetFileAsync(fileId);
 
-                if (document == null)
-                {
-                    _logger.LogWarning($"Document not found in MongoDB: {fileId}");
-                    return NotFound(new { success = false, message = "Document not found" });
-                }
+            if (document == null)
+                return NotFound(new { success = false, message = "Document not found" });
 
-                _logger.LogInformation($"Serving document from MongoDB: {document.OriginalFileName}");
-
-                return File(
-                    document.FileData,
-                    document.ContentType,
-                    document.OriginalFileName,
-                    enableRangeProcessing: true
-                );
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error serving document {fileId}: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "Error retrieving document" });
-            }
+            return File(
+                document.FileData,
+                document.ContentType,
+                document.OriginalFileName,
+                enableRangeProcessing: true
+            );
         }
+       
 
         /// <summary>
         /// Helper method to convert byte sizes into human-readable formats.

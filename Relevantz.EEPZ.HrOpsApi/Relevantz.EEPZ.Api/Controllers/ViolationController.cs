@@ -1,7 +1,5 @@
-
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.DTOs.Request;
@@ -51,16 +49,8 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "Admin,HR")]
         public async Task<IActionResult> GetAllViolations()
         {
-            try
-            {
-                var result = await _violationService.GetAllViolationsAsync();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error fetching all violations: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "An error occurred" });
-            }
+            var result = await _violationService.GetAllViolationsAsync();
+            return Ok(result);
         }
 
         /// <summary>
@@ -73,19 +63,12 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "Admin,HR,Manager")]
         public async Task<IActionResult> GetViolationById(int id)
         {
-            try
-            {
-                var result = await _violationService.GetViolationByIdAsync(id);
-                if (!result.Success)
-                    return NotFound(result);
+            var result = await _violationService.GetViolationByIdAsync(id);
 
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error fetching violation {id}: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "An error occurred" });
-            }
+            if (!result.Success)
+                return NotFound(result);
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -96,30 +79,22 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("employee/{EmployeeUserId}")]
         public async Task<IActionResult> GetViolationsByEmployee(int EmployeeUserId)
         {
-            try
+            var currentUserIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+            if (!int.TryParse(currentUserIdClaim, out int currentUserId))
+                return Unauthorized(new { success = false, message = "Invalid user authentication" });
+
+            var isHR = User.IsInRole("Admin") || User.IsInRole("HR");
+
+            if (!isHR && currentUserId != EmployeeUserId)
             {
-                var currentUserIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                    ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-
-                if (!int.TryParse(currentUserIdClaim, out int currentUserId))
-                    return Unauthorized(new { success = false, message = "Invalid user authentication" });
-
-                var isHR = User.IsInRole("Admin") || User.IsInRole("HR");
-
-                if (!isHR && currentUserId != EmployeeUserId)
-                {
-                    _logger.LogWarning($"User {currentUserId} attempted to access violations of user {EmployeeUserId}");
-                    return Forbid("You can only view your own violations");
-                }
-
-                var result = await _violationService.GetViolationsByEmployeeAsync(EmployeeUserId);
-                return Ok(result);
+                _logger.LogWarning($"User {currentUserId} attempted to access violations of user {EmployeeUserId}");
+                return Forbid("You can only view your own violations");
             }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error fetching violations for employee {EmployeeUserId}: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "An error occurred" });
-            }
+
+            var result = await _violationService.GetViolationsByEmployeeAsync(EmployeeUserId);
+            return Ok(result);
         }
 
         /// <summary>
@@ -131,16 +106,8 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "Admin,HR")]
         public async Task<IActionResult> GetViolationsByPolicy(int policyId)
         {
-            try
-            {
-                var result = await _violationService.GetViolationsByPolicyAsync(policyId);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error fetching violations for policy {policyId}: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "An error occurred" });
-            }
+            var result = await _violationService.GetViolationsByPolicyAsync(policyId);
+            return Ok(result);
         }
 
         /// <summary>
@@ -152,31 +119,23 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "Admin,HR,Manager")]
         public async Task<IActionResult> ReportViolation([FromBody] ReportViolationRequestDto request)
         {
-            try
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+            if (!int.TryParse(userIdClaim, out int reportedByUserId))
             {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                    ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-
-                if (!int.TryParse(userIdClaim, out int reportedByUserId))
-                {
-                    _logger.LogWarning("Unable to extract user ID for reporting violation");
-                    return Unauthorized(new { success = false, message = "Invalid user authentication" });
-                }
-
-                _logger.LogInformation($"User {reportedByUserId} reporting violation for {request.EmployeeUserId}");
-
-                var result = await _violationService.ReportViolationAsync(request, reportedByUserId);
-
-                if (!result.Success)
-                    return BadRequest(result);
-
-                return Ok(result);
+                _logger.LogWarning("Unable to extract user ID for reporting violation");
+                return Unauthorized(new { success = false, message = "Invalid user authentication" });
             }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error reporting violation: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "An error occurred while reporting violation" });
-            }
+
+            _logger.LogInformation($"User {reportedByUserId} reporting violation for {request.EmployeeUserId}");
+
+            var result = await _violationService.ReportViolationAsync(request, reportedByUserId);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -189,26 +148,18 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "Admin,HR")]
         public async Task<IActionResult> ResolveViolation(int id, [FromBody] ResolveViolationRequestDto request)
         {
-            try
-            {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                    ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 
-                if (int.TryParse(userIdClaim, out int userId))
-                    _logger.LogInformation($"User {userId} resolving violation {id}");
+            if (int.TryParse(userIdClaim, out int userId))
+                _logger.LogInformation($"User {userId} resolving violation {id}");
 
-                var result = await _violationService.ResolveViolationAsync(id, request);
+            var result = await _violationService.ResolveViolationAsync(id, request);
 
-                if (!result.Success)
-                    return BadRequest(result);
+            if (!result.Success)
+                return BadRequest(result);
 
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error resolving violation {id}: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "An error occurred while resolving violation" });
-            }
+            return Ok(result);
         }
 
         /// <summary>
@@ -219,16 +170,8 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "Admin,HR")]
         public async Task<IActionResult> GetViolationStats()
         {
-            try
-            {
-                var result = await _violationService.GetViolationStatsAsync();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error fetching violation stats: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "An error occurred" });
-            }
+            var result = await _violationService.GetViolationStatsAsync();
+            return Ok(result);
         }
 
         #endregion
@@ -243,17 +186,9 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "Admin,HR")]
         public async Task<IActionResult> GetAllSlaEscalations()
         {
-            try
-            {
-                _logger.LogInformation("Fetching all SLA escalations");
-                var result = await _slaEscalationService.GetAllSlaEscalationsAsync();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error fetching SLA escalations: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "An error occurred" });
-            }
+            _logger.LogInformation("Fetching all SLA escalations");
+            var result = await _slaEscalationService.GetAllSlaEscalationsAsync();
+            return Ok(result);
         }
 
         /// <summary>
@@ -264,30 +199,22 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("sla-escalations/employee/{EmployeeUserId}")]
         public async Task<IActionResult> GetSlaEscalationsByEmployee(int EmployeeUserId)
         {
-            try
+            var currentUserIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+            if (!int.TryParse(currentUserIdClaim, out int currentUserId))
+                return Unauthorized(new { success = false, message = "Invalid user authentication" });
+
+            var isHR = User.IsInRole("Admin") || User.IsInRole("HR");
+
+            if (!isHR && currentUserId != EmployeeUserId)
             {
-                var currentUserIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                    ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-
-                if (!int.TryParse(currentUserIdClaim, out int currentUserId))
-                    return Unauthorized(new { success = false, message = "Invalid user authentication" });
-
-                var isHR = User.IsInRole("Admin") || User.IsInRole("HR");
-
-                if (!isHR && currentUserId != EmployeeUserId)
-                {
-                    _logger.LogWarning($"Unauthorized SLA escalation access attempt by user {currentUserId}");
-                    return Forbid("You can only view your own SLA escalations");
-                }
-
-                var result = await _slaEscalationService.GetSlaEscalationsByEmployeeAsync(EmployeeUserId);
-                return Ok(result);
+                _logger.LogWarning($"Unauthorized SLA escalation access attempt by user {currentUserId}");
+                return Forbid("You can only view your own SLA escalations");
             }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error fetching employee SLA escalations: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "An error occurred" });
-            }
+
+            var result = await _slaEscalationService.GetSlaEscalationsByEmployeeAsync(EmployeeUserId);
+            return Ok(result);
         }
 
         /// <summary>
@@ -298,35 +225,27 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("sla-escalations/{escalationId}")]
         public async Task<IActionResult> GetSlaEscalationById(int escalationId)
         {
-            try
+            var result = await _slaEscalationService.GetSlaEscalationByIdAsync(escalationId);
+
+            if (!result.Success)
+                return NotFound(result);
+
+            var currentUserIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+            if (int.TryParse(currentUserIdClaim, out int currentUserId))
             {
-                var result = await _slaEscalationService.GetSlaEscalationByIdAsync(escalationId);
+                var isHR = User.IsInRole("Admin") || User.IsInRole("HR");
 
-                if (!result.Success)
-                    return NotFound(result);
+                var escalation = result.Data;
+                var isOwner = escalation?.SlaId != null;
+                var isAssigned = escalation?.EscalatedToEmployeeId == currentUserId;
 
-                var currentUserIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                    ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-
-                if (int.TryParse(currentUserIdClaim, out int currentUserId))
-                {
-                    var isHR = User.IsInRole("Admin") || User.IsInRole("HR");
-
-                    var escalation = result.Data;
-                    var isOwner = escalation?.SlaId != null;
-                    var isAssigned = escalation?.EscalatedToEmployeeId == currentUserId;
-
-                    if (!isHR && !isOwner && !isAssigned)
-                        return Forbid("You don't have permission to view this escalation");
-                }
-
-                return Ok(result);
+                if (!isHR && !isOwner && !isAssigned)
+                    return Forbid("You don't have permission to view this escalation");
             }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error fetching escalation details: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "An error occurred" });
-            }
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -337,16 +256,8 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "Admin,HR")]
         public async Task<IActionResult> GetCombinedViolationsAndEscalations()
         {
-            try
-            {
-                var result = await _slaEscalationService.GetCombinedViolationsAndEscalationsAsync();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error fetching combined violations: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "An error occurred" });
-            }
+            var result = await _slaEscalationService.GetCombinedViolationsAndEscalationsAsync();
+            return Ok(result);
         }
 
         /// <summary>
@@ -357,16 +268,8 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "Admin,HR")]
         public async Task<IActionResult> GetSlaEscalationStats()
         {
-            try
-            {
-                var result = await _slaEscalationService.GetSlaEscalationStatsAsync();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error fetching escalation stats: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "An error occurred" });
-            }
+            var result = await _slaEscalationService.GetSlaEscalationStatsAsync();
+            return Ok(result);
         }
 
         #endregion
