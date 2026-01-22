@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Business.Services.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace PerformanceManagement.Controllers
 {
@@ -22,15 +23,20 @@ namespace PerformanceManagement.Controllers
         }
 
         [HttpGet("depthead/{deptHeadEmployeeId}/approved-nominations")]
-        public async Task<IActionResult> GetApprovedNominationsByDeptHead(int deptHeadEmployeeId)
+        public async Task<IActionResult> GetApprovedNominationsByDeptHead(
+            [FromRoute][Range(1, int.MaxValue)] int deptHeadEmployeeId)
         {
             try
             {
-                var result = await _service.GetApprovedNominationsByDeptHeadAsync(
-                    deptHeadEmployeeId
-                );
+                var result = await _service.GetApprovedNominationsByDeptHeadAsync(deptHeadEmployeeId);
 
-                var success = (bool)((dynamic)result).success;
+                if (result == null)
+                {
+                    return NotFound(new { success = false, message = "No approved nominations found." });
+                }
+
+                dynamic dyn = result;
+                bool success = dyn.success != null && (bool)dyn.success;
 
                 if (!success)
                 {
@@ -41,19 +47,27 @@ namespace PerformanceManagement.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"[DH_APPROVED_NOMINATIONS] Error: {ex.Message}");
-                return StatusCode(500, new { success = false, message = $"Error: {ex.Message}" });
+                _logger.LogError(ex, "[DH_APPROVED_NOMINATIONS] Error occurred.");
+                return StatusCode(500, new { success = false, message = "Internal server error." });
             }
         }
 
         [HttpGet("nomination-details/{nominationId}")]
-        public async Task<IActionResult> GetNominationDetails(int nominationId)
+        public async Task<IActionResult> GetNominationDetails(
+            [FromRoute][Range(1, int.MaxValue, ErrorMessage = "Nomination ID must be a positive integer.")]
+            int nominationId)
         {
             try
             {
                 var result = await _service.GetNominationDetailsAsync(nominationId);
 
-                var success = (bool)((dynamic)result).success;
+                if (result == null)
+                {
+                    return NotFound(new { success = false, message = "Nomination not found." });
+                }
+
+                dynamic dyn = result;
+                bool success = dyn.success != null && (bool)dyn.success;
 
                 if (!success)
                 {
@@ -64,19 +78,27 @@ namespace PerformanceManagement.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"[DH_NOMINATION_DETAILS] Error: {ex.Message}");
-                return StatusCode(500, new { success = false, message = ex.Message });
+                _logger.LogError(ex, "[DH_NOMINATION_DETAILS] Error occurred.");
+                return StatusCode(500, new { success = false, message = "Internal server error." });
             }
         }
 
         [HttpGet("depthead/{deptHeadEmployeeId}/statistics")]
-        public async Task<IActionResult> GetDepartmentStatistics(int deptHeadEmployeeId)
+        public async Task<IActionResult> GetDepartmentStatistics(
+            [FromRoute][Range(1, int.MaxValue, ErrorMessage = "Employee ID must be a positive integer.")]
+            int deptHeadEmployeeId)
         {
             try
             {
                 var result = await _service.GetDepartmentStatisticsAsync(deptHeadEmployeeId);
 
-                var success = (bool)((dynamic)result).success;
+                if (result == null)
+                {
+                    return NotFound(new { success = false, message = "Statistics not found." });
+                }
+
+                dynamic dyn = result;
+                bool success = dyn.success != null && (bool)dyn.success;
 
                 if (!success)
                 {
@@ -87,8 +109,8 @@ namespace PerformanceManagement.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"[DH_STATISTICS] Error: {ex.Message}");
-                return StatusCode(500, new { success = false, message = ex.Message });
+                _logger.LogError(ex, "[DH_STATISTICS] Error occurred.");
+                return StatusCode(500, new { success = false, message = "Internal server error." });
             }
         }
     }
