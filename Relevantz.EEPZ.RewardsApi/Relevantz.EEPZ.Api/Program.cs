@@ -184,6 +184,8 @@ builder.Services.AddAuthentication(options =>
 });
  
 builder.Services.AddAuthorization();
+
+builder.Services.AddScoped<DbContext>(sp => sp.GetRequiredService<EEPZDbContext>());
  
 builder.Services.AddScoped<IHRNominationRepository, HRNominationRepository>();
 builder.Services.AddScoped<IHRNominationService, HRNominationService>();
