@@ -480,11 +480,6 @@ const GoalApprovalsPage = () => {
             <h6 className={`mt-3 mb-2 ${styles.emptyStateTitle}`}>
               No approvals found
             </h6>
-            <p className="text-muted mb-0">
-              {viewMode === "pending"
-                ? "You have no pending approvals at the moment"
-                : "No approval history available"}
-            </p>
           </div>
         ) : (
           <>

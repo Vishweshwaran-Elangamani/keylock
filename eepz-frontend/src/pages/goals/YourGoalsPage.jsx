@@ -385,11 +385,6 @@ const YourGoalsPage = () => {
               ? "No goals match your filters"
               : "No goals found"}
           </h6>
-          <p className="text-muted mb-3">
-            {activeFilterCount > 0
-              ? "Try adjusting your search or filters"
-              : "Start by creating your first goal"}
-          </p>
           <div className="d-flex gap-2 justify-content-center">
             {activeFilterCount > 0 && (
               <button
