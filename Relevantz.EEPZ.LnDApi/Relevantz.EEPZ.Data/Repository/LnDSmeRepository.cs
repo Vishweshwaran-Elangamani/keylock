@@ -24,7 +24,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         #region SME Status Queries
 
-        /// <summary>Checks if an employee has any active SME status.</summary>
+        /// <summary>
+        /// Checks if an employee has any active SME status 
+        /// </summary>
         public async Task<bool> IsEmployeeSme(int employeeId)
         {
             Log.Debug("IsEmployeeSmeAsync called. EmployeeId={EmployeeId}", employeeId);
@@ -41,7 +43,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             return isSme;
         }
 
-        /// <summary>Gets an active SME record for a specific employee and skill combination.</summary>
+        /// <summary>
+        /// Gets an active SME record for a specific employee and skill combination 
+        /// </summary>
         public async Task<Lndsme?> GetActiveSme(int employeeId, int skillId)
         {
             Log.Debug(
@@ -71,7 +75,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             return sme;
         }
 
-        /// <summary>Gets an SME record by employee ID from assignment details dictionary.</summary>
+        /// <summary>
+        /// Gets an SME record by employee ID from assignment details dictionary
+        /// </summary>
         public async Task<Lndsme?> GetSmeFromEmployeeId(
             Dictionary<string, object> assignmentDetails
         )
@@ -95,7 +101,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         #region SME Assignment Queries
 
-        /// <summary>Gets in-progress assignment count for a specific SME.</summary>
+        /// <summary>
+        /// Gets in-progress assignment count for a specific SME 
+        /// </summary>
         public async Task<int> GetSmeInProgressAssignmentCount(int smeId)
         {
             Log.Debug("GetSmeInProgressAssignmentCountAsync called. SmeId={SmeId}", smeId);
@@ -116,7 +124,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         #region SME Retrieval
 
-        /// <summary>Gets paginated available SMEs for a skill filtered by max assignment limit.</summary>
+        /// <summary>
+        /// Gets paginated available SMEs for a skill filtered by max assignment limit 
+        /// </summary>
         public async Task<(
             List<Lndsme> Items,
             int TotalCount
@@ -191,7 +201,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             return (items, totalCount);
         }
 
-        /// <summary>Gets paginated all active SMEs with employee and department details.</summary>
+        /// <summary>
+        /// Gets paginated all active SMEs with employee and department details 
+        /// </summary>
         public async Task<(List<SmeResponseModel> Items, int TotalCount)> GetAllActiveSmes(
      ActiveSmesRequestModel request
  )
@@ -253,7 +265,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             return (items, totalCount);
         }
 
-        /// <summary>Gets all active SMEs for Excel export without pagination.</summary>
+        /// <summary>
+        /// Gets all active SMEs for Excel export without pagination 
+        /// </summary>
         public async Task<List<Lndsme>> GetAllActiveSmesForExport(
             ExportActiveSmesRequestModel request
         )
@@ -305,7 +319,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         #region SME Modifications
 
-        /// <summary>Adds a new SME record to the database context (requires SaveChanges).</summary>
+        /// <summary>
+        /// Adds a new SME record to the database context (requires SaveChanges)
+        /// </summary>
         public async Task<Lndsme> AddSme(Lndsme sme)
         {
             Log.Information(
@@ -320,7 +336,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             return sme;
         }
 
-        /// <summary>Updates an existing SME record in the database context (requires SaveChanges).</summary>
+        /// <summary>
+        /// Updates an existing SME record in the database context (requires SaveChanges)
+        /// </summary>
         public async Task UpdateSme(Lndsme sme)
         {
             Log.Information(

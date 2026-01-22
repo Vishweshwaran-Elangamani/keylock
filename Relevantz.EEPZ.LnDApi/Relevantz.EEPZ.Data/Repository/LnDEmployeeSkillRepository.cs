@@ -23,7 +23,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         #region Employee Queries
 
-        /// <summary>Gets an employee by ID with profile, authentication, and department details.</summary>
+        /// <summary>
+        /// Gets an employee by ID with profile, authentication, and department details 
+        /// </summary>
         public async Task<Employee?> GetEmployeeById(int employeeId)
         {
             Log.Debug("GetEmployeeByIdAsync called. EmployeeId={EmployeeId}", employeeId);
@@ -43,7 +45,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             return employee;
         }
 
-        /// <summary>Gets paginated subordinate employees with search across name, email, and department.</summary>
+        /// <summary>
+        /// Gets paginated subordinate employees with search across name, email, and department
+        /// </summary>
         public async Task<(List<Employee> Items, int TotalCount)> GetSubordinateEmployees(
             int managerId,
             SubordinateEmployeesRequestModel request
@@ -105,7 +109,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         #region Skill Queries
 
-        /// <summary>Gets all skills ordered by skill name.</summary>
+        /// <summary>
+        /// Gets all skills ordered by skill name 
+        /// </summary>
         public async Task<List<MasterSkill>> GetAllSkills()
         {
             Log.Debug("GetAllSkillsAsync called");
@@ -117,7 +123,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             return skills;
         }
 
-        /// <summary>Gets a single skill by ID.</summary>
+        /// <summary>
+        /// Gets a single skill by ID 
+        /// </summary>
         public async Task<MasterSkill?> GetSkillById(int skillId)
         {
             Log.Debug("GetSkillByIdAsync called. SkillId={SkillId}", skillId);
@@ -136,8 +144,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         #region Skill Mapping Queries 
 
-        /// <summary>Gets paginated subordinate skill mappings with optional employee filter and search.</summary>
-        /// <summary>Gets paginated subordinate skill mappings with optional employee filter and search.</summary>
+        /// <summary>
+        /// Gets paginated subordinate skill mappings with optional employee filter and search 
+        /// </summary>
         public async Task<(
             List<Lndemployeeskillmapper> Items,
             int TotalCount
@@ -193,7 +202,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             return (items, totalCount);
         }
 
-        /// <summary>Gets paginated skill mappings for a specific employee.</summary>
+        /// <summary>
+        /// Gets paginated skill mappings for a specific employee 
+        /// </summary>
         public async Task<(List<Lndemployeeskillmapper> Items, int TotalCount)> GetMySkills(
             int employeeId,
             MySkillsRequestModel request
@@ -231,7 +242,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             return (items, totalCount);
         }
 
-        /// <summary>Gets a skill mapping by employee ID and skill ID.</summary>
+        /// <summary>
+        /// Gets a skill mapping by employee ID and skill ID 
+        /// </summary>
         public async Task<Lndemployeeskillmapper?> GetEmployeeSkillMapping(
             int employeeId,
             int skillId
@@ -259,7 +272,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             return mapping;
         }
 
-        /// <summary>Gets a skill mapping by mapper ID.</summary>
+        /// <summary>
+        /// Gets a skill mapping by mapper ID 
+        /// </summary>
         public async Task<Lndemployeeskillmapper?> GetEmployeeSkillMappingById(int skillMapperId)
         {
             Log.Debug("GetEmployeeSkillMappingByIdAsync called. MapperId={MapperId}", skillMapperId);
@@ -278,7 +293,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             return mapping;
         }
 
-        /// <summary>Gets existing skill IDs for an employee from a list of skill IDs.</summary>
+        /// <summary>
+        /// Gets existing skill IDs for an employee from a list of skill IDs 
+        /// </summary>
         public async Task<List<int>> GetExistingSkillMappings(
             int employeeId,
             List<int> skillIds
@@ -308,7 +325,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         #region Skill Mapping Modifications
 
-        /// <summary>Adds a single skill mapping and returns the saved entity with generated ID.</summary>
+        /// <summary>
+        /// Adds a single skill mapping and returns the saved entity with generated ID 
+        /// </summary>
         public async Task<Lndemployeeskillmapper> AddEmployeeSkill(
             Lndemployeeskillmapper mapper
         )
@@ -329,7 +348,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             return (await GetEmployeeSkillMappingById(mapper.MapperId))!;
         }
 
-        /// <summary>Adds multiple skill mappings in bulk and returns the saved entities.</summary>
+        /// <summary>
+        /// Adds multiple skill mappings in bulk and returns the saved entities 
+        /// </summary>
         public async Task<List<Lndemployeeskillmapper>> AddEmployeeSkills(
             List<Lndemployeeskillmapper> mappers
         )
@@ -350,7 +371,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             return mappers;
         }
 
-        /// <summary>Updates an existing skill mapping in the database context (requires SaveChanges).</summary>
+        /// <summary>
+        /// Updates an existing skill mapping in the database context (requires SaveChanges)
+        /// </summary>
         public async Task UpdateEmployeeSkill(Lndemployeeskillmapper mapper)
         {
             Log.Information(
@@ -363,7 +386,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             Log.Debug("UpdateEmployeeSkillAsync: Mapper updated in context. Pending SaveChanges");
         }
 
-        /// <summary>Deletes a skill mapping from the database context (requires SaveChanges).</summary>
+        /// <summary>
+        /// Deletes a skill mapping from the database context
+        /// </summary>
         public async Task DeleteEmployeeSkill(Lndemployeeskillmapper mapper)
         {
             Log.Information(
@@ -398,7 +423,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             return approvals;
         }
 
-        /// <summary>Gets active assignments for a specific employee and skill.</summary>
+        /// <summary>
+        /// Gets active assignments for a specific employee and skill 
+        /// </summary>
         public async Task<List<Lndassignment>> GetActiveAssignmentsForSkill(int employeeId, int skillId)
         {
             Log.Debug(
@@ -423,7 +450,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             return assignments;
         }
 
-        /// <summary>Gets pending approvals for specific assignments.</summary>
+        /// <summary>
+        /// Gets pending approvals for specific assignments 
+        /// </summary>
         public async Task<List<Lndapproval>> GetPendingAssignmentApprovals(List<int> assignmentIds)
         {
             Log.Debug(
@@ -449,7 +478,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             return approvals;
         }
 
-        /// <summary>Deletes multiple approvals from the database.</summary>
+        /// <summary>
+        /// Deletes multiple approvals from the database 
+        /// </summary>
         public async Task DeleteApprovals(List<Lndapproval> approvals)
         {
             Log.Debug(
@@ -466,7 +497,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             await Task.CompletedTask;
         }
 
-        /// <summary>Deletes multiple assignments from the database.</summary>
+        /// <summary>
+        /// Deletes multiple assignments from the database 
+        /// </summary>
         public async Task DeleteAssignments(List<Lndassignment> assignments)
         {
             Log.Debug(

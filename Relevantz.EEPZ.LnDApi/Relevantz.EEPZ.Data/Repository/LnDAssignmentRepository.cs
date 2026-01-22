@@ -23,7 +23,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         #region Overdue Management
 
-        /// <summary>Gets all assignments that are overdue (past deadline and not completed).</summary>
+        /// <summary>
+        /// Gets all assignments that are overdue (past deadline and not completed)
+        /// </summary>
         public async Task<List<Lndassignment>> GetOverdueAssignments()
         {
             var today = DateTime.Now.Date;
@@ -52,7 +54,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         #region Assignment Retrieval
 
-        /// <summary>Gets a single assignment by ID with all related entities including mentee, SME, and skill.</summary>
+        /// <summary>
+        /// Gets a single assignment by ID with all related entities including mentee, SME, and skill 
+        /// </summary>
         public async Task<Lndassignment?> GetAssignmentById(int assignmentId)
         {
             Log.Debug("GetAssignmentByIdAsync called. AssignmentId={AssignmentId}", assignmentId);
@@ -79,7 +83,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             return assignment;
         }
 
-        /// <summary>Gets paginated assignments for a mentee with filtering and search capabilities.</summary>
+        /// <summary>
+        /// Gets paginated assignments for a mentee with filtering and search capabilities
+        /// </summary>
         public async Task<(List<AssignmentResponseModel> Items, int TotalCount)> GetMyAssignments(
      int employeeId,
      AssignmentRequestModel request
@@ -162,7 +168,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
 
-        /// <summary>Gets paginated assignments for a manager's team with filtering and search capabilities.</summary>
+        /// <summary>
+        /// Gets paginated assignments for a manager's team with filtering and search capabilities 
+        /// </summary>
         public async Task<(List<AssignmentResponseModel> Items, int TotalCount)> GetTeamAssignments(
       int managerId,
       AssignmentRequestModel request
@@ -258,7 +266,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
 
-        /// <summary>Gets paginated assignments where employee is the assigned SME with filtering and search.</summary>
+        /// <summary>
+        /// Gets paginated assignments where employee is the assigned SME with filtering and search
+        /// </summary>
         public async Task<(List<AssignmentResponseModel> Items, int TotalCount)> GetSmeAssignments(
    int smeEmployeeId,
    AssignmentRequestModel request
@@ -329,7 +339,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
 
-        /// <summary>Gets all team assignments for Excel export without pagination.</summary>
+        /// <summary>
+        /// Gets all team assignments for Excel export without pagination 
+        /// </summary>
         public async Task<List<Lndassignment>> GetAllTeamAssignmentsForExport(
       int managerId,
       ExportAssignmentRequestModel request
@@ -389,7 +401,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         #region Assignment Modifications
 
-        /// <summary>Adds a new assignment to the database context (requires SaveChanges).</summary>
+        /// <summary>
+        /// Adds a new assignment to the database context (requires SaveChanges)
+        /// </summary>
         public async Task<Lndassignment> AddAssignment(Lndassignment assignment)
         {
             Log.Information(
@@ -404,7 +418,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             return assignment;
         }
 
-        /// <summary>Updates an existing assignment in the database context (requires SaveChanges).</summary>
+        /// <summary>
+        /// Updates an existing assignment in the database context (requires SaveChanges)
+        /// </summary>
         public async Task UpdateAssignment(Lndassignment assignment)
         {
             Log.Information(

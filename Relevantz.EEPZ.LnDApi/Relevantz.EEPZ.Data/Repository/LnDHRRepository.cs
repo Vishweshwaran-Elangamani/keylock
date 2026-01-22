@@ -23,7 +23,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         #region Employee Queries
 
-        /// <summary>Gets paginated active employees with search across name, email, and department.</summary>
+        /// <summary>
+        /// Gets paginated active employees with search across name, email, and department 
+        /// </summary>
         public async Task<(List<SubordinateEmployeeResponseModel> Items, int TotalCount)> GetAllOrganizationEmployees(
       OrganizationEmployeesRequestModel request
   )
@@ -90,7 +92,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
 
-        /// <summary>Gets paginated skills for a specific employee with SME data included.</summary>
+        /// <summary>
+        /// Gets paginated skills for a specific employee with SME data included 
+        /// </summary>
         public async Task<(
      List<Lndemployeeskillmapper> Items,
      int TotalCount
@@ -144,7 +148,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         #region Assignment Queries
 
-        /// <summary>Gets paginated organization-wide assignments with filtering, search, and sorting.</summary>
+        /// <summary>
+        /// Gets paginated organization-wide assignments with filtering, search, and sorting 
+        /// </summary>
         public async Task<(List<Lndassignment> Items, int TotalCount)>
      GetAllOrganizationAssignments(OrganizationAssignmentsRequestModel request)
         {
@@ -192,7 +198,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
 
-        /// <summary>Gets all organization assignments for Excel export without pagination.</summary>
+        /// <summary>
+        /// Gets all organization assignments for Excel export without pagination 
+        /// </summary>
         public async Task<List<Lndassignment>> GetAllOrganizationAssignmentsForExport(
       ExportOrganizationAssignmentsRequestModel request
   )

@@ -24,7 +24,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         #region Approval Retrieval
 
         /// <summary>
-        /// Gets a single approval by ID with all related entities.
+        /// Gets a single approval by ID with all related entities
         /// </summary>
         public async Task<Lndapproval?> GetApprovalById(int approvalId)
         {
@@ -50,7 +50,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>
-        /// Gets pending SME registration approval.
+        /// Gets pending SME registration approval
         /// </summary>
         public async Task<Lndapproval?> GetPendingSmeRegistration(int employeeId, int skillId)
         {
@@ -63,7 +63,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>
-        /// Gets pending assignment approval.
+        /// Gets pending assignment approval
         /// </summary>
         public async Task<Lndapproval?> GetPendingAssignmentApproval(int assignmentId, string approvalType)
         {
@@ -75,8 +75,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>
-        /// Gets approvals assigned to employee (APPROVER).
-        /// ❗ NO SORTING LOGIC HERE
+        /// Gets approvals assigned to employee APPROVER
         /// </summary>
         public async Task<(List<ApprovalResponseModel> Items, int TotalCount)> GetMyApprovals(
             int employeeId,
@@ -145,8 +144,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>
-        /// Gets approval history (REQUESTER / APPROVER / ALL).
-        /// ❗ NO SORTING LOGIC HERE
+        /// Gets approval history (REQUESTER / APPROVER / ALL)
         /// </summary>
         public async Task<(List<ApprovalResponseModel> Items, int TotalCount)> GetApprovalHistory(
             int employeeId,
