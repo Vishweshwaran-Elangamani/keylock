@@ -320,7 +320,7 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 context.Employees.Add(adminEmployee);
                 await context.SaveChangesAsync();
                 // Create Admin Authentication
-                var adminPassword = configuration["AdminSeedData:Password"] ?? "rZ@26012025#Rix";
+                var adminPassword = configuration["AdminSeedData:Password"] ?? "rZ@26012026#Rix";
                 var adminAuth = new Userauthentication
                 {
                     EmployeeId = adminEmployee.EmployeeId,
