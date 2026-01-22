@@ -21,23 +21,23 @@ namespace Relevantz.EEPZ.Api.Controllers
     {
         private readonly IBulkOperationService _bulkOperationService;
         private readonly IExportService _exportService;
+
         /// <summary>
         /// Initializes a new instance of <see cref="BulkOperationController"/>.
         /// </summary>
         /// <param name="bulkOperationService">Service handling bulk user operations.</param>
         /// <param name="exportService">Service that builds Excel exports for master data.</param>
-        public BulkOperationController(IBulkOperationService bulkOperationService, IExportService exportService)
+        public BulkOperationController(
+            IBulkOperationService bulkOperationService,
+            IExportService exportService)
         {
             _bulkOperationService = bulkOperationService;
             _exportService = exportService;
         }
+
         /// <summary>
         /// Creates multiple users in bulk.
         /// </summary>
-        /// <param name="request">Payload containing the list of users to create.</param>
-        /// <returns>
-        /// 200 OK with the bulk operation result payload.
-        /// </returns>
         [HttpPost("bulk-create-users")]
         public async Task<IActionResult> BulkCreateUsers([FromBody] BulkUserCreateRequestDto request)
         {
@@ -45,13 +45,10 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _bulkOperationService.BulkCreateUsersAsync(request.Users, performedByUserId);
             return Ok(result);
         }
+
         /// <summary>
         /// Inactivates multiple users in bulk.
         /// </summary>
-        /// <param name="request">Payload containing user identifiers and optional reason.</param>
-        /// <returns>
-        /// 200 OK with the bulk inactivation result payload.
-        /// </returns>
         [HttpPost("bulk-inactivate-users")]
         public async Task<IActionResult> BulkInactivateUsers([FromBody] BulkUserInactivateRequestDto request)
         {
@@ -59,149 +56,111 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _bulkOperationService.BulkInactivateUsersAsync(request, performedByUserId);
             return Ok(result);
         }
+
         /// <summary>
         /// Creates users in bulk from an uploaded Excel file.
         /// </summary>
-        /// <param name="file">Excel file (.xlsx or .xls) containing user data in the expected template format.</param>
-        /// <returns>
-        /// 200 OK with the bulk creation result on success,
-        /// 400 Bad Request if validation fails (missing/invalid file, size limit exceeded).
-        /// </returns>
         [HttpPost("bulk-create-from-excel")]
         public async Task<IActionResult> BulkCreateUsersFromExcel(IFormFile file)
         {
             if (file == null || file.Length == 0)
                 return BadRequest(new { success = false, message = "Please upload a valid Excel file" });
-            // File validation
+
             var allowedExtensions = new[] { ".xlsx", ".xls" };
             var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+
             if (!allowedExtensions.Contains(fileExtension))
                 return BadRequest(new { success = false, message = "Only .xlsx and .xls files are allowed" });
-            // File size validation (5MB max)
+
             if (file.Length > 5 * 1024 * 1024)
                 return BadRequest(new { success = false, message = "File size exceeds 5MB limit" });
+
             var performedByUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+
             using var stream = file.OpenReadStream();
             var result = await _bulkOperationService.BulkCreateUsersFromExcelAsync(stream, performedByUserId);
+
             return Ok(result);
         }
+
         /// <summary>
         /// Downloads the Excel template for bulk user import.
         /// </summary>
-        /// <returns>
-        /// A downloadable Excel file (.xlsx) with the required columns and sample data,
-        /// or 500 Internal Server Error if generation fails.
-        /// </returns>
         [HttpGet("download-template")]
         [Authorize]
         public async Task<IActionResult> DownloadExcelTemplate()
         {
-            try
-            {
-                var templateBytes = await _bulkOperationService.GenerateExcelTemplateAsync();
-                return File(
-                    templateBytes,
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    $"UserImportTemplate_{DateTime.UtcNow:yyyyMMdd}.xlsx"
-                );
-            }
-            catch (Exception ex)
-            {
-                EEPZServiceLog.Error("Error downloading Excel template", ex);
-                return StatusCode(500, "Failed to generate template");
-            }
+            var templateBytes = await _bulkOperationService.GenerateExcelTemplateAsync();
+
+            return File(
+                templateBytes,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"UserImportTemplate_{DateTime.UtcNow:yyyyMMdd}.xlsx"
+            );
         }
+
         /// <summary>
         /// Exports all roles to an Excel file.
         /// </summary>
-        /// <returns>
-        /// A downloadable Excel file (.xlsx) containing the roles data,
-        /// or 400 Bad Request with error details if export fails.
-        /// </returns>
         [HttpGet("export/roles")]
         public async Task<IActionResult> ExportRoles()
         {
-            try
-            {
-                var fileBytes = await _exportService.ExportRolesToExcelAsync();
-                var fileName = $"Roles_Export_{DateTime.UtcNow:yyyyMMdd_HHmmss}.xlsx";
-                return File(fileBytes,
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    fileName);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = "Error exporting roles", error = ex.Message });
-            }
+            var fileBytes = await _exportService.ExportRolesToExcelAsync();
+            var fileName = $"Roles_Export_{DateTime.UtcNow:yyyyMMdd_HHmmss}.xlsx";
+
+            return File(
+                fileBytes,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileName
+            );
         }
+
         /// <summary>
         /// Exports all departments to an Excel file.
         /// </summary>
-        /// <returns>
-        /// A downloadable Excel file (.xlsx) containing the departments data,
-        /// or 400 Bad Request with error details if export fails.
-        /// </returns>
         [HttpGet("export/departments")]
         public async Task<IActionResult> ExportDepartments()
         {
-            try
-            {
-                var fileBytes = await _exportService.ExportDepartmentsToExcelAsync();
-                var fileName = $"Departments_Export_{DateTime.UtcNow:yyyyMMdd_HHmmss}.xlsx";
-                return File(fileBytes,
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    fileName);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = "Error exporting departments", error = ex.Message });
-            }
+            var fileBytes = await _exportService.ExportDepartmentsToExcelAsync();
+            var fileName = $"Departments_Export_{DateTime.UtcNow:yyyyMMdd_HHmmss}.xlsx";
+
+            return File(
+                fileBytes,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileName
+            );
         }
+
         /// <summary>
         /// Exports all users to an Excel file.
         /// </summary>
-        /// <returns>
-        /// A downloadable Excel file (.xlsx) containing the users data,
-        /// or 400 Bad Request with error details if export fails.
-        /// </returns>
         [HttpGet("export/users")]
         public async Task<IActionResult> ExportUsers()
         {
-            try
-            {
-                var fileBytes = await _exportService.ExportUsersToExcelAsync();
-                var fileName = $"Users_Export_{DateTime.UtcNow:yyyyMMdd_HHmmss}.xlsx";
-                return File(fileBytes,
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    fileName);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = "Error exporting users", error = ex.Message });
-            }
+            var fileBytes = await _exportService.ExportUsersToExcelAsync();
+            var fileName = $"Users_Export_{DateTime.UtcNow:yyyyMMdd_HHmmss}.xlsx";
+
+            return File(
+                fileBytes,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileName
+            );
         }
+
         /// <summary>
         /// Exports roles, departments, and users into a single Excel file with multiple sheets.
         /// </summary>
-        /// <returns>
-        /// A downloadable Excel file (.xlsx) with multiple worksheets,
-        /// or 400 Bad Request with error details if export fails.
-        /// </returns>
         [HttpGet("export/all-data")]
         public async Task<IActionResult> ExportAllData()
         {
-            try
-            {
-                var fileBytes = await _exportService.ExportAllDataToExcelAsync();
-                var fileName = $"EEPZ_Complete_Export_{DateTime.UtcNow:yyyyMMdd_HHmmss}.xlsx";
-                return File(fileBytes,
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    fileName);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = "Error exporting all data", error = ex.Message });
-            }
+            var fileBytes = await _exportService.ExportAllDataToExcelAsync();
+            var fileName = $"EEPZ_Complete_Export_{DateTime.UtcNow:yyyyMMdd_HHmmss}.xlsx";
+
+            return File(
+                fileBytes,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileName
+            );
         }
     }
 }
