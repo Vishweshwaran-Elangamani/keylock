@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Core.Services.Interfaces;
+using System.IO;
 
 namespace PerformanceManagement.Controllers
 {
@@ -18,184 +18,117 @@ namespace PerformanceManagement.Controllers
         public AssessmentDetailsController(
             IAssessmentDetailsService assessmentDetailsService,
             IFileStorageService fileStorage,
-            ILogger<AssessmentDetailsController> logger
-        )
+            ILogger<AssessmentDetailsController> logger)
         {
             _assessmentDetailsService = assessmentDetailsService;
             _fileStorage = fileStorage;
             _logger = logger;
         }
 
+        // Standardized error response DTO
+        private IActionResult ErrorResponse(string message, int statusCode = 400)
+        {
+            var response = new { success = false, message };
+            return StatusCode(statusCode, response);
+        }
+
         [HttpGet("all-details")]
         public async Task<IActionResult> GetAllDetails()
         {
-            try
-            {
-                var result = await _assessmentDetailsService.GetAllDetailsAsync();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error fetching all assessment details");
-                return StatusCode(500, new { success = false, message = $"Error: {ex.Message}" });
-            }
+            var result = await _assessmentDetailsService.GetAllDetailsAsync();
+            return Ok(new { success = true, data = result });
         }
 
         [HttpGet("hrattachments/{attachmentId}/download")]
         public async Task<IActionResult> DownloadHrAttachment(int attachmentId)
         {
-            try
+            if (attachmentId <= 0)
+                return ErrorResponse("Invalid attachmentId", StatusCodes.Status400BadRequest);
+
+            _logger.LogInformation("HR download request for attachment {AttachmentId}", attachmentId);
+
+            var result = await _assessmentDetailsService.GetHrAttachmentAsync(attachmentId);
+
+            if (!result.Success)
             {
-                _logger.LogInformation(
-                    "HR download request for attachment {AttachmentId}",
-                    attachmentId
-                );
+                _logger.LogWarning("Failed to get HR attachment {AttachmentId}: {Error}",
+                    attachmentId, result.ErrorMessage);
 
-                var result = await _assessmentDetailsService.GetHrAttachmentAsync(attachmentId);
-
-                if (!result.Success)
-                {
-                    _logger.LogWarning(
-                        "Failed to get HR attachment {AttachmentId}: {Error}",
-                        attachmentId,
-                        result.ErrorMessage
-                    );
-                    return NotFound(
-                        new
-                        {
-                            success = false,
-                            message = result.ErrorMessage ?? "Attachment not found",
-                        }
-                    );
-                }
-
-                if (result.FileBytes == null || result.FileBytes.Length == 0)
-                {
-                    _logger.LogWarning(
-                        "HR attachment {AttachmentId} has no file data",
-                        attachmentId
-                    );
-                    return NotFound(new { success = false, message = "File data is empty" });
-                }
-
-                var contentType = result.ContentType ?? "application/octet-stream";
-                var fileName = result.FileName ?? "download";
-
-                _logger.LogInformation(
-                    "Sending HR file: FileName={FileName}, ContentType={ContentType}, Size={Size} bytes",
-                    fileName,
-                    contentType,
-                    result.FileBytes.Length
-                );
-
-                Response.Headers.Add("Content-Disposition", $"attachment; filename=\"{fileName}\"");
-                Response.Headers.Add("X-Content-Type-Options", "nosniff");
-
-                return File(result.FileBytes, contentType, fileName);
+                return ErrorResponse(result.ErrorMessage ?? "Attachment not found", StatusCodes.Status404NotFound);
             }
-            catch (FileNotFoundException ex)
+
+            if (result.FileBytes == null || result.FileBytes.Length == 0)
             {
-                _logger.LogError(
-                    ex,
-                    "File not found for HR attachment {AttachmentId}",
-                    attachmentId
-                );
-                return NotFound(new { success = false, message = "File not found in storage" });
+                _logger.LogWarning("HR attachment {AttachmentId} has no file data", attachmentId);
+                return ErrorResponse("File data is empty", StatusCodes.Status404NotFound);
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(
-                    ex,
-                    "Error downloading HR attachment {AttachmentId}",
-                    attachmentId
-                );
-                return StatusCode(500, new { success = false, message = $"Error: {ex.Message}" });
-            }
+
+            var contentType = result.ContentType ?? "application/octet-stream";
+            var safeFileName = string.IsNullOrWhiteSpace(result.FileName)
+                ? "download"
+                : Path.GetFileName(result.FileName);
+
+            _logger.LogInformation("Sending HR file: FileName={FileName}, ContentType={ContentType}, Size={Size} bytes",
+                safeFileName, contentType, result.FileBytes.Length);
+
+            // Use built-in overload to set headers safely
+            return File(result.FileBytes, contentType, safeFileName);
         }
 
         [HttpGet("test-file/{fileId}")]
         public async Task<IActionResult> TestFileExists(string fileId)
         {
-            try
+            if (string.IsNullOrWhiteSpace(fileId))
+                return ErrorResponse("Invalid fileId", StatusCodes.Status400BadRequest);
+
+            _logger.LogInformation("Testing file existence: {FileId}", fileId);
+
+            var exists = await _fileStorage.FileExistsAsync(fileId);
+
+            if (!exists)
             {
-                _logger.LogInformation("Testing file existence: {FileId}", fileId);
+                return ErrorResponse("File not found in GridFS", StatusCodes.Status404NotFound);
+            }
 
-                var exists = await _fileStorage.FileExistsAsync(fileId);
+            var metadata = await _fileStorage.GetFileMetadataAsync(fileId);
 
-                if (!exists)
+            return Ok(new
+            {
+                success = true,
+                fileExists = true,
+                metadata = new
                 {
-                    return NotFound(
-                        new
-                        {
-                            success = false,
-                            message = "File not found in GridFS",
-                            fileId = fileId,
-                        }
-                    );
+                    fileId = metadata?.FileId,
+                    fileName = metadata?.FileName,
+                    fileSize = metadata?.FileSize,
+                    contentType = metadata?.ContentType,
+                    uploadDate = metadata?.UploadDate,
+                    subFolder = metadata?.SubFolder,
                 }
-
-                var metadata = await _fileStorage.GetFileMetadataAsync(fileId);
-
-                return Ok(
-                    new
-                    {
-                        success = true,
-                        fileExists = true,
-                        metadata = new
-                        {
-                            fileId = metadata?.FileId,
-                            fileName = metadata?.FileName,
-                            fileSize = metadata?.FileSize,
-                            contentType = metadata?.ContentType,
-                            uploadDate = metadata?.UploadDate,
-                            subFolder = metadata?.SubFolder,
-                        },
-                    }
-                );
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error testing file {FileId}", fileId);
-                return StatusCode(
-                    500,
-                    new
-                    {
-                        success = false,
-                        message = ex.Message,
-                        fileId = fileId,
-                    }
-                );
-            }
+            });
         }
 
         [HttpGet("hrattachments/{attachmentId}/info")]
         public async Task<IActionResult> GetAttachmentInfo(int attachmentId)
         {
-            try
-            {
-                var result = await _assessmentDetailsService.GetHrAttachmentAsync(attachmentId);
+            if (attachmentId <= 0)
+                return ErrorResponse("Invalid attachmentId", StatusCodes.Status400BadRequest);
 
-                if (!result.Success)
-                {
-                    return NotFound(new { success = false, message = result.ErrorMessage });
-                }
+            var result = await _assessmentDetailsService.GetHrAttachmentAsync(attachmentId);
 
-                return Ok(
-                    new
-                    {
-                        success = true,
-                        attachmentId = attachmentId,
-                        fileName = result.FileName,
-                        contentType = result.ContentType,
-                        fileSize = result.FileBytes?.Length ?? 0,
-                    }
-                );
-            }
-            catch (Exception ex)
+            if (!result.Success)
             {
-                _logger.LogError(ex, "Error getting attachment info {AttachmentId}", attachmentId);
-                return StatusCode(500, new { success = false, message = ex.Message });
+                return ErrorResponse(result.ErrorMessage ?? "Attachment not found", StatusCodes.Status404NotFound);
             }
+
+            return Ok(new
+            {
+                success = true,
+                attachmentId,
+                fileName = result.FileName,
+                contentType = result.ContentType,
+                fileSize = result.FileBytes?.Length ?? 0
+            });
         }
     }
 }
