@@ -8,6 +8,9 @@ using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Relevantz.EEPZ.Api.Controllers.Goals
 {
+    /// <summary>
+    /// Controller for managing goal attachments, including upload, listing, download, preview, and deletion.
+    /// </summary>
     public class GoalAttachmentsController : BaseGoalController
     {
         protected readonly IGoalAttachmentService _service;
@@ -24,6 +27,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             _baseService = baseService;
         }
 
+        /// <summary>
+        /// Uploads a file attachment for a specific goal.
+        /// </summary>
         [HttpPost("api/goal-attachments/{goalId:int}/upload")]
         public async Task<IActionResult> UploadFile(
             int goalId,
@@ -44,6 +50,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return Ok(response);
         }
 
+        /// <summary>
+        /// Retrieves a list of all attachments for a specific goal.
+        /// </summary>
         [HttpGet("api/goal-attachments/{goalId:int}")]
         public async Task<IActionResult> ListAttachments(int goalId)
         {
@@ -58,6 +67,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return Ok(response);
         }
 
+        /// <summary>
+        /// Downloads a specific attachment by its ID.
+        /// </summary>
         [HttpGet("api/goal-attachments/{attachmentId:int}/download")]
         public async Task<IActionResult> DownloadAttachment(int attachmentId)
         {
@@ -74,6 +86,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return File(fileBytes, contentType, fileName);
         }
 
+        /// <summary>
+        /// Previews a specific attachment inline by its ID.
+        /// </summary>
         [HttpGet("api/goal-attachments/{attachmentId:int}/preview")]
         public async Task<IActionResult> PreviewAttachment(int attachmentId)
         {
@@ -93,6 +108,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return File(fileBytes, contentType, enableRangeProcessing: true);
         }
 
+        /// <summary>
+        /// Deletes a specific attachment by its ID.
+        /// </summary>
         [HttpDelete("api/goal-attachments/{attachmentId:int}")]
         public async Task<IActionResult> DeleteAttachment(int attachmentId)
         {

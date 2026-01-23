@@ -9,6 +9,10 @@ using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Relevantz.EEPZ.Api.Controllers.Goals
 {
+    /// <summary>
+    /// Controller for managing goal approval workflows, including creating requests, closing approvals,
+    /// retrieving pending approvals, and querying user-specific approvals.
+    /// </summary>
     public class GoalApprovalsController : BaseGoalController
     {
         protected new readonly IGoalApprovalsService _service;
@@ -25,6 +29,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             _baseService = baseService;
         }
 
+        /// <summary>
+        /// Creates a new approval request for a specific goal.
+        /// </summary>
         [HttpPost("api/goal-approvals/{goalId}")]
         public async Task<IActionResult> CreateApprovalRequest(
             int goalId,
@@ -39,6 +46,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return Ok(result);
         }
 
+        /// <summary>
+        /// Closes a pending approval request for a specific goal approval ID.
+        /// </summary>
         [HttpPut("api/goal-approvals/{approvalId}")]
         [Authorize(
             Roles = $"{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD},{USER_ROLE.LEADERSHIP}"
@@ -56,6 +66,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return Ok(result);
         }
 
+        /// <summary>
+        /// Retrieves all pending approval requests assigned to the current user.
+        /// </summary>
         [HttpGet("api/goal-approvals/pending")]
         [Authorize(
             Roles = $"{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD},{USER_ROLE.LEADERSHIP}"
@@ -75,6 +88,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return Ok(response);
         }
 
+        /// <summary>
+        /// Retrieves approvals for the current user based on query filters.
+        /// </summary>
         [HttpGet("api/goal-approvals/query")]
         public async Task<IActionResult> GetUserApprovals([FromQuery] ApprovalQueryModel query)
         {

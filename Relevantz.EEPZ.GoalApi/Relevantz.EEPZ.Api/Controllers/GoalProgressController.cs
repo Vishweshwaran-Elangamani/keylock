@@ -8,6 +8,10 @@ using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Relevantz.EEPZ.Api.Controllers.Goals
 {
+    /// <summary>
+    /// Controller for managing goal progress operations such as checklist toggling, manual updates,
+    /// retrieving progress, team progress, cascading progress, and hierarchy.
+    /// </summary>
     public class GoalProgressController : BaseGoalController
     {
         protected new readonly IGoalProgressService _service;
@@ -24,6 +28,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             _baseService = baseService;
         }
 
+        /// <summary>
+        /// Toggles the completion state of a checklist item for a specific goal.
+        /// </summary>
         [HttpPut("api/goal-progress/{goalId:int}/checklist/toggle")]
         public async Task<IActionResult> ToggleChecklist(
             int goalId,
@@ -37,6 +44,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return Ok(result);
         }
 
+        /// <summary>
+        /// Updates the progress of a goal manually by an authorized user.
+        /// </summary>
         [HttpPut("api/goal-progress/{goalId:int}/manual")]
         [Authorize(
             Roles = $"{USER_ROLE.EMPLOYEE},{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD},{USER_ROLE.LEADERSHIP}"
@@ -53,6 +63,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return Ok(result);
         }
 
+        /// <summary>
+        /// Retrieves the progress percentage of a specific goal for the current user.
+        /// </summary>
         [HttpGet("api/goal-progress/{goalId:int}")]
         public async Task<IActionResult> GetProgress(int goalId)
         {
@@ -69,6 +82,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return Ok(response);
         }
 
+        /// <summary>
+        /// Retrieves the team progress percentage for a specific goal, accessible by managers and leadership roles.
+        /// </summary>
         [HttpGet("api/goal-progress/{goalId:int}/team")]
         [Authorize(
             Roles = $"{USER_ROLE.EMPLOYEE},{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD},{USER_ROLE.LEADERSHIP}"
@@ -88,6 +104,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return Ok(response);
         }
 
+        /// <summary>
+        /// Retrieves cascading progress for a specific goal, reflecting dependent goals' progress.
+        /// </summary>
         [HttpGet("api/goal-progress/{goalId:int}/cascading")]
         public async Task<IActionResult> GetCascadingProgress(int goalId)
         {
@@ -104,6 +123,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return Ok(response);
         }
 
+        /// <summary>
+        /// Retrieves the progress hierarchy for a specific goal, showing structured progress details.
+        /// </summary>
         [HttpGet("api/goal-progress/{goalId:int}/hierarchy")]
         public async Task<IActionResult> GetProgressHierarchy(int goalId)
         {

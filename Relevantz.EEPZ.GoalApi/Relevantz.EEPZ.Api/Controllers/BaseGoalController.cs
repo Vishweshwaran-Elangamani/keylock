@@ -9,6 +9,10 @@ using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Relevantz.EEPZ.Api.Controllers.Goals
 {
+    /// <summary>
+    /// Base controller for goal-related APIs, providing common functionality such as user role 
+    /// and employee master ID retrieval for authorization and identity validation.
+    /// </summary>
     [ApiController]
     [Authorize]
     public abstract class BaseGoalController : ControllerBase

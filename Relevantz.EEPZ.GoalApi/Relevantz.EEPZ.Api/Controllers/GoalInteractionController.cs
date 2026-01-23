@@ -7,6 +7,9 @@ using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Relevantz.EEPZ.Api.Controllers.Goals
 {
+    /// <summary>
+    /// Controller for managing goal interactions such as comments, timelines, dashboard summaries, completion checks, and project subordinates.
+    /// </summary>
     public class GoalInteractionsController : BaseGoalController
     {
         protected new readonly IGoalInteractionService _service;
@@ -23,6 +26,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             _baseService = baseService;
         }
 
+        /// <summary>
+        /// Adds a comment to a specific goal.
+        /// </summary>
         [HttpPost("api/goal-interaction/{id:int}/comments")]
         public async Task<IActionResult> AddComment(int id, [FromBody] CreateCommentModel dto)
         {
@@ -34,6 +40,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return Ok(result);
         }
 
+        /// <summary>
+        /// Retrieves all comments for a specific goal.
+        /// </summary>
         [HttpGet("api/goal-interaction/{id:int}/comments")]
         public async Task<IActionResult> ListComments(int id)
         {
@@ -48,6 +57,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return Ok(response);
         }
 
+        /// <summary>
+        /// Retrieves the timeline of events for a specific goal.
+        /// </summary>
         [HttpGet("api/goal-interaction/{id:int}/timeline")]
         public async Task<IActionResult> GetTimeline(int id)
         {
@@ -64,6 +76,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return Ok(response);
         }
 
+        /// <summary>
+        /// Retrieves a dashboard summary for the current user.
+        /// </summary>
         [HttpGet("api/goal-interaction/dashboard/summary")]
         public async Task<IActionResult> DashboardSummary()
         {
@@ -80,6 +95,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return Ok(response);
         }
 
+        /// <summary>
+        /// Checks whether a specific goal can be marked as complete by the current user.
+        /// </summary>
         [HttpGet("api/goal-interaction/{id:int}/can-complete")]
         public async Task<IActionResult> CanMarkComplete(int id)
         {
@@ -140,6 +158,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return Ok(response);
         }
 
+        /// <summary>
+        /// Retrieves the list of subordinates for a specific project.
+        /// </summary>
         [HttpGet("api/goal-interaction/projects/{projectId:int}/subordinates")]
         public async Task<IActionResult> GetProjectSubordinates(int projectId)
         {

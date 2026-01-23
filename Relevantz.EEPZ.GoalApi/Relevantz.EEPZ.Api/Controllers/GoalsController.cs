@@ -8,6 +8,9 @@ using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Relevantz.EEPZ.Api.Controllers.Goals
 {
+    /// <summary>
+    /// Controller for managing goals, including creation, retrieval, updates, assignments, and project-related operations.
+    /// </summary>
     public class GoalsController : BaseGoalController
     {
         protected new readonly IGoalService _service;
@@ -24,6 +27,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             _baseService = baseService;
         }
 
+        /// <summary>
+        /// Creates a new goal for the current user.
+        /// </summary>
         [HttpPost("/api/goals/create")]
         [Authorize(
             Roles = $"{USER_ROLE.EMPLOYEE},{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD},{USER_ROLE.LEADERSHIP}"
@@ -38,6 +44,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return CreatedAtAction(nameof(GetGoalDetailsById), new { id = result.Data }, result);
         }
 
+        /// <summary>
+        /// Retrieves detailed information about a specific goal by its ID.
+        /// </summary>
         [HttpGet("/api/goals/{id:int}")]
         public async Task<IActionResult> GetGoalDetailsById(int id)
         {
@@ -55,6 +64,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return Ok(response);
         }
 
+        /// <summary>
+        /// Queries goals based on filters such as pagination, search, and user role.
+        /// </summary>
         [HttpGet("/api/goals/query")]
         public async Task<IActionResult> QueryGoals([FromQuery] GoalQueryModel query)
         {
@@ -78,6 +90,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return Ok(response);
         }
 
+        /// <summary>
+        /// Updates an existing goal by its ID.
+        /// </summary>
         [HttpPut("/api/goals/{id:int}")]
         public async Task<IActionResult> UpdateGoal(int id, [FromBody] UpdateGoalModel dto)
         {
@@ -89,6 +104,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return Ok(result);
         }
 
+        /// <summary>
+        /// Retrieves the list of assignees for a specific goal.
+        /// </summary>
         [HttpGet("/api/goals/{id:int}/assignees")]
         public async Task<IActionResult> GetAssignees(int id)
         {
@@ -103,6 +121,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return Ok(response);
         }
 
+        /// <summary>
+        /// Assigns a goal to employees, restricted to managers and department heads.
+        /// </summary>
         [HttpPost("/api/goals/{id:int}/assign")]
         [Authorize(Roles = $"{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD}")]
         public async Task<IActionResult> Assign(int id, [FromBody] AssignGoalModel dto)
@@ -115,6 +136,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return Ok(result);
         }
 
+        /// <summary>
+        /// Retrieves projects associated with the current user.
+        /// </summary>
         [HttpGet("/api/goals/projects/user")]
         public async Task<IActionResult> GetUserProjects()
         {
@@ -131,6 +155,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return Ok(response);
         }
 
+        /// <summary>
+        /// Retrieves all projects, accessible by managers and leadership roles.
+        /// </summary>
         [HttpGet("/api/goals/projects")]
         [Authorize(
             Roles = $"{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD},{USER_ROLE.LEADERSHIP}"
@@ -148,6 +175,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return Ok(response);
         }
 
+        /// <summary>
+        /// Retrieves details of a specific project by its ID.
+        /// </summary>
         [HttpGet("/api/goals/projects/{projectId:int}")]
         public async Task<IActionResult> GetProject(int projectId)
         {
