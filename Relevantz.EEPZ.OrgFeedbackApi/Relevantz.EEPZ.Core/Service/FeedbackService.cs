@@ -6,6 +6,8 @@ using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
+using Mapster;
+using Relevantz.EEPZ.Common.Constants;
 
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
@@ -30,44 +32,37 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             ArgumentNullException.ThrowIfNull(dto);
 
-            if (dto.QuestionResponses == null || dto.QuestionResponses.Count == 0)
-                throw new ArgumentException("At least one question response is required.", nameof(dto.QuestionResponses));
+            if (dto.Responses == null || dto.Responses.Count == 0)
+                throw new ArgumentException(MessageConstants.QuestionResponsesRequired, nameof(dto.Responses));
 
-            var feedback = new Feedback
-            {
-                FeedbackType = dto.FeedbackType,
-                SubmittedByEmployeeId = dto.IsAnonymous ? null : dto.SubmittedByEmployeeId,
-                RecipientEmployeeId = dto.RecipientEmployeeId,
-                RelatedGoalId = dto.RelatedGoalId,
-                RelatedProjectId = dto.RelatedProjectId,
-                RelatedMentorId = dto.RelatedMentorId,
-                RelatedOrganizationGoalId = dto.RelatedOrganizationGoalId,
-                Rating = dto.Rating,
-                Comments = dto.Comments,
-                IsAnonymous = dto.IsAnonymous,
-                Status = FeedbackConstants.Status.Draft
-            };
+
+
+            var feedback = dto.Adapt<Feedback>();
+
+            feedback.SubmittedByEmployeeId = dto.IsAnonymous ? null : dto.SubmittedByEmployeeId;
+            feedback.Status = FeedbackConstants.Status.Draft;
+
 
             var feedbackId = await _feedbackRepo.CreateFeedbackAsync(feedback);
 
-            foreach (var responseDto in dto.QuestionResponses)
+            foreach (var responseDto in dto.Responses)
             {
-                var questionResponse = new Feedbackquestionresponse
-                {
-                    FeedbackId = feedbackId,
-                    QuestionId = responseDto.QuestionId,
-                    RatingValue = responseDto.RatingValue,
-                    BooleanValue = responseDto.BooleanValue,
-                    TextValue = responseDto.TextValue,
-                    SelectedOptions = responseDto.SelectedOptions != null && responseDto.SelectedOptions.Count > 0
+                var questionResponse = responseDto.Adapt<Feedbackquestionresponse>();
+                questionResponse.FeedbackId = feedbackId;
+
+                questionResponse.SelectedOptions =
+                    responseDto.SelectedOptions != null && responseDto.SelectedOptions.Count > 0
                         ? JsonSerializer.Serialize(responseDto.SelectedOptions)
-                        : null
-                };
+                        : null;
 
                 await _feedbackRepo.CreateQuestionResponseAsync(questionResponse);
             }
 
-            _logger.LogInformation("Feedback created successfully. FeedbackId: {FeedbackId}", feedbackId);
+
+            _logger.LogInformation("{Message}. FeedbackId: {FeedbackId}",
+    MessageConstants.FeedbackCreatedLog,
+    feedbackId);
+
 
             return await GetFeedbackByIdAsync(feedbackId);
         }
@@ -103,7 +98,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         public async Task<FeedbackFormDto?> GetFeedbackFormAsync(string feedbackType)
         {
             if (string.IsNullOrWhiteSpace(feedbackType))
-                throw new ArgumentException("FeedbackType is required.", nameof(feedbackType));
+                throw new ArgumentException(MessageConstants.FeedbackTypeRequired, nameof(feedbackType));
+
 
             var questions = await _questionRepo.GetQuestionsByTypeAsync(feedbackType);
 
@@ -175,24 +171,24 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             ArgumentNullException.ThrowIfNull(dto);
 
-            var canEdit = await _feedbackRepo.CanEditFeedbackAsync(feedbackId);
-            if (!canEdit)
-                return null;
-
             var feedback = await _feedbackRepo.GetFeedbackByIdAsync(feedbackId);
-            if (feedback == null)
-                return null;
+            if (feedback == null) return null;
+
+            var canEdit = await _feedbackRepo.CanEditFeedbackAsync(feedbackId);
+            if (!canEdit) return null;
+
 
             feedback.Rating = dto.Rating ?? feedback.Rating;
             feedback.Comments = dto.Comments ?? feedback.Comments;
 
             await _feedbackRepo.UpdateFeedbackAsync(feedback);
 
-            if (dto.QuestionResponses != null && dto.QuestionResponses.Count > 0)
+            if (dto.Responses != null && dto.Responses.Count > 0)
             {
                 var existingResponses = await _feedbackRepo.GetFeedbackResponsesAsync(feedbackId);
 
-                foreach (var responseDto in dto.QuestionResponses)
+                foreach (var responseDto in dto.Responses)
+
                 {
                     var existingResponse = existingResponses.FirstOrDefault(r => r.QuestionId == responseDto.QuestionId);
                     if (existingResponse == null)
@@ -209,7 +205,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
             }
 
-            _logger.LogInformation("Feedback updated. FeedbackId: {FeedbackId}", feedbackId);
+            _logger.LogInformation("{Message}. FeedbackId: {FeedbackId}",
+    MessageConstants.FeedbackUpdatedLog,
+    feedbackId);
+
 
             return await GetFeedbackByIdAsync(feedbackId);
         }
@@ -219,7 +218,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var result = await _feedbackRepo.UpdateFeedbackStatusAsync(feedbackId, FeedbackConstants.Status.Submitted);
 
             if (result)
-                _logger.LogInformation("Feedback submitted. FeedbackId: {FeedbackId}", feedbackId);
+                _logger.LogInformation("{Message}. FeedbackId: {FeedbackId}",
+    MessageConstants.FeedbackSubmittedLog,
+    feedbackId);
+
 
             return result;
         }
@@ -229,7 +231,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var result = await _feedbackRepo.FlagFeedbackForBiasAsync(feedbackId, isBias, isFairness, reviewedByHRId);
 
             if (result)
-                _logger.LogInformation("Feedback flagged for HR review. FeedbackId: {FeedbackId}", feedbackId);
+                _logger.LogInformation("{Message}. FeedbackId: {FeedbackId}",
+        MessageConstants.FeedbackFlaggedLog,
+        feedbackId);
+
+
 
             return result;
         }
@@ -239,7 +245,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var result = await _feedbackRepo.SetHRReviewAsync(feedbackId, hrComments, reviewedByHRId);
 
             if (result)
-                _logger.LogInformation("HR review updated. FeedbackId: {FeedbackId}", feedbackId);
+                _logger.LogInformation("{Message}. FeedbackId: {FeedbackId}",
+     MessageConstants.FeedbackHrReviewUpdatedLog,
+     feedbackId);
 
             return result;
         }
@@ -249,7 +257,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var result = await _feedbackRepo.DeleteFeedbackAsync(feedbackId);
 
             if (result)
-                _logger.LogInformation("Feedback deleted. FeedbackId: {FeedbackId}", feedbackId);
+                _logger.LogInformation("{Message}. FeedbackId: {FeedbackId}",
+    MessageConstants.FeedbackDeletedLog,
+    feedbackId);
 
             return result;
         }
@@ -299,10 +309,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
 
             var submitterName = feedback.IsAnonymous
-    ? "Anonymous"
-    : feedback.SubmittedByEmployee?.Userprofile?.FirstName ?? "Unknown";
+    ? MessageConstants.AnonymousUser
+: feedback.SubmittedByEmployee?.Userprofile?.FirstName ?? MessageConstants.UnknownUser;
 
-            var recipientName = feedback.RecipientEmployee?.Userprofile?.FirstName ?? "Unknown";
+            var recipientName = feedback.RecipientEmployee?.Userprofile?.FirstName ?? MessageConstants.UnknownUser;
 
 
             return new FeedbackResponseDto

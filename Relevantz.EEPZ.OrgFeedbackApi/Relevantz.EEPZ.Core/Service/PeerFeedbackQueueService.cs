@@ -4,6 +4,7 @@ using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
+using Relevantz.EEPZ.Common.Constants;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -12,7 +13,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private readonly IPeerFeedbackQueueRepository _queueRepo;
         private readonly ILogger<PeerFeedbackQueueService> _logger;
 
-        private const string STATUS_PENDING = "Pending";
 
         public PeerFeedbackQueueService(
             IPeerFeedbackQueueRepository queueRepo,
@@ -24,14 +24,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         public async Task<PeerFeedbackQueueResponseDto?> CreatePeerFeedbackAsync(CreatePeerFeedbackRequestDto dto)
         {
-            if (dto == null)
-                return null;
 
-            if (dto.SubmittedByEmployeeId <= 0 || dto.RecipientEmployeeId <= 0)
-                return null;
-
-            if (string.IsNullOrWhiteSpace(dto.FeedbackContent))
-                return null;
 
             var feedback = new Peerfeedbackqueue
             {
@@ -39,7 +32,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 RecipientEmployeeId = dto.RecipientEmployeeId,
                 FeedbackContent = dto.FeedbackContent,
                 IsAnonymous = dto.IsAnonymous,
-                Status = STATUS_PENDING
+                Status = PeerFeedbackConstants.Status.Pending
             };
 
             var queueId = await _queueRepo.CreatePeerFeedbackAsync(feedback);
@@ -129,7 +122,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (feedback == null)
                 return null;
 
-            if (!string.Equals(feedback.Status, STATUS_PENDING, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(feedback.Status, PeerFeedbackConstants.Status.Pending, StringComparison.OrdinalIgnoreCase))
                 return null;
 
             if (!string.IsNullOrWhiteSpace(dto.FeedbackContent))
@@ -209,11 +202,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 SubmittedByEmployeeId = feedback.SubmittedByEmployeeId,
                 SubmitterName = feedback.SubmittedByEmployee != null
                     ? $"{feedback.SubmittedByEmployee.EmployeeId}"
-                    : "Anonymous",
+                    : MessageConstants.AnonymousUser,
                 RecipientEmployeeId = feedback.RecipientEmployeeId,
                 RecipientName = feedback.RecipientEmployee != null
                     ? $"{feedback.RecipientEmployee.EmployeeId}"
-                    : "Unknown",
+                    : MessageConstants.UnknownUser,
                 FeedbackContent = feedback.FeedbackContent,
                 IsAnonymous = feedback.IsAnonymous,
                 IsProfessional = feedback.IsProfessional,
@@ -221,7 +214,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 ApprovedByHRId = feedback.ApprovedByHrid,
                 ApprovedByHRName = feedback.ApprovedByHr != null
                     ? $"{feedback.ApprovedByHr.EmployeeId}"
-                    : "Unknown",
+                    : MessageConstants.UnknownUser,
                 Status = feedback.Status,
                 CreatedAt = feedback.CreatedAt,
                 ApprovedAt = feedback.ApprovedAt

@@ -26,15 +26,21 @@ namespace Relevantz.EEPZ.Api.Controllers
         [ProducesResponseType(typeof(ApiResponseDto<MentorFeedbackResponseDto>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponseDto<MentorFeedbackResponseDto>), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateMentorFeedback([FromBody] CreateMentorFeedbackRequestDto dto)
-        {
-            var result = await _service.CreateMentorFeedbackAsync(dto);
+{
+    if (!ModelState.IsValid)
+    {
+        return BadRequest(ApiResponseDto<MentorFeedbackResponseDto>.ErrorResponse(
+            MessageConstants.ValidationError));
+    }
 
-            return Ok(ApiResponseDto<MentorFeedbackResponseDto>.SuccessResponse(
-                result,
-                MessageConstants.MentorFeedbackCreated));
-        }
+    var result = await _service.CreateMentorFeedbackAsync(dto);
 
-        [HttpGet("{id:int}")]
+    return Ok(ApiResponseDto<MentorFeedbackResponseDto>.SuccessResponse(
+        result,
+        MessageConstants.MentorFeedbackCreated));
+}
+
+        [HttpGet("track/{id:int}")]
         [ProducesResponseType(typeof(ApiResponseDto<MentorFeedbackResponseDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponseDto<MentorFeedbackResponseDto>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponseDto<MentorFeedbackResponseDto>), StatusCodes.Status500InternalServerError)]

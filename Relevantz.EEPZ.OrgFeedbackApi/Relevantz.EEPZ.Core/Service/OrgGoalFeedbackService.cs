@@ -25,11 +25,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             ArgumentNullException.ThrowIfNull(dto);
 
-            if (dto.GoalId <= 0) return null;
-            if (dto.SubmittedByEmployeeId <= 0) return null;
-            if (dto.RecipientEmployeeId <= 0) return null;
-            if (dto.Rating < 1 || dto.Rating > 5) return null;
-
             var feedback = new Feedback
             {
                 RelatedGoalId = dto.GoalId,
@@ -169,17 +164,20 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 OrgGoalFeedbackId = feedback.FeedbackId,
                 GoalId = feedback.RelatedGoalId ?? 0,
-                OrganizationGoalName = feedback.RelatedGoal?.GoalTitle ?? "Unknown",
+                OrganizationGoalName = feedback.RelatedGoal?.GoalTitle ?? MessageConstants.UnknownUser,
+
                 GoalDescription = feedback.RelatedGoal?.GoalDescription ?? string.Empty,
                 GoalType = feedback.RelatedGoal?.GoalType ?? string.Empty,
 
                 SubmittedByEmployeeId = feedback.SubmittedByEmployeeId ?? 0,
                 SubmitterName = feedback.IsAnonymous
-                    ? "Anonymous"
-                    : (feedback.SubmittedByEmployee?.EmployeeId.ToString() ?? "Unknown"),
+                   ? MessageConstants.AnonymousUser
+                   : (feedback.SubmittedByEmployee?.EmployeeId.ToString() ?? MessageConstants.UnknownUser),
+
 
                 RecipientEmployeeId = feedback.RecipientEmployeeId,
-                RecipientName = feedback.RecipientEmployee?.EmployeeId.ToString() ?? "Unknown",
+                RecipientName = feedback.RecipientEmployee?.EmployeeId.ToString() ?? MessageConstants.UnknownUser,
+
 
                 Rating = feedback.Rating ?? 0,
                 FeedbackComments = feedback.Comments ?? string.Empty,

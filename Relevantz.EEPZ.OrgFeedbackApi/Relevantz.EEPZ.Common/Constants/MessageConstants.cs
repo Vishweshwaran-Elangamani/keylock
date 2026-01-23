@@ -42,6 +42,47 @@ namespace Relevantz.EEPZ.Common.Constants
         public const string InvalidStatusProvided = "Invalid status provided";
         #endregion
 
+        #region SME Messages
+        public const string ActiveSmesRetrievedSuccessfully = "Active SMEs retrieved successfully";
+        #endregion
+
+        #region Feedback API Response Messages
+        public const string FeedbackCreated = "Feedback created successfully";
+        public const string FeedbackRetrieved = "Feedback retrieved successfully";
+        public const string FeedbackUpdated = "Feedback updated successfully";
+        public const string FeedbackSubmitted = "Feedback submitted successfully";
+        public const string FeedbackDeleted = "Feedback deleted successfully";
+        public const string FeedbackNotFound = "Feedback not found";
+        #endregion
+
+        #region Common User Display
+        public const string AnonymousUser = "Anonymous";
+        public const string UnknownUser = "Unknown";
+        #endregion
+
+        #region Feedback Validation Messages
+        public const string FeedbackTypeRequired = "FeedbackType is required.";
+        public const string QuestionResponsesRequired = "At least one question response is required.";
+        public const string InvalidRatingRange = "Rating must be between 1 and 5.";
+        public const string FeedbackFromRequired = "FeedbackFrom is required.";
+        #endregion
+
+        #region Feedback Log Messages
+        public const string FeedbackCreatedLog = "Feedback created successfully";
+        public const string FeedbackUpdatedLog = "Feedback updated successfully";
+        public const string FeedbackSubmittedLog = "Feedback submitted successfully";
+        public const string FeedbackDeletedLog = "Feedback deleted successfully";
+        public const string FeedbackFlaggedLog = "Feedback flagged for HR review";
+        public const string FeedbackHrReviewUpdatedLog = "HR review updated successfully";
+        #endregion
+
+        #region Peer Feedback Queue Messages
+        public const string PeerFeedbackCreated = "Peer feedback created successfully";
+        public const string PeerFeedbackUpdated = "Peer feedback updated successfully";
+        public const string PeerFeedbackDeleted = "Peer feedback deleted successfully";
+        public const string PeerFeedbackNotFound = "Peer feedback not found";
+        #endregion
+
         #region Generic Messages
         public const string OperationSuccessful = "Operation completed successfully";
         public const string OperationFailed = "Operation failed";

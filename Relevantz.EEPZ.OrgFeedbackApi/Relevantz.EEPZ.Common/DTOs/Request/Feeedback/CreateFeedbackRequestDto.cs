@@ -25,6 +25,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
 
         public bool IsAnonymous { get; set; } = false;
 
-        public List<FeedbackQuestionResponseRequestDto> QuestionResponses { get; set; } = new();
+        public List<FeedbackQuestionResponseRequestDto> Responses { get; set; } = new();
+
     }
 }

@@ -27,6 +27,11 @@ namespace Relevantz.EEPZ.Api.Controllers
         [ProducesResponseType(typeof(ApiResponseDto<OrgGoalFeedbackResponseDto>), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateOrgGoalFeedback([FromBody] CreateOrgGoalFeedbackRequestDto dto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ApiResponseDto<OrgGoalFeedbackResponseDto>.ErrorResponse(
+                    MessageConstants.ValidationError));
+            }
             var result = await _service.CreateOrgGoalFeedbackAsync(dto);
 
             return Ok(ApiResponseDto<OrgGoalFeedbackResponseDto>.SuccessResponse(
@@ -34,7 +39,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 MessageConstants.OrgGoalFeedbackCreated));
         }
 
-        [HttpGet("{id:int}")]
+        [HttpGet("feedback/{id:int}")]
         [ProducesResponseType(typeof(ApiResponseDto<OrgGoalFeedbackResponseDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponseDto<OrgGoalFeedbackResponseDto>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponseDto<OrgGoalFeedbackResponseDto>), StatusCodes.Status500InternalServerError)]
@@ -80,7 +85,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 MessageConstants.AllOrgGoalFeedbackRetrieved));
         }
 
-        [HttpPut("{id:int}")]
+        [HttpPut("feedback/{id:int}")]
         [ProducesResponseType(typeof(ApiResponseDto<OrgGoalFeedbackResponseDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponseDto<OrgGoalFeedbackResponseDto>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponseDto<OrgGoalFeedbackResponseDto>), StatusCodes.Status400BadRequest)]
@@ -101,7 +106,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 MessageConstants.OrgGoalFeedbackUpdated));
         }
 
-        [HttpDelete("{id:int}")]
+        [HttpDelete("feedback/{id:int}")]
         [ProducesResponseType(typeof(ApiResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponseDto<bool>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponseDto<bool>), StatusCodes.Status500InternalServerError)]

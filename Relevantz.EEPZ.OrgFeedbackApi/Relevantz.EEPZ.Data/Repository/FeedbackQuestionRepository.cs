@@ -77,7 +77,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
         public async Task<List<Dictionary<string, object>>> GetChoiceOptionsAsync(int questionId)
         {
-            var optionsList = new List<Dictionary<string, object>>(); // ✅ review comment #54
+            var optionsList = new List<Dictionary<string, object>>();
 
             var question = await _context.Feedbackquestions
                 .AsNoTracking()

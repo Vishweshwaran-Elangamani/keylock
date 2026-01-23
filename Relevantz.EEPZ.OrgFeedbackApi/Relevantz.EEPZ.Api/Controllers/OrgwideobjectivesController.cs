@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.IService;
+using Relevantz.EEPZ.Common.Constants;
+
 
 namespace Relevantz.EEPZ.Api.Controllers
 {
@@ -29,7 +31,7 @@ namespace Relevantz.EEPZ.Api.Controllers
 
             return Ok(ApiResponseDto<List<OrgObjectiveResponseDto>>.SuccessResponse(
                 objectives,
-                "Organization objectives retrieved successfully"));
+                MessageConstants.OrganizationObjectivesRetrieved));
         }
 
         [HttpGet("dropdown")]
@@ -42,7 +44,7 @@ namespace Relevantz.EEPZ.Api.Controllers
 
             return Ok(ApiResponseDto<List<OrgObjectiveResponseDto>>.SuccessResponse(
                 objectives,
-                "Organization objectives retrieved successfully"));
+                MessageConstants.OrganizationObjectivesRetrieved));
         }
 
         [HttpGet("{objectiveId:int}")]
@@ -57,12 +59,12 @@ namespace Relevantz.EEPZ.Api.Controllers
             if (objective == null)
             {
                 return NotFound(ApiResponseDto<OrgObjectiveResponseDto>.ErrorResponse(
-                    $"Organization objective with ID {objectiveId} not found"));
+                    MessageConstants.OrganizationObjectiveNotFound));
             }
 
             return Ok(ApiResponseDto<OrgObjectiveResponseDto>.SuccessResponse(
                 objective,
-                "Objective retrieved successfully"));
+               MessageConstants.OrganizationObjectiveRetrieved));
         }
 
         [HttpGet("active")]
@@ -75,10 +77,11 @@ namespace Relevantz.EEPZ.Api.Controllers
 
             return Ok(ApiResponseDto<List<OrgObjectiveResponseDto>>.SuccessResponse(
                 objectives,
-                "Active objectives retrieved successfully"));
+                MessageConstants.ActiveObjectivesRetrieved
+));
         }
 
-        [HttpGet("status/{status}")]
+        [HttpGet("objective/{status}")]
         [ProducesResponseType(typeof(ApiResponseDto<List<OrgObjectiveResponseDto>>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetObjectivesByStatus(string status)
         {
@@ -88,7 +91,7 @@ namespace Relevantz.EEPZ.Api.Controllers
 
             return Ok(ApiResponseDto<List<OrgObjectiveResponseDto>>.SuccessResponse(
                 objectives,
-                $"Objectives with status '{status}' retrieved successfully"));
+               MessageConstants.ObjectivesByStatusRetrieved));
         }
     }
 }

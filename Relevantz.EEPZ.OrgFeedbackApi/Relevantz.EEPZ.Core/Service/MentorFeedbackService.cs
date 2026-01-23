@@ -27,13 +27,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             ArgumentNullException.ThrowIfNull(dto);
 
-            if (dto.MentorEmployeeId <= 0) return null;
-            if (dto.MenteeEmployeeId <= 0) return null;
-            if (dto.SmeId <= 0) return null;
-            if (dto.SkillIdReference <= 0) return null;
-            if (dto.SubmittedByEmployeeId <= 0) return null;
-            if (dto.Rating < 1 || dto.Rating > 5) return null;
-            if (string.IsNullOrWhiteSpace(dto.FeedbackFrom)) return null;
 
             var feedback = new Mentorfeedbacktracking
             {

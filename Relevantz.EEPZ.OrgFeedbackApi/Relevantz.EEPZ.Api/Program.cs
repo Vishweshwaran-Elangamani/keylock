@@ -18,6 +18,8 @@ using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Common;
 using Relevantz.EEPZ.Core.Service;
 using Relevantz.EEPZ.Api.Middleare;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 
 using Relevantz.EEPZ.Data.Repository;
@@ -51,6 +53,8 @@ try
 
 builder.Services.AddExceptionHandler<GlobalExceptionMiddleware>();
 builder.Services.AddProblemDetails();
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<Relevantz.EEPZ.Api.Validators.CreateMentorFeedbackRequestValidator>();
 
 
 

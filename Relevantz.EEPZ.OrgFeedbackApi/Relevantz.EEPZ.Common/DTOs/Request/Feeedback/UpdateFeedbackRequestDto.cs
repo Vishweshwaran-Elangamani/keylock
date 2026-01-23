@@ -9,6 +9,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
 
         public string? Comments { get; set; }
 
-        public List<FeedbackQuestionResponseRequestDto> QuestionResponses { get; set; } = new();
+        public List<FeedbackQuestionResponseRequestDto> Responses { get; set; } = new();
+
     }
 }
