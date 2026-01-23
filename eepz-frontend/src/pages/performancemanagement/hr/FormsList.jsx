@@ -748,11 +748,14 @@ function FormsList() {
                       </tr>
                     ) : pagedForms.length === 0 ? (
                       <tr>
-                        <td colSpan={4} className="flp-empty-state">
-                          <i className="bi bi-inbox"></i>
-                          <p>No forms found matching the criteria!</p>
-                        </td>
-                      </tr>
+  <td colSpan={4}>
+    <div className="flp-empty-state">
+      <i className="bi bi-inbox"></i>
+      <p>No forms found</p>
+    </div>
+  </td>
+</tr>
+
                     ) : (
                       pagedForms.map((f) => (
                         <tr
@@ -825,7 +828,7 @@ function FormsList() {
                       setFormsPerPage(Number(val));
                       setFormsPage(1);
                     }}
-                    options={[5, 8, 10, 15, 20]}
+                    options={[5, 10, 15]}
                   />
                 </div>
 

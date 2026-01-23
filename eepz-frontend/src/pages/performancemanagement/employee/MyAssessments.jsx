@@ -892,7 +892,7 @@ function MyAssessments() {
                   <div className="empass-attachments-section">
                     <h3 className="empass-attachments-title">
                       <i className="bi bi-paperclip"></i>
-                      Attachments
+                      Attach Documents for Reference
                     </h3>
 
                     {modalMode === "submit" && (
@@ -902,8 +902,8 @@ function MyAssessments() {
                             htmlFor="file-upload"
                             className="empass-upload-btn"
                           >
-                            <i className="bi bi-cloud-upload"></i> Add
-                            Attachment
+                            <i className="bi bi-cloud-upload"></i> 
+                            Upload Attachments
                           </label>
                           <input
                             id="file-upload"
@@ -950,8 +950,8 @@ function MyAssessments() {
 
                                 <div className="empass-attachment-name-section">
                                   <label className="empass-input-label">
-                                    <i className="bi bi-tag"></i> Attachment
-                                    Name *
+                                    <i className="bi bi-tag"></i> 
+                                    Attachment Name *
                                   </label>
                                   <input
                                     type="text"

@@ -1193,23 +1193,21 @@
 
 .dp-clear-filters-btn {
   padding: 6px 14px;
-  color: #6c757d;
+  color:  #27235c;
   border: 1px solid #27235c;
   border-radius: 6px;
-  font-weight: 600;
-  font-size: 13px;
   cursor: pointer;
   height: 36px;
   white-space: nowrap;
-  background: #f8f9fa;
+  background: white;
   transition: all 0.2s;
   flex-shrink: 0;
 }
 
 .dp-clear-filters-btn:hover {
   background: #e9ecef;
-  border-color: #adb5bd;
-  color: #495057;
+  border-color:  #27235c;
+  color:  #27235c;
 }
 
 .dp-project-filter-dropdown {
@@ -1239,9 +1237,7 @@
   background: #ffffff;
   border: 1.5px solid #27235c;
   border-radius: 6px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #212529;
+  color:  #27235c;
   height: 36px;
   transition: all 0.2s ease;
 }

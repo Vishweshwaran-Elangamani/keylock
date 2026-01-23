@@ -51,7 +51,6 @@
 .empassper-loading-state p {
   margin-top: 16px;
   color: var(--text-light);
-  font-size: 16px;
   font-weight: 500;
 }
 
@@ -96,7 +95,6 @@
   align-items: center;
   justify-content: center;
   color: #fff;
-  font-size: 20px;
   box-shadow: 0 4px 12px rgba(39, 35, 92, 0.3);
   flex-shrink: 0;
 }
@@ -107,7 +105,6 @@
 }
 
 .empassper-header-title {
-  font-size: 28px;
   font-weight: 700;
   margin: 0 0 4px 0;
   color: var(--text);
@@ -115,7 +112,6 @@
 }
 
 .empassper-header-description {
-  font-size: 14px;
   color: var(--text-light);
   margin: 0;
   text-align: left;
@@ -133,7 +129,6 @@
 }
 
 .empassper-timer-label {
-  font-size: 11px;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.8);
   text-transform: uppercase;
@@ -142,14 +137,13 @@
 }
 
 .empassper-timer-display {
-  font-size: 20px !important;
   font-weight: 700;
   color: #ffffff;
   line-height: 1;
 }
 
 .empassper-timer-subtext {
-  font-size: 11px;
+
   color: rgba(255, 255, 255, 0.9);
   margin-top: 4px;
 }
@@ -183,7 +177,7 @@
   min-width: 220px;
   max-width: fit-content;
   transition: all 0.3s ease;
-  font-size: 13px;
+  
 }
 
 .empassper-timer-bar:hover {
@@ -258,7 +252,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
   color: #fff;
   flex-shrink: 0;
 }
@@ -280,7 +273,6 @@
 }
 
 .empassper-stat-value {
-  font-size: 22px;
   font-weight: 700;
   color: var(--text);
   margin: 0 0 4px 0;
@@ -288,7 +280,6 @@
 }
 
 .empassper-stat-label {
-  font-size: 13px;
   color: var(--text-light);
   font-weight: 600;
   margin: 0;
@@ -318,7 +309,7 @@
   flex: 1;
   padding: 10px 14px;
   border: none;
-  font-size: 14px;
+ 
   outline: none;
   min-height: 38px;
 }
@@ -328,8 +319,7 @@
   background-color: #27235c;
   color: white;
   border: none;
-  font-size: 14px;
-  font-weight: 600;
+
   cursor: pointer;
   transition: opacity 0.2s;
   white-space: nowrap;
@@ -374,7 +364,7 @@
   padding: 10px 12px;
   border: 2px solid var(--border);
   border-radius: 6px;
-  font-size: 13px;
+ 
   color: var(--text);
   transition: all 0.3s ease;
   background: var(--card);
@@ -398,14 +388,14 @@
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-light);
-  font-size: 16px;
+ 
 }
 
 .empassper-filter-select {
   padding: 8px 12px;
   border: 2px solid var(--border);
   border-radius: 8px;
-  font-size: 13px;
+
   color: var(--text);
   background: var(--card);
   cursor: pointer;
@@ -442,7 +432,7 @@
   padding: 8px 26px;
   border-radius: 999px;
   font-weight: 700;
-  font-size: 13px;
+ 
   color: #ffffff;
   cursor: pointer;
   display: inline-flex;
@@ -466,7 +456,6 @@
 
 .empassper-pill-count {
   font-weight: 700;
-  font-size: 12px;
   opacity: 0.95;
 }
 
@@ -488,7 +477,6 @@
   color: var(--primary);
   border-radius: 10px;
   cursor: pointer;
-  font-size: 13px;
   font-weight: 700;
   transition: all 0.3s ease;
 }
@@ -508,7 +496,6 @@
   background: rgba(255, 255, 255, 0.2);
   padding: 3px 8px;
   border-radius: 12px;
-  font-size: 12px;
   font-weight: 700;
 }
 
@@ -555,9 +542,7 @@
   padding: 8px 10px !important;
   text-align: left;
   color: #ffffff;
-  font-weight: 600;
-  font-size: 12px !important;
-  text-transform: uppercase;
+  font-weight: 600;  text-transform: uppercase;
   letter-spacing: 0.5px;
   background: rgb(8, 8, 95);
   padding-left: 15px !important;
@@ -605,7 +590,7 @@
 
 .empassper-table td {
   padding: 8px 10px !important;
-  font-size: 13px !important;
+
   color: var(--text);
   text-align: left;
   vertical-align: middle;
@@ -633,7 +618,7 @@
 
 .empassper-table td {
   padding: 8px 10px !important;
-  font-size: 13px !important;
+ 
   color: var(--text);
   text-align: left;
   vertical-align: middle;
@@ -648,7 +633,7 @@
 
 .empassper-form-name i {
   color: var(--secondary);
-  font-size: 16px;
+  
 }
 
 .empassper-date-cell {
@@ -680,7 +665,7 @@
   background: rgba(245, 158, 11, 0.12);
   color: #f59e0b;
   border-radius: 8px;
-  font-size: 12px;
+ 
   font-weight: 600;
 }
 
@@ -800,12 +785,12 @@
 }
 .empass-modal-close {
   position: absolute;
-  top: 20px;        
-  right: 28px;      
+  /* top: 20px;         */
+  right: 20px;      
   background: transparent !important;
   border: none !important;
-  color: #6c757d;   
-  font-size: 24px;  
+  color:  #27235c;   
+  font-size: 16px;  
   font-weight: 300;
   line-height: 1;
   cursor: pointer;
@@ -899,7 +884,7 @@
 }
 
 .empass-form-subtitle {
-  font-size: 11px;
+
   color: var(--text-light);
   margin: 0;
   line-height: 1.2;
@@ -913,14 +898,14 @@
   padding: 6px 12px;
   border-radius: 8px;
   position: absolute;
-  right: 24px;
+  right: 80px;
   top: 50%;
   transform: translateY(-50%);
 }
 
 .empass-attachment-badge-text {
   color: white;
-  font-size: 13px;
+  /* font-size: 13px; */
   font-weight: 700;
   letter-spacing: 0.02em;
 }
@@ -991,7 +976,7 @@
   width: 100% !important;
   padding: 0.5rem 1.8rem 0.5rem 0.6rem !important;
   height: 38px !important;
-  font-size: 0.85rem !important;
+  
   text-align: left !important;
   display: flex;
   align-items: center;
@@ -1078,7 +1063,6 @@
 
 .empass-custom-rating-option {
   padding: 0.6rem 0.5rem !important;
-  font-size: 0.8rem !important;
   text-align: left !important;
   cursor: pointer;
   user-select: none;
@@ -1118,7 +1102,7 @@
   padding: 6px 10px;
   background: #f3f4f6;
   border-radius: 6px;
-  font-size: 14px;
+ 
   color: #374151;
   font-weight: 500;
   display: inline-block;
@@ -1140,10 +1124,9 @@
   margin-top: 0px;
   border-collapse: separate;
   border-left: none;
-  border-radius: 8px;
   border-right: none;
   border-bottom: none;
-  border: 1px solid black;
+  border: 1px solid  #27235c;
   border-spacing: 0;
 }
 
@@ -1159,21 +1142,11 @@
   background: var(--primary);
   color: #ffffff;
   font-weight: 700;
-  font-size: 11px;
   text-transform: uppercase;
   border-bottom: 1px solid var(--border);
   border-right: 1px solid var(--border);
   height: 44px;
 }
-
-.empass-form-table th:first-child {
-  border-top-left-radius: 8px;
-}
-
-.empass-form-table th:last-child {
-  border-top-right-radius: 8px;
-}
-
 .empass-form-table tr {
   background: #ffffff;
 }
@@ -1350,6 +1323,7 @@
 
 .empass-attachment-name-section {
   margin-bottom: 12px;
+  
 }
 
 .empass-input-label {
@@ -1358,6 +1332,7 @@
   font-weight: 600;
   color: #374151;
   margin-bottom: 6px;
+  text-align: left;
 }
 
 .empass-input {

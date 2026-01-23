@@ -60,14 +60,17 @@
   align-items: center !important;
   justify-content: center !important;
   border-radius: 4px !important;
-  transition: background 0.2s ease !important;
   line-height: 1 !important;
   font-weight: 400 !important;
+  transition: background 0.2s ease, transform 0.3s ease !important; 
+  transform: rotate(0deg); 
 }
 
-.header-close.hover {
-  background: rgba(255, 255, 255, 0.1) !important;
+.header-close:hover {
+  background: #5a6268 !important;
+  transform: rotate(90deg) !important; 
 }
+
 
 .view-form-body {
   padding: 20px !important;
@@ -330,6 +333,7 @@
 
 .close-button.hover {
   background: #5a6268 !important;
+  
 }
 
 .edit-button {
