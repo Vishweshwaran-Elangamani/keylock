@@ -1178,3 +1178,19 @@
     font-size: 13px;
   }
 }
+
+.table-card-epd {
+  overflow: hidden;       
+  border-radius: 12px;
+}
+
+
+.pagination-container-epd {
+  border-top: none;      
+}
+
+
+.pagination-container-epd {
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}

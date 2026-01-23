@@ -892,3 +892,20 @@
     min-width: 900px;
   }
 }
+
+
+.ci-table-card {
+  overflow: hidden;      
+  border-radius: 12px;
+}
+
+
+.ci-pagination {
+  border-top: none;      
+}
+
+
+.ci-pagination {
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}

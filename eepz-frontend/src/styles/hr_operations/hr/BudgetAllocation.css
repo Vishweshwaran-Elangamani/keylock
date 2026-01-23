@@ -1059,3 +1059,19 @@
     padding: 0.625rem 0.75rem;
   }
 }
+
+
+.ba-table-card {
+  overflow: hidden;      
+  border-radius: 12px;
+}
+
+.ba-pagination-container {
+  border-top: none;      
+}
+
+
+.ba-pagination-container {
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}

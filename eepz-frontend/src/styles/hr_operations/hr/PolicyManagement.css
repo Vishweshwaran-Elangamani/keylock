@@ -875,3 +875,19 @@
     min-width: 900px;
   }
 }
+
+
+.pma-table-card {
+  overflow: hidden;     
+  border-radius: 12px;
+}
+
+.pma-pagination {
+  border-top: none;    
+}
+
+
+.pma-pagination {
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}

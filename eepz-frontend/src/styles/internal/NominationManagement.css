@@ -427,6 +427,14 @@
   text-align: center;
 }
 
+/* CLIP TABLE ONLY (NOT PAGINATION) */
+.nm-table-section {
+  overflow: hidden;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+
 .nm-nomination-id {
   display: inline-flex;
   align-items: center;
@@ -837,4 +845,21 @@
     font-size: 0.8rem;
     padding: 0.625rem 0.75rem;
   }
+}
+
+
+.nm-table-card {
+  overflow: visible;   /* overrides overflow: visible */
+  border-radius: 12px;
+}
+
+
+.nm-pagination-container {
+  border-top: none;   /* overrides previous border-top */
+}
+
+
+.nm-pagination-container {
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
 }

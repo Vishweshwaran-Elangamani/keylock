@@ -483,6 +483,14 @@
   text-align: center;
 }
 
+/* CLIP TABLE ONLY (NOT PAGINATION) */
+.ioma-table-section {
+  overflow: hidden;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+
 
 .ioma-department-badge {
   display: inline-flex;
@@ -700,13 +708,16 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.25rem;
-  background: #ffffff;  /* CHANGED: from #f8f9fa to #ffffff */
+  background: #ffffff;
   border-top: 1px solid #e5e7eb;
-  flex-wrap: wrap;
-  gap: 1rem;
-  position: relative;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
   overflow: visible;
+  position: relative;
+  z-index: 10;
+
 }
+
 
 
 .ioma-pagination-info {
