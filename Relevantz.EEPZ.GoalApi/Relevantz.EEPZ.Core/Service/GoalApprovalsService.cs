@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Enums;
+using Relevantz.EEPZ.Common.Exceptions;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repository.Interface;
-using Serilog;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -36,641 +36,582 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _environment = environment;
         }
 
-        public async Task<ApiResponseModel<int>> RequestApprovalAsync(
+        public async Task<ApiResponseModel<int>> CreateApprovalRequestAsync(
             int goalId,
             CreateApprovalRequestModel dto,
             int requesterEmployeeMasterId,
             string requesterRole
         )
         {
-            try
+            var goal = await _baseRepo.GetGoalByIdAsync(goalId);
+            if (goal == null)
             {
-                var goal = await _baseRepo.GetGoalByIdAsync(goalId);
-                if (goal == null)
+                throw new GoalNotFoundException(goalId);
+            }
+
+            if (dto.ApprovalType == APPROVAL_TYPE.COMPLETION)
+            {
+                if (
+                    requesterRole == USER_ROLE.LEADERSHIP
+                    && (goal.GoalType?.ToLower() == GOAL_TYPE.ORG)
+                )
                 {
-                    return ApiResponseModel<int>.ErrorResponse(ResponseMessages.Codes.GOAL_NOT_FOUND);
-                }
-
-                if (dto.ApprovalType == APPROVAL_TYPE.COMPLETION)
-                {
-                    if (
-                        requesterRole == USER_ROLE.LEADERSHIP
-                        && (goal.GoalType?.ToLower() == GOAL_TYPE.ORG)
-                    )
-                    {
-                        var autoApproval = new GoalApproval
-                        {
-                            GoalId = goalId,
-                            ApprovalType = APPROVAL_TYPE.COMPLETION,
-                            RequestedBy = requesterEmployeeMasterId,
-                            RequestedOn = DateTime.UtcNow,
-                            ApprovedBy = requesterEmployeeMasterId,
-                            ApprovalStatus = APPROVAL_STATUS.APPROVED,
-                            ApprovedOn = DateTime.UtcNow,
-                        };
-
-                        await _repo.AddApprovalAsync(autoApproval);
-                        goal.Goalstatus = GOAL_STATUS.COMPLETED;
-                        await _baseRepo.SaveChangesAsync();
-
-                        return ApiResponseModel<int>.SuccessResponse(
-                            ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
-                            autoApproval.ApprovalId
-                        );
-                    }
-
-                    if (
-                        requesterRole == USER_ROLE.LEADERSHIP
-                        && (goal.GoalType?.ToLower() == GOAL_TYPE.SELF)
-                    )
-                    {
-                        var autoApproval = new GoalApproval
-                        {
-                            GoalId = goalId,
-                            ApprovalType = APPROVAL_TYPE.COMPLETION,
-                            RequestedBy = requesterEmployeeMasterId,
-                            RequestedOn = DateTime.UtcNow,
-                            ApprovedBy = requesterEmployeeMasterId,
-                            ApprovalStatus = APPROVAL_STATUS.APPROVED,
-                            ApprovedOn = DateTime.UtcNow,
-                        };
-
-                        await _repo.AddApprovalAsync(autoApproval);
-                        goal.Goalstatus = GOAL_STATUS.COMPLETED;
-                        await _baseRepo.SaveChangesAsync();
-
-                        return ApiResponseModel<int>.SuccessResponse(
-                            ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
-                            autoApproval.ApprovalId
-                        );
-                    }
-
-                    var managerId = await _baseRepo.GetReportingManagerEmployeeMasterIdAsync(
-                        requesterEmployeeMasterId
-                    );
-                    if (!managerId.HasValue)
-                    {
-                        return ApiResponseModel<int>.ErrorResponse(
-                            ResponseMessages.Codes.APPROVAL_NO_MANAGER,
-                            "Cannot submit approval: No reporting manager found"
-                        );
-                    }
-
-                    var approval = new GoalApproval
+                    var autoApproval = new GoalApproval
                     {
                         GoalId = goalId,
                         ApprovalType = APPROVAL_TYPE.COMPLETION,
-
                         RequestedBy = requesterEmployeeMasterId,
                         RequestedOn = DateTime.UtcNow,
-                        ApprovedBy = managerId.Value,
-                        ApprovalStatus = APPROVAL_STATUS.PENDING,
+                        ApprovedBy = requesterEmployeeMasterId,
+                        ApprovalStatus = APPROVAL_STATUS.APPROVED,
+                        ApprovedOn = DateTime.UtcNow,
                     };
 
-                    await _repo.AddApprovalAsync(approval);
+                    await _repo.AddApprovalAsync(autoApproval);
+                    goal.Goalstatus = GOAL_STATUS.COMPLETED;
                     await _baseRepo.SaveChangesAsync();
 
                     return ApiResponseModel<int>.SuccessResponse(
                         ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
-                        approval.ApprovalId
+                        autoApproval.ApprovalId
                     );
                 }
 
-                if (dto.ApprovalType == APPROVAL_TYPE.CLOSURE)
+                if (
+                    requesterRole == USER_ROLE.LEADERSHIP
+                    && (goal.GoalType?.ToLower() == GOAL_TYPE.SELF)
+                )
                 {
-                    if (goal.CreatedBy != requesterEmployeeMasterId)
-                    {
-                        return ApiResponseModel<int>.ErrorResponse(
-                            ResponseMessages.Codes.GOAL_ACCESS_DENIED,
-                            "Only goal creator can request closure"
-                        );
-                    }
-
-                    if (
-                        new[]
-                        {
-                            GOAL_STATUS.CLOSED,
-                            GOAL_STATUS.COMPLETED,
-                            GOAL_STATUS.CANCELLED,
-                        }.Contains(goal.Goalstatus?.ToLower() ?? "")
-                    )
-                    {
-                        return ApiResponseModel<int>.ErrorResponse(
-                            ResponseMessages.Codes.GOAL_INVALID_STATUS,
-                            "Goal is already completed or closed"
-                        );
-                    }
-
-                    if (
-                        requesterRole == USER_ROLE.LEADERSHIP
-                        && (goal.GoalType?.ToLower() == GOAL_TYPE.ORG)
-                    )
-                    {
-                        var autoApproval = new GoalApproval
-                        {
-                            GoalId = goalId,
-                            ApprovalType = APPROVAL_TYPE.COMPLETION,
-                            RequestedBy = requesterEmployeeMasterId,
-                            RequestedOn = DateTime.UtcNow,
-                            ApprovedBy = requesterEmployeeMasterId,
-                            ApprovalStatus = APPROVAL_STATUS.APPROVED,
-                            ApprovedOn = DateTime.UtcNow,
-                        };
-
-                        await _repo.AddApprovalAsync(autoApproval);
-                        goal.Goalstatus = GOAL_STATUS.CLOSED;
-
-                        await _baseRepo.SaveChangesAsync();
-
-                        return ApiResponseModel<int>.SuccessResponse(
-                            ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
-                            autoApproval.ApprovalId
-                        );
-                    }
-
-                    var managerId = await _baseRepo.GetReportingManagerEmployeeMasterIdAsync(
-                        requesterEmployeeMasterId
-                    );
-                    if (!managerId.HasValue)
-                    {
-                        return ApiResponseModel<int>.ErrorResponse(
-                            ResponseMessages.Codes.APPROVAL_NO_MANAGER,
-                            "No manager found to approve closure"
-                        );
-                    }
-
-                    var approval = new GoalApproval
+                    var autoApproval = new GoalApproval
                     {
                         GoalId = goalId,
-                        ApprovalType = APPROVAL_TYPE.CLOSURE,
+                        ApprovalType = APPROVAL_TYPE.COMPLETION,
                         RequestedBy = requesterEmployeeMasterId,
                         RequestedOn = DateTime.UtcNow,
-                        ApprovedBy = managerId.Value,
-                        ApprovalStatus = APPROVAL_STATUS.PENDING,
+                        ApprovedBy = requesterEmployeeMasterId,
+                        ApprovalStatus = APPROVAL_STATUS.APPROVED,
+                        ApprovedOn = DateTime.UtcNow,
                     };
 
-                    await _repo.AddApprovalAsync(approval);
+                    await _repo.AddApprovalAsync(autoApproval);
+                    goal.Goalstatus = GOAL_STATUS.COMPLETED;
                     await _baseRepo.SaveChangesAsync();
 
                     return ApiResponseModel<int>.SuccessResponse(
                         ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
-                        approval.ApprovalId
+                        autoApproval.ApprovalId
                     );
                 }
 
-                if (dto.ApprovalType == APPROVAL_TYPE.REOPENING)
+                var managerId = await _baseRepo.GetReportingManagerEmployeeMasterIdAsync(
+                    requesterEmployeeMasterId
+                );
+                if (!managerId.HasValue)
                 {
-                    if (!goal.Goalendat.HasValue || goal.Goalendat.Value >= DateTime.UtcNow)
-                    {
-                        return ApiResponseModel<int>.ErrorResponse(
-                            ResponseMessages.Codes.GOAL_INVALID_STATUS,
-                            "Goal is not overdue"
-                        );
-                    }
-
-                    if (
-                        goal.CreatedBy != requesterEmployeeMasterId
-                        && !await _baseRepo.IsUserAssignedToGoalAsync(
-                            goalId,
-                            requesterEmployeeMasterId
-                        )
-                    )
-                    {
-                        return ApiResponseModel<int>.ErrorResponse(
-                            ResponseMessages.Codes.GOAL_ACCESS_DENIED,
-                            "Only goal creator or assignees can request reopening"
-                        );
-                    }
-
-                    var managerId = await _baseRepo.GetReportingManagerEmployeeMasterIdAsync(
-                        requesterEmployeeMasterId
-                    );
-                    if (!managerId.HasValue)
-                    {
-                        return ApiResponseModel<int>.ErrorResponse(
-                            ResponseMessages.Codes.APPROVAL_NO_MANAGER,
-                            "No manager found to approve reopening"
-                        );
-                    }
-
-                    var approval = new GoalApproval
-                    {
-                        GoalId = goalId,
-                        ApprovalType = APPROVAL_TYPE.REOPENING,
-                        RequestedBy = requesterEmployeeMasterId,
-                        RequestedOn = DateTime.UtcNow,
-                        ApprovedBy = managerId.Value,
-                        ApprovalStatus = APPROVAL_STATUS.PENDING,
-                    };
-
-                    await _repo.AddApprovalAsync(approval);
-                    await _baseRepo.SaveChangesAsync();
-
-                    return ApiResponseModel<int>.SuccessResponse(
-                        ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
-                        approval.ApprovalId
-                    );
-                }
-
-                if (dto.ApprovalType == APPROVAL_TYPE.REACTIVATION)
-                {
-                    if (goal.CreatedBy != requesterEmployeeMasterId)
-                    {
-                        return ApiResponseModel<int>.ErrorResponse(
-                            ResponseMessages.Codes.GOAL_ACCESS_DENIED,
-                            "Only goal creator can request reactivation"
-                        );
-                    }
-
-                    if (
-                        !new[] { GOAL_STATUS.CLOSED, GOAL_STATUS.COMPLETED }.Contains(
-                            goal.Goalstatus?.ToLower() ?? ""
-                        )
-                    )
-                    {
-                        return ApiResponseModel<int>.ErrorResponse(
-                            ResponseMessages.Codes.GOAL_INVALID_STATUS,
-                            "Only closed or completed goals can be reactivated"
-                        );
-                    }
-
-                    if (
-                        requesterRole == USER_ROLE.LEADERSHIP
-                        && (goal.GoalType?.ToLower() == GOAL_TYPE.ORG)
-                    )
-                    {
-                        var autoApproval = new GoalApproval
-                        {
-                            GoalId = goalId,
-                            ApprovalType = APPROVAL_TYPE.REACTIVATION,
-
-                            RequestedBy = requesterEmployeeMasterId,
-                            RequestedOn = DateTime.UtcNow,
-                            ApprovedBy = requesterEmployeeMasterId,
-                            ApprovalStatus = APPROVAL_STATUS.APPROVED,
-                            ApprovedOn = DateTime.UtcNow,
-                        };
-
-                        await _repo.AddApprovalAsync(autoApproval);
-                        goal.Goalstatus = GOAL_STATUS.REOPENED;
-                        await _baseRepo.SaveChangesAsync();
-
-                        return ApiResponseModel<int>.SuccessResponse(
-                            ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
-                            autoApproval.ApprovalId
-                        );
-                    }
-
-                    var managerId = await _baseRepo.GetReportingManagerEmployeeMasterIdAsync(
-                        requesterEmployeeMasterId
-                    );
-                    if (!managerId.HasValue)
-                    {
-                        return ApiResponseModel<int>.ErrorResponse(
-                            ResponseMessages.Codes.APPROVAL_NO_MANAGER,
-                            "No manager found to approve reactivation"
-                        );
-                    }
-
-                    var approval = new GoalApproval
-                    {
-                        GoalId = goalId,
-                        ApprovalType = APPROVAL_TYPE.REACTIVATION,
-                        RequestedBy = requesterEmployeeMasterId,
-                        RequestedOn = DateTime.UtcNow,
-                        ApprovedBy = managerId.Value,
-                        ApprovalStatus = APPROVAL_STATUS.PENDING,
-                    };
-
-                    await _repo.AddApprovalAsync(approval);
-                    await _baseRepo.SaveChangesAsync();
-
-                    return ApiResponseModel<int>.SuccessResponse(
-                        ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
-                        approval.ApprovalId
-                    );
-                }
-
-                var approverId = dto.ApprovalType switch
-                {
-                    "creation" or "selfgoalactivation" or "delegation" or "task_acknowledgment" =>
-                        await _baseRepo.GetReportingManagerEmployeeMasterIdAsync(
-                            requesterEmployeeMasterId
-                        ),
-                    _ => throw new InvalidOperationException(
-                        $"Unknown approval type: {dto.ApprovalType}"
-                    ),
-                };
-
-                if (!approverId.HasValue)
-                {
-                    return ApiResponseModel<int>.ErrorResponse(
+                    throw new BusinessRuleException(
                         ResponseMessages.Codes.APPROVAL_NO_MANAGER,
                         "Cannot submit approval: No reporting manager found"
                     );
                 }
 
-                var standardApproval = new GoalApproval
+                var approval = new GoalApproval
                 {
                     GoalId = goalId,
-                    ApprovalType = dto.ApprovalType,
+                    ApprovalType = APPROVAL_TYPE.COMPLETION,
                     RequestedBy = requesterEmployeeMasterId,
                     RequestedOn = DateTime.UtcNow,
-                    ApprovedBy = approverId.Value,
+                    ApprovedBy = managerId.Value,
                     ApprovalStatus = APPROVAL_STATUS.PENDING,
                 };
 
-                await _repo.AddApprovalAsync(standardApproval);
+                await _repo.AddApprovalAsync(approval);
                 await _baseRepo.SaveChangesAsync();
 
                 return ApiResponseModel<int>.SuccessResponse(
                     ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
-                    standardApproval.ApprovalId
+                    approval.ApprovalId
                 );
             }
-            catch (Exception ex)
+
+            if (dto.ApprovalType == APPROVAL_TYPE.CLOSURE)
             {
-                return ApiResponseModel<int>.ErrorResponse(
-                    ResponseMessages.Codes.INTERNAL_SERVER_ERROR
+                if (goal.CreatedBy != requesterEmployeeMasterId)
+                {
+                    throw new GoalAccessDeniedException();
+                }
+
+                if (
+                    new[]
+                    {
+                        GOAL_STATUS.CLOSED,
+                        GOAL_STATUS.COMPLETED,
+                        GOAL_STATUS.CANCELLED,
+                    }.Contains(goal.Goalstatus?.ToLower() ?? "")
+                )
+                {
+                    throw new BusinessRuleException(
+                        ResponseMessages.Codes.GOAL_INVALID_STATUS,
+                        "Goal is already completed or closed"
+                    );
+                }
+
+                if (
+                    requesterRole == USER_ROLE.LEADERSHIP
+                    && (goal.GoalType?.ToLower() == GOAL_TYPE.ORG)
+                )
+                {
+                    var autoApproval = new GoalApproval
+                    {
+                        GoalId = goalId,
+                        ApprovalType = APPROVAL_TYPE.COMPLETION,
+                        RequestedBy = requesterEmployeeMasterId,
+                        RequestedOn = DateTime.UtcNow,
+                        ApprovedBy = requesterEmployeeMasterId,
+                        ApprovalStatus = APPROVAL_STATUS.APPROVED,
+                        ApprovedOn = DateTime.UtcNow,
+                    };
+
+                    await _repo.AddApprovalAsync(autoApproval);
+                    goal.Goalstatus = GOAL_STATUS.CLOSED;
+
+                    await _baseRepo.SaveChangesAsync();
+
+                    return ApiResponseModel<int>.SuccessResponse(
+                        ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
+                        autoApproval.ApprovalId
+                    );
+                }
+
+                var managerId = await _baseRepo.GetReportingManagerEmployeeMasterIdAsync(
+                    requesterEmployeeMasterId
+                );
+                if (!managerId.HasValue)
+                {
+                    throw new BusinessRuleException(
+                        ResponseMessages.Codes.APPROVAL_NO_MANAGER,
+                        "No manager found to approve closure"
+                    );
+                }
+
+                var approval = new GoalApproval
+                {
+                    GoalId = goalId,
+                    ApprovalType = APPROVAL_TYPE.CLOSURE,
+                    RequestedBy = requesterEmployeeMasterId,
+                    RequestedOn = DateTime.UtcNow,
+                    ApprovedBy = managerId.Value,
+                    ApprovalStatus = APPROVAL_STATUS.PENDING,
+                };
+
+                await _repo.AddApprovalAsync(approval);
+                await _baseRepo.SaveChangesAsync();
+
+                return ApiResponseModel<int>.SuccessResponse(
+                    ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
+                    approval.ApprovalId
                 );
             }
+
+            if (dto.ApprovalType == APPROVAL_TYPE.REOPENING)
+            {
+                if (!goal.Goalendat.HasValue || goal.Goalendat.Value >= DateTime.UtcNow)
+                {
+                    throw new BusinessRuleException(
+                        ResponseMessages.Codes.GOAL_INVALID_STATUS,
+                        "Goal is not overdue"
+                    );
+                }
+
+                if (
+                    goal.CreatedBy != requesterEmployeeMasterId
+                    && !await _baseRepo.IsUserAssignedToGoalAsync(goalId, requesterEmployeeMasterId)
+                )
+                {
+                    throw new GoalAccessDeniedException();
+                }
+
+                var managerId = await _baseRepo.GetReportingManagerEmployeeMasterIdAsync(
+                    requesterEmployeeMasterId
+                );
+                if (!managerId.HasValue)
+                {
+                    throw new BusinessRuleException(
+                        ResponseMessages.Codes.APPROVAL_NO_MANAGER,
+                        "No manager found to approve reopening"
+                    );
+                }
+
+                var approval = new GoalApproval
+                {
+                    GoalId = goalId,
+                    ApprovalType = APPROVAL_TYPE.REOPENING,
+                    RequestedBy = requesterEmployeeMasterId,
+                    RequestedOn = DateTime.UtcNow,
+                    ApprovedBy = managerId.Value,
+                    ApprovalStatus = APPROVAL_STATUS.PENDING,
+                };
+
+                await _repo.AddApprovalAsync(approval);
+                await _baseRepo.SaveChangesAsync();
+
+                return ApiResponseModel<int>.SuccessResponse(
+                    ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
+                    approval.ApprovalId
+                );
+            }
+
+            if (dto.ApprovalType == APPROVAL_TYPE.REACTIVATION)
+            {
+                if (goal.CreatedBy != requesterEmployeeMasterId)
+                {
+                    throw new GoalAccessDeniedException();
+                }
+
+                if (
+                    !new[] { GOAL_STATUS.CLOSED, GOAL_STATUS.COMPLETED }.Contains(
+                        goal.Goalstatus?.ToLower() ?? ""
+                    )
+                )
+                {
+                    throw new BusinessRuleException(
+                        ResponseMessages.Codes.GOAL_INVALID_STATUS,
+                        "Only closed or completed goals can be reactivated"
+                    );
+                }
+
+                if (
+                    requesterRole == USER_ROLE.LEADERSHIP
+                    && (goal.GoalType?.ToLower() == GOAL_TYPE.ORG)
+                )
+                {
+                    var autoApproval = new GoalApproval
+                    {
+                        GoalId = goalId,
+                        ApprovalType = APPROVAL_TYPE.REACTIVATION,
+                        RequestedBy = requesterEmployeeMasterId,
+                        RequestedOn = DateTime.UtcNow,
+                        ApprovedBy = requesterEmployeeMasterId,
+                        ApprovalStatus = APPROVAL_STATUS.APPROVED,
+                        ApprovedOn = DateTime.UtcNow,
+                    };
+
+                    await _repo.AddApprovalAsync(autoApproval);
+                    goal.Goalstatus = GOAL_STATUS.REOPENED;
+                    await _baseRepo.SaveChangesAsync();
+
+                    return ApiResponseModel<int>.SuccessResponse(
+                        ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
+                        autoApproval.ApprovalId
+                    );
+                }
+
+                var managerId = await _baseRepo.GetReportingManagerEmployeeMasterIdAsync(
+                    requesterEmployeeMasterId
+                );
+                if (!managerId.HasValue)
+                {
+                    throw new BusinessRuleException(
+                        ResponseMessages.Codes.APPROVAL_NO_MANAGER,
+                        "No manager found to approve reactivation"
+                    );
+                }
+
+                var approval = new GoalApproval
+                {
+                    GoalId = goalId,
+                    ApprovalType = APPROVAL_TYPE.REACTIVATION,
+                    RequestedBy = requesterEmployeeMasterId,
+                    RequestedOn = DateTime.UtcNow,
+                    ApprovedBy = managerId.Value,
+                    ApprovalStatus = APPROVAL_STATUS.PENDING,
+                };
+
+                await _repo.AddApprovalAsync(approval);
+                await _baseRepo.SaveChangesAsync();
+
+                return ApiResponseModel<int>.SuccessResponse(
+                    ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
+                    approval.ApprovalId
+                );
+            }
+
+            var approverId = dto.ApprovalType switch
+            {
+                "creation" or "selfgoalactivation" or "delegation" or "task_acknowledgment" =>
+                    await _baseRepo.GetReportingManagerEmployeeMasterIdAsync(
+                        requesterEmployeeMasterId
+                    ),
+                _ => throw new BadRequestException(
+                    ResponseMessages.Codes.INVALID_REQUEST,
+                    $"Unknown approval type: {dto.ApprovalType}"
+                ),
+            };
+
+            if (!approverId.HasValue)
+            {
+                throw new BusinessRuleException(
+                    ResponseMessages.Codes.APPROVAL_NO_MANAGER,
+                    "Cannot submit approval: No reporting manager found"
+                );
+            }
+
+            var standardApproval = new GoalApproval
+            {
+                GoalId = goalId,
+                ApprovalType = dto.ApprovalType,
+                RequestedBy = requesterEmployeeMasterId,
+                RequestedOn = DateTime.UtcNow,
+                ApprovedBy = approverId.Value,
+                ApprovalStatus = APPROVAL_STATUS.PENDING,
+            };
+
+            await _repo.AddApprovalAsync(standardApproval);
+            await _baseRepo.SaveChangesAsync();
+
+            return ApiResponseModel<int>.SuccessResponse(
+                ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
+                standardApproval.ApprovalId
+            );
         }
 
-        public async Task<ApiResponseModel> DecideApprovalAsync(
+        public async Task<ApiResponseModel> ClosePendingApprovalAsync(
             int approvalId,
-            DecideApprovalModel dto,
+            ApprovalDesicionModel dto,
             int approverEmployeeMasterId,
             string approverRole
         )
         {
-            try
+            var approval = await _repo.GetApprovalByIdAsync(approvalId);
+            if (approval == null)
             {
-                var approval = await _repo.GetApprovalByIdAsync(approvalId);
-                if (approval == null)
+                throw new ApprovalNotFoundException(approvalId);
+            }
+
+            var goal = approval.Goal;
+
+            if (!approval.ApprovedBy.HasValue)
+            {
+                throw new BadRequestException(
+                    ResponseMessages.Codes.APPROVAL_NOT_FOUND,
+                    "This approval request is malformed (no approver assigned)."
+                );
+            }
+
+            if (approval.ApprovedBy.Value != approverEmployeeMasterId)
+            {
+                throw new ApprovalAccessDeniedException();
+            }
+
+            if (approval.ApprovalStatus != APPROVAL_STATUS.PENDING)
+            {
+                throw new ConflictException(
+                    ResponseMessages.Codes.APPROVAL_ALREADY_DECIDED,
+                    $"This approval has already been {approval.ApprovalStatus}. Decision was made on {approval.ApprovedOn:yyyy-MM-dd HH:mm}."
+                );
+            }
+
+            if (
+                dto.Decision != APPROVAL_STATUS.APPROVED
+                && dto.Decision != APPROVAL_STATUS.REJECTED
+            )
+            {
+                throw new BadRequestException(
+                    ResponseMessages.Codes.APPROVAL_INVALID_DECISION,
+                    $"Invalid decision: '{dto.Decision}'. Must be 'approved' or 'rejected'."
+                );
+            }
+
+            approval.ApprovalStatus = dto.Decision;
+            approval.ApprovedOn = DateTime.UtcNow;
+            await _repo.UpdateApprovalAsync(approval);
+
+            if (
+                approval.ApprovalType == APPROVAL_TYPE.COMPLETION
+                || approval.ApprovalType == APPROVAL_TYPE.TASK_ACKNOWLEDGMENT
+            )
+            {
+                if (dto.Decision == APPROVAL_STATUS.REJECTED)
                 {
-                    return ApiResponseModel.ErrorResponse(ResponseMessages.Codes.APPROVAL_NOT_FOUND);
+                    await _attachmentRepo.UnmarkProofAttachmentsAsync(approvalId);
                 }
+            }
 
-                var goal = approval.Goal;
-
-                if (!approval.ApprovedBy.HasValue)
+            if (dto.Decision == APPROVAL_STATUS.APPROVED)
+            {
+                switch (approval.ApprovalType)
                 {
-                    return ApiResponseModel.ErrorResponse(
-                        ResponseMessages.Codes.APPROVAL_NOT_FOUND,
-                        "This approval request is malformed (no approver assigned)."
-                    );
-                }
+                    case APPROVAL_TYPE.CREATION:
+                    case APPROVAL_TYPE.SELF_GOAL_ACTIVATION:
+                        goal.Goalstatus = GOAL_STATUS.OPEN;
+                        await _goalRepo.UpdateGoalAsync(goal);
+                        break;
 
-                if (approval.ApprovedBy.Value != approverEmployeeMasterId)
-                {
-                    return ApiResponseModel.ErrorResponse(
-                        ResponseMessages.Codes.APPROVAL_ACCESS_DENIED,
-                        $"You are not authorized to approve this request. This approval is assigned to employee ID {approval.ApprovedBy.Value}."
-                    );
-                }
+                    case APPROVAL_TYPE.DELEGATION:
+                        goal.Goalstatus = GOAL_STATUS.OPEN;
+                        await _goalRepo.UpdateGoalAsync(goal);
+                        break;
 
-                if (approval.ApprovalStatus != APPROVAL_STATUS.PENDING)
-                {
-                    return ApiResponseModel.ErrorResponse(
-                        ResponseMessages.Codes.APPROVAL_ALREADY_DECIDED,
-                        $"This approval has already been {approval.ApprovalStatus}. Decision was made on {approval.ApprovedOn:yyyy-MM-dd HH:mm}."
-                    );
-                }
+                    case APPROVAL_TYPE.COMPLETION:
+                        var requesterRole = approval.RequestedBy.HasValue
+                            ? await _baseRepo.GetUserRoleAsync(approval.RequestedBy.Value)
+                            : null;
 
-                if (
-                    dto.Decision != APPROVAL_STATUS.APPROVED
-                    && dto.Decision != APPROVAL_STATUS.REJECTED
-                )
-                {
-                    return ApiResponseModel.ErrorResponse(
-                        ResponseMessages.Codes.APPROVAL_INVALID_DECISION,
-                        $"Invalid decision: '{dto.Decision}'. Must be 'approved' or 'rejected'."
-                    );
-                }
+                        bool shouldCompleteGoal = false;
 
-                approval.ApprovalStatus = dto.Decision;
-                approval.ApprovedOn = DateTime.UtcNow;
-                await _repo.UpdateApprovalAsync(approval);
-
-                if (
-                    approval.ApprovalType == APPROVAL_TYPE.COMPLETION
-                    || approval.ApprovalType == APPROVAL_TYPE.TASK_ACKNOWLEDGMENT
-                )
-                {
-                    if (dto.Decision == APPROVAL_STATUS.REJECTED)
-                    {
-                        await _attachmentRepo.UnmarkProofAttachmentsAsync(approvalId);
-                    }
-                }
-
-                if (dto.Decision == APPROVAL_STATUS.APPROVED)
-                {
-                    switch (approval.ApprovalType)
-                    {
-                        case APPROVAL_TYPE.CREATION:
-                        case APPROVAL_TYPE.SELF_GOAL_ACTIVATION:
-
-                            goal.Goalstatus = GOAL_STATUS.OPEN;
-
-                            await _goalRepo.UpdateGoalAsync(goal);
-                            break;
-
-                        case APPROVAL_TYPE.DELEGATION:
-
-                            goal.Goalstatus = GOAL_STATUS.OPEN;
-                            await _goalRepo.UpdateGoalAsync(goal);
-                            break;
-
-                        case APPROVAL_TYPE.COMPLETION:
-                            var requesterRole = approval.RequestedBy.HasValue
-                                ? await _baseRepo.GetUserRoleAsync(approval.RequestedBy.Value)
-                                : null;
-
-                            bool shouldCompleteGoal = false;
-
-                            if (goal.GoalType == GOAL_TYPE.SELF)
-                            {
-                                shouldCompleteGoal = true;
-                            }
-                            else if (goal.GoalType == GOAL_TYPE.TEAM)
-                            {
-                                shouldCompleteGoal =
-                                    requesterRole == USER_ROLE.MANAGER
-                                    || requesterRole == USER_ROLE.DEPARTMENT_HEAD
-                                    || requesterRole == USER_ROLE.LEADERSHIP;
-
-                                if (shouldCompleteGoal)
-                                {
-                                    bool isCreator = goal.CreatedBy == approval.RequestedBy;
-                                    bool isAssignedManager =
-                                        await _baseRepo.IsUserAssignedToGoalAsync(
-                                            goal.GoalId,
-                                            approval.RequestedBy.Value
-                                        );
-
-                                    if (!isCreator && !isAssignedManager)
-                                    {
-                                        shouldCompleteGoal = false;
-                                    }
-                                }
-                            }
-                            else if (goal.GoalType == GOAL_TYPE.ORG)
-                            {
-                                shouldCompleteGoal = requesterRole == USER_ROLE.LEADERSHIP;
-                            }
+                        if (goal.GoalType == GOAL_TYPE.SELF)
+                        {
+                            shouldCompleteGoal = true;
+                        }
+                        else if (goal.GoalType == GOAL_TYPE.TEAM)
+                        {
+                            shouldCompleteGoal =
+                                requesterRole == USER_ROLE.MANAGER
+                                || requesterRole == USER_ROLE.DEPARTMENT_HEAD
+                                || requesterRole == USER_ROLE.LEADERSHIP;
 
                             if (shouldCompleteGoal)
                             {
-                                goal.Goalstatus = GOAL_STATUS.COMPLETED;
-
-                                await _goalRepo.UpdateGoalAsync(goal);
-                            }
-                            break;
-
-                        case APPROVAL_TYPE.TASK_ACKNOWLEDGMENT:
-
-                            if (approval.RequestedBy.HasValue)
-                            {
-                                var assignment = await _baseRepo.GetGoalAssignmentAsync(
+                                bool isCreator = goal.CreatedBy == approval.RequestedBy;
+                                bool isAssignedManager = await _baseRepo.IsUserAssignedToGoalAsync(
                                     goal.GoalId,
                                     approval.RequestedBy.Value
                                 );
 
-                                if (assignment != null)
+                                if (!isCreator && !isAssignedManager)
                                 {
-                                    assignment.IsAcknowledged = true;
-                                    assignment.AcknowledgedOn = DateTime.UtcNow;
-                                    assignment.AcknowledgedBy = approverEmployeeMasterId;
-                                    await _goalRepo.UpdateGoalAssignmentAsync(assignment);
-
-                                    Log.Information(
-                                        "[DecideApproval] Employee {EmployeeId} acknowledged for goal {GoalId} by {ApproverId}",
-                                        approval.RequestedBy.Value,
-                                        goal.GoalId,
-                                        approverEmployeeMasterId
-                                    );
+                                    shouldCompleteGoal = false;
                                 }
                             }
-                            break;
+                        }
+                        else if (goal.GoalType == GOAL_TYPE.ORG)
+                        {
+                            shouldCompleteGoal = requesterRole == USER_ROLE.LEADERSHIP;
+                        }
 
-                        case APPROVAL_TYPE.REOPENING:
-
-                            if (!dto.NewDeadline.HasValue)
-                            {
-                                return ApiResponseModel.ErrorResponse(
-                                    ResponseMessages.Codes.INVALID_REQUEST,
-                                    "New deadline is required to approve reopening request",
-                                    new[] { "Please enter a deadline date" }
-                                );
-                            }
-
-                            if (dto.NewDeadline.Value <= DateTime.UtcNow)
-                            {
-                                return ApiResponseModel.ErrorResponse(
-                                    ResponseMessages.Codes.INVALID_REQUEST,
-                                    "New deadline must be in the future",
-                                    new[]
-                                    {
-                                        $"Deadline must be after {DateTime.UtcNow:yyyy-MM-dd HH:mm}",
-                                    }
-                                );
-                            }
-
-                            goal.Goalendat = dto.NewDeadline.Value;
-                            goal.Goalstatus = GOAL_STATUS.REOPENED;
-
-                            goal.ReopenedBy = approval.RequestedBy;
-                            goal.ReopenedOn = DateTime.UtcNow;
+                        if (shouldCompleteGoal)
+                        {
+                            goal.Goalstatus = GOAL_STATUS.COMPLETED;
                             await _goalRepo.UpdateGoalAsync(goal);
-                            break;
+                        }
+                        break;
 
-                        case APPROVAL_TYPE.CLOSURE:
-
-                            goal.Goalstatus = GOAL_STATUS.CLOSED;
-
-                            goal.ClosedBy = approverEmployeeMasterId;
-                            goal.ClosedOn = DateTime.UtcNow;
-                            await _goalRepo.UpdateGoalAsync(goal);
-                            break;
-
-                        case APPROVAL_TYPE.REACTIVATION:
-                            goal.Goalstatus = GOAL_STATUS.OPEN;
-                            await _goalRepo.UpdateGoalAsync(goal);
-                            break;
-
-                        default:
-                            return ApiResponseModel.ErrorResponse(
-                                ResponseMessages.Codes.INTERNAL_SERVER_ERROR,
-                                $"Unknown approval type: {approval.ApprovalType}"
+                    case APPROVAL_TYPE.TASK_ACKNOWLEDGMENT:
+                        if (approval.RequestedBy.HasValue)
+                        {
+                            var assignment = await _baseRepo.GetGoalAssignmentAsync(
+                                goal.GoalId,
+                                approval.RequestedBy.Value
                             );
-                    }
-                }
-                else
-                {
-                    switch (approval.ApprovalType)
-                    {
-                        case APPROVAL_TYPE.CREATION:
-                        case APPROVAL_TYPE.SELF_GOAL_ACTIVATION:
 
-                            goal.Goalstatus = GOAL_STATUS.CLOSED;
-                            await _goalRepo.UpdateGoalAsync(goal);
-                            break;
-
-                        case APPROVAL_TYPE.DELEGATION:
-                            break;
-
-                        case APPROVAL_TYPE.COMPLETION:
-                        case APPROVAL_TYPE.TASK_ACKNOWLEDGMENT:
-
-                            if (
-                                !(
-                                    goal.Goalstatus == GOAL_STATUS.IN_PROGRESS
-                                    || goal.Goalstatus == GOAL_STATUS.OPEN
-                                )
-                            )
+                            if (assignment != null)
                             {
-                                goal.Goalstatus = GOAL_STATUS.IN_PROGRESS;
-                                await _goalRepo.UpdateGoalAsync(goal);
+                                assignment.IsAcknowledged = true;
+                                assignment.AcknowledgedOn = DateTime.UtcNow;
+                                assignment.AcknowledgedBy = approverEmployeeMasterId;
+                                await _goalRepo.UpdateGoalAssignmentAsync(assignment);
                             }
-                            break;
+                        }
+                        break;
 
-                        case APPROVAL_TYPE.REOPENING:
+                    case APPROVAL_TYPE.REOPENING:
+                        if (!dto.NewDeadline.HasValue)
+                        {
+                            throw new BadRequestException(
+                                ResponseMessages.Codes.INVALID_REQUEST,
+                                "New deadline is required to approve reopening request"
+                            );
+                        }
 
-                            goal.ReopenUntil = null;
-                            await _goalRepo.UpdateGoalAsync(goal);
-                            break;
+                        if (dto.NewDeadline.Value <= DateTime.UtcNow)
+                        {
+                            throw new BadRequestException(
+                                ResponseMessages.Codes.INVALID_REQUEST,
+                                $"New deadline must be in the future. Deadline must be after {DateTime.UtcNow:yyyy-MM-dd HH:mm}"
+                            );
+                        }
 
-                        case APPROVAL_TYPE.CLOSURE:
-                            break;
+                        goal.Goalendat = dto.NewDeadline.Value;
+                        goal.Goalstatus = GOAL_STATUS.REOPENED;
+                        goal.ReopenedBy = approval.RequestedBy;
+                        goal.ReopenedOn = DateTime.UtcNow;
+                        await _goalRepo.UpdateGoalAsync(goal);
+                        break;
 
-                        case APPROVAL_TYPE.REACTIVATION:
+                    case APPROVAL_TYPE.CLOSURE:
+                        goal.Goalstatus = GOAL_STATUS.CLOSED;
+                        goal.ClosedBy = approverEmployeeMasterId;
+                        goal.ClosedOn = DateTime.UtcNow;
+                        await _goalRepo.UpdateGoalAsync(goal);
+                        break;
 
-                            break;
-                    }
+                    case APPROVAL_TYPE.REACTIVATION:
+                        goal.Goalstatus = GOAL_STATUS.OPEN;
+                        await _goalRepo.UpdateGoalAsync(goal);
+                        break;
+
+                    default:
+                        throw new InternalServerException(
+                            ResponseMessages.Codes.INTERNAL_SERVER_ERROR,
+                            $"Unknown approval type: {approval.ApprovalType}"
+                        );
                 }
-
-                await _baseRepo.SaveChangesAsync();
-
-                var metadata = new
-                {
-                    ApprovalId = approvalId,
-                    GoalId = goal.GoalId,
-                    Decision = dto.Decision,
-                    ApprovalType = approval.ApprovalType,
-                    ApprovedBy = approverEmployeeMasterId,
-                    ApprovedOn = approval.ApprovedOn,
-                };
-
-                return ApiResponseModel.SuccessResponse(
-                    ResponseMessages.Codes.APPROVAL_DECIDED_SUCCESS,
-                    metadata
-                );
             }
-            catch (Exception ex)
+            else
             {
-                Log.Error(ex, "[DecideApproval] Error deciding approval {ApprovalId}", approvalId);
-                return ApiResponseModel.ErrorResponse(ResponseMessages.Codes.INTERNAL_SERVER_ERROR);
+                switch (approval.ApprovalType)
+                {
+                    case APPROVAL_TYPE.CREATION:
+                    case APPROVAL_TYPE.SELF_GOAL_ACTIVATION:
+                        goal.Goalstatus = GOAL_STATUS.CLOSED;
+                        await _goalRepo.UpdateGoalAsync(goal);
+                        break;
+
+                    case APPROVAL_TYPE.DELEGATION:
+                        break;
+
+                    case APPROVAL_TYPE.COMPLETION:
+                    case APPROVAL_TYPE.TASK_ACKNOWLEDGMENT:
+                        if (
+                            !(
+                                goal.Goalstatus == GOAL_STATUS.IN_PROGRESS
+                                || goal.Goalstatus == GOAL_STATUS.OPEN
+                            )
+                        )
+                        {
+                            goal.Goalstatus = GOAL_STATUS.IN_PROGRESS;
+                            await _goalRepo.UpdateGoalAsync(goal);
+                        }
+                        break;
+
+                    case APPROVAL_TYPE.REOPENING:
+                        goal.ReopenUntil = null;
+                        await _goalRepo.UpdateGoalAsync(goal);
+                        break;
+
+                    case APPROVAL_TYPE.CLOSURE:
+                        break;
+
+                    case APPROVAL_TYPE.REACTIVATION:
+                        break;
+                }
             }
+
+            await _baseRepo.SaveChangesAsync();
+
+            var metadata = new
+            {
+                ApprovalId = approvalId,
+                GoalId = goal.GoalId,
+                Decision = dto.Decision,
+                ApprovalType = approval.ApprovalType,
+                ApprovedBy = approverEmployeeMasterId,
+                ApprovedOn = approval.ApprovedOn,
+            };
+
+            return ApiResponseModel.SuccessResponse(
+                ResponseMessages.Codes.APPROVAL_DECIDED_SUCCESS,
+                metadata
+            );
         }
 
         public async Task<List<GoalApprovalModel>> GetPendingApprovalsAsync(
@@ -739,7 +680,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string userRole
         )
         {
-            // Build the base query using SQL-translatable expressions
             var baseQuery = _repo
                 .GetGoalApprovalsQueryable()
                 .Where(ga =>
@@ -749,7 +689,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     || ga.Goal.GoalAssignments.Any(assignment => assignment.AssignedTo == userId)
                 );
 
-            // Apply filters
             if (!string.IsNullOrEmpty(query.Status) && query.Status != "all")
             {
                 baseQuery = baseQuery.Where(ga => ga.ApprovalStatus == query.Status);
@@ -792,24 +731,20 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 baseQuery = baseQuery.Where(ga => ga.GoalId == query.GoalId.Value);
             }
 
-            // Apply search filter
             if (!string.IsNullOrEmpty(query.Search))
             {
                 var searchTerm = query.Search.ToLower();
                 baseQuery = baseQuery.Where(ga => ga.Goal.GoalTitle.ToLower().Contains(searchTerm));
             }
 
-            // Get total count before pagination
             var totalCount = await _repo.CountAsync(baseQuery);
 
-            // Apply pagination and ordering
             var approvals = await _repo.GetPagedAsync(
                 baseQuery.OrderByDescending(ga => ga.RequestedOn),
                 query.Page,
                 query.PageSize
             );
 
-            // Map to Models
             var approvalModels = new List<UserGoalApprovalModel>();
             foreach (var ga in approvals)
             {
@@ -817,10 +752,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 approvalModels.Add(dto);
             }
 
-            // Calculate summary counts
             var summary = await CalculateApprovalSummaryOptimized(userId, userRole);
 
-            // Calculate pagination info
             var totalPages = (int)Math.Ceiling((double)totalCount / query.PageSize);
 
             return new PagedApprovalsModel
@@ -951,7 +884,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var approverName = await _baseService.GetEmployeeNameAsync(approval.ApprovedBy);
             var goalCreatorName = await _baseService.GetEmployeeNameAsync(approval.Goal?.CreatedBy);
 
-            // Get goal assignees
             var goalAssignees = new List<AssigneeModel>();
             if (approval.Goal?.GoalAssignments != null)
             {
@@ -978,7 +910,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
             }
 
-            // Get attachments
             var allAttachments = new List<GoalAttachmentModel>();
             var proofAttachments = new List<GoalAttachmentModel>();
 
@@ -1024,25 +955,17 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 RequestedOn = approval.RequestedOn,
                 ApprovalStatus = approval.ApprovalStatus ?? APPROVAL_STATUS.PENDING,
                 ReopenUntil = approval.Goal?.ReopenUntil,
-
-                // Approver information
                 ApproverEmployeeMasterId = approval.ApprovedBy,
                 ApproverName = approverName,
                 ApproverRole = approval.ApprovedBy.HasValue
                     ? await _baseRepo.GetUserRoleAsync(approval.ApprovedBy.Value)
                     : null,
                 ApprovedOn = approval.ApprovedOn,
-
-                // Goal information
                 GoalCreatedByEmployeeMasterId = approval.Goal?.CreatedBy,
                 GoalCreatedByName = goalCreatorName,
                 GoalAssignees = goalAssignees,
-
-                // Attachments
                 AllAttachments = allAttachments,
                 ProofAttachments = proofAttachments,
-
-                // User context
                 UserRole = DetermineUserRoleInApproval(approval, userId, userRole),
                 CanMakeDecision = CanUserMakeDecision(approval, userId, userRole),
                 UserContext = GenerateUserContext(approval, userId, userRole),

@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Enums;
+using Relevantz.EEPZ.Common.Exceptions;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repository.Interface;
-using Serilog;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -22,7 +22,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         public bool CanCreate(string role, string goalType) =>
-            (goalType == GOAL_TYPE.SELF) // All roles can create self goals
+            (goalType == GOAL_TYPE.SELF)
             || (
                 goalType == GOAL_TYPE.TEAM
                 && (role == USER_ROLE.MANAGER || role == USER_ROLE.DEPARTMENT_HEAD)
@@ -36,7 +36,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         public async Task<int?> GetApproverForUserAsync(int employeeMasterId, string approvalType)
         {
-            // Get the user's reporting manager
             var managerId = await _repo.GetReportingManagerEmployeeMasterIdAsync(employeeMasterId);
             return managerId;
         }
@@ -105,26 +104,20 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (goal == null)
                 return false;
 
-            // Get user role
             var userRole = await _repo.GetUserRoleAsync(employeeMasterId);
 
-            // Leadership can view ANY goal
             if (userRole == USER_ROLE.LEADERSHIP)
                 return true;
 
-            // Org goals visible to everyone
             if (goal.GoalType == GOAL_TYPE.ORG)
                 return true;
 
-            // Creator can always view
             if (goal.CreatedBy == employeeMasterId)
                 return true;
 
-            // Assignees can view
             if (await _repo.IsUserAssignedToGoalAsync(goalId, employeeMasterId))
                 return true;
 
-            // Reporting managers can view their subordinates' self goals
             if (goal.GoalType == GOAL_TYPE.SELF && goal.CreatedBy.HasValue)
             {
                 var creatorManagerId = await _repo.GetReportingManagerEmployeeMasterIdAsync(
@@ -136,7 +129,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
             }
 
-            // Dept Head can view team goals in their department
             if (userRole == USER_ROLE.DEPARTMENT_HEAD && goal.GoalType == GOAL_TYPE.TEAM)
             {
                 var deptHead = await _repo.GetEmployeeDetailsByMasterIdAsync(employeeMasterId);
@@ -151,7 +143,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
             }
 
-            // Managers can view team goals of their subordinates
             if (goal.GoalType == GOAL_TYPE.TEAM && goal.CreatedBy.HasValue)
             {
                 var creatorManagerId = await _repo.GetReportingManagerEmployeeMasterIdAsync(
@@ -187,7 +178,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     if (isCreator)
                         return true;
 
-                    // Check if user is the creator's manager
                     var creatorManagerId = await _repo.GetReportingManagerEmployeeMasterIdAsync(
                         goal.CreatedBy ?? 0
                     );
@@ -197,10 +187,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     if (isCreator || isAssignee)
                         return true;
 
-                    // Check if user is a manager/dept head/leadership
                     if (USER_ROLE.MANAGERIAL_ROLES.Contains(currentUserRole))
                     {
-                        // Check if user is manager of any assignee
                         var assignees = await _repo.GetAssigneesAsync(goalId);
                         foreach (var assignee in assignees)
                         {
@@ -231,43 +219,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string role
         )
         {
-            try
-            {
-                Log.Information(
-                    "[CanUserCommentOnGoalAsync] Checking - Goal {GoalId}, User {ID} ({Role})",
-                    goalId,
-                    employeeMasterId,
-                    role
-                );
-
-                var canComment = await _repo.CanUserCommentOnGoalAsync(
-                    goalId,
-                    employeeMasterId,
-                    role
-                );
-                return canComment;
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "[CanUserCommentOnGoalAsync] Error checking permission");
-                return false;
-            }
+            var canComment = await _repo.CanUserCommentOnGoalAsync(goalId, employeeMasterId, role);
+            return canComment;
         }
 
         public async Task<bool> IsGoalCommentableAsync(int goalId)
         {
-            try
-            {
-                Log.Information("[IsGoalCommentableAsync] Checking - Goal {GoalId}", goalId);
-
-                var isCommentable = await _repo.IsGoalCommentableAsync(goalId);
-                return isCommentable;
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "[IsGoalCommentableAsync] Error checking if commentable");
-                return false;
-            }
+            var isCommentable = await _repo.IsGoalCommentableAsync(goalId);
+            return isCommentable;
         }
 
         public async Task<GoalDetailModel> GetGoalAsync(
@@ -278,16 +237,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             var goal = await _repo.GetGoalByIdAsync(goalId);
             if (goal == null)
-                throw new KeyNotFoundException("Goal not found");
+                throw new GoalNotFoundException(goalId);
 
-            // Access control
             var canView = await CanViewGoalAsync(goalId, currentUserEmployeeMasterId);
             if (!canView)
-                throw new UnauthorizedAccessException(
-                    "You do not have permission to view this goal."
-                );
+                throw new GoalAccessDeniedException();
 
-            // Calculate OVERALL progress
             int progressPercent;
             var latestLog = await _repo.GetLatestProgressLogAsync(goalId);
             if (latestLog != null && latestLog.Source == PROGRESS_SOURCE.MANUAL)
@@ -318,7 +273,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
             }
 
-            // Get project name
             string? projectName = null;
             if (goal.ProjectId.HasValue)
             {
@@ -326,13 +280,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 projectName = project?.ProjectName;
             }
 
-            // Get creator name
             var creatorName = await GetEmployeeNameAsync(goal.CreatedBy);
 
-            // GET ASSIGNEES WITH DETAILS (MOST IMPORTANT)
             var assignees = await GetAssigneesWithDetailsAsync(goalId);
 
-            // Check permissions
             bool canEdit =
                 goal.CreatedBy == currentUserEmployeeMasterId
                 && goal.Goalstatus != GOAL_STATUS.COMPLETED
@@ -355,7 +306,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     || await _repo.IsUserAssignedToGoalAsync(goalId, currentUserEmployeeMasterId)
                 )
             );
-            // Check if user has pending approval
             bool hasPendingApproval = await _repo.HasPendingApprovalAsync(
                 goalId,
                 currentUserEmployeeMasterId
@@ -424,7 +374,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     {
                         EmployeeMasterId = assignment.AssignedTo.Value,
                         Name = $"{profile.FirstName} {profile.LastName}".Trim(),
-                        Role = edm.Role?.RoleName ?? USER_ROLE.EMPLOYEE, // Fixed: Use Role.RoleName
+                        Role = edm.Role?.RoleName ?? USER_ROLE.EMPLOYEE,
                         IsAcknowledged = assignment.IsAcknowledged ?? false,
                         AcknowledgedOn = assignment.AcknowledgedOn,
                     }

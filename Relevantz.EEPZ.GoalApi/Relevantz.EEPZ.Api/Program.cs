@@ -7,38 +7,33 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Relevantz.EEPZ.Common.Configuration;
+using Relevantz.EEPZ.Common.Middleware;
+using Relevantz.EEPZ.Core.IService;
+using Relevantz.EEPZ.Core.Service;
 using Relevantz.EEPZ.Core.Services.Implementations;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repository.Implementations;
 using Relevantz.EEPZ.Data.Repository.Interface;
-using Relevantz.EEPZ.Core.IService;
-using Relevantz.EEPZ.Core.Service;
-using Relevantz.EEPZ.Common.Configuration;
+
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
 
-
 var builder = WebApplication.CreateBuilder(args);
 Console.WriteLine("Building........");
-
-
 
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
     .CreateLogger();
 
-
 builder.Host.UseSerilog();
-
 
 Log.Information("Starting EEPZ Backend Application");
 
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -52,7 +47,6 @@ builder.Services.AddSwaggerGen(options =>
         }
     );
 
-
     options.AddSecurityDefinition(
         "Bearer",
         new OpenApiSecurityScheme
@@ -65,7 +59,6 @@ builder.Services.AddSwaggerGen(options =>
             Description = "Enter 'Bearer' followed by your JWT token",
         }
     );
-
 
     options.AddSecurityRequirement(
         new OpenApiSecurityRequirement
@@ -85,24 +78,20 @@ builder.Services.AddSwaggerGen(options =>
     );
 });
 
-
 // Configure MySQL Database
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<EEPZDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
 );
 
-
 // Configure JWT Authentication with debugging
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["SecretKey"];
-
 
 if (string.IsNullOrEmpty(secretKey))
 {
     throw new InvalidOperationException("JWT SecretKey is not configured in appsettings.json");
 }
-
 
 builder
     .Services.AddAuthentication(options =>
@@ -115,10 +104,8 @@ builder
     {
         var keyBytes = Encoding.UTF8.GetBytes(secretKey);
 
-
         options.SaveToken = true;
         options.RequireHttpsMetadata = false; // Set to true in production
-
 
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -127,20 +114,16 @@ builder
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
 
-
             ValidIssuer = jwtSettings["Issuer"],
             ValidAudience = jwtSettings["Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
 
-
             ClockSkew = TimeSpan.Zero,
-
 
             // FIX: Use the full claim type
             RoleClaimType = ClaimTypes.Role, // Instead of "role"
             NameClaimType = "sub",
         };
-
 
         //  Event handlers for debugging
         options.Events = new JwtBearerEvents
@@ -163,17 +146,12 @@ builder
                     context.Principal?.Claims.Select(c => $"{c.Type}={c.Value}").ToList()
                     ?? new List<string>();
 
-
                 Log.Information("JWT Token Validated Successfully");
                 Log.Information("   Claims: {Claims}", string.Join(", ", claims));
 
-
                 var empMasterIdClaim = context.Principal?.FindFirst("empMasterId");
 
-
-
                 var roleClaim = context.Principal?.FindFirst(ClaimTypes.Role);
-
 
                 if (empMasterIdClaim == null)
                 {
@@ -184,7 +162,6 @@ builder
                     Log.Information("   empMasterId: {EmpMasterId}", empMasterIdClaim.Value);
                 }
 
-
                 if (roleClaim == null)
                 {
                     Log.Warning("⚠ WARNING: role claim not found!");
@@ -194,10 +171,8 @@ builder
                     Log.Information("   role: {Role}", roleClaim.Value);
                 }
 
-
                 return Task.CompletedTask;
             },
-
 
             OnChallenge = context =>
             {
@@ -227,9 +202,7 @@ builder
         };
     });
 
-
 builder.Services.AddAuthorization();
-
 
 // Register module DI (Goal Management)
 builder.Services.AddHttpContextAccessor();
@@ -240,20 +213,19 @@ builder.Services.AddScoped<IGoalInteractionRepository, GoalInteractionRepository
 builder.Services.AddScoped<IGoalProgressRepository, GoalProgressRepository>();
 builder.Services.AddScoped<IGoalRepository, GoalRepository>();
 
-
 builder.Services.AddScoped<IBaseGoalService, BaseGoalService>();
 builder.Services.AddScoped<IGoalApprovalsService, GoalApprovalsService>();
 builder.Services.AddScoped<IGoalAttachmentService, GoalAttachmentService>();
 builder.Services.AddScoped<IGoalInteractionService, GoalInteractionService>();
 builder.Services.AddScoped<IGoalProgressService, GoalProgressService>();
 builder.Services.AddScoped<IGoalService, GoalService>();
-// Configure MongoDB Settings
-builder.Services.Configure<MongoDbSettings>(
-    builder.Configuration.GetSection("MongoDbSettings"));
 
+// Configure MongoDB Settings
+builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDbSettings"));
 
 // Register File Storage Service (MongoDB GridFS)
 builder.Services.AddSingleton<IFileStorageService, FileStorageService>();
+
 // Configure CORS
 builder.Services.AddCors(options =>
 {
@@ -266,9 +238,7 @@ builder.Services.AddCors(options =>
     );
 });
 
-
 var app = builder.Build();
-
 
 // Swagger
 if (app.Environment.IsDevelopment())
@@ -280,7 +250,6 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-
 // Enable Serilog request logging
 app.UseSerilogRequestLogging(options =>
 {
@@ -289,103 +258,102 @@ app.UseSerilogRequestLogging(options =>
     options.GetLevel = (httpContext, elapsed, ex) => LogEventLevel.Information;
 });
 
-
 app.UseHttpsRedirection();
+app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseStaticFiles();
-
-
 
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 
-
 app.MapControllers();
-
-
 
 // Health Check Endpoint
 
-app.MapGet("/health", async (EEPZDbContext eepzDbContext, IConfiguration config) =>
-{
-    bool mySqlConnected = false;
-    bool mongoConnected = false;
+app.MapGet(
+    "/health",
+    async (EEPZDbContext eepzDbContext, IConfiguration config) =>
+    {
+        bool mySqlConnected = false;
+        bool mongoConnected = false;
 
-    try
-    {
-        mySqlConnected = await eepzDbContext.Database.CanConnectAsync();
-    }
-    catch (Exception)
-    {
-        // Health check failed silently
-    }
-
-    // Test MongoDB Connection
-    try
-    {
-        var fileStorageService = app.Services.GetRequiredService<IFileStorageService>();
-        mongoConnected = true;
-    }
-    catch (Exception)
-    {
-        mongoConnected = false;
-    }
-
-    return Results.Ok(new
-    {
-        status = "Healthy",
-        timestamp = DateTime.UtcNow,
-        service = "EEPZ Goal Management API",
-        version = "v1.0",
-        environment = app.Environment.EnvironmentName,
-
-        database = new
+        try
         {
-            mySQL = new
+            mySqlConnected = await eepzDbContext.Database.CanConnectAsync();
+        }
+        catch (Exception)
+        {
+            // Health check failed silently
+        }
+
+        // Test MongoDB Connection
+        try
+        {
+            var fileStorageService = app.Services.GetRequiredService<IFileStorageService>();
+            mongoConnected = true;
+        }
+        catch (Exception)
+        {
+            mongoConnected = false;
+        }
+
+        return Results.Ok(
+            new
             {
-                connected = mySqlConnected,
-                provider = "MySQL (EF Core)",
-                connectionStringName = "DefaultConnection"
-            },
-            mongoDB = new
-            {
-                connected = mongoConnected,
-                provider = "MongoDB GridFS",
-                databaseName = config["MongoDbSettings:DatabaseName"]
+                status = "Healthy",
+                timestamp = DateTime.UtcNow,
+                service = "EEPZ Goal Management API",
+                version = "v1.0",
+                environment = app.Environment.EnvironmentName,
+
+                database = new
+                {
+                    mySQL = new
+                    {
+                        connected = mySqlConnected,
+                        provider = "MySQL (EF Core)",
+                        connectionStringName = "DefaultConnection",
+                    },
+                    mongoDB = new
+                    {
+                        connected = mongoConnected,
+                        provider = "MongoDB GridFS",
+                        databaseName = config["MongoDbSettings:DatabaseName"],
+                    },
+                },
+
+                storage = new
+                {
+                    type = "MongoDB GridFS",
+                    enabled = !string.IsNullOrEmpty(config["MongoDbSettings:ConnectionString"]),
+                },
+
+                endpoints = new
+                {
+                    categories = new[]
+                    {
+                        "Base Goals",
+                        "Goal Approvals",
+                        "Goal Attachments",
+                        "Goal Interactions",
+                        "Goal Progress",
+                    },
+                },
+
+                authentication = new
+                {
+                    enabled = true,
+                    type = "JWT Bearer",
+                    issuerConfigured = !string.IsNullOrEmpty(config["JwtSettings:Issuer"]),
+                    audienceConfigured = !string.IsNullOrEmpty(config["JwtSettings:Audience"]),
+                },
+
+                cors = "AllowAll Enabled",
+                swagger = app.Environment.IsDevelopment(),
             }
-        },
-
-        storage = new
-        {
-            type = "MongoDB GridFS",
-            enabled = !string.IsNullOrEmpty(config["MongoDbSettings:ConnectionString"])
-        },
-
-        endpoints = new
-        {
-            categories = new[]
-            {
-                "Base Goals",
-                "Goal Approvals",
-                "Goal Attachments",
-                "Goal Interactions",
-                "Goal Progress"
-            }
-        },
-
-        authentication = new
-        {
-            enabled = true,
-            type = "JWT Bearer",
-            issuerConfigured = !string.IsNullOrEmpty(config["JwtSettings:Issuer"]),
-            audienceConfigured = !string.IsNullOrEmpty(config["JwtSettings:Audience"])
-        },
-
-        cors = "AllowAll Enabled",
-        swagger = app.Environment.IsDevelopment()
-    });
-});
-
+        );
+    }
+);
 
 // Log configuration details
 Log.Information("   Application Configuration:");
@@ -396,7 +364,6 @@ Log.Information(
     "   Database: {Database}",
     connectionString?.Split(';').FirstOrDefault(x => x.Contains("Database"))
 );
-
 
 try
 {

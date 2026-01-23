@@ -89,7 +89,7 @@ namespace Relevantz.EEPZ.Common.Models
         public List<int>? ProofAttachmentIds { get; set; }
     }
 
-    public class DecideApprovalModel
+    public class ApprovalDesicionModel
     {
         public string Decision { get; set; } = default!;
         public DateTime? NewDeadline { get; set; }

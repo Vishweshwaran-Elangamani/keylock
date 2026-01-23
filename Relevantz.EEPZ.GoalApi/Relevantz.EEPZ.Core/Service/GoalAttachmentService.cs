@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Exceptions;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.IService;
-using Relevantz.EEPZ.Data.Repository.Interface;
 using Relevantz.EEPZ.Core.Services.Interface;
-using Serilog;
+using Relevantz.EEPZ.Data.Repository.Interface;
 
 namespace Relevantz.EEPZ.Core.Service
 {
@@ -35,112 +35,82 @@ namespace Relevantz.EEPZ.Core.Service
             string fileName
         )?> PreviewFileAsync(int attachmentId, int currentUserEmployeeMasterId)
         {
-            try
+            var attachment = await _repo.GetAttachmentByIdAsync(attachmentId);
+
+            if (attachment == null)
             {
-                var attachment = await _repo.GetAttachmentByIdAsync(attachmentId);
-
-                if (attachment == null)
-                {
-                    Log.Warning("Attachment {AttachmentId} not found", attachmentId);
-                    return null;
-                }
-
-                // Check access
-                var goal = await _baseRepo.GetGoalByIdAsync(attachment.GoalId);
-                if (goal == null)
-                {
-                    Log.Warning("Goal {GoalId} not found for attachment {AttachmentId}", 
-                        attachment.GoalId, attachmentId);
-                    return null;
-                }
-
-                var canView = await _baseService.CanViewGoalAsync(
-                    attachment.GoalId, 
-                    currentUserEmployeeMasterId);
-                
-                if (!canView)
-                {
-                    Log.Warning(
-                        "User {UserId} does not have access to view attachment {AttachmentId}", 
-                        currentUserEmployeeMasterId, 
-                        attachmentId);
-                    return null;
-                }
-
-                // Get file from MongoDB GridFS
-                var (fileBytes, contentType, fileName) = await _fileStorage.GetFileForPreviewAsync(
-                    attachment.Attachments ?? "");
-
-                // Use attachment title if available, otherwise use filename from GridFS
-                var displayFileName = !string.IsNullOrEmpty(attachment.AttachmentTitle)
-                    ? attachment.AttachmentTitle
-                    : fileName;
-
-                // Ensure filename has proper extension
-                if (!Path.HasExtension(displayFileName))
-                {
-                    var extension = Path.GetExtension(fileName);
-                    displayFileName += extension;
-                }
-
-                Log.Information(
-                    "User {UserId} previewing attachment {AttachmentId}", 
-                    currentUserEmployeeMasterId, 
-                    attachmentId);
-
-                return (fileBytes, contentType, displayFileName);
+                throw new FileNotFoundCustomException(attachmentId);
             }
-            catch (FileNotFoundException ex)
+
+            var goal = await _baseRepo.GetGoalByIdAsync(attachment.GoalId);
+            if (goal == null)
             {
-                Log.Error(ex, "File not found for attachment {AttachmentId}", attachmentId);
-                return null;
+                throw new GoalNotFoundException(attachment.GoalId);
             }
-            catch (Exception ex)
+
+            var canView = await _baseService.CanViewGoalAsync(
+                attachment.GoalId,
+                currentUserEmployeeMasterId
+            );
+
+            if (!canView)
             {
-                Log.Error(ex, "Error previewing attachment {AttachmentId}", attachmentId);
-                return null;
+                throw new FileAccessDeniedException();
             }
+
+            var (fileBytes, contentType, fileName) = await _fileStorage.GetFileForPreviewAsync(
+                attachment.Attachments ?? ""
+            );
+
+            var displayFileName = !string.IsNullOrEmpty(attachment.AttachmentTitle)
+                ? attachment.AttachmentTitle
+                : fileName;
+
+            if (!Path.HasExtension(displayFileName))
+            {
+                var extension = Path.GetExtension(fileName);
+                displayFileName += extension;
+            }
+
+            return (fileBytes, contentType, displayFileName);
         }
 
         public async Task<FileUploadResponseModel> UploadFileAsync(
             int goalId,
             IFormFile file,
             string title,
-            int currentUserEmployeeMasterId 
-        ) 
+            int currentUserEmployeeMasterId
+        )
         {
             var goal = await _baseRepo.GetGoalByIdAsync(goalId);
             if (goal == null)
             {
-                Log.Warning("Goal {GoalId} not found for file upload", goalId);
-                throw new KeyNotFoundException("Goal not found");
+                throw new GoalNotFoundException(goalId);
             }
 
-            // Check if user can upload to this goal
             var canView = await _baseService.CanViewGoalAsync(goalId, currentUserEmployeeMasterId);
             if (!canView)
             {
-                Log.Warning(
-                    "User {UserId} attempted to upload file to goal {GoalId} without permission", 
-                    currentUserEmployeeMasterId, 
-                    goalId);
-                throw new UnauthorizedAccessException("You cannot upload files to this goal.");
+                throw new FileAccessDeniedException();
             }
 
-            // Validate file
             if (file == null || file.Length == 0)
             {
-                throw new ArgumentException("File is empty or null");
+                throw new BadRequestException(
+                    ResponseMessages.Codes.BadRequest,
+                    "File is empty or null"
+                );
             }
 
-            // Validate file size (10MB limit)
             const long maxFileSize = 10 * 1024 * 1024;
             if (file.Length > maxFileSize)
             {
-                throw new InvalidOperationException("File size exceeds maximum limit of 10MB");
+                throw new BadRequestException(
+                    ResponseMessages.Codes.FILE_SIZE_EXCEEDED,
+                    "File size exceeds maximum limit of 10MB"
+                );
             }
 
-            // Validate file extension
             var allowedExtensions = new[]
             {
                 ".pdf",
@@ -158,58 +128,36 @@ namespace Relevantz.EEPZ.Core.Service
 
             if (!allowedExtensions.Contains(fileExtension))
             {
-                throw new InvalidOperationException($"File type '{fileExtension}' is not allowed");
+                throw new BadRequestException(
+                    ResponseMessages.Codes.FILE_TYPE_INVALID,
+                    $"File type '{fileExtension}' is not allowed"
+                );
             }
 
-            try
+            var fileId = await _fileStorage.SaveFileAsync(file, "goals/attachments");
+
+            var attachment = new GoalAttachment
             {
-                // Upload to MongoDB GridFS
-                var fileId = await _fileStorage.SaveFileAsync(file, "goals/attachments");
+                GoalId = goalId,
+                AttachmentTitle = title,
+                Attachments = fileId,
+                AttachedBy = currentUserEmployeeMasterId,
+                AttachedOn = DateTime.UtcNow,
+            };
 
-                Log.Information(
-                    "File uploaded to MongoDB GridFS with ID {FileId} for goal {GoalId}", 
-                    fileId, 
-                    goalId);
+            await _repo.AddAttachmentAsync(attachment);
+            await _baseRepo.SaveChangesAsync();
 
-                // Save attachment record with MongoDB file ID
-                var attachment = new GoalAttachment
-                {
-                    GoalId = goalId,
-                    AttachmentTitle = title,
-                    Attachments = fileId, // Store MongoDB ObjectId
-                    AttachedBy = currentUserEmployeeMasterId,
-                    AttachedOn = DateTime.UtcNow,
-                };
-
-                await _repo.AddAttachmentAsync(attachment);
-                await _baseRepo.SaveChangesAsync();
-
-                Log.Information(
-                    "Attachment {AttachmentId} created for goal {GoalId} by user {UserId}", 
-                    attachment.Goalattachmentsid, 
-                    goalId, 
-                    currentUserEmployeeMasterId);
-
-                return new FileUploadResponseModel
-                {
-                    AttachmentId = attachment.Goalattachmentsid,
-                    AttachmentTitle = attachment.AttachmentTitle ?? "",
-                    FilePath = attachment.Attachments ?? "",
-                    FileName = file.FileName,
-                    FileSize = file.Length,
-                    ContentType = file.ContentType,
-                    UploadedOn = attachment.AttachedOn ?? DateTime.UtcNow,
-                };
-            }
-            catch (Exception ex)
+            return new FileUploadResponseModel
             {
-                Log.Error(
-                    ex, 
-                    "Error uploading file for goal {GoalId} by user {UserId}", 
-                    goalId, 
-                    currentUserEmployeeMasterId);
-                throw;
-            }
+                AttachmentId = attachment.Goalattachmentsid,
+                AttachmentTitle = attachment.AttachmentTitle ?? "",
+                FilePath = attachment.Attachments ?? "",
+                FileName = file.FileName,
+                FileSize = file.Length,
+                ContentType = file.ContentType,
+                UploadedOn = attachment.AttachedOn ?? DateTime.UtcNow,
+            };
         }
 
         public async Task<(
@@ -221,59 +169,34 @@ namespace Relevantz.EEPZ.Core.Service
             var attachment = await _repo.GetAttachmentByIdAsync(attachmentId);
             if (attachment == null)
             {
-                Log.Warning("Attachment {AttachmentId} not found for download", attachmentId);
-                throw new KeyNotFoundException("Attachment not found");
+                throw new FileNotFoundCustomException(attachmentId);
             }
 
-            // Check if user can access this goal
             var canView = await _baseService.CanViewGoalAsync(
-                attachment.GoalId, 
-                currentUserEmployeeMasterId);
-            
+                attachment.GoalId,
+                currentUserEmployeeMasterId
+            );
+
             if (!canView)
             {
-                Log.Warning(
-                    "User {UserId} attempted to download attachment {AttachmentId} without permission", 
-                    currentUserEmployeeMasterId, 
-                    attachmentId);
-                throw new UnauthorizedAccessException("You cannot access this attachment.");
+                throw new FileAccessDeniedException();
             }
 
-            try
+            var (fileBytes, contentType, fileName) = await _fileStorage.GetFileForPreviewAsync(
+                attachment.Attachments ?? ""
+            );
+
+            var downloadFileName = !string.IsNullOrEmpty(attachment.AttachmentTitle)
+                ? attachment.AttachmentTitle
+                : fileName;
+
+            if (!Path.HasExtension(downloadFileName))
             {
-                // Get file from MongoDB GridFS
-                var (fileBytes, contentType, fileName) = await _fileStorage.GetFileForPreviewAsync(
-                    attachment.Attachments ?? "");
-
-                // Use the original filename from attachment title or from GridFS
-                var downloadFileName = !string.IsNullOrEmpty(attachment.AttachmentTitle)
-                    ? attachment.AttachmentTitle
-                    : fileName;
-
-                // Ensure filename has proper extension
-                if (!Path.HasExtension(downloadFileName))
-                {
-                    var extension = Path.GetExtension(fileName);
-                    downloadFileName += extension;
-                }
-
-                Log.Information(
-                    "User {UserId} downloaded attachment {AttachmentId}", 
-                    currentUserEmployeeMasterId, 
-                    attachmentId);
-
-                return (fileBytes, contentType, downloadFileName);
+                var extension = Path.GetExtension(fileName);
+                downloadFileName += extension;
             }
-            catch (FileNotFoundException ex)
-            {
-                Log.Error(ex, "File not found for attachment {AttachmentId}", attachmentId);
-                throw new FileNotFoundException("Attachment file not found on server.", ex);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Error downloading attachment {AttachmentId}", attachmentId);
-                throw;
-            }
+
+            return (fileBytes, contentType, downloadFileName);
         }
 
         public async Task<bool> DeleteAttachmentAsync(
@@ -284,101 +207,46 @@ namespace Relevantz.EEPZ.Core.Service
             var attachment = await _repo.GetAttachmentByIdAsync(attachmentId);
             if (attachment == null)
             {
-                Log.Warning("Attachment {AttachmentId} not found for deletion", attachmentId);
-                throw new KeyNotFoundException("Attachment not found");
+                throw new FileNotFoundCustomException(attachmentId);
             }
 
             var goal = await _baseRepo.GetGoalByIdAsync(attachment.GoalId);
             if (goal == null)
             {
-                Log.Warning(
-                    "Goal {GoalId} not found for attachment {AttachmentId}", 
-                    attachment.GoalId, 
-                    attachmentId);
-                throw new KeyNotFoundException("Goal not found");
+                throw new GoalNotFoundException(attachment.GoalId);
             }
 
-            // Only attachment uploader or goal creator can delete
             if (
                 attachment.AttachedBy != currentUserEmployeeMasterId
                 && goal.CreatedBy != currentUserEmployeeMasterId
             )
             {
-                Log.Warning(
-                    "User {UserId} attempted to delete attachment {AttachmentId} without permission", 
-                    currentUserEmployeeMasterId, 
-                    attachmentId);
-                throw new UnauthorizedAccessException("You cannot delete this attachment.");
+                throw new FileAccessDeniedException();
             }
 
-            try
+            if (!string.IsNullOrEmpty(attachment.Attachments))
             {
-                // Delete file from MongoDB GridFS
-                if (!string.IsNullOrEmpty(attachment.Attachments))
-                {
-                    var deleted = await _fileStorage.DeleteFileAsync(attachment.Attachments);
-                    if (deleted)
-                    {
-                        Log.Information(
-                            "File {FileId} deleted from MongoDB GridFS", 
-                            attachment.Attachments);
-                    }
-                    else
-                    {
-                        Log.Warning(
-                            "File {FileId} not found in MongoDB GridFS during deletion", 
-                            attachment.Attachments);
-                    }
-                }
-
-                // Delete from database
-                await _repo.DeleteAttachmentAsync(attachmentId);
-                await _baseRepo.SaveChangesAsync();
-
-                Log.Information(
-                    "Attachment {AttachmentId} deleted by user {UserId}", 
-                    attachmentId, 
-                    currentUserEmployeeMasterId);
-
-                return true;
+                await _fileStorage.DeleteFileAsync(attachment.Attachments);
             }
-            catch (Exception ex)
-            {
-                Log.Error(
-                    ex, 
-                    "Error deleting attachment {AttachmentId} by user {UserId}", 
-                    attachmentId, 
-                    currentUserEmployeeMasterId);
-                throw;
-            }
+
+            await _repo.DeleteAttachmentAsync(attachmentId);
+            await _baseRepo.SaveChangesAsync();
+
+            return true;
         }
 
         public async Task<List<GoalAttachment>> ListAttachmentsAsync(int goalId)
         {
-            try
-            {
-                var attachments = await _repo.GetAttachmentsByGoalAsync(goalId);
-                Log.Information(
-                    "Retrieved {Count} attachments for goal {GoalId}", 
-                    attachments.Count, 
-                    goalId);
-                return attachments;
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Error listing attachments for goal {GoalId}", goalId);
-                throw;
-            }
+            var attachments = await _repo.GetAttachmentsByGoalAsync(goalId);
+            return attachments;
         }
-
 
         public async Task<GoalAttachment> GetAttachmentAsync(int attachmentId)
         {
             var attachment = await _repo.GetAttachmentByIdAsync(attachmentId);
             if (attachment == null)
             {
-                Log.Warning("Attachment {AttachmentId} not found", attachmentId);
-                throw new KeyNotFoundException("Attachment not found");
+                throw new FileNotFoundCustomException(attachmentId);
             }
 
             return attachment;

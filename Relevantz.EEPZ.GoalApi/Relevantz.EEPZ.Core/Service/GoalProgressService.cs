@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Enums;
+using Relevantz.EEPZ.Common.Exceptions;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repository.Interface;
-using Serilog;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -39,144 +39,114 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             int currentUserEmployeeMasterId
         )
         {
-            try
+            var goal = await _baseRepo.GetGoalByIdAsync(goalId);
+            if (goal == null)
             {
-                var goal = await _baseRepo.GetGoalByIdAsync(goalId);
-                if (goal == null)
-                {
-                    return ApiResponseModel.ErrorResponse(ResponseMessages.Codes.GOAL_NOT_FOUND);
-                }
+                throw new GoalNotFoundException(goalId);
+            }
 
-                // Check if user is acknowledged and block toggling
-                var assignment = await _baseRepo.GetGoalAssignmentAsync(
-                    goalId,
-                    currentUserEmployeeMasterId
+            var assignment = await _baseRepo.GetGoalAssignmentAsync(
+                goalId,
+                currentUserEmployeeMasterId
+            );
+            if (assignment?.IsAcknowledged == true)
+            {
+                throw new BusinessRuleException(
+                    ResponseMessages.Codes.CHECKLIST_LOCKED,
+                    "Your tasks have been acknowledged. You cannot modify the checklist."
                 );
-                if (assignment?.IsAcknowledged == true)
-                {
-                    return ApiResponseModel.ErrorResponse(
-                        ResponseMessages.Codes.CHECKLIST_LOCKED,
-                        "Your tasks have been acknowledged. You cannot modify the checklist.",
-                        new { IsAcknowledged = true, AcknowledgedOn = assignment.AcknowledgedOn }
-                    );
-                }
+            }
 
-                var checklistItem = await _repo.GetChecklistItemAsync(dto.ChecklistId);
-                if (checklistItem == null || checklistItem.GoalId != goalId)
-                {
-                    return ApiResponseModel.ErrorResponse(ResponseMessages.Codes.CHECKLIST_NOT_FOUND);
-                }
+            var checklistItem = await _repo.GetChecklistItemAsync(dto.ChecklistId);
+            if (checklistItem == null || checklistItem.GoalId != goalId)
+            {
+                throw new ChecklistNotFoundException(dto.ChecklistId);
+            }
 
-                // Set progress
-                await _repo.SetChecklistProgressAsync(
-                    dto.ChecklistId,
+            await _repo.SetChecklistProgressAsync(
+                dto.ChecklistId,
+                currentUserEmployeeMasterId,
+                dto.IsCompleted
+            );
+
+            await _baseRepo.SaveChangesAsync();
+
+            if (dto.IsCompleted && goal.Goalstatus == GOAL_STATUS.OPEN)
+            {
+                goal.Goalstatus = GOAL_STATUS.IN_PROGRESS;
+                await _goalRepo.UpdateGoalAsync(goal);
+            }
+
+            var completed = await _baseRepo.CountCompletedForUserAsync(
+                goalId,
+                currentUserEmployeeMasterId
+            );
+            var total = await _baseRepo.CountTotalForUserAsync(goalId, currentUserEmployeeMasterId);
+            var percent = total == 0 ? 0 : (int)Math.Round((double)completed / total * 100);
+
+            if (percent < 100)
+            {
+                var pendingApprovals = await _repo.GetPendingApprovalsForGoalAndUserAsync(
+                    goalId,
                     currentUserEmployeeMasterId,
-                    dto.IsCompleted
+                    new[] { APPROVAL_TYPE.TASK_ACKNOWLEDGMENT, "completion" }
                 );
 
-                await _baseRepo.SaveChangesAsync();
-
-                // Auto-transition from "open" to "inprogress" when user starts working
-                if (dto.IsCompleted && goal.Goalstatus == GOAL_STATUS.OPEN)
+                foreach (var approval in pendingApprovals)
                 {
-                    goal.Goalstatus = GOAL_STATUS.IN_PROGRESS;
-                    await _goalRepo.UpdateGoalAsync(goal);
+                    approval.ApprovalStatus = APPROVAL_STATUS.REJECTED;
+                }
 
-                    Log.Information(
-                        "[ToggleChecklist] Goal {GoalId} transitioned from 'open' to 'inprogress'",
-                        goalId
+                if (pendingApprovals.Any())
+                {
+                    await _baseRepo.SaveChangesAsync();
+
+                    await _repo.AddProgressLogAsync(
+                        new Goalprogresslog
+                        {
+                            GoalId = goalId,
+                            UpdatedBy = currentUserEmployeeMasterId,
+                            UpdatedOn = DateTime.UtcNow,
+                            ProgressPercent = percent,
+                            Source = PROGRESS_SOURCE.AUTO,
+                        }
                     );
                 }
+            }
 
-                // Recalculate progress
-                var completed = await _baseRepo.CountCompletedForUserAsync(
-                    goalId,
-                    currentUserEmployeeMasterId
-                );
-                var total = await _baseRepo.CountTotalForUserAsync(
-                    goalId,
-                    currentUserEmployeeMasterId
-                );
-                var percent = total == 0 ? 0 : (int)Math.Round((double)completed / total * 100);
-
-                // Auto-revoke pending approvals if progress drops below 100%
-                if (percent < 100)
-                {
-                    var pendingApprovals = await _repo.GetPendingApprovalsForGoalAndUserAsync(
-                        goalId,
-                        currentUserEmployeeMasterId,
-                        new[] { APPROVAL_TYPE.TASK_ACKNOWLEDGMENT, "completion" }
-                    );
-
-                    foreach (var approval in pendingApprovals)
-                    {
-                        approval.ApprovalStatus = APPROVAL_STATUS.REJECTED;
-                    }
-
-                    if (pendingApprovals.Any())
-                    {
-                        await _baseRepo.SaveChangesAsync();
-
-                        // Log the auto-revoke event
-                        await _repo.AddProgressLogAsync(
-                            new Goalprogresslog
-                            {
-                                GoalId = goalId,
-                                UpdatedBy = currentUserEmployeeMasterId,
-                                UpdatedOn = DateTime.UtcNow,
-                                ProgressPercent = percent,
-                                Source = PROGRESS_SOURCE.AUTO,
-                            }
-                        );
-                    }
-                }
-
-                // Add progress log
-                await _repo.AddProgressLogAsync(
-                    new Goalprogresslog
-                    {
-                        GoalId = goalId,
-                        UpdatedBy = currentUserEmployeeMasterId,
-                        UpdatedOn = DateTime.UtcNow,
-                        ProgressPercent = percent,
-                        Source = PROGRESS_SOURCE.AUTO,
-                    }
-                );
-
-                // Keep status as "inprogress" even at 100%
-                // Status only changes to "completed" after approval
-                if (percent == 100 && goal.Goalstatus == GOAL_STATUS.OPEN)
-                {
-                    goal.Goalstatus = GOAL_STATUS.IN_PROGRESS;
-                    await _goalRepo.UpdateGoalAsync(goal);
-                }
-
-                await _baseRepo.SaveChangesAsync();
-
-                var metadata = new
+            await _repo.AddProgressLogAsync(
+                new Goalprogresslog
                 {
                     GoalId = goalId,
-                    ChecklistId = dto.ChecklistId,
-                    IsCompleted = dto.IsCompleted,
-                    NewProgress = percent,
                     UpdatedBy = currentUserEmployeeMasterId,
-                    StatusChanged = goal.Goalstatus == GOAL_STATUS.IN_PROGRESS && dto.IsCompleted,
-                };
+                    UpdatedOn = DateTime.UtcNow,
+                    ProgressPercent = percent,
+                    Source = PROGRESS_SOURCE.AUTO,
+                }
+            );
 
-                return ApiResponseModel.SuccessResponse(
-                    ResponseMessages.Codes.CHECKLIST_TOGGLED_SUCCESS,
-                    metadata
-                );
-            }
-            catch (Exception ex)
+            if (percent == 100 && goal.Goalstatus == GOAL_STATUS.OPEN)
             {
-                Log.Error(
-                    ex,
-                    "[ToggleChecklist] Error toggling checklist for goal {GoalId}",
-                    goalId
-                );
-                return ApiResponseModel.ErrorResponse(ResponseMessages.Codes.INTERNAL_SERVER_ERROR);
+                goal.Goalstatus = GOAL_STATUS.IN_PROGRESS;
+                await _goalRepo.UpdateGoalAsync(goal);
             }
+
+            await _baseRepo.SaveChangesAsync();
+
+            var metadata = new
+            {
+                GoalId = goalId,
+                ChecklistId = dto.ChecklistId,
+                IsCompleted = dto.IsCompleted,
+                NewProgress = percent,
+                UpdatedBy = currentUserEmployeeMasterId,
+                StatusChanged = goal.Goalstatus == GOAL_STATUS.IN_PROGRESS && dto.IsCompleted,
+            };
+
+            return ApiResponseModel.SuccessResponse(
+                ResponseMessages.Codes.CHECKLIST_TOGGLED_SUCCESS,
+                metadata
+            );
         }
 
         public async Task<ApiResponseModel> ManualUpdateProgressAsync(
@@ -185,60 +155,52 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             int currentUserEmployeeMasterId
         )
         {
-            try
+            var goal = await _baseRepo.GetGoalByIdAsync(goalId);
+            if (goal == null)
             {
-                var goal = await _baseRepo.GetGoalByIdAsync(goalId);
-                if (goal == null)
-                {
-                    return ApiResponseModel.ErrorResponse(ResponseMessages.Codes.GOAL_NOT_FOUND);
-                }
+                throw new GoalNotFoundException(goalId);
+            }
 
-                var role = await _baseRepo.GetUserRoleAsync(currentUserEmployeeMasterId);
-                if (
-                    !(
-                        role == USER_ROLE.MANAGER
-                        || role == USER_ROLE.DEPARTMENT_HEAD
-                        || role == USER_ROLE.LEADERSHIP
-                    )
+            var role = await _baseRepo.GetUserRoleAsync(currentUserEmployeeMasterId);
+            if (
+                !(
+                    role == USER_ROLE.MANAGER
+                    || role == USER_ROLE.DEPARTMENT_HEAD
+                    || role == USER_ROLE.LEADERSHIP
                 )
-                {
-                    return ApiResponseModel.ErrorResponse(
-                        ResponseMessages.Codes.PROGRESS_UPDATE_DENIED,
-                        "Only managers and above can manually update progress."
-                    );
-                }
-
-                await _repo.AddProgressLogAsync(
-                    new Goalprogresslog
-                    {
-                        GoalId = goalId,
-                        UpdatedBy = currentUserEmployeeMasterId,
-                        UpdatedOn = DateTime.UtcNow,
-                        ProgressPercent = dto.ProgressPercent,
-                        Source = dto.Source,
-                    }
+            )
+            {
+                throw new ForbiddenException(
+                    ResponseMessages.Codes.PROGRESS_UPDATE_DENIED,
+                    "Only managers and above can manually update progress."
                 );
+            }
 
-                await _baseRepo.SaveChangesAsync();
-
-                var metadata = new
+            await _repo.AddProgressLogAsync(
+                new Goalprogresslog
                 {
                     GoalId = goalId,
+                    UpdatedBy = currentUserEmployeeMasterId,
+                    UpdatedOn = DateTime.UtcNow,
                     ProgressPercent = dto.ProgressPercent,
                     Source = dto.Source,
-                    UpdatedBy = currentUserEmployeeMasterId,
-                };
+                }
+            );
 
-                return ApiResponseModel.SuccessResponse(
-                    ResponseMessages.Codes.GOAL_PROGRESS_UPDATED,
-                    metadata
-                );
-            }
-            catch (Exception ex)
+            await _baseRepo.SaveChangesAsync();
+
+            var metadata = new
             {
-                Console.WriteLine($"Error manually updating progress for goal {goalId}: {ex}");
-                return ApiResponseModel.ErrorResponse(ResponseMessages.Codes.INTERNAL_SERVER_ERROR);
-            }
+                GoalId = goalId,
+                ProgressPercent = dto.ProgressPercent,
+                Source = dto.Source,
+                UpdatedBy = currentUserEmployeeMasterId,
+            };
+
+            return ApiResponseModel.SuccessResponse(
+                ResponseMessages.Codes.GOAL_PROGRESS_UPDATED,
+                metadata
+            );
         }
 
         public async Task<int> GetGoalProgressPercentAsync(int goalId, int forEmployeeMasterId)
@@ -267,7 +229,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             var goal = await _baseRepo.GetGoalByIdAsync(goalId);
             if (goal == null)
-                return 0;
+                throw new GoalNotFoundException(goalId);
 
             if (goal.GoalType != GOAL_TYPE.TEAM)
                 return await GetGoalProgressPercentAsync(goalId, managerEmployeeMasterId);
@@ -304,7 +266,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             var goal = await _baseRepo.GetGoalByIdAsync(goalId);
             if (goal == null)
-                throw new KeyNotFoundException("Goal not found");
+                throw new GoalNotFoundException(goalId);
 
             var ownProgress = await CalculateUserOwnProgressAsync(goalId, userId);
             var subordinates = await _repo.GetSubordinatesAssignedToGoalAsync(goalId, userId);
@@ -338,11 +300,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             var user = await _baseRepo.GetEmployeeDetailsByMasterIdAsync(userId);
             if (user == null)
-                throw new KeyNotFoundException("User not found");
+                throw new UserNotFoundException(userId);
 
             var goal = await _baseRepo.GetGoalByIdAsync(goalId);
             if (goal == null)
-                throw new KeyNotFoundException("Goal not found");
+                throw new GoalNotFoundException(goalId);
 
             var ownProgress = await CalculateUserOwnProgressAsync(goalId, userId);
             var ownItems = await _repo.GetUserOwnChecklistItemsAsync(goalId, userId);

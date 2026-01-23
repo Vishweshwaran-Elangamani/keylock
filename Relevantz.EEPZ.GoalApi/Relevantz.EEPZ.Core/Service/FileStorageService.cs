@@ -4,6 +4,8 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using Relevantz.EEPZ.Common.Configuration;
+using Relevantz.EEPZ.Common.Constants;
+using Relevantz.EEPZ.Common.Exceptions;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.IService;
 
@@ -20,13 +22,13 @@ namespace Relevantz.EEPZ.Core.Service
 
             var client = new MongoClient(_mongoSettings.ConnectionString);
             var database = client.GetDatabase(_mongoSettings.DatabaseName);
-            
+
             var bucketOptions = new GridFSBucketOptions
             {
                 BucketName = _mongoSettings.GridFSBucketName,
                 ChunkSizeBytes = 1048576,
                 WriteConcern = WriteConcern.WMajority,
-                ReadPreference = ReadPreference.Primary
+                ReadPreference = ReadPreference.Primary,
             };
 
             _gridFSBucket = new GridFSBucket(database, bucketOptions);
@@ -35,7 +37,7 @@ namespace Relevantz.EEPZ.Core.Service
         public async Task<string> SaveFileAsync(IFormFile file, string subFolder)
         {
             if (file == null || file.Length == 0)
-                throw new ArgumentException("File is empty");
+                throw new BadRequestException(ResponseMessages.Codes.BadRequest, "File is empty");
 
             var fileName = file.FileName;
             var contentType = file.ContentType;
@@ -46,21 +48,14 @@ namespace Relevantz.EEPZ.Core.Service
                 { "contentType", contentType },
                 { "originalFileName", fileName },
                 { "uploadDate", DateTime.UtcNow },
-                { "fileSize", file.Length }
+                { "fileSize", file.Length },
             };
 
-            var options = new GridFSUploadOptions
-            {
-                Metadata = metadata
-            };
+            var options = new GridFSUploadOptions { Metadata = metadata };
 
             using (var stream = file.OpenReadStream())
             {
-                var objectId = await _gridFSBucket.UploadFromStreamAsync(
-                    fileName,
-                    stream,
-                    options
-                );
+                var objectId = await _gridFSBucket.UploadFromStreamAsync(fileName, stream, options);
 
                 return objectId.ToString();
             }
@@ -69,10 +64,16 @@ namespace Relevantz.EEPZ.Core.Service
         public async Task<byte[]> GetFileAsync(string fileId)
         {
             if (string.IsNullOrEmpty(fileId))
-                throw new ArgumentException("File ID cannot be empty");
+                throw new BadRequestException(
+                    ResponseMessages.Codes.BadRequest,
+                    "File ID cannot be empty"
+                );
 
             if (!ObjectId.TryParse(fileId, out var objectId))
-                throw new ArgumentException("Invalid file ID format");
+                throw new BadRequestException(
+                    ResponseMessages.Codes.BadRequest,
+                    "Invalid file ID format"
+                );
 
             try
             {
@@ -81,36 +82,58 @@ namespace Relevantz.EEPZ.Core.Service
             }
             catch (GridFSFileNotFoundException)
             {
-                throw new FileNotFoundException($"File with ID {fileId} not found in GridFS");
+                throw new NotFoundException(
+                    ResponseMessages.Codes.FILE_NOT_FOUND,
+                    $"File with ID {fileId} not found"
+                );
             }
         }
 
         public async Task<bool> DeleteFileAsync(string fileId)
         {
             if (string.IsNullOrEmpty(fileId))
-                return false;
+                throw new BadRequestException(
+                    ResponseMessages.Codes.BadRequest,
+                    "File ID cannot be empty"
+                );
 
             if (!ObjectId.TryParse(fileId, out var objectId))
-                return false;
+                throw new BadRequestException(
+                    ResponseMessages.Codes.BadRequest,
+                    "Invalid file ID format"
+                );
 
             try
             {
                 await _gridFSBucket.DeleteAsync(objectId);
                 return true;
             }
-            catch
+            catch (GridFSFileNotFoundException)
             {
-                return false;
+                throw new NotFoundException(
+                    ResponseMessages.Codes.FILE_NOT_FOUND,
+                    $"File with ID {fileId} not found"
+                );
             }
         }
 
-        public async Task<(byte[] fileBytes, string contentType, string fileName)> GetFileForPreviewAsync(string fileId)
+        public async Task<(
+            byte[] fileBytes,
+            string contentType,
+            string fileName
+        )> GetFileForPreviewAsync(string fileId)
         {
             if (string.IsNullOrEmpty(fileId))
-                throw new ArgumentException("File ID cannot be empty");
+                throw new BadRequestException(
+                    ResponseMessages.Codes.BadRequest,
+                    "File ID cannot be empty"
+                );
 
             if (!ObjectId.TryParse(fileId, out var objectId))
-                throw new ArgumentException("Invalid file ID format");
+                throw new BadRequestException(
+                    ResponseMessages.Codes.BadRequest,
+                    "Invalid file ID format"
+                );
 
             try
             {
@@ -119,59 +142,70 @@ namespace Relevantz.EEPZ.Core.Service
                 var fileInfo = await cursor.FirstOrDefaultAsync();
 
                 if (fileInfo == null)
-                    throw new FileNotFoundException($"File with ID {fileId} not found");
+                    throw new NotFoundException(
+                        ResponseMessages.Codes.FILE_NOT_FOUND,
+                        $"File with ID {fileId} not found"
+                    );
 
                 var bytes = await _gridFSBucket.DownloadAsBytesAsync(objectId);
 
-                var contentType = fileInfo.Metadata?.Contains("contentType") == true
-                    ? fileInfo.Metadata["contentType"].AsString
-                    : GetContentType(fileInfo.Filename);
-                
+                var contentType =
+                    fileInfo.Metadata?.Contains("contentType") == true
+                        ? fileInfo.Metadata["contentType"].AsString
+                        : GetContentType(fileInfo.Filename);
+
                 var fileName = fileInfo.Filename;
 
                 return (bytes, contentType, fileName);
             }
             catch (GridFSFileNotFoundException)
             {
-                throw new FileNotFoundException($"File with ID {fileId} not found in GridFS");
+                throw new NotFoundException(
+                    ResponseMessages.Codes.FILE_NOT_FOUND,
+                    $"File with ID {fileId} not found"
+                );
             }
         }
 
         public async Task<FileMetadata?> GetFileMetadataAsync(string fileId)
         {
             if (string.IsNullOrEmpty(fileId))
-                return null;
+                throw new BadRequestException(
+                    ResponseMessages.Codes.BadRequest,
+                    "File ID cannot be empty"
+                );
 
             if (!ObjectId.TryParse(fileId, out var objectId))
-                return null;
+                throw new BadRequestException(
+                    ResponseMessages.Codes.BadRequest,
+                    "Invalid file ID format"
+                );
 
-            try
+            var filter = Builders<GridFSFileInfo>.Filter.Eq(x => x.Id, objectId);
+            var cursor = await _gridFSBucket.FindAsync(filter);
+            var fileInfo = await cursor.FirstOrDefaultAsync();
+
+            if (fileInfo == null)
+                throw new NotFoundException(
+                    ResponseMessages.Codes.FILE_NOT_FOUND,
+                    $"File with ID {fileId} not found"
+                );
+
+            return new FileMetadata
             {
-                var filter = Builders<GridFSFileInfo>.Filter.Eq(x => x.Id, objectId);
-                var cursor = await _gridFSBucket.FindAsync(filter);
-                var fileInfo = await cursor.FirstOrDefaultAsync();
-
-                if (fileInfo == null)
-                    return null;
-
-                return new FileMetadata
-                {
-                    FileId = fileInfo.Id.ToString(),
-                    FileName = fileInfo.Filename,
-                    FileSize = fileInfo.Length,
-                    ContentType = fileInfo.Metadata?.Contains("contentType") == true
+                FileId = fileInfo.Id.ToString(),
+                FileName = fileInfo.Filename,
+                FileSize = fileInfo.Length,
+                ContentType =
+                    fileInfo.Metadata?.Contains("contentType") == true
                         ? fileInfo.Metadata["contentType"].AsString
                         : "application/octet-stream",
-                    UploadDate = fileInfo.UploadDateTime,
-                    SubFolder = fileInfo.Metadata?.Contains("subfolder") == true
+                UploadDate = fileInfo.UploadDateTime,
+                SubFolder =
+                    fileInfo.Metadata?.Contains("subfolder") == true
                         ? fileInfo.Metadata["subfolder"].AsString
-                        : ""
-                };
-            }
-            catch
-            {
-                return null;
-            }
+                        : "",
+            };
         }
 
         private string GetContentType(string fileName)
@@ -182,7 +216,8 @@ namespace Relevantz.EEPZ.Core.Service
             {
                 ".pdf" => "application/pdf",
                 ".doc" => "application/msword",
-                ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                ".docx" =>
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                 ".xls" => "application/vnd.ms-excel",
                 ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 ".png" => "image/png",

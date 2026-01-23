@@ -6,15 +6,15 @@ namespace Relevantz.EEPZ.Core.Services.Interface
 {
     public interface IGoalApprovalsService
     {
-        Task<ApiResponseModel<int>> RequestApprovalAsync(
+        Task<ApiResponseModel<int>> CreateApprovalRequestAsync(
             int goalId,
             CreateApprovalRequestModel dto,
             int requesterEmployeeMasterId,
             string requesterRole
         );
-        Task<ApiResponseModel> DecideApprovalAsync(
+        Task<ApiResponseModel> ClosePendingApprovalAsync(
             int approvalId,
-            DecideApprovalModel dto,
+            ApprovalDesicionModel dto,
             int approverEmployeeMasterId,
             string approverRole
         );

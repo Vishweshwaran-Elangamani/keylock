@@ -24,9 +24,6 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             _baseService = baseService;
         }
 
-        /// <summary>
-        /// Upload a file attachment to a goal
-        /// </summary>
         [HttpPost("api/goal-attachments/{goalId:int}/upload")]
         public async Task<IActionResult> UploadFile(
             int goalId,
@@ -34,274 +31,81 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             [FromForm] string title
         )
         {
-            var userId = 0;
-            try
-            {
-                userId = GetEmpMasterId();
+            var userId = GetEmpMasterId();
 
-                _logger.LogInformation(
-                    "User {UserId} uploading file to goal {GoalId}: {FileName} ({FileSize} bytes)",
-                    userId,
-                    goalId,
-                    file.FileName,
-                    file.Length
-                );
+            var result = await _service.UploadFileAsync(goalId, file, title, userId);
 
-                var result = await _service.UploadFileAsync(goalId, file, title, userId);
+            var response = ApiResponseModel<FileUploadResponseModel>.SuccessResponse(
+                ResponseMessages.Codes.FILE_UPLOADED_SUCCESS,
+                result,
+                new { GoalId = goalId, UploadedBy = userId }
+            );
 
-                _logger.LogInformation(
-                    "File uploaded successfully to goal {GoalId}. AttachmentId: {AttachmentId}",
-                    goalId,
-                    result.AttachmentId
-                );
-
-                var response = ApiResponseModel<FileUploadResponseModel>.SuccessResponse(
-                    ResponseMessages.Codes.FILE_UPLOADED_SUCCESS,
-                    result,
-                    new { GoalId = goalId, UploadedBy = userId }
-                );
-
-                return Ok(response);
-            }
-            catch (KeyNotFoundException)
-            {
-                _logger.LogWarning("Goal {GoalId} not found during file upload", goalId);
-                var response = ApiResponseModel<FileUploadResponseModel>.ErrorResponse(
-                    ResponseMessages.Codes.GOAL_NOT_FOUND
-                );
-                return NotFound(response);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                var response = ApiResponseModel<FileUploadResponseModel>.ErrorResponse(
-                    ResponseMessages.Codes.FILE_ACCESS_DENIED
-                );
-                return Forbid(response.Message);
-            }
-            catch (InvalidOperationException ex) when (ex.Message.Contains("size"))
-            {
-                var response = ApiResponseModel<FileUploadResponseModel>.ErrorResponse(
-                    ResponseMessages.Codes.FILE_SIZE_EXCEEDED,
-                    ex.Message
-                );
-                return BadRequest(response);
-            }
-            catch (InvalidOperationException ex) when (ex.Message.Contains("type"))
-            {
-                var response = ApiResponseModel<FileUploadResponseModel>.ErrorResponse(
-                    ResponseMessages.Codes.FILE_TYPE_INVALID,
-                    ex.Message
-                );
-                return BadRequest(response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(
-                    ex,
-                    "Error uploading file to goal {GoalId} by User {UserId}",
-                    goalId,
-                    userId
-                );
-                var response = ApiResponseModel<FileUploadResponseModel>.ErrorResponse(
-                    ResponseMessages.Codes.FILE_UPLOAD_FAILED
-                );
-                return StatusCode(500, response);
-            }
+            return Ok(response);
         }
 
-        /// <summary>
-        /// List all attachments for a goal
-        /// </summary>
         [HttpGet("api/goal-attachments/{goalId:int}")]
         public async Task<IActionResult> ListAttachments(int goalId)
         {
-            try
-            {
-                var items = await _service.ListAttachmentsAsync(goalId);
+            var items = await _service.ListAttachmentsAsync(goalId);
 
-                var response = ApiResponseModel<List<GoalAttachment>>.SuccessResponse(
-                    ResponseMessages.Codes.FILE_DOWNLOADED_SUCCESS,
-                    items,
-                    new { GoalId = goalId, AttachmentCount = items.Count }
-                );
+            var response = ApiResponseModel<List<GoalAttachment>>.SuccessResponse(
+                ResponseMessages.Codes.FILE_DOWNLOADED_SUCCESS,
+                items,
+                new { GoalId = goalId, AttachmentCount = items.Count }
+            );
 
-                return Ok(response);
-            }
-            catch (KeyNotFoundException)
-            {
-                var response = ApiResponseModel<List<GoalAttachment>>.ErrorResponse(
-                    ResponseMessages.Codes.GOAL_NOT_FOUND
-                );
-                return NotFound(response);
-            }
-            catch (Exception ex)
-            {
-                var response = ApiResponseModel<List<GoalAttachment>>.ErrorResponse(
-                    ResponseMessages.Codes.INTERNAL_SERVER_ERROR
-                );
-                return StatusCode(500, response);
-            }
+            return Ok(response);
         }
 
-        /// <summary>
-        /// Download an attachment by ID (enhanced with security)
-        /// </summary>
         [HttpGet("api/goal-attachments/{attachmentId:int}/download")]
         public async Task<IActionResult> DownloadAttachment(int attachmentId)
         {
-            try
-            {
-                var userId = GetEmpMasterId();
+            var userId = GetEmpMasterId();
 
-                var (fileBytes, contentType, fileName) = await _service.DownloadFileAsync(
-                    attachmentId,
-                    userId
-                );
+            var (fileBytes, contentType, fileName) = await _service.DownloadFileAsync(
+                attachmentId,
+                userId
+            );
 
-                // Set Content-Disposition header with proper filename
-                Response.Headers.Add("Content-Disposition", $"attachment; filename=\"{fileName}\"");
+            Response.Headers.Add("Content-Disposition", $"attachment; filename=\"{fileName}\"");
+            Response.Headers.Add("Access-Control-Expose-Headers", "Content-Disposition");
 
-                // Also set Access-Control-Expose-Headers to allow frontend to read Content-Disposition
-                Response.Headers.Add("Access-Control-Expose-Headers", "Content-Disposition");
-
-                return File(fileBytes, contentType, fileName);
-            }
-            catch (KeyNotFoundException)
-            {
-                var response = ApiResponseModel.ErrorResponse(
-                    ResponseMessages.Codes.FILE_NOT_FOUND
-                );
-                return NotFound(response);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                var response = ApiResponseModel.ErrorResponse(
-                    ResponseMessages.Codes.FILE_ACCESS_DENIED
-                );
-                return Forbid(response.Message);
-            }
-            catch (FileNotFoundException)
-            {
-                var response = ApiResponseModel.ErrorResponse(
-                    ResponseMessages.Codes.FILE_NOT_FOUND
-                );
-                return NotFound(response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error downloading attachment {AttachmentId}", attachmentId);
-                var response = ApiResponseModel.ErrorResponse(
-                    ResponseMessages.Codes.INTERNAL_SERVER_ERROR
-                );
-                return StatusCode(500, response);
-            }
+            return File(fileBytes, contentType, fileName);
         }
 
-        /// <summary>
-        /// Preview attachment without downloading (inline display)
-        /// </summary>
         [HttpGet("api/goal-attachments/{attachmentId:int}/preview")]
         public async Task<IActionResult> PreviewAttachment(int attachmentId)
         {
-            try
-            {
-                var userId = GetEmpMasterId();
-                var result = await _service.PreviewFileAsync(attachmentId, userId);
+            var userId = GetEmpMasterId();
 
-                if (result == null)
-                {
-                    var response = ApiResponseModel<object>.ErrorResponse(
-                        ResponseMessages.Codes.FILE_NOT_FOUND,
-                        "Attachment not found or access denied"
-                    );
-                    return NotFound(response);
-                }
+            var result = await _service.PreviewFileAsync(attachmentId, userId);
 
-                byte[] fileBytes = result.Value.fileBytes;
-                string contentType = result.Value.contentType;
-                string fileName = result.Value.fileName;
+            byte[] fileBytes = result.Value.fileBytes;
+            string contentType = result.Value.contentType;
+            string fileName = result.Value.fileName;
 
-                // Set proper headers for inline preview
-                Response.Headers["Content-Disposition"] = $"inline; filename=\"{fileName}\"";
-                Response.Headers["Cache-Control"] = "public, max-age=3600";
-                Response.Headers["Content-Length"] = fileBytes.Length.ToString();
-                Response.Headers["Accept-Ranges"] = "bytes";
+            Response.Headers["Content-Disposition"] = $"inline; filename=\"{fileName}\"";
+            Response.Headers["Cache-Control"] = "public, max-age=3600";
+            Response.Headers["Content-Length"] = fileBytes.Length.ToString();
+            Response.Headers["Accept-Ranges"] = "bytes";
 
-                return File(fileBytes, contentType, enableRangeProcessing: true);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                var response = ApiResponseModel<object>.ErrorResponse(
-                    ResponseMessages.Codes.FILE_ACCESS_DENIED
-                );
-                return Forbid(response.Message);
-            }
-            catch (FileNotFoundException)
-            {
-                var response = ApiResponseModel<object>.ErrorResponse(
-                    ResponseMessages.Codes.FILE_NOT_FOUND
-                );
-                return NotFound(response);
-            }
-            catch (Exception)
-            {
-                var response = ApiResponseModel<object>.ErrorResponse(
-                    ResponseMessages.Codes.INTERNAL_SERVER_ERROR
-                );
-                return StatusCode(500, response);
-            }
+            return File(fileBytes, contentType, enableRangeProcessing: true);
         }
 
-        /// <summary>
-        /// Delete an attachment
-        /// </summary>
         [HttpDelete("api/goal-attachments/{attachmentId:int}")]
         public async Task<IActionResult> DeleteAttachment(int attachmentId)
         {
-            try
-            {
-                var userId = GetEmpMasterId();
+            var userId = GetEmpMasterId();
 
-                var success = await _service.DeleteAttachmentAsync(attachmentId, userId);
+            await _service.DeleteAttachmentAsync(attachmentId, userId);
 
-                if (success)
-                {
-                    var response = ApiResponseModel.SuccessResponse(
-                        ResponseMessages.Codes.FILE_DELETED_SUCCESS,
-                        new { AttachmentId = attachmentId, DeletedBy = userId }
-                    );
-                    return Ok(response);
-                }
-                else
-                {
-                    var response = ApiResponseModel.ErrorResponse(
-                        ResponseMessages.Codes.FILE_UPLOAD_FAILED
-                    );
-                    return BadRequest(response);
-                }
-            }
-            catch (KeyNotFoundException)
-            {
-                var response = ApiResponseModel.ErrorResponse(
-                    ResponseMessages.Codes.FILE_NOT_FOUND
-                );
-                return NotFound(response);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                var response = ApiResponseModel.ErrorResponse(
-                    ResponseMessages.Codes.FILE_ACCESS_DENIED
-                );
-                return Forbid(response.Message);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error deleting attachment {AttachmentId}", attachmentId);
-                var response = ApiResponseModel.ErrorResponse(
-                    ResponseMessages.Codes.INTERNAL_SERVER_ERROR
-                );
-                return StatusCode(500, response);
-            }
+            var response = ApiResponseModel.SuccessResponse(
+                ResponseMessages.Codes.FILE_DELETED_SUCCESS,
+                new { AttachmentId = attachmentId, DeletedBy = userId }
+            );
+
+            return Ok(response);
         }
     }
 }

@@ -7,6 +7,31 @@ namespace Relevantz.EEPZ.Common.Constants
     {
         public static class Codes
         {
+            public const string Success = "SUCCESS";
+            public const string Created = "CREATED";
+            public const string Updated = "UPDATED";
+            public const string Deleted = "DELETED";
+
+            public const string BadRequest = "BAD_REQUEST";
+            public const string ValidationError = "VALIDATION_ERROR";
+            public const string NotFound = "NOT_FOUND";
+            public const string Unauthorized = "UNAUTHORIZED";
+            public const string Forbidden = "FORBIDDEN";
+            public const string Conflict = "CONFLICT";
+            public const string Duplicate = "DUPLICATE";
+            public const string BusinessRuleViolation = "BUSINESS_RULE_VIOLATION";
+
+            public const string InternalServerError = "INTERNAL_SERVER_ERROR";
+            public const string ServiceUnavailable = "SERVICE_UNAVAILABLE";
+            public const string Timeout = "TIMEOUT";
+            public const string OperationCancelled = "OPERATION_CANCELLED";
+
+            public const string UserNotFound = "USER_NOT_FOUND";
+            public const string UserAlreadyExists = "USER_ALREADY_EXISTS";
+            public const string InvalidCredentials = "INVALID_CREDENTIALS";
+            public const string TokenExpired = "TOKEN_EXPIRED";
+            public const string InvalidToken = "INVALID_TOKEN";
+
             // Goal Management - Success
             public const string GOAL_CREATED_SUCCESS = "GOAL_CREATED_SUCCESS";
             public const string GOAL_UPDATED_SUCCESS = "GOAL_UPDATED_SUCCESS";
@@ -60,11 +85,9 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string FILE_UPLOADED_SUCCESS = "FILE_UPLOADED_SUCCESS";
             public const string FILE_DOWNLOADED_SUCCESS = "FILE_DOWNLOADED_SUCCESS";
             public const string FILE_DELETED_SUCCESS = "FILE_DELETED_SUCCESS";
+
             // File Management - Success section
             public const string FILEPREVIEWEDSUCCESS = "FILEPREVIEWEDSUCCESS";
-
-
-
 
             // File Management - Errors
             public const string FILE_NOT_FOUND = "FILE_NOT_FOUND";
@@ -155,8 +178,10 @@ namespace Relevantz.EEPZ.Common.Constants
                 "Progress updated successfully",
                 "Goal progress has been updated and logged."
             ),
-              [Codes.FILEPREVIEWEDSUCCESS] = new("File preview ready", 
-             "The file is ready for preview."),
+            [Codes.FILEPREVIEWEDSUCCESS] = new(
+                "File preview ready",
+                "The file is ready for preview."
+            ),
 
             [Codes.GOAL_COMPLETED_SUCCESS] = new(
                 "Goal marked as completed",
@@ -277,8 +302,7 @@ namespace Relevantz.EEPZ.Common.Constants
                 "File not found",
                 "The requested file does not exist or may have been deleted."
             ),
-            // In Messages dictionary, add: 
-         
+            // In Messages dictionary, add:
 
             [Codes.FILE_ACCESS_DENIED] = new(
                 "File access denied",

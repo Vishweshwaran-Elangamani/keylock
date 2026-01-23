@@ -25,155 +25,71 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             _baseService = baseService;
         }
 
-        /// <summary>
-        /// Request approval (creation, completion, reopening, delegation)
-        /// </summary>
-        [HttpPost("api/goal-approvals/{goalId:int}")]
-        public async Task<IActionResult> RequestApproval(
+        [HttpPost("api/goal-approvals/{goalId}")]
+        public async Task<IActionResult> CreateApprovalRequest(
             int goalId,
-            [FromBody] CreateApprovalRequestModel dto
+            [FromBody] CreateApprovalRequestModel request
         )
         {
-            try
-            {
-                var userId = GetEmpMasterId();
-                var role = GetUserRole();
+            var userId = GetEmpMasterId();
+            var role = GetUserRole();
 
-                var result = await _service.RequestApprovalAsync(goalId, dto, userId, role);
+            var result = await _service.CreateApprovalRequestAsync(goalId, request, userId, role);
 
-                if (result.Success)
-                {
-                    return Ok(result);
-                }
-
-                return result.Code switch
-                {
-                    ResponseMessages.Codes.GOAL_NOT_FOUND => NotFound(result),
-                    ResponseMessages.Codes.GOAL_ACCESS_DENIED => Forbid(result.Message),
-                    ResponseMessages.Codes.GOAL_INVALID_STATUS => BadRequest(result),
-                    ResponseMessages.Codes.APPROVAL_PROOF_REQUIRED => BadRequest(result),
-                    ResponseMessages.Codes.APPROVAL_PROOF_INVALID => BadRequest(result),
-                    ResponseMessages.Codes.APPROVAL_NO_MANAGER => BadRequest(result),
-                    ResponseMessages.Codes.INVALID_REQUEST => BadRequest(result),
-                    _ => BadRequest(result),
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(
-                    ex,
-                    "Error requesting approval for goal {GoalId} by User {UserId}",
-                    goalId,
-                    GetEmpMasterId()
-                );
-                var response = ApiResponseModel<int>.ErrorResponse(
-                    ResponseMessages.Codes.INTERNAL_SERVER_ERROR
-                );
-                return StatusCode(500, response);
-            }
+            return Ok(result);
         }
 
-        /// <summary>
-        /// Approve or reject an approval request
-        /// </summary>
-        [HttpPut("api/goal-approvals/{approvalId:int}")]
+        [HttpPut("api/goal-approvals/{approvalId}")]
         [Authorize(
             Roles = $"{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD},{USER_ROLE.LEADERSHIP}"
         )]
-        public async Task<IActionResult> DecideApproval(
+        public async Task<IActionResult> ClosePendingApproval(
             int approvalId,
-            [FromBody] DecideApprovalModel dto
+            [FromBody] ApprovalDesicionModel desicion
         )
         {
-            try
-            {
-                var userId = GetEmpMasterId();
-                var role = GetUserRole();
+            var userId = GetEmpMasterId();
+            var role = GetUserRole();
 
-                var result = await _service.DecideApprovalAsync(approvalId, dto, userId, role);
+            var result = await _service.ClosePendingApprovalAsync(approvalId, desicion, userId, role);
 
-                if (result.Success)
-                {
-                    return Ok(result);
-                }
-
-                return result.Code switch
-                {
-                    ResponseMessages.Codes.APPROVAL_NOT_FOUND => NotFound(result),
-                    ResponseMessages.Codes.APPROVAL_ACCESS_DENIED => Forbid(result.Message),
-                    ResponseMessages.Codes.APPROVAL_ALREADY_DECIDED => Conflict(result),
-                    _ => BadRequest(result),
-                };
-            }
-            catch (Exception ex)
-            {
-                var response = ApiResponseModel.ErrorResponse(
-                    ResponseMessages.Codes.INTERNAL_SERVER_ERROR
-                );
-                return StatusCode(500, response);
-            }
+            return Ok(result);
         }
 
-        /// <summary>
-        /// Get pending approvals for current user (manager/Department Head/Leadership)
-        /// </summary>
         [HttpGet("api/goal-approvals/pending")]
         [Authorize(
             Roles = $"{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD},{USER_ROLE.LEADERSHIP}"
         )]
         public async Task<IActionResult> PendingApprovals()
         {
-            try
-            {
-                var userId = GetEmpMasterId();
+            var userId = GetEmpMasterId();
 
-                var approvals = await _service.GetPendingApprovalsAsync(userId);
+            var approvals = await _service.GetPendingApprovalsAsync(userId);
 
-                var response = ApiResponseModel<List<GoalApprovalModel>>.SuccessResponse(
-                    ResponseMessages.Codes.APPROVAL_RETRIEVED_SUCCESS,
-                    approvals,
-                    new { PendingCount = approvals.Count, ApproverId = userId }
-                );
+            var response = ApiResponseModel<List<GoalApprovalModel>>.SuccessResponse(
+                ResponseMessages.Codes.APPROVAL_RETRIEVED_SUCCESS,
+                approvals,
+                new { PendingCount = approvals.Count, ApproverId = userId }
+            );
 
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                var response = ApiResponseModel<List<GoalApprovalModel>>.ErrorResponse(
-                    ResponseMessages.Codes.INTERNAL_SERVER_ERROR
-                );
-                return StatusCode(500, response);
-            }
+            return Ok(response);
         }
 
-        /// <summary>
-        /// Get all approvals that the current user is involved in (requested, approving, or goal participant)
-        /// </summary>
-        [HttpGet("api/goal-approvals/my")]
-        public async Task<IActionResult> GetMyApprovals([FromQuery] ApprovalQueryModel query)
+        [HttpGet("api/goal-approvals/query")]
+        public async Task<IActionResult> GetUserApprovals([FromQuery] ApprovalQueryModel query)
         {
-            try
-            {
-                var userId = GetEmpMasterId();
-                var role = GetUserRole();
+            var userId = GetEmpMasterId();
+            var role = GetUserRole();
 
-                var approvals = await _service.GetUserApprovalsAsync(query, userId, role);
+            var approvals = await _service.GetUserApprovalsAsync(query, userId, role);
 
-                var response = ApiResponseModel<PagedApprovalsModel>.SuccessResponse(
-                    ResponseMessages.Codes.APPROVAL_RETRIEVED_SUCCESS,
-                    approvals,
-                    new { UserId = userId, Role = role }
-                );
+            var response = ApiResponseModel<PagedApprovalsModel>.SuccessResponse(
+                ResponseMessages.Codes.APPROVAL_RETRIEVED_SUCCESS,
+                approvals,
+                new { UserId = userId, Role = role }
+            );
 
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                var response = ApiResponseModel<PagedApprovalsModel>.ErrorResponse(
-                    ResponseMessages.Codes.INTERNAL_SERVER_ERROR
-                );
-                return StatusCode(500, response);
-            }
+            return Ok(response);
         }
     }
 }

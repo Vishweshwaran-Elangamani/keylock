@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Enums;
+using Relevantz.EEPZ.Common.Exceptions;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repository.Interface;
-using Serilog;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -43,68 +43,55 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string currentUserRole
         )
         {
-            try
+            var goal = await _baseRepo.GetGoalByIdAsync(goalId);
+            if (goal == null)
             {
-                var goal = await _baseRepo.GetGoalByIdAsync(goalId);
-                if (goal == null)
-                {
-                    return ApiResponseModel.ErrorResponse(ResponseMessages.Codes.GOAL_NOT_FOUND);
-                }
+                throw new GoalNotFoundException(goalId);
+            }
 
-                // NEW CODE:
-                // Check if user can comment
-                var canComment = await _baseService.CanUserCommentOnGoalAsync(
-                    goalId,
-                    currentUserEmployeeMasterId,
-                    currentUserRole
-                );
-                if (!canComment)
-                {
-                    return ApiResponseModel.ErrorResponse(
-                        ResponseMessages.Codes.COMMENT_ACCESS_DENIED,
-                        "You do not have permission to comment on this goal"
-                    );
-                }
-
-                // Check if goal is commentable (not completed/closed)
-                // Check if goal is commentable (not completed/closed)
-                var isCommentable = await _baseService.IsGoalCommentableAsync(goalId);
-                if (!isCommentable)
-                {
-                    Log.Warning("[AddCommentAsync] Goal {GoalId} is not commentable", goalId);
-                    return ApiResponseModel.ErrorResponse(
-                        ResponseMessages.Codes.GOAL_COMMENT_BLOCKED,
-                        "Cannot comment on completed or closed goals"
-                    );
-                }
-
-                var comment = new GoalComment
-                {
-                    GoalId = goalId,
-                    GoalComment1 = dto.Comment,
-                    CommentedBy = currentUserEmployeeMasterId,
-                    CommentedOn = DateTime.UtcNow,
-                };
-                await _repo.AddCommentAsync(comment);
-                await _baseRepo.SaveChangesAsync();
-
-                var metadata = new
-                {
-                    GoalId = goalId,
-                    CommentId = comment.Goalcommentid,
-                    CommentedBy = currentUserEmployeeMasterId,
-                };
-
-                return ApiResponseModel.SuccessResponse(
-                    ResponseMessages.Codes.COMMENT_ADDED_SUCCESS,
-                    metadata
+            var canComment = await _baseService.CanUserCommentOnGoalAsync(
+                goalId,
+                currentUserEmployeeMasterId,
+                currentUserRole
+            );
+            if (!canComment)
+            {
+                throw new AccessDeniedException(
+                    ResponseMessages.Codes.COMMENT_ACCESS_DENIED,
+                    "You do not have permission to comment on this goal"
                 );
             }
-            catch (Exception ex)
+
+            var isCommentable = await _baseService.IsGoalCommentableAsync(goalId);
+            if (!isCommentable)
             {
-                Console.WriteLine($"Error adding comment to goal {goalId}: {ex}");
-                return ApiResponseModel.ErrorResponse(ResponseMessages.Codes.INTERNAL_SERVER_ERROR);
+                throw new BusinessRuleException(
+                    ResponseMessages.Codes.GOAL_COMMENT_BLOCKED,
+                    "Cannot comment on completed or closed goals"
+                );
             }
+
+            var comment = new GoalComment
+            {
+                GoalId = goalId,
+                GoalComment1 = dto.Comment,
+                CommentedBy = currentUserEmployeeMasterId,
+                CommentedOn = DateTime.UtcNow,
+            };
+            await _repo.AddCommentAsync(comment);
+            await _baseRepo.SaveChangesAsync();
+
+            var metadata = new
+            {
+                GoalId = goalId,
+                CommentId = comment.Goalcommentid,
+                CommentedBy = currentUserEmployeeMasterId,
+            };
+
+            return ApiResponseModel.SuccessResponse(
+                ResponseMessages.Codes.COMMENT_ADDED_SUCCESS,
+                metadata
+            );
         }
 
         public async Task<List<GoalCommentModel>> ListCommentsAsync(int goalId)
@@ -140,96 +127,55 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             int currentUserEmployeeMasterId
         )
         {
-            try
-            {
-                Log.Information(
-                    "GetDashboardSummaryAsync - Starting for user {UserId}",
-                    currentUserEmployeeMasterId
-                );
+            var userRole = await _baseRepo.GetUserRoleAsync(currentUserEmployeeMasterId);
 
-                var userRole = await _baseRepo.GetUserRoleAsync(currentUserEmployeeMasterId);
-
-                Log.Information("GetDashboardSummaryAsync - User role: {Role}", userRole);
-
-                var allGoals = await _goalRepo.QueryGoalsAsync(
-                    new GoalQueryModel
-                    {
-                        CurrentUserEmpMasterID = currentUserEmployeeMasterId,
-                        CurrentUserRole = userRole,
-                        Page = 1,
-                        PageSize = 1000000,
-                    }
-                );
-
-                Log.Information(
-                    "GetDashboardSummaryAsync - Retrieved {Count} total goals",
-                    allGoals.Count
-                );
-
-                var completed = allGoals
-                    .Where(g => g.Goalstatus?.ToLower() == GOAL_STATUS.COMPLETED.ToLower())
-                    .ToList();
-
-                var pending = allGoals
-                    .Where(g => g.Goalstatus?.ToLower() == GOAL_STATUS.PENDING.ToLower())
-                    .ToList();
-
-                var ongoing = allGoals
-                    .Where(g =>
-                        g.Goalstatus?.ToLower() == GOAL_STATUS.IN_PROGRESS.ToLower()
-                        || g.Goalstatus?.ToLower() == GOAL_STATUS.OPEN.ToLower()
-                        || g.Goalstatus?.ToLower() == GOAL_STATUS.REOPENED.ToLower()
-                    )
-                    .ToList();
-
-                var overdue = allGoals
-                    .Where(g =>
-                        g.Goalendat.HasValue
-                        && g.Goalendat.Value < DateTime.UtcNow
-                        && g.Goalstatus?.ToLower() != GOAL_STATUS.COMPLETED.ToLower()
-                        && g.Goalstatus?.ToLower() != GOAL_STATUS.CLOSED.ToLower()
-                    )
-                    .ToList();
-
-                var pendingApprovals = await _approvalsRepo.CountPendingApprovalsForUserAsync(
-                    currentUserEmployeeMasterId
-                );
-
-                Log.Information(
-                    "GetDashboardSummaryAsync - Summary: Completed={Completed}, Ongoing={Ongoing}, Pending={Pending}, Overdue={Overdue}, PendingApprovals={PendingApprovals}",
-                    completed.Count,
-                    ongoing.Count,
-                    pending.Count,
-                    overdue.Count,
-                    pendingApprovals
-                );
-
-                return new GoalDashboardSummaryModel
+            var allGoals = await _goalRepo.QueryGoalsAsync(
+                new GoalQueryModel
                 {
-                    Completed = completed.Count,
-                    Ongoing = ongoing.Count,
-                    Pending = pending.Count,
-                    Overdue = overdue.Count,
-                    PendingApprovals = pendingApprovals,
-                };
-            }
-            catch (Exception ex)
-            {
-                Log.Error(
-                    ex,
-                    "GetDashboardSummaryAsync - Error calculating dashboard summary for user {UserId}",
-                    currentUserEmployeeMasterId
-                );
+                    CurrentUserEmpMasterID = currentUserEmployeeMasterId,
+                    CurrentUserRole = userRole,
+                    Page = 1,
+                    PageSize = 1000000,
+                }
+            );
 
-                return new GoalDashboardSummaryModel
-                {
-                    Completed = 0,
-                    Ongoing = 0,
-                    Pending = 0,
-                    Overdue = 0,
-                    PendingApprovals = 0,
-                };
-            }
+            var completed = allGoals
+                .Where(g => g.Goalstatus?.ToLower() == GOAL_STATUS.COMPLETED.ToLower())
+                .ToList();
+
+            var pending = allGoals
+                .Where(g => g.Goalstatus?.ToLower() == GOAL_STATUS.PENDING.ToLower())
+                .ToList();
+
+            var ongoing = allGoals
+                .Where(g =>
+                    g.Goalstatus?.ToLower() == GOAL_STATUS.IN_PROGRESS.ToLower()
+                    || g.Goalstatus?.ToLower() == GOAL_STATUS.OPEN.ToLower()
+                    || g.Goalstatus?.ToLower() == GOAL_STATUS.REOPENED.ToLower()
+                )
+                .ToList();
+
+            var overdue = allGoals
+                .Where(g =>
+                    g.Goalendat.HasValue
+                    && g.Goalendat.Value < DateTime.UtcNow
+                    && g.Goalstatus?.ToLower() != GOAL_STATUS.COMPLETED.ToLower()
+                    && g.Goalstatus?.ToLower() != GOAL_STATUS.CLOSED.ToLower()
+                )
+                .ToList();
+
+            var pendingApprovals = await _approvalsRepo.CountPendingApprovalsForUserAsync(
+                currentUserEmployeeMasterId
+            );
+
+            return new GoalDashboardSummaryModel
+            {
+                Completed = completed.Count,
+                Ongoing = ongoing.Count,
+                Pending = pending.Count,
+                Overdue = overdue.Count,
+                PendingApprovals = pendingApprovals,
+            };
         }
 
         public async Task<List<GoalSummaryModel>> GetOngoingAsync(
@@ -305,15 +251,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             var goal = await _baseRepo.GetGoalByIdAsync(goalId);
             if (goal == null)
-                throw new KeyNotFoundException("Goal not found");
+                throw new GoalNotFoundException(goalId);
 
             var canView = await _baseService.CanViewGoalAsync(goalId, currentUserEmployeeMasterId);
             if (!canView)
-                throw new UnauthorizedAccessException("You cannot view this goal's timeline.");
+                throw new GoalAccessDeniedException();
 
             var events = new List<TimelineEventModel>();
 
-            // Goal creation
             events.Add(
                 new TimelineEventModel
                 {
@@ -328,7 +273,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
             );
 
-            // Progress logs
             var progressLogs = await _repo.GetProgressLogsByGoalAsync(goalId);
             foreach (var p in progressLogs)
             {
@@ -348,7 +292,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
             }
 
-            // Approvals
             foreach (var a in goal.GoalApprovals)
             {
                 string requestDescription = a.ApprovalType switch
@@ -417,7 +360,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
             }
 
-            // Comments
             foreach (var c in goal.GoalComments)
             {
                 events.Add(
@@ -436,7 +378,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
             }
 
-            // Assignments
             foreach (var a in goal.GoalAssignments)
             {
                 events.Add(
@@ -455,7 +396,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
             }
 
-            // Attachments
             foreach (var att in goal.GoalAttachments)
             {
                 events.Add(
