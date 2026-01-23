@@ -8,6 +8,7 @@ namespace PerformanceManagement.Controllers
 {
     [ApiController]
     [Authorize]
+    [Authorize(Roles = "Department Head,Employee")] 
     [Route("api/[controller]")]
     public class DepartmentHeadNominationController : ControllerBase
     {

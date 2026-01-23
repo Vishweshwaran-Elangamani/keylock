@@ -27,11 +27,12 @@ namespace Relevantz.EEPZ.API.Controllers
             _service = service ?? throw new ArgumentNullException(nameof(service));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
- 
+
         /// <summary>
         /// Searches nomination notifications for the given employee.
         /// </summary>
         /// <param name="employeeId">Employee identifier (must be a positive integer).</param>
+         [Authorize(Roles = "Manager,HR,Department Head,Employee")]
         [HttpGet("search")]
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
