@@ -12,6 +12,9 @@ using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repositories.Implementations;
 using Relevantz.EEPZ.Data.Repositories.Interface;
 using Relevantz.EEPZ.Api.Middleware;
+using FluentValidation;
+using FluentValidation.AspNetCore; 
+using Relevantz.EEPZ.Common.Validators; 
 using Serilog;
 
 
@@ -61,7 +64,8 @@ builder
             .Json
             .JsonNamingPolicy
             .CamelCase;
-    });
+    }).AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<Relevantz.EEPZ.Common.Validators.ApprovalDecisionRequestModelValidator>());
+
 
 
 
@@ -114,6 +118,7 @@ builder.Services.AddSwaggerGen(options =>
         }
     );
 });
+
 
 // Configure MySQL Database
 
