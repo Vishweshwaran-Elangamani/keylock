@@ -238,7 +238,7 @@ const goalService = {
   },
   getMyApprovals: async (filters = {}) => {
     try {
-      const response = await goalApi.get("/goal-approvals/my", {
+      const response = await goalApi.get("/goal-approvals/query", {
         params: filters,
       });
       return response.data;
