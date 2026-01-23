@@ -63,7 +63,9 @@ const NotificationBell = () => {
       case "Reminder":
         return <AlertCircle size={16} className="nb-icon nb-icon-reminder" />;
       case "AutoClosure":
-        return <AlertCircle size={16} className="nb-icon nb-icon-autoclosure" />;
+        return (
+          <AlertCircle size={16} className="nb-icon nb-icon-autoclosure" />
+        );
       case "Escalation":
         return <AlertCircle size={16} className="nb-icon nb-icon-escalation" />;
       default:
@@ -89,10 +91,7 @@ const NotificationBell = () => {
 
       {showDropdown && (
         <>
-          <div
-            className="nb-backdrop"
-            onClick={() => setShowDropdown(false)}
-          />
+          <div className="nb-backdrop" onClick={() => setShowDropdown(false)} />
 
           <div className="nb-dropdown">
             <div className="nb-header">
@@ -130,10 +129,7 @@ const NotificationBell = () => {
                 </div>
               ) : (
                 notifications.map((notification) => (
-                  <div
-                    key={notification.notificationId}
-                    className="nb-item"
-                  >
+                  <div key={notification.notificationId} className="nb-item">
                     <div className="nb-item-inner">
                       <div className="nb-item-icon">
                         {getNotificationIcon(notification.notificationType)}

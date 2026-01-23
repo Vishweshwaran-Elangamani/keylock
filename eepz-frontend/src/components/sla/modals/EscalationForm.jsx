@@ -164,7 +164,11 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
               </div>
               <h5 className="esc-header-title">Add Escalation</h5>
             </div>
-            <button onClick={onClose} disabled={submitting}className="esc-close-btn">
+            <button
+              onClick={onClose}
+              disabled={submitting}
+              className="esc-close-btn"
+            >
               <X size={20} />
             </button>
           </div>
@@ -172,7 +176,10 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
           <div className="esc-body">
             {loadingManager ? (
               <div className="esc-loading">
-                <div className="spinner-border text-primary esc-loading-spinner" role="status">
+                <div
+                  className="spinner-border text-primary esc-loading-spinner"
+                  role="status"
+                >
                   <span className="visually-hidden">Loading...</span>
                 </div>
                 <p className="esc-loading-text">
@@ -182,15 +189,22 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
             ) : managerError ? (
               <div>
                 <div className="esc-manager-error alert alert-danger d-flex align-items-start gap-3">
-                  <AlertCircle size={20} className="flex-shrink-0 esc-manager-error-icon"/>
-                  
+                  <AlertCircle
+                    size={20}
+                    className="flex-shrink-0 esc-manager-error-icon"
+                  />
+
                   <div>
                     <strong className="d-block mb-1">Manager Not Found</strong>
                     <small>{managerError}</small>
                   </div>
                 </div>
                 <div className="esc-manager-error-footer text-center mt-3">
-                  <button type="button" className="esc-btn esc-btn-secondary btn btn-secondary"onClick={onClose}>
+                  <button
+                    type="button"
+                    className="esc-btn esc-btn-secondary btn btn-secondary"
+                    onClick={onClose}
+                  >
                     Close
                   </button>
                 </div>
@@ -206,7 +220,9 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                   <small className="esc-deadline-text">
                     Deadline:{" "}
                     {new Date(sla.deadline).toLocaleDateString("en-US", {
-                      year: "numeric",month: "short",day: "numeric",
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
                     })}
                   </small>
                 </div>
@@ -225,8 +241,13 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                     Reason <span className="esc-required">*</span>
                   </label>
                   <div className="esc-select-wrapper">
-                    <select id="reason" className="esc-select" value={selectedReason}
-                      onChange={(e) => setSelectedReason(e.target.value)} disabled={submitting}>
+                    <select
+                      id="reason"
+                      className="esc-select"
+                      value={selectedReason}
+                      onChange={(e) => setSelectedReason(e.target.value)}
+                      disabled={submitting}
+                    >
                       {reasonOptions.map((option, index) => (
                         <option
                           key={option.value || "placeholder"}
@@ -245,12 +266,22 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                     Your Comment <span className="esc-required">*</span>
                   </label>
                   <textarea
-                    id="details"className="esc-textarea form-control"
-                    placeholder="Write your comment here..."value={description}
-                    onChange={(e) => setDescription(e.target.value)} onKeyDown={handleKeyDown} required
-                    rows={3} disabled={submitting} maxLength={500}/>
+                    id="details"
+                    className="esc-textarea form-control"
+                    placeholder="Write your comment here..."
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    required
+                    rows={3}
+                    disabled={submitting}
+                    maxLength={500}
+                  />
                   <div className="esc-comment-meta d-flex justify-content-between align-items-center mt-1">
-                    <small className="esc-comment-hint">  Press Ctrl+Enter to submit quickly</small>
+                    <small className="esc-comment-hint">
+                      {" "}
+                      Press Ctrl+Enter to submit quickly
+                    </small>
                     <small className="esc-comment-count">
                       {description.length}/500
                     </small>
@@ -266,23 +297,42 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                 </div>
 
                 <div className="esc-footer">
-                  <button type="button" className="esc-btn esc-btn-cancel btn" onClick={onClose} disabled={submitting}>
+                  <button
+                    type="button"
+                    className="esc-btn esc-btn-cancel btn"
+                    onClick={onClose}
+                    disabled={submitting}
+                  >
                     Cancel
                   </button>
-                  
-                <button type="submit"  className="esc-btn esc-btn-submit btn d-flex align-items-center gap-2"
-                    disabled={  submitting || loadingManager || !managerId || 
-                !selectedReason || description.trim().length < 10    }
+
+                  <button
+                    type="submit"
+                    className="esc-btn esc-btn-submit btn d-flex align-items-center gap-2"
+                    disabled={
+                      submitting ||
+                      loadingManager ||
+                      !managerId ||
+                      !selectedReason ||
+                      description.trim().length < 10
+                    }
                   >
-                  {submitting ? (
+                    {submitting ? (
                       <>
                         <span className="spinner-border spinner-border-sm esc-submit-spinner" />
                         <span>Posting...</span>
                       </>
                     ) : (
                       <>
-                        <svg className="esc-submit-icon" width="14"height="14"
-                          viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <svg
+                          className="esc-submit-icon"
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
                           <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
                         </svg>
                         <span>Post Escalation</span>

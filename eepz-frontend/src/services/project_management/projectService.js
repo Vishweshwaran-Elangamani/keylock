@@ -133,7 +133,6 @@ const projectService = {
     }
   },
 
- 
   getAllEmployees: async () => {
     try {
       const response = await apiClient.get("/employees");
@@ -144,7 +143,6 @@ const projectService = {
       );
     }
   },
-
 
   getManagers: async () => {
     try {
@@ -208,7 +206,6 @@ const projectService = {
     }
   },
 
-
   getEmployeesByDepartment: async (departmentId) => {
     try {
       const response = await apiClient.get("/employees", {
@@ -236,7 +233,6 @@ const projectService = {
       );
     }
   },
-
 
   getInitialStageEmployees: async () => {
     try {

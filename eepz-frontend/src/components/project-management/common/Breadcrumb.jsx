@@ -29,7 +29,9 @@ const Breadcrumb = ({ items = [] }) => {
           return (
             <li
               key={index}
-              className={`pm-bc__item breadcrumb-item ${isLast ? "active" : ""}`}
+              className={`pm-bc__item breadcrumb-item ${
+                isLast ? "active" : ""
+              }`}
               aria-current={isLast ? "page" : undefined}
             >
               {isLast ? (

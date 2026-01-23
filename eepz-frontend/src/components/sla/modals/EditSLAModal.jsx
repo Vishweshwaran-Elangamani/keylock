@@ -100,7 +100,9 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
     <div className="esla-overlay" onClick={onClose} role="presentation">
       <div className="esla-modal" onClick={(e) => e.stopPropagation()}>
         <div className="esla-header">
-          <h5 className="esla-title">Edit SLA - {sla?.employeeName || "N/A"}</h5>
+          <h5 className="esla-title">
+            Edit SLA - {sla?.employeeName || "N/A"}
+          </h5>
 
           <button
             type="button"

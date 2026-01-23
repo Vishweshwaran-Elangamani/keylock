@@ -1,6 +1,12 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import ReactDOM from "react-dom";
-import { CheckCircle, AlertCircle, X, MessageSquare, Calendar } from "lucide-react";
+import {
+  CheckCircle,
+  AlertCircle,
+  X,
+  MessageSquare,
+  Calendar,
+} from "lucide-react";
 import CustomCalendar from "../../../components/project-management/common/CustomCalendar";
 import CustomDropdown from "../../../components/project-management/common/CustomDropdown";
 import "../../../styles/projectmanagement/modals/EditProjectModal.css";

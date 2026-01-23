@@ -1,12 +1,24 @@
 import React, { useMemo } from "react";
-import { Award, Calendar, CheckCircle, FileText, Lock, Unlock } from "lucide-react";
+import {
+  Award,
+  Calendar,
+  CheckCircle,
+  FileText,
+  Lock,
+  Unlock,
+} from "lucide-react";
 import {
   getComplianceRating,
   getComplianceSummary,
 } from "../../../utils/sla/slaCalculations";
 import "../../../styles/sla/components/ComplianceCard.css";
 
-const ComplianceCard = ({ compliance, slaData, onClick, showActions = false }) => {
+const ComplianceCard = ({
+  compliance,
+  slaData,
+  onClick,
+  showActions = false,
+}) => {
   const calculatedCompliance = useMemo(() => {
     if (!slaData?.length) return compliance;
 
@@ -34,7 +46,9 @@ const ComplianceCard = ({ compliance, slaData, onClick, showActions = false }) =
     );
   }
 
-  const compliancePercentage = Number(calculatedCompliance?.compliancePercentage ?? 0);
+  const compliancePercentage = Number(
+    calculatedCompliance?.compliancePercentage ?? 0
+  );
   const rating = getComplianceRating?.(compliancePercentage);
 
   const formatDate = (date) =>
@@ -97,7 +111,10 @@ const ComplianceCard = ({ compliance, slaData, onClick, showActions = false }) =
         <div className="cc-progress">
           <div
             className="cc-progress-fill"
-            data-progress={Math.max(0, Math.min(100, compliancePercentage)).toFixed(0)}
+            data-progress={Math.max(
+              0,
+              Math.min(100, compliancePercentage)
+            ).toFixed(0)}
           />
         </div>
 
@@ -137,15 +154,16 @@ const ComplianceCard = ({ compliance, slaData, onClick, showActions = false }) =
 
         {(calculatedCompliance?.openSlas ?? 0) > 0 && (
           <div className="cc-open">
-            {calculatedCompliance?.openSlas ?? 0} SLA(s) currently open (not included
-            in compliance %)
+            {calculatedCompliance?.openSlas ?? 0} SLA(s) currently open (not
+            included in compliance %)
           </div>
         )}
 
         <div className="cc-updated">
           Last Updated:{" "}
           {formatDate(
-            calculatedCompliance?.calculatedAt ?? calculatedCompliance?.updatedAt
+            calculatedCompliance?.calculatedAt ??
+              calculatedCompliance?.updatedAt
           )}
         </div>
       </div>

@@ -121,7 +121,9 @@ const ReopenSLAForm = ({ sla, onClose, onSuccess }) => {
                 </div>
 
                 <div className="rsf-deadline-col">
-                  <small className="rsf-small-label">New Deadline (+1 Day)</small>
+                  <small className="rsf-small-label">
+                    New Deadline (+1 Day)
+                  </small>
                   <strong className="rsf-deadline-value rsf-deadline-value--new">
                     {calculateNewDeadline()}
                   </strong>
@@ -155,7 +157,9 @@ const ReopenSLAForm = ({ sla, onClose, onSuccess }) => {
               />
 
               <div className="rsf-help-row">
-                <small className="rsf-help-left">Provide clear justification</small>
+                <small className="rsf-help-left">
+                  Provide clear justification
+                </small>
                 <small className="rsf-help-right">
                   {formData.reason.length}/500
                 </small>

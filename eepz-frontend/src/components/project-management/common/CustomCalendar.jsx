@@ -21,7 +21,19 @@ const CustomCalendar = ({
   const [calendarPosition, setCalendarPosition] = useState({ top: 0, left: 0 });
 
   const monthNames = [
-    "January","February","March","April","May","June","July","August","September","October","November","December",];
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
 
   const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 

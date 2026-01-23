@@ -61,7 +61,10 @@ const SLATable = ({ slas, onViewDetails, onEscalate, showActions = true }) => {
 
             <div className="col-md-6">
               <div className="sla-table-filter-wrapper d-flex align-items-center gap-2">
-                <Filter size={18} className="sla-table-filter-icon text-muted" />
+                <Filter
+                  size={18}
+                  className="sla-table-filter-icon text-muted"
+                />
                 <select
                   className="sla-table-filter-select form-select"
                   value={filterStatus}
@@ -90,7 +93,10 @@ const SLATable = ({ slas, onViewDetails, onEscalate, showActions = true }) => {
                 >
                   <div className="sla-table-th-content d-flex align-items-center gap-2">
                     SLA Type
-                    <ArrowUpDown size={14} className="sla-table-sort-icon text-muted" />
+                    <ArrowUpDown
+                      size={14}
+                      className="sla-table-sort-icon text-muted"
+                    />
                   </div>
                 </th>
 
@@ -100,7 +106,10 @@ const SLATable = ({ slas, onViewDetails, onEscalate, showActions = true }) => {
                 >
                   <div className="sla-table-th-content d-flex align-items-center gap-2">
                     Employee
-                    <ArrowUpDown size={14} className="sla-table-sort-icon text-muted" />
+                    <ArrowUpDown
+                      size={14}
+                      className="sla-table-sort-icon text-muted"
+                    />
                   </div>
                 </th>
 
@@ -112,7 +121,10 @@ const SLATable = ({ slas, onViewDetails, onEscalate, showActions = true }) => {
                 >
                   <div className="sla-table-th-content d-flex align-items-center gap-2">
                     Deadline
-                    <ArrowUpDown size={14} className="sla-table-sort-icon text-muted" />
+                    <ArrowUpDown
+                      size={14}
+                      className="sla-table-sort-icon text-muted"
+                    />
                   </div>
                 </th>
 

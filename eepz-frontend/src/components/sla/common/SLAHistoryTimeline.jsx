@@ -21,7 +21,11 @@ const SLAHistoryTimeline = ({ history }) => {
         return { icon: TrendingUp, label: "Status Changed", variant: "status" };
       case "Escalated":
       case "EscalatedToDeptHead":
-        return { icon: AlertTriangle, label: "Escalated", variant: "escalated" };
+        return {
+          icon: AlertTriangle,
+          label: "Escalated",
+          variant: "escalated",
+        };
       case "Reopened":
         return { icon: RotateCcw, label: "Reopened", variant: "reopened" };
       case "Closed":

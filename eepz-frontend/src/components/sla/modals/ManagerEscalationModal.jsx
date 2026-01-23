@@ -10,16 +10,26 @@ const MgrSelect = ({ value, onChange, options, placeholder }) => {
 
   return (
     <div className="mgr-select">
-      <button type="button"className={`mgr-select-control ${  open ? "mgr-select-control--open" : ""}`}
-        onClick={() => setOpen((p) => !p)}>
-        
+      <button
+        type="button"
+        className={`mgr-select-control ${
+          open ? "mgr-select-control--open" : ""
+        }`}
+        onClick={() => setOpen((p) => !p)}
+      >
         <span className="mgr-select-value">
           {selected ? selected.label : placeholder}
         </span>
-        <span className={`mgr-select-icon ${open ? "mgr-select-icon--open" : ""}`}>     
+        <span
+          className={`mgr-select-icon ${open ? "mgr-select-icon--open" : ""}`}
+        >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <polyline  points="6 9 12 15 18 9"
-              stroke="currentColor" strokeWidth="2"strokeLinecap="round" strokeLinejoin="round"
+            <polyline
+              points="6 9 12 15 18 9"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
           </svg>
         </span>
@@ -27,13 +37,24 @@ const MgrSelect = ({ value, onChange, options, placeholder }) => {
 
       {open && (
         <div className="mgr-select-menu">
-          <div className="mgr-select-option mgr-select-option--selected"
-            onClick={() => { onChange(""); setOpen(false);}}>  {placeholder}
+          <div
+            className="mgr-select-option mgr-select-option--selected"
+            onClick={() => {
+              onChange("");
+              setOpen(false);
+            }}
+          >
+            {" "}
+            {placeholder}
           </div>
-          
+
           {options.map((opt) => (
-            <div key={opt.value}  className="mgr-select-option"
-              onClick={() => { onChange(opt.value); setOpen(false);
+            <div
+              key={opt.value}
+              className="mgr-select-option"
+              onClick={() => {
+                onChange(opt.value);
+                setOpen(false);
               }}
             >
               {opt.label}
@@ -126,9 +147,12 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
       const payload = {
-        slaid: review.slaid,escalationLevel: "L2",
-        submittedByEmployeeId: user.empId,escalatedToEmployeeId: deptHead.employeeId || deptHead.employeeMasterId,
-        reason,description: comments.trim(),
+        slaid: review.slaid,
+        escalationLevel: "L2",
+        submittedByEmployeeId: user.empId,
+        escalatedToEmployeeId: deptHead.employeeId || deptHead.employeeMasterId,
+        reason,
+        description: comments.trim(),
       };
 
       await onEscalate(payload);
@@ -150,7 +174,10 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
     return (
       <div className="mgr-overlay mgr-overlay--center-only">
         <div className="mgr-loading-card">
-          <div className="spinner-border text-primary mgr-loading-spinner" role="status"/>
+          <div
+            className="spinner-border text-primary mgr-loading-spinner"
+            role="status"
+          />
           <p className="mgr-loading-text">Loading escalation details...</p>
         </div>
       </div>
@@ -160,7 +187,10 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
   if (alreadyEscalated) {
     return (
       <div className="mgr-overlay" onClick={onClose}>
-        <div className="mgr-modal mgr-modal--small" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="mgr-modal mgr-modal--small"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="mgr-modal-header mgr-modal-header--primary">
             <h5 className="mgr-modal-title">Already Escalated</h5>
             <button className="mgr-close-btn" onClick={onClose}>
@@ -190,7 +220,10 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
   if (!deptHead) {
     return (
       <div className="mgr-overlay" onClick={onClose}>
-        <div className="mgr-modal mgr-modal--small" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="mgr-modal mgr-modal--small"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="mgr-modal-header mgr-modal-header--primary">
             <h5 className="mgr-modal-title">Error</h5>
             <button className="mgr-close-btn" onClick={onClose}>
@@ -221,11 +254,18 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
   return (
     <div className="mgr-overlay" onClick={!loading ? onClose : undefined}>
       <div
-        className="mgr-modal mgr-modal--main"onClick={(e) => e.stopPropagation()} >
+        className="mgr-modal mgr-modal--main"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="mgr-modal-header mgr-modal-header--primary">
           <h5 className="mgr-modal-title">Escalate to Department Head</h5>
-          <button className={`mgr-close-btn ${loading ? "mgr-close-btn--disabled" : "" }`}
-            onClick={onClose} disabled={loading}>
+          <button
+            className={`mgr-close-btn ${
+              loading ? "mgr-close-btn--disabled" : ""
+            }`}
+            onClick={onClose}
+            disabled={loading}
+          >
             <X size={24} />
           </button>
         </div>
@@ -237,7 +277,10 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
               <div className="mgr-error-text-wrapper">
                 <p className="mgr-error-text">{error}</p>
               </div>
-              <button className="mgr-error-close" onClick={() => setError(null)}>
+              <button
+                className="mgr-error-close"
+                onClick={() => setError(null)}
+              >
                 <X size={18} />
               </button>
             </div>
@@ -268,10 +311,17 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
               <label className="mgr-label">
                 Reason <span className="mgr-required">*</span>
               </label>
-              <div className={`mgr-select-container ${loading ? "mgr-select-container--disabled" : "" }`}>
-                <MgrSelect value={reason}
-                  onChange={setReason}  options={reasons.map((r) => ({ value: r, label: r }))}
-                  placeholder="-- Select Reason --"/>
+              <div
+                className={`mgr-select-container ${
+                  loading ? "mgr-select-container--disabled" : ""
+                }`}
+              >
+                <MgrSelect
+                  value={reason}
+                  onChange={setReason}
+                  options={reasons.map((r) => ({ value: r, label: r }))}
+                  placeholder="-- Select Reason --"
+                />
               </div>
             </div>
 
@@ -279,9 +329,15 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
               <label className="mgr-label">
                 Your Comment <span className="mgr-required">*</span>
               </label>
-              <textarea rows="4" className="mgr-textarea"
-                placeholder="Explain why you're escalating..." value={comments}
-                onChange={(e) => setComments(e.target.value)}maxLength={250}disabled={loading}/>
+              <textarea
+                rows="4"
+                className="mgr-textarea"
+                placeholder="Explain why you're escalating..."
+                value={comments}
+                onChange={(e) => setComments(e.target.value)}
+                maxLength={250}
+                disabled={loading}
+              />
               <small className="mgr-char-count">
                 {comments.length}/250 characters
               </small>
@@ -290,10 +346,21 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
         </div>
 
         <div className="mgr-modal-footer">
-          <button className="mgr-btn mgr-btn--cancel" onClick={onClose} disabled={loading}>Cancel</button>
+          <button
+            className="mgr-btn mgr-btn--cancel"
+            onClick={onClose}
+            disabled={loading}
+          >
+            Cancel
+          </button>
 
-          <button className={`mgr-btn mgr-btn--primary ${   loading || !isValid ? "mgr-btn--disabled" : "" }`}
-            onClick={handleSubmit} disabled={loading || !isValid}>
+          <button
+            className={`mgr-btn mgr-btn--primary ${
+              loading || !isValid ? "mgr-btn--disabled" : ""
+            }`}
+            onClick={handleSubmit}
+            disabled={loading || !isValid}
+          >
             {loading ? (
               <>
                 <span className="mgr-btn-spinner" />
@@ -301,7 +368,8 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
               </>
             ) : (
               <>
-                <Send size={18} /> Escalate to DH </>
+                <Send size={18} /> Escalate to DH{" "}
+              </>
             )}
           </button>
         </div>

@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  CheckCircle,
-  Clock,
-  AlertTriangle,
-  Pause,
-} from "lucide-react";
+import { CheckCircle, Clock, AlertTriangle, Pause } from "lucide-react";
 import "../../../styles/sla/components/SLAStatusBadge.css";
 
 const SLAStatusBadge = ({ status, size = "md" }) => {
