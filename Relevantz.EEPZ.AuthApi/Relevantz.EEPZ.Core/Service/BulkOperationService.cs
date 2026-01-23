@@ -155,7 +155,32 @@ namespace Relevantz.EEPZ.Core.Service
                     continue;
                 }
 
-                
+                try
+                {
+                    await _userManagementService.CreateUserAsync(user, performedByUserId);
+                    successCount++;
+
+                    var role = roles?.FirstOrDefault(r => r.RoleId == user.RoleId);
+                    var department = departments?.FirstOrDefault(d => d.DepartmentId == user.DepartmentId);
+
+                    successfulUsers.Add(new SuccessfulUserDto
+                    {
+                        Email = user.Email,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        EmployeeCompanyId = user.EmployeeCompanyId,
+                        Role = role?.RoleName ?? "Unknown",
+                        Department = department?.DepartmentName ?? "Unknown"
+                    });
+
+                    EEPZBusinessLog.Information($"User created with Employee ID: {user.EmployeeCompanyId}");
+                }
+                catch (Exception ex)
+                {
+                    failureCount++;
+                    errors.Add($"Row {rowNumber} ({user.Email}): {ex.Message}");
+                    EEPZBusinessLog.Warning($"Failed to create user at row {rowNumber}: {ex.Message}");
+                }
             }
 
             var bulkLog = new Bulkoperationlog
@@ -194,7 +219,17 @@ namespace Relevantz.EEPZ.Core.Service
 
             foreach (var userId in request.UserIds)
             {
-                
+                try
+                {
+                    await _userManagementService.DeactivateUserAsync(userId);
+                    successCount++;
+                }
+                catch (Exception ex)
+                {
+                    failureCount++;
+                    errors.Add($"UserId {userId}: {ex.Message}");
+                    EEPZBusinessLog.Warning($"Failed to deactivate user {userId}: {ex.Message}");
+                }
             }
 
             var bulkLog = new Bulkoperationlog

@@ -33,16 +33,56 @@ namespace Relevantz.EEPZ.Api.Middleware
 
         private Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            _logger.LogError(exception, "An unhandled exception occurred during the request.");
+            HttpStatusCode statusCode;
+            string message;
+
+            switch (exception)
+            {
+                case InvalidOperationException:
+                    statusCode = HttpStatusCode.BadRequest;
+                    message = exception.Message;
+                    _logger.LogWarning(exception, "Validation error occurred.");
+                    break;
+
+                case UnauthorizedAccessException:
+                    statusCode = HttpStatusCode.Unauthorized;
+                    message = "You are not authorized to perform this action.";
+                    _logger.LogWarning(exception, "Unauthorized access attempt.");
+                    break;
+
+                case KeyNotFoundException:
+                    statusCode = HttpStatusCode.NotFound;
+                    message = exception.Message;
+                    _logger.LogWarning(exception, "Resource not found.");
+                    break;
+
+                case ArgumentNullException:
+                    statusCode = HttpStatusCode.BadRequest;
+                    message = exception.Message;
+                    _logger.LogWarning(exception, "Null argument provided.");
+                    break;
+
+                case ArgumentException:
+                    statusCode = HttpStatusCode.BadRequest;
+                    message = exception.Message;
+                    _logger.LogWarning(exception, "Invalid argument provided.");
+                    break;
+
+                default:
+                    statusCode = HttpStatusCode.InternalServerError;
+                    message = "An error occurred while processing your request. Please try again later.";
+                    _logger.LogError(exception, "An unhandled exception occurred during the request.");
+                    break;
+            }
 
             var response = new ApiResponseDto<object>
             {
                 Success = false,
-                Message = "An error occurred while processing your request. Please try again later.",
+                Message = message,
                 Data = null
             };
 
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            context.Response.StatusCode = (int)statusCode;
             context.Response.ContentType = "application/json";
 
             var result = JsonConvert.SerializeObject(response);
