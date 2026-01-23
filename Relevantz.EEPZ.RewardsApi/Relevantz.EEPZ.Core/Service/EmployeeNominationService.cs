@@ -1,4 +1,4 @@
- 
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,75 +43,49 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return result;
             }
  
-            try
+            _logger.LogInformation("[SEARCH] Starting search for employee notifications. EmployeeId={EmployeeId}", employeeId);
+ 
+            // 1) Load all approved nominations for the employee
+            var approvedNominations = await _repository.GetApprovedNominationsByEmployeeAsync(
+                employeeId, cancellationToken);
+ 
+            if (approvedNominations == null || approvedNominations.Count == 0)
             {
-                _logger.LogInformation("[SEARCH] Starting search for employee notifications. EmployeeId={EmployeeId}", employeeId);
- 
-                // 1) Load all approved nominations for the employee
-                var approvedNominations = await _repository.GetApprovedNominationsByEmployeeAsync(
-                    employeeId, cancellationToken);
- 
-                if (approvedNominations == null || approvedNominations.Count == 0)
-                {
-                    _logger.LogInformation("[SEARCH] No approved notifications found for EmployeeId={EmployeeId}", employeeId);
-                    result.Success = true;
-                    result.Message = "No approved notifications found";
-                    return result;
-                }
- 
-                // 2) Batch-load all related recognition details (with RewardType) in a single query
-                var oppIds = approvedNominations
-                    .Select(n => n.OpportunityId)
-                    .Distinct()
-                    .ToList();
- 
-                var details = await _repository.GetRecognitionDetailsWithRewardTypeByOppIdsAsync(
-                    oppIds, cancellationToken);
- 
-                // 3) Index by OpportunityId for fast lookup
-                var detailByOppId = details.ToDictionary(d => d.OpportunityId);
- 
-                // 4) Map nominations -> DTOs using the preloaded dictionary
-                var items = new List<EmployeeNotificationItemDto>(approvedNominations.Count);
-                foreach (var nomination in approvedNominations)
-                {
-                    detailByOppId.TryGetValue(nomination.OpportunityId, out var detail);
- 
-                    items.Add(new EmployeeNotificationItemDto
-                    {
-                        NominationId = nomination.NominationId,
-                        RoleType = detail?.RewardType?.RewardName ?? "Opportunity"
-                    });
-                }
- 
-                result.Data.AddRange(items);
+                _logger.LogInformation("[SEARCH] No approved notifications found for EmployeeId={EmployeeId}", employeeId);
                 result.Success = true;
-                _logger.LogInformation("[SEARCH] Found {Count} approved notifications for EmployeeId={EmployeeId}", result.Data.Count, employeeId);
+                result.Message = "No approved notifications found";
                 return result;
             }
-            catch (ArgumentException ex)
+ 
+            // 2) Batch-load all related recognition details (with RewardType) in a single query
+            var oppIds = approvedNominations
+                .Select(n => n.OpportunityId)
+                .Distinct()
+                .ToList();
+ 
+            var details = await _repository.GetRecognitionDetailsWithRewardTypeByOppIdsAsync(
+                oppIds, cancellationToken);
+ 
+            // 3) Index by OpportunityId for fast lookup
+            var detailByOppId = details.ToDictionary(d => d.OpportunityId);
+ 
+            // 4) Map nominations -> DTOs using the preloaded dictionary
+            var items = new List<EmployeeNotificationItemDto>(approvedNominations.Count);
+            foreach (var nomination in approvedNominations)
             {
-                _logger.LogWarning(ex, "[SEARCH] Invalid argument provided for EmployeeId={EmployeeId}", employeeId);
-                result.Success = false;
-                result.Message = ex.Message;
-                return result;
+                detailByOppId.TryGetValue(nomination.OpportunityId, out var detail);
+ 
+                items.Add(new EmployeeNotificationItemDto
+                {
+                    NominationId = nomination.NominationId,
+                    RoleType = detail?.RewardType?.RewardName ?? "Opportunity"
+                });
             }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogError(ex, "[SEARCH] Operation failed for EmployeeId={EmployeeId}", employeeId);
-                result.Success = false;
-                result.Message = "Operation failed. Please try again.";
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "[SEARCH] Unexpected error occurred for EmployeeId={EmployeeId}", employeeId);
-                result.Success = false;
-                result.Message = "An unexpected error occurred. Please contact support.";
-                return result;
-            }
+ 
+            result.Data.AddRange(items);
+            result.Success = true;
+            _logger.LogInformation("[SEARCH] Found {Count} approved notifications for EmployeeId={EmployeeId}", result.Data.Count, employeeId);
+            return result;
         }
     }
 }
- 
- 

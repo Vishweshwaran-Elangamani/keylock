@@ -140,18 +140,17 @@ builder.Services.AddCors(options =>
     });
 });
 
-
 builder.Services.AddHealthChecks()
     .AddCheck("self", () => HealthCheckResult.Healthy("App is running"), tags: new[] { "live" })
     .AddCheck<MySqlDbHealthCheck>("mysql-db", tags: new[] { "ready", "db", "mysql" });
 
+// ✅ Register custom exception handling middleware (added)
+builder.Services.AddTransient<Relevantz.EEPZ.Api.Middleware.ExceptionHandlingMiddleware>();
 
 var app = builder.Build();
 
-
 app.UseHttpMetrics();
 app.MapMetrics("/metrics");
-
 
 if (app.Environment.IsDevelopment())
 {
@@ -165,30 +164,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseSerilogRequestLogging();
 
-
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
 
-app.UseExceptionHandler(errorApp =>
-{
-    errorApp.Run(async context =>
-    {
-        context.Response.ContentType = "application/json";
-        context.Response.StatusCode = 500;
-
-        var error = context.Features.Get<IExceptionHandlerFeature>()?.Error;
-
-        await context.Response.WriteAsJsonAsync(new
-        {
-            success = false,
-            message = error?.Message ?? "Internal server error",
-            path = context.Request.Path
-        });
-    });
-});
-
+// ❌ Removed: Inline UseExceptionHandler block
+// ✅ Add custom exception handling middleware early in the pipeline (added)
+app.UseMiddleware<Relevantz.EEPZ.Api.Middleware.ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
@@ -196,7 +179,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
 
 app.MapHealthChecks("/health/live", new HealthCheckOptions
 {
@@ -252,8 +234,6 @@ finally
     Log.CloseAndFlush();
 }
 
-
-
 public class FileUploadSettings
 {
     public string UploadPath { get; set; } = string.Empty;
@@ -286,4 +266,3 @@ internal sealed class MySqlDbHealthCheck : IHealthCheck
         }
     }
 }
-

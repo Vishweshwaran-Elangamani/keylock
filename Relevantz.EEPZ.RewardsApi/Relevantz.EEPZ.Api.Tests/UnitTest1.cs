@@ -2,7 +2,6 @@
 using System;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -79,7 +78,7 @@ namespace Relevantz.EEPZ.Api.Tests.Controllers
             obj.Value.Should().BeEquivalentTo(new
             {
                 success = false,
-                message = $"Error: {ex.Message}"
+                message = "Internal server error."
             });
         }
 
@@ -134,7 +133,7 @@ namespace Relevantz.EEPZ.Api.Tests.Controllers
             obj.Value.Should().BeEquivalentTo(new
             {
                 success = false,
-                message = ex.Message
+                message = "Internal server error."
             });
         }
 
@@ -189,7 +188,7 @@ namespace Relevantz.EEPZ.Api.Tests.Controllers
             obj.Value.Should().BeEquivalentTo(new
             {
                 success = false,
-                message = ex.Message
+                message = "Internal server error."
             });
         }
     }

@@ -1,3 +1,4 @@
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Business.Services.Interfaces;
@@ -21,35 +22,32 @@ namespace PerformanceManagement.Controllers
             _service = service;
             _logger = logger;
         }
+        
+[HttpGet("throw")]
+[AllowAnonymous] // optional, makes it easy to test without JWT
+public IActionResult Throw() => throw new InvalidOperationException("Boom from controller!");
+
 
         [HttpGet("depthead/{deptHeadEmployeeId}/approved-nominations")]
         public async Task<IActionResult> GetApprovedNominationsByDeptHead(
             [FromRoute][Range(1, int.MaxValue)] int deptHeadEmployeeId)
         {
-            try
+            var result = await _service.GetApprovedNominationsByDeptHeadAsync(deptHeadEmployeeId);
+
+            if (result == null)
             {
-                var result = await _service.GetApprovedNominationsByDeptHeadAsync(deptHeadEmployeeId);
-
-                if (result == null)
-                {
-                    return NotFound(new { success = false, message = "No approved nominations found." });
-                }
-
-                dynamic dyn = result;
-                bool success = dyn.success != null && (bool)dyn.success;
-
-                if (!success)
-                {
-                    return NotFound(result);
-                }
-
-                return Ok(result);
+                return NotFound(new { success = false, message = "No approved nominations found." });
             }
-            catch (Exception ex)
+
+            dynamic dyn = result;
+            bool success = dyn.success != null && (bool)dyn.success;
+
+            if (!success)
             {
-                _logger.LogError(ex, "[DH_APPROVED_NOMINATIONS] Error occurred.");
-                return StatusCode(500, new { success = false, message = "Internal server error." });
+                return NotFound(result);
             }
+
+            return Ok(result);
         }
 
         [HttpGet("nomination-details/{nominationId}")]
@@ -57,61 +55,45 @@ namespace PerformanceManagement.Controllers
             [FromRoute][Range(1, int.MaxValue, ErrorMessage = "Nomination ID must be a positive integer.")]
             int nominationId)
         {
-            try
+            var result = await _service.GetNominationDetailsAsync(nominationId);
+
+            if (result == null)
             {
-                var result = await _service.GetNominationDetailsAsync(nominationId);
-
-                if (result == null)
-                {
-                    return NotFound(new { success = false, message = "Nomination not found." });
-                }
-
-                dynamic dyn = result;
-                bool success = dyn.success != null && (bool)dyn.success;
-
-                if (!success)
-                {
-                    return NotFound(result);
-                }
-
-                return Ok(result);
+                return NotFound(new { success = false, message = "Nomination not found." });
             }
-            catch (Exception ex)
+
+            dynamic dyn = result;
+            bool success = dyn.success != null && (bool)dyn.success;
+
+            if (!success)
             {
-                _logger.LogError(ex, "[DH_NOMINATION_DETAILS] Error occurred.");
-                return StatusCode(500, new { success = false, message = "Internal server error." });
+                return NotFound(result);
             }
-        }
+
+            return Ok(result);
+    }
 
         [HttpGet("depthead/{deptHeadEmployeeId}/statistics")]
         public async Task<IActionResult> GetDepartmentStatistics(
             [FromRoute][Range(1, int.MaxValue, ErrorMessage = "Employee ID must be a positive integer.")]
             int deptHeadEmployeeId)
         {
-            try
+            var result = await _service.GetDepartmentStatisticsAsync(deptHeadEmployeeId);
+
+            if (result == null)
             {
-                var result = await _service.GetDepartmentStatisticsAsync(deptHeadEmployeeId);
-
-                if (result == null)
-                {
-                    return NotFound(new { success = false, message = "Statistics not found." });
-                }
-
-                dynamic dyn = result;
-                bool success = dyn.success != null && (bool)dyn.success;
-
-                if (!success)
-                {
-                    return NotFound(result);
-                }
-
-                return Ok(result);
+                return NotFound(new { success = false, message = "Statistics not found." });
             }
-            catch (Exception ex)
+
+            dynamic dyn = result;
+            bool success = dyn.success != null && (bool)dyn.success;
+
+            if (!success)
             {
-                _logger.LogError(ex, "[DH_STATISTICS] Error occurred.");
-                return StatusCode(500, new { success = false, message = "Internal server error." });
+                return NotFound(result);
             }
+
+            return Ok(result);
         }
     }
 }

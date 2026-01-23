@@ -46,17 +46,9 @@ namespace Relevantz.EEPZ.Api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetRewardTypes()
         {
-            try
-            {
-                _logger.LogInformation("[GET_REWARD_TYPES] Request received");
-                var res = await _managerNominationService.GetRewardTypesAsync();
-                return ToActionResult(res);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "[GET_REWARD_TYPES] Unhandled error");
-                return StatusCode(500, new { success = false, message = "Unexpected error while fetching reward types." });
-            }
+            _logger.LogInformation("[GET_REWARD_TYPES] Request received");
+            var res = await _managerNominationService.GetRewardTypesAsync();
+            return ToActionResult(res);
         }
 
         /// <summary>
@@ -73,17 +65,9 @@ namespace Relevantz.EEPZ.Api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetOpportunities()
         {
-            try
-            {
-                _logger.LogInformation("[GET_OPPORTUNITIES] Request received");
-                var res = await _managerNominationService.GetOpportunitiesAsync();
-                return ToActionResult(res);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "[GET_OPPORTUNITIES] Unhandled error");
-                return StatusCode(500, new { success = false, message = "Unexpected error while fetching opportunities." });
-            }
+            _logger.LogInformation("[GET_OPPORTUNITIES] Request received");
+            var res = await _managerNominationService.GetOpportunitiesAsync();
+            return ToActionResult(res);
         }
 
         /// <summary>
@@ -99,22 +83,14 @@ namespace Relevantz.EEPZ.Api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetOpportunitiesByRewardType([FromRoute] int rewardTypeId)
         {
-            try
+            if (rewardTypeId <= 0)
             {
-                if (rewardTypeId <= 0)
-                {
-                    return BadRequest(new { success = false, message = "rewardTypeId must be greater than zero." });
-                }
+                return BadRequest(new { success = false, message = "rewardTypeId must be greater than zero." });
+            }
 
-                _logger.LogInformation("[GET_OPPORTUNITIES_BY_REWARD] Request received for RewardTypeId: {RewardTypeId}", rewardTypeId);
-                var res = await _managerNominationService.GetOpportunitiesByRewardTypeAsync(rewardTypeId);
-                return ToActionResult(res);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "[GET_OPPORTUNITIES_BY_REWARD] Unhandled error for RewardTypeId: {RewardTypeId}", rewardTypeId);
-                return StatusCode(500, new { success = false, message = "Unexpected error while fetching opportunities by reward type." });
-            }
+            _logger.LogInformation("[GET_OPPORTUNITIES_BY_REWARD] Request received for RewardTypeId: {RewardTypeId}", rewardTypeId);
+            var res = await _managerNominationService.GetOpportunitiesByRewardTypeAsync(rewardTypeId);
+            return ToActionResult(res);
         }
 
         /// <summary>
@@ -130,22 +106,14 @@ namespace Relevantz.EEPZ.Api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetNominationParameters([FromRoute] int rewardTypeId)
         {
-            try
+            if (rewardTypeId <= 0)
             {
-                if (rewardTypeId <= 0)
-                {
-                    return BadRequest(new { success = false, message = "rewardTypeId must be greater than zero." });
-                }
+                return BadRequest(new { success = false, message = "rewardTypeId must be greater than zero." });
+            }
 
-                _logger.LogInformation("[GET_PARAMETERS] Request received for RewardTypeId: {RewardTypeId}", rewardTypeId);
-                var res = await _managerNominationService.GetNominationParametersAsync(rewardTypeId);
-                return ToActionResult(res);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "[GET_PARAMETERS] Unhandled error for RewardTypeId: {RewardTypeId}", rewardTypeId);
-                return StatusCode(500, new { success = false, message = "Unexpected error while fetching nomination parameters." });
-            }
+            _logger.LogInformation("[GET_PARAMETERS] Request received for RewardTypeId: {RewardTypeId}", rewardTypeId);
+            var res = await _managerNominationService.GetNominationParametersAsync(rewardTypeId);
+            return ToActionResult(res);
         }
 
         /// <summary>
@@ -161,22 +129,14 @@ namespace Relevantz.EEPZ.Api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetTeamMembers([FromRoute] int managerId)
         {
-            try
+            if (managerId <= 0)
             {
-                if (managerId <= 0)
-                {
-                    return BadRequest(new { success = false, message = "managerId must be greater than zero." });
-                }
+                return BadRequest(new { success = false, message = "managerId must be greater than zero." });
+            }
 
-                _logger.LogInformation("[GET_TEAM_MEMBERS] Request received for ManagerId: {ManagerId}", managerId);
-                var res = await _managerNominationService.GetTeamMembersAsync(managerId);
-                return ToActionResult(res);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "[GET_TEAM_MEMBERS] Unhandled error for ManagerId: {ManagerId}", managerId);
-                return StatusCode(500, new { success = false, message = "Unexpected error while fetching team members." });
-            }
+            _logger.LogInformation("[GET_TEAM_MEMBERS] Request received for ManagerId: {ManagerId}", managerId);
+            var res = await _managerNominationService.GetTeamMembersAsync(managerId);
+            return ToActionResult(res);
         }
 
         /// <summary>
@@ -198,21 +158,13 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> CreateNomination(
             [FromBody] Relevantz.EEPZ.Common.DTOs.Request.NominationSubmitDto request)
         {
-            try
-            {
-                _logger.LogInformation("[SUBMIT_NOMINATION] Request received for NomineeEmployeeId: {NomineeId}", request?.NomineeEmployeeId);
+            _logger.LogInformation("[SUBMIT_NOMINATION] Request received for NomineeEmployeeId: {NomineeId}", request?.NomineeEmployeeId);
 
-                if (request is null)
-                    return BadRequest(new { success = false, message = "Payload is required" });
+            if (request is null)
+                return BadRequest(new { success = false, message = "Payload is required" });
 
-                var res = await _managerNominationService.SubmitNominationAsync(request);
-                return ToActionResult(res);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "[SUBMIT_NOMINATION] Unhandled error for NomineeEmployeeId: {NomineeId}", request?.NomineeEmployeeId);
-                return StatusCode(500, new { success = false, message = "Unexpected error while submitting nomination." });
-            }
+            var res = await _managerNominationService.SubmitNominationAsync(request);
+            return ToActionResult(res);
         }
 
         /// <summary>
@@ -228,22 +180,14 @@ namespace Relevantz.EEPZ.Api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetEmployeeNominations([FromRoute] int employeeId)
         {
-            try
+            if (employeeId <= 0)
             {
-                if (employeeId <= 0)
-                {
-                    return BadRequest(new { success = false, message = "employeeId must be greater than zero." });
-                }
+                return BadRequest(new { success = false, message = "employeeId must be greater than zero." });
+            }
 
-                _logger.LogInformation("[GET_EMPLOYEE_NOMINATIONS] Request received for EmployeeId: {EmployeeId}", employeeId);
-                var res = await _managerNominationService.GetEmployeeNominationsAsync(employeeId);
-                return ToActionResult(res);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "[GET_EMPLOYEE_NOMINATIONS] Unhandled error for EmployeeId: {EmployeeId}", employeeId);
-                return StatusCode(500, new { success = false, message = "Unexpected error while fetching employee nominations." });
-            }
+            _logger.LogInformation("[GET_EMPLOYEE_NOMINATIONS] Request received for EmployeeId: {EmployeeId}", employeeId);
+            var res = await _managerNominationService.GetEmployeeNominationsAsync(employeeId);
+            return ToActionResult(res);
         }
 
         /// <summary>
@@ -259,22 +203,14 @@ namespace Relevantz.EEPZ.Api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetMyNominations([FromRoute] int managerId)
         {
-            try
+            if (managerId <= 0)
             {
-                if (managerId <= 0)
-                {
-                    return BadRequest(new { success = false, message = "managerId must be greater than zero." });
-                }
+                return BadRequest(new { success = false, message = "managerId must be greater than zero." });
+            }
 
-                _logger.LogInformation("[GET_MY_NOMINATIONS] Request received for ManagerId: {ManagerId}", managerId);
-                var res = await _managerNominationService.GetMyNominationsAsync(managerId);
-                return ToActionResult(res);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "[GET_MY_NOMINATIONS] Unhandled error for ManagerId: {ManagerId}", managerId);
-                return StatusCode(500, new { success = false, message = "Unexpected error while fetching your nominations." });
-            }
+            _logger.LogInformation("[GET_MY_NOMINATIONS] Request received for ManagerId: {ManagerId}", managerId);
+            var res = await _managerNominationService.GetMyNominationsAsync(managerId);
+            return ToActionResult(res);
         }
 
         /// <summary>
@@ -290,22 +226,14 @@ namespace Relevantz.EEPZ.Api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetNomination([FromRoute] int nominationId)
         {
-            try
+            if (nominationId <= 0)
             {
-                if (nominationId <= 0)
-                {
-                    return BadRequest(new { success = false, message = "nominationId must be greater than zero." });
-                }
+                return BadRequest(new { success = false, message = "nominationId must be greater than zero." });
+            }
 
-                _logger.LogInformation("[GET_NOMINATION_DETAILS] Request received for NominationId: {NominationId}", nominationId);
-                var res = await _managerNominationService.GetNominationDetailsAsync(nominationId);
-                return ToActionResult(res);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "[GET_NOMINATION_DETAILS] Unhandled error for NominationId: {NominationId}", nominationId);
-                return StatusCode(500, new { success = false, message = "Unexpected error while fetching nomination details." });
-            }
+            _logger.LogInformation("[GET_NOMINATION_DETAILS] Request received for NominationId: {NominationId}", nominationId);
+            var res = await _managerNominationService.GetNominationDetailsAsync(nominationId);
+            return ToActionResult(res);
         }
 
         /// <summary>

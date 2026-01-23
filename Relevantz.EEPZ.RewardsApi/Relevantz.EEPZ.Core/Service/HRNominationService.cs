@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Logging;
+using Relevantz.EEPZ.Common.DTOs.Response;
+using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
-using Relevantz.EEPZ.Common.Entities;
-using Relevantz.EEPZ.Common.DTOs.Response;
 
 namespace Relevantz.EEPZ.Core.Services
 {
@@ -13,346 +13,347 @@ namespace Relevantz.EEPZ.Core.Services
 
         public HRNominationService(
             IHRNominationRepository repository,
-            ILogger<HRNominationService> logger)
+            ILogger<HRNominationService> logger
+        )
         {
             _repository = repository;
             _logger = logger;
         }
 
         public async Task<object> GetAllManagerNominationsForHRAsync(
-    string? search,
-    string? status,
-    string? sortBy,
-    string? sortDirection,
-    int page = 1,
-    int pageSize = 10
-)
-{
-    try
-    {
-        var nominations = await _repository.GetPendingVisibleManagerNominationsAsync();
-
-        var nominationDtos = new List<dynamic>();
-
-        foreach (var n in nominations)
+            string? search,
+            string? status,
+            string? sortBy,
+            string? sortDirection,
+            int page = 1,
+            int pageSize = 10
+        )
         {
-            var opportunity = await _repository.GetOpportunityByIdAsync(n.OpportunityId);
-            var nomineeDept = await _repository.GetEmployeeDepartmentDetailsAsync(n.NomineeEmployeeId);
-            var parameterValues = await _repository.GetNominationParameterValuesAsync(n.NominationId);
+            var nominations = await _repository.GetPendingVisibleManagerNominationsAsync();
 
-            nominationDtos.Add(new
+            var nominationDtos = new List<dynamic>();
+
+            foreach (var n in nominations)
             {
-                n.NominationId,
-                n.OpportunityId,
-                OpportunityName = opportunity?.OpportunityName ?? "Unknown",
-                OpportunityDeadline = opportunity?.Deadline,
-                RewardType = opportunity?.RewardType != null ? new
-                {
-                    opportunity.RewardType.RewardTypeId,
-                    opportunity.RewardType.RewardName,
-                    opportunity.RewardType.RewardCategory
-                } : null,
-                NomineeEmployeeId = n.NomineeEmployeeId,
-                NomineeName = n.NomineeEmployee.Userprofile.FirstName + " " + n.NomineeEmployee.Userprofile.LastName,
-                NomineeEmail = n.NomineeEmployee.Userprofile.PersonalEmail,
-                NomineeDepartmentId = nomineeDept?.DepartmentId,
-                NomineeDepartmentName = nomineeDept?.Department?.DepartmentName ?? "Unknown",
-                ManagerEmployeeId = n.NominatedByEmployeeId,
-                ManagerName = n.NominatedByEmployee.Userprofile.FirstName + " " + n.NominatedByEmployee.Userprofile.LastName,
-                n.Justification,
-                n.SubmittedAt,
-                n.Status,
-                ParameterValues = parameterValues
-            });
-        }
+                var opportunity = await _repository.GetOpportunityByIdAsync(n.OpportunityId);
+                var nomineeDept = await _repository.GetEmployeeDepartmentDetailsAsync(
+                    n.NomineeEmployeeId
+                );
+                var parameterValues = await _repository.GetNominationParameterValuesAsync(
+                    n.NominationId
+                );
 
-        IEnumerable<dynamic> filtered = nominationDtos;
+                nominationDtos.Add(
+                    new
+                    {
+                        n.NominationId,
+                        n.OpportunityId,
+                        OpportunityName = opportunity?.OpportunityName ?? "Unknown",
+                        OpportunityDeadline = opportunity?.Deadline,
+                        RewardType = opportunity?.RewardType != null
+                            ? new
+                            {
+                                opportunity.RewardType.RewardTypeId,
+                                opportunity.RewardType.RewardName,
+                                opportunity.RewardType.RewardCategory,
+                            }
+                            : null,
+                        NomineeEmployeeId = n.NomineeEmployeeId,
+                        NomineeName = n.NomineeEmployee.Userprofile.FirstName
+                            + " "
+                            + n.NomineeEmployee.Userprofile.LastName,
+                        NomineeEmail = n.NomineeEmployee.Userprofile.PersonalEmail,
+                        NomineeDepartmentId = nomineeDept?.DepartmentId,
+                        NomineeDepartmentName = nomineeDept?.Department?.DepartmentName
+                            ?? "Unknown",
+                        ManagerEmployeeId = n.NominatedByEmployeeId,
+                        ManagerName = n.NominatedByEmployee.Userprofile.FirstName
+                            + " "
+                            + n.NominatedByEmployee.Userprofile.LastName,
+                        n.Justification,
+                        n.SubmittedAt,
+                        n.Status,
+                        ParameterValues = parameterValues,
+                    }
+                );
+            }
 
-        if (!string.IsNullOrWhiteSpace(search))
-        {
-            var s = search.Trim().ToLowerInvariant();
-            filtered = filtered.Where(x =>
-                (x.OpportunityName != null && x.OpportunityName.ToString().ToLowerInvariant().Contains(s)) ||
-                (x.NomineeName != null && x.NomineeName.ToString().ToLowerInvariant().Contains(s)) ||
-                (x.ManagerName != null && x.ManagerName.ToString().ToLowerInvariant().Contains(s))
-            );
-        }
+            IEnumerable<dynamic> filtered = nominationDtos;
 
-        if (!string.IsNullOrWhiteSpace(status))
-        {
-            filtered = filtered.Where(x =>
-                x.Status != null &&
-                string.Equals(x.Status.ToString(), status, StringComparison.OrdinalIgnoreCase)
-            );
-        }
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var s = search.Trim().ToLowerInvariant();
+                filtered = filtered.Where(x =>
+                    (
+                        x.OpportunityName != null
+                        && x.OpportunityName.ToString().ToLowerInvariant().Contains(s)
+                    )
+                    || (
+                        x.NomineeName != null
+                        && x.NomineeName.ToString().ToLowerInvariant().Contains(s)
+                    )
+                    || (
+                        x.ManagerName != null
+                        && x.ManagerName.ToString().ToLowerInvariant().Contains(s)
+                    )
+                );
+            }
 
-        var grouped = filtered
-            .GroupBy(n => new
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                filtered = filtered.Where(x =>
+                    x.Status != null
+                    && string.Equals(
+                        x.Status.ToString(),
+                        status,
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                );
+            }
+
+            var grouped = filtered.GroupBy(n => new
             {
                 n.OpportunityId,
                 n.OpportunityName,
                 n.OpportunityDeadline,
-                n.RewardType
+                n.RewardType,
             });
 
-        IOrderedEnumerable<IGrouping<dynamic, dynamic>> orderedGroups;
+            IOrderedEnumerable<IGrouping<dynamic, dynamic>> orderedGroups;
 
-        var dirDesc = string.Equals(sortDirection, "desc", StringComparison.OrdinalIgnoreCase);
+            var dirDesc = string.Equals(sortDirection, "desc", StringComparison.OrdinalIgnoreCase);
 
-        switch (sortBy?.Trim())
-        {
-            case "OpportunityName":
-                orderedGroups = dirDesc
-                    ? grouped.OrderByDescending(g => g.Key.OpportunityName)
-                    : grouped.OrderBy(g => g.Key.OpportunityName);
-                break;
+            switch (sortBy?.Trim())
+            {
+                case "OpportunityName":
+                    orderedGroups = dirDesc
+                        ? grouped.OrderByDescending(g => g.Key.OpportunityName)
+                        : grouped.OrderBy(g => g.Key.OpportunityName);
+                    break;
 
-            case "OpportunityDeadline":
-                orderedGroups = dirDesc
-                    ? grouped.OrderByDescending(g => g.Key.OpportunityDeadline)
-                    : grouped.OrderBy(g => g.Key.OpportunityDeadline);
-                break;
+                case "OpportunityDeadline":
+                    orderedGroups = dirDesc
+                        ? grouped.OrderByDescending(g => g.Key.OpportunityDeadline)
+                        : grouped.OrderBy(g => g.Key.OpportunityDeadline);
+                    break;
 
-            case "NominationCount":
-                orderedGroups = dirDesc
-                    ? grouped.OrderByDescending(g => g.Count())
-                    : grouped.OrderBy(g => g.Count());
-                break;
+                case "NominationCount":
+                    orderedGroups = dirDesc
+                        ? grouped.OrderByDescending(g => g.Count())
+                        : grouped.OrderBy(g => g.Count());
+                    break;
 
-            default:
-                orderedGroups = grouped.OrderBy(g => 0);
-                break;
+                default:
+                    orderedGroups = grouped.OrderBy(g => 0);
+                    break;
+            }
+
+            var groupedNominations = orderedGroups
+                .Select(g => new
+                {
+                    OpportunityId = g.Key.OpportunityId,
+                    OpportunityName = g.Key.OpportunityName,
+                    OpportunityDeadline = g.Key.OpportunityDeadline,
+                    RewardType = g.Key.RewardType,
+                    NominationCount = g.Count(),
+                    Nominations = g.ToList(),
+                })
+                .ToList();
+
+            var totalRecords = groupedNominations.Count;
+            var totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
+            page = Math.Max(1, page);
+
+            var paginatedNominations = groupedNominations
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return new
+            {
+                success = true,
+                data = paginatedNominations,
+                pagination = new
+                {
+                    currentPage = page,
+                    pageSize = pageSize,
+                    totalRecords = totalRecords,
+                    totalPages = totalPages,
+                    hasNextPage = page < totalPages,
+                    hasPreviousPage = page > 1,
+                },
+                totalNominations = totalRecords,
+                totalOpportunities = totalRecords,
+                message = $"Page {page} of {totalPages} (showing {paginatedNominations.Count} of {totalRecords} opportunities)",
+            };
         }
-
-        var groupedNominations = orderedGroups
-            .Select(g => new
-            {
-                OpportunityId = g.Key.OpportunityId,
-                OpportunityName = g.Key.OpportunityName,
-                OpportunityDeadline = g.Key.OpportunityDeadline,
-                RewardType = g.Key.RewardType,
-                NominationCount = g.Count(),
-                Nominations = g.ToList()
-            })
-            .ToList();
-
-        var totalRecords = groupedNominations.Count;
-        var totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
-        page = Math.Max(1, page); 
-
-        var paginatedNominations = groupedNominations
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToList();
-
-        return new
-        {
-            success = true,
-            data = paginatedNominations,
-            pagination = new
-            {
-                currentPage = page,
-                pageSize = pageSize,
-                totalRecords = totalRecords,
-                totalPages = totalPages,
-                hasNextPage = page < totalPages,
-                hasPreviousPage = page > 1
-            },
-            totalNominations = totalRecords,        
-            totalOpportunities = totalRecords,      
-            message = $"Page {page} of {totalPages} (showing {paginatedNominations.Count} of {totalRecords} opportunities)"
-        };
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError($"[HR_ALL_NOMINATIONS] Error: {ex.Message}");
-        return new
-        {
-            success = false,
-            message = "Error retrieving nominations",
-            details = ex.Message
-        };
-    }
-}
 
         public async Task<ApiResponse<object>> GetNominationDetailsAsync(int nominationId)
         {
-            try
+            var nomination = await _repository.GetNominationByIdAsync(nominationId);
+
+            if (nomination == null)
             {
-                var nomination = await _repository.GetNominationByIdAsync(nominationId);
+                return ApiResponse<object>.ErrorResponse("Nomination not found");
+            }
 
-                if (nomination == null)
+            var nomineeDept = await _repository.GetEmployeeDepartmentDetailsAsync(
+                nomination.NomineeEmployeeId
+            );
+            var parameterValues = await _repository.GetNominationParameterValuesWithDetailsAsync(
+                nominationId
+            );
+
+            var result = new
+            {
+                nominationId = nomination.NominationId,
+                status = nomination.Status,
+                justification = nomination.Justification,
+                submittedAt = nomination.SubmittedAt,
+                reviewedAt = nomination.ReviewedAt,
+                reviewRemarks = nomination.ReviewRemarks,
+                nomineeEmployeeId = nomination.NomineeEmployeeId,
+                nomineeName = $"{nomination.NomineeEmployee.Userprofile.FirstName} {nomination.NomineeEmployee.Userprofile.LastName}",
+                nominee = new
                 {
-                    return ApiResponse<object>.ErrorResponse("Nomination not found");
-                }
-
-                var nomineeDept = await _repository.GetEmployeeDepartmentDetailsAsync(nomination.NomineeEmployeeId);
-                var parameterValues = await _repository.GetNominationParameterValuesWithDetailsAsync(nominationId);
-
-                var result = new
+                    employeeId = nomination.NomineeEmployee.EmployeeId,
+                    firstName = nomination.NomineeEmployee.Userprofile.FirstName,
+                    lastName = nomination.NomineeEmployee.Userprofile.LastName,
+                    personalEmail = nomination.NomineeEmployee.Userprofile.PersonalEmail,
+                    department = new
+                    {
+                        departmentId = nomineeDept?.DepartmentId,
+                        departmentName = nomineeDept?.Department?.DepartmentName ?? "Unknown",
+                    },
+                },
+                nominatedBy = new
                 {
-                    nominationId = nomination.NominationId,
-                    status = nomination.Status,
-                    justification = nomination.Justification,
-                    submittedAt = nomination.SubmittedAt,
-                    reviewedAt = nomination.ReviewedAt,
-                    reviewRemarks = nomination.ReviewRemarks,
-                    nomineeEmployeeId = nomination.NomineeEmployeeId,
-                    nomineeName = $"{nomination.NomineeEmployee.Userprofile.FirstName} {nomination.NomineeEmployee.Userprofile.LastName}",
-                    nominee = new
-                    {
-                        employeeId = nomination.NomineeEmployee.EmployeeId,
-                        firstName = nomination.NomineeEmployee.Userprofile.FirstName,
-                        lastName = nomination.NomineeEmployee.Userprofile.LastName,
-                        personalEmail = nomination.NomineeEmployee.Userprofile.PersonalEmail,
-                        department = new
-                        {
-                            departmentId = nomineeDept?.DepartmentId,
-                            departmentName = nomineeDept?.Department?.DepartmentName ?? "Unknown"
-                        }
-                    },
-                    nominatedBy = new
-                    {
-                        firstName = nomination.NominatedByEmployee.Userprofile.FirstName,
-                        lastName = nomination.NominatedByEmployee.Userprofile.LastName
-                    },
-                    opportunity = nomination.Opportunity != null ? new
+                    firstName = nomination.NominatedByEmployee.Userprofile.FirstName,
+                    lastName = nomination.NominatedByEmployee.Userprofile.LastName,
+                },
+                opportunity = nomination.Opportunity != null
+                    ? new
                     {
                         opportunityName = nomination.Opportunity.OpportunityName,
                         description = nomination.Opportunity.Description,
                         deadline = nomination.Opportunity.Deadline,
-                        rewardType = nomination.Opportunity.RewardType != null ? new
-                        {
-                            rewardName = nomination.Opportunity.RewardType.RewardName,
-                            rewardCategory = nomination.Opportunity.RewardType.RewardCategory
-                        } : null
-                    } : null,
-                    parameterValues = parameterValues
-                };
+                        rewardType = nomination.Opportunity.RewardType != null
+                            ? new
+                            {
+                                rewardName = nomination.Opportunity.RewardType.RewardName,
+                                rewardCategory = nomination.Opportunity.RewardType.RewardCategory,
+                            }
+                            : null,
+                    }
+                    : null,
+                parameterValues = parameterValues,
+            };
 
-                return ApiResponse<object>.SuccessResponse(result, "Nomination details retrieved successfully");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"[NOMINATION_DETAILS] Error: {ex.Message}");
-                return ApiResponse<object>.ErrorResponse("Error retrieving nomination details", new List<string> { ex.Message });
-            }
+            return ApiResponse<object>.SuccessResponse(
+                result,
+                "Nomination details retrieved successfully"
+            );
         }
 
         public async Task<ApiResponse<object>> ApproveNominationsAsync(HRNominationApprovalDto dto)
         {
-            try
+            if (dto.SelectedNominationIds == null || dto.SelectedNominationIds.Count == 0)
             {
-                if (dto.SelectedNominationIds == null || dto.SelectedNominationIds.Count == 0)
-                {
-                    return ApiResponse<object>.ErrorResponse("No nominations selected");
-                }
+                return ApiResponse<object>.ErrorResponse("No nominations selected");
+            }
 
-                if (dto.SelectedNominationIds.Count > 3)
-                {
-                    return ApiResponse<object>.ErrorResponse("Maximum 3 nominees can be selected per opportunity");
-                }
-
-                var selectedNominations = await _repository.GetNominationsByIdsAsync(
-                    dto.SelectedNominationIds.Select(x => (int)x).ToList()
-                );
-
-                if (selectedNominations.Count == 0)
-                {
-                    return ApiResponse<object>.ErrorResponse("No nominations found");
-                }
-
-                var now = DateTime.UtcNow;
-
-                foreach (var nomination in selectedNominations)
-                {
-                    nomination.Status = "Approved";
-                    nomination.ReviewedByEmployeeId = (int)dto.HrUserId;
-                    nomination.ReviewedAt = now;
-                    nomination.ReviewRemarks = dto.ApprovalRemarks ?? "Selected by HR";
-
-                    var tracking = new Nominationvisibilitytracking
-                    {
-                        NominationId = nomination.NominationId,
-                        ViewedByEmployeeId = (int)dto.HrUserId,
-                        ActionTaken = "Approved",
-                        ViewedAt = now
-                    };
-                    await _repository.AddNominationTrackingAsync(tracking);
-                }
-
-                await _repository.SaveChangesAsync();
-
-                return ApiResponse<object>.SuccessResponse(
-                    new { approvedCount = selectedNominations.Count },
-                    $"{selectedNominations.Count} nomination(s) approved successfully"
+            if (dto.SelectedNominationIds.Count > 3)
+            {
+                return ApiResponse<object>.ErrorResponse(
+                    "Maximum 3 nominees can be selected per opportunity"
                 );
             }
-            catch (Exception ex)
+
+            var selectedNominations = await _repository.GetNominationsByIdsAsync(
+                dto.SelectedNominationIds.Select(x => (int)x).ToList()
+            );
+
+            if (selectedNominations.Count == 0)
             {
-                _logger.LogError($"[HR_APPROVE] Error: {ex.Message}");
-                return ApiResponse<object>.ErrorResponse("Error approving nominations", new List<string> { ex.Message });
+                return ApiResponse<object>.ErrorResponse("No nominations found");
             }
+
+            var now = DateTime.UtcNow;
+
+            foreach (var nomination in selectedNominations)
+            {
+                nomination.Status = "Approved";
+                nomination.ReviewedByEmployeeId = (int)dto.HrUserId;
+                nomination.ReviewedAt = now;
+                nomination.ReviewRemarks = dto.ApprovalRemarks ?? "Selected by HR";
+
+                var tracking = new Nominationvisibilitytracking
+                {
+                    NominationId = nomination.NominationId,
+                    ViewedByEmployeeId = (int)dto.HrUserId,
+                    ActionTaken = "Approved",
+                    ViewedAt = now,
+                };
+                await _repository.AddNominationTrackingAsync(tracking);
+            }
+
+            await _repository.SaveChangesAsync();
+
+            return ApiResponse<object>.SuccessResponse(
+                new { approvedCount = selectedNominations.Count },
+                $"{selectedNominations.Count} nomination(s) approved successfully"
+            );
         }
 
         public async Task<ApiResponse<object>> RejectNominationsAsync(HRNominationRejectDto dto)
         {
-            try
+            if (dto.SelectedNominationIds == null || dto.SelectedNominationIds.Count == 0)
             {
-                if (dto.SelectedNominationIds == null || dto.SelectedNominationIds.Count == 0)
-                {
-                    return ApiResponse<object>.ErrorResponse("No nominations selected");
-                }
-
-                var nominationsToReject = await _repository.GetNominationsByIdsAsync(
-                    dto.SelectedNominationIds.Select(x => (int)x).ToList()
-                );
-
-                if (nominationsToReject.Count == 0)
-                {
-                    return ApiResponse<object>.ErrorResponse("No nominations found");
-                }
-
-                var now = DateTime.UtcNow;
-
-                foreach (var nomination in nominationsToReject)
-                {
-                    nomination.Status = "Rejected";
-                    nomination.ReviewedByEmployeeId = (int)dto.HrUserId;
-                    nomination.ReviewedAt = now;
-                    nomination.ReviewRemarks = dto.RejectionRemarks ?? "Rejected by HR";
-
-                    var tracking = new Nominationvisibilitytracking
-                    {
-                        NominationId = nomination.NominationId,
-                        ViewedByEmployeeId = (int)dto.HrUserId,
-                        ActionTaken = "Rejected",
-                        ViewedAt = now
-                    };
-                    await _repository.AddNominationTrackingAsync(tracking);
-                }
-
-                await _repository.SaveChangesAsync();
-
-                return ApiResponse<object>.SuccessResponse(
-                    new { rejectedCount = nominationsToReject.Count },
-                    $"{nominationsToReject.Count} nomination(s) rejected successfully"
-                );
+                return ApiResponse<object>.ErrorResponse("No nominations selected");
             }
-            catch (Exception ex)
+
+            var nominationsToReject = await _repository.GetNominationsByIdsAsync(
+                dto.SelectedNominationIds.Select(x => (int)x).ToList()
+            );
+
+            if (nominationsToReject.Count == 0)
             {
-                _logger.LogError($"[REJECT_NOMINATIONS] Error: {ex.Message}");
-                return ApiResponse<object>.ErrorResponse("Error rejecting nominations", new List<string> { ex.Message });
+                return ApiResponse<object>.ErrorResponse("No nominations found");
             }
+
+            var now = DateTime.UtcNow;
+
+            foreach (var nomination in nominationsToReject)
+            {
+                nomination.Status = "Rejected";
+                nomination.ReviewedByEmployeeId = (int)dto.HrUserId;
+                nomination.ReviewedAt = now;
+                nomination.ReviewRemarks = dto.RejectionRemarks ?? "Rejected by HR";
+
+                var tracking = new Nominationvisibilitytracking
+                {
+                    NominationId = nomination.NominationId,
+                    ViewedByEmployeeId = (int)dto.HrUserId,
+                    ActionTaken = "Rejected",
+                    ViewedAt = now,
+                };
+                await _repository.AddNominationTrackingAsync(tracking);
+            }
+
+            await _repository.SaveChangesAsync();
+
+            return ApiResponse<object>.SuccessResponse(
+                new { rejectedCount = nominationsToReject.Count },
+                $"{nominationsToReject.Count} nomination(s) rejected successfully"
+            );
         }
 
         public async Task<object> GetAllRewardTypesAsync(bool activeOnly)
         {
-            try
-            {
-                var rewardTypes = await _repository.GetRewardTypesAsync(activeOnly);
+            var rewardTypes = await _repository.GetRewardTypesAsync(activeOnly);
 
-                var result = rewardTypes.Select(rt => new
+            var result = rewardTypes
+                .Select(rt => new
                 {
                     rt.RewardTypeId,
                     rt.RewardCategory,
@@ -361,92 +362,66 @@ namespace Relevantz.EEPZ.Core.Services
                     rt.IsActive,
                     IsVisibleForManagerNomination = rt.IsVisibleForManagerNomination,
                     rt.CreatedAt,
-                    ParameterCount = 0
-                }).ToList();
+                    ParameterCount = 0,
+                })
+                .ToList();
 
-                return new
-                {
-                    success = true,
-                    data = result,
-                    message = $"Found {result.Count} reward types"
-                };
-            }
-            catch (Exception ex)
+            return new
             {
-                _logger.LogError($"[GET_REWARD_TYPES] Error: {ex.Message}");
-                throw;
-            }
+                success = true,
+                data = result,
+                message = $"Found {result.Count} reward types",
+            };
         }
 
         public async Task<object> CreateRewardTypeAsync(CreateRewardTypeDto dto)
         {
-            try
+            var rewardType = new Rewardtype
             {
-                var rewardType = new Rewardtype
-                {
-                    RewardCategory = dto.RewardCategory,
-                    RewardName = dto.RewardName,
-                    Description = dto.Description,
-                    IsActive = true,
-                    IsVisibleForManagerNomination = dto.IsVisibleForManagerNomination,
-                    CreatedBy = dto.CreatedBy,
-                    CreatedAt = DateTime.UtcNow
-                };
+                RewardCategory = dto.RewardCategory,
+                RewardName = dto.RewardName,
+                Description = dto.Description,
+                IsActive = true,
+                IsVisibleForManagerNomination = dto.IsVisibleForManagerNomination,
+                CreatedBy = dto.CreatedBy,
+                CreatedAt = DateTime.UtcNow,
+            };
 
-                await _repository.AddRewardTypeAsync(rewardType);
-                await _repository.SaveChangesAsync();
+            await _repository.AddRewardTypeAsync(rewardType);
+            await _repository.SaveChangesAsync();
 
-                return new
-                {
-                    success = true,
-                    data = new { rewardTypeId = rewardType.RewardTypeId },
-                    message = "Reward type created successfully"
-                };
-            }
-            catch (Exception ex)
+            return new
             {
-                _logger.LogError($"[CREATE_REWARD_TYPE] Error: {ex.Message}");
-                throw;
-            }
+                success = true,
+                data = new { rewardTypeId = rewardType.RewardTypeId },
+                message = "Reward type created successfully",
+            };
         }
 
         public async Task<object> UpdateRewardTypeAsync(int rewardTypeId, UpdateRewardTypeDto dto)
         {
-            try
+            var rewardType = await _repository.GetRewardTypeByIdAsync(rewardTypeId);
+            if (rewardType == null)
             {
-                var rewardType = await _repository.GetRewardTypeByIdAsync(rewardTypeId);
-                if (rewardType == null)
-                {
-                    return new { success = false, message = "Reward type not found" };
-                }
-
-                rewardType.RewardName = dto.RewardName;
-                rewardType.Description = dto.Description;
-                rewardType.IsActive = dto.IsActive;
-                rewardType.IsVisibleForManagerNomination = dto.IsVisibleForManagerNomination;
-
-                await _repository.SaveChangesAsync();
-
-                return new
-                {
-                    success = true,
-                    message = "Reward type updated successfully"
-                };
+                return new { success = false, message = "Reward type not found" };
             }
-            catch (Exception ex)
-            {
-                _logger.LogError($"[UPDATE_REWARD_TYPE] Error: {ex.Message}");
-                throw;
-            }
+
+            rewardType.RewardName = dto.RewardName;
+            rewardType.Description = dto.Description;
+            rewardType.IsActive = dto.IsActive;
+            rewardType.IsVisibleForManagerNomination = dto.IsVisibleForManagerNomination;
+
+            await _repository.SaveChangesAsync();
+
+            return new { success = true, message = "Reward type updated successfully" };
         }
 
         public async Task<object> GetParametersByRewardTypeAsync(int rewardTypeId)
         {
-            try
-            {
-                var parameters = await _repository.GetParametersByRewardTypeAsync(rewardTypeId);
+            var parameters = await _repository.GetParametersByRewardTypeAsync(rewardTypeId);
 
-                var result = parameters.Select(p => new
+            var result = parameters
+                .Select(p => new
                 {
                     p.ParameterId,
                     p.ParameterName,
@@ -455,130 +430,92 @@ namespace Relevantz.EEPZ.Core.Services
                     p.PlaceholderText,
                     p.MinimumValue,
                     p.MaximumValue,
-                    p.SortOrder
-                }).ToList();
+                    p.SortOrder,
+                })
+                .ToList();
 
-                return new
-                {
-                    success = true,
-                    data = result,
-                    message = $"Found {result.Count} parameters"
-                };
-            }
-            catch (Exception ex)
+            return new
             {
-                _logger.LogError($"[GET_PARAMETERS] Error: {ex.Message}");
-                throw;
-            }
+                success = true,
+                data = result,
+                message = $"Found {result.Count} parameters",
+            };
         }
 
         public async Task<object> CreateParameterAsync(CreateParameterDto dto)
         {
-            try
+            var parameter = new Nominationparameter
             {
-                var parameter = new Nominationparameter
-                {
-                    RewardTypeId = dto.RewardTypeId,
-                    ParameterName = dto.ParameterName,
-                    ParameterType = dto.ParameterType,
-                    IsRequired = dto.IsRequired,
-                    PlaceholderText = dto.PlaceholderText,
-                    MinimumValue = dto.MinimumValue,
-                    MaximumValue = dto.MaximumValue,
-                    SortOrder = dto.SortOrder,
-                    CreatedAt = DateTime.UtcNow
-                };
+                RewardTypeId = dto.RewardTypeId,
+                ParameterName = dto.ParameterName,
+                ParameterType = dto.ParameterType,
+                IsRequired = dto.IsRequired,
+                PlaceholderText = dto.PlaceholderText,
+                MinimumValue = dto.MinimumValue,
+                MaximumValue = dto.MaximumValue,
+                SortOrder = dto.SortOrder,
+                CreatedAt = DateTime.UtcNow,
+            };
 
-                await _repository.AddParameterAsync(parameter);
-                await _repository.SaveChangesAsync();
+            await _repository.AddParameterAsync(parameter);
+            await _repository.SaveChangesAsync();
 
-                return new
-                {
-                    success = true,
-                    data = new { parameterId = parameter.ParameterId },
-                    message = "Parameter created successfully"
-                };
-            }
-            catch (Exception ex)
+            return new
             {
-                _logger.LogError($"[CREATE_PARAMETER] Error: {ex.Message}");
-                throw;
-            }
+                success = true,
+                data = new { parameterId = parameter.ParameterId },
+                message = "Parameter created successfully",
+            };
         }
 
         public async Task<object> UpdateParameterAsync(int parameterId, UpdateParameterDto dto)
         {
-            try
+            var parameter = await _repository.GetParameterByIdAsync(parameterId);
+            if (parameter == null)
             {
-                var parameter = await _repository.GetParameterByIdAsync(parameterId);
-                if (parameter == null)
-                {
-                    return new { success = false, message = "Parameter not found" };
-                }
-
-                parameter.ParameterName = dto.ParameterName;
-                parameter.ParameterType = dto.ParameterType;
-                parameter.IsRequired = dto.IsRequired;
-                parameter.PlaceholderText = dto.PlaceholderText;
-                parameter.MinimumValue = dto.MinimumValue;
-                parameter.MaximumValue = dto.MaximumValue;
-                parameter.SortOrder = dto.SortOrder;
-
-                await _repository.SaveChangesAsync();
-
-                return new
-                {
-                    success = true,
-                    message = "Parameter updated successfully"
-                };
+                return new { success = false, message = "Parameter not found" };
             }
-            catch (Exception ex)
-            {
-                _logger.LogError($"[UPDATE_PARAMETER] Error: {ex.Message}");
-                throw;
-            }
+
+            parameter.ParameterName = dto.ParameterName;
+            parameter.ParameterType = dto.ParameterType;
+            parameter.IsRequired = dto.IsRequired;
+            parameter.PlaceholderText = dto.PlaceholderText;
+            parameter.MinimumValue = dto.MinimumValue;
+            parameter.MaximumValue = dto.MaximumValue;
+            parameter.SortOrder = dto.SortOrder;
+
+            await _repository.SaveChangesAsync();
+
+            return new { success = true, message = "Parameter updated successfully" };
         }
 
         public async Task<object> DeleteParameterAsync(int parameterId)
         {
-            try
+            var parameter = await _repository.GetParameterByIdAsync(parameterId);
+            if (parameter == null)
             {
-                var parameter = await _repository.GetParameterByIdAsync(parameterId);
-                if (parameter == null)
-                {
-                    return new { success = false, message = "Parameter not found" };
-                }
-
-                await _repository.DeleteParameterAsync(parameter);
-                await _repository.SaveChangesAsync();
-
-                return new
-                {
-                    success = true,
-                    message = "Parameter deleted successfully"
-                };
+                return new { success = false, message = "Parameter not found" };
             }
-            catch (Exception ex)
-            {
-                _logger.LogError($"[DELETE_PARAMETER] Error: {ex.Message}");
-                throw;
-            }
+
+            await _repository.DeleteParameterAsync(parameter);
+            await _repository.SaveChangesAsync();
+
+            return new { success = true, message = "Parameter deleted successfully" };
         }
 
         public async Task<object> GetApprovedProfilesAsync()
         {
-            try
+            var approvedNominations = await _repository.GetApprovedNominationsAsync();
+
+            var result = new List<object>();
+            foreach (var n in approvedNominations)
             {
-                var approvedNominations = await _repository.GetApprovedNominationsAsync();
+                var opportunity = await _repository.GetOpportunityByIdAsync(n.OpportunityId);
 
-                var result = new List<object>();
-                foreach (var n in approvedNominations)
-                {
-                    var opportunity = await _repository.GetOpportunityByIdAsync(n.OpportunityId);
+                var dept = await _repository.GetEmployeeDepartmentDetailsAsync(n.NomineeEmployeeId);
 
-                    var dept = await _repository.GetEmployeeDepartmentDetailsAsync(n.NomineeEmployeeId);
-
-                    result.Add(new
+                result.Add(
+                    new
                     {
                         n.NominationId,
                         n.Justification,
@@ -589,48 +526,47 @@ namespace Relevantz.EEPZ.Core.Services
                             n.NomineeEmployee.EmployeeId,
                             n.NomineeEmployee.Userprofile.FirstName,
                             n.NomineeEmployee.Userprofile.LastName,
-                            DepartmentName = dept?.Department?.DepartmentName ?? "Unknown"
+                            DepartmentName = dept?.Department?.DepartmentName ?? "Unknown",
                         },
-                        Opportunity = opportunity != null ? new
-                        {
-                            opportunity.OpportunityName,
-                            RewardType = opportunity.RewardType?.RewardName ?? "Unknown",
-                            RewardCategory = opportunity.RewardType?.RewardCategory ?? "Unknown"
-                        } : null
-                    });
-                }
+                        Opportunity = opportunity != null
+                            ? new
+                            {
+                                opportunity.OpportunityName,
+                                RewardType = opportunity.RewardType?.RewardName ?? "Unknown",
+                                RewardCategory = opportunity.RewardType?.RewardCategory
+                                    ?? "Unknown",
+                            }
+                            : null,
+                    }
+                );
+            }
 
-                return new
-                {
-                    success = true,
-                    data = result,
-                    message = $"Found {result.Count} approved profiles"
-                };
-            }
-            catch (Exception ex)
+            return new
             {
-                _logger.LogError($"[APPROVED_PROFILES] Error: {ex.Message}");
-                throw;
-            }
+                success = true,
+                data = result,
+                message = $"Found {result.Count} approved profiles",
+            };
         }
 
         public async Task<object> GetRejectedProfilesAsync()
         {
-            try
+            var rejectedNominations = await _repository.GetRejectedNominationsAsync();
+
+            _logger.LogInformation(
+                $"[REJECTED_PROFILES] Found {rejectedNominations.Count} rejected nominations"
+            );
+
+            var result = new List<object>();
+
+            foreach (var n in rejectedNominations)
             {
-                var rejectedNominations = await _repository.GetRejectedNominationsAsync();
+                var opportunity = await _repository.GetOpportunityByIdAsync(n.OpportunityId);
 
-                _logger.LogInformation($"[REJECTED_PROFILES] Found {rejectedNominations.Count} rejected nominations");
+                var dept = await _repository.GetEmployeeDepartmentDetailsAsync(n.NomineeEmployeeId);
 
-                var result = new List<object>();
-
-                foreach (var n in rejectedNominations)
-                {
-                    var opportunity = await _repository.GetOpportunityByIdAsync(n.OpportunityId);
-
-                    var dept = await _repository.GetEmployeeDepartmentDetailsAsync(n.NomineeEmployeeId);
-
-                    result.Add(new
+                result.Add(
+                    new
                     {
                         n.NominationId,
                         n.Justification,
@@ -642,69 +578,62 @@ namespace Relevantz.EEPZ.Core.Services
                             n.NomineeEmployee.EmployeeId,
                             n.NomineeEmployee.Userprofile.FirstName,
                             n.NomineeEmployee.Userprofile.LastName,
-                            DepartmentName = dept?.Department?.DepartmentName ?? "Unknown"
+                            DepartmentName = dept?.Department?.DepartmentName ?? "Unknown",
                         },
-                        Opportunity = opportunity != null ? new
-                        {
-                            opportunity.OpportunityName,
-                            RewardType = opportunity.RewardType?.RewardName ?? "Unknown",
-                            RewardCategory = opportunity.RewardType?.RewardCategory ?? "Unknown"
-                        } : null
-                    });
-                }
+                        Opportunity = opportunity != null
+                            ? new
+                            {
+                                opportunity.OpportunityName,
+                                RewardType = opportunity.RewardType?.RewardName ?? "Unknown",
+                                RewardCategory = opportunity.RewardType?.RewardCategory
+                                    ?? "Unknown",
+                            }
+                            : null,
+                    }
+                );
+            }
 
-                return new
-                {
-                    success = true,
-                    data = result,
-                    message = $"Found {result.Count} rejected profiles"
-                };
-            }
-            catch (Exception ex)
+            return new
             {
-                _logger.LogError($"[REJECTED_PROFILES] Error: {ex.Message}");
-                throw;
-            }
+                success = true,
+                data = result,
+                message = $"Found {result.Count} rejected profiles",
+            };
         }
 
         public async Task<object> GetStatisticsAsync()
         {
-            try
+            var totalNominations = await _repository.GetTotalNominationsCountAsync();
+            var pendingNominations = await _repository.GetPendingNominationsCountAsync();
+            var approvedNominations = await _repository.GetApprovedNominationsCountAsync();
+            var rejectedNominations = await _repository.GetRejectedNominationsCountAsync();
+            var activeOpportunities = await _repository.GetActiveOpportunitiesCountAsync();
+
+            var nominationsWithOpportunities =
+                await _repository.GetAllNominationsWithOpportunitiesAsync();
+
+            var recognitionCount = nominationsWithOpportunities.Count(x =>
+                x.Opportunity?.RewardType?.RewardCategory == "Recognition"
+            );
+
+            var promotionCount = nominationsWithOpportunities.Count(x =>
+                x.Opportunity?.RewardType?.RewardCategory == "Promotion"
+            );
+
+            return new
             {
-                var totalNominations = await _repository.GetTotalNominationsCountAsync();
-                var pendingNominations = await _repository.GetPendingNominationsCountAsync();
-                var approvedNominations = await _repository.GetApprovedNominationsCountAsync();
-                var rejectedNominations = await _repository.GetRejectedNominationsCountAsync();
-                var activeOpportunities = await _repository.GetActiveOpportunitiesCountAsync();
-
-                var nominationsWithOpportunities = await _repository.GetAllNominationsWithOpportunitiesAsync();
-
-                var recognitionCount = nominationsWithOpportunities
-                    .Count(x => x.Opportunity?.RewardType?.RewardCategory == "Recognition");
-
-                var promotionCount = nominationsWithOpportunities
-                    .Count(x => x.Opportunity?.RewardType?.RewardCategory == "Promotion");
-
-                return new
+                success = true,
+                data = new
                 {
-                    success = true,
-                    data = new
-                    {
-                        totalNominations,
-                        pendingNominations,
-                        approvedNominations,
-                        rejectedNominations,
-                        activeOpportunities,
-                        recognitionCount,
-                        promotionCount
-                    }
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"[STATISTICS] Error: {ex.Message}");
-                throw;
-            }
+                    totalNominations,
+                    pendingNominations,
+                    approvedNominations,
+                    rejectedNominations,
+                    activeOpportunities,
+                    recognitionCount,
+                    promotionCount,
+                },
+            };
         }
     }
 }
