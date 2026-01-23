@@ -13,8 +13,9 @@
   font-family: "Poppins", sans-serif;
 }
 
-.sched-breadcrumb-nav {
+.sched-breadcrumb-nav-dashboard{
   --bs-breadcrumb-divider: "";
+  margin-left: -150px;
 }
 
 .sched-breadcrumb-link {

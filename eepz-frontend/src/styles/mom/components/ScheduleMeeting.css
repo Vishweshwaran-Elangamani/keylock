@@ -31,53 +31,68 @@
 
 .sched-breadcrumb-nav-meeting {
   margin-bottom: 1.5rem;
-  margin-left: 35px;
+  margin-left: -110px;
 }
 
 .sched-breadcrumb {
-  background-color: transparent;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   padding: 0;
-  margin-left: -120px;
-  margin-top: -10px;
+  margin: 0;
+  background: transparent;
+}
+
+.sched-breadcrumb li {
+  display: flex;
+  align-items: center;
 }
 
 .sched-breadcrumb-link {
   background: none;
   border: none;
-  color: #97247e;
-  cursor: pointer;
   padding: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 1px;
+  color: #97247e;
   font-size: 0.875rem;
   font-weight: 500;
-  text-decoration: none;
-  transition: color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  line-height: 1;
+  margin-left: 2px;
 }
 
-.sched-breadcrumb-link:hover {
-  color: #7a1d65;
+.sched-breadcrumb-link svg {
+  display: block;
+}
+.sched-breadcrumb-home-separator{
+  color: #97247e;
+  margin-left: 10px;
 }
 
 .sched-breadcrumb-separator {
   display: flex;
   align-items: center;
-  color: #97247e;
-  margin: 0 2px;
   font-size: 1rem;
   font-weight: 500;
+  color: #97247e;
+  line-height: 1;
+  
 }
 
 .sched-breadcrumb-current {
-  color: black;
   font-size: 0.875rem;
   font-weight: 600;
+  color: #000;
+  line-height: 1;
 }
 
 .breadcrumb-item + .breadcrumb-item::before {
   display: none;
+  margin-left: 10px;
 }
+
 
 .sched-input {
   font-size: 1rem;

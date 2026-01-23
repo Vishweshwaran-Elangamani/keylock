@@ -14,7 +14,6 @@ import {
   Eye,
   Plus,
   ArrowLeft,
-  MessageSquare,
   AlertTriangle,
   Share2,
   Search,
@@ -22,8 +21,6 @@ import {
 } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../styles/mom/components/MyMomsList.css";
-
-const PRIMARY = "#27235C";
 
 const MyMomsList = () => {
   const [moms, setMoms] = useState([]);
@@ -66,13 +63,8 @@ const MyMomsList = () => {
     }
   };
 
-  const openMomDetails = (mom) => {
-    setSelectedMom(mom);
-  };
-
-  const closeMomDetails = () => {
-    setSelectedMom(null);
-  };
+  const openMomDetails = (mom) => setSelectedMom(mom);
+  const closeMomDetails = () => setSelectedMom(null);
 
   const openShareModal = (mom) => {
     setShareModalMom(mom);
@@ -109,9 +101,7 @@ const MyMomsList = () => {
         selectedEmployees
       );
       if (response.success) {
-        toastr.success(
-          `MOM shared with ${selectedEmployees.length} employee(s)`
-        );
+        toastr.success(`MOM shared with ${selectedEmployees.length} employee(s)`);
         closeShareModal();
       }
     } catch (err) {
@@ -142,9 +132,7 @@ const MyMomsList = () => {
       Other: "secondary",
     };
     return (
-      <span className={`badge bg-${badgeMap[type] || "secondary"}`}>
-        {type}
-      </span>
+      <span className={`badge bg-${badgeMap[type] || "secondary"}`}>{type}</span>
     );
   };
 
@@ -156,6 +144,7 @@ const MyMomsList = () => {
         </span>
       );
     }
+
     switch (status) {
       case "Completed":
         return (
@@ -213,18 +202,17 @@ const MyMomsList = () => {
     <div className="mml-page">
       <div className="row justify-content-center">
         <div className="col-12 col-xl-11">
-          <div
-            className="mml-header card shadow-sm"
-            style={{ backgroundColor: PRIMARY }}
-          >
+          <div className="mml-header card shadow-sm mml-header-primary">
             <div className="mml-header-inner">
               <div className="mml-header-left">
                 <button
                   className="btn btn-light mml-back-btn"
                   onClick={() => navigate(-1)}
+                  type="button"
                 >
                   <ArrowLeft size={20} />
                 </button>
+
                 <div className="mml-header-text">
                   <h2 className="mml-header-title">My MOMs</h2>
                   <p className="mml-header-subtitle">
@@ -232,9 +220,11 @@ const MyMomsList = () => {
                   </p>
                 </div>
               </div>
+
               <button
                 className="btn btn-light mml-header-create-btn"
                 onClick={() => navigate("/mom/create")}
+                type="button"
               >
                 <Plus size={18} />
                 <span className="mml-header-create-text">Create New MOM</span>
@@ -265,6 +255,7 @@ const MyMomsList = () => {
                 <button
                   className="btn btn-primary d-flex align-items-center gap-2 mx-auto"
                   onClick={() => navigate("/mom/create")}
+                  type="button"
                 >
                   <Plus size={18} />
                   Create Your First MOM
@@ -286,9 +277,7 @@ const MyMomsList = () => {
 
                         <div className="col">
                           <div className="mml-mom-header-row">
-                            <h5 className="mml-mom-title">
-                              {mom.meetingTitle}
-                            </h5>
+                            <h5 className="mml-mom-title">{mom.meetingTitle}</h5>
                             {getMeetingTypeBadge(mom.meetingType)}
                           </div>
 
@@ -300,9 +289,7 @@ const MyMomsList = () => {
                                   className="mml-info-icon text-primary"
                                 />
                                 <div className="mml-info-text">
-                                  <div className="mml-info-label">
-                                    Meeting Date
-                                  </div>
+                                  <div className="mml-info-label">Meeting Date</div>
                                   <div className="mml-info-value">
                                     {formatDateTime(mom.meetingDate)}
                                   </div>
@@ -317,9 +304,7 @@ const MyMomsList = () => {
                                   className="mml-info-icon text-primary"
                                 />
                                 <div className="mml-info-text">
-                                  <div className="mml-info-label">
-                                    Attendees
-                                  </div>
+                                  <div className="mml-info-label">Attendees</div>
                                   <div className="mml-info-value">
                                     {mom.attendees || "N/A"}
                                   </div>
@@ -334,12 +319,9 @@ const MyMomsList = () => {
                                   className="mml-info-icon text-primary"
                                 />
                                 <div className="mml-info-text">
-                                  <div className="mml-info-label">
-                                    Submitted by
-                                  </div>
+                                  <div className="mml-info-label">Submitted by</div>
                                   <div className="mml-info-value">
-                                    {mom.submittedByEmployeeName} (
-                                    {mom.submittedByRole})
+                                    {mom.submittedByEmployeeName} ({mom.submittedByRole})
                                   </div>
                                 </div>
                               </div>
@@ -350,31 +332,36 @@ const MyMomsList = () => {
                             <button
                               className="btn btn-sm btn-outline-primary d-flex align-items-center gap-2"
                               onClick={() => openMomDetails(mom)}
+                              type="button"
                             >
                               <Eye size={16} />
                               View Details
                             </button>
+
                             <button
                               className="btn btn-sm btn-info d-flex align-items-center gap-2"
                               onClick={() => openShareModal(mom)}
+                              type="button"
                             >
                               <Share2 size={16} />
                               Share
                             </button>
+
                             {mom.isEditable && (
                               <>
                                 <button
                                   className="btn btn-sm btn-warning d-flex align-items-center gap-2"
-                                  onClick={() =>
-                                    navigate(`/mom/edit/${mom.momId}`)
-                                  }
+                                  onClick={() => navigate(`/mom/edit/${mom.momId}`)}
+                                  type="button"
                                 >
                                   <Edit size={16} />
                                   Edit
                                 </button>
+
                                 <button
                                   className="btn btn-sm btn-danger d-flex align-items-center gap-2"
                                   onClick={() => handleDelete(mom.momId)}
+                                  type="button"
                                 >
                                   <Trash2 size={16} />
                                   Delete
@@ -402,10 +389,7 @@ const MyMomsList = () => {
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="modal-content border-0 shadow mml-modal-content">
-                  <div
-                    className="modal-header mml-modal-header"
-                    style={{ backgroundColor: PRIMARY }}
-                  >
+                  <div className="modal-header mml-modal-header mml-header-primary">
                     <div>
                       <h5 className="modal-title fw-bold mb-1 mml-modal-title">
                         Share MOM
@@ -438,6 +422,7 @@ const MyMomsList = () => {
                           <button
                             className="btn btn-light mml-search-clear"
                             onClick={() => setSearchTerm("")}
+                            type="button"
                           >
                             <X size={18} />
                           </button>
@@ -449,8 +434,7 @@ const MyMomsList = () => {
                       <div className="alert alert-info d-flex align-items-center gap-2 mb-3">
                         <Users size={18} />
                         <span>
-                          <strong>{selectedEmployees.length}</strong>{" "}
-                          employee(s) selected
+                          <strong>{selectedEmployees.length}</strong> employee(s) selected
                         </span>
                       </div>
                     )}
@@ -470,20 +454,15 @@ const MyMomsList = () => {
                               <input
                                 type="checkbox"
                                 className="form-check-input mml-employee-checkbox"
-                                checked={selectedEmployees.includes(
-                                  employee.employeeId
-                                )}
-                                onChange={() =>
-                                  toggleEmployeeSelection(employee.employeeId)
-                                }
+                                checked={selectedEmployees.includes(employee.employeeId)}
+                                onChange={() => toggleEmployeeSelection(employee.employeeId)}
                               />
                               <div className="mml-employee-text">
                                 <div className="fw-semibold">
                                   {employee.firstName} {employee.lastName}
                                 </div>
                                 <div className="small text-muted">
-                                  {employee.email} • {employee.departmentName} •{" "}
-                                  {employee.roleName}
+                                  {employee.email} • {employee.departmentName} • {employee.roleName}
                                 </div>
                               </div>
                             </label>
@@ -497,15 +476,16 @@ const MyMomsList = () => {
                     <button
                       className="btn btn-secondary"
                       onClick={closeShareModal}
+                      type="button"
                     >
                       Cancel
                     </button>
+
                     <button
                       className="btn btn-primary d-flex align-items-center gap-2"
                       onClick={handleShareMom}
-                      disabled={
-                        selectedEmployees.length === 0 || sharingLoading
-                      }
+                      disabled={selectedEmployees.length === 0 || sharingLoading}
+                      type="button"
                     >
                       <Share2 size={16} />
                       {sharingLoading
@@ -529,10 +509,7 @@ const MyMomsList = () => {
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="modal-content border-0 shadow mml-modal-content">
-                  <div
-                    className="modal-header border-0 mml-modal-header"
-                    style={{ backgroundColor: PRIMARY }}
-                  >
+                  <div className="modal-header border-0 mml-modal-header mml-header-primary">
                     <div>
                       <h5 className="modal-title fw-bold mb-1 mml-modal-title">
                         {selectedMom.meetingTitle}
@@ -551,16 +528,12 @@ const MyMomsList = () => {
                   <div className="modal-body mml-modal-body">
                     <div className="card bg-light border-0 mb-4">
                       <div className="card-body">
-                        <h6 className="fw-semibold mb-3">
-                          Meeting Information
-                        </h6>
+                        <h6 className="fw-semibold mb-3">Meeting Information</h6>
                         <div className="row g-3">
                           <div className="col-md-6">
                             <div className="mml-detail-row">
                               <Calendar size={16} className="text-primary" />
-                              <small className="text-muted">
-                                Meeting Date:
-                              </small>
+                              <small className="text-muted">Meeting Date:</small>
                             </div>
                             <div className="fw-semibold">
                               {formatDateTime(selectedMom.meetingDate)}
@@ -571,15 +544,13 @@ const MyMomsList = () => {
                             <div className="col-md-6">
                               <div className="mml-detail-row">
                                 <LinkIcon size={16} className="text-primary" />
-                                <small className="text-muted">
-                                  Meeting Link:
-                                </small>
+                                <small className="text-muted">Meeting Link:</small>
                               </div>
                               <a
                                 href={selectedMom.meetingLink}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="text-primary text-decoration-none d-flex align-items-center gap-1"
+                                className="mml-link"
                               >
                                 Join Meeting <LinkIcon size={14} />
                               </a>
@@ -599,13 +570,10 @@ const MyMomsList = () => {
                           <div className="col-md-6">
                             <div className="mml-detail-row">
                               <Users size={16} className="text-primary" />
-                              <small className="text-muted">
-                                Submitted by:
-                              </small>
+                              <small className="text-muted">Submitted by:</small>
                             </div>
                             <div className="fw-semibold">
-                              {selectedMom.submittedByEmployeeName} (
-                              {selectedMom.submittedByRole})
+                              {selectedMom.submittedByEmployeeName} ({selectedMom.submittedByRole})
                             </div>
                           </div>
                         </div>
@@ -627,6 +595,7 @@ const MyMomsList = () => {
                       <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2">
                         Discussion Points
                       </h6>
+
                       {selectedMom.discussionPoints?.length > 0 ? (
                         <div className="list-group">
                           {selectedMom.discussionPoints.map((dp, index) => (
@@ -656,6 +625,7 @@ const MyMomsList = () => {
                       <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2">
                         Action Items
                       </h6>
+
                       {selectedMom.actionItems?.length > 0 ? (
                         <div className="list-group">
                           {selectedMom.actionItems.map((ai) => (
@@ -669,6 +639,7 @@ const MyMomsList = () => {
                                 </h6>
                                 {getStatusBadge(ai.status, ai.isOverdue)}
                               </div>
+
                               <div className="row g-2 mt-2">
                                 <div className="col-md-6">
                                   <small className="text-muted">
@@ -678,6 +649,7 @@ const MyMomsList = () => {
                                     {ai.assignedToEmployeeName}
                                   </div>
                                 </div>
+
                                 <div className="col-md-6">
                                   <small className="text-muted">
                                     Due Date:
@@ -716,9 +688,11 @@ const MyMomsList = () => {
                     <button
                       className="btn btn-secondary"
                       onClick={closeMomDetails}
+                      type="button"
                     >
                       Close
                     </button>
+
                     {selectedMom.isEditable && (
                       <button
                         className="btn btn-primary d-flex align-items-center gap-2"
@@ -726,6 +700,7 @@ const MyMomsList = () => {
                           closeMomDetails();
                           navigate(`/mom/edit/${selectedMom.momId}`);
                         }}
+                        type="button"
                       >
                         <Edit size={16} />
                         Edit MOM

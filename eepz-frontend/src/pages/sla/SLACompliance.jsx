@@ -35,7 +35,6 @@ const SLACompliance = () => {
         setError("No SLA data available");
       }
     } catch (err) {
-      console.error("Error:", err);
       setError(err.message || "Failed to load SLA data");
       setAllSLAs([]);
     } finally {
@@ -138,6 +137,17 @@ const SLACompliance = () => {
   });
 
   const stats = calculateOverallStats();
+
+  const getRatingClassName = (ratingObj, dept) => {
+    const color = ratingObj?.color?.toLowerCase() || "";
+    if (color.includes("green")) return "sla-compliance-rating-green";
+    if (color.includes("red")) return "sla-compliance-rating-red";
+    if (color.includes("yellow") || color.includes("orange"))
+      return "sla-compliance-rating-yellow";
+    if (dept?.complianceRating?.toLowerCase()?.includes("good"))
+      return "sla-compliance-rating-green";
+    return "sla-compliance-rating-blue";
+  };
 
   return (
     <div className="sla-compliance-wrapper">
@@ -243,6 +253,7 @@ const SLACompliance = () => {
           <AlertCircle size={18} className="sla-compliance-alert-icon" />
           <span className="sla-compliance-alert-text">{error}</span>
           <button
+            type="button"
             className="sla-compliance-alert-close"
             onClick={() => setError(null)}
           >
@@ -308,12 +319,16 @@ const SLACompliance = () => {
                       </th>
                     </tr>
                   </thead>
+
                   <tbody>
                     {sortedData.map((dept) => {
                       const ratingObj = getComplianceRating(
                         dept.compliancePercentage
                       );
-                      const ratingColor = ratingObj.color;
+                      const ratingClassName = getRatingClassName(
+                        ratingObj,
+                        dept
+                      );
 
                       return (
                         <tr key={dept.complianceId}>
@@ -347,21 +362,13 @@ const SLACompliance = () => {
 
                           <td className="sla-compliance-table-cell-center">
                             <div className="sla-compliance-progress-wrapper">
-                              <div className="sla-compliance-progress-bar">
-                                <div
-                                  className="sla-compliance-progress-fill"
-                                  style={{
-                                    width: `${Math.min(
-                                      100,
-                                      dept.compliancePercentage
-                                    )}%`,
-                                    backgroundColor: ratingColor,
-                                  }}
-                                />
-                              </div>
+                              <progress
+                                className={`sla-compliance-progress-bar ${ratingClassName}`}
+                                value={Math.min(100, dept.compliancePercentage)}
+                                max={100}
+                              />
                               <span
-                                className="sla-compliance-progress-text"
-                                style={{ color: ratingColor }}
+                                className={`sla-compliance-progress-text ${ratingClassName}`}
                               >
                                 {dept.compliancePercentage.toFixed(1)}%
                               </span>

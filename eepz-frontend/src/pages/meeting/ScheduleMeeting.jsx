@@ -295,34 +295,33 @@ const ScheduleMeeting = () => {
                 <button
                   onClick={() => navigate("/manager/dashboard/")}
                   className="sched-breadcrumb-link"
-                  style={{ display: "flex", alignItems: "center", padding: 0 }}
                   type="button"
                 >
                   <Home size={18} />
                 </button>
               </li>
 
-              <li className="sched-breadcrumb-separator" style={{ margin: "0 4px" }}>
-                /
-              </li>
+             <li className="breadcrumb-item">
+                <span className="sched-breadcrumb-home-separator">/</span>
+            </li>
+
 
               <li className="breadcrumb-item d-flex align-items-center">
                 <button
                   onClick={() => navigate("/manager/dashboard/meetmom")}
                   className="sched-breadcrumb-link"
-                  style={{ padding: 0, marginLeft: "2px" }}
                   type="button"
                 >
                   Meeting and MoM
                 </button>
               </li>
 
-              <li className="sched-breadcrumb-separator" style={{ margin: "0 4px" }}>
-                /
-              </li>
+             <li className="breadcrumb-item">
+                <span className="sched-breadcrumb-separator">/</span>
+            </li>
 
               <li className="breadcrumb-item active d-flex align-items-center">
-                <span className="sched-breadcrumb-current" style={{ marginLeft: "2px" }}>
+                <span className="sched-breadcrumb-current">
                   Schedule Meeting
                 </span>
               </li>

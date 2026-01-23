@@ -9,9 +9,9 @@
 }
 
 .sla-compliance-breadcrumbs {
- margin-top: -28px;
- margin-bottom: 40px;
- margin-left: -20px;
+  margin-top: -28px;
+  margin-bottom: 40px;
+  margin-left: -20px;
 }
 
 .sla-compliance-header {
@@ -261,6 +261,10 @@
   text-align: center !important;
 }
 
+.sla-compliance-table-header-center-compliance {
+  text-align: center;
+}
+
 .sla-compliance-table tbody td {
   padding: 0.85rem 1rem;
   border-bottom: 1px solid #f1f5f9;
@@ -282,42 +286,6 @@
   text-align: left;
 }
 
-.sla-compliance-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 46px;
-  padding: 0.3rem 0.6rem;
-  border-radius: 999px;
-  font-size: 0.82rem;
-  font-weight: 700;
-}
-
-.sla-compliance-pill-closed {
-  background: rgba(16, 185, 129, 0.15);
-  color: #10b981;
-}
-
-.sla-compliance-pill-open {
-  background: rgba(245, 158, 11, 0.15);
-  color: #f59e0b;
-}
-
-.sla-compliance-pill-ontime {
-  background: rgba(91, 147, 255, 0.15);
-  color: #5b93ff;
-}
-
-.sla-compliance-pill-breached {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
-}
-
-.sla-compliance-pill-extended {
-  background: rgba(156, 163, 175, 0.2);
-  color: #475569;
-}
-
 .sla-compliance-progress-wrapper {
   display: flex;
   align-items: center;
@@ -336,17 +304,23 @@
   background: #e5e7eb;
   overflow: hidden;
   transform: translateX(8px);
-
+  appearance: none;
+  border: none;
 }
 
-.sla-compliance-table-header-center-compliance{
-  text-align: center;
-}
-
-.sla-compliance-progress-fill {
-  height: 100%;
+.sla-compliance-progress-bar::-webkit-progress-bar {
+  background-color: #e5e7eb;
   border-radius: 999px;
-  transition: width 0.2s ease;
+}
+
+.sla-compliance-progress-bar::-webkit-progress-value {
+  border-radius: 999px;
+  transition: width 0.25s ease;
+}
+
+.sla-compliance-progress-bar::-moz-progress-bar {
+  border-radius: 999px;
+  transition: width 0.25s ease;
 }
 
 .sla-compliance-progress-text {
@@ -355,17 +329,54 @@
   min-width: 54px;
   text-align: left;
   margin-left: 2px;
-  
 }
 
-.sla-compliance-rating-pill {
-  display: inline-flex;
-  padding: 0.4rem 0.85rem;
-  border-radius: 999px;
-  border: 1px solid transparent;
-  font-size: 0.82rem;
-  font-weight: 700;
-  white-space: nowrap;
+.sla-compliance-rating-green.sla-compliance-progress-text {
+  color: #10b981;
+}
+
+.sla-compliance-rating-yellow.sla-compliance-progress-text {
+  color: #f59e0b;
+}
+
+.sla-compliance-rating-red.sla-compliance-progress-text {
+  color: #ef4444;
+}
+
+.sla-compliance-rating-blue.sla-compliance-progress-text {
+  color: #5b93ff;
+}
+
+.sla-compliance-rating-green.sla-compliance-progress-bar::-webkit-progress-value {
+  background-color: #10b981;
+}
+
+.sla-compliance-rating-yellow.sla-compliance-progress-bar::-webkit-progress-value {
+  background-color: #f59e0b;
+}
+
+.sla-compliance-rating-red.sla-compliance-progress-bar::-webkit-progress-value {
+  background-color: #ef4444;
+}
+
+.sla-compliance-rating-blue.sla-compliance-progress-bar::-webkit-progress-value {
+  background-color: #5b93ff;
+}
+
+.sla-compliance-rating-green.sla-compliance-progress-bar::-moz-progress-bar {
+  background-color: #10b981;
+}
+
+.sla-compliance-rating-yellow.sla-compliance-progress-bar::-moz-progress-bar {
+  background-color: #f59e0b;
+}
+
+.sla-compliance-rating-red.sla-compliance-progress-bar::-moz-progress-bar {
+  background-color: #ef4444;
+}
+
+.sla-compliance-rating-blue.sla-compliance-progress-bar::-moz-progress-bar {
+  background-color: #5b93ff;
 }
 
 .sla-compliance-empty {

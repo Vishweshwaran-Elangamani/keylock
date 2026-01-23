@@ -55,18 +55,22 @@
 .smm-tabs-item {
   display: flex;
   align-items: center;
+  gap:12px;
 }
 
 .smm-tab-btn {
   background-color: rgba(255, 255, 255, 0.2);
   color: #ffffff;
-  transition: all 0.2s ease;
   border: none;
-  border-radius: 9999px;
-  padding-inline: 1.4rem;
-  padding-block: 0.55rem;
-  font-weight: 500;
+  border-radius: 10px;
+  padding: 0.7rem 1.4rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .smm-tab-btn:hover {
@@ -76,16 +80,14 @@
 .smm-tab-btn.smm-tab-active {
   background-color: #d84796;
   color: #ffffff;
-  font-weight: 600;
+  box-shadow: 0 0 0 2px rgba(216, 71, 150, 0.25);
 }
 
 .smm-tab-btn.smm-tab-active:hover {
   background-color: #d84796;
 }
 
-.smm-tab-btn-gap {
-  margin-left: 0.5rem;
-}
+
 
 .smm-body {
   text-align: left;

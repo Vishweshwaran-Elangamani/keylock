@@ -97,6 +97,11 @@ const RSVPSummary = () => {
     }
   };
 
+  const toPercentInt = (value) => {
+    const v = Math.round(value);
+    return Math.max(0, Math.min(100, v));
+  };
+
   if (loading) {
     return (
       <div className="rsvp-sum-loading">
@@ -122,6 +127,7 @@ const RSVPSummary = () => {
             <button
               className="btn btn-primary d-flex align-items-center gap-2"
               onClick={() => navigate(-1)}
+              type="button"
             >
               <ArrowLeft size={18} />
               Go Back
@@ -144,6 +150,7 @@ const RSVPSummary = () => {
             <button
               className="btn btn-primary d-flex align-items-center gap-2"
               onClick={() => navigate(-1)}
+              type="button"
             >
               <ArrowLeft size={18} />
               Go Back
@@ -161,7 +168,6 @@ const RSVPSummary = () => {
     declinedCount = 0,
     tentativeCount = 0,
     pendingCount = 0,
-    responseRate = 0,
     participants = [],
   } = summary;
 
@@ -169,6 +175,20 @@ const RSVPSummary = () => {
     totalInvitations > 0
       ? Math.round(((totalInvitations - pendingCount) / totalInvitations) * 100)
       : 0;
+
+  const acceptedPct =
+    totalInvitations > 0 ? (acceptedCount / totalInvitations) * 100 : 0;
+  const tentativePct =
+    totalInvitations > 0 ? (tentativeCount / totalInvitations) * 100 : 0;
+  const declinedPct =
+    totalInvitations > 0 ? (declinedCount / totalInvitations) * 100 : 0;
+  const pendingPct =
+    totalInvitations > 0 ? (pendingCount / totalInvitations) * 100 : 0;
+
+  const acceptedClass = `rsvp-sum-w-${toPercentInt(acceptedPct)}`;
+  const tentativeClass = `rsvp-sum-w-${toPercentInt(tentativePct)}`;
+  const declinedClass = `rsvp-sum-w-${toPercentInt(declinedPct)}`;
+  const pendingClass = `rsvp-sum-w-${toPercentInt(pendingPct)}`;
 
   return (
     <div className="container-fluid rsvp-sum-page">
@@ -178,9 +198,11 @@ const RSVPSummary = () => {
             <button
               className="btn btn-light rsvp-sum-back-btn d-flex align-items-center justify-content-center"
               onClick={() => navigate(-1)}
+              type="button"
             >
               <ArrowLeft size={20} />
             </button>
+
             <div className="flex-grow-1">
               <h2 className="fw-bold mb-1 rsvp-sum-title">RSVP Summary</h2>
               {meetingTitle && (
@@ -270,58 +292,43 @@ const RSVPSummary = () => {
             <div className="card border-0 shadow-sm mb-4 rsvp-sum-breakdown-card">
               <div className="card-body">
                 <h6 className="fw-semibold mb-3">Response Breakdown</h6>
+
                 <div className="progress mb-3 rsvp-sum-progress">
                   {acceptedCount > 0 && (
                     <div
-                      className="progress-bar bg-success d-flex align-items-center justify-content-center"
-                      style={{
-                        width: `${(acceptedCount / totalInvitations) * 100}%`,
-                      }}
+                      className={`progress-bar bg-success d-flex align-items-center justify-content-center ${acceptedClass}`}
                     >
-                      {acceptedCount > 0 && (
-                        <small className="fw-semibold">{acceptedCount}</small>
-                      )}
+                      <small className="fw-semibold">{acceptedCount}</small>
                     </div>
                   )}
+
                   {tentativeCount > 0 && (
                     <div
-                      className="progress-bar bg-info d-flex align-items-center justify-content-center"
-                      style={{
-                        width: `${(tentativeCount / totalInvitations) * 100}%`,
-                      }}
+                      className={`progress-bar bg-info d-flex align-items-center justify-content-center ${tentativeClass}`}
                     >
-                      {tentativeCount > 0 && (
-                        <small className="fw-semibold text-dark">
-                          {tentativeCount}
-                        </small>
-                      )}
+                      <small className="fw-semibold text-dark">
+                        {tentativeCount}
+                      </small>
                     </div>
                   )}
+
                   {declinedCount > 0 && (
                     <div
-                      className="progress-bar bg-danger d-flex align-items-center justify-content-center"
-                      style={{
-                        width: `${(declinedCount / totalInvitations) * 100}%`,
-                      }}
+                      className={`progress-bar bg-danger d-flex align-items-center justify-content-center ${declinedClass}`}
                     >
-                      {declinedCount > 0 && (
-                        <small className="fw-semibold">{declinedCount}</small>
-                      )}
+                      <small className="fw-semibold">{declinedCount}</small>
                     </div>
                   )}
+
                   {pendingCount > 0 && (
                     <div
-                      className="progress-bar bg-secondary d-flex align-items-center justify-content-center"
-                      style={{
-                        width: `${(pendingCount / totalInvitations) * 100}%`,
-                      }}
+                      className={`progress-bar bg-secondary d-flex align-items-center justify-content-center ${pendingClass}`}
                     >
-                      {pendingCount > 0 && (
-                        <small className="fw-semibold">{pendingCount}</small>
-                      )}
+                      <small className="fw-semibold">{pendingCount}</small>
                     </div>
                   )}
                 </div>
+
                 <div className="d-flex flex-wrap gap-2">
                   <span className="badge bg-success d-inline-flex align-items-center gap-1">
                     <CheckCircle size={12} /> Accepted ({acceptedCount})
@@ -344,16 +351,12 @@ const RSVPSummary = () => {
             <div className="card-body">
               <h5 className="card-title fw-semibold mb-4 d-flex align-items-center gap-2">
                 <Users size={22} />
-                Participants{" "}
-                {participants.length > 0 && `(${participants.length})`}
+                Participants {participants.length > 0 && `(${participants.length})`}
               </h5>
 
               {participants.length === 0 ? (
                 <div className="text-center py-5 text-muted">
-                  <Users
-                    size={48}
-                    className="mb-3 rsvp-sum-participants-icon"
-                  />
+                  <Users size={48} className="mb-3 rsvp-sum-participants-icon" />
                   <p className="mb-0">No participants data available</p>
                 </div>
               ) : (
@@ -361,13 +364,9 @@ const RSVPSummary = () => {
                   <table className="table table-hover align-middle mb-0">
                     <thead className="table-light">
                       <tr>
-                        <th className="fw-semibold rsvp-sum-th">
-                          Employee Name
-                        </th>
+                        <th className="fw-semibold rsvp-sum-th">Employee Name</th>
                         <th className="fw-semibold rsvp-sum-th">Status</th>
-                        <th className="fw-semibold rsvp-sum-th">
-                          Response Date
-                        </th>
+                        <th className="fw-semibold rsvp-sum-th">Response Date</th>
                         <th className="fw-semibold rsvp-sum-th">Comments</th>
                       </tr>
                     </thead>
@@ -377,10 +376,7 @@ const RSVPSummary = () => {
                           <td>
                             <div className="d-flex align-items-center gap-2">
                               <div className="rsvp-sum-avatar">
-                                <Users
-                                  size={18}
-                                  className="rsvp-sum-avatar-icon"
-                                />
+                                <Users size={18} className="rsvp-sum-avatar-icon" />
                               </div>
                               <span className="fw-semibold">
                                 {participant.employeeName || "Unknown"}
@@ -416,6 +412,7 @@ const RSVPSummary = () => {
               )}
             </div>
           </div>
+
         </div>
       </div>
     </div>

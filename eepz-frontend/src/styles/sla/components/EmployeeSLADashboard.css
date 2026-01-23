@@ -300,31 +300,6 @@
   color: #fff;
 }
 
-.emp-sla-refresh-btn {
-  height: 38px;
-  padding: 0 14px;
-  border-radius: 999px;
-  border: 1px solid #e5e7eb;
-  background: #ffffff;
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: #374151;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.emp-sla-refresh-btn:hover:not(:disabled) {
-  background: #f3f4f6;
-  transform: translateY(-1px);
-}
-
-.emp-sla-refresh-btn:disabled {
-  cursor: not-allowed;
-  color: #9ca3af;
-  opacity: 0.6;
-}
-
 .emp-sla-content {
   flex: 1;
   overflow: visible;
@@ -437,16 +412,6 @@
   display: flex;
   align-items: center;
   gap: 0.625rem;
-}
-
-.emp-sla-table-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
 }
 
 .emp-sla-table-type-text {
@@ -630,7 +595,6 @@
 
 .emp-sla-status-open,
 .emp-sla-badge.emp-sla-status-open,
-.emp-sla-table-icon.emp-sla-status-open,
 .emp-sla-card-icon.emp-sla-status-open {
   background: #dbeafe;
   color: #0f62fe;
@@ -638,7 +602,6 @@
 
 .emp-sla-status-progress,
 .emp-sla-badge.emp-sla-status-progress,
-.emp-sla-table-icon.emp-sla-status-progress,
 .emp-sla-card-icon.emp-sla-status-progress {
   background: #fef3c7;
   color: #d4941e;
@@ -646,7 +609,6 @@
 
 .emp-sla-status-closed,
 .emp-sla-badge.emp-sla-status-closed,
-.emp-sla-table-icon.emp-sla-status-closed,
 .emp-sla-card-icon.emp-sla-status-closed {
   background: #dcfce7;
   color: #24a148;
@@ -654,7 +616,6 @@
 
 .emp-sla-status-overdue,
 .emp-sla-badge-overdue,
-.emp-sla-table-icon.emp-sla-status-overdue,
 .emp-sla-card-icon.emp-sla-status-overdue {
   background: #fee2e2;
   color: #e01950;

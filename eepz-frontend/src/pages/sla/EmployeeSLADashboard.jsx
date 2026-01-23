@@ -324,6 +324,7 @@ const EmployeeSLADashboard = () => {
                   activeTab === key ? "active" : ""
                 }`}
                 onClick={() => setActiveTab(key)}
+                type="button"
               >
                 {label}
               </button>
@@ -341,9 +342,11 @@ const EmployeeSLADashboard = () => {
                 setCurrentPage(1);
               }}
               title="Table View"
+              type="button"
             >
               <i className="bi bi-table"></i>
             </button>
+
             <button
               className={`emp-sla-view-btn ${
                 viewMode === "grid" ? "active" : ""
@@ -354,6 +357,7 @@ const EmployeeSLADashboard = () => {
                 setCurrentPage(1);
               }}
               title="Grid View"
+              type="button"
             >
               <i className="bi bi-grid-3x3-gap-fill"></i>
             </button>
@@ -461,6 +465,7 @@ const EmployeeSLADashboard = () => {
                               <button
                                 className="emp-sla-action-btn"
                                 onClick={() => handleViewDetails(sla.slaid)}
+                                type="button"
                               >
                                 <Eye size={14} />
                                 <span>View</span>
@@ -539,8 +544,7 @@ const EmployeeSLADashboard = () => {
 
                     <div className="emp-sla-pagination-center">
                       <span className="emp-sla-pagination-status">
-                        Showing {startIndex} to {endIndex} of {safeTotal}{" "}
-                        entries
+                        Showing {startIndex} to {endIndex} of {safeTotal} entries
                       </span>
                     </div>
 

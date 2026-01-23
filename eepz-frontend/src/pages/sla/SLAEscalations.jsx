@@ -8,7 +8,6 @@ import {
   XCircle,
   User,
   Calendar,
-  FileText,
   MessageSquare,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -42,13 +41,8 @@ const SLAEscalations = () => {
         slaService.getSLAEscalations(parseInt(slaid)),
       ]);
 
-      if (slaResponse.success) {
-        setSla(slaResponse.data);
-      }
-
-      if (escalationsResponse.success) {
-        setEscalations(escalationsResponse.data);
-      }
+      if (slaResponse.success) setSla(slaResponse.data);
+      if (escalationsResponse.success) setEscalations(escalationsResponse.data);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -71,51 +65,26 @@ const SLAEscalations = () => {
           description: "The escalation has been resolved and saved",
           duration: 4000,
         });
+
         setSelectedEscalation(null);
         setResolutionForm({
           escalationStatus: "Resolved",
           resolutionComments: "",
         });
+
         fetchData();
-      } else {
-        toast.error("Failed to resolve escalation", {
-          description: response.message || "Unable to process resolution",
-          duration: 5000,
-        });
+        return;
       }
+
+      toast.error("Failed to resolve escalation", {
+        description: response.message || "Unable to process resolution",
+        duration: 5000,
+      });
     } catch (err) {
       toast.error("Failed to resolve escalation", {
         description: err.message || "An unexpected error occurred",
         duration: 5000,
       });
-    }
-  };
-
-  const getEscalationLevelColor = (level) => {
-    switch (level) {
-      case "L1":
-        return { bg: "#0F62FE15", text: "#0F62FE" };
-      case "L2":
-        return { bg: "#E2B93B15", text: "#E2B93B" };
-      case "DeptHead":
-        return { bg: "#AC509815", text: "#AC5098" };
-      case "Leadership":
-        return { bg: "#E0195015", text: "#E01950" };
-      default:
-        return { bg: "#6B728015", text: "#6B7280" };
-    }
-  };
-
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case "Resolved":
-        return <CheckCircle size={20} color="#24A148" />;
-      case "Dismissed":
-        return <XCircle size={20} color="#6B7280" />;
-      case "Escalated":
-        return <AlertTriangle size={20} color="#E2B93B" />;
-      default:
-        return <Clock size={20} color="#0F62FE" />;
     }
   };
 
@@ -129,6 +98,47 @@ const SLAEscalations = () => {
         return "sla-escalation-status-badge-escalated";
       default:
         return "sla-escalation-status-badge-pending";
+    }
+  };
+
+  const getStatusIconClass = (status) => {
+    switch (status) {
+      case "Resolved":
+        return "sla-escalation-status-icon-resolved";
+      case "Dismissed":
+        return "sla-escalation-status-icon-dismissed";
+      case "Escalated":
+        return "sla-escalation-status-icon-escalated";
+      default:
+        return "sla-escalation-status-icon-pending";
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case "Resolved":
+        return <CheckCircle size={20} />;
+      case "Dismissed":
+        return <XCircle size={20} />;
+      case "Escalated":
+        return <AlertTriangle size={20} />;
+      default:
+        return <Clock size={20} />;
+    }
+  };
+
+  const getEscalationLevelClass = (level) => {
+    switch (level) {
+      case "L1":
+        return "sla-escalation-level-l1";
+      case "L2":
+        return "sla-escalation-level-l2";
+      case "DeptHead":
+        return "sla-escalation-level-depthead";
+      case "Leadership":
+        return "sla-escalation-level-leadership";
+      default:
+        return "sla-escalation-level-default";
     }
   };
 
@@ -147,9 +157,11 @@ const SLAEscalations = () => {
           <button
             className="sla-escalations-back-btn"
             onClick={() => navigate(-1)}
+            type="button"
           >
             <ArrowLeft size={20} />
           </button>
+
           <div className="sla-escalations-title-wrapper">
             <h2 className="sla-escalations-title">SLA Escalations</h2>
             {sla && (
@@ -174,41 +186,40 @@ const SLAEscalations = () => {
       ) : (
         <div className="sla-escalations-grid">
           {escalations.map((escalation, index) => {
-            const levelColors = getEscalationLevelColor(
-              escalation.escalationLevel
-            );
             const isExpanded = selectedEscalation === escalation.escalationId;
 
+            const levelClass = getEscalationLevelClass(
+              escalation.escalationLevel
+            );
+
+            const statusIconClass = getStatusIconClass(
+              escalation.escalationStatus
+            );
+
             return (
-              <div
-                key={escalation.escalationId}
-                className="sla-escalation-card"
-              >
+              <div key={escalation.escalationId} className="sla-escalation-card">
                 <div className="sla-escalation-card-body">
                   <div className="sla-escalation-header">
                     <div className="sla-escalation-header-left">
                       <div
-                        className="sla-escalation-icon-wrapper"
-                        style={{ backgroundColor: levelColors.bg }}
+                        className={`sla-escalation-icon-wrapper ${levelClass} ${statusIconClass}`}
                       >
                         {getStatusIcon(escalation.escalationStatus)}
                       </div>
+
                       <div className="sla-escalation-header-content">
                         <div className="sla-escalation-title-row">
                           <h5 className="sla-escalation-title">
                             {escalation.reason}
                           </h5>
+
                           <span
-                            className="sla-escalation-level-badge"
-                            style={{
-                              backgroundColor: levelColors.bg,
-                              color: levelColors.text,
-                              border: `1px solid ${levelColors.text}30`,
-                            }}
+                            className={`sla-escalation-level-badge ${levelClass}`}
                           >
                             {escalation.escalationLevel}
                           </span>
                         </div>
+
                         <p className="sla-escalation-description">
                           {escalation.description}
                         </p>
@@ -314,6 +325,7 @@ const SLAEscalations = () => {
                             isExpanded ? null : escalation.escalationId
                           )
                         }
+                        type="button"
                       >
                         <MessageSquare size={14} />
                         {isExpanded ? "Cancel" : "Resolve Escalation"}
@@ -371,6 +383,7 @@ const SLAEscalations = () => {
                               handleResolveEscalation(escalation.escalationId)
                             }
                             disabled={!resolutionForm.resolutionComments}
+                            type="button"
                           >
                             <CheckCircle size={16} />
                             Submit Resolution

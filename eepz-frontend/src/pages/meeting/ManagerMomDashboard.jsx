@@ -275,7 +275,7 @@ const ManagerMomDashboard = () => {
     <div className="managermom-page">
       <div className="row justify-content-center">
         <div className="col-lg-10 col-xl-9">
-          <nav aria-label="breadcrumb" className="sched-breadcrumb-nav">
+          <nav aria-label="breadcrumb" className="sched-breadcrumb-nav-dashboard">
             <ol className="breadcrumb mb-0 d-flex align-items-center sched-breadcrumb">
               <li className="breadcrumb-item d-flex align-items-center">
                 <button
