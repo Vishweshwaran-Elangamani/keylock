@@ -853,34 +853,27 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
         }
 
-
         /// <summary>
         /// Get SLAs due in specific number of days (for reminders)
         /// </summary>
         public async Task<List<Sla>> GetSlasDueInDaysAsync(int days)
         {
-            try
-            {
-                var targetDate = DateTime.Now.AddDays(days).Date;
-                var nextDate = targetDate.AddDays(1);
+            var targetDate = DateTime.Now.Date.AddDays(days);
 
-                return await _context.Slas
-                    .Include(s => s.Employee)
-                        .ThenInclude(e => e.Userprofile)
-                    .Include(s => s.AssignedToEmployee)
-                        .ThenInclude(a => a.Userprofile)
-                    .Include(s => s.Department)
-                    .Where(s => s.Deadline >= targetDate &&
-                               s.Deadline < nextDate &&
-                               s.Status != "Closed" &&
-                               s.Status != "Completed")
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error retrieving SLAs due in {days} days");
-                throw;
-            }
+            return await _context.Slas
+                .Include(s => s.Employee)
+                    .ThenInclude(e => e.Userprofile)
+                .Include(s => s.Employee)
+                    .ThenInclude(e => e.Userauthentication)
+                .Include(s => s.AssignedToEmployee)
+                    .ThenInclude(a => a.Userprofile)
+                .Include(s => s.AssignedToEmployee)
+                    .ThenInclude(a => a.Userauthentication)
+                .Include(s => s.Department)
+                .Where(s => s.Deadline.Date == targetDate &&
+                           s.Status != "Closed" &&
+                           s.Status != "Completed")
+                .ToListAsync();
         }
 
         /// <summary>
@@ -888,46 +881,40 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         /// </summary>
         public async Task<List<Sla>> GetOverdueSlasByDaysAsync(int days)
         {
-            try
-            {
-                var cutoffDate = DateTime.Now.AddDays(-days);
+            var cutoffDate = DateTime.Now.Date.AddDays(-days);
 
-                return await _context.Slas
-                    .Include(s => s.Employee)
-                        .ThenInclude(e => e.Userprofile)
-                    .Include(s => s.AssignedToEmployee)
-                        .ThenInclude(a => a.Userprofile)
-                    .Include(s => s.Department)
-                    .Where(s => s.Deadline < cutoffDate &&
-                               s.Status != "Closed" &&
-                               s.Status != "Completed")
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving overdue SLAs");
-                throw;
-            }
+            return await _context.Slas
+                .Include(s => s.Employee)
+                    .ThenInclude(e => e.Userprofile)
+                .Include(s => s.Employee)
+                    .ThenInclude(e => e.Userauthentication)
+                .Include(s => s.AssignedToEmployee)
+                    .ThenInclude(a => a.Userprofile)
+                .Include(s => s.AssignedToEmployee)
+                    .ThenInclude(a => a.Userauthentication)
+                .Include(s => s.Department)
+                .Where(s => s.Deadline.Date <= cutoffDate &&
+                           s.Status != "Closed" &&
+                           s.Status != "Completed")
+                .ToListAsync();
         }
 
+        /// <summary>
+        /// Get completed SLAs (for auto-close)
+        /// </summary>
         public async Task<List<Sla>> GetCompletedSlasAsync()
         {
-            try
-            {
-                return await _context.Slas
-                    .Include(s => s.Employee)
-                        .ThenInclude(e => e.Userprofile)
-                    .Include(s => s.Department)
-                    .Where(s => s.Status == "Completed" &&
-                               s.ClosedAt == null)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving completed SLAs");
-                throw;
-            }
+            return await _context.Slas
+                .Include(s => s.Employee)
+                    .ThenInclude(e => e.Userprofile)
+                .Include(s => s.Employee)
+                    .ThenInclude(e => e.Userauthentication)
+                .Include(s => s.Department)
+                .Where(s => s.Status == "Completed" &&
+                           s.ClosedAt == null)
+                .ToListAsync();
         }
+
 
         public async Task<List<Slahistory>> GetAllSlaHistoryAsync()
         {

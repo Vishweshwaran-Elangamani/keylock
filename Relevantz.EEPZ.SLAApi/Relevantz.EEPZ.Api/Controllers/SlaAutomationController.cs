@@ -1,9 +1,6 @@
 using Relevantz.EEPZ.Common.DTOs.Response;
-using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Relevantz.EEPZ.Common.Entities;
-using Relevantz.EEPZ.Core.Services;
 
 namespace eepzbackend.Controllers
 {
@@ -21,34 +18,31 @@ namespace eepzbackend.Controllers
         }
 
         [HttpPost("send-reminders/day-minus-2")]
-        public async Task<IActionResult> SendRemindersDayMinus2()
+        public async Task<ApiResponse<List<SlaResponse>>> SendRemindersDayMinus2()
         {
-            var result = await _slaAutomationService.SendReminders(2);
-            return Ok(result);
+            return await _slaAutomationService.SendReminders(2);
         }
 
         [HttpPost("send-reminders/day-minus-1")]
-        public async Task<IActionResult> SendRemindersDayMinus1()
+        public async Task<ApiResponse<List<SlaResponse>>> SendRemindersDayMinus1()
         {
-            var result = await _slaAutomationService.SendReminders(1);
-            return Ok(result);
+            return await _slaAutomationService.SendReminders(1);
         }
 
         [HttpPost("send-reminders/day-zero")]
-        public async Task<IActionResult> SendRemindersDayZero()
+        public async Task<ApiResponse<List<SlaResponse>>> SendRemindersDayZero()
         {
-            var result = await _slaAutomationService.SendReminders(0);
-            return Ok(result);
+            return await _slaAutomationService.SendReminders(0);
         }
 
         [HttpPost("send-reminders/all")]
-        public async Task<IActionResult> SendAllReminders()
+        public async Task<ApiResponse<object>> SendAllReminders()
         {
-            var result2Days = await SendRemindersDayMinus2();
-            var result1Day = await SendRemindersDayMinus1();
-            var result0Days = await SendRemindersDayZero();
+            var result2Days = await _slaAutomationService.SendReminders(2);
+            var result1Day = await _slaAutomationService.SendReminders(1);
+            var result0Days = await _slaAutomationService.SendReminders(0);
 
-            return Ok(new ApiResponse<object>
+            return new ApiResponse<object>
             {
                 Success = true,
                 Message = "All reminders processing completed",
@@ -58,28 +52,19 @@ namespace eepzbackend.Controllers
                     DayMinus1 = result1Day,
                     DayZero = result0Days
                 }
-            });
+            };
         }
 
         [HttpPost("auto-close")]
-        public async Task<IActionResult> AutoCloseSlas()
+        public async Task<ApiResponse<int>> AutoCloseSlas()
         {
-            var result = await _slaAutomationService.AutoCloseSlas();
-            return Ok(result);
+            return await _slaAutomationService.AutoCloseSlas();
         }
 
         [HttpPost("run-full-cycle")]
-        public async Task<IActionResult> RunFullAutomationCycle()
+        public async Task<ApiResponse<int>> RunFullAutomationCycle()
         {
-            var result = await _slaAutomationService.RunFullAutomationCycle();
-            return Ok(result);
-        }
-
-        private string GetEmployeeName(Employee emp)
-        {
-            if (emp?.Userprofile == null)
-                return "Unknown";
-            return $"{emp.Userprofile.FirstName} {emp.Userprofile.LastName}";
+            return await _slaAutomationService.RunFullAutomationCycle();
         }
     }
 }
