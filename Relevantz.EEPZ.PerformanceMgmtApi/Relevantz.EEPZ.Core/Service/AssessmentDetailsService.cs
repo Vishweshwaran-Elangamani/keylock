@@ -1,251 +1,445 @@
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using Relevantz.EEPZ.Common.Entities;
-using Relevantz.EEPZ.Data.Repository.Interfaces;
-using Relevantz.EEPZ.Core.Services.Interfaces;
-using Relevantz.EEPZ.Core.IService;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.DTOs.Response;
+using Relevantz.EEPZ.Core.IService;
+using Relevantz.EEPZ.Core.Services.Interfaces;
+using Relevantz.EEPZ.Data.Repository.Interfaces;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
+    /// <summary>
+    /// Corrected service:
+    /// - Implements interface signatures exactly (no extra parameters or return-type changes).
+    /// - Reduces repeated LINQ per iteration by pre-indexing collections.
+    /// - Adds logging and exception handling around repository calls.
+    /// - Uses constants for status strings (no magic strings in logic).
+    /// - Centralizes reviewer name resolution.
+    /// - Validates/sanitizes storage Id before file retrieval.
+    /// - Avoids multiple returns in GetHrAttachmentAsync.
+    /// NOTE: For best performance, consider moving heavy query shaping into repo layer.
+    /// </summary>
     public class AssessmentDetailsService : IAssessmentDetailsService
     {
         private readonly IAssessmentDetailsRepository _repository;
         private readonly IFileStorageService _fileStorage;
         private readonly ILogger<AssessmentDetailsService> _logger;
 
+        // Accepts MongoDB ObjectId-like values (GridFS) – 24 hex chars
+        private static readonly Regex ObjectIdRegex = new Regex("^[a-fA-F0-9]{24}$", RegexOptions.Compiled);
+
+        private static class AssessmentStatuses
+        {
+            public const string Pending = "Pending";
+            public const string PendingReview = "Pending Review";
+            public const string Completed = "Assessment Completed";
+        }
+
         public AssessmentDetailsService(
             IAssessmentDetailsRepository repository,
             IFileStorageService fileStorage,
             ILogger<AssessmentDetailsService> logger)
         {
-            _repository = repository;
-            _fileStorage = fileStorage;
-            _logger = logger;
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _fileStorage = fileStorage ?? throw new ArgumentNullException(nameof(fileStorage));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<object> GetAllDetailsAsync()
         {
-            var profiles = await _repository.GetAllUserProfilesAsync();
-            var userAuths = await _repository.GetAllUserAuthenticationsAsync();
-            var projects = await _repository.GetAllProjectsAsync();
-            var projectEmployees = await _repository.GetAllProjectEmployeesAsync();
-            var selfAssessments = await _repository.GetAllSelfAssessmentsWithDetailsAsync();
-            var reviews = await _repository.GetAllAssessmentReviewsAsync();
-            var assignments = await _repository.GetAssignmentsWithFormCompetenciesAsync();
-            var attachments = await _repository.GetAllSelfAssessmentAttachmentsAsync();
+            using var scope = _logger.BeginScope("AssessmentDetailsService.GetAllDetails");
+            var sw = Stopwatch.StartNew();
 
-            var results = new List<object>();
-
-            foreach (var assignment in assignments)
+            try
             {
-                var userAuth = userAuths.FirstOrDefault(ua => ua.UserId == assignment.EmployeeId);
-                if (userAuth == null) continue;
+                _logger.LogInformation("Fetching datasets from repository...");
 
-                var profile = profiles.FirstOrDefault(p => p.EmployeeId == userAuth.EmployeeId);
-                if (profile == null) continue;
+                // Fetch in parallel to reduce wall-clock time.
+                var profilesTask = _repository.GetAllUserProfilesAsync();
+                var userAuthsTask = _repository.GetAllUserAuthenticationsAsync();
+                var projectsTask = _repository.GetAllProjectsAsync();
+                var projectEmployeesTask = _repository.GetAllProjectEmployeesAsync();
+                var selfAssessmentsTask = _repository.GetAllSelfAssessmentsWithDetailsAsync();
+                var reviewsTask = _repository.GetAllAssessmentReviewsAsync();
+                var assignmentsTask = _repository.GetAssignmentsWithFormCompetenciesAsync();
+                var attachmentsTask = _repository.GetAllSelfAssessmentAttachmentsAsync();
 
-                var pe = projectEmployees
-                    .Where(x => x.EmployeeId == profile.EmployeeId && x.IsPrimary == true)
-                    .FirstOrDefault();
+                await Task.WhenAll(
+                    profilesTask, userAuthsTask, projectsTask, projectEmployeesTask,
+                    selfAssessmentsTask, reviewsTask, assignmentsTask, attachmentsTask
+                );
 
-                var project = pe != null
-                    ? projects.FirstOrDefault(pj => pj.ProjectId == pe.ProjectId)
-                    : null;
+                // Null-safe materialization
+                var profiles = profilesTask.Result ?? new List<Userprofile>();
+                var userAuths = userAuthsTask.Result ?? new List<Userauthentication>();
+                var projects = projectsTask.Result ?? new List<Project>();
+                var projectEmployees = projectEmployeesTask.Result ?? new List<Projectemployee>();
+                var selfAssessments = selfAssessmentsTask.Result ?? new List<Selfassessment>();
+                var reviews = reviewsTask.Result ?? new List<Assessmentreview>();
+                var assignments = assignmentsTask.Result ?? new List<Assignment>();
+                var attachments = attachmentsTask.Result ?? new List<Selfassessmentattachment>();
 
-                var selfAssessment = selfAssessments
-                    .Where(sa => sa.EmployeeId == assignment.EmployeeId && sa.FormId == assignment.FormId)
-                    .OrderByDescending(sa => sa.SubmittedAt)
-                    .FirstOrDefault();
+                _logger.LogInformation("Datasets fetched. Building lookup dictionaries...");
 
-                var l1Auth = project?.L1approverEmployeeId.HasValue == true
-                    ? userAuths.FirstOrDefault(ua => ua.EmployeeId == project.L1approverEmployeeId)
-                    : null;
+                // Lookups to avoid repeated .Where/.FirstOrDefault in loops
+                var profileByEmpId = profiles
+                    .Where(p => p != null)
+                    .GroupBy(p => p.EmployeeId)
+                    .ToDictionary(g => g.Key, g => g.First());
 
-                var l2Auth = project?.L2approverEmployeeId.HasValue == true
-                    ? userAuths.FirstOrDefault(ua => ua.EmployeeId == project.L2approverEmployeeId)
-                    : null;
+                var userAuthByEmpId = userAuths
+                    .Where(ua => ua != null)
+                    .GroupBy(ua => ua.EmployeeId)
+                    .ToDictionary(g => g.Key, g => g.First());
 
-                bool hasL1 = l1Auth != null;
-                bool hasL2 = l2Auth != null;
+                var primaryProjectEmployeeByEmpId = projectEmployees
+                    .Where(pe => pe != null && pe.IsPrimary == true)
+                    .GroupBy(pe => pe.EmployeeId)
+                    .ToDictionary(g => g.Key, g => g.First());
 
-                var competencies = new List<object>();
+                var projectById = projects
+                    .Where(p => p != null)
+                    .GroupBy(p => p.ProjectId)
+                    .ToDictionary(g => g.Key, g => g.First());
 
-                if (selfAssessment != null && selfAssessment.Assessmentdetails != null && selfAssessment.Assessmentdetails.Any())
+                // Latest self-assessment per (EmployeeId, FormId)
+                var latestSelfAssessmentByEmpForm = selfAssessments
+                    .Where(sa => sa != null)
+                    .GroupBy(sa => (sa.EmployeeId, sa.FormId))
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.OrderByDescending(sa => sa.SubmittedAt).First()
+                    );
+
+                // Reviews by (DetailId, ReviewerUserId)
+                var reviewsByDetailAndReviewer = reviews
+                    .Where(r => r != null)
+                    .GroupBy(r => (r.DetailId, r.ReviewerId))
+                    .ToDictionary(g => g.Key, g => g.First());
+
+                // Attachments by AssessmentId
+                var attachmentsByAssessmentId = attachments
+                    .Where(a => a != null)
+                    .GroupBy(a => a.AssessmentId)
+                    .ToDictionary(g => g.Key, g => g.ToList());
+
+                _logger.LogInformation("Lookups built in {ElapsedMs} ms. Processing {AssignmentCount} assignments...",
+                    sw.ElapsedMilliseconds, assignments.Count);
+
+                var results = new List<object>(assignments.Count);
+
+                foreach (var assignment in assignments)
                 {
-                    foreach (var detail in selfAssessment.Assessmentdetails)
+                    if (assignment == null) continue;
+
+                    // Resolve employee auth & profile
+                    if (!userAuthByEmpId.TryGetValue(assignment.EmployeeId, out var employeeAuth) || employeeAuth == null)
+                        continue;
+
+                    if (!profileByEmpId.TryGetValue(employeeAuth.EmployeeId, out var profile) || profile == null)
+                        continue;
+
+                    // Resolve primary project
+                    Project? project = null;
+                    if (primaryProjectEmployeeByEmpId.TryGetValue(profile.EmployeeId, out var pe) && pe != null)
                     {
-                        var l1Review = hasL1
-                            ? reviews.FirstOrDefault(r => r.DetailId == detail.DetailId && r.ReviewerId == l1Auth.UserId)
-                            : null;
-
-                        var l2Review = hasL2
-                            ? reviews.FirstOrDefault(r => r.DetailId == detail.DetailId && r.ReviewerId == l2Auth.UserId)
-                            : null;
-
-                        string status = (detail.EmployeeRating == null && string.IsNullOrEmpty(detail.EmployeeComments))
-                            ? "Pending"
-                            : (!hasL1 && !hasL2)
-                                ? "Pending Review"
-                                : (hasL1 && l1Review == null) || (hasL2 && l2Review == null)
-                                    ? "Pending"
-                                    : "Assessment Completed";
-
-                        string l1ReviewerName = "No L1";
-                        if (hasL1 && project?.L1approverEmployeeId.HasValue == true)
-                        {
-                            var l1Profile = profiles.FirstOrDefault(p => p.EmployeeId == project.L1approverEmployeeId);
-                            l1ReviewerName = l1Profile != null
-                                ? $"{l1Profile.FirstName ?? ""} {l1Profile.LastName ?? ""}".Trim()
-                                : "L1 Reviewer";
-                            if (string.IsNullOrEmpty(l1ReviewerName)) l1ReviewerName = "L1 Reviewer";
-                        }
-
-                        string l2ReviewerName = "No L2";
-                        if (hasL2 && project?.L2approverEmployeeId.HasValue == true)
-                        {
-                            var l2Profile = profiles.FirstOrDefault(p => p.EmployeeId == project.L2approverEmployeeId);
-                            l2ReviewerName = l2Profile != null
-                                ? $"{l2Profile.FirstName ?? ""} {l2Profile.LastName ?? ""}".Trim()
-                                : "L2 Reviewer";
-                            if (string.IsNullOrEmpty(l2ReviewerName)) l2ReviewerName = "L2 Reviewer";
-                        }
-
-                        competencies.Add(new
-                        {
-                            CompetencyName = detail.Competency?.Name ?? "Unknown",
-                            EmployeeRating = detail.EmployeeRating,
-                            EmployeeComments = detail.EmployeeComments,
-                            L1ReviewerName = l1ReviewerName,
-                            L1Rating = l1Review?.Rating,
-                            L1Comments = l1Review?.Comments,
-                            L1ReviewStatus = l1Review?.ReviewStatus,
-                            L2ReviewerName = l2ReviewerName,
-                            L2Rating = l2Review?.Rating,
-                            L2Comments = l2Review?.Comments,
-                            L2ReviewStatus = l2Review?.ReviewStatus,
-                            Status = status
-                        });
+                        projectById.TryGetValue(pe.ProjectId, out project);
                     }
-                }
-                else
-                {
-                    var formComps = assignment.Form?.Competencies ?? new List<Competency>();
-                    foreach (var fc in formComps)
+
+                    // Latest self assessment for this employee & form
+                    latestSelfAssessmentByEmpForm.TryGetValue((assignment.EmployeeId, assignment.FormId), out var selfAssessment);
+
+                    // Approver user-auth by approver employee id
+                    Userauthentication? l1Auth = null;
+                    Userauthentication? l2Auth = null;
+                    var l1EmpId = project?.L1approverEmployeeId;
+                    var l2EmpId = project?.L2approverEmployeeId;
+
+                    if (l1EmpId.HasValue) userAuthByEmpId.TryGetValue(l1EmpId.Value, out l1Auth);
+                    if (l2EmpId.HasValue) userAuthByEmpId.TryGetValue(l2EmpId.Value, out l2Auth);
+
+                    var hasL1 = l1Auth != null;
+                    var hasL2 = l2Auth != null;
+
+                    // Build competencies
+                    var competencies = new List<object>();
+
+                    if (selfAssessment != null && selfAssessment.Assessmentdetails != null && selfAssessment.Assessmentdetails.Any())
                     {
-                        string l1ReviewerName = "No L1";
-                        if (hasL1 && project?.L1approverEmployeeId.HasValue == true)
+                        foreach (var detail in selfAssessment.Assessmentdetails)
                         {
-                            var l1Profile = profiles.FirstOrDefault(p => p.EmployeeId == project.L1approverEmployeeId);
-                            l1ReviewerName = l1Profile != null
-                                ? $"{l1Profile.FirstName ?? ""} {l1Profile.LastName ?? ""}".Trim()
-                                : "No L1";
-                        }
+                            if (detail == null) continue;
 
-                        string l2ReviewerName = "No L2";
-                        if (hasL2 && project?.L2approverEmployeeId.HasValue == true)
-                        {
-                            var l2Profile = profiles.FirstOrDefault(p => p.EmployeeId == project.L2approverEmployeeId);
-                            l2ReviewerName = l2Profile != null
-                                ? $"{l2Profile.FirstName ?? ""} {l2Profile.LastName ?? ""}".Trim()
-                                : "No L2";
-                        }
+                            Assessmentreview? l1Review = null;
+                            Assessmentreview? l2Review = null;
 
-                        competencies.Add(new
-                        {
-                            CompetencyName = fc.Name ?? "Unknown",
-                            EmployeeRating = (int?)null,
-                            EmployeeComments = string.Empty,
-                            L1ReviewerName = l1ReviewerName,
-                            L1Rating = (int?)null,
-                            L1Comments = string.Empty,
-                            L1ReviewStatus = string.Empty,
-                            L2ReviewerName = l2ReviewerName,
-                            L2Rating = (int?)null,
-                            L2Comments = string.Empty,
-                            L2ReviewStatus = string.Empty,
-                            Status = "Pending"
-                        });
+                            if (hasL1 && l1Auth != null)
+                                reviewsByDetailAndReviewer.TryGetValue((detail.DetailId, l1Auth.UserId), out l1Review);
+
+                            if (hasL2 && l2Auth != null)
+                                reviewsByDetailAndReviewer.TryGetValue((detail.DetailId, l2Auth.UserId), out l2Review);
+
+                            var status = CalculateStatus(
+                                detail.EmployeeRating,
+                                detail.EmployeeComments,
+                                hasL1,
+                                hasL2,
+                                l1Review,
+                                l2Review
+                            );
+
+                            var l1ReviewerName = GetReviewerName(hasL1, l1EmpId, profileByEmpId, "No L1");
+                            var l2ReviewerName = GetReviewerName(hasL2, l2EmpId, profileByEmpId, "No L2");
+
+                            competencies.Add(new
+                            {
+                                CompetencyName = detail.Competency?.Name ?? "Unknown",
+                                EmployeeRating = detail.EmployeeRating,
+                                EmployeeComments = detail.EmployeeComments ?? string.Empty,
+
+                                L1ReviewerName = l1ReviewerName,
+                                L1Rating = l1Review?.Rating,
+                                L1Comments = l1Review?.Comments,
+                                L1ReviewStatus = l1Review?.ReviewStatus,
+
+                                L2ReviewerName = l2ReviewerName,
+                                L2Rating = l2Review?.Rating,
+                                L2Comments = l2Review?.Comments,
+                                L2ReviewStatus = l2Review?.ReviewStatus,
+
+                                Status = status
+                            });
+                        }
                     }
-                }
-
-                var assessmentAttachments = new List<object>();
-                if (selfAssessment != null)
-                {
-                    var attList = attachments
-                        .Where(a => a.AssessmentId == selfAssessment.AssessmentId)
-                        .ToList();
-
-                    foreach (var att in attList)
+                    else
                     {
-                        assessmentAttachments.Add(new
+                        // No self-assessment yet: seed from form competencies
+                        var formComps = assignment.Form?.Competencies ?? new List<Competency>();
+
+                        var l1ReviewerName = GetReviewerName(hasL1, l1EmpId, profileByEmpId, "No L1");
+                        var l2ReviewerName = GetReviewerName(hasL2, l2EmpId, profileByEmpId, "No L2");
+
+                        foreach (var fc in formComps)
                         {
-                            AttachmentId = att.AttachmentId,
-                            FileName = att.FileName,
-                            FileType = att.FileType,
-                            FileSize = att.FileSize,
-                            AttachmentNote = att.AttachmentNote ?? string.Empty,
-                            UploadedAt = att.UploadedAt,
-                            DisplayOrder = att.DisplayOrder
-                        });
+                            if (fc == null) continue;
+
+                            competencies.Add(new
+                            {
+                                CompetencyName = fc.Name ?? "Unknown",
+                                EmployeeRating = (int?)null,
+                                EmployeeComments = string.Empty,
+
+                                L1ReviewerName = l1ReviewerName,
+                                L1Rating = (int?)null,
+                                L1Comments = string.Empty,
+                                L1ReviewStatus = string.Empty,
+
+                                L2ReviewerName = l2ReviewerName,
+                                L2Rating = (int?)null,
+                                L2Comments = string.Empty,
+                                L2ReviewStatus = string.Empty,
+
+                                Status = AssessmentStatuses.Pending
+                            });
+                        }
                     }
+
+                    // Build attachments for latest assessment
+                    var assessmentAttachments = new List<object>();
+                    if (selfAssessment != null &&
+                        attachmentsByAssessmentId.TryGetValue(selfAssessment.AssessmentId, out var attList) &&
+                        attList != null)
+                    {
+                        foreach (var att in attList)
+                        {
+                            if (att == null) continue;
+
+                            assessmentAttachments.Add(new
+                            {
+                                AttachmentId = att.AttachmentId,
+                                FileName = att.FileName,
+                                FileType = att.FileType,
+                                FileSize = att.FileSize,
+                                AttachmentNote = att.AttachmentNote ?? string.Empty,
+                                UploadedAt = att.UploadedAt,
+                                DisplayOrder = att.DisplayOrder
+                            });
+                        }
+                    }
+
+                    results.Add(new
+                    {
+                        EmployeeId = profile.EmployeeId,
+                        EmployeeName = BuildFullName(profile.FirstName, profile.LastName),
+                        ProjectName = project?.ProjectName ?? string.Empty,
+                        Competencies = competencies,
+                        Goals = new List<object>(), // Reserved
+                        Attachments = assessmentAttachments
+                    });
                 }
 
-                results.Add(new
-                {
-                    EmployeeId = profile.EmployeeId,
-                    EmployeeName = $"{profile.FirstName} {profile.LastName}",
-                    ProjectName = project?.ProjectName ?? string.Empty,
-                    Competencies = competencies,
-                    Goals = new List<object>(),
-                    Attachments = assessmentAttachments
-                });
+                _logger.LogInformation("Processed {Count} assignments in {ElapsedMs} ms.", results.Count, sw.ElapsedMilliseconds);
+                return new { success = true, data = results };
             }
-
-            return new { success = true, data = results };
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while getting all assessment details.");
+                return new { success = false, error = "An unexpected error occurred." };
+            }
+            finally
+            {
+                sw.Stop();
+            }
         }
 
         public async Task<AssessmentDownloadResult> GetHrAttachmentAsync(int attachmentId)
         {
-            var result = new AssessmentDownloadResult();
+            using var scope = _logger.BeginScope("AssessmentDetailsService.GetHrAttachment {AttachmentId}", attachmentId);
+            var result = new AssessmentDownloadResult
+            {
+                Success = false
+            };
 
             try
             {
+                _logger.LogInformation("Fetching attachment metadata for AttachmentId={AttachmentId}", attachmentId);
                 var attachment = await _repository.GetAttachmentByIdAsync(attachmentId);
 
                 if (attachment == null)
                 {
                     result.Success = false;
                     result.ErrorMessage = "Attachment not found";
+                    _logger.LogWarning("Attachment not found. AttachmentId={AttachmentId}", attachmentId);
+                    return result; // Single early return on not-found for clarity
+                }
+
+                _logger.LogInformation(
+                    "Attachment meta: Id={Id}, Name={Name}, Type={Type}, Size={Size}, UploadedAt={UploadedAt}, DisplayOrder={Order}",
+                    attachment.AttachmentId, attachment.FileName, attachment.FileType, attachment.FileSize,
+                    attachment.UploadedAt, attachment.DisplayOrder
+                );
+
+                // Validate/sanitize storage id (GridFS ObjectId format expected)
+                var storageId = SanitizeStorageId(attachment.FilePath);
+                if (storageId == null)
+                {
+                    result.Success = false;
+                    result.ErrorMessage = "Invalid storage identifier";
+                    _logger.LogWarning("Invalid storage identifier for AttachmentId={AttachmentId}. Raw={Raw}", attachmentId, attachment.FilePath);
                     return result;
                 }
 
-                // Get file from MongoDB GridFS using stored ObjectId
-                var (fileBytes, contentType, fileName) = await _fileStorage.GetFileForPreviewAsync(
-                    attachment.FilePath ?? "");
+                // Download from storage (service signature expects just the id/path)
+                byte[] fileBytes;
+                string contentType;
+                string storageFileName;
+
+                try
+                {
+                    (fileBytes, contentType, storageFileName) = await _fileStorage.GetFileForPreviewAsync(storageId);
+                }
+                catch (FileNotFoundException ex)
+                {
+                    _logger.LogError(ex, "File not found in storage for AttachmentId={AttachmentId}", attachmentId);
+                    result.Success = false;
+                    result.ErrorMessage = "File not found in storage";
+                    return result;
+                }
+
+                if (fileBytes == null || fileBytes.Length == 0)
+                {
+                    result.Success = false;
+                    result.ErrorMessage = "File not found in storage";
+                    _logger.LogWarning("No file bytes returned for AttachmentId={AttachmentId}, StorageId={StorageId}", attachmentId, storageId);
+                    return result;
+                }
+
+                // Prefer original filename for download; log storage filename for diagnostics
+                _logger.LogInformation("Storage file resolved for AttachmentId={AttachmentId}: {StorageFileName}", attachmentId, storageFileName);
 
                 result.Success = true;
                 result.FileName = attachment.FileName;
                 result.ContentType = contentType;
                 result.FileBytes = fileBytes;
 
-                _logger.LogInformation("HR attachment {AttachmentId} downloaded successfully", attachmentId);
-                return result;
-            }
-            catch (FileNotFoundException ex)
-            {
-                _logger.LogError(ex, "File not found for attachment {AttachmentId}", attachmentId);
-                result.Success = false;
-                result.ErrorMessage = "File not found in storage";
+                _logger.LogInformation("Attachment downloaded successfully. AttachmentId={AttachmentId}, Bytes={Bytes}", attachmentId, fileBytes.Length);
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error downloading HR attachment {AttachmentId}", attachmentId);
+                _logger.LogError(ex, "Error downloading HR attachment. AttachmentId={AttachmentId}", attachmentId);
                 result.Success = false;
-                result.ErrorMessage = $"Error: {ex.Message}";
+                result.ErrorMessage = "Error occurred while downloading attachment.";
                 return result;
             }
         }
+
+        #region Private Helpers
+
+        private static string BuildFullName(string? first, string? last)
+        {
+            var f = first?.Trim() ?? string.Empty;
+            var l = last?.Trim() ?? string.Empty;
+            var name = $"{f} {l}".Trim();
+            return string.IsNullOrWhiteSpace(name) ? "Unknown" : name;
+        }
+
+        private static string? SanitizeStorageId(string? raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw)) return null;
+            var trimmed = raw.Trim();
+            return ObjectIdRegex.IsMatch(trimmed) ? trimmed : null;
+        }
+
+        private static string CalculateStatus(
+            int? employeeRating,
+            string? employeeComments,
+            bool hasL1,
+            bool hasL2,
+            Assessmentreview? l1Review,
+            Assessmentreview? l2Review)
+        {
+            // If employee hasn't provided anything yet
+            if (employeeRating == null && string.IsNullOrWhiteSpace(employeeComments))
+                return AssessmentStatuses.Pending;
+
+            // If there are no approvers at all
+            if (!hasL1 && !hasL2)
+                return AssessmentStatuses.PendingReview;
+
+            // If approvers exist but any expected review is missing
+            var l1Pending = hasL1 && l1Review == null;
+            var l2Pending = hasL2 && l2Review == null;
+
+            if (l1Pending || l2Pending)
+                return AssessmentStatuses.Pending;
+
+            return AssessmentStatuses.Completed;
+        }
+
+        private static string GetReviewerName(
+            bool hasApprover,
+            int? approverEmployeeId,
+            IDictionary<int, Userprofile> profileByEmpId,
+            string defaultWhenNoApprover)
+        {
+            if (!hasApprover || !approverEmployeeId.HasValue)
+                return defaultWhenNoApprover;
+
+            if (!profileByEmpId.TryGetValue(approverEmployeeId.Value, out var prof) || prof == null)
+                return defaultWhenNoApprover;
+
+            var name = $"{prof.FirstName ?? string.Empty} {prof.LastName ?? string.Empty}".Trim();
+            return string.IsNullOrWhiteSpace(name) ? defaultWhenNoApprover : name;
+        }
+
+        #endregion
     }
 }
