@@ -20,8 +20,6 @@ var builder = WebApplication.CreateBuilder(args);
 Console.WriteLine("Building EEPZ Backend........");
 
 
-
-
 // Configure Serilog for Logging
 
 Log.Logger = new LoggerConfiguration()
@@ -40,14 +38,7 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
-
-
-
 // Add Services to Container
-
-
-
-
 // Add Controllers with JSON Options
 builder
     .Services.AddControllers()
@@ -75,9 +66,6 @@ builder
 
 
 builder.Services.AddEndpointsApiExplorer();
-
-
-
 
 // Configure Swagger with JWT Support
 
@@ -109,8 +97,6 @@ builder.Services.AddSwaggerGen(options =>
         }
     );
 
-
-
     options.AddSecurityRequirement(
         new OpenApiSecurityRequirement
         {
@@ -129,14 +115,9 @@ builder.Services.AddSwaggerGen(options =>
     );
 });
 
-
-
-
 // Configure MySQL Database
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-
 
 if (string.IsNullOrEmpty(connectionString))
 {
@@ -145,8 +126,6 @@ if (string.IsNullOrEmpty(connectionString))
         "Database connection string 'DefaultConnection' not found."
     );
 }
-
-
 
 // Register EEPZDbContext (the main context used by LnDService)           
 builder.Services.AddDbContext<EEPZDbContext>(options =>
@@ -166,7 +145,6 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
     );
 
 
-
     // Enable sensitive data logging only in development 
     if (builder.Environment.IsDevelopment())
     {
@@ -175,22 +153,16 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
     }
 });
 
-
-
-
 // Configure MongoDB Settings
 
 builder.Services.Configure<MongoDbSettings>(
     builder.Configuration.GetSection("MongoDbSettings"));
 
 
-
 // Validate MongoDB Configuration  
 var mongoConfig = builder.Configuration.GetSection("MongoDbSettings");
 var mongoConnectionString = mongoConfig["ConnectionString"];
 var mongoDatabaseName = mongoConfig["DatabaseName"];
-
-
 
 if (string.IsNullOrEmpty(mongoConnectionString))
 {
@@ -201,23 +173,16 @@ else
     Log.Information($"MongoDB configured - Database: {mongoDatabaseName}");
 }
 
-
-
-
 // Configure JWT Authentication
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["SecretKey"];
-
-
 
 if (string.IsNullOrEmpty(secretKey))
 {
     Log.Fatal("JWT SecretKey is not configured!");
     throw new InvalidOperationException("JWT SecretKey not found in configuration.");
 }
-
-
 
 builder
     .Services.AddAuthentication(options =>
@@ -238,7 +203,6 @@ builder
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
             ClockSkew = TimeSpan.Zero,
         };
-
 
 
         options.Events = new JwtBearerEvents
@@ -263,18 +227,10 @@ builder
     });
 
 
-
 builder.Services.AddAuthorization();
 
 
-
-
 // Register Application Services (DI)
-
-
-
-
-
 // File Storage Service - MongoDB GridFS
 
 builder.Services.AddSingleton<IFileStorageService, FileStorageService>();
@@ -282,12 +238,7 @@ Log.Information("File Storage Service registered with MongoDB GridFS");
 
 
 
-
 // LnD Module - Complete Registration
-
-
-
-
 // LnD Repositories
 builder.Services.AddScoped<ILnDEmployeeSkillRepository, LnDEmployeeSkillRepository>();
 builder.Services.AddScoped<ILnDSmeRepository, LnDSmeRepository>();
@@ -306,11 +257,8 @@ builder.Services.AddScoped<ILnDApprovalService, LnDApprovalService>();
 builder.Services.AddScoped<ILnDHRService, LnDHRService>();
 
 
-
 // File Migration Service (Optional - for migrating existing files)
 // builder.Services.AddScoped<FileStorageMigrationService>();
-
-
 
 builder.Services.AddCors(options =>
 {
@@ -321,10 +269,6 @@ builder.Services.AddCors(options =>
             policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
         }
     );
-
-
-
-    // Production CORS policy (more restrictive)
     options.AddPolicy(
         "Production",
         policy =>
@@ -348,7 +292,6 @@ builder.Services.AddCors(options =>
 // Add HTTP Client
 
 builder.Services.AddHttpClient();
-
 
 
 
@@ -377,17 +320,11 @@ builder.Services.AddMemoryCache();
 var app = builder.Build();
 
 
-
 Log.Information("EEPZ Backend Application Starting...");
 
 
 
-
 // Configure HTTP Request Pipeline
-
-
-
-
 // Enable CORS
 app.UseCors("AllowAll");
 
@@ -464,7 +401,7 @@ app.MapGet("/health", async (EEPZDbContext eepzDbContext, IConfiguration config)
     }
     catch (Exception)
     {
-        // Health check failed silently
+
     }
 
     // Test MongoDB Connection
@@ -583,7 +520,6 @@ using (var scope = app.Services.CreateScope())
 
 
 
-        // Ensure database connection is working
         if (eepzDbContext.Database.CanConnect())
         {
             Log.Information("EEPZDbContext - MySQL database connection established successfully.");
@@ -594,8 +530,6 @@ using (var scope = app.Services.CreateScope())
         }
 
 
-
-        // Test MongoDB Connection
         try
         {
             var fileStorageService = services.GetRequiredService<IFileStorageService>();

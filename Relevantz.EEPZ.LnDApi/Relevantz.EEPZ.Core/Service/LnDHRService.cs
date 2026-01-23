@@ -25,7 +25,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         #region Employee Management
 
-        /// <summary>Gets paginated list of all organization employees with department information.</summary>
+        /// <summary>
+        /// Gets paginated list of all organization employees with department information
+        /// </summary>
         public async Task<ApiResponse<PaginatedResponse<SubordinateEmployeeResponseModel>>> GetAllOrganizationEmployees(
     OrganizationEmployeesRequestModel request
 )
@@ -64,7 +66,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
-        /// <summary>Gets paginated skills for a specific employee with SME eligibility calculation.</summary>
+        /// <summary>
+        /// Gets paginated skills for a specific employee with SME eligibility calculation
+        /// </summary>
         public async Task<ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>>
      GetEmployeeSkillsById(
          int employeeId,
@@ -121,7 +125,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         #region Assignment Management
 
-        /// <summary>Gets paginated organization-wide assignments with filtering and search.</summary>
+        /// <summary>
+        /// Gets paginated organization-wide assignments with filtering and search
+        /// </summary>
         public async Task<ApiResponse<PaginatedResponse<AssignmentResponseModel>>>
       GetAllOrganizationAssignments(OrganizationAssignmentsRequestModel request)
         {
@@ -211,7 +217,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         #region Export
 
-        /// <summary>Exports all organization assignments to Excel with department and employee details.</summary>
+        /// <summary>
+        /// Exports all organization assignments to Excel with department and employee details
+        /// </summary>
         public async Task<ApiResponse<byte[]>> GetOrganizationAssignmentsForExport(
        ExportOrganizationAssignmentsRequestModel request
    )

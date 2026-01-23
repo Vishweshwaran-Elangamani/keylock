@@ -37,7 +37,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         #region SME Status
 
-        /// <summary>Checks if an employee has active SME status for any skill.</summary>
+        /// <summary>
+        /// Checks if an employee has active SME status for any skill
+        /// </summary>
         public async Task<ApiResponse<bool>> CheckIfEmployeeIsSme(int employeeId)
         {
             Log.Information("CheckIfEmployeeIsSme started. EmployeeId={EmployeeId}", employeeId);
@@ -56,7 +58,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         #region SME Application
 
-        /// <summary>Submits an SME registration application with proof document for manager approval.</summary>
+        /// <summary>
+        /// Submits an SME registration application with proof document for manager approval
+        /// </summary>
         public async Task<ApiResponse<int>> ApplyToBecomeSme(
             int employeeId,
             BecomeSmeRequestModel request
@@ -182,7 +186,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         #region SME Queries
 
-        /// <summary>Gets paginated available SMEs for a skill with in-progress assignment counts.</summary>
+        /// <summary>
+        /// Gets paginated available SMEs for a skill with in-progress assignment counts
+        /// </summary>
         public async Task<ApiResponse<PaginatedResponse<SmeResponseModel>>> GetAvailableSmes(
             AvailableSmesRequestModel request
         )
@@ -244,7 +250,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
-        /// <summary>Gets paginated list of all active SMEs with department information.</summary>
+        /// <summary>
+        /// Gets paginated list of all active SMEs with department information
+        /// </summary>
         public async Task<ApiResponse<PaginatedResponse<SmeResponseModel>>> GetAllActiveSmes(
       ActiveSmesRequestModel request
   )
@@ -278,7 +286,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         #region Export
 
-        /// <summary>Exports all active SMEs to Excel with employee, skill, and department details.</summary>
+        /// <summary>
+        /// Exports all active SMEs to Excel with employee, skill, and department details
+        /// </summary>
         public async Task<ApiResponse<byte[]>> GetAllActiveSmesForExport(
             ExportActiveSmesRequestModel request
         )

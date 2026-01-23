@@ -38,8 +38,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         #region Assignment Operations
 
-        /// <summary>Checks and marks assignments as overdue based on deadline and current status.</summary>
-    
+        /// <summary>
+        /// Checks and marks assignments as overdue based on deadline and current status
+        /// </summary>
+
         public async Task<ApiResponse<int>> CheckAndMarkOverdueAssignments()
         {
             Log.Information("CheckAndMarkOverdueAssignments started");
@@ -55,8 +57,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     Success = true,
                     Message = LnDConstants.RESPONSE_MESSAGES.OVERDUE_ASSIGNMENTS_MARKED,
                     Data = 0
-                }; 
-            } 
+                };
+            }
 
             foreach (var assignment in overdueAssignments)
             {
@@ -78,8 +80,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 Data = overdueAssignments.Count
             };
         }
-        
-        /// <summary>Creates an SME assignment request for a team member requiring skill development.</summary>
+
+        /// <summary>
+        /// Creates an SME assignment request for a team member requiring skill development
+        /// </summary>
         public async Task<ApiResponse<int>> RequestSmeAssignment(
             int managerId,
             SmeRequestModel request
@@ -167,7 +171,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
-        /// <summary>Uploads completion proof document and creates approval request for SME acknowledgement.</summary>
+        /// <summary>
+        /// Uploads completion proof document and creates approval request for SME acknowledgement
+        /// </summary>
         public async Task<ApiResponse<bool>> UploadCompletionProof(
             int employeeId,
             UploadCompletionProofRequestModel request
@@ -268,7 +274,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
-        /// <summary>Completes assignment with rating update and marks associated approval as approved.</summary>
+        /// <summary>
+        /// Completes assignment with rating update and marks associated approval as approved
+        /// </summary>
         public async Task<ApiResponse<bool>> CompleteAssignment(
             int managerId,
             CompleteAssignmentRequestModel request
@@ -382,7 +390,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         #region Assignment Retrieval
 
-        /// <summary>Gets paginated assignments for the employee as mentee with overdue calculation.</summary>
+        /// <summary>
+        /// Gets paginated assignments for the employee as mentee with overdue calculation
+        /// </summary>
 
         public async Task<ApiResponse<PaginatedResponse<AssignmentResponseModel>>> GetMyAssignments(
     int employeeId,
@@ -438,7 +448,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
-        /// <summary>Gets paginated assignments for manager's team members with overdue calculation.</summary>
+        /// <summary>
+        /// Gets paginated assignments for manager's team members with overdue calculation
+        /// </summary>
         public async Task<ApiResponse<PaginatedResponse<AssignmentResponseModel>>> GetTeamAssignments(
         int managerId,
         AssignmentRequestModel request
@@ -491,7 +503,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
-        /// <summary>Gets paginated assignments where the employee is the assigned SME.</summary>
+        /// <summary>
+        /// Gets paginated assignments where the employee is the assigned SME
+        /// </summary>
 
 
         public async Task<ApiResponse<PaginatedResponse<AssignmentResponseModel>>> GetSmeAssignments(
@@ -584,7 +598,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         #region Export
 
-        /// <summary>Exports team assignments to Excel with formatted headers and data columns.</summary>
+        /// <summary>
+        /// Exports team assignments to Excel with formatted headers and data columns
+        /// </summary>
         public async Task<ApiResponse<byte[]>> GetTeamAssignmentsForExport(
      int managerId,
      ExportAssignmentRequestModel request

@@ -329,7 +329,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
-        
+
 
         /// <summary>
         /// Gets complete approval history for an employee as requester or approver with filtering and pagination.
@@ -469,7 +469,7 @@ ApprovalHistoryRequestModel request
             {
                 details.Assignment = new AssignmentDetailsResponseModel
                 {
-                    AssignmentId = approval.Assignment.AssignmentId, 
+                    AssignmentId = approval.Assignment.AssignmentId,
                     MenteeName =
                         $"{approval.Assignment.MenteeEmployee.Userprofile.FirstName} {approval.Assignment.MenteeEmployee.Userprofile.LastName}",
                     SmeName =
@@ -590,7 +590,7 @@ ApprovalHistoryRequestModel request
                     && assignment.Sme.EmployeeId != employeeId
                     && assignment.MenteeEmployee.ReportingManagerEmployeeId != employeeId
                 )
-            ) 
+            )
             {
                 Log.Warning(
                     "GetAssignmentProof: Assignment not found or access denied. AssignmentId={AssignmentId}, EmployeeId={EmployeeId}",
@@ -843,9 +843,6 @@ ApprovalHistoryRequestModel request
                     query.OrderByDescending(a => a.RequestedOn)
             };
         }
-
-
-
     }
 }
 
