@@ -15,7 +15,11 @@ using System.IO.Compression;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Relevantz.EEPZ.Api.Middleware;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+
 var builder = WebApplication.CreateBuilder(args);
+
 // Configure Serilog with structured logging
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
@@ -23,8 +27,10 @@ Log.Logger = new LoggerConfiguration()
     .Enrich.WithProperty("Service", "EEPZ-Auth")
     .Enrich.WithProperty("Environment", builder.Environment.EnvironmentName)
     .CreateLogger();
+
 builder.Host.UseSerilog();
 Log.Information("Starting EEPZ Application in {Environment} mode", builder.Environment.EnvironmentName);
+
 // Add Controllers with validation
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -33,7 +39,16 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new NullableDateOnlyJsonConverter());
         options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
     });
+
+// Add FluentValidation
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<Relevantz.EEPZ.Common.Validators.LoginRequestDtoValidator>();
+
+Log.Information("FluentValidation registered successfully");
+
 builder.Services.AddEndpointsApiExplorer();
+
 // Add Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -44,6 +59,7 @@ builder.Services.AddSwaggerGen(c =>
         Version = "v1",
         Description = "EEPZ Authentication & User Management API"
     });
+
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -53,6 +69,7 @@ builder.Services.AddSwaggerGen(c =>
         In = ParameterLocation.Header,
         Description = "Enter 'Bearer' followed by your JWT token"
     });
+
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -64,12 +81,15 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+
 // Configure MySQL Database Context with proper connection handling
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Database connection string is not configured");
+
 var dbRetryCount = builder.Configuration.GetValue<int>("Database:MaxRetryCount", 3);
 var dbRetryDelay = builder.Configuration.GetValue<int>("Database:MaxRetryDelaySeconds", 10);
 var dbCommandTimeout = builder.Configuration.GetValue<int>("Database:CommandTimeoutSeconds", 30);
+
 builder.Services.AddDbContext<EEPZDbContext>(options =>
 {
     options.UseMySql(
@@ -86,10 +106,13 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
         .EnableSensitiveDataLogging(builder.Environment.IsDevelopment())
         .EnableDetailedErrors(builder.Environment.IsDevelopment());
 }, ServiceLifetime.Scoped);
+
 // Configure MongoDB Settings
 builder.Services.Configure<MongoDbSettings>(
     builder.Configuration.GetSection("MongoDbSettings"));
+
 Log.Information("MongoDB configuration loaded successfully");
+
 // Configure JWT Authentication with security
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSettings["SecretKey"] 
@@ -98,6 +121,7 @@ var issuer = jwtSettings["Issuer"]
     ?? throw new InvalidOperationException("JWT Issuer not configured");
 var audience = jwtSettings["Audience"] 
     ?? throw new InvalidOperationException("JWT Audience not configured");
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -118,6 +142,7 @@ builder.Services.AddAuthentication(options =>
         RequireExpirationTime = true,
         RequireSignedTokens = true
     };
+
     options.Events = new JwtBearerEvents
     {
         OnAuthenticationFailed = context =>
@@ -140,6 +165,7 @@ builder.Services.AddAuthentication(options =>
         }
     };
 });
+
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy => 
@@ -149,6 +175,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("EmployeeAccess", policy => 
         policy.RequireRole("Employee", "HR", "Admin"));
 });
+
 // Register MySQL Repositories
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IUserAuthenticationRepository, UserAuthenticationRepository>();
@@ -161,9 +188,12 @@ builder.Services.AddScoped<ILoginAttemptRepository, LoginAttemptRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IChangeRequestRepository, ChangeRequestRepository>();
 builder.Services.AddScoped<IBulkOperationLogRepository, BulkOperationLogRepository>();
+
 // Register MongoDB Repository
 builder.Services.AddScoped<IProfileImageRepository, ProfileImageRepository>();
+
 Log.Information("Repositories registered successfully");
+
 // Register Services
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IOtpService, OtpService>();
@@ -177,10 +207,13 @@ builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IChangeRequestService, ChangeRequestService>();
 builder.Services.AddScoped<IBulkOperationService, BulkOperationService>();
 builder.Services.AddScoped<IExportService, ExportService>();
+
 Log.Information("Services registered successfully");
+
 // Configure CORS with environment-specific policies
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins")
     .Get<string[]>() ?? Array.Empty<string>();
+
 if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddCors(options =>
@@ -209,6 +242,7 @@ else
     });
     Log.Information("CORS configured with restricted origins for Production");
 }
+
 // Add Response Compression
 builder.Services.AddResponseCompression(options =>
 {
@@ -216,16 +250,20 @@ builder.Services.AddResponseCompression(options =>
     options.Providers.Add<GzipCompressionProvider>();
     options.Providers.Add<BrotliCompressionProvider>();
 });
+
 builder.Services.Configure<GzipCompressionProviderOptions>(options =>
 {
     options.Level = CompressionLevel.Fastest;
 });
+
 builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
 {
     options.Level = CompressionLevel.Fastest;
 });
+
 // Add Memory Cache
 builder.Services.AddMemoryCache();
+
 // Add HTTP Client with timeout
 var httpTimeout = builder.Configuration.GetValue<int>("HttpClient:TimeoutSeconds", 30);
 builder.Services.AddHttpClient("DefaultClient")
@@ -234,6 +272,7 @@ builder.Services.AddHttpClient("DefaultClient")
     {
         client.Timeout = TimeSpan.FromSeconds(httpTimeout);
     });
+
 // Configure Health Checks
 builder.Services.AddHealthChecks()
     .AddCheck("mysql-db", () =>
@@ -263,7 +302,9 @@ builder.Services.AddHealthChecks()
             return HealthCheckResult.Unhealthy("MongoDB connection failed", ex);
         }
     }, new[] { "db", "mongodb" });
+
 var app = builder.Build();
+
 // Database Initialization with proper error handling
 using (var scope = app.Services.CreateScope())
 {
@@ -272,7 +313,9 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<EEPZDbContext>();
         var configuration = services.GetRequiredService<IConfiguration>();
+        
         Log.Information("Initializing MySQL database connection");
+
         if (builder.Environment.IsDevelopment())
         {
             await context.Database.EnsureCreatedAsync();
@@ -287,9 +330,11 @@ using (var scope = app.Services.CreateScope())
                 await context.Database.MigrateAsync();
             }
         }
+
         Log.Information("Seeding database with initial data");
         await DbInitializer.InitializeAsync(context, configuration);
         Log.Information("MySQL database initialized successfully");
+
         // Test MongoDB Connection
         try
         {
@@ -309,9 +354,11 @@ using (var scope = app.Services.CreateScope())
         throw;
     }
 }
+
 // Configure middleware pipeline
 // 1. Response Compression
 app.UseResponseCompression();
+
 // 2. Correlation ID Middleware
 app.Use(async (context, next) =>
 {
@@ -322,11 +369,12 @@ app.Use(async (context, next) =>
         await next();
     }
 });
+
 // 3. Security Headers Middleware
-// Security Headers Middleware
 app.Use(async (context, next) =>
 {
     var path = context.Request.Path.Value?.ToLower() ?? "";
+    
     // Only apply security headers to NON-Swagger paths
     if (!path.StartsWith("/swagger") && 
         !path.Contains("index.html") && 
@@ -339,14 +387,17 @@ app.Use(async (context, next) =>
         context.Response.Headers.Add("Referrer-Policy", "strict-origin-when-cross-origin");
         context.Response.Headers.Add("Content-Security-Policy", 
             "default-src 'self'; frame-ancestors 'none'");
+        
         if (!builder.Environment.IsDevelopment())
         {
             context.Response.Headers.Add("Strict-Transport-Security", 
                 "max-age=31536000; includeSubDomains");
         }
     }
+    
     await next();
 });
+
 // 4. Exception Handler
 app.UseExceptionHandler(errorApp =>
 {
@@ -354,13 +405,16 @@ app.UseExceptionHandler(errorApp =>
     {
         var error = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>();
         var correlationId = context.TraceIdentifier;
+        
         if (error != null)
         {
             Log.Error(error.Error, 
                 "Unhandled exception - CorrelationId: {CorrelationId}, Path: {Path}",
                 correlationId, context.Request.Path);
+            
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             context.Response.ContentType = "application/json";
+            
             var errorResponse = new
             {
                 success = false,
@@ -371,10 +425,12 @@ app.UseExceptionHandler(errorApp =>
                     ? error.Error.Message 
                     : "Internal Server Error"
             };
+            
             await context.Response.WriteAsJsonAsync(errorResponse);
         }
     });
 });
+
 // 5. Swagger
 if (app.Environment.IsDevelopment())
 {
@@ -387,6 +443,7 @@ if (app.Environment.IsDevelopment())
     });
     Log.Information("Swagger UI enabled at http://localhost:5101/");
 }
+
 // 6. Serilog Request Logging
 app.UseSerilogRequestLogging(options =>
 {
@@ -396,6 +453,7 @@ app.UseSerilogRequestLogging(options =>
         : httpContext.Response.StatusCode > 499
             ? Serilog.Events.LogEventLevel.Error
             : Serilog.Events.LogEventLevel.Information;
+    
     options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
     {
         diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value);
@@ -404,20 +462,27 @@ app.UseSerilogRequestLogging(options =>
         diagnosticContext.Set("CorrelationId", httpContext.TraceIdentifier);
     };
 });
+
 // 7. HTTPS Redirection
 app.UseHttpsRedirection();
+
 // 8. Static Files
 app.UseStaticFiles();
+
 // 9. CORS
 var corsPolicy = app.Environment.IsDevelopment() ? "DevelopmentPolicy" : "ProductionPolicy";
 app.UseCors(corsPolicy);
 Log.Information("CORS policy '{Policy}' applied", corsPolicy);
+
 // 10. Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
+
 // 11. Map Controllers
 app.MapControllers();
+
 app.UseMiddleware<GlobalExceptionMiddleware>();
+
 // 12. Health Check Endpoints
 app.MapHealthChecks("/health/live", new HealthCheckOptions
 {
@@ -434,6 +499,7 @@ app.MapHealthChecks("/health/live", new HealthCheckOptions
         });
     }
 }).AllowAnonymous();
+
 app.MapHealthChecks("/health/ready", new HealthCheckOptions
 {
     Predicate = check => check.Tags.Contains("db"),
@@ -456,6 +522,7 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions
         await context.Response.WriteAsJsonAsync(result);
     }
 }).AllowAnonymous();
+
 // 13. API Info Endpoint
 if (app.Environment.IsDevelopment())
 {
@@ -477,6 +544,7 @@ if (app.Environment.IsDevelopment())
         });
     }).AllowAnonymous();
 }
+
 try
 {
     Log.Information("EEPZ Application started successfully on {Environment}", 
