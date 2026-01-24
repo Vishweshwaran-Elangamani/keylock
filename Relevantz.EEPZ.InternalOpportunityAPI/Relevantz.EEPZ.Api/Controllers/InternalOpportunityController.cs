@@ -55,7 +55,6 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             try
             {
-                InternalOpportunityValidator.ValidateCreate(request);
 
                 var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ??
                                  User.FindFirst("sub");
@@ -88,7 +87,6 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             try
             {
-                InternalOpportunityValidator.ValidateUpdate(request);
                 var result = await _opportunityService.UpdateOpportunityAsync(id, request);
                 return Ok(result);
             }

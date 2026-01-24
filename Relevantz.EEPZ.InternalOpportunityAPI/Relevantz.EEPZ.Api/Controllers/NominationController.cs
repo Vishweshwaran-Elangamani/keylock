@@ -33,8 +33,6 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             try
             {
-                NominationValidator.ValidateSelfNomination(request);
-
                 var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)
                                   ?? User.FindFirst("sub");
 
@@ -69,7 +67,6 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             try
             {
-                NominationValidator.ValidateManagerNomination(request);
 
                 var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)
                                   ?? User.FindFirst("sub");
@@ -282,7 +279,6 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             try
             {
-                NominationValidator.ValidateManagerReview(request);
 
                 var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)
                                   ?? User.FindFirst("sub");

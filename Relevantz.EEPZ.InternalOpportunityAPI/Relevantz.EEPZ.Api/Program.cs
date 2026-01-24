@@ -14,7 +14,8 @@ using System.Text;
 using System.IO.Compression;
 using AutoMapper;
 using Serilog;
-
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +41,13 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
     });
+
+// Add FluentValidation
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<Relevantz.EEPZ.Common.Validators.InternalOpportunity.CreateInternalOpportunityRequestDtoValidator>();
+
+Log.Information("FluentValidation registered successfully");
 
 
 builder.Services.AddEndpointsApiExplorer();
