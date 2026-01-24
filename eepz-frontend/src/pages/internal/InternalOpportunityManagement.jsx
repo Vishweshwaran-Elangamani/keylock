@@ -539,7 +539,7 @@ const InternalOpportunityManagement = () => {
                 </button>
                 {showItemsDropdown && (
                   <div className="ioma-items-dropdown">
-                    {[10, 25, 50].map((size) => (
+                    {[5,10, 25, 50].map((size) => (
                       <div
                         key={size}
                         onClick={() => {

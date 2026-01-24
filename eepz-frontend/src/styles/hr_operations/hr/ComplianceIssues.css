@@ -357,13 +357,14 @@
   border-radius: 12px;
   border: 1px solid #e5e7eb;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-  overflow: visible;
+  overflow: visible; /* CHANGED */
   position: relative;
 }
 
 .ci-table-wrapper {
   overflow-x: auto;
   position: relative;
+  border-radius: 12px 12px 0 0; /* ADDED */
 }
 
 .ci-table {
@@ -601,7 +602,8 @@
   background: #ffffff;
   border-radius: 0 0 12px 12px;
   position: relative;
-  overflow: visible;
+  overflow: visible; /* CHANGED */
+  z-index: 1; /* ADDED */
 }
 
 .ci-pagination-info {
@@ -615,7 +617,7 @@
 /* Custom Rows Per Page Dropdown */
 .ci-rows-dropdown-wrapper {
   position: relative;
-  z-index: 100;
+  z-index: 1000; /* INCREASED */
 }
 
 .ci-rows-button {
@@ -891,21 +893,4 @@
   .ci-table {
     min-width: 900px;
   }
-}
-
-
-.ci-table-card {
-  overflow: hidden;      
-  border-radius: 12px;
-}
-
-
-.ci-pagination {
-  border-top: none;      
-}
-
-
-.ci-pagination {
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
 }

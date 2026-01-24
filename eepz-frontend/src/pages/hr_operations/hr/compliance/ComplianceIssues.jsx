@@ -5,6 +5,7 @@ import { FaSearch } from "react-icons/fa";
 import violationService from "../../../../services/hr_operations/hr/violationService";
 import EscalationDetailModal from "../../../../components/hr_operations/modals/EscalationDetailModal";
 import "../../../../styles/hr_operations/hr/ComplianceIssues.css";
+
 const StatusDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
   const options = [
@@ -51,6 +52,7 @@ const StatusDropdown = ({ value, onChange }) => {
     </div>
   );
 };
+
 const LevelDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
   const options = [
@@ -96,6 +98,7 @@ const LevelDropdown = ({ value, onChange }) => {
     </div>
   );
 };
+
 const ComplianceIssues = () => {
   const [slaEscalations, setSlaEscalations] = useState([]);
   const [filteredEscalations, setFilteredEscalations] = useState([]);
@@ -110,12 +113,15 @@ const ComplianceIssues = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [showRowsDropdown, setShowRowsDropdown] = useState(false);
   const rowsDropdownRef = useRef(null);
+
   useEffect(() => {
     fetchSlaEscalations();
   }, []);
+
   useEffect(() => {
     applyFilters();
   }, [slaEscalations, selectedStatus, selectedLevel, activeSearchTerm]);
+
   // Click outside handler for rows dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -131,6 +137,7 @@ const ComplianceIssues = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
   const fetchSlaEscalations = async () => {
     try {
       setLoading(true);
@@ -145,10 +152,12 @@ const ComplianceIssues = () => {
       setLoading(false);
     }
   };
+
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
     setCurrentPage(1);
   };
+
   const applyFilters = () => {
     let filtered = [...slaEscalations];
     if (activeSearchTerm) {
@@ -169,6 +178,7 @@ const ComplianceIssues = () => {
     setFilteredEscalations(filtered);
     setCurrentPage(1);
   };
+
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
@@ -176,10 +186,12 @@ const ComplianceIssues = () => {
     setSelectedLevel("");
     setCurrentPage(1);
   };
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredEscalations.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredEscalations.length / itemsPerPage) || 1;
+
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
@@ -198,10 +210,12 @@ const ComplianceIssues = () => {
     }
     return pages;
   };
+
   const handleViewEscalationDetails = (escalation) => {
     setSelectedEscalation(escalation);
     setShowEscalationDetailModal(true);
   };
+
   const getSeverityBadge = (severity) => {
     const badges = {
       Low: "success",
@@ -211,6 +225,7 @@ const ComplianceIssues = () => {
     };
     return badges[severity] || "secondary";
   };
+
   const getStatusBadge = (status) => {
     const badges = {
       Open: "primary",
@@ -219,6 +234,7 @@ const ComplianceIssues = () => {
     };
     return badges[status] || "secondary";
   };
+
   const getEscalationStats = () => {
     const total = filteredEscalations.length;
     const open = filteredEscalations.filter((e) => e.escalationStatus === "Open").length;
@@ -231,7 +247,9 @@ const ComplianceIssues = () => {
       resolvedEscalations: resolved,
     };
   };
+
   const stats = getEscalationStats();
+
   if (loading) {
     return (
       <div className="ci-loading-container">
@@ -241,6 +259,7 @@ const ComplianceIssues = () => {
       </div>
     );
   }
+
   return (
     <div className="ci-page">
       <div className="stats-cards-ci">
@@ -426,7 +445,7 @@ const ComplianceIssues = () => {
             </tbody>
           </table>
         </div>
-        {totalPages > 1 && filteredEscalations.length > 0 && (
+        {filteredEscalations.length > 0 && (
           <div className="ci-pagination">
             <div className="ci-pagination-info">
               <span>Show</span>
@@ -519,4 +538,5 @@ const ComplianceIssues = () => {
     </div>
   );
 };
+
 export default ComplianceIssues;

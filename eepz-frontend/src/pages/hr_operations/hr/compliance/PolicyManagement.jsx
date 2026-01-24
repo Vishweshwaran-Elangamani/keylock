@@ -8,6 +8,7 @@ import EditPolicyModal from "../../../../components/hr_operations/modals/EditPol
 import PublishPolicyModal from "../../../../components/hr_operations/modals/PublishPolicyModal";
 import UnpublishPolicyModal from "../../../../components/hr_operations/modals/UnpublishPolicyModal";
 import "../../../../styles/hr_operations/hr/PolicyManagement.css";
+
 const PolicyStatusDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
   const options = [
@@ -53,6 +54,7 @@ const PolicyStatusDropdown = ({ value, onChange }) => {
     </div>
   );
 };
+
 const PolicyCategoryDropdown = ({ value, onChange, categories }) => {
   const [open, setOpen] = useState(false);
   const allOptions = [
@@ -97,6 +99,7 @@ const PolicyCategoryDropdown = ({ value, onChange, categories }) => {
     </div>
   );
 };
+
 const PolicyManagement = () => {
   const [policies, setPolicies] = useState([]);
   const [filteredPolicies, setFilteredPolicies] = useState([]);
@@ -117,6 +120,7 @@ const PolicyManagement = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [showRowsDropdown, setShowRowsDropdown] = useState(false);
   const rowsDropdownRef = useRef(null);
+
   const enqueueToast = (variant, message) => {
     switch (variant) {
       case "success":
@@ -136,12 +140,15 @@ const PolicyManagement = () => {
         toast(message);
     }
   };
+
   useEffect(() => {
     fetchPolicies();
   }, []);
+
   useEffect(() => {
     applyFilters();
   }, [policies, categoryFilter, statusFilter, activeSearchTerm]);
+
   // Click outside handler for rows dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -157,10 +164,12 @@ const PolicyManagement = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
   const showAlert = (type, message) => {
     setAlert({ type, message });
     setTimeout(() => setAlert(null), 3000);
   };
+
   const fetchPolicies = async () => {
     try {
       setLoading(true);
@@ -173,10 +182,12 @@ const PolicyManagement = () => {
       setLoading(false);
     }
   };
+
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
     setCurrentPage(1);
   };
+
   const applyFilters = () => {
     let filtered = [...policies];
     if (activeSearchTerm) {
@@ -198,6 +209,7 @@ const PolicyManagement = () => {
     setFilteredPolicies(filtered);
     setCurrentPage(1);
   };
+
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
@@ -205,13 +217,16 @@ const PolicyManagement = () => {
     setStatusFilter("");
     setCurrentPage(1);
   };
+
   const uniqueCategories = [
     ...new Set(policies.map((policy) => policy.category).filter(Boolean)),
   ];
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredPolicies.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredPolicies.length / itemsPerPage) || 1;
+
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
@@ -230,19 +245,23 @@ const PolicyManagement = () => {
     }
     return pages;
   };
+
   const handleAddSuccess = () => {
     setShowAddModal(false);
     fetchPolicies();
   };
+
   const handleEditSuccess = () => {
     setShowEditModal(false);
     setSelectedPolicy(null);
     fetchPolicies();
   };
+
   const handleView = (policy) => {
     setSelectedPolicy(policy);
     setShowEditModal(true);
   };
+
   const handleDelete = async (policyId) => {
     try {
       await policyService.deletePolicy(policyId);
@@ -252,10 +271,12 @@ const PolicyManagement = () => {
       enqueueToast("danger", "Failed to delete policy");
     }
   };
+
   const handlePublishClick = (policy) => {
     setSelectedPolicy(policy);
     setShowPublishModal(true);
   };
+
   const handlePublishConfirm = async () => {
     if (!selectedPolicy) return;
     try {
@@ -271,10 +292,12 @@ const PolicyManagement = () => {
       setPublishing(false);
     }
   };
+
   const handleUnpublishClick = (policy) => {
     setSelectedPolicy(policy);
     setShowUnpublishModal(true);
   };
+
   const handleUnpublishConfirm = async () => {
     if (!selectedPolicy) return;
     try {
@@ -290,6 +313,7 @@ const PolicyManagement = () => {
       setUnpublishing(false);
     }
   };
+
   const getPolicyStats = () => {
     const total = filteredPolicies.length;
     const published = filteredPolicies.filter((p) => p.isPublished).length;
@@ -302,7 +326,9 @@ const PolicyManagement = () => {
       totalCategories: categories,
     };
   };
+
   const stats = getPolicyStats();
+
   if (loading) {
     return (
       <div className="pma-loading-container">
@@ -312,6 +338,7 @@ const PolicyManagement = () => {
       </div>
     );
   }
+
   return (
     <div className="pma-page">
       {alert && (
@@ -501,7 +528,7 @@ const PolicyManagement = () => {
             </tbody>
           </table>
         </div>
-        {totalPages > 1 && filteredPolicies.length > 0 && (
+        {filteredPolicies.length > 0 && (
           <div className="pma-pagination">
             <div className="pma-pagination-info">
               <span>Show</span>
@@ -627,4 +654,5 @@ const PolicyManagement = () => {
     </div>
   );
 };
+
 export default PolicyManagement;

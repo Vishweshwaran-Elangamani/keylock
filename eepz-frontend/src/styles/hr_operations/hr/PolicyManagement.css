@@ -389,13 +389,14 @@
   border-radius: 12px;
   border: 1px solid #e5e7eb;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-  overflow: visible;
+  overflow: visible; /* CHANGED FROM hidden */
   position: relative;
 }
 
 .pma-table-wrapper {
   overflow-x: auto;
   position: relative;
+  border-radius: 12px 12px 0 0; /* ADDED */
 }
 
 .pma-table {
@@ -583,7 +584,8 @@
   background: #ffffff;
   border-radius: 0 0 12px 12px;
   position: relative;
-  overflow: visible;
+  overflow: visible; /* CHANGED FROM hidden */
+  z-index: 1; /* ADDED */
 }
 
 .pma-pagination-info {
@@ -597,7 +599,7 @@
 /* Custom Rows Per Page Dropdown */
 .pma-rows-dropdown-wrapper {
   position: relative;
-  z-index: 100;
+  z-index: 1000; /* INCREASED */
 }
 
 .pma-rows-button {
@@ -874,20 +876,4 @@
   .pma-table {
     min-width: 900px;
   }
-}
-
-
-.pma-table-card {
-  overflow: hidden;     
-  border-radius: 12px;
-}
-
-.pma-pagination {
-  border-top: none;    
-}
-
-
-.pma-pagination {
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
 }

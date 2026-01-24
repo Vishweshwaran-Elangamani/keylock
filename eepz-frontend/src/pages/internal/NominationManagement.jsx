@@ -494,7 +494,7 @@ const NominationManagement = () => {
                 </button>
                 {showRowsDropdown && (
                   <div className="nm-rows-dropdown">
-                    {[10, 25, 50].map((size) => (
+                    {[5,10, 25, 50].map((size) => (
                       <div
                         key={size}
                         onClick={() => {
