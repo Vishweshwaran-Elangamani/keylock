@@ -2,7 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import userService from "../../../../services/auth/userService";
 import { toast } from "sonner";
 import "../../../../styles/auth/user/AddUserModal.css";
-const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) => {
+const CustomDropdown = ({
+  value,
+  onChange,
+  options,
+  placeholder,
+  name,
+  error,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [openUpward, setOpenUpward] = useState(false);
   const dropdownRef = useRef(null);
@@ -25,7 +32,7 @@ const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) 
       const rect = dropdownRef.current.getBoundingClientRect();
       const spaceBelow = window.innerHeight - rect.bottom;
       const spaceAbove = rect.top;
-      const dropdownHeight = 250; 
+      const dropdownHeight = 250;
       if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
         setOpenUpward(true);
       } else {
@@ -40,7 +47,9 @@ const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) 
   return (
     <div
       ref={dropdownRef}
-      className={`aum-custom-dropdown ${error ? "error" : ""} ${isOpen ? "active" : ""}`}
+      className={`aum-custom-dropdown ${error ? "error" : ""} ${
+        isOpen ? "active" : ""
+      }`}
     >
       <div
         className="aum-custom-dropdown-selected"
@@ -56,7 +65,11 @@ const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) 
         <span className={`aum-custom-dropdown-arrow ${isOpen ? "open" : ""}`} />
       </div>
       {isOpen && (
-        <div className={`aum-custom-dropdown-menu ${openUpward ? "open-upward" : ""}`}>
+        <div
+          className={`aum-custom-dropdown-menu ${
+            openUpward ? "open-upward" : ""
+          }`}
+        >
           {options.map((option) => (
             <div
               key={option.value}
@@ -97,7 +110,6 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
     { label: "Select Gender", value: "" },
     { label: "Male", value: "Male" },
     { label: "Female", value: "Female" },
-    { label: "Prefer not to say", value: "PreferNotToSay" },
   ];
   const employmentTypeOptions = [
     { label: "Select Employment Type", value: "" },
@@ -215,7 +227,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
         email: formData.email.trim(),
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
-        mobileNumber: formData.mobileNumber.trim() || null,  
+        mobileNumber: formData.mobileNumber.trim() || null,
         gender: formData.gender || null,
         dateOfBirthOfficial: formData.dateOfBirthOfficial || null,
         employmentType: formData.employmentType,
