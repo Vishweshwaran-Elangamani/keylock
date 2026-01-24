@@ -47,25 +47,29 @@ const CreateMomModal = ({ meetingData, onClose }) => {
   const calendarRefs = useRef({});
 
   useEffect(() => {
-    const fetchEmployees = async () => {
-      setLoadingEmployees(true);
-      try {
-        const response = await employeeService.getAllEmployees();
-        if (response.success && response.data) {
-          const filteredEmployees = response.data.filter(
-            (emp) => emp.roleName !== "System Administrator"
-          );
-          setEmployees(filteredEmployees);
-        }
-      } catch (error) {
-        console.error("Failed to fetch employees", error);
-        toastr.error("Failed to load employee list");
-      } finally {
-        setLoadingEmployees(false);
+  const fetchEmployees = async () => {
+    setLoadingEmployees(true);
+    try {
+      const response = await employeeService.getAllEmployees();
+
+      if (response.data?.success && Array.isArray(response.data.data)) {
+        const filteredEmployees = response.data.data.filter(
+          (emp) => emp.roleName !== "System Administrator" 
+        );
+
+        setEmployees(filteredEmployees);
       }
-    };
-    fetchEmployees();
-  }, []);
+    } catch (error) {
+      console.error("Failed to fetch employees", error);
+      toastr.error("Failed to load employee list");
+    } finally {
+      setLoadingEmployees(false);
+    }
+  };
+
+  fetchEmployees();
+}, []);
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -168,12 +172,23 @@ const CreateMomModal = ({ meetingData, onClose }) => {
     }
   };
 
-  const getEmployeeName = (employeeMasterId) => {
-    const employee = employees.find(
-      (e) => e.employeeMasterId === parseInt(employeeMasterId)
-    );
-    return employee ? `${employee.firstName} ${employee.lastName}` : "";
-  };
+  const getEmployeeName = (assignedId) => {
+  if (!assignedId || employees.length === 0) return "";
+
+  const id = Number(assignedId);
+
+  const employee = employees.find(
+    (e) =>
+      Number(e.employeeMasterId) === id ||
+      Number(e.employeeId) === id
+  );
+
+  return employee
+    ? `${employee.firstName} ${employee.lastName}`
+    : "";
+};
+
+
 
   const formatDisplayDate = (value) => {
     if (!value) return "";
