@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   AlertTriangle,
@@ -9,11 +9,10 @@ import {
   Eye,
   Zap,
   TrendingUp,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 import slaService, { dateHelpers } from "../../services/sla/slaService";
 import Breadcrumb from "../../components/sla/common/Breadcrumbs";
+import PaginationFooter from "../../components/project-management/common/PaginationFooter"; // ✅ ADD THIS
 import "../../styles/sla/components/EmployeeSLADashboard.css";
 
 const EmployeeSLADashboard = () => {
@@ -26,11 +25,9 @@ const EmployeeSLADashboard = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [viewMode, setViewMode] = useState("table");
   const [user, setUser] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
 
+  const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
 
   useEffect(() => {
     try {
@@ -56,55 +53,42 @@ const EmployeeSLADashboard = () => {
     setCurrentPage(1);
   }, [activeTab, slas.length, itemsPerPage]);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  const fetchSLAs = useCallback(async (empId) => {
+    setLoading(true);
+    setRefreshing(true);
+    setError(null);
 
-  const fetchSLAs = useCallback(
-    async (empId) => {
-      setLoading(true);
-      setRefreshing(true);
-      setError(null);
+    try {
+      if (!empId) throw new Error("Employee ID not found");
+      const response = await slaService.getEmployeeSLAs(empId);
 
-      try {
-        if (!empId) throw new Error("Employee ID not found");
-        const response = await slaService.getEmployeeSLAs(empId);
+      if (response?.success) {
+        let slasData;
+        if (Array.isArray(response.data)) slasData = response.data;
+        else if (response.data && typeof response.data === "object")
+          slasData = response.data;
+        else slasData = [];
 
-        if (response?.success) {
-          let slasData;
-          if (Array.isArray(response.data)) slasData = response.data;
-          else if (response.data && typeof response.data === "object")
-            slasData = response.data;
-          else slasData = [];
+        const processed = slasData.map((sla, idx) => ({
+          ...sla,
+          daysUntilDeadline: dateHelpers.daysRemaining(sla.deadline),
+          urgencyStatus: dateHelpers.getUrgencyStatus(sla.deadline),
+          key: `${sla.slaid || "sla"}-${sla.employeeId || "emp"}-${idx}`,
+        }));
 
-          const processed = slasData.map((sla, idx) => ({
-            ...sla,
-            daysUntilDeadline: dateHelpers.daysRemaining(sla.deadline),
-            urgencyStatus: dateHelpers.getUrgencyStatus(sla.deadline),
-            key: `${sla.slaid || "sla"}-${sla.employeeId || "emp"}-${idx}`,
-          }));
-
-          setSlas(processed);
-        } else {
-          setSlas([]);
-          setError(response?.message || "No SLAs found");
-        }
-      } catch (err) {
-        setError(err.message || "Failed to fetch SLAs");
+        setSlas(processed);
+      } else {
         setSlas([]);
-      } finally {
-        setLoading(false);
-        setRefreshing(false);
+        setError(response?.message || "No SLAs found");
       }
-    },
-    [setSlas]
-  );
+    } catch (err) {
+      setError(err.message || "Failed to fetch SLAs");
+      setSlas([]);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
 
   const filterSLAs = useCallback(() => {
     let filtered = [...slas];
@@ -129,6 +113,7 @@ const EmployeeSLADashboard = () => {
       default:
         filtered = slas;
     }
+
     setFilteredSLAs(filtered);
   }, [slas, activeTab]);
 
@@ -156,6 +141,7 @@ const EmployeeSLADashboard = () => {
     const onTime = slas.filter(
       (s) => s.complianceStatus && s.complianceStatus === "OnTime"
     ).length;
+
     return { total, open, inProgress, completed, overdue, onTime };
   }, [slas]);
 
@@ -190,35 +176,6 @@ const EmployeeSLADashboard = () => {
     currentPage * itemsPerPage
   );
 
-  const goToPage = (page) => {
-    const p = Math.max(1, Math.min(page, totalPages));
-    setCurrentPage(p);
-  };
-
-  const getPageNumbers = () => {
-    const pages = [];
-    const maxPagesToShow = 5;
-
-    if (totalPages <= maxPagesToShow) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
-    } else if (currentPage <= 3) {
-      for (let i = 1; i <= 4; i++) pages.push(i);
-      pages.push("...");
-      pages.push(totalPages);
-    } else if (currentPage >= totalPages - 2) {
-      pages.push(1);
-      pages.push("...");
-      for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
-    } else {
-      pages.push(1);
-      pages.push("...");
-      for (let i = currentPage - 1; i <= currentPage + 1; i++) pages.push(i);
-      pages.push("...");
-      pages.push(totalPages);
-    }
-    return pages;
-  };
-
   if (loading) {
     return (
       <div className="emp-sla-loading">
@@ -250,6 +207,7 @@ const EmployeeSLADashboard = () => {
         </div>
       )}
 
+      {/* METRICS */}
       <div className="emp-sla-metric-row">
         <div className="emp-sla-metric-card">
           <div className="emp-sla-metric-icon emp-sla-metric-icon-total">
@@ -292,6 +250,7 @@ const EmployeeSLADashboard = () => {
         </div>
       </div>
 
+      {/* OVERDUE ALERT */}
       {stats.overdue > 0 && (
         <div className="emp-sla-alert-overdue">
           <div className="emp-sla-alert-overdue-icon">
@@ -308,6 +267,7 @@ const EmployeeSLADashboard = () => {
         </div>
       )}
 
+      {/* TABS + VIEW SWITCH */}
       <div className="emp-sla-header-row">
         <div className="emp-sla-tabs-strip">
           <div className="emp-sla-tabs-container">
@@ -320,9 +280,7 @@ const EmployeeSLADashboard = () => {
             ].map(({ key, label }) => (
               <button
                 key={key}
-                className={`emp-sla-tab-pill ${
-                  activeTab === key ? "active" : ""
-                }`}
+                className={`emp-sla-tab-pill ${activeTab === key ? "active" : ""}`}
                 onClick={() => setActiveTab(key)}
                 type="button"
               >
@@ -333,9 +291,7 @@ const EmployeeSLADashboard = () => {
 
           <div className="emp-sla-view-switcher">
             <button
-              className={`emp-sla-view-btn ${
-                viewMode === "table" ? "active" : ""
-              }`}
+              className={`emp-sla-view-btn ${viewMode === "table" ? "active" : ""}`}
               onClick={() => {
                 setViewMode("table");
                 setItemsPerPage(10);
@@ -348,9 +304,7 @@ const EmployeeSLADashboard = () => {
             </button>
 
             <button
-              className={`emp-sla-view-btn ${
-                viewMode === "grid" ? "active" : ""
-              }`}
+              className={`emp-sla-view-btn ${viewMode === "grid" ? "active" : ""}`}
               onClick={() => {
                 setViewMode("grid");
                 setItemsPerPage(9);
@@ -365,6 +319,7 @@ const EmployeeSLADashboard = () => {
         </div>
       </div>
 
+      {/* CONTENT */}
       <div className="emp-sla-content">
         {filteredSLAs.length === 0 ? (
           <div className="emp-sla-empty">
@@ -378,6 +333,7 @@ const EmployeeSLADashboard = () => {
           </div>
         ) : (
           <>
+            {/* TABLE VIEW */}
             {viewMode === "table" && (
               <div className="emp-sla-table-container">
                 <div className="emp-sla-table-responsive">
@@ -416,9 +372,7 @@ const EmployeeSLADashboard = () => {
                             <td>
                               <span
                                 className={`emp-sla-badge ${
-                                  overdue
-                                    ? "emp-sla-badge-overdue"
-                                    : statusStyle.className
+                                  overdue ? "emp-sla-badge-overdue" : statusStyle.className
                                 }`}
                               >
                                 {overdue ? "OVERDUE" : sla.status}
@@ -478,168 +432,46 @@ const EmployeeSLADashboard = () => {
                   </table>
                 </div>
 
+                {/* ✅ EXTERNAL PAGINATION FOOTER */}
                 {safeTotal > 0 && (
-                  <div className="emp-sla-pagination-footer">
-                    <div className="emp-sla-pagination-left">
-                      <span className="emp-sla-pagination-text">Show</span>
-
-                      <div
-                        className="emp-sla-entries-dropdown"
-                        ref={dropdownRef}
-                      >
-                        <button
-                          type="button"
-                          className={`emp-sla-entries-selected ${
-                            isDropdownOpen ? "open" : ""
-                          }`}
-                          onClick={() => setIsDropdownOpen((v) => !v)}
-                        >
-                          <span className="emp-sla-entries-value">
-                            {itemsPerPage}
-                          </span>
-
-                          <svg
-                            className={`emp-sla-entries-chevron ${
-                              isDropdownOpen ? "open" : ""
-                            }`}
-                            width="18"
-                            height="18"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                          >
-                            <path
-                              d="M6 9L12 15L18 9"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        </button>
-
-                        {isDropdownOpen && (
-                          <div className="emp-sla-entries-options">
-                            {[5, 10, 25, 50].map((opt) => (
-                              <button
-                                key={opt}
-                                type="button"
-                                className={`emp-sla-entries-option ${
-                                  itemsPerPage === opt ? "selected" : ""
-                                }`}
-                                onClick={() => {
-                                  setItemsPerPage(opt);
-                                  setCurrentPage(1);
-                                  setIsDropdownOpen(false);
-                                }}
-                              >
-                                {opt}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-
-                      <span className="emp-sla-pagination-text">entries</span>
-                    </div>
-
-                    <div className="emp-sla-pagination-center">
-                      <span className="emp-sla-pagination-status">
-                        Showing {startIndex} to {endIndex} of {safeTotal} entries
-                      </span>
-                    </div>
-
-                    <div className="emp-sla-pagination-right">
-                      <ul className="emp-sla-pagination-list">
-                        <li
-                          className={`emp-sla-page-item ${
-                            currentPage === 1 ? "disabled" : ""
-                          }`}
-                        >
-                          <button
-                            className="emp-sla-page-link"
-                            onClick={() => goToPage(currentPage - 1)}
-                            disabled={currentPage === 1}
-                            type="button"
-                          >
-                            <ChevronLeft size={14} />
-                          </button>
-                        </li>
-
-                        {getPageNumbers().map((page, idx) =>
-                          page === "..." ? (
-                            <li
-                              key={`ellipsis-${idx}`}
-                              className="emp-sla-page-item disabled"
-                            >
-                              <span className="emp-sla-page-link">…</span>
-                            </li>
-                          ) : (
-                            <li
-                              key={page}
-                              className={`emp-sla-page-item ${
-                                currentPage === page ? "active" : ""
-                              }`}
-                            >
-                              <button
-                                className="emp-sla-page-link"
-                                onClick={() => goToPage(page)}
-                                type="button"
-                              >
-                                {page}
-                              </button>
-                            </li>
-                          )
-                        )}
-
-                        <li
-                          className={`emp-sla-page-item ${
-                            currentPage === totalPages ? "disabled" : ""
-                          }`}
-                        >
-                          <button
-                            className="emp-sla-page-link"
-                            onClick={() => goToPage(currentPage + 1)}
-                            disabled={currentPage === totalPages}
-                            type="button"
-                          >
-                            <ChevronRight size={14} />
-                          </button>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
+                  <PaginationFooter
+                    currentPage={currentPage}
+                    totalItems={safeTotal}
+                    itemsPerPage={itemsPerPage}
+                    onPageChange={setCurrentPage}
+                    onItemsPerPageChange={(size) => {
+                      setItemsPerPage(size);
+                      setCurrentPage(1);
+                    }}
+                    pageSizeOptions={[5, 10, 25, 50]}
+                    showPageSizeDropdown={true}
+                    showStatusText={true}
+                    pageNumberMode="compact" // ✅ only numbers like 1 2
+                  />
                 )}
               </div>
             )}
 
+            {/* GRID VIEW */}
             {viewMode === "grid" && (
               <>
                 <div className="emp-sla-cards-grid">
                   {paginatedSLAs.map((sla) => {
                     const overdue = isOverdue(sla);
                     const statusStyle = overdue
-                      ? {
-                          className: "emp-sla-status-overdue",
-                          icon: AlertTriangle,
-                        }
+                      ? { className: "emp-sla-status-overdue", icon: AlertTriangle }
                       : getStatusStyle(sla.status);
                     const IconComponent = statusStyle.icon;
 
                     return (
                       <div key={sla.key} className="emp-sla-card">
                         <div className="emp-sla-card-header">
-                          <div
-                            className={`emp-sla-card-icon ${statusStyle.className}`}
-                          >
+                          <div className={`emp-sla-card-icon ${statusStyle.className}`}>
                             <IconComponent size={20} strokeWidth={2} />
                           </div>
                           <div className="emp-sla-card-header-text">
-                            <h6 className="emp-sla-card-title">
-                              {sla.slatype || "SLA"}
-                            </h6>
-                            <span
-                              className={`emp-sla-card-badge ${statusStyle.className}`}
-                            >
+                            <h6 className="emp-sla-card-title">{sla.slatype || "SLA"}</h6>
+                            <span className={`emp-sla-card-badge ${statusStyle.className}`}>
                               {overdue ? "OVERDUE" : sla.status}
                             </span>
                           </div>
@@ -654,14 +486,10 @@ const EmployeeSLADashboard = () => {
                           </div>
 
                           <div className="emp-sla-card-row">
-                            <span className="emp-sla-card-label">
-                              Days Remaining
-                            </span>
+                            <span className="emp-sla-card-label">Days Remaining</span>
                             <span
                               className={`emp-sla-card-value ${
-                                overdue
-                                  ? "emp-sla-text-danger"
-                                  : "emp-sla-text-success"
+                                overdue ? "emp-sla-text-danger" : "emp-sla-text-success"
                               }`}
                             >
                               {overdue
@@ -671,9 +499,7 @@ const EmployeeSLADashboard = () => {
                           </div>
 
                           <div className="emp-sla-card-row">
-                            <span className="emp-sla-card-label">
-                              Assigned To
-                            </span>
+                            <span className="emp-sla-card-label">Assigned To</span>
                             <span className="emp-sla-card-value emp-sla-truncate">
                               {sla.assignedToName || "-"}
                             </span>
@@ -681,9 +507,7 @@ const EmployeeSLADashboard = () => {
 
                           {sla.complianceStatus && (
                             <div className="emp-sla-card-row">
-                              <span className="emp-sla-card-label">
-                                Compliance
-                              </span>
+                              <span className="emp-sla-card-label">Compliance</span>
                               <span
                                 className={`emp-sla-badge emp-sla-badge-compliance-${sla.complianceStatus.toLowerCase()}`}
                               >
@@ -708,67 +532,23 @@ const EmployeeSLADashboard = () => {
                   })}
                 </div>
 
-                {totalPages > 1 && (
-                  <div className="emp-sla-grid-pagination-wrapper">
-                    <nav className="emp-sla-grid-pagination">
-                      <ul className="emp-sla-pagination-list">
-                        <li
-                          className={`emp-sla-page-item ${
-                            currentPage === 1 ? "disabled" : ""
-                          }`}
-                        >
-                          <button
-                            className="emp-sla-page-link"
-                            onClick={() => goToPage(currentPage - 1)}
-                            disabled={currentPage === 1}
-                            type="button"
-                          >
-                            <ChevronLeft size={14} />
-                          </button>
-                        </li>
-
-                        {getPageNumbers().map((page, idx) =>
-                          page === "..." ? (
-                            <li
-                              key={`ellipsis-${idx}`}
-                              className="emp-sla-page-item disabled"
-                            >
-                              <span className="emp-sla-page-link">…</span>
-                            </li>
-                          ) : (
-                            <li
-                              key={page}
-                              className={`emp-sla-page-item ${
-                                currentPage === page ? "active" : ""
-                              }`}
-                            >
-                              <button
-                                className="emp-sla-page-link"
-                                onClick={() => goToPage(page)}
-                                type="button"
-                              >
-                                {page}
-                              </button>
-                            </li>
-                          )
-                        )}
-
-                        <li
-                          className={`emp-sla-page-item ${
-                            currentPage === totalPages ? "disabled" : ""
-                          }`}
-                        >
-                          <button
-                            className="emp-sla-page-link"
-                            onClick={() => goToPage(currentPage + 1)}
-                            disabled={currentPage === totalPages}
-                            type="button"
-                          >
-                            <ChevronRight size={14} />
-                          </button>
-                        </li>
-                      </ul>
-                    </nav>
+                {/* ✅ EXTERNAL PAGINATION FOOTER for grid too */}
+                {safeTotal > 0 && totalPages > 1 && (
+                  <div className="emp-sla-grid-footer-wrap">
+                    <PaginationFooter
+                      currentPage={currentPage}
+                      totalItems={safeTotal}
+                      itemsPerPage={itemsPerPage}
+                      onPageChange={setCurrentPage}
+                      onItemsPerPageChange={(size) => {
+                        setItemsPerPage(size);
+                        setCurrentPage(1);
+                      }}
+                      pageSizeOptions={[5, 10, 25, 50]}
+                      showPageSizeDropdown={true}
+                      showStatusText={true}
+                      pageNumberMode="compact"
+                    />
                   </div>
                 )}
               </>

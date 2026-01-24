@@ -310,11 +310,6 @@
   font-size: 0.9375rem !important;
 }
 
-.prj-list-project-name:hover {
-  color: #0f62fe !important;
-  text-decoration: underline !important;
-}
-
 .prj-list-badge {
   display: inline-block !important;
   padding: 0.375rem 0.875rem !important;
@@ -344,7 +339,6 @@
   color: #842029 !important;
 }
 
-/* ✅ FIXED ICON + MULTILINE TEXT ALIGNMENT (THIS IS THE MAIN CHANGE YOU NEED) */
 .prj-list-cell-with-icon {
   display: grid !important;
   grid-template-columns: 24px 1fr !important;
@@ -487,164 +481,6 @@
   box-shadow: 0 2px 6px rgba(198, 40, 40, 0.3) !important;
 }
 
-.prj-list-pagination-footer {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  padding: 1rem 1.5rem !important;
-  background: #ffffff !important;
-  border-top: 1px solid #dee2e6 !important;
-  flex-wrap: wrap !important;
-  gap: 1rem !important;
-  margin: 0 !important;
-  border-bottom-left-radius: 12px !important;
-  border-bottom-right-radius: 12px !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.prj-list-pagination-left {
-  display: flex !important;
-  align-items: center !important;
-  gap: 0.5rem !important;
-  position: relative !important;
-  z-index: 100 !important;
-}
-
-.prj-list-pagination-text {
-  font-size: 0.875rem !important;
-  color: #6c757d !important;
-}
-
-.prj-list-page-size-dd {
-  width: 60px !important;
-  min-width: 70px !important;
-  padding-top: 12px;
-}
-
-.prj-list-page-size-dropdown .cdrop-label {
-  display: none !important;
-}
-
-.prj-list-page-size-dropdown .cdrop-wrap {
-  margin-bottom: 0 !important;
-}
-
-.prj-list-page-size-dropdown .cdrop-trigger {
-  padding: 0.375rem 0.5rem !important;
-  min-height: 36px !important;
-  height: 36px !important;
-  border-radius: 6px !important;
-  border: 1px solid #dee2e6 !important;
-  font-size: 0.875rem !important;
-  font-weight: 500 !important;
-  box-shadow: none !important;
-}
-
-.prj-list-page-size-dropdown .cdrop-value {
-  font-size: 0.875rem !important;
-  font-weight: 600 !important;
-  color: #212529 !important;
-  text-align: left !important;
-}
-
-.prj-list-page-size-dropdown .cdrop-icon {
-  width: 16px !important;
-  height: 16px !important;
-}
-
-.prj-list-page-size-dropdown .cdrop-menu {
-  border-radius: 8px !important;
-  max-height: 240px !important;
-}
-
-.prj-list-page-size-dropdown .cdrop-item {
-  text-align: center !important;
-  padding: 0.5rem 0.25rem !important;
-  font-size: 0.875rem !important;
-  font-weight: 600 !important;
-}
-
-.prj-list-pagination-center {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  flex: 1 !important;
-}
-
-.prj-list-pagination-status {
-  font-size: 0.875rem !important;
-  color: #6c757d !important;
-  white-space: nowrap !important;
-}
-
-.prj-list-pagination-right {
-  display: flex !important;
-  align-items: center !important;
-}
-
-.prj-list-pagination-list {
-  display: flex !important;
-  align-items: center !important;
-  gap: 0.375rem !important;
-  list-style: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-.prj-list-page-item {
-  list-style: none !important;
-}
-
-.prj-list-page-link {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  min-width: 36px !important;
-  height: 36px !important;
-  padding: 0.5rem 0.75rem !important;
-  border: 1px solid #dee2e6 !important;
-  border-radius: 6px !important;
-  background-color: #ffffff !important;
-  color: #212529 !important;
-  font-size: 0.875rem !important;
-  font-weight: 500 !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-}
-
-.prj-list-page-link:hover:not(:disabled) {
-  background-color: #ffffff !important;
-  border-color: #3c3862 !important;
-  color: #3c3862 !important;
-}
-
-.prj-list-page-item.active .prj-list-page-link {
-  background-color: #3c3862 !important;
-  border-color: #3c3862 !important;
-  color: #ffffff !important;
-  font-weight: 600 !important;
-}
-
-.prj-list-page-item.disabled .prj-list-page-link {
-  opacity: 0.5 !important;
-  cursor: not-allowed !important;
-  pointer-events: none !important;
-}
-
-.prj-list-page-ellipsis {
-  display: inline-flex !important;
-  align-items: center !important;
-  min-width: 36px !important;
-  height: 36px !important;
-  justify-content: center !important;
-}
-
-.prj-list-page-dots {
-  color: #6c757d !important;
-  user-select: none !important;
-}
-
 .prj-list-table tbody td[colspan] {
   text-align: center !important;
   padding: 3rem 1rem !important;
@@ -678,17 +514,6 @@
 
   .prj-list-btn {
     flex: 1 !important;
-  }
-
-  .prj-list-pagination-footer {
-    flex-direction: column !important;
-    align-items: stretch !important;
-  }
-
-  .prj-list-pagination-left,
-  .prj-list-pagination-center,
-  .prj-list-pagination-right {
-    justify-content: center !important;
   }
 
   .prj-list-search-wrapper:has(.prj-list-clear-btn) .prj-list-search-input {
@@ -733,24 +558,5 @@
   .prj-list-action-btn svg {
     width: 14px !important;
     height: 14px !important;
-  }
-
-  .prj-list-pagination-footer {
-    padding: 0.875rem !important;
-  }
-
-  .prj-list-pagination-left {
-    font-size: 0.8125rem !important;
-  }
-
-  .prj-list-pagination-status {
-    font-size: 0.8125rem !important;
-  }
-
-  .prj-list-page-link {
-    min-width: 32px !important;
-    height: 32px !important;
-    padding: 0.375rem 0.5rem !important;
-    font-size: 0.8125rem !important;
   }
 }

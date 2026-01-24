@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
   Search,
-  Filter,
   FileText,
   Send,
   Eye,
@@ -20,6 +19,7 @@ import ManagerEscalationModal from "../../components/sla/modals/ManagerEscalatio
 import ResolveEscalationModal from "../../components/sla/modals/ResolveEscalationModal";
 import { formatDate } from "../../utils/sla/dateFormatter";
 import CustomDropdown from "../../components/project-management/common/CustomDropdown";
+import PaginationFooter from "../../components/project-management/common/PaginationFooter";
 
 import "../../styles/sla/components/ManagerSLADashboard.css";
 
@@ -259,47 +259,21 @@ const ManagerSLADashboard = () => {
 
   const stats = calculateStats();
   const isTeamTab = activeTab === "team-escalation";
-  const pageSize = isTeamTab ? itemsPerPage : 9;
+
+  const effectivePageSize = isTeamTab ? itemsPerPage : 9;
 
   const safeTotal = filteredSlas.length;
-  const totalPages = Math.max(1, Math.ceil(safeTotal / pageSize));
+  const totalPages = Math.max(1, Math.ceil(safeTotal / effectivePageSize));
   const validCurrentPage = Math.min(currentPage, totalPages);
 
-  const startIndex = safeTotal === 0 ? 0 : (validCurrentPage - 1) * pageSize;
+  const start = (validCurrentPage - 1) * effectivePageSize;
+  const end = start + effectivePageSize;
 
-  const endIndex =
-    safeTotal === 0 ? 0 : Math.min(validCurrentPage * pageSize, safeTotal);
+  const paginatedData = filteredSlas.slice(start, end);
 
-  const paginatedData = filteredSlas.slice(startIndex, endIndex);
-
-  const goToPage = (page) => {
-    const p = Math.max(1, Math.min(page, totalPages));
-    setCurrentPage(p);
-  };
-
-  const getPageNumbers = () => {
-    const pages = [];
-    const maxPagesToShow = 5;
-
-    if (totalPages <= maxPagesToShow) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
-    } else if (validCurrentPage <= 3) {
-      for (let i = 1; i <= 4; i++) pages.push(i);
-      pages.push("...");
-      pages.push(totalPages);
-    } else if (validCurrentPage >= totalPages - 2) {
-      pages.push(1);
-      pages.push("...");
-      for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
-    } else {
-      pages.push(1);
-      pages.push("...");
-      for (let i = validCurrentPage - 1; i <= validCurrentPage + 1; i++)
-        pages.push(i);
-      pages.push("...");
-      pages.push(totalPages);
-    }
-    return pages;
+  const handleItemsPerPageChange = (size) => {
+    setItemsPerPage(size);
+    setCurrentPage(1);
   };
 
   if (loading) {
@@ -615,6 +589,7 @@ const ManagerSLADashboard = () => {
                     <th>Actions</th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {paginatedData.map((esc) => (
                     <tr
@@ -703,94 +678,19 @@ const ManagerSLADashboard = () => {
             </div>
 
             {safeTotal > 0 && (
-              <div className="mgr-sla-pagination-footer">
-                <div className="mgr-sla-pagination-left">
-                  <span className="mgr-sla-pagination-text">Show</span>
-
-                  <CustomDropdown
-                    name="entries"
-                    value={itemsPerPage}
-                    options={[5, 10, 25, 50].map((n) => ({
-                      value: n,
-                      label: String(n),
-                    }))}
-                    onChange={(_, val) => {
-                      setItemsPerPage(Number(val));
-                      setCurrentPage(1);
-                    }}
-                    className="mgr-entries-dd"
-                    placeholder="5"
-                  />
-
-                  <span className="mgr-sla-pagination-text">entries</span>
-                </div>
-
-                <div className="mgr-sla-pagination-center">
-                  <span className="mgr-sla-pagination-status">
-                    Showing {safeTotal === 0 ? 0 : startIndex + 1} to {endIndex}{" "}
-                    of {safeTotal} entries
-                  </span>
-                </div>
-
-                <div className="mgr-sla-pagination-right">
-                  <ul className="mgr-sla-pagination-list">
-                    <li
-                      className={`mgr-sla-page-item ${
-                        validCurrentPage === 1 ? "disabled" : ""
-                      }`}
-                    >
-                      <button
-                        className="mgr-sla-page-link mgr-sla-page-arrow"
-                        onClick={() => goToPage(validCurrentPage - 1)}
-                        disabled={validCurrentPage === 1}
-                        type="button"
-                      >
-                        <span className="mgr-sla-arrow-icon">‹</span>
-                      </button>
-                    </li>
-
-                    {getPageNumbers().map((page, idx) =>
-                      page === "..." ? (
-                        <li
-                          key={`ellipsis-${idx}`}
-                          className="mgr-sla-page-item disabled"
-                        >
-                          <span className="mgr-sla-page-link">...</span>
-                        </li>
-                      ) : (
-                        <li
-                          key={page}
-                          className={`mgr-sla-page-item ${
-                            validCurrentPage === page ? "active" : ""
-                          }`}
-                        >
-                          <button
-                            className="mgr-sla-page-link"
-                            onClick={() => goToPage(page)}
-                            type="button"
-                          >
-                            {page}
-                          </button>
-                        </li>
-                      )
-                    )}
-
-                    <li
-                      className={`mgr-sla-page-item ${
-                        validCurrentPage === totalPages ? "disabled" : ""
-                      }`}
-                    >
-                      <button
-                        className="mgr-sla-page-link mgr-sla-page-arrow"
-                        onClick={() => goToPage(validCurrentPage + 1)}
-                        disabled={validCurrentPage === totalPages}
-                        type="button"
-                      >
-                        <span className="mgr-sla-arrow-icon">›</span>
-                      </button>
-                    </li>
-                  </ul>
-                </div>
+              <div className="mgr-pf-wrap">
+                <PaginationFooter
+                  currentPage={validCurrentPage}
+                  totalItems={safeTotal}
+                  itemsPerPage={effectivePageSize}
+                  onPageChange={(p) => setCurrentPage(p)}
+                  onItemsPerPageChange={(size) =>
+                    handleItemsPerPageChange(Number(size))
+                  }
+                  pageSizeOptions={[5, 10, 25, 50]}
+                  showPageSizeDropdown={true}
+                  showStatusText={true}
+                />
               </div>
             )}
           </div>

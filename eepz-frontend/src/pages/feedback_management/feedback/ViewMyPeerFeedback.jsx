@@ -255,17 +255,6 @@ export default function ViewMyPeerFeedback() {
 
                   <div className="fm-viewpeer-card__header">
                     <div className="fm-viewpeer-card__sender">
-                      {isAnon ? (
-                        <Lock
-                          size={18}
-                          className="fm-viewpeer-card__icon fm-viewpeer-card__icon--anonymous"
-                        />
-                      ) : (
-                        <User
-                          size={18}
-                          className="fm-viewpeer-card__icon fm-viewpeer-card__icon--peer"
-                        />
-                      )}
                       <h6
                         className={`fm-viewpeer-card__name ${
                           isAnon ? "fm-viewpeer-card__name--anonymous" : ""

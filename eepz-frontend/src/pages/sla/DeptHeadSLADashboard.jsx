@@ -15,66 +15,8 @@ import { toast } from "sonner";
 import slaService from "../../services/sla/slaService";
 import Breadcrumb from "../../components/sla/common/Breadcrumbs";
 import CustomDropdown from "../../components/project-management/common/CustomDropdown";
+import PaginationFooter from "../../components/project-management/common/PaginationFooter";
 import "../../styles/sla/components/DeptHeadSLADashboard.css";
-
-const PaginationDropdown = ({ value, onChange, options }) => {
-  const [open, setOpen] = useState(false);
-  const selected = options.find((o) => o === value) || options[0];
-
-  return (
-    <div className="dh-pagination-dropdown">
-      <button
-        type="button"
-        className={`dh-pagination-dropdown-control ${open ? "open" : ""}`}
-        onClick={() => setOpen((p) => !p)}
-      >
-        <span className="dh-pagination-dropdown-value">{selected}</span>
-        <span className={`dh-pagination-dropdown-icon ${open ? "open" : ""}`}>
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <polyline
-              points="6 9 12 15 18 9"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </span>
-      </button>
-
-      {open && (
-        <>
-          <div
-            className="dh-pagination-dropdown-backdrop"
-            onClick={() => setOpen(false)}
-          />
-          <div className="dh-pagination-dropdown-menu">
-            {options.map((opt) => (
-              <div
-                key={opt}
-                className={`dh-pagination-dropdown-option ${
-                  opt === value ? "selected" : ""
-                }`}
-                onClick={() => {
-                  onChange(opt);
-                  setOpen(false);
-                }}
-              >
-                {opt}
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  );
-};
 
 const DeptHeadSLADashboard = () => {
   const navigate = useNavigate();
@@ -358,41 +300,10 @@ const DeptHeadSLADashboard = () => {
 
   const stats = calculateStats();
 
-  const safeTotal = filteredL2Escalations.length;
-  const totalPages = Math.max(1, Math.ceil(safeTotal / itemsPerPage));
-  const startIndex = safeTotal === 0 ? 0 : (currentPage - 1) * itemsPerPage;
-  const endIndex =
-    safeTotal === 0 ? 0 : Math.min(currentPage * itemsPerPage, safeTotal);
-  const paginatedData = filteredL2Escalations.slice(startIndex, endIndex);
-
-  const goToPage = (page) => {
-    const p = Math.max(1, Math.min(page, totalPages));
-    setCurrentPage(p);
-  };
-
-  const getPageNumbers = () => {
-    const pages = [];
-    const maxPagesToShow = 5;
-
-    if (totalPages <= maxPagesToShow) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
-    } else if (currentPage <= 3) {
-      for (let i = 1; i <= 4; i++) pages.push(i);
-      pages.push("...");
-      pages.push(totalPages);
-    } else if (currentPage >= totalPages - 2) {
-      pages.push(1);
-      pages.push("...");
-      for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
-    } else {
-      pages.push(1);
-      pages.push("...");
-      for (let i = currentPage - 1; i <= currentPage + 1; i++) pages.push(i);
-      pages.push("...");
-      pages.push(totalPages);
-    }
-    return pages;
-  };
+  const paginatedData = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredL2Escalations.slice(start, start + itemsPerPage);
+  }, [filteredL2Escalations, currentPage, itemsPerPage]);
 
   if (loading) {
     return (
@@ -645,91 +556,16 @@ const DeptHeadSLADashboard = () => {
           </table>
         </div>
 
-        {safeTotal > 0 && (
-          <div className="dh-sla-pagination-footer">
-            <div className="dh-sla-pagination-left">
-              <span className="dh-sla-pagination-text">Show</span>
-
-              <PaginationDropdown
-                value={itemsPerPage}
-                onChange={(val) => {
-                  setItemsPerPage(val);
-                  setCurrentPage(1);
-                }}
-                options={[5, 10, 25, 50]}
-              />
-
-              <span className="dh-sla-pagination-text">entries</span>
-            </div>
-
-            <div className="dh-sla-pagination-center">
-              <span className="dh-sla-pagination-status">
-                Showing {safeTotal === 0 ? 0 : startIndex + 1} to {endIndex} of{" "}
-                {safeTotal} entries
-              </span>
-            </div>
-
-            <div className="dh-sla-pagination-right">
-              <ul className="dh-sla-pagination-list">
-                <li
-                  className={`dh-sla-page-item ${
-                    currentPage === 1 ? "disabled" : ""
-                  }`}
-                >
-                  <button
-                    className="dh-sla-page-link dh-sla-page-arrow"
-                    onClick={() => goToPage(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    type="button"
-                  >
-                    <span className="dh-sla-arrow-icon">‹</span>
-                  </button>
-                </li>
-
-                {getPageNumbers().map((page, idx) =>
-                  page === "..." ? (
-                    <li
-                      key={`ellipsis-${idx}`}
-                      className="dh-sla-page-item disabled"
-                    >
-                      <span className="dh-sla-page-link">…</span>
-                    </li>
-                  ) : (
-                    <li
-                      key={page}
-                      className={`dh-sla-page-item ${
-                        currentPage === page ? "active" : ""
-                      }`}
-                    >
-                      <button
-                        className="dh-sla-page-link"
-                        onClick={() => goToPage(page)}
-                        type="button"
-                      >
-                        {page}
-                      </button>
-                    </li>
-                  )
-                )}
-
-                <li
-                  className={`dh-sla-page-item ${
-                    currentPage === totalPages ? "disabled" : ""
-                  }`}
-                >
-                  <button
-                    className="dh-sla-page-link dh-sla-page-arrow"
-                    onClick={() => goToPage(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    type="button"
-                  >
-                    <span className="dh-sla-arrow-icon">›</span>
-                  </button>
-                </li>
-              </ul>
-            </div>
-          </div>
-        )}
+        <PaginationFooter
+          currentPage={currentPage}
+          totalItems={filteredL2Escalations.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={(val) => {
+            setItemsPerPage(val);
+            setCurrentPage(1);
+          }}
+        />
       </div>
 
       {showResolutionModal && selectedEscalation && (

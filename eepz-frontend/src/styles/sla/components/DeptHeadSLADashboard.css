@@ -194,6 +194,7 @@
   gap: 0.75rem;
   width: 100%;
   flex-wrap: nowrap;
+  margin-top: 15px;
 }
 
 .dh-sla-search-wrapper {
@@ -208,6 +209,8 @@
   min-width: 420px;
   max-width: 520px;
   margin-top: -17px;
+  max-height: 45px;
+  min-height: 45px;
 }
 
 .dh-sla-search-wrapper:focus-within {
@@ -271,6 +274,7 @@
   background: #27235c;
   color: #ffffff;
   min-width: 120px;
+  min-height: 42px;
 }
 
 .dh-sla-search-btn:hover {
@@ -532,165 +536,6 @@
   display: block;
 }
 
-.dh-pagination-dropdown {
-  position: relative;
-  display: inline-block;
-  font-size: 0.875rem;
-  z-index: 200;
-}
-
-.dh-pagination-dropdown-control {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.5rem 0.75rem;
-  min-width: 70px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  background-color: #ffffff;
-  color: #111827;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  outline: none;
-  position: relative;
-  z-index: 201;
-}
-
-.dh-pagination-dropdown-control:hover {
-  border-color: #9ca3af;
-}
-
-.dh-pagination-dropdown-control.open {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.dh-pagination-dropdown-value {
-  font-weight: 400;
-  color: #111827;
-}
-
-.dh-pagination-dropdown-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #9ca3af;
-  transition: transform 0.2s ease, color 0.2s ease;
-  flex-shrink: 0;
-}
-
-.dh-pagination-dropdown-control:hover .dh-pagination-dropdown-icon {
-  color: #6b7280;
-}
-
-.dh-pagination-dropdown-icon.open {
-  transform: rotate(180deg);
-  color: #3b82f6;
-}
-
-.dh-pagination-dropdown-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 199;
-  background: transparent;
-}
-
-.dh-pagination-dropdown-menu {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  right: 0;
-  border-radius: 6px;
-  background: #ffffff;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-  z-index: 202;
-  border: 1px solid #e5e7eb;
-  min-width: 70px;
-  overflow: hidden;
-}
-
-.dh-pagination-dropdown-option {
-  padding: 0.625rem 0.75rem;
-  font-size: 0.875rem;
-  text-align: center;
-  cursor: pointer;
-  background-color: #ffffff;
-  color: #374151;
-  transition: all 0.12s ease;
-  font-weight: 400;
-  white-space: nowrap;
-}
-
-.dh-pagination-dropdown-option:not(:last-child) {
-  border-bottom: 1px solid #f3f4f6;
-}
-
-.dh-pagination-dropdown-option:not(.selected):hover {
-  background-color: #27235c;
-  color: #ffffff;
-}
-
-.dh-pagination-dropdown-option.selected {
-  background-color: #e5e7eb;
-  color: #1f2937;
-  font-weight: 600;
-}
-
-.dh-pagination-dropdown-option.selected:hover {
-  background-color: #e5e7eb;
-  color: #1f2937;
-}
-
-.dh-sla-pagination-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.25rem 1.5rem;
-  border-top: 1px solid #e5e7eb;
-  background: white;
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
-  position: relative;
-  z-index: 10;
-}
-
-.dh-sla-pagination-left,
-.dh-sla-pagination-center,
-.dh-sla-pagination-right {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.dh-sla-pagination-left {
-  font-size: 0.875rem;
-  position: relative;
-  z-index: 200;
-}
-
-.dh-sla-pagination-text {
-  color: #6b7280;
-  font-weight: 500;
-}
-
-.dh-sla-pagination-status {
-  color: #6b7280;
-  font-size: 0.875rem;
-}
-
-.dh-sla-pagination-list {
-  display: flex;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  gap: 0.25rem;
-}
 
 .dh-sla-page-item {
   display: flex;
@@ -1024,21 +869,6 @@
   .dh-sla-table {
     min-width: 700px;
   }
-
-  .dh-sla-pagination-footer {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: stretch;
-  }
-
-  .dh-sla-pagination-left,
-  .dh-sla-pagination-center {
-    justify-content: center;
-  }
-
-  .dh-sla-pagination-right {
-    justify-content: center;
-  }
 }
 
 @media (max-width: 768px) {
@@ -1090,15 +920,6 @@
 
   .dh-sla-modal-footer {
     padding: 1rem 1.25rem;
-  }
-
-  .dh-sla-pagination-left {
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  .dh-sla-pagination-footer {
-    padding: 0.75rem 1rem;
   }
 }
 

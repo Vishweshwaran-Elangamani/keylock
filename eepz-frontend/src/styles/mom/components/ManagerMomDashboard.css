@@ -426,70 +426,6 @@
   gap: 16px;
 }
 
-.mom-pagination-dropdown {
-  position: relative;
-  display: inline-block;
-  font-size: 0.875rem;
-}
-
-.mom-pagination-dropdown-control {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  padding: 0 0.85rem;
-  min-width: 78px;
-  height: 34px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  background-color: #ffffff;
-  color: #111827;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  outline: none;
-  user-select: none;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
-}
-
-.mom-pagination-dropdown-control:hover {
-  border-color: #9ca3af;
-}
-
-.mom-pagination-dropdown-control.open {
-  border-color: #27235c;
-}
-
-.mom-pagination-dropdown-value {
-  font-weight: 600;
-}
-
-.mom-pagination-dropdown-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s ease;
-  color: #6b7280;
-}
-
-.mom-pagination-dropdown-icon.open {
-  transform: rotate(180deg);
-}
-
-.mom-pagination-dropdown-menu {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  min-width: 78px;
-  background: #ffffff;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 9999;
-  overflow: hidden;
-  animation: momDropdownFadeIn 0.15s ease;
-}
-
 @keyframes momDropdownFadeIn {
   from {
     opacity: 0;
@@ -501,70 +437,6 @@
   }
 }
 
-.mom-pagination-dropdown-option {
-  padding: 8px 12px;
-  text-align: center;
-  cursor: pointer;
-  font-size: 0.875rem;
-  color: #1e293b;
-  font-weight: 500;
-  transition: all 0.15s ease;
-  background-color: #ffffff;
-}
-
-.mom-pagination-dropdown-option.selected {
-  background-color: #f3f4f6;
-  color: #1e293b;
-  font-weight: 600;
-}
-
-.mom-pagination-dropdown-option:hover {
-  background-color: #27235c;
-  color: #ffffff;
-  font-weight: 600;
-}
-
-.managermom-pagination-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.875rem 1rem;
-  background: #ffffff;
-  border-top: 1px solid #e5e7eb;
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  position: relative;
-}
-
-.managermom-pagination-left,
-.managermom-pagination-center,
-.managermom-pagination-right {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.managermom-pagination-center {
-  flex: 1;
-  justify-content: center;
-}
-
-.managermom-pagination-status {
-  color: #6b7280;
-  font-size: 0.875rem;
-  white-space: nowrap;
-}
-
-.managermom-pagination-list {
-  display: flex;
-  align-items: center;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  gap: 4px;
-}
 
 .managermom-page-item {
   display: flex;
@@ -608,27 +480,6 @@
   border-color: #27235c;
 }
 
-.managermom-grid-pagination-wrapper {
-  background: #ffffff;
-  border-radius: 12px 12px 0 0;
-  border: 1px solid #e5e7eb;
-  border-bottom: none;
-  overflow: hidden;
-  margin-top: 1.5rem;
-  margin-bottom: 0;
-}
-
-.managermom-grid-pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 1rem 1.25rem;
-  border-top: 1px solid #e5e7eb;
-  background: #ffffff;
-  border-radius: 0 0 12px 12px;
-  position: relative;
-  overflow: visible;
-}
 
 .mm-bar-w-0 { width: 0%; }
 .mm-bar-w-1 { width: 1%; }
@@ -743,21 +594,6 @@
   }
 
   .managermom-toolbar-right {
-    justify-content: center;
-  }
-
-  .managermom-pagination-footer {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: stretch;
-  }
-
-  .managermom-pagination-left,
-  .managermom-pagination-center {
-    justify-content: center;
-  }
-
-  .managermom-pagination-right {
     justify-content: center;
   }
 }

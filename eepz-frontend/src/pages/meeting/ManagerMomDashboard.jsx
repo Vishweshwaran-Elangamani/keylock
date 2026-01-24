@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Home } from "lucide-react";
 import momService from "../../services/meeting/momService";
@@ -9,89 +9,19 @@ import toastr from "toastr";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import ManagerMeetingDetailsModal from "../../components/meeting/modals/ManagerMeetingDetailsModal";
+import PaginationFooter from "../../components/project-management/common/PaginationFooter";
 import "../../styles/mom/components/ManagerMomDashboard.css";
-
-const MomPaginationDropdown = ({ value, onChange, options }) => {
-  const [open, setOpen] = useState(false);
-  const triggerRef = useRef(null);
-  const dropdownRef = useRef(null);
-  const selected = options.find((o) => o === value) || options[0];
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target) &&
-        triggerRef.current &&
-        !triggerRef.current.contains(event.target)
-      ) {
-        setOpen(false);
-      }
-    };
-
-    if (open) document.addEventListener("mousedown", handleClickOutside);
-
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [open]);
-
-  return (
-    <div className={`mom-pagination-dropdown ${open ? "open" : ""}`}>
-      <button
-        ref={triggerRef}
-        type="button"
-        className={`mom-pagination-dropdown-control ${open ? "open" : ""}`}
-        onClick={() => setOpen((p) => !p)}
-      >
-        <span className="mom-pagination-dropdown-value">{selected}</span>
-        <span className={`mom-pagination-dropdown-icon ${open ? "open" : ""}`}>
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <polyline
-              points="6 9 12 15 18 9"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </span>
-      </button>
-
-      {open && (
-        <div ref={dropdownRef} className="mom-pagination-dropdown-menu">
-          {options.map((opt) => (
-            <div
-              key={opt}
-              className={`mom-pagination-dropdown-option ${
-                opt === value ? "selected" : ""
-              }`}
-              onClick={() => {
-                onChange(opt);
-                setOpen(false);
-              }}
-            >
-              {opt}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
 
 const ManagerMomDashboard = () => {
   const navigate = useNavigate();
+
   const [stats, setStats] = useState({
     teamMomsCount: 0,
     oneOnOnesCount: 0,
     overdueActionsCount: 0,
     totalMeetingsCount: 0,
   });
+
   const [upcomingMeetings, setUpcomingMeetings] = useState([]);
   const [recentTeamMoms, setRecentTeamMoms] = useState([]);
   const [actionItems, setActionItems] = useState([]);
@@ -101,6 +31,7 @@ const ManagerMomDashboard = () => {
   const [viewMode, setViewMode] = useState("table");
   const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [actionItemFilter, setActionItemFilter] = useState("all");
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
 
@@ -114,6 +45,10 @@ const ManagerMomDashboard = () => {
     }, 30000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [itemsPerPage, viewMode]);
 
   const loadDashboardData = async (silentRefresh = false) => {
     try {
@@ -209,47 +144,16 @@ const ManagerMomDashboard = () => {
     return `${dd}-${mm}-${yyyy} ${hh}:${min}`;
   };
 
-  const isOverdue = (dueDate, status) =>
-    status === "Pending" && new Date(dueDate) < new Date();
-
   const safeTotal = upcomingMeetings.length;
   const perPage = viewMode === "grid" ? 9 : itemsPerPage;
   const totalPages = Math.max(1, Math.ceil(safeTotal / perPage));
   const validCurrentPage = Math.min(currentPage, totalPages);
+
   const startIndex = safeTotal === 0 ? 0 : (validCurrentPage - 1) * perPage;
   const endIndex =
     safeTotal === 0 ? 0 : Math.min(validCurrentPage * perPage, safeTotal);
+
   const paginatedMeetings = upcomingMeetings.slice(startIndex, endIndex);
-
-  const goToPage = (page) => {
-    const p = Math.max(1, Math.min(page, totalPages));
-    setCurrentPage(p);
-  };
-
-  const getPageNumbers = () => {
-    const pages = [];
-    const maxPagesToShow = 5;
-
-    if (totalPages <= maxPagesToShow) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
-    } else if (validCurrentPage <= 3) {
-      for (let i = 1; i <= 4; i++) pages.push(i);
-      pages.push("...");
-      pages.push(totalPages);
-    } else if (validCurrentPage >= totalPages - 2) {
-      pages.push(1);
-      pages.push("...");
-      for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
-    } else {
-      pages.push(1);
-      pages.push("...");
-      for (let i = validCurrentPage - 1; i <= validCurrentPage + 1; i++)
-        pages.push(i);
-      pages.push("...");
-      pages.push(totalPages);
-    }
-    return pages;
-  };
 
   const getProgressWidthClass = (accepted, total) => {
     if (!total || total <= 0) return "mm-bar-w-0";
@@ -489,83 +393,20 @@ const ManagerMomDashboard = () => {
             </div>
 
             {safeTotal > 0 && (
-              <div className="managermom-pagination-footer">
-                <div className="managermom-pagination-left">
-                  <span className="managermom-pagination-text">Show</span>
-                  <MomPaginationDropdown
-                    value={itemsPerPage}
-                    onChange={(val) => {
-                      setItemsPerPage(val);
-                      setCurrentPage(1);
-                    }}
-                    options={[5, 10, 25, 50]}
-                  />
-                  <span className="managermom-pagination-text">entries</span>
-                </div>
-
-                <div className="managermom-pagination-center">
-                  <span className="managermom-pagination-status">
-                    Showing {safeTotal === 0 ? 0 : startIndex + 1} to {endIndex}{" "}
-                    of {safeTotal} entries
-                  </span>
-                </div>
-
-                <div className="managermom-pagination-right">
-                  <ul className="managermom-pagination-list">
-                    <li
-                      className={`managermom-page-item ${
-                        validCurrentPage === 1 ? "disabled" : ""
-                      }`}
-                    >
-                      <button
-                        className="managermom-page-link managermom-page-arrow"
-                        onClick={() => goToPage(validCurrentPage - 1)}
-                        disabled={validCurrentPage === 1}
-                      >
-                        <span className="managermom-arrow-icon">‹</span>
-                      </button>
-                    </li>
-
-                    {getPageNumbers().map((page, idx) =>
-                      page === "..." ? (
-                        <li
-                          key={`ellipsis-${idx}`}
-                          className="managermom-page-item disabled"
-                        >
-                          <span className="managermom-page-link">...</span>
-                        </li>
-                      ) : (
-                        <li
-                          key={page}
-                          className={`managermom-page-item ${
-                            validCurrentPage === page ? "active" : ""
-                          }`}
-                        >
-                          <button
-                            className="managermom-page-link"
-                            onClick={() => goToPage(page)}
-                          >
-                            {page}
-                          </button>
-                        </li>
-                      )
-                    )}
-
-                    <li
-                      className={`managermom-page-item ${
-                        validCurrentPage === totalPages ? "disabled" : ""
-                      }`}
-                    >
-                      <button
-                        className="managermom-page-link managermom-page-arrow"
-                        onClick={() => goToPage(validCurrentPage + 1)}
-                        disabled={validCurrentPage === totalPages}
-                      >
-                        <span className="managermom-arrow-icon">›</span>
-                      </button>
-                    </li>
-                  </ul>
-                </div>
+              <div className="managermom-pf-wrap">
+                <PaginationFooter
+                  currentPage={validCurrentPage}
+                  totalItems={safeTotal}
+                  itemsPerPage={perPage}
+                  onPageChange={(p) => setCurrentPage(p)}
+                  onItemsPerPageChange={(size) => {
+                    setItemsPerPage(Number(size));
+                    setCurrentPage(1);
+                  }}
+                  pageSizeOptions={[5, 10, 25, 50]}
+                  showPageSizeDropdown={true}
+                  showStatusText={true}
+                />
               </div>
             )}
           </div>
@@ -632,67 +473,6 @@ const ManagerMomDashboard = () => {
                 })
               )}
             </div>
-
-            {safeTotal > 0 && totalPages > 1 && (
-              <div className="managermom-grid-pagination-wrapper">
-                <div className="managermom-grid-pagination">
-                  <ul className="managermom-pagination-list">
-                    <li
-                      className={`managermom-page-item ${
-                        validCurrentPage === 1 ? "disabled" : ""
-                      }`}
-                    >
-                      <button
-                        className="managermom-page-link managermom-page-arrow"
-                        onClick={() => goToPage(validCurrentPage - 1)}
-                        disabled={validCurrentPage === 1}
-                      >
-                        <span className="managermom-arrow-icon">‹</span>
-                      </button>
-                    </li>
-
-                    {getPageNumbers().map((page, idx) =>
-                      page === "..." ? (
-                        <li
-                          key={`ellipsis-${idx}`}
-                          className="managermom-page-item disabled"
-                        >
-                          <span className="managermom-page-link">...</span>
-                        </li>
-                      ) : (
-                        <li
-                          key={page}
-                          className={`managermom-page-item ${
-                            validCurrentPage === page ? "active" : ""
-                          }`}
-                        >
-                          <button
-                            className="managermom-page-link"
-                            onClick={() => goToPage(page)}
-                          >
-                            {page}
-                          </button>
-                        </li>
-                      )
-                    )}
-
-                    <li
-                      className={`managermom-page-item ${
-                        validCurrentPage === totalPages ? "disabled" : ""
-                      }`}
-                    >
-                      <button
-                        className="managermom-page-link managermom-page-arrow"
-                        onClick={() => goToPage(validCurrentPage + 1)}
-                        disabled={validCurrentPage === totalPages}
-                      >
-                        <span className="managermom-arrow-icon">›</span>
-                      </button>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            )}
           </>
         )}
 

@@ -1,19 +1,11 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
-import {
-  Star,
-  User,
-  MessageSquare,
-  Calendar,
-  Eye,
-  Home,
-  Loader,
-} from "lucide-react";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { Star, User, MessageSquare, Calendar, Eye, Home } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { mentorFeedbackApi } from "../../../services/feedbackmanagement/feedbackApi";
 import axios from "axios";
 import "../../../styles/feedback/components/MentorFeedbackDashboard.css";
-
 import CustomDropdown from "../../../components/project-management/common/CustomDropdown";
+import PaginationFooter from "../../../components/project-management/common/PaginationFooter";
 
 const formatDate = (dateInput) => {
   if (!dateInput) return "—";
@@ -28,6 +20,13 @@ const formatDate = (dateInput) => {
   } catch {
     return "—";
   }
+};
+
+const isNumericValue = (val) => {
+  if (val === null || val === undefined) return false;
+  const s = String(val).trim();
+  if (!s) return false;
+  return !isNaN(Number(s));
 };
 
 export default function MentorFeedbackDashboard() {
@@ -49,29 +48,69 @@ export default function MentorFeedbackDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedFeedback, setSelectedFeedback] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
 
-  const [entriesPerPage, setEntriesPerPage] = useState(5);
- const [filters, setFilters] = useState({
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+
+  const [filters, setFilters] = useState({
     status: "all",
     rating: "all",
     skill: "all",
   });
 
+  const employeeNameCacheRef = useRef(new Map());
+
   const fetchEmployeeName = async (employeeId) => {
     try {
+      const id = Number(employeeId);
+      if (!id || isNaN(id)) return "Unknown";
+
+      if (employeeNameCacheRef.current.has(id)) {
+        return employeeNameCacheRef.current.get(id);
+      }
+
+      const PROJECT_API_URL = import.meta.env.VITE_PROJECT_API_URL;
+
       const response = await axios.get(
-        `${import.meta.env.VITE_PROJECT_API_URL}/api/EmployeeManagement/${employeeId}`
+        `${PROJECT_API_URL}/api/employees/${id}`
       );
 
-      if (response.data?.success && response.data.data) {
-        const { firstName, lastName } = response.data.data;
-        return `${firstName} ${lastName}`;
+      let name = `Employee ${id}`;
+
+      if (response?.data) {
+        const payload = response.data?.data ?? response.data;
+        const firstName = payload?.firstName ?? payload?.FirstName;
+        const lastName = payload?.lastName ?? payload?.LastName;
+
+        if (firstName || lastName) {
+          name = `${firstName ?? ""} ${lastName ?? ""}`.trim();
+        }
       }
-      return `Employee ${employeeId}`;
+
+      employeeNameCacheRef.current.set(id, name);
+      return name;
     } catch {
       return `Employee ${employeeId}`;
     }
+  };
+
+  const resolveMenteeDisplayName = async (feedback) => {
+    if (feedback?.isAnonymous) return "Anonymous";
+
+    const menteeNameRaw = feedback?.menteeName;
+
+    if (menteeNameRaw && !isNumericValue(menteeNameRaw)) {
+      const clean = String(menteeNameRaw).trim();
+      if (clean.length > 0) return clean;
+    }
+
+    const menteeId =
+      feedback?.menteeEmployeeId ??
+      (isNumericValue(menteeNameRaw) ? Number(menteeNameRaw) : null);
+
+    if (!menteeId) return "Unknown";
+
+    return await fetchEmployeeName(menteeId);
   };
 
   const fetchAllData = useCallback(async () => {
@@ -84,20 +123,17 @@ export default function MentorFeedbackDashboard() {
 
       if (response.data?.success && Array.isArray(response.data.data)) {
         const enrichedPromises = response.data.data.map(async (feedback) => {
-          let menteeName = "Unknown";
+          const menteeName = await resolveMenteeDisplayName(feedback);
 
-          if (feedback.menteeName) {
-            const menteeId = parseInt(feedback.menteeName, 10);
-            if (!isNaN(menteeId)) menteeName = await fetchEmployeeName(menteeId);
-          } else if (feedback.menteeEmployeeId) {
-            const menteeId = parseInt(feedback.menteeEmployeeId, 10);
-            if (!isNaN(menteeId)) menteeName = await fetchEmployeeName(menteeId);
-          }
+          const menteeEmployeeId =
+            feedback?.menteeEmployeeId ??
+            (isNumericValue(feedback?.menteeName)
+              ? Number(feedback?.menteeName)
+              : null);
 
           return {
             ...feedback,
-            menteeEmployeeId:
-              feedback.menteeEmployeeId || parseInt(feedback.menteeName, 10),
+            menteeEmployeeId,
             menteeName,
             createdAtFormatted: formatDate(feedback.createdAt),
           };
@@ -118,7 +154,7 @@ export default function MentorFeedbackDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [user?.empId]);
+  }, [user?.empId, user?.employeeId]);
 
   useEffect(() => {
     fetchAllData();
@@ -140,23 +176,29 @@ export default function MentorFeedbackDashboard() {
     setCurrentPage(1);
   }, [filters, feedbacks]);
 
-  const indexOfLastEntry = currentPage * entriesPerPage;
-  const indexOfFirstEntry = indexOfLastEntry - entriesPerPage;
-  const currentEntries = filteredFeedbacks.slice(
-    indexOfFirstEntry,
-    indexOfLastEntry
-  );
+  const safeTotal = filteredFeedbacks.length;
 
-  const totalPages = Math.ceil(filteredFeedbacks.length / entriesPerPage);
+  const totalPages = Math.max(1, Math.ceil(safeTotal / itemsPerPage));
+
+  const startIndex =
+    safeTotal === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+
+  const endIndex =
+    safeTotal === 0 ? 0 : Math.min(currentPage * itemsPerPage, safeTotal);
+
+  const currentEntries = filteredFeedbacks.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
-  // ✅ Dropdown options
   const stats = useMemo(() => {
     const total = feedbacks.length;
     const avgRating =
       total > 0
-        ? (feedbacks.reduce((sum, f) => sum + f.rating, 0) / total).toFixed(1)
+        ? (feedbacks.reduce((sum, f) => sum + (Number(f.rating) || 0), 0) / total)
+            .toFixed(1)
         : 0;
     return { total, avgRating };
   }, [feedbacks]);
@@ -195,51 +237,23 @@ export default function MentorFeedbackDashboard() {
     [uniqueSkills]
   );
 
-  const entriesOptions = useMemo(
-    () => [5, 10, 25, 50].map((n) => ({ label: String(n), value: String(n) })),
-    []
-  );
+  const entriesOptions = useMemo(() => [5, 10, 25, 50], []);
 
   const renderStars = (rating) => {
+    const r = Number(rating) || 0;
     return (
       <div className="mfd-stars-wrapper">
         {[1, 2, 3, 4, 5].map((star) => (
           <Star
             key={star}
             size={16}
-            fill={star <= rating ? "#FFB800" : "none"}
-            stroke={star <= rating ? "#FFB800" : "#cbd5e1"}
+            fill={star <= r ? "#FFB800" : "none"}
+            stroke={star <= r ? "#FFB800" : "#cbd5e1"}
             strokeWidth={2}
           />
         ))}
       </div>
     );
-  };
-
-  const getPageNumbers = () => {
-    const pages = [];
-    const maxVisiblePages = 5;
-
-    if (totalPages <= maxVisiblePages) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
-    } else {
-      if (currentPage <= 3) {
-        for (let i = 1; i <= 4; i++) pages.push(i);
-        pages.push("...");
-        pages.push(totalPages);
-      } else if (currentPage >= totalPages - 2) {
-        pages.push(1);
-        pages.push("...");
-        for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
-      } else {
-        pages.push(1);
-        pages.push("...");
-        for (let i = currentPage - 1; i <= currentPage + 1; i++) pages.push(i);
-        pages.push("...");
-        pages.push(totalPages);
-      }
-    }
-    return pages;
   };
 
   if (loading) {
@@ -378,178 +392,98 @@ export default function MentorFeedbackDashboard() {
           </div>
         </div>
       ) : (
-        <>
-          <div className="mfd-table-wrapper">
-            <div className="mfd-table-responsive">
-              <table className="mfd-table">
-                <thead className="mfd-table-header">
-                  <tr>
-                    <th>EMPLOYEE</th>
-                    <th>SKILL</th>
-                    <th>RATING</th>
-                    <th>SUBMITTED</th>
-                    <th>ACTIONS</th>
-                  </tr>
-                </thead>
-                <tbody className="mfd-table-body">
-                  {currentEntries.map((feedback) => (
-                    <tr
-                      key={feedback.trackingId}
-                      className="mfd-table-row"
-                      onClick={() => setSelectedFeedback(feedback)}
-                    >
-                      <td>
-                        <div className="mfd-employee-cell">
-                          <User size={16} className="mfd-employee-icon" />
-                          <div className="mfd-employee-info">
-                            <div className="mfd-employee-name">
-                              {feedback.isAnonymous
-                                ? "Anonymous"
-                                : feedback.menteeName}
-                            </div>
+        <div className="mfd-table-wrapper">
+          <div className="mfd-table-responsive">
+            <table className="mfd-table">
+              <thead className="mfd-table-header">
+                <tr>
+                  <th>EMPLOYEE</th>
+                  <th>SKILL</th>
+                  <th>RATING</th>
+                  <th>SUBMITTED</th>
+                  <th>ACTIONS</th>
+                </tr>
+              </thead>
+
+              <tbody className="mfd-table-body">
+                {currentEntries.map((feedback) => (
+                  <tr
+                    key={feedback.trackingId}
+                    className="mfd-table-row"
+                    onClick={() => setSelectedFeedback(feedback)}
+                  >
+                    <td>
+                      <div className="mfd-employee-cell">
+                        <User size={16} className="mfd-employee-icon" />
+                        <div className="mfd-employee-info">
+                          <div className="mfd-employee-name">
+                            {feedback.isAnonymous
+                              ? "Anonymous"
+                              : feedback.menteeName}
                           </div>
                         </div>
-                      </td>
+                      </div>
+                    </td>
 
-                      <td>
-                        <span className="mfd-badge-skill">
-                          {feedback.skillName}
+                    <td>
+                      <span className="mfd-badge-skill">{feedback.skillName}</span>
+                    </td>
+
+                    <td>
+                      <div className="mfd-rating-cell">
+                        <Star size={16} className="mfd-rating-star" />
+                        <span className="mfd-rating-text">
+                          {feedback.rating}/5
                         </span>
-                      </td>
+                      </div>
+                    </td>
 
-                      <td>
-                        <div className="mfd-rating-cell">
-                          <Star size={16} className="mfd-rating-star" />
-                          <span className="mfd-rating-text">
-                            {feedback.rating}/5
-                          </span>
-                        </div>
-                      </td>
+                    <td>
+                      <div className="mfd-date-cell">
+                        <Calendar size={14} className="mfd-date-icon" />
+                        {feedback.createdAtFormatted}
+                      </div>
+                    </td>
 
-                      <td>
-                        <div className="mfd-date-cell">
-                          <Calendar size={14} className="mfd-date-icon" />
-                          {feedback.createdAtFormatted}
-                        </div>
-                      </td>
-
-                      <td>
-                        <div className="mfd-actions">
-                          <button
-                            className="mfd-action-btn mfd-action-view"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedFeedback(feedback);
-                            }}
-                            title="View details"
-                            type="button"
-                          >
-                            <Eye size={14} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="mfd-pagination-footer">
-              <div className="mfd-pagination-left">
-                <span className="mfd-pagination-text">Show</span>
-
-                <div className="mfd-entries-dd">
-                  <CustomDropdown
-                    name="entriesPerPage"
-                    value={String(entriesPerPage)}
-                    options={entriesOptions}
-                    placeholder="5"
-                    onChange={(_, val) => {
-                      const num = Number(val);
-                      setEntriesPerPage(num);
-                      setCurrentPage(1);
-                    }}
-                    className="mfd-dd"
-                  />
-                </div>
-
-                <span className="mfd-pagination-text">entries</span>
-              </div>
-
-              <div className="mfd-pagination-center">
-                <span className="mfd-pagination-status">
-                  Showing {indexOfFirstEntry + 1} to{" "}
-                  {Math.min(indexOfLastEntry, filteredFeedbacks.length)} of{" "}
-                  {filteredFeedbacks.length} entries
-                </span>
-              </div>
-
-              <div className="mfd-pagination-right">
-                <ul className="mfd-pagination-list">
-                  <li
-                    className={`mfd-page-item ${
-                      currentPage === 1 ? "disabled" : ""
-                    }`}
-                  >
-                    <button
-                      className="mfd-page-link"
-                      onClick={() =>
-                        currentPage > 1 && handlePageChange(currentPage - 1)
-                      }
-                      disabled={currentPage === 1}
-                      type="button"
-                      aria-label="Previous page"
-                    >
-                      ‹
-                    </button>
-                  </li>
-
-                  {getPageNumbers().map((page, index) => (
-                    <li
-                      key={index}
-                      className={`mfd-page-item ${
-                        currentPage === page ? "active" : ""
-                      }`}
-                    >
-                      {page === "..." ? (
-                        <span className="mfd-page-ellipsis">
-                          <span className="mfd-page-dots">...</span>
-                        </span>
-                      ) : (
+                    <td>
+                      <div className="mfd-actions">
                         <button
-                          className="mfd-page-link"
-                          onClick={() => handlePageChange(page)}
+                          className="mfd-action-btn mfd-action-view"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedFeedback(feedback);
+                          }}
+                          title="View details"
                           type="button"
                         >
-                          {page}
+                          <Eye size={14} />
                         </button>
-                      )}
-                    </li>
-                  ))}
-
-                  <li
-                    className={`mfd-page-item ${
-                      currentPage === totalPages ? "disabled" : ""
-                    }`}
-                  >
-                    <button
-                      className="mfd-page-link"
-                      onClick={() =>
-                        currentPage < totalPages &&
-                        handlePageChange(currentPage + 1)
-                      }
-                      disabled={currentPage === totalPages}
-                      type="button"
-                      aria-label="Next page"
-                    >
-                      ›
-                    </button>
-                  </li>
-                </ul>
-              </div>
-            </div>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        </>
+
+          {safeTotal > 0 && (
+            <div className="mfd-pf-wrap">
+              <PaginationFooter
+                currentPage={currentPage}
+                totalItems={safeTotal}
+                itemsPerPage={itemsPerPage}
+                onPageChange={(p) => handlePageChange(p)}
+                onItemsPerPageChange={(size) => {
+                  setItemsPerPage(size);
+                  setCurrentPage(1);
+                }}
+                pageSizeOptions={entriesOptions}
+                showPageSizeDropdown={true}
+                showStatusText={true}
+              />
+            </div>
+          )}
+        </div>
       )}
 
       {selectedFeedback && (

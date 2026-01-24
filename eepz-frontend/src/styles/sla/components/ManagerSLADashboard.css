@@ -943,64 +943,6 @@
   transform: translateY(-1px);
   box-shadow: 0 2px 4px rgba(22, 163, 74, 0.3);
 }
-
-.mgr-sla-pagination-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 1.5rem;
-  background: #ffffff;
-  border-top: 1px solid #e5e7eb;
-  border-bottom-left-radius: 16px;
-  border-bottom-right-radius: 16px;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin: 0;
-  position: relative;
-  z-index: 1;
-}
-
-.mgr-sla-pagination-left {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  position: relative;
-  z-index: 50;
-}
-
-.mgr-sla-pagination-text {
-  font-size: 0.875rem;
-  color: #6b7280;
-  font-weight: 400;
-}
-
-.mgr-sla-pagination-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-}
-
-.mgr-sla-pagination-status {
-  font-size: 0.875rem;
-  color: #6b7280;
-  white-space: nowrap;
-}
-
-.mgr-sla-pagination-right {
-  display: flex;
-  align-items: center;
-}
-
-.mgr-sla-pagination-list {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
 .mgr-sla-page-item {
   list-style: none;
 }
@@ -1104,16 +1046,6 @@
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   }
 
-  .mgr-sla-pagination-footer {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .mgr-sla-pagination-left,
-  .mgr-sla-pagination-center,
-  .mgr-sla-pagination-right {
-    justify-content: center;
-  }
 }
 
 @media (max-width: 768px) {

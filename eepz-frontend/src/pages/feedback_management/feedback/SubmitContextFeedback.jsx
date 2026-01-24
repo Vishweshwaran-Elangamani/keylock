@@ -90,7 +90,6 @@ export default function SubmitContextFeedback() {
   const [successMsg, setSuccessMsg] = useState("");
   const [error, setError] = useState("");
 
-  // ✅ anchor refs for perfect portal alignment (menu width/position)
   const goalAnchorRef = useRef(null);
   const recipientAnchorRef = useRef(null);
 

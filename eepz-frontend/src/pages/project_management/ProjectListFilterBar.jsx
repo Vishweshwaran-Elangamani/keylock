@@ -51,11 +51,7 @@ const ProjectListFilterBar = ({
               <span>Cancel</span>
             </button>
           ) : (
-            <button
-              className="prj-list-search-btn"
-              type="button"
-              onClick={onSearch}
-            >
+            <button className="prj-list-search-btn" type="button" onClick={onSearch}>
               <Search size={16} />
               <span>Search</span>
             </button>
