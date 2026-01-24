@@ -4,9 +4,9 @@ namespace Relevantz.EEPZ.Core.Services.Interface
 {
     public interface ILnDHRService
     {
-        Task<ApiResponse<PaginatedResponse<SubordinateEmployeeResponseModel>>> GetAllOrganizationEmployees(
-            OrganizationEmployeesRequestModel request
-        );
+        Task<
+            ApiResponse<PaginatedResponse<SubordinateEmployeeResponseModel>>
+        > GetAllOrganizationEmployees(OrganizationEmployeesRequestModel request);
         Task<ApiResponse<PaginatedResponse<AssignmentResponseModel>>> GetAllOrganizationAssignments(
             OrganizationAssignmentsRequestModel request
         );

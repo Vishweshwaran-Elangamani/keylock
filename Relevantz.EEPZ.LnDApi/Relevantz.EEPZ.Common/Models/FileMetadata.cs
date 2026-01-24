@@ -9,8 +9,4 @@ namespace Relevantz.EEPZ.Common.Models
         public DateTime UploadDate { get; set; }
         public string SubFolder { get; set; } = string.Empty;
     }
-}     
-
-
-
-
+}

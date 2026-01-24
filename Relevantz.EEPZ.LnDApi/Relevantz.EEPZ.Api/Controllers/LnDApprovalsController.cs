@@ -37,7 +37,11 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             Log.Information(
                 "GetMyApprovals API called. EmployeeId={EmployeeId}, ApprovalType={ApprovalType}, Status={Status}, Page={PageNumber}, PageSize={PageSize}",
-                employeeId, request.ApprovalType ?? "all", request.Status ?? "all", request.PageNumber, request.PageSize
+                employeeId,
+                request.ApprovalType ?? "all",
+                request.Status ?? "all",
+                request.PageNumber,
+                request.PageSize
             );
 
             var result = await _approvalService.GetMyApprovals(employeeId, request);
@@ -46,7 +50,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Information(
                     "GetMyApprovals API succeeded. EmployeeId={EmployeeId}, TotalCount={TotalCount}",
-                    employeeId, result.Data?.TotalCount ?? 0
+                    employeeId,
+                    result.Data?.TotalCount ?? 0
                 );
                 return Ok(result);
             }
@@ -54,7 +59,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "GetMyApprovals API failed. EmployeeId={EmployeeId}, Message={Message}",
-                    employeeId, result.Message
+                    employeeId,
+                    result.Message
                 );
                 return BadRequest(result);
             }
@@ -62,16 +68,20 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
         /// <summary>
         /// Processes an approval decision (approve or reject).
-        /// Triggers business workflows for SME registration, assignments, and acknowledgements.  
+        /// Triggers business workflows for SME registration, assignments, and acknowledgements.
         /// </summary>
         [HttpPost("api/lnd-approvals/process")]
-        public async Task<IActionResult> ProcessApproval([FromBody] ApprovalDecisionRequestModel request)
+        public async Task<IActionResult> ProcessApproval(
+            [FromBody] ApprovalDecisionRequestModel request
+        )
         {
             var approverId = GetCurrentEmployeeId();
 
             Log.Information(
                 "ProcessApproval API called. ApproverId={ApproverId}, ApprovalId={ApprovalId}, IsApproved={IsApproved}",
-                approverId, request.ApprovalId, request.IsApproved
+                approverId,
+                request.ApprovalId,
+                request.IsApproved
             );
 
             var result = await _approvalService.ProcessApproval(approverId, request);
@@ -80,7 +90,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Information(
                     "ProcessApproval API succeeded. ApproverId={ApproverId}, ApprovalId={ApprovalId}, Decision={Decision}",
-                    approverId, request.ApprovalId, request.IsApproved ? "APPROVED" : "REJECTED"
+                    approverId,
+                    request.ApprovalId,
+                    request.IsApproved ? "APPROVED" : "REJECTED"
                 );
                 return Ok(result);
             }
@@ -88,7 +100,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "ProcessApproval API failed. ApproverId={ApproverId}, ApprovalId={ApprovalId}, Message={Message}",
-                    approverId, request.ApprovalId, result.Message
+                    approverId,
+                    request.ApprovalId,
+                    result.Message
                 );
                 return BadRequest(result);
             }
@@ -103,13 +117,18 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Supports filtering by role, type, status, and search term with pagination.
         /// </summary>
         [HttpGet("api/lnd-approvals/history")]
-        public async Task<IActionResult> GetApprovalHistory([FromQuery] ApprovalHistoryRequestModel request)
+        public async Task<IActionResult> GetApprovalHistory(
+            [FromQuery] ApprovalHistoryRequestModel request
+        )
         {
             var employeeId = GetCurrentEmployeeId();
 
             Log.Information(
                 "GetApprovalHistory API called. EmployeeId={EmployeeId}, Role={Role}, ApprovalType={ApprovalType}, Status={Status}",
-                employeeId, request.Role ?? "all", request.ApprovalType ?? "all", request.Status ?? "all"
+                employeeId,
+                request.Role ?? "all",
+                request.ApprovalType ?? "all",
+                request.Status ?? "all"
             );
 
             var result = await _approvalService.GetApprovalHistory(employeeId, request);
@@ -118,7 +137,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Information(
                     "GetApprovalHistory API succeeded. EmployeeId={EmployeeId}, TotalCount={TotalCount}",
-                    employeeId, result.Data?.TotalCount ?? 0
+                    employeeId,
+                    result.Data?.TotalCount ?? 0
                 );
                 return Ok(result);
             }
@@ -126,7 +146,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "GetApprovalHistory API failed. EmployeeId={EmployeeId}, Message={Message}",
-                    employeeId, result.Message
+                    employeeId,
+                    result.Message
                 );
                 return BadRequest(result);
             }
@@ -135,7 +156,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// <summary>
         /// Gets detailed approval information including all attachments and assignment details.
         /// Enforces access control for requester and approver only.
-        /// </summary> 
+        /// </summary>
         [HttpGet("api/approvals/{approvalId}/details")]
         public async Task<IActionResult> GetApprovalDetails(int approvalId)
         {
@@ -143,7 +164,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             Log.Debug(
                 "GetApprovalDetails API called. ApprovalId={ApprovalId}, EmployeeId={EmployeeId}",
-                approvalId, employeeId
+                approvalId,
+                employeeId
             );
 
             var result = await _approvalService.GetApprovalDetails(employeeId, approvalId);
@@ -157,7 +179,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "GetApprovalDetails API failed. ApprovalId={ApprovalId}, Message={Message}",
-                    approvalId, result.Message
+                    approvalId,
+                    result.Message
                 );
                 return BadRequest(result);
             }
@@ -178,7 +201,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             Log.Information(
                 "DownloadApprovalAttachment API called. ApprovalId={ApprovalId}, EmployeeId={EmployeeId}",
-                approvalId, employeeId
+                approvalId,
+                employeeId
             );
 
             var result = await _approvalService.GetApprovalAttachment(employeeId, approvalId);
@@ -187,7 +211,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "DownloadApprovalAttachment API failed. ApprovalId={ApprovalId}, Message={Message}",
-                    approvalId, result.Message
+                    approvalId,
+                    result.Message
                 );
                 return BadRequest(result);
             }
@@ -198,7 +223,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             Log.Information(
                 "DownloadApprovalAttachment API succeeded. ApprovalId={ApprovalId}, FileName={FileName}, FileSize={FileSize} bytes",
-                approvalId, fileName, fileBytes.Length
+                approvalId,
+                fileName,
+                fileBytes.Length
             );
 
             return File(fileBytes, contentType, fileName);
@@ -215,7 +242,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             Log.Information(
                 "DownloadAssignmentProof API called. AssignmentId={AssignmentId}, EmployeeId={EmployeeId}",
-                assignmentId, employeeId
+                assignmentId,
+                employeeId
             );
 
             var result = await _approvalService.GetAssignmentProof(employeeId, assignmentId);
@@ -224,7 +252,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "DownloadAssignmentProof API failed. AssignmentId={AssignmentId}, Message={Message}",
-                    assignmentId, result.Message
+                    assignmentId,
+                    result.Message
                 );
                 return BadRequest(result);
             }
@@ -235,7 +264,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             Log.Information(
                 "DownloadAssignmentProof API succeeded. AssignmentId={AssignmentId}, FileName={FileName}, FileSize={FileSize} bytes",
-                assignmentId, fileName, fileBytes.Length
+                assignmentId,
+                fileName,
+                fileBytes.Length
             );
 
             return File(fileBytes, contentType, fileName);
@@ -256,23 +287,29 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             Log.Debug(
                 "GetApprovalAttachmentPreview API called. ApprovalId={ApprovalId}, EmployeeId={EmployeeId}",
-                approvalId, employeeId
+                approvalId,
+                employeeId
             );
 
-            var result = await _approvalService.GetApprovalAttachmentPreview(employeeId, approvalId);
+            var result = await _approvalService.GetApprovalAttachmentPreview(
+                employeeId,
+                approvalId
+            );
 
             if (!result.Success)
             {
                 Log.Warning(
                     "GetApprovalAttachmentPreview API failed. ApprovalId={ApprovalId}, Message={Message}",
-                    approvalId, result.Message
+                    approvalId,
+                    result.Message
                 );
                 return BadRequest(result);
             }
 
             Log.Debug(
                 "GetApprovalAttachmentPreview API succeeded. ApprovalId={ApprovalId}, FileName={FileName}",
-                approvalId, result.Data.FileName
+                approvalId,
+                result.Data.FileName
             );
 
             return File(
@@ -294,7 +331,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             Log.Debug(
                 "GetAssignmentProofPreview API called. AssignmentId={AssignmentId}, EmployeeId={EmployeeId}",
-                assignmentId, employeeId
+                assignmentId,
+                employeeId
             );
 
             var result = await _approvalService.GetAssignmentProofPreview(employeeId, assignmentId);
@@ -303,14 +341,16 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "GetAssignmentProofPreview API failed. AssignmentId={AssignmentId}, Message={Message}",
-                    assignmentId, result.Message
+                    assignmentId,
+                    result.Message
                 );
                 return BadRequest(result);
             }
 
             Log.Debug(
                 "GetAssignmentProofPreview API succeeded. AssignmentId={AssignmentId}, FileName={FileName}",
-                assignmentId, result.Data.FileName
+                assignmentId,
+                result.Data.FileName
             );
 
             return File(

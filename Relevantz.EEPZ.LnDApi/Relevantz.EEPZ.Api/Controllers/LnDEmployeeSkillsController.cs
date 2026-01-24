@@ -38,7 +38,10 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             if (result.Success)
             {
-                Log.Information("GetAllSkills API succeeded. SkillCount={Count}", result.Data?.Count ?? 0);
+                Log.Information(
+                    "GetAllSkills API succeeded. SkillCount={Count}",
+                    result.Data?.Count ?? 0
+                );
                 return Ok(result);
             }
             else
@@ -58,7 +61,10 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             Log.Information(
                 "GetMySkills API called. EmployeeId={EmployeeId}, SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
-                employeeId, request.SearchTerm ?? "none", request.PageNumber, request.PageSize
+                employeeId,
+                request.SearchTerm ?? "none",
+                request.PageNumber,
+                request.PageSize
             );
 
             var result = await _employeeSkillService.GetMySkills(employeeId, request);
@@ -67,7 +73,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Information(
                     "GetMySkills API succeeded. EmployeeId={EmployeeId}, TotalCount={TotalCount}",
-                    employeeId, result.Data?.TotalCount ?? 0
+                    employeeId,
+                    result.Data?.TotalCount ?? 0
                 );
                 return Ok(result);
             }
@@ -75,7 +82,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "GetMySkills API failed. EmployeeId={EmployeeId}, Message={Message}",
-                    employeeId, result.Message
+                    employeeId,
+                    result.Message
                 );
                 return BadRequest(result);
             }
@@ -85,13 +93,19 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Gets skills for subordinate employees with optional employee filter and search
         /// </summary>
         [HttpGet("api/lnd-skills/subordinates")]
-        public async Task<IActionResult> GetSubordinateSkills([FromQuery] SubordinateSkillsRequestModel request)
+        public async Task<IActionResult> GetSubordinateSkills(
+            [FromQuery] SubordinateSkillsRequestModel request
+        )
         {
             var managerId = GetCurrentEmployeeId();
 
             Log.Information(
                 "GetSubordinateSkills API called. ManagerId={ManagerId}, EmployeeId={EmployeeId}, SearchTerm={SearchTerm}, SortBy={SortBy}, Page={PageNumber}",
-                managerId, request.EmployeeId?.ToString() ?? "all", request.SearchTerm ?? "none", request.SortBy, request.PageNumber
+                managerId,
+                request.EmployeeId?.ToString() ?? "all",
+                request.SearchTerm ?? "none",
+                request.SortBy,
+                request.PageNumber
             );
 
             var result = await _employeeSkillService.GetSubordinateSkills(managerId, request);
@@ -100,7 +114,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Information(
                     "GetSubordinateSkills API succeeded. ManagerId={ManagerId}, TotalCount={TotalCount}",
-                    managerId, result.Data?.TotalCount ?? 0
+                    managerId,
+                    result.Data?.TotalCount ?? 0
                 );
                 return Ok(result);
             }
@@ -108,7 +123,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "GetSubordinateSkills API failed. ManagerId={ManagerId}, Message={Message}",
-                    managerId, result.Message
+                    managerId,
+                    result.Message
                 );
                 return BadRequest(result);
             }
@@ -122,13 +138,18 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Gets paginated list of subordinate employees with search capability
         /// </summary>
         [HttpGet("api/lnd-skills/employees/subordinates")]
-        public async Task<IActionResult> GetSubordinateEmployees([FromQuery] SubordinateEmployeesRequestModel request)
+        public async Task<IActionResult> GetSubordinateEmployees(
+            [FromQuery] SubordinateEmployeesRequestModel request
+        )
         {
             var managerId = GetCurrentEmployeeId();
 
             Log.Information(
                 "GetSubordinateEmployees API called. ManagerId={ManagerId}, SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
-                managerId, request.SearchTerm ?? "none", request.PageNumber, request.PageSize
+                managerId,
+                request.SearchTerm ?? "none",
+                request.PageNumber,
+                request.PageSize
             );
 
             var result = await _employeeSkillService.GetSubordinateEmployees(managerId, request);
@@ -137,7 +158,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Information(
                     "GetSubordinateEmployees API succeeded. ManagerId={ManagerId}, TotalCount={TotalCount}",
-                    managerId, result.Data?.TotalCount ?? 0
+                    managerId,
+                    result.Data?.TotalCount ?? 0
                 );
                 return Ok(result);
             }
@@ -145,7 +167,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "GetSubordinateEmployees API failed. ManagerId={ManagerId}, Message={Message}",
-                    managerId, result.Message
+                    managerId,
+                    result.Message
                 );
                 return BadRequest(result);
             }
@@ -159,13 +182,18 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Records a single skill rating for an employee
         /// </summary>
         [HttpPost("api/lnd-skills/record")]
-        public async Task<IActionResult> RecordEmployeeSkill([FromBody] RecordSkillRequestModel request)
+        public async Task<IActionResult> RecordEmployeeSkill(
+            [FromBody] RecordSkillRequestModel request
+        )
         {
             var managerId = GetCurrentEmployeeId();
 
             Log.Information(
                 "RecordEmployeeSkill API called. ManagerId={ManagerId}, EmployeeId={EmployeeId}, SkillId={SkillId}, Rating={Rating}",
-                managerId, request.EmployeeId, request.SkillId, request.Rating
+                managerId,
+                request.EmployeeId,
+                request.SkillId,
+                request.Rating
             );
 
             var result = await _employeeSkillService.RecordEmployeeSkill(managerId, request);
@@ -174,7 +202,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Information(
                     "RecordEmployeeSkill API succeeded. ManagerId={ManagerId}, EmployeeId={EmployeeId}, SkillId={SkillId}",
-                    managerId, request.EmployeeId, request.SkillId
+                    managerId,
+                    request.EmployeeId,
+                    request.SkillId
                 );
                 return Ok(result);
             }
@@ -182,7 +212,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "RecordEmployeeSkill API failed. ManagerId={ManagerId}, Message={Message}",
-                    managerId, result.Message
+                    managerId,
+                    result.Message
                 );
                 return BadRequest(result);
             }
@@ -192,13 +223,17 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Records multiple skill ratings for an employee in a single transaction
         /// </summary>
         [HttpPost("api/lnd-skills/record-bulk")]
-        public async Task<IActionResult> BulkRecordEmployeeSkills([FromBody] BulkRecordSkillRequestModel request)
+        public async Task<IActionResult> BulkRecordEmployeeSkills(
+            [FromBody] BulkRecordSkillRequestModel request
+        )
         {
             var managerId = GetCurrentEmployeeId();
 
             Log.Information(
                 "BulkRecordEmployeeSkills API called. ManagerId={ManagerId}, EmployeeId={EmployeeId}, SkillCount={Count}",
-                managerId, request.EmployeeId, request.Skills?.Count ?? 0
+                managerId,
+                request.EmployeeId,
+                request.Skills?.Count ?? 0
             );
 
             var result = await _employeeSkillService.BulkRecordEmployeeSkills(managerId, request);
@@ -207,7 +242,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Information(
                     "BulkRecordEmployeeSkills API succeeded. ManagerId={ManagerId}, EmployeeId={EmployeeId}, ProcessedCount={Count}",
-                    managerId, request.EmployeeId, request.Skills?.Count ?? 0
+                    managerId,
+                    request.EmployeeId,
+                    request.Skills?.Count ?? 0
                 );
                 return Ok(result);
             }
@@ -215,7 +252,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "BulkRecordEmployeeSkills API failed. ManagerId={ManagerId}, Message={Message}",
-                    managerId, result.Message
+                    managerId,
+                    result.Message
                 );
                 return BadRequest(result);
             }
@@ -225,13 +263,17 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Updates an existing employee skill rating
         /// </summary>
         [HttpPut("api/lnd-skills/rating")]
-        public async Task<IActionResult> UpdateEmployeeSkillRating([FromBody] UpdateSkillRatingRequestModel request)
+        public async Task<IActionResult> UpdateEmployeeSkillRating(
+            [FromBody] UpdateSkillRatingRequestModel request
+        )
         {
             var managerId = GetCurrentEmployeeId();
 
             Log.Information(
                 "UpdateEmployeeSkillRating API called. ManagerId={ManagerId}, MapperId={MapperId}, NewRating={NewRating}",
-                managerId, request.MapperId, request.Rating
+                managerId,
+                request.MapperId,
+                request.Rating
             );
 
             var result = await _employeeSkillService.UpdateEmployeeSkillRating(managerId, request);
@@ -240,7 +282,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Information(
                     "UpdateEmployeeSkillRating API succeeded. ManagerId={ManagerId}, MapperId={MapperId}, NewRating={NewRating}",
-                    managerId, request.MapperId, request.Rating
+                    managerId,
+                    request.MapperId,
+                    request.Rating
                 );
                 return Ok(result);
             }
@@ -248,7 +292,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "UpdateEmployeeSkillRating API failed. ManagerId={ManagerId}, MapperId={MapperId}, Message={Message}",
-                    managerId, request.MapperId, result.Message
+                    managerId,
+                    request.MapperId,
+                    result.Message
                 );
                 return BadRequest(result);
             }
@@ -264,7 +310,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             Log.Information(
                 "DeleteEmployeeSkill API called. ManagerId={ManagerId}, MapperId={MapperId}",
-                managerId, skillMapperId
+                managerId,
+                skillMapperId
             );
 
             var result = await _employeeSkillService.DeleteEmployeeSkill(managerId, skillMapperId);
@@ -273,7 +320,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Information(
                     "DeleteEmployeeSkill API succeeded. ManagerId={ManagerId}, MapperId={MapperId}",
-                    managerId, skillMapperId
+                    managerId,
+                    skillMapperId
                 );
                 return Ok(result);
             }
@@ -281,7 +329,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "DeleteEmployeeSkill API failed. ManagerId={ManagerId}, MapperId={MapperId}, Message={Message}",
-                    managerId, skillMapperId, result.Message
+                    managerId,
+                    skillMapperId,
+                    result.Message
                 );
                 return BadRequest(result);
             }

@@ -1,5 +1,5 @@
-using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Models;
 
 namespace Relevantz.EEPZ.Data.Repositories.Interface
 {
@@ -10,13 +10,13 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
         Task<Lndassignment> AddAssignment(Lndassignment assignment);
         Task UpdateAssignment(Lndassignment assignment);
         Task<(List<AssignmentResponseModel> Items, int TotalCount)> GetMyAssignments(
-       int employeeId,
-       AssignmentRequestModel request
-   );
+            int employeeId,
+            AssignmentRequestModel request
+        );
         Task<(List<AssignmentResponseModel> Items, int TotalCount)> GetTeamAssignments(
-        int managerId,
-        AssignmentRequestModel request
-    );
+            int managerId,
+            AssignmentRequestModel request
+        );
         Task<(List<AssignmentResponseModel> Items, int TotalCount)> GetSmeAssignments(
             int smeEmployeeId,
             AssignmentRequestModel request

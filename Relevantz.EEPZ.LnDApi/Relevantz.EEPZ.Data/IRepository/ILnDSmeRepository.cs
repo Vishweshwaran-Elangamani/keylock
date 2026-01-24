@@ -1,5 +1,5 @@
-using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Models;
 
 namespace Relevantz.EEPZ.Data.Repositories.Interface
 {
@@ -13,12 +13,12 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
             AvailableSmesRequestModel request,
             int maxAssignments
         );
-        
-    Task<(List<SmeResponseModel> Items, int TotalCount)> GetAllActiveSmes(
-        ActiveSmesRequestModel request
-    );
+
+        Task<(List<SmeResponseModel> Items, int TotalCount)> GetAllActiveSmes(
+            ActiveSmesRequestModel request
+        );
         Task<int> GetSmeInProgressAssignmentCount(int smeId);
-    
+
         Task<List<Lndsme>> GetAllActiveSmesForExport(ExportActiveSmesRequestModel request);
         Task<Lndsme?> GetSmeFromEmployeeId(Dictionary<string, object> assignmentDetails);
     }

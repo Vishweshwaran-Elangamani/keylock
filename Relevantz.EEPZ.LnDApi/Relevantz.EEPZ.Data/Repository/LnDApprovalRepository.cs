@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repositories.Interface;
 using Serilog;
@@ -31,9 +31,10 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             Log.Debug("GetApprovalByIdAsync called. ApprovalId={ApprovalId}", approvalId);
 
             var approval = await _context
-                .Lndapprovals
-                .Include(a => a.RequesterEmployee).ThenInclude(e => e.Userprofile)
-                .Include(a => a.ApproverEmployee).ThenInclude(e => e.Userprofile)
+                .Lndapprovals.Include(a => a.RequesterEmployee)
+                    .ThenInclude(e => e.Userprofile)
+                .Include(a => a.ApproverEmployee)
+                    .ThenInclude(e => e.Userprofile)
                 .Include(a => a.Skill)
                 .Include(a => a.Attachment)
                 .Include(a => a.Assignment)
@@ -43,7 +44,10 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             if (approval == null)
             {
-                Log.Warning("GetApprovalByIdAsync: Approval not found. ApprovalId={ApprovalId}", approvalId);
+                Log.Warning(
+                    "GetApprovalByIdAsync: Approval not found. ApprovalId={ApprovalId}",
+                    approvalId
+                );
             }
 
             return approval;
@@ -55,22 +59,25 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         public async Task<Lndapproval?> GetPendingSmeRegistration(int employeeId, int skillId)
         {
             return await _context.Lndapprovals.FirstOrDefaultAsync(a =>
-                a.RequesterEmployeeId == employeeId &&
-                a.SkillId == skillId &&
-                a.ApprovalType == LnDConstants.APPROVAL_TYPE.SME_REGISTRATION &&
-                a.Status == LnDConstants.APPROVAL_STATUS.PENDING
+                a.RequesterEmployeeId == employeeId
+                && a.SkillId == skillId
+                && a.ApprovalType == LnDConstants.APPROVAL_TYPE.SME_REGISTRATION
+                && a.Status == LnDConstants.APPROVAL_STATUS.PENDING
             );
         }
 
         /// <summary>
         /// Gets pending assignment approval
         /// </summary>
-        public async Task<Lndapproval?> GetPendingAssignmentApproval(int assignmentId, string approvalType)
+        public async Task<Lndapproval?> GetPendingAssignmentApproval(
+            int assignmentId,
+            string approvalType
+        )
         {
             return await _context.Lndapprovals.FirstOrDefaultAsync(a =>
-                a.AssignmentId == assignmentId &&
-                a.ApprovalType == approvalType &&
-                a.Status == LnDConstants.APPROVAL_STATUS.PENDING
+                a.AssignmentId == assignmentId
+                && a.ApprovalType == approvalType
+                && a.Status == LnDConstants.APPROVAL_STATUS.PENDING
             );
         }
 
@@ -85,9 +92,10 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             Log.Information("GetMyApprovalsAsync called. EmployeeId={EmployeeId}", employeeId);
 
             var query = _context
-                .Lndapprovals
-                .Include(a => a.RequesterEmployee).ThenInclude(e => e.Userprofile)
-                .Include(a => a.ApproverEmployee).ThenInclude(e => e.Userprofile)
+                .Lndapprovals.Include(a => a.RequesterEmployee)
+                    .ThenInclude(e => e.Userprofile)
+                .Include(a => a.ApproverEmployee)
+                    .ThenInclude(e => e.Userprofile)
                 .Include(a => a.Skill)
                 .Include(a => a.Attachment)
                 .Where(a => a.ApproverEmployeeId == employeeId);
@@ -96,9 +104,14 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             {
                 var s = request.SearchTerm.ToLower();
                 query = query.Where(a =>
-                    a.ApprovalType.ToLower().Contains(s) ||
-                    (a.RequesterEmployee.Userprofile.FirstName + " " +
-                     a.RequesterEmployee.Userprofile.LastName).ToLower().Contains(s)
+                    a.ApprovalType.ToLower().Contains(s)
+                    || (
+                        a.RequesterEmployee.Userprofile.FirstName
+                        + " "
+                        + a.RequesterEmployee.Userprofile.LastName
+                    )
+                        .ToLower()
+                        .Contains(s)
                 );
             }
 
@@ -107,7 +120,6 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             if (!string.IsNullOrEmpty(request.Status))
                 query = query.Where(a => a.Status == request.Status);
-
 
             query = query.OrderByDescending(a => a.RequestedOn);
 
@@ -125,18 +137,21 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                     SkillName = a.Skill != null ? a.Skill.SkillName : null,
                     RequesterEmployeeId = a.RequesterEmployeeId,
                     RequesterName =
-                        a.RequesterEmployee.Userprofile.FirstName + " " +
-                        a.RequesterEmployee.Userprofile.LastName,
+                        a.RequesterEmployee.Userprofile.FirstName
+                        + " "
+                        + a.RequesterEmployee.Userprofile.LastName,
                     ApproverEmployeeId = a.ApproverEmployeeId,
-                    ApproverName = a.ApproverEmployee != null
-                        ? a.ApproverEmployee.Userprofile.FirstName + " " +
-                          a.ApproverEmployee.Userprofile.LastName
-                        : null,
+                    ApproverName =
+                        a.ApproverEmployee != null
+                            ? a.ApproverEmployee.Userprofile.FirstName
+                                + " "
+                                + a.ApproverEmployee.Userprofile.LastName
+                            : null,
                     Status = a.Status,
                     Notes = a.Notes,
                     RequestedOn = a.RequestedOn,
                     UpdatedOn = a.UpdatedOn,
-                    AttachmentPath = a.Attachment != null ? a.Attachment.FilePath : null
+                    AttachmentPath = a.Attachment != null ? a.Attachment.FilePath : null,
                 })
                 .ToListAsync();
 
@@ -154,25 +169,29 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             Log.Information("GetApprovalHistoryAsync called. EmployeeId={EmployeeId}", employeeId);
 
             var query = _context
-                .Lndapprovals
-                .Include(a => a.RequesterEmployee).ThenInclude(e => e.Userprofile)
-                .Include(a => a.ApproverEmployee).ThenInclude(e => e.Userprofile)
+                .Lndapprovals.Include(a => a.RequesterEmployee)
+                    .ThenInclude(e => e.Userprofile)
+                .Include(a => a.ApproverEmployee)
+                    .ThenInclude(e => e.Userprofile)
                 .Include(a => a.Skill)
                 .Include(a => a.Attachment)
                 .AsQueryable();
 
-            if (!string.IsNullOrEmpty(request.Role) &&
-                request.Role.ToLower() != LnDConstants.ROLE_FILTERS.ALL)
+            if (
+                !string.IsNullOrEmpty(request.Role)
+                && request.Role.ToLower() != LnDConstants.ROLE_FILTERS.ALL
+            )
             {
-                query = request.Role.ToLower() == LnDConstants.ROLE_FILTERS.REQUESTER
-                    ? query.Where(a => a.RequesterEmployeeId == employeeId)
-                    : query.Where(a => a.ApproverEmployeeId == employeeId);
+                query =
+                    request.Role.ToLower() == LnDConstants.ROLE_FILTERS.REQUESTER
+                        ? query.Where(a => a.RequesterEmployeeId == employeeId)
+                        : query.Where(a => a.ApproverEmployeeId == employeeId);
             }
             else
             {
                 query = query.Where(a =>
-                    a.RequesterEmployeeId == employeeId ||
-                    a.ApproverEmployeeId == employeeId);
+                    a.RequesterEmployeeId == employeeId || a.ApproverEmployeeId == employeeId
+                );
             }
 
             if (!string.IsNullOrEmpty(request.ApprovalType))
@@ -185,8 +204,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             {
                 var s = request.SearchTerm.ToLower();
                 query = query.Where(a =>
-                    a.ApprovalType.ToLower().Contains(s) ||
-                    a.Status.ToLower().Contains(s)
+                    a.ApprovalType.ToLower().Contains(s) || a.Status.ToLower().Contains(s)
                 );
             }
 
@@ -206,18 +224,21 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                     SkillName = a.Skill != null ? a.Skill.SkillName : null,
                     RequesterEmployeeId = a.RequesterEmployeeId,
                     RequesterName =
-                        a.RequesterEmployee.Userprofile.FirstName + " " +
-                        a.RequesterEmployee.Userprofile.LastName,
+                        a.RequesterEmployee.Userprofile.FirstName
+                        + " "
+                        + a.RequesterEmployee.Userprofile.LastName,
                     ApproverEmployeeId = a.ApproverEmployeeId,
-                    ApproverName = a.ApproverEmployee != null
-                        ? a.ApproverEmployee.Userprofile.FirstName + " " +
-                          a.ApproverEmployee.Userprofile.LastName
-                        : null,
+                    ApproverName =
+                        a.ApproverEmployee != null
+                            ? a.ApproverEmployee.Userprofile.FirstName
+                                + " "
+                                + a.ApproverEmployee.Userprofile.LastName
+                            : null,
                     Status = a.Status,
                     Notes = a.Notes,
                     RequestedOn = a.RequestedOn,
                     UpdatedOn = a.UpdatedOn,
-                    AttachmentPath = a.Attachment != null ? a.Attachment.FilePath : null
+                    AttachmentPath = a.Attachment != null ? a.Attachment.FilePath : null,
                 })
                 .ToListAsync();
 
@@ -251,7 +272,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         public async Task<Lndattachment?> GetAttachmentById(int attachmentId)
         {
-            return await _context.Lndattachments.FirstOrDefaultAsync(a => a.AttachmentId == attachmentId);
+            return await _context.Lndattachments.FirstOrDefaultAsync(a =>
+                a.AttachmentId == attachmentId
+            );
         }
 
         #endregion

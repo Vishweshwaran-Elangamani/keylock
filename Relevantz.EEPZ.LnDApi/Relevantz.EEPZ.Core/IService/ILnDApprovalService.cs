@@ -9,7 +9,7 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             MyApprovalsRequestModel request
         );
         Task<ApiResponse<bool>> ProcessApproval(
-            int approverId, 
+            int approverId,
             ApprovalDecisionRequestModel request
         );
         Task<ApiResponse<PaginatedResponse<ApprovalResponseModel>>> GetApprovalHistory(
@@ -17,24 +17,24 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             ApprovalHistoryRequestModel request
         );
         Task<ApiResponse<ApprovalDetailsResponseModel>> GetApprovalDetails(
-            int employeeId, 
+            int employeeId,
             int approvalId
         );
         Task<ApiResponse<FileDownloadResponseModel>> GetApprovalAttachment(
-            int employeeId, 
+            int employeeId,
             int approvalId
         );
         Task<ApiResponse<FileDownloadResponseModel>> GetAssignmentProof(
-            int employeeId, 
+            int employeeId,
             int assignmentId
         );
         Task<ApiResponse<FileDownloadResponseModel>> GetApprovalAttachmentPreview(
             int employeeId,
             int approvalId
-        );  
+        );
         Task<ApiResponse<FileDownloadResponseModel>> GetAssignmentProofPreview(
-            int employeeId, 
+            int employeeId,
             int assignmentId
-        );   
+        );
     }
 }

@@ -8,13 +8,14 @@ namespace Relevantz.EEPZ.Common.Validators
         public RecordSkillRequestModelValidator()
         {
             RuleFor(x => x.EmployeeId)
-                .GreaterThan(0).WithMessage("EmployeeId must be greater than 0");
+                .GreaterThan(0)
+                .WithMessage("EmployeeId must be greater than 0");
 
-            RuleFor(x => x.SkillId)
-                .GreaterThan(0).WithMessage("SkillId must be greater than 0");
+            RuleFor(x => x.SkillId).GreaterThan(0).WithMessage("SkillId must be greater than 0");
 
             RuleFor(x => x.Rating)
-                .InclusiveBetween(1, 10).WithMessage("Rating must be between 1 and 10");
+                .InclusiveBetween(1, 10)
+                .WithMessage("Rating must be between 1 and 10");
         }
     }
 }

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repositories.Interface;
 using Serilog;
@@ -24,46 +24,52 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         #region Employee Queries
 
         /// <summary>
-        /// Gets paginated active employees with search across name, email, and department 
+        /// Gets paginated active employees with search across name, email, and department
         /// </summary>
-        public async Task<(List<SubordinateEmployeeResponseModel> Items, int TotalCount)> GetAllOrganizationEmployees(
-      OrganizationEmployeesRequestModel request
-  )
+        public async Task<(
+            List<SubordinateEmployeeResponseModel> Items,
+            int TotalCount
+        )> GetAllOrganizationEmployees(OrganizationEmployeesRequestModel request)
         {
             Log.Information(
                 "GetAllOrganizationEmployeesAsync called. SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}, ExcludeDepartment={ExcludeDepartment}",
-                request.SearchTerm ?? "none", request.PageNumber, request.PageSize, request.ExcludeDepartment ?? "none"
+                request.SearchTerm ?? "none",
+                request.PageNumber,
+                request.PageSize,
+                request.ExcludeDepartment ?? "none"
             );
 
-            var baseQuery = _context.Employees
-                .Include(e => e.Userprofile)
+            var baseQuery = _context
+                .Employees.Include(e => e.Userprofile)
                 .Include(e => e.Userauthentication)
                 .Include(e => e.Employeedetailsmasters)
-                .ThenInclude(ed => ed.Department)
+                    .ThenInclude(ed => ed.Department)
                 .Where(e => e.EmploymentStatus == "Active");
-
 
             if (!string.IsNullOrEmpty(request.ExcludeDepartment))
             {
                 baseQuery = baseQuery.Where(e =>
-                    !e.Employeedetailsmasters.Any(edm => edm.Department.DepartmentName == request.ExcludeDepartment)
+                    !e.Employeedetailsmasters.Any(edm =>
+                        edm.Department.DepartmentName == request.ExcludeDepartment
+                    )
                 );
             }
-
 
             if (!string.IsNullOrEmpty(request.SearchTerm))
             {
                 var lowerSearchTerm = request.SearchTerm.ToLower();
                 baseQuery = baseQuery.Where(e =>
                     (e.Userprofile.FirstName + " " + e.Userprofile.LastName)
-                        .ToLower().Contains(lowerSearchTerm)
+                        .ToLower()
+                        .Contains(lowerSearchTerm)
                     || e.Userauthentication.Email.ToLower().Contains(lowerSearchTerm)
-                    || e.Employeedetailsmasters.Any(edm => edm.Department.DepartmentName.ToLower().Contains(lowerSearchTerm))
+                    || e.Employeedetailsmasters.Any(edm =>
+                        edm.Department.DepartmentName.ToLower().Contains(lowerSearchTerm)
+                    )
                 );
             }
 
             var totalCount = await baseQuery.CountAsync();
-
 
             var items = await baseQuery
                 .OrderBy(e => e.Userprofile.FirstName)
@@ -73,35 +79,36 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .Select(e => new SubordinateEmployeeResponseModel
                 {
                     EmployeeId = e.EmployeeId,
-                    EmployeeName = e.Userprofile != null
-                        ? e.Userprofile.FirstName + " " + e.Userprofile.LastName
-                        : null,
+                    EmployeeName =
+                        e.Userprofile != null
+                            ? e.Userprofile.FirstName + " " + e.Userprofile.LastName
+                            : null,
                     Email = e.Userauthentication != null ? e.Userauthentication.Email : null,
-                    DepartmentName = e.Employeedetailsmasters.FirstOrDefault(ed => ed.Department != null) != null
-                        ? e.Employeedetailsmasters.FirstOrDefault(ed => ed.Department != null).Department.DepartmentName
-                        : null
+                    DepartmentName =
+                        e.Employeedetailsmasters.FirstOrDefault(ed => ed.Department != null) != null
+                            ? e
+                                .Employeedetailsmasters.FirstOrDefault(ed => ed.Department != null)
+                                .Department.DepartmentName
+                            : null,
                 })
                 .ToListAsync();
 
             Log.Information(
                 "GetAllOrganizationEmployeesAsync completed. ReturnedCount={Count}, TotalCount={TotalCount}",
-                items.Count, totalCount
+                items.Count,
+                totalCount
             );
 
             return (items, totalCount);
         }
 
-
         /// <summary>
-        /// Gets paginated skills for a specific employee with SME data included 
+        /// Gets paginated skills for a specific employee with SME data included
         /// </summary>
         public async Task<(
-     List<Lndemployeeskillmapper> Items,
-     int TotalCount
- )> GetEmployeeSkillsById(
-     int employeeId,
-     EmployeeSkillsByIdRequestModel request
- )
+            List<Lndemployeeskillmapper> Items,
+            int TotalCount
+        )> GetEmployeeSkillsById(int employeeId, EmployeeSkillsByIdRequestModel request)
         {
             Log.Information(
                 "GetEmployeeSkillsByIdAsync called. EmployeeId={EmployeeId}, SearchTerm={SearchTerm}, Page={PageNumber}",
@@ -110,19 +117,17 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 request.PageNumber
             );
 
-            var query = _context.Lndemployeeskillmappers
-                .Include(m => m.Employee)
+            var query = _context
+                .Lndemployeeskillmappers.Include(m => m.Employee)
                     .ThenInclude(e => e.Userprofile)
                 .Include(m => m.Skill)
                     .ThenInclude(s => s.Lndsmes)
                 .AsNoTracking()
                 .Where(m => m.EmployeeId == employeeId);
 
-
             if (!string.IsNullOrEmpty(request.SearchTerm))
             {
-                query = query.Where(m =>
-                    m.Skill.SkillName.Contains(request.SearchTerm));
+                query = query.Where(m => m.Skill.SkillName.Contains(request.SearchTerm));
             }
 
             var pageSize = 10;
@@ -149,13 +154,15 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         #region Assignment Queries
 
         /// <summary>
-        /// Gets paginated organization-wide assignments with filtering, search, and sorting 
+        /// Gets paginated organization-wide assignments with filtering, search, and sorting
         /// </summary>
-        public async Task<(List<Lndassignment> Items, int TotalCount)>
-     GetAllOrganizationAssignments(OrganizationAssignmentsRequestModel request)
+        public async Task<(
+            List<Lndassignment> Items,
+            int TotalCount
+        )> GetAllOrganizationAssignments(OrganizationAssignmentsRequestModel request)
         {
-            var query = _context.Lndassignments
-                .Include(a => a.MenteeEmployee)
+            var query = _context
+                .Lndassignments.Include(a => a.MenteeEmployee)
                     .ThenInclude(e => e.Userprofile)
                 .Include(a => a.MenteeEmployee)
                     .ThenInclude(e => e.Employeedetailsmasters)
@@ -167,23 +174,21 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .AsNoTracking()
                 .AsQueryable();
 
-
             if (!string.IsNullOrEmpty(request.StatusFilter))
             {
                 query = query.Where(a => a.Status == request.StatusFilter);
             }
-
 
             if (!string.IsNullOrEmpty(request.SearchTerm))
             {
                 var search = request.SearchTerm.ToLower();
 
                 query = query.Where(a =>
-                    (a.Skill.SkillName ?? "").ToLower().Contains(search) ||
-                    (a.MenteeEmployee.Userprofile.FirstName ?? "").ToLower().Contains(search) ||
-                    (a.MenteeEmployee.Userprofile.LastName ?? "").ToLower().Contains(search) ||
-                    (a.Sme.Employee.Userprofile.FirstName ?? "").ToLower().Contains(search) ||
-                    (a.Sme.Employee.Userprofile.LastName ?? "").ToLower().Contains(search)
+                    (a.Skill.SkillName ?? "").ToLower().Contains(search)
+                    || (a.MenteeEmployee.Userprofile.FirstName ?? "").ToLower().Contains(search)
+                    || (a.MenteeEmployee.Userprofile.LastName ?? "").ToLower().Contains(search)
+                    || (a.Sme.Employee.Userprofile.FirstName ?? "").ToLower().Contains(search)
+                    || (a.Sme.Employee.Userprofile.LastName ?? "").ToLower().Contains(search)
                 );
             }
 
@@ -197,13 +202,12 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             return (items, totalCount);
         }
 
-
         /// <summary>
-        /// Gets all organization assignments for Excel export without pagination 
+        /// Gets all organization assignments for Excel export without pagination
         /// </summary>
         public async Task<List<Lndassignment>> GetAllOrganizationAssignmentsForExport(
-      ExportOrganizationAssignmentsRequestModel request
-  )
+            ExportOrganizationAssignmentsRequestModel request
+        )
         {
             Log.Information(
                 "GetAllOrganizationAssignmentsForExportAsync called. StatusFilter={StatusFilter}, SearchTerm={SearchTerm}",
@@ -211,8 +215,8 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 request.SearchTerm ?? "none"
             );
 
-            var query = _context.Lndassignments
-                .Include(a => a.MenteeEmployee)
+            var query = _context
+                .Lndassignments.Include(a => a.MenteeEmployee)
                     .ThenInclude(e => e.Userprofile)
                 .Include(a => a.MenteeEmployee)
                     .ThenInclude(e => e.Employeedetailsmasters)
@@ -224,32 +228,42 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .AsNoTracking()
                 .AsQueryable();
 
-
             if (!string.IsNullOrEmpty(request.StatusFilter))
             {
                 query = query.Where(a => a.Status == request.StatusFilter);
             }
-
 
             if (!string.IsNullOrEmpty(request.SearchTerm))
             {
                 var lowerSearchTerm = request.SearchTerm.ToLower();
 
                 query = query.Where(a =>
-                    (a.MenteeEmployee.Userprofile.FirstName ?? "").ToLower().Contains(lowerSearchTerm)
-                    || (a.MenteeEmployee.Userprofile.LastName ?? "").ToLower().Contains(lowerSearchTerm)
+                    (a.MenteeEmployee.Userprofile.FirstName ?? "")
+                        .ToLower()
+                        .Contains(lowerSearchTerm)
+                    || (a.MenteeEmployee.Userprofile.LastName ?? "")
+                        .ToLower()
+                        .Contains(lowerSearchTerm)
                     || (
                         (a.MenteeEmployee.Userprofile.FirstName ?? "")
                         + " "
                         + (a.MenteeEmployee.Userprofile.LastName ?? "")
-                    ).ToLower().Contains(lowerSearchTerm)
-                    || (a.Sme.Employee.Userprofile.FirstName ?? "").ToLower().Contains(lowerSearchTerm)
-                    || (a.Sme.Employee.Userprofile.LastName ?? "").ToLower().Contains(lowerSearchTerm)
+                    )
+                        .ToLower()
+                        .Contains(lowerSearchTerm)
+                    || (a.Sme.Employee.Userprofile.FirstName ?? "")
+                        .ToLower()
+                        .Contains(lowerSearchTerm)
+                    || (a.Sme.Employee.Userprofile.LastName ?? "")
+                        .ToLower()
+                        .Contains(lowerSearchTerm)
                     || (
                         (a.Sme.Employee.Userprofile.FirstName ?? "")
                         + " "
                         + (a.Sme.Employee.Userprofile.LastName ?? "")
-                    ).ToLower().Contains(lowerSearchTerm)
+                    )
+                        .ToLower()
+                        .Contains(lowerSearchTerm)
                     || (a.Skill.SkillName ?? "").ToLower().Contains(lowerSearchTerm)
                 );
             }

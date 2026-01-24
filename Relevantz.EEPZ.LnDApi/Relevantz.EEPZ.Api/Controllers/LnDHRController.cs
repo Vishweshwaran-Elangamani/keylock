@@ -39,7 +39,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         {
             Log.Information(
                 "GetAllOrganizationAssignments API called. StatusFilter={StatusFilter}, Page={PageNumber}, PageSize={PageSize}",
-                request.StatusFilter ?? "all", request.PageNumber, request.PageSize
+                request.StatusFilter ?? "all",
+                request.PageNumber,
+                request.PageSize
             );
 
             var result = await _hrService.GetAllOrganizationAssignments(request);
@@ -90,7 +92,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             Log.Information(
                 "GetOrganizationAssignmentsForExport API succeeded. FileName={FileName}, FileSize={FileSize} bytes",
-                fileName, result.Data.Length
+                fileName,
+                result.Data.Length
             );
 
             return File(
@@ -114,7 +117,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         {
             Log.Information(
                 "GetAllOrganizationEmployees API called. SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
-                request.SearchTerm ?? "none", request.PageNumber, request.PageSize
+                request.SearchTerm ?? "none",
+                request.PageNumber,
+                request.PageSize
             );
 
             var result = await _hrService.GetAllOrganizationEmployees(request);
@@ -148,7 +153,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         {
             Log.Information(
                 "GetEmployeeSkillsById API called. EmployeeId={EmployeeId}, Page={PageNumber}, SearchTerm={SearchTerm}",
-                employeeId, request.PageNumber, request.SearchTerm ?? "none"
+                employeeId,
+                request.PageNumber,
+                request.SearchTerm ?? "none"
             );
 
             var result = await _hrService.GetEmployeeSkillsById(employeeId, request);
@@ -157,7 +164,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Information(
                     "GetEmployeeSkillsById API succeeded. EmployeeId={EmployeeId}, TotalCount={TotalCount}",
-                    employeeId, result.Data?.TotalCount ?? 0
+                    employeeId,
+                    result.Data?.TotalCount ?? 0
                 );
                 return Ok(result);
             }
@@ -165,7 +173,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "GetEmployeeSkillsById API failed. EmployeeId={EmployeeId}, Message={Message}",
-                    employeeId, result.Message
+                    employeeId,
+                    result.Message
                 );
                 return BadRequest(result);
             }
@@ -185,7 +194,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         {
             Log.Information(
                 "GetAllActiveSmes API called. SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
-                request.SearchTerm ?? "none", request.PageNumber, request.PageSize
+                request.SearchTerm ?? "none",
+                request.PageNumber,
+                request.PageSize
             );
 
             var result = await _smeService.GetAllActiveSmes(request);
@@ -200,10 +211,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             }
             else
             {
-                Log.Warning(
-                    "GetAllActiveSmes API failed. Message={Message}",
-                    result.Message
-                );
+                Log.Warning("GetAllActiveSmes API failed. Message={Message}", result.Message);
                 return BadRequest(result);
             }
         }
@@ -236,7 +244,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             Log.Information(
                 "GetAllActiveSmesForExport API succeeded. FileName={FileName}, FileSize={FileSize} bytes",
-                fileName, result.Data.Length
+                fileName,
+                result.Data.Length
             );
 
             return File(

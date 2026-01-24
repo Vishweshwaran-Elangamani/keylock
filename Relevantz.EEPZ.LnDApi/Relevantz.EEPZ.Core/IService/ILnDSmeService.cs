@@ -6,8 +6,12 @@ namespace Relevantz.EEPZ.Core.Services.Interface
     {
         Task<ApiResponse<bool>> CheckIfEmployeeIsSme(int employeeId);
         Task<ApiResponse<int>> ApplyToBecomeSme(int employeeId, BecomeSmeRequestModel request);
-        Task<ApiResponse<PaginatedResponse<SmeResponseModel>>> GetAvailableSmes(AvailableSmesRequestModel request);
-        Task<ApiResponse<PaginatedResponse<SmeResponseModel>>> GetAllActiveSmes(ActiveSmesRequestModel request);
+        Task<ApiResponse<PaginatedResponse<SmeResponseModel>>> GetAvailableSmes(
+            AvailableSmesRequestModel request
+        );
+        Task<ApiResponse<PaginatedResponse<SmeResponseModel>>> GetAllActiveSmes(
+            ActiveSmesRequestModel request
+        );
         Task<ApiResponse<byte[]>> GetAllActiveSmesForExport(ExportActiveSmesRequestModel request);
     }
 }

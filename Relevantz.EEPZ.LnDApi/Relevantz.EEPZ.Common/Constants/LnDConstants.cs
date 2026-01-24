@@ -137,10 +137,9 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string APPROVER = "approver";
         }
 
-        /// <summary> 
-        /// Team Assignment export constants 
         /// <summary>
-
+        /// Team Assignment export constants
+        /// <summary>
         public static class TEAM_EXPORT
         {
             public const string TITLE = "Team Assignment";
@@ -155,7 +154,6 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string DUE_DATE = "Due Date";
             public const string SCORE = "Score";
             public const string COMMENTS = "Comments";
-
         }
 
         public static class ACTIVE_SMES_EXPORT
@@ -181,7 +179,6 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string DUE_DATE = "Due Date";
             public const string SCORE = "Score";
             public const string COMMENTS = "Comments";
-
         }
 
         public static class RESPONSE_MESSAGES
@@ -192,46 +189,35 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string FAILED = "Operation failed";
             public const string ACCESS_DENIED = "You do not have access to this resource";
             public const string NOT_FOUND = "Requested resource not found";
-            public const string EMPLOYEES_FOUND =
-    "Found {0} employee(s)";
+            public const string EMPLOYEES_FOUND = "Found {0} employee(s)";
 
             // Approval
             public const string APPROVAL_NOT_FOUND_OR_NOT_APPROVER =
                 "Approval not found or you are not the approver";
 
-            public const string APPROVAL_ALREADY_PROCESSED =
-                "Approval has already been processed";
+            public const string APPROVAL_ALREADY_PROCESSED = "Approval has already been processed";
 
-            public const string APPROVAL_PROCESSED_SUCCESS =
-                "Approval processed successfully";
+            public const string APPROVAL_PROCESSED_SUCCESS = "Approval processed successfully";
 
-            public const string APPROVAL_REJECTED_SUCCESS =
-                "Request rejected successfully";
+            public const string APPROVAL_REJECTED_SUCCESS = "Request rejected successfully";
 
-            public const string APPROVAL_NOT_FOUND =
-                "Approval not found";
+            public const string APPROVAL_NOT_FOUND = "Approval not found";
 
             // Assignment
-            public const string ASSIGNMENT_NOT_FOUND =
-                "Assignment not found";
-            public const string ASSIGNMENTS_FOUND =
-       "Found {0} assignment(s)";
-            public const string ASSIGNMENT_ACCESS_DENIED =
-                "Assignment not found or access denied";
+            public const string ASSIGNMENT_NOT_FOUND = "Assignment not found";
+            public const string ASSIGNMENTS_FOUND = "Found {0} assignment(s)";
+            public const string ASSIGNMENT_ACCESS_DENIED = "Assignment not found or access denied";
 
             public const string ASSIGNMENT_PROOF_NOT_FOUND =
                 "No proof document found for this assignment";
 
             // SME
-            public const string SME_NOT_FOUND =
-                "SME not found";
-
+            public const string SME_NOT_FOUND = "SME not found";
 
             public const string SME_MIN_RATING_REQUIRED =
-"You need a rating of at least {0} to become an SME";
+                "You need a rating of at least {0} to become an SME";
 
-            public const string ALREADY_ACTIVE_SME =
-                "You are already an active SME for this skill";
+            public const string ALREADY_ACTIVE_SME = "You are already an active SME for this skill";
 
             public const string SME_REGISTRATION_ALREADY_PENDING =
                 "You already have a pending SME registration request";
@@ -239,19 +225,15 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string SME_REGISTRATION_REQUEST_SUCCESS =
                 "SME registration request submitted successfully";
 
-            public const string ACTIVE_SMES_FOUND =
-                "Found {0} active SME(s)";
+            public const string ACTIVE_SMES_FOUND = "Found {0} active SME(s)";
 
             // Attachment
-            public const string ATTACHMENT_NOT_FOUND =
-                "No attachment found for this approval";
+            public const string ATTACHMENT_NOT_FOUND = "No attachment found for this approval";
 
-            public const string ATTACHMENT_ACCESS_DENIED =
-                "Approval not found or access denied";
-
+            public const string ATTACHMENT_ACCESS_DENIED = "Approval not found or access denied";
 
             public const string EMPLOYEE_NOT_FOUND_OR_NOT_SUBORDINATE =
-     "Employee not found or not your subordinate";
+                "Employee not found or not your subordinate";
 
             public const string SKILL_RATING_TOO_HIGH_FOR_SME_REQUEST =
                 "Employee must have a skill rating below minimum to request SME assignment";
@@ -260,8 +242,7 @@ namespace Relevantz.EEPZ.Common.Constants
                 "SME assignment request sent successfully";
 
             // Assignment – Upload completion proof
-            public const string ASSIGNMENT_NOT_IN_PROGRESS =
-                "Assignment is not in progress";
+            public const string ASSIGNMENT_NOT_IN_PROGRESS = "Assignment is not in progress";
 
             public const string COMPLETION_PROOF_UPLOAD_SUCCESS =
                 "Completion proof uploaded successfully. Awaiting SME acknowledgement.";
@@ -270,49 +251,36 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string ASSIGNMENT_NOT_READY_FOR_COMPLETION =
                 "Assignment is not ready for completion";
 
-            public const string ASSIGNMENT_COMPLETED_SUCCESS =
-                "Assignment completed successfully";
+            public const string ASSIGNMENT_COMPLETED_SUCCESS = "Assignment completed successfully";
 
             // Overdue
-            public const string OVERDUE_ASSIGNMENTS_MARKED =
-                "assignment(s) marked as overdue";
+            public const string OVERDUE_ASSIGNMENTS_MARKED = "assignment(s) marked as overdue";
 
-            public const string MANAGER_NOT_FOUND =
-              "Manager not found";
+            public const string MANAGER_NOT_FOUND = "Manager not found";
+
             // Skills
-            public const string SKILL_NOT_FOUND =
-                "Skill not found";
+            public const string SKILL_NOT_FOUND = "Skill not found";
 
-            public const string SKILL_ALREADY_RECORDED =
-                "Skill already recorded for this employee";
+            public const string SKILL_ALREADY_RECORDED = "Skill already recorded for this employee";
 
-            public const string SKILL_RECORDED_SUCCESS =
-                "Skill recorded successfully";
+            public const string SKILL_RECORDED_SUCCESS = "Skill recorded successfully";
 
-            public const string SKILL_RATING_UPDATED_SUCCESS =
-                "Skill rating updated successfully";
+            public const string SKILL_RATING_UPDATED_SUCCESS = "Skill rating updated successfully";
 
             public const string SKILL_MAPPING_NOT_FOUND_OR_UNAUTHORIZED =
                 "Skill mapping not found or employee not your subordinate";
 
-            public const string SKILL_DELETED_SUCCESS =
-                "Skill deleted successfully";
+            public const string SKILL_DELETED_SUCCESS = "Skill deleted successfully";
 
             // Fetch messages
-            public const string SUBORDINATES_FOUND =
-                "Found {0} subordinate(s)";
+            public const string SUBORDINATES_FOUND = "Found {0} subordinate(s)";
 
-            public const string SKILLS_FOUND =
-                "Found {0} skill(s)";
+            public const string SKILLS_FOUND = "Found {0} skill(s)";
 
-            public const string BULK_SKILLS_RECORDED =
-                "{0} skills recorded successfully";
+            public const string BULK_SKILLS_RECORDED = "{0} skills recorded successfully";
 
             public const string SKILL_DELETE_WITH_ASSIGNMENTS =
                 "Skill deleted successfully. {0} active assignment(s) removed. SME status deactivated if applicable.";
-
-
         }
     }
 }
-

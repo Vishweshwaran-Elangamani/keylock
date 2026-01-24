@@ -7,7 +7,6 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
     /// <summary>
     /// Base controller for LnD module with shared helper methods
     /// </summary>
-    
     public abstract class BaseLnDController : ControllerBase
     {
         protected int GetCurrentEmployeeId()
@@ -16,10 +15,12 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             if (string.IsNullOrEmpty(employeeIdClaim))
             {
-                throw new UnauthorizedAccessException(LnDConstants.RESPONSE_MESSAGES.EMPLOYEE_ID_NOT_FOUND_TOKEN); 
+                throw new UnauthorizedAccessException(
+                    LnDConstants.RESPONSE_MESSAGES.EMPLOYEE_ID_NOT_FOUND_TOKEN
+                );
             }
 
-            return int.Parse(employeeIdClaim); 
+            return int.Parse(employeeIdClaim);
         }
     }
 }

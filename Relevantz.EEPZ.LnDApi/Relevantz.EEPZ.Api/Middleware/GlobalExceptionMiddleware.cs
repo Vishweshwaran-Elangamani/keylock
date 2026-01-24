@@ -18,7 +18,6 @@ namespace Relevantz.EEPZ.Api.Middleware
         {
             try
             {
-
                 await _next(context);
             }
             catch (Exception ex)
@@ -44,13 +43,13 @@ namespace Relevantz.EEPZ.Api.Middleware
             {
                 Success = false,
                 Message = "An error occurred while processing your request",
-                Errors = new List<string> { exception.Message }
+                Errors = new List<string> { exception.Message },
             };
 
-            var jsonResponse = JsonSerializer.Serialize(response, new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            });
+            var jsonResponse = JsonSerializer.Serialize(
+                response,
+                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
+            );
 
             return context.Response.WriteAsync(jsonResponse);
         }

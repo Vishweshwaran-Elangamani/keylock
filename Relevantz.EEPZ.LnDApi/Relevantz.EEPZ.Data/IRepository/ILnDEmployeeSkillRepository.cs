@@ -1,5 +1,5 @@
-using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Models;
 
 namespace Relevantz.EEPZ.Data.Repositories.Interface
 {
@@ -19,9 +19,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
         Task<Lndemployeeskillmapper?> GetEmployeeSkillMapping(int employeeId, int skillId);
         Task<Lndemployeeskillmapper?> GetEmployeeSkillMappingById(int skillMapperId);
         Task<Lndemployeeskillmapper> AddEmployeeSkill(Lndemployeeskillmapper mapper);
-        Task<List<Lndemployeeskillmapper>> AddEmployeeSkills(
-            List<Lndemployeeskillmapper> mappers
-        );
+        Task<List<Lndemployeeskillmapper>> AddEmployeeSkills(List<Lndemployeeskillmapper> mappers);
         Task UpdateEmployeeSkill(Lndemployeeskillmapper mapper);
         Task DeleteEmployeeSkill(Lndemployeeskillmapper mapper);
         Task<(List<Lndemployeeskillmapper> Items, int TotalCount)> GetMySkills(

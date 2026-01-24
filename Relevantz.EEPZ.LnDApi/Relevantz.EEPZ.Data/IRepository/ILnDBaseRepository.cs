@@ -4,8 +4,6 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
 {
     public interface ILnDBaseRepository
     {
-
         Task<int> SaveChangesAsync();
     }
-
 }

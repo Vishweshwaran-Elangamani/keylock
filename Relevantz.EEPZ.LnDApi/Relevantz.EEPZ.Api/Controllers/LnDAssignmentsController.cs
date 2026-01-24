@@ -40,11 +40,17 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             if (!result.Success)
             {
-                Log.Warning("CheckOverdueAssignments API failed. Message={Message}", result.Message);
+                Log.Warning(
+                    "CheckOverdueAssignments API failed. Message={Message}",
+                    result.Message
+                );
                 return BadRequest(result);
             }
 
-            Log.Information("CheckOverdueAssignments API succeeded. OverdueCount={Count}", result.Data);
+            Log.Information(
+                "CheckOverdueAssignments API succeeded. OverdueCount={Count}",
+                result.Data
+            );
             return Ok(result);
         }
 
@@ -58,7 +64,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             Log.Information(
                 "RequestSmeAssignment API called. ManagerId={ManagerId}, MenteeId={MenteeId}, SkillId={SkillId}",
-                managerId, request.MenteeEmployeeId, request.SkillId
+                managerId,
+                request.MenteeEmployeeId,
+                request.SkillId
             );
 
             var result = await _assignmentService.RequestSmeAssignment(managerId, request);
@@ -67,7 +75,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Information(
                     "RequestSmeAssignment API succeeded. ManagerId={ManagerId}, MenteeId={MenteeId}",
-                    managerId, request.MenteeEmployeeId
+                    managerId,
+                    request.MenteeEmployeeId
                 );
                 return Ok(result);
             }
@@ -75,7 +84,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "RequestSmeAssignment API failed. ManagerId={ManagerId}, Message={Message}",
-                    managerId, result.Message
+                    managerId,
+                    result.Message
                 );
                 return BadRequest(result);
             }
@@ -93,7 +103,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             Log.Information(
                 "UploadCompletionProof API called. EmployeeId={EmployeeId}, AssignmentId={AssignmentId}",
-                employeeId, request.AssignmentId
+                employeeId,
+                request.AssignmentId
             );
 
             var result = await _assignmentService.UploadCompletionProof(employeeId, request);
@@ -102,7 +113,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Information(
                     "UploadCompletionProof API succeeded. EmployeeId={EmployeeId}, AssignmentId={AssignmentId}",
-                    employeeId, request.AssignmentId
+                    employeeId,
+                    request.AssignmentId
                 );
                 return Ok(result);
             }
@@ -110,7 +122,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "UploadCompletionProof API failed. EmployeeId={EmployeeId}, Message={Message}",
-                    employeeId, result.Message
+                    employeeId,
+                    result.Message
                 );
                 return BadRequest(result);
             }
@@ -128,7 +141,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             Log.Information(
                 "CompleteAssignment API called. ManagerId={ManagerId}, AssignmentId={AssignmentId}",
-                managerId, request.AssignmentId
+                managerId,
+                request.AssignmentId
             );
 
             var result = await _assignmentService.CompleteAssignment(managerId, request);
@@ -137,7 +151,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Information(
                     "CompleteAssignment API succeeded. ManagerId={ManagerId}, AssignmentId={AssignmentId}",
-                    managerId, request.AssignmentId
+                    managerId,
+                    request.AssignmentId
                 );
                 return Ok(result);
             }
@@ -145,7 +160,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "CompleteAssignment API failed. ManagerId={ManagerId}, Message={Message}",
-                    managerId, result.Message
+                    managerId,
+                    result.Message
                 );
                 return BadRequest(result);
             }
@@ -159,13 +175,17 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Gets assignments for the logged-in employee as mentee with filtering and pagination
         /// </summary>
         [HttpGet("api/lnd-assignments/my-assignments")]
-        public async Task<IActionResult> GetMyAssignments([FromQuery] AssignmentRequestModel request)
+        public async Task<IActionResult> GetMyAssignments(
+            [FromQuery] AssignmentRequestModel request
+        )
         {
             var employeeId = GetCurrentEmployeeId();
 
             Log.Information(
                 "GetMyAssignments API called. EmployeeId={EmployeeId}, StatusFilter={StatusFilter}, Page={PageNumber}",
-                employeeId, request.StatusFilter ?? "all", request.PageNumber
+                employeeId,
+                request.StatusFilter ?? "all",
+                request.PageNumber
             );
 
             var result = await _assignmentService.GetMyAssignments(employeeId, request);
@@ -174,7 +194,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Information(
                     "GetMyAssignments API succeeded. EmployeeId={EmployeeId}, TotalCount={TotalCount}",
-                    employeeId, result.Data?.TotalCount ?? 0
+                    employeeId,
+                    result.Data?.TotalCount ?? 0
                 );
                 return Ok(result);
             }
@@ -182,7 +203,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "GetMyAssignments API failed. EmployeeId={EmployeeId}, Message={Message}",
-                    employeeId, result.Message
+                    employeeId,
+                    result.Message
                 );
                 return BadRequest(result);
             }
@@ -192,13 +214,17 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Gets assignments for the manager's team members with filtering and pagination
         /// </summary>
         [HttpGet("api/lnd-assignments/team")]
-        public async Task<IActionResult> GetTeamAssignments([FromQuery] AssignmentRequestModel request)
+        public async Task<IActionResult> GetTeamAssignments(
+            [FromQuery] AssignmentRequestModel request
+        )
         {
             var managerId = GetCurrentEmployeeId();
 
             Log.Information(
                 "GetTeamAssignments API called. ManagerId={ManagerId}, StatusFilter={StatusFilter}, Page={PageNumber}",
-                managerId, request.StatusFilter ?? "all", request.PageNumber
+                managerId,
+                request.StatusFilter ?? "all",
+                request.PageNumber
             );
 
             var result = await _assignmentService.GetTeamAssignments(managerId, request);
@@ -207,7 +233,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Information(
                     "GetTeamAssignments API succeeded. ManagerId={ManagerId}, TotalCount={TotalCount}",
-                    managerId, result.Data?.TotalCount ?? 0
+                    managerId,
+                    result.Data?.TotalCount ?? 0
                 );
                 return Ok(result);
             }
@@ -215,7 +242,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "GetTeamAssignments API failed. ManagerId={ManagerId}, Message={Message}",
-                    managerId, result.Message
+                    managerId,
+                    result.Message
                 );
                 return BadRequest(result);
             }
@@ -225,13 +253,17 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Gets assignments where the logged-in employee is the assigned SME with filtering and pagination
         /// </summary>
         [HttpGet("api/lnd-assignments/sme")]
-        public async Task<IActionResult> GetSmeAssignments([FromQuery] AssignmentRequestModel request)
+        public async Task<IActionResult> GetSmeAssignments(
+            [FromQuery] AssignmentRequestModel request
+        )
         {
             var smeEmployeeId = GetCurrentEmployeeId();
 
             Log.Information(
                 "GetSmeAssignments API called. SmeEmployeeId={SmeEmployeeId}, StatusFilter={StatusFilter}, Page={PageNumber}",
-                smeEmployeeId, request.StatusFilter ?? "all", request.PageNumber
+                smeEmployeeId,
+                request.StatusFilter ?? "all",
+                request.PageNumber
             );
 
             var result = await _assignmentService.GetSmeAssignments(smeEmployeeId, request);
@@ -240,7 +272,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Information(
                     "GetSmeAssignments API succeeded. SmeEmployeeId={SmeEmployeeId}, TotalCount={TotalCount}",
-                    smeEmployeeId, result.Data?.TotalCount ?? 0
+                    smeEmployeeId,
+                    result.Data?.TotalCount ?? 0
                 );
                 return Ok(result);
             }
@@ -248,7 +281,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "GetSmeAssignments API failed. SmeEmployeeId={SmeEmployeeId}, Message={Message}",
-                    smeEmployeeId, result.Message
+                    smeEmployeeId,
+                    result.Message
                 );
                 return BadRequest(result);
             }
@@ -263,13 +297,16 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// </summary>
         [HttpGet("api/lnd-assignments/team/export")]
         [Authorize(Roles = LnDConstants.USER_ROLES.MANAGER)]
-        public async Task<IActionResult> GetTeamAssignmentsForExport([FromQuery] ExportAssignmentRequestModel request)
+        public async Task<IActionResult> GetTeamAssignmentsForExport(
+            [FromQuery] ExportAssignmentRequestModel request
+        )
         {
             var managerId = GetCurrentEmployeeId();
 
             Log.Information(
                 "ExportTeamAssignments API called. ManagerId={ManagerId}, StatusFilter={StatusFilter}",
-                managerId, request.StatusFilter ?? "all"
+                managerId,
+                request.StatusFilter ?? "all"
             );
 
             var result = await _assignmentService.GetTeamAssignmentsForExport(managerId, request);
@@ -278,7 +315,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "ExportTeamAssignments API failed. ManagerId={ManagerId}, Message={Message}",
-                    managerId, result.Message
+                    managerId,
+                    result.Message
                 );
                 return BadRequest(result);
             }
@@ -287,7 +325,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             Log.Information(
                 "ExportTeamAssignments API succeeded. ManagerId={ManagerId}, FileName={FileName}, FileSize={FileSize} bytes",
-                managerId, fileName, result.Data.Length
+                managerId,
+                fileName,
+                result.Data.Length
             );
 
             return File(

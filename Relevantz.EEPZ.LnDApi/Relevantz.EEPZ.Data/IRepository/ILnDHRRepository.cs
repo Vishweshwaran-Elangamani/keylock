@@ -1,13 +1,14 @@
-using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Models;
 
 namespace Relevantz.EEPZ.Data.Repositories.Interface
 {
     public interface ILnDHRRepository
     {
-       Task<(List<SubordinateEmployeeResponseModel> Items, int TotalCount)> GetAllOrganizationEmployees(
-        OrganizationEmployeesRequestModel request
-    );
+        Task<(
+            List<SubordinateEmployeeResponseModel> Items,
+            int TotalCount
+        )> GetAllOrganizationEmployees(OrganizationEmployeesRequestModel request);
         Task<(List<Lndassignment> Items, int TotalCount)> GetAllOrganizationAssignments(
             OrganizationAssignmentsRequestModel request
         );

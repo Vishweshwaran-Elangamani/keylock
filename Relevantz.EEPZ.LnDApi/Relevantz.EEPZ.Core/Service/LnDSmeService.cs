@@ -1,7 +1,7 @@
 using ClosedXML.Excel;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repositories.Interface;
 using Serilog;
@@ -48,7 +48,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             Log.Information(
                 "CheckIfEmployeeIsSme succeeded. EmployeeId={EmployeeId}, IsSme={IsSme}",
-                employeeId, isSme
+                employeeId,
+                isSme
             );
 
             return new ApiResponse<bool> { Success = true, Data = isSme };
@@ -68,7 +69,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             Log.Information(
                 "ApplyToBecomeSme started. EmployeeId={EmployeeId}, SkillId={SkillId}, FileName={FileName}",
-                employeeId, request.SkillId, request.ProofDocument?.FileName
+                employeeId,
+                request.SkillId,
+                request.ProofDocument?.FileName
             );
 
             var skillMapping = await _skillRepository.GetEmployeeSkillMapping(
@@ -80,37 +83,36 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 Log.Warning(
                     "ApplyToBecomeSme: Skill rating validation failed. EmployeeId={EmployeeId}, SkillId={SkillId}, Rating={Rating}",
-                    employeeId, request.SkillId, skillMapping?.Rating
+                    employeeId,
+                    request.SkillId,
+                    skillMapping?.Rating
                 );
 
                 return new ApiResponse<int>
                 {
                     Success = false,
                     Message = string.Format(
-    LnDConstants.RESPONSE_MESSAGES.SME_MIN_RATING_REQUIRED,
-    LnDConstants.MIN_SME_RATING
-),
-
+                        LnDConstants.RESPONSE_MESSAGES.SME_MIN_RATING_REQUIRED,
+                        LnDConstants.MIN_SME_RATING
+                    ),
                 };
             }
 
-            var existingSme = await _smeRepository.GetActiveSme(
-                employeeId,
-                request.SkillId
-            );
+            var existingSme = await _smeRepository.GetActiveSme(employeeId, request.SkillId);
 
             if (existingSme != null)
             {
                 Log.Warning(
                     "ApplyToBecomeSme: Employee already an active SME. EmployeeId={EmployeeId}, SkillId={SkillId}, SmeId={SmeId}",
-                    employeeId, request.SkillId, existingSme.SmeId
+                    employeeId,
+                    request.SkillId,
+                    existingSme.SmeId
                 );
 
                 return new ApiResponse<int>
                 {
                     Success = false,
                     Message = LnDConstants.RESPONSE_MESSAGES.ALREADY_ACTIVE_SME,
-
                 };
             }
 
@@ -123,14 +125,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 Log.Warning(
                     "ApplyToBecomeSme: Pending approval exists. EmployeeId={EmployeeId}, SkillId={SkillId}, ApprovalId={ApprovalId}",
-                    employeeId, request.SkillId, pendingApproval.ApprovalId
+                    employeeId,
+                    request.SkillId,
+                    pendingApproval.ApprovalId
                 );
 
                 return new ApiResponse<int>
                 {
                     Success = false,
                     Message = LnDConstants.RESPONSE_MESSAGES.SME_REGISTRATION_ALREADY_PENDING,
-
                 };
             }
 
@@ -170,7 +173,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             Log.Information(
                 "ApplyToBecomeSme succeeded. EmployeeId={EmployeeId}, SkillId={SkillId}, ApprovalId={ApprovalId}, ApproverId={ApproverId}",
-                employeeId, request.SkillId, approval.ApprovalId, skillMapping.Employee.ReportingManagerEmployeeId
+                employeeId,
+                request.SkillId,
+                approval.ApprovalId,
+                skillMapping.Employee.ReportingManagerEmployeeId
             );
 
             return new ApiResponse<int>
@@ -195,18 +201,21 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             Log.Information(
                 "GetAvailableSmes started. SkillId={SkillId}, SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
-                request.SkillId, request.SearchTerm ?? "none", request.PageNumber, request.PageSize
+                request.SkillId,
+                request.SearchTerm ?? "none",
+                request.PageNumber,
+                request.PageSize
             );
 
-            var (items, totalCount) =
-                await _smeRepository.GetAvailableSmesWithAssignmentCounts(
-                    request,
-                    LnDConstants.MAX_SME_ASSIGNMENTS
-                );
+            var (items, totalCount) = await _smeRepository.GetAvailableSmesWithAssignmentCounts(
+                request,
+                LnDConstants.MAX_SME_ASSIGNMENTS
+            );
 
             Log.Debug(
                 "GetAvailableSmes: Retrieved {ItemCount} SMEs. TotalCount={TotalCount}",
-                items.Count, totalCount
+                items.Count,
+                totalCount
             );
 
             var smeModels = new List<SmeResponseModel>();
@@ -234,7 +243,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             Log.Information(
                 "GetAvailableSmes succeeded. SkillId={SkillId}, ReturnedCount={Count}, TotalCount={TotalCount}",
-                request.SkillId, smeModels.Count, totalCount
+                request.SkillId,
+                smeModels.Count,
+                totalCount
             );
 
             return new ApiResponse<PaginatedResponse<SmeResponseModel>>
@@ -254,12 +265,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         /// Gets paginated list of all active SMEs with department information
         /// </summary>
         public async Task<ApiResponse<PaginatedResponse<SmeResponseModel>>> GetAllActiveSmes(
-      ActiveSmesRequestModel request
-  )
+            ActiveSmesRequestModel request
+        )
         {
             Log.Information(
                 "GetAllActiveSmes started. SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
-                request.SearchTerm ?? "none", request.PageNumber, request.PageSize
+                request.SearchTerm ?? "none",
+                request.PageNumber,
+                request.PageSize
             );
 
             var (items, totalCount) = await _smeRepository.GetAllActiveSmes(request);
@@ -268,9 +281,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 Success = true,
                 Message = string.Format(
-    LnDConstants.RESPONSE_MESSAGES.ACTIVE_SMES_FOUND,
-    totalCount
-),
+                    LnDConstants.RESPONSE_MESSAGES.ACTIVE_SMES_FOUND,
+                    totalCount
+                ),
                 Data = new PaginatedResponse<SmeResponseModel>
                 {
                     Items = items,
@@ -280,7 +293,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 },
             };
         }
-
 
         #endregion
 
@@ -348,7 +360,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                     Log.Information(
                         "GetAllActiveSmesForExport succeeded. SmeCount={Count}, FileSize={FileSize} bytes",
-                        allSmes.Count, fileBytes.Length
+                        allSmes.Count,
+                        fileBytes.Length
                     );
 
                     return new ApiResponse<byte[]> { Success = true, Data = fileBytes };

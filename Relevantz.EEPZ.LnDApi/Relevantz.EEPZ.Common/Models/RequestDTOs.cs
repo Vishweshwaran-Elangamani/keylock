@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
+
 namespace Relevantz.EEPZ.Common.Models
 {
     /// <summary>

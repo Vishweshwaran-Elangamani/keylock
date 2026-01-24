@@ -42,7 +42,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Information(
                     "CheckIfEmployeeIsSme API succeeded. EmployeeId={EmployeeId}, IsSme={IsSme}",
-                    employeeId, result.Data
+                    employeeId,
+                    result.Data
                 );
                 return Ok(result);
             }
@@ -50,7 +51,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "CheckIfEmployeeIsSme API failed. EmployeeId={EmployeeId}, Message={Message}",
-                    employeeId, result.Message
+                    employeeId,
+                    result.Message
                 );
                 return BadRequest(result);
             }
@@ -70,7 +72,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             Log.Information(
                 "ApplyToBecomeSme API called. EmployeeId={EmployeeId}, SkillId={SkillId}",
-                employeeId, request.SkillId
+                employeeId,
+                request.SkillId
             );
 
             var result = await _smeService.ApplyToBecomeSme(employeeId, request);
@@ -79,7 +82,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Information(
                     "ApplyToBecomeSme API succeeded. EmployeeId={EmployeeId}, SkillId={SkillId}, ApprovalId={ApprovalId}",
-                    employeeId, request.SkillId, result.Data
+                    employeeId,
+                    request.SkillId,
+                    result.Data
                 );
                 return Ok(result);
             }
@@ -87,7 +92,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "ApplyToBecomeSme API failed. EmployeeId={EmployeeId}, SkillId={SkillId}, Message={Message}",
-                    employeeId, request.SkillId, result.Message
+                    employeeId,
+                    request.SkillId,
+                    result.Message
                 );
                 return BadRequest(result);
             }
@@ -101,11 +108,16 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Gets available SMEs for a specific skill with pagination and search
         /// </summary>
         [HttpGet("api/lnd-sme/available")]
-        public async Task<IActionResult> GetAvailableSmes([FromQuery] AvailableSmesRequestModel request)
+        public async Task<IActionResult> GetAvailableSmes(
+            [FromQuery] AvailableSmesRequestModel request
+        )
         {
             Log.Information(
                 "GetAvailableSmes API called. SkillId={SkillId}, SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
-                request.SkillId, request.SearchTerm ?? "none", request.PageNumber, request.PageSize
+                request.SkillId,
+                request.SearchTerm ?? "none",
+                request.PageNumber,
+                request.PageSize
             );
 
             var result = await _smeService.GetAvailableSmes(request);
@@ -114,7 +126,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Information(
                     "GetAvailableSmes API succeeded. SkillId={SkillId}, TotalCount={TotalCount}",
-                    request.SkillId, result.Data?.TotalCount ?? 0
+                    request.SkillId,
+                    result.Data?.TotalCount ?? 0
                 );
                 return Ok(result);
             }
@@ -122,7 +135,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "GetAvailableSmes API failed. SkillId={SkillId}, Message={Message}",
-                    request.SkillId, result.Message
+                    request.SkillId,
+                    result.Message
                 );
                 return BadRequest(result);
             }

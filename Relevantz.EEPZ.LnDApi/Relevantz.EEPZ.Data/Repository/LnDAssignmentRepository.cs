@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repositories.Interface;
 using Serilog;
@@ -44,18 +44,20 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 )
                 .ToListAsync();
 
-            Log.Information("GetOverdueAssignmentsAsync completed. OverdueCount={Count}", assignments.Count);
+            Log.Information(
+                "GetOverdueAssignmentsAsync completed. OverdueCount={Count}",
+                assignments.Count
+            );
 
             return assignments;
         }
-
 
         #endregion
 
         #region Assignment Retrieval
 
         /// <summary>
-        /// Gets a single assignment by ID with all related entities including mentee, SME, and skill 
+        /// Gets a single assignment by ID with all related entities including mentee, SME, and skill
         /// </summary>
         public async Task<Lndassignment?> GetAssignmentById(int assignmentId)
         {
@@ -63,21 +65,27 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             var assignment = await _context
                 .Lndassignments.Include(a => a.MenteeEmployee)
-                .ThenInclude(e => e.Userprofile)
+                    .ThenInclude(e => e.Userprofile)
                 .Include(a => a.Sme)
-                .ThenInclude(s => s.Employee)
-                .ThenInclude(e => e.Userprofile)
+                    .ThenInclude(s => s.Employee)
+                        .ThenInclude(e => e.Userprofile)
                 .Include(a => a.Skill)
                 .FirstOrDefaultAsync(a => a.AssignmentId == assignmentId);
 
             if (assignment == null)
             {
-                Log.Warning("GetAssignmentByIdAsync: Assignment not found. AssignmentId={AssignmentId}", assignmentId);
+                Log.Warning(
+                    "GetAssignmentByIdAsync: Assignment not found. AssignmentId={AssignmentId}",
+                    assignmentId
+                );
             }
             else
             {
-                Log.Debug("GetAssignmentByIdAsync succeeded. AssignmentId={AssignmentId}, Status={Status}",
-                    assignmentId, assignment.Status);
+                Log.Debug(
+                    "GetAssignmentByIdAsync succeeded. AssignmentId={AssignmentId}, Status={Status}",
+                    assignmentId,
+                    assignment.Status
+                );
             }
 
             return assignment;
@@ -87,18 +95,19 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         /// Gets paginated assignments for a mentee with filtering and search capabilities
         /// </summary>
         public async Task<(List<AssignmentResponseModel> Items, int TotalCount)> GetMyAssignments(
-     int employeeId,
-     AssignmentRequestModel request
- )
+            int employeeId,
+            AssignmentRequestModel request
+        )
         {
             Log.Information(
                 "GetMyAssignmentsAsync called. EmployeeId={EmployeeId}, StatusFilter={StatusFilter}, Page={PageNumber}",
-                employeeId, request.StatusFilter ?? "all", request.PageNumber
+                employeeId,
+                request.StatusFilter ?? "all",
+                request.PageNumber
             );
 
             var query = _context
-                .Lndassignments
-                .Include(a => a.MenteeEmployee)
+                .Lndassignments.Include(a => a.MenteeEmployee)
                     .ThenInclude(e => e.Userprofile)
                 .Include(a => a.Sme)
                     .ThenInclude(s => s.Employee)
@@ -116,15 +125,25 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 var lowerSearchTerm = request.SearchTerm.ToLower();
                 query = query.Where(a =>
                     a.Skill.SkillName.ToLower().Contains(lowerSearchTerm)
-                    || ((a.Sme.Employee.Userprofile.FirstName ?? "") + " " +
-                        (a.Sme.Employee.Userprofile.LastName ?? ""))
-                        .ToLower().Contains(lowerSearchTerm)
-                    || ((a.MenteeEmployee.Userprofile.FirstName ?? "") + " " +
-                        (a.MenteeEmployee.Userprofile.LastName ?? ""))
-                        .ToLower().Contains(lowerSearchTerm)
+                    || (
+                        (a.Sme.Employee.Userprofile.FirstName ?? "")
+                        + " "
+                        + (a.Sme.Employee.Userprofile.LastName ?? "")
+                    )
+                        .ToLower()
+                        .Contains(lowerSearchTerm)
+                    || (
+                        (a.MenteeEmployee.Userprofile.FirstName ?? "")
+                        + " "
+                        + (a.MenteeEmployee.Userprofile.LastName ?? "")
+                    )
+                        .ToLower()
+                        .Contains(lowerSearchTerm)
                     || a.Status.ToLower().Contains(lowerSearchTerm)
-                    || (a.CompletionNotes != null &&
-                        a.CompletionNotes.ToLower().Contains(lowerSearchTerm))
+                    || (
+                        a.CompletionNotes != null
+                        && a.CompletionNotes.ToLower().Contains(lowerSearchTerm)
+                    )
                 );
             }
 
@@ -138,13 +157,15 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                     AssignmentId = a.AssignmentId,
                     MenteeEmployeeId = a.MenteeEmployeeId,
                     MenteeName =
-                        a.MenteeEmployee.Userprofile.FirstName + " " +
-                        a.MenteeEmployee.Userprofile.LastName,
+                        a.MenteeEmployee.Userprofile.FirstName
+                        + " "
+                        + a.MenteeEmployee.Userprofile.LastName,
                     SmeId = a.SmeId,
                     SmeEmployeeId = a.Sme.EmployeeId,
                     SmeName =
-                        a.Sme.Employee.Userprofile.FirstName + " " +
-                        a.Sme.Employee.Userprofile.LastName,
+                        a.Sme.Employee.Userprofile.FirstName
+                        + " "
+                        + a.Sme.Employee.Userprofile.LastName,
                     SkillId = a.SkillId,
                     SkillName = a.Skill.SkillName,
                     Deadline = a.Deadline,
@@ -155,35 +176,37 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                     CreatedOn = a.CreatedOn,
                     UpdatedOn = a.UpdatedOn,
                     IsOverdue = false,
-                    DaysOverdue = null
+                    DaysOverdue = null,
                 })
                 .ToListAsync();
 
             Log.Information(
                 "GetMyAssignmentsAsync completed. EmployeeId={EmployeeId}, ReturnedCount={Count}, TotalCount={TotalCount}",
-                employeeId, items.Count, totalCount
+                employeeId,
+                items.Count,
+                totalCount
             );
 
             return (items, totalCount);
         }
 
-
         /// <summary>
-        /// Gets paginated assignments for a manager's team with filtering and search capabilities 
+        /// Gets paginated assignments for a manager's team with filtering and search capabilities
         /// </summary>
         public async Task<(List<AssignmentResponseModel> Items, int TotalCount)> GetTeamAssignments(
-      int managerId,
-      AssignmentRequestModel request
-  )
+            int managerId,
+            AssignmentRequestModel request
+        )
         {
             Log.Information(
                 "GetTeamAssignmentsAsync called. ManagerId={ManagerId}, StatusFilter={StatusFilter}, Page={PageNumber}",
-                managerId, request.StatusFilter ?? "all", request.PageNumber
+                managerId,
+                request.StatusFilter ?? "all",
+                request.PageNumber
             );
 
             var query = _context
-                .Lndassignments
-                .Include(a => a.MenteeEmployee)
+                .Lndassignments.Include(a => a.MenteeEmployee)
                     .ThenInclude(e => e.Userprofile)
                 .Include(a => a.Sme)
                     .ThenInclude(s => s.Employee)
@@ -205,16 +228,24 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                     || a.MenteeEmployee.Userprofile.FirstName.ToLower().Contains(lowerSearchTerm)
                     || a.MenteeEmployee.Userprofile.LastName.ToLower().Contains(lowerSearchTerm)
                     || (
-                        (a.MenteeEmployee.Userprofile.FirstName + " " +
-                         a.MenteeEmployee.Userprofile.LastName)
-                        .ToLower().Contains(lowerSearchTerm)
+                        (
+                            a.MenteeEmployee.Userprofile.FirstName
+                            + " "
+                            + a.MenteeEmployee.Userprofile.LastName
+                        )
+                            .ToLower()
+                            .Contains(lowerSearchTerm)
                     )
                     || a.Sme.Employee.Userprofile.FirstName.ToLower().Contains(lowerSearchTerm)
                     || a.Sme.Employee.Userprofile.LastName.ToLower().Contains(lowerSearchTerm)
                     || (
-                        (a.Sme.Employee.Userprofile.FirstName + " " +
-                         a.Sme.Employee.Userprofile.LastName)
-                        .ToLower().Contains(lowerSearchTerm)
+                        (
+                            a.Sme.Employee.Userprofile.FirstName
+                            + " "
+                            + a.Sme.Employee.Userprofile.LastName
+                        )
+                            .ToLower()
+                            .Contains(lowerSearchTerm)
                     )
                 );
             }
@@ -229,59 +260,63 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                     AssignmentId = a.AssignmentId,
                     MenteeEmployeeId = a.MenteeEmployeeId,
                     MenteeName =
-                        a.MenteeEmployee.Userprofile.FirstName + " " +
-                        a.MenteeEmployee.Userprofile.LastName,
+                        a.MenteeEmployee.Userprofile.FirstName
+                        + " "
+                        + a.MenteeEmployee.Userprofile.LastName,
                     SmeId = a.SmeId,
                     SmeEmployeeId = a.Sme.EmployeeId,
                     SmeName =
-                        a.Sme.Employee.Userprofile.FirstName + " " +
-                        a.Sme.Employee.Userprofile.LastName,
+                        a.Sme.Employee.Userprofile.FirstName
+                        + " "
+                        + a.Sme.Employee.Userprofile.LastName,
                     SkillId = a.SkillId,
                     SkillName = a.Skill.SkillName,
                     Deadline = a.Deadline,
                     Status = a.Status,
                     ProofFilePath = a.ProofFilePath,
                     CompletionNotes =
-                        a.Lndapprovals
-                            .OrderByDescending(ap => ap.UpdatedOn)
+                        a.Lndapprovals.OrderByDescending(ap => ap.UpdatedOn)
                             .FirstOrDefault(ap => !string.IsNullOrEmpty(ap.Notes)) != null
-                            ? a.Lndapprovals
-                                .OrderByDescending(ap => ap.UpdatedOn)
-                                .FirstOrDefault(ap => !string.IsNullOrEmpty(ap.Notes))!.Notes
+                            ? a
+                                .Lndapprovals.OrderByDescending(ap => ap.UpdatedOn)
+                                .FirstOrDefault(ap => !string.IsNullOrEmpty(ap.Notes))!
+                                .Notes
                             : null,
                     CompletionRating = a.CompletionRating,
                     CreatedOn = a.CreatedOn,
                     UpdatedOn = a.UpdatedOn,
                     IsOverdue = false,
-                    DaysOverdue = null
+                    DaysOverdue = null,
                 })
                 .ToListAsync();
 
             Log.Information(
                 "GetTeamAssignmentsAsync completed. ManagerId={ManagerId}, ReturnedCount={Count}, TotalCount={TotalCount}",
-                managerId, items.Count, totalCount
+                managerId,
+                items.Count,
+                totalCount
             );
 
             return (items, totalCount);
         }
 
-
         /// <summary>
         /// Gets paginated assignments where employee is the assigned SME with filtering and search
         /// </summary>
         public async Task<(List<AssignmentResponseModel> Items, int TotalCount)> GetSmeAssignments(
-   int smeEmployeeId,
-   AssignmentRequestModel request
-)
+            int smeEmployeeId,
+            AssignmentRequestModel request
+        )
         {
             Log.Information(
                 "GetSmeAssignmentsAsync called. SmeEmployeeId={SmeEmployeeId}, StatusFilter={StatusFilter}, Page={PageNumber}",
-                smeEmployeeId, request.StatusFilter ?? "all", request.PageNumber
+                smeEmployeeId,
+                request.StatusFilter ?? "all",
+                request.PageNumber
             );
 
             var query = _context
-                .Lndassignments
-                .Include(a => a.MenteeEmployee)
+                .Lndassignments.Include(a => a.MenteeEmployee)
                     .ThenInclude(e => e.Userprofile)
                 .Include(a => a.Sme)
                     .ThenInclude(s => s.Employee)
@@ -312,10 +347,16 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 {
                     AssignmentId = a.AssignmentId,
                     MenteeEmployeeId = a.MenteeEmployeeId,
-                    MenteeName = a.MenteeEmployee.Userprofile.FirstName + " " + a.MenteeEmployee.Userprofile.LastName,
+                    MenteeName =
+                        a.MenteeEmployee.Userprofile.FirstName
+                        + " "
+                        + a.MenteeEmployee.Userprofile.LastName,
                     SmeId = a.SmeId,
                     SmeEmployeeId = a.Sme.EmployeeId,
-                    SmeName = a.Sme.Employee.Userprofile.FirstName + " " + a.Sme.Employee.Userprofile.LastName,
+                    SmeName =
+                        a.Sme.Employee.Userprofile.FirstName
+                        + " "
+                        + a.Sme.Employee.Userprofile.LastName,
                     SkillId = a.SkillId,
                     SkillName = a.Skill.SkillName,
                     Deadline = a.Deadline,
@@ -326,35 +367,36 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                     CreatedOn = a.CreatedOn,
                     UpdatedOn = a.UpdatedOn,
                     IsOverdue = false,
-                    DaysOverdue = null
+                    DaysOverdue = null,
                 })
                 .ToListAsync();
 
             Log.Information(
                 "GetSmeAssignmentsAsync completed. SmeEmployeeId={SmeEmployeeId}, ReturnedCount={Count}, TotalCount={TotalCount}",
-                smeEmployeeId, items.Count, totalCount
+                smeEmployeeId,
+                items.Count,
+                totalCount
             );
 
             return (items, totalCount);
         }
 
-
         /// <summary>
-        /// Gets all team assignments for Excel export without pagination 
+        /// Gets all team assignments for Excel export without pagination
         /// </summary>
         public async Task<List<Lndassignment>> GetAllTeamAssignmentsForExport(
-      int managerId,
-      ExportAssignmentRequestModel request
-  )
+            int managerId,
+            ExportAssignmentRequestModel request
+        )
         {
             Log.Information(
                 "GetAllTeamAssignmentsForExportAsync called. ManagerId={ManagerId}, StatusFilter={StatusFilter}",
-                managerId, request.StatusFilter ?? "all"
+                managerId,
+                request.StatusFilter ?? "all"
             );
 
             var query = _context
-                .Lndassignments
-                .Include(a => a.MenteeEmployee)
+                .Lndassignments.Include(a => a.MenteeEmployee)
                     .ThenInclude(e => e.Userprofile)
                 .Include(a => a.MenteeEmployee)
                     .ThenInclude(e => e.Employeedetailsmasters)
@@ -378,8 +420,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                     || (a.MenteeEmployee.Userprofile.FirstName ?? "").Contains(request.SearchTerm)
                     || (a.MenteeEmployee.Userprofile.LastName ?? "").Contains(request.SearchTerm)
                     || (
-                        (a.MenteeEmployee.Userprofile.FirstName ?? "") + " " +
-                        (a.MenteeEmployee.Userprofile.LastName ?? "")
+                        (a.MenteeEmployee.Userprofile.FirstName ?? "")
+                        + " "
+                        + (a.MenteeEmployee.Userprofile.LastName ?? "")
                     ).Contains(request.SearchTerm)
                     || (a.Sme.Employee.Userprofile.FirstName ?? "").Contains(request.SearchTerm)
                     || (a.Sme.Employee.Userprofile.LastName ?? "").Contains(request.SearchTerm)
@@ -390,12 +433,12 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             Log.Information(
                 "GetAllTeamAssignmentsForExportAsync completed. ManagerId={ManagerId}, TotalCount={Count}",
-                managerId, items.Count
+                managerId,
+                items.Count
             );
 
             return items;
         }
-
 
         #endregion
 
@@ -408,7 +451,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         {
             Log.Information(
                 "AddAssignmentAsync called. MenteeId={MenteeId}, SmeId={SmeId}, SkillId={SkillId}",
-                assignment.MenteeEmployeeId, assignment.SmeId, assignment.SkillId
+                assignment.MenteeEmployeeId,
+                assignment.SmeId,
+                assignment.SkillId
             );
 
             _context.Lndassignments.Add(assignment);
@@ -425,7 +470,8 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         {
             Log.Information(
                 "UpdateAssignmentAsync called. AssignmentId={AssignmentId}, Status={Status}",
-                assignment.AssignmentId, assignment.Status
+                assignment.AssignmentId,
+                assignment.Status
             );
 
             _context.Lndassignments.Update(assignment);

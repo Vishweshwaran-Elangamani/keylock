@@ -1,8 +1,8 @@
 using System.Text.Json;
 using ClosedXML.Excel;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repositories.Interface;
 using Serilog;
@@ -41,7 +41,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         /// <summary>
         /// Checks and marks assignments as overdue based on deadline and current status
         /// </summary>
-
         public async Task<ApiResponse<int>> CheckAndMarkOverdueAssignments()
         {
             Log.Information("CheckAndMarkOverdueAssignments started");
@@ -56,7 +55,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 {
                     Success = true,
                     Message = LnDConstants.RESPONSE_MESSAGES.OVERDUE_ASSIGNMENTS_MARKED,
-                    Data = 0
+                    Data = 0,
                 };
             }
 
@@ -76,8 +75,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return new ApiResponse<int>
             {
                 Success = true,
-                Message = $"{overdueAssignments.Count} {LnDConstants.RESPONSE_MESSAGES.OVERDUE_ASSIGNMENTS_MARKED}",
-                Data = overdueAssignments.Count
+                Message =
+                    $"{overdueAssignments.Count} {LnDConstants.RESPONSE_MESSAGES.OVERDUE_ASSIGNMENTS_MARKED}",
+                Data = overdueAssignments.Count,
             };
         }
 
@@ -91,7 +91,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             Log.Information(
                 "RequestSmeAssignment started. ManagerId={ManagerId}, MenteeId={MenteeId}, SkillId={SkillId}, MentorId={MentorId}",
-                managerId, request.MenteeEmployeeId, request.SkillId, request.MentorEmployeeId
+                managerId,
+                request.MenteeEmployeeId,
+                request.SkillId,
+                request.MentorEmployeeId
             );
 
             var mentee = await _skillRepository.GetEmployeeById(request.MenteeEmployeeId);
@@ -100,14 +103,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 Log.Warning(
                     "RequestSmeAssignment: Employee validation failed. MenteeId={MenteeId}, ManagerId={ManagerId}",
-                    request.MenteeEmployeeId, managerId
+                    request.MenteeEmployeeId,
+                    managerId
                 );
 
                 return new ApiResponse<int>
                 {
                     Success = false,
                     Message = LnDConstants.RESPONSE_MESSAGES.EMPLOYEE_NOT_FOUND_OR_NOT_SUBORDINATE,
-
                 };
             }
 
@@ -116,21 +119,19 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 request.SkillId
             );
 
-            if (
-                skillMapping == null
-                || skillMapping.Rating >= LnDConstants.MIN_REQUEST_SME_RATING
-            )
+            if (skillMapping == null || skillMapping.Rating >= LnDConstants.MIN_REQUEST_SME_RATING)
             {
                 Log.Warning(
                     "RequestSmeAssignment: Skill rating validation failed. MenteeId={MenteeId}, SkillId={SkillId}, Rating={Rating}",
-                    request.MenteeEmployeeId, request.SkillId, skillMapping?.Rating
+                    request.MenteeEmployeeId,
+                    request.SkillId,
+                    skillMapping?.Rating
                 );
 
                 return new ApiResponse<int>
                 {
                     Success = false,
                     Message = LnDConstants.RESPONSE_MESSAGES.SKILL_RATING_TOO_HIGH_FOR_SME_REQUEST,
-
                 };
             }
 
@@ -159,7 +160,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             Log.Information(
                 "RequestSmeAssignment succeeded. ApprovalId={ApprovalId}, MenteeId={MenteeId}, MentorId={MentorId}",
-                approval.ApprovalId, request.MenteeEmployeeId, request.MentorEmployeeId
+                approval.ApprovalId,
+                request.MenteeEmployeeId,
+                request.MentorEmployeeId
             );
 
             return new ApiResponse<int>
@@ -181,25 +184,25 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             Log.Information(
                 "UploadCompletionProof started. EmployeeId={EmployeeId}, AssignmentId={AssignmentId}, FileName={FileName}",
-                employeeId, request.AssignmentId, request.ProofDocument?.FileName
+                employeeId,
+                request.AssignmentId,
+                request.ProofDocument?.FileName
             );
 
-            var assignment = await _assignmentRepository.GetAssignmentById(
-                request.AssignmentId
-            );
+            var assignment = await _assignmentRepository.GetAssignmentById(request.AssignmentId);
 
             if (assignment == null || assignment.MenteeEmployeeId != employeeId)
             {
                 Log.Warning(
                     "UploadCompletionProof: Assignment not found or access denied. AssignmentId={AssignmentId}, EmployeeId={EmployeeId}",
-                    request.AssignmentId, employeeId
+                    request.AssignmentId,
+                    employeeId
                 );
 
                 return new ApiResponse<bool>
                 {
                     Success = false,
                     Message = LnDConstants.RESPONSE_MESSAGES.ASSIGNMENT_NOT_FOUND,
-
                 };
             }
 
@@ -207,14 +210,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 Log.Warning(
                     "UploadCompletionProof: Invalid assignment status. AssignmentId={AssignmentId}, Status={Status}",
-                    request.AssignmentId, assignment.Status
+                    request.AssignmentId,
+                    assignment.Status
                 );
 
                 return new ApiResponse<bool>
                 {
                     Success = false,
                     Message = LnDConstants.RESPONSE_MESSAGES.ASSIGNMENT_NOT_IN_PROGRESS,
-
                 };
             }
 
@@ -262,7 +265,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             Log.Information(
                 "UploadCompletionProof succeeded. AssignmentId={AssignmentId}, ApprovalId={ApprovalId}, SmeId={SmeId}",
-                request.AssignmentId, approval.ApprovalId, assignment.Sme.EmployeeId
+                request.AssignmentId,
+                approval.ApprovalId,
+                assignment.Sme.EmployeeId
             );
 
             return new ApiResponse<bool>
@@ -284,12 +289,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             Log.Information(
                 "CompleteAssignment started. ManagerId={ManagerId}, AssignmentId={AssignmentId}, NewRating={NewRating}",
-                managerId, request.AssignmentId, request.NewRating
+                managerId,
+                request.AssignmentId,
+                request.NewRating
             );
 
-            var assignment = await _assignmentRepository.GetAssignmentById(
-                request.AssignmentId
-            );
+            var assignment = await _assignmentRepository.GetAssignmentById(request.AssignmentId);
 
             if (
                 assignment == null
@@ -298,32 +303,29 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 Log.Warning(
                     "CompleteAssignment: Assignment not found or access denied. AssignmentId={AssignmentId}, ManagerId={ManagerId}",
-                    request.AssignmentId, managerId
+                    request.AssignmentId,
+                    managerId
                 );
 
                 return new ApiResponse<bool>
                 {
                     Success = false,
                     Message = LnDConstants.RESPONSE_MESSAGES.ASSIGNMENT_ACCESS_DENIED,
-
                 };
             }
 
-            if (
-                assignment.Status
-                != LnDConstants.ASSIGNMENT_STATUS.PENDING_MANAGER_ACKNOWLEDGEMENT
-            )
+            if (assignment.Status != LnDConstants.ASSIGNMENT_STATUS.PENDING_MANAGER_ACKNOWLEDGEMENT)
             {
                 Log.Warning(
                     "CompleteAssignment: Invalid assignment status. AssignmentId={AssignmentId}, Status={Status}",
-                    request.AssignmentId, assignment.Status
+                    request.AssignmentId,
+                    assignment.Status
                 );
 
                 return new ApiResponse<bool>
                 {
                     Success = false,
                     Message = LnDConstants.RESPONSE_MESSAGES.ASSIGNMENT_NOT_READY_FOR_COMPLETION,
-
                 };
             }
 
@@ -336,7 +338,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 Log.Debug(
                     "CompleteAssignment: Updating skill rating. MenteeId={MenteeId}, SkillId={SkillId}, OldRating={OldRating}, NewRating={NewRating}",
-                    assignment.MenteeEmployeeId, assignment.SkillId, skillMapping.Rating, request.NewRating
+                    assignment.MenteeEmployeeId,
+                    assignment.SkillId,
+                    skillMapping.Rating,
+                    request.NewRating
                 );
 
                 skillMapping.Rating = request.NewRating;
@@ -375,7 +380,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             Log.Information(
                 "CompleteAssignment succeeded. AssignmentId={AssignmentId}, MenteeId={MenteeId}, NewRating={NewRating}",
-                request.AssignmentId, assignment.MenteeEmployeeId, request.NewRating
+                request.AssignmentId,
+                assignment.MenteeEmployeeId,
+                request.NewRating
             );
 
             return new ApiResponse<bool>
@@ -393,46 +400,51 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         /// <summary>
         /// Gets paginated assignments for the employee as mentee with overdue calculation
         /// </summary>
-
         public async Task<ApiResponse<PaginatedResponse<AssignmentResponseModel>>> GetMyAssignments(
-    int employeeId,
-    AssignmentRequestModel request
-)
+            int employeeId,
+            AssignmentRequestModel request
+        )
         {
             Log.Information(
                 "GetMyAssignments started. EmployeeId={EmployeeId}, StatusFilter={StatusFilter}, Page={PageNumber}",
-                employeeId, request.StatusFilter ?? "all", request.PageNumber
+                employeeId,
+                request.StatusFilter ?? "all",
+                request.PageNumber
             );
 
-
-
-            var (items, totalCount) =
-    await _assignmentRepository.GetMyAssignments(employeeId, request);
+            var (items, totalCount) = await _assignmentRepository.GetMyAssignments(
+                employeeId,
+                request
+            );
 
             var sortedItems = ApplyAssignmentSorting(
-                items.AsQueryable(),
-                request.SortField,
-                request.SortOrder
-            ).ToList();
-
+                    items.AsQueryable(),
+                    request.SortField,
+                    request.SortOrder
+                )
+                .ToList();
 
             var today = DateTime.Now.Date;
 
             foreach (var item in items)
             {
-                var isOverdue = item.Deadline.HasValue
+                var isOverdue =
+                    item.Deadline.HasValue
                     && item.Deadline.Value.Date < today
                     && item.Status != LnDConstants.ASSIGNMENT_STATUS.COMPLETED;
 
                 item.IsOverdue = isOverdue;
-                item.DaysOverdue = isOverdue && item.Deadline.HasValue
-                    ? (int)(today - item.Deadline.Value.Date).TotalDays
-                    : null;
+                item.DaysOverdue =
+                    isOverdue && item.Deadline.HasValue
+                        ? (int)(today - item.Deadline.Value.Date).TotalDays
+                        : null;
             }
 
             Log.Information(
                 "GetMyAssignments succeeded. EmployeeId={EmployeeId}, ReturnedCount={Count}, TotalCount={TotalCount}",
-                employeeId, items.Count, totalCount
+                employeeId,
+                items.Count,
+                totalCount
             );
 
             return new ApiResponse<PaginatedResponse<AssignmentResponseModel>>
@@ -451,24 +463,28 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         /// <summary>
         /// Gets paginated assignments for manager's team members with overdue calculation
         /// </summary>
-        public async Task<ApiResponse<PaginatedResponse<AssignmentResponseModel>>> GetTeamAssignments(
-        int managerId,
-        AssignmentRequestModel request
-    )
+        public async Task<
+            ApiResponse<PaginatedResponse<AssignmentResponseModel>>
+        > GetTeamAssignments(int managerId, AssignmentRequestModel request)
         {
             Log.Information(
                 "GetTeamAssignments started. ManagerId={ManagerId}, StatusFilter={StatusFilter}, Page={PageNumber}",
-                managerId, request.StatusFilter ?? "all", request.PageNumber
+                managerId,
+                request.StatusFilter ?? "all",
+                request.PageNumber
             );
 
-            var (items, totalCount) =
-                await _assignmentRepository.GetTeamAssignments(managerId, request);
+            var (items, totalCount) = await _assignmentRepository.GetTeamAssignments(
+                managerId,
+                request
+            );
 
             var sortedItems = ApplyAssignmentSorting(
-                items.AsQueryable(),
-                request.SortField,
-                request.SortOrder
-            ).ToList();
+                    items.AsQueryable(),
+                    request.SortField,
+                    request.SortOrder
+                )
+                .ToList();
 
             var today = DateTime.Now.Date;
 
@@ -480,14 +496,17 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     && item.Status != LnDConstants.ASSIGNMENT_STATUS.COMPLETED;
 
                 item.IsOverdue = isOverdue;
-                item.DaysOverdue = isOverdue && item.Deadline.HasValue
-                    ? (int)(today - item.Deadline.Value.Date).TotalDays
-                    : null;
+                item.DaysOverdue =
+                    isOverdue && item.Deadline.HasValue
+                        ? (int)(today - item.Deadline.Value.Date).TotalDays
+                        : null;
             }
 
             Log.Information(
                 "GetTeamAssignments succeeded. ManagerId={ManagerId}, ReturnedCount={Count}, TotalCount={TotalCount}",
-                managerId, sortedItems.Count, totalCount
+                managerId,
+                sortedItems.Count,
+                totalCount
             );
 
             return new ApiResponse<PaginatedResponse<AssignmentResponseModel>>
@@ -498,20 +517,17 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     Items = sortedItems,
                     TotalCount = totalCount,
                     PageNumber = request.PageNumber,
-                    PageSize = request.PageSize
-                }
+                    PageSize = request.PageSize,
+                },
             };
         }
 
         /// <summary>
         /// Gets paginated assignments where the employee is the assigned SME
         /// </summary>
-
-
-        public async Task<ApiResponse<PaginatedResponse<AssignmentResponseModel>>> GetSmeAssignments(
-    int smeEmployeeId,
-    AssignmentRequestModel request
-)
+        public async Task<
+            ApiResponse<PaginatedResponse<AssignmentResponseModel>>
+        > GetSmeAssignments(int smeEmployeeId, AssignmentRequestModel request)
         {
             Log.Information(
                 "GetSmeAssignments started. SmeEmployeeId={SmeEmployeeId}, StatusFilter={StatusFilter}, SearchTerm={SearchTerm}, SortField={SortField}, SortOrder={SortOrder}, Page={PageNumber}, PageSize={PageSize}",
@@ -524,8 +540,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 request.PageSize
             );
 
-            var (items, totalCount) =
-                await _assignmentRepository.GetSmeAssignments(smeEmployeeId, request);
+            var (items, totalCount) = await _assignmentRepository.GetSmeAssignments(
+                smeEmployeeId,
+                request
+            );
 
             Log.Debug(
                 "GetSmeAssignments: Retrieved {ItemCount} items from repository. TotalCount={TotalCount}",
@@ -534,10 +552,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
 
             var sortedItems = ApplySmeAssignmentSorting(
-                items.AsQueryable(),
-                request.SortField,
-                request.SortOrder
-            ).ToList();
+                    items.AsQueryable(),
+                    request.SortField,
+                    request.SortOrder
+                )
+                .ToList();
 
             var today = DateTime.Now.Date;
             Log.Debug("GetSmeAssignments: Current date for overdue calculation: {Today}", today);
@@ -547,18 +566,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             foreach (var item in sortedItems)
             {
                 var deadlineDate = item.Deadline?.Date;
-                var isCompleted =
-                    item.Status == LnDConstants.ASSIGNMENT_STATUS.COMPLETED;
+                var isCompleted = item.Status == LnDConstants.ASSIGNMENT_STATUS.COMPLETED;
 
-                var isOverdue =
-                    deadlineDate.HasValue
-                    && deadlineDate.Value < today
-                    && !isCompleted;
+                var isOverdue = deadlineDate.HasValue && deadlineDate.Value < today && !isCompleted;
 
                 item.IsOverdue = isOverdue;
-                item.DaysOverdue = isOverdue && deadlineDate.HasValue
-                    ? (int)(today - deadlineDate.Value).TotalDays
-                    : null;
+                item.DaysOverdue =
+                    isOverdue && deadlineDate.HasValue
+                        ? (int)(today - deadlineDate.Value).TotalDays
+                        : null;
 
                 if (isOverdue)
                 {
@@ -589,8 +605,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     Items = sortedItems,
                     TotalCount = totalCount,
                     PageNumber = request.PageNumber,
-                    PageSize = request.PageSize
-                }
+                    PageSize = request.PageSize,
+                },
             };
         }
 
@@ -602,27 +618,27 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         /// Exports team assignments to Excel with formatted headers and data columns
         /// </summary>
         public async Task<ApiResponse<byte[]>> GetTeamAssignmentsForExport(
-     int managerId,
-     ExportAssignmentRequestModel request
- )
+            int managerId,
+            ExportAssignmentRequestModel request
+        )
         {
             Log.Information(
                 "ExportTeamAssignmentsToExcel started. ManagerId={ManagerId}, StatusFilter={StatusFilter}",
-                managerId, request.StatusFilter ?? "all"
+                managerId,
+                request.StatusFilter ?? "all"
             );
 
-
-            var items =
-                await _assignmentRepository.GetAllTeamAssignmentsForExport(
-                    managerId,
-                    request
-                );
+            var items = await _assignmentRepository.GetAllTeamAssignmentsForExport(
+                managerId,
+                request
+            );
 
             var sortedItems = ApplyAssignmentEntitySorting(
-                items.AsQueryable(),
-                request.SortField,
-                request.SortOrder
-            ).ToList();
+                    items.AsQueryable(),
+                    request.SortField,
+                    request.SortOrder
+                )
+                .ToList();
 
             Log.Debug(
                 "ExportTeamAssignmentsToExcel: Retrieved {Count} assignments for export",
@@ -654,14 +670,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 foreach (var assignment in sortedItems)
                 {
                     var menteeName =
-                        $"{assignment.MenteeEmployee?.Userprofile?.FirstName ?? ""} " +
-                        $"{assignment.MenteeEmployee?.Userprofile?.LastName ?? ""}".Trim();
+                        $"{assignment.MenteeEmployee?.Userprofile?.FirstName ?? ""} "
+                        + $"{assignment.MenteeEmployee?.Userprofile?.LastName ?? ""}".Trim();
 
                     var skillName = assignment.Skill?.SkillName ?? "N/A";
 
                     var smeName =
-                        $"{assignment.Sme?.Employee?.Userprofile?.FirstName ?? ""} " +
-                        $"{assignment.Sme?.Employee?.Userprofile?.LastName ?? ""}".Trim();
+                        $"{assignment.Sme?.Employee?.Userprofile?.FirstName ?? ""} "
+                        + $"{assignment.Sme?.Employee?.Userprofile?.LastName ?? ""}".Trim();
 
                     worksheet.Cell(row, 1).Value = menteeName;
                     worksheet.Cell(row, 2).Value = skillName;
@@ -671,10 +687,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         assignment.CreatedOn?.ToString("MM/dd/yyyy") ?? "";
                     worksheet.Cell(row, 6).Value =
                         assignment.Deadline?.ToString("MM/dd/yyyy") ?? "";
-                    worksheet.Cell(row, 7).Value =
-                        assignment.CompletionRating?.ToString() ?? "N/A";
-                    worksheet.Cell(row, 8).Value =
-                        assignment.CompletionNotes ?? "";
+                    worksheet.Cell(row, 7).Value = assignment.CompletionRating?.ToString() ?? "N/A";
+                    worksheet.Cell(row, 8).Value = assignment.CompletionNotes ?? "";
 
                     row++;
                 }
@@ -688,14 +702,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                     Log.Information(
                         "ExportTeamAssignmentsToExcel succeeded. ManagerId={ManagerId}, AssignmentCount={Count}, FileSize={FileSize} bytes",
-                        managerId, sortedItems.Count, fileBytes.Length
+                        managerId,
+                        sortedItems.Count,
+                        fileBytes.Length
                     );
 
-                    return new ApiResponse<byte[]>
-                    {
-                        Success = true,
-                        Data = fileBytes
-                    };
+                    return new ApiResponse<byte[]> { Success = true, Data = fileBytes };
                 }
             }
         }
@@ -704,10 +716,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
 
         private IQueryable<AssignmentResponseModel> ApplySmeAssignmentSorting(
-    IQueryable<AssignmentResponseModel> query,
-    string? sortField,
-    string? sortOrder
-)
+            IQueryable<AssignmentResponseModel> query,
+            string? sortField,
+            string? sortOrder
+        )
         {
             bool isAscending =
                 string.IsNullOrEmpty(sortOrder)
@@ -718,46 +730,39 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             return sortField?.ToLower() switch
             {
-                LnDConstants.SORT_FIELDS.MENTEE_NAME =>
-                    isAscending
-                        ? query.OrderBy(a => a.MenteeName)
-                        : query.OrderByDescending(a => a.MenteeName),
+                LnDConstants.SORT_FIELDS.MENTEE_NAME => isAscending
+                    ? query.OrderBy(a => a.MenteeName)
+                    : query.OrderByDescending(a => a.MenteeName),
 
-                LnDConstants.SORT_FIELDS.SKILL_NAME =>
-                    isAscending
-                        ? query.OrderBy(a => a.SkillName)
-                        : query.OrderByDescending(a => a.SkillName),
+                LnDConstants.SORT_FIELDS.SKILL_NAME => isAscending
+                    ? query.OrderBy(a => a.SkillName)
+                    : query.OrderByDescending(a => a.SkillName),
 
-                LnDConstants.SORT_FIELDS.STATUS =>
-                    isAscending
-                        ? query.OrderBy(a => a.Status)
-                        : query.OrderByDescending(a => a.Status),
+                LnDConstants.SORT_FIELDS.STATUS => isAscending
+                    ? query.OrderBy(a => a.Status)
+                    : query.OrderByDescending(a => a.Status),
 
-                LnDConstants.SORT_FIELDS.CREATED_ON =>
-                    isAscending
-                        ? query.OrderBy(a => a.CreatedOn)
-                        : query.OrderByDescending(a => a.CreatedOn),
+                LnDConstants.SORT_FIELDS.CREATED_ON => isAscending
+                    ? query.OrderBy(a => a.CreatedOn)
+                    : query.OrderByDescending(a => a.CreatedOn),
 
-                LnDConstants.SORT_FIELDS.DEADLINE =>
-                    isAscending
-                        ? query.OrderBy(a => a.Deadline)
-                        : query.OrderByDescending(a => a.Deadline),
+                LnDConstants.SORT_FIELDS.DEADLINE => isAscending
+                    ? query.OrderBy(a => a.Deadline)
+                    : query.OrderByDescending(a => a.Deadline),
 
-                LnDConstants.SORT_FIELDS.COMPLETION_RATING =>
-                    isAscending
-                        ? query.OrderBy(a => a.CompletionRating ?? 0)
-                        : query.OrderByDescending(a => a.CompletionRating ?? 0),
+                LnDConstants.SORT_FIELDS.COMPLETION_RATING => isAscending
+                    ? query.OrderBy(a => a.CompletionRating ?? 0)
+                    : query.OrderByDescending(a => a.CompletionRating ?? 0),
 
-                _ =>
-                    query.OrderByDescending(a => a.CreatedOn)
+                _ => query.OrderByDescending(a => a.CreatedOn),
             };
         }
 
         private IQueryable<AssignmentResponseModel> ApplyAssignmentSorting(
-    IQueryable<AssignmentResponseModel> query,
-    string? sortField,
-    string? sortOrder
-)
+            IQueryable<AssignmentResponseModel> query,
+            string? sortField,
+            string? sortOrder
+        )
         {
             bool isAscending =
                 string.IsNullOrEmpty(sortOrder)
@@ -768,51 +773,43 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             return sortField?.ToLower() switch
             {
-                LnDConstants.SORT_FIELDS.MENTEE_NAME =>
-                    isAscending
-                        ? query.OrderBy(a => a.MenteeName)
-                        : query.OrderByDescending(a => a.MenteeName),
+                LnDConstants.SORT_FIELDS.MENTEE_NAME => isAscending
+                    ? query.OrderBy(a => a.MenteeName)
+                    : query.OrderByDescending(a => a.MenteeName),
 
-                LnDConstants.SORT_FIELDS.SKILL_NAME =>
-                    isAscending
-                        ? query.OrderBy(a => a.SkillName)
-                        : query.OrderByDescending(a => a.SkillName),
+                LnDConstants.SORT_FIELDS.SKILL_NAME => isAscending
+                    ? query.OrderBy(a => a.SkillName)
+                    : query.OrderByDescending(a => a.SkillName),
 
-                LnDConstants.SORT_FIELDS.SME_NAME =>
-                    isAscending
-                        ? query.OrderBy(a => a.SmeName)
-                        : query.OrderByDescending(a => a.SmeName),
+                LnDConstants.SORT_FIELDS.SME_NAME => isAscending
+                    ? query.OrderBy(a => a.SmeName)
+                    : query.OrderByDescending(a => a.SmeName),
 
-                LnDConstants.SORT_FIELDS.STATUS =>
-                    isAscending
-                        ? query.OrderBy(a => a.Status)
-                        : query.OrderByDescending(a => a.Status),
+                LnDConstants.SORT_FIELDS.STATUS => isAscending
+                    ? query.OrderBy(a => a.Status)
+                    : query.OrderByDescending(a => a.Status),
 
-                LnDConstants.SORT_FIELDS.CREATED_ON =>
-                    isAscending
-                        ? query.OrderBy(a => a.CreatedOn)
-                        : query.OrderByDescending(a => a.CreatedOn),
+                LnDConstants.SORT_FIELDS.CREATED_ON => isAscending
+                    ? query.OrderBy(a => a.CreatedOn)
+                    : query.OrderByDescending(a => a.CreatedOn),
 
-                LnDConstants.SORT_FIELDS.DEADLINE =>
-                    isAscending
-                        ? query.OrderBy(a => a.Deadline)
-                        : query.OrderByDescending(a => a.Deadline),
+                LnDConstants.SORT_FIELDS.DEADLINE => isAscending
+                    ? query.OrderBy(a => a.Deadline)
+                    : query.OrderByDescending(a => a.Deadline),
 
-                LnDConstants.SORT_FIELDS.COMPLETION_RATING =>
-                    isAscending
-                        ? query.OrderBy(a => a.CompletionRating ?? 0)
-                        : query.OrderByDescending(a => a.CompletionRating ?? 0),
+                LnDConstants.SORT_FIELDS.COMPLETION_RATING => isAscending
+                    ? query.OrderBy(a => a.CompletionRating ?? 0)
+                    : query.OrderByDescending(a => a.CompletionRating ?? 0),
 
-                _ =>
-                    query.OrderByDescending(a => a.CreatedOn)
+                _ => query.OrderByDescending(a => a.CreatedOn),
             };
         }
 
         private IQueryable<Lndassignment> ApplyAssignmentEntitySorting(
-    IQueryable<Lndassignment> query,
-    string? sortField,
-    string? sortOrder
-)
+            IQueryable<Lndassignment> query,
+            string? sortField,
+            string? sortOrder
+        )
         {
             bool isAscending =
                 string.IsNullOrEmpty(sortOrder)
@@ -823,50 +820,44 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             return sortField?.ToLower() switch
             {
-                LnDConstants.SORT_FIELDS.MENTEE_NAME =>
-                    isAscending
-                        ? query.OrderBy(a => a.MenteeEmployee.Userprofile.FirstName)
-                               .ThenBy(a => a.MenteeEmployee.Userprofile.LastName)
-                        : query.OrderByDescending(a => a.MenteeEmployee.Userprofile.FirstName)
-                               .ThenByDescending(a => a.MenteeEmployee.Userprofile.LastName),
+                LnDConstants.SORT_FIELDS.MENTEE_NAME => isAscending
+                    ? query
+                        .OrderBy(a => a.MenteeEmployee.Userprofile.FirstName)
+                        .ThenBy(a => a.MenteeEmployee.Userprofile.LastName)
+                    : query
+                        .OrderByDescending(a => a.MenteeEmployee.Userprofile.FirstName)
+                        .ThenByDescending(a => a.MenteeEmployee.Userprofile.LastName),
 
-                LnDConstants.SORT_FIELDS.SKILL_NAME =>
-                    isAscending
-                        ? query.OrderBy(a => a.Skill.SkillName)
-                        : query.OrderByDescending(a => a.Skill.SkillName),
+                LnDConstants.SORT_FIELDS.SKILL_NAME => isAscending
+                    ? query.OrderBy(a => a.Skill.SkillName)
+                    : query.OrderByDescending(a => a.Skill.SkillName),
 
-                LnDConstants.SORT_FIELDS.SME_NAME =>
-                    isAscending
-                        ? query.OrderBy(a => a.Sme.Employee.Userprofile.FirstName)
-                               .ThenBy(a => a.Sme.Employee.Userprofile.LastName)
-                        : query.OrderByDescending(a => a.Sme.Employee.Userprofile.FirstName)
-                               .ThenByDescending(a => a.Sme.Employee.Userprofile.LastName),
+                LnDConstants.SORT_FIELDS.SME_NAME => isAscending
+                    ? query
+                        .OrderBy(a => a.Sme.Employee.Userprofile.FirstName)
+                        .ThenBy(a => a.Sme.Employee.Userprofile.LastName)
+                    : query
+                        .OrderByDescending(a => a.Sme.Employee.Userprofile.FirstName)
+                        .ThenByDescending(a => a.Sme.Employee.Userprofile.LastName),
 
-                LnDConstants.SORT_FIELDS.STATUS =>
-                    isAscending
-                        ? query.OrderBy(a => a.Status)
-                        : query.OrderByDescending(a => a.Status),
+                LnDConstants.SORT_FIELDS.STATUS => isAscending
+                    ? query.OrderBy(a => a.Status)
+                    : query.OrderByDescending(a => a.Status),
 
-                LnDConstants.SORT_FIELDS.CREATED_ON =>
-                    isAscending
-                        ? query.OrderBy(a => a.CreatedOn)
-                        : query.OrderByDescending(a => a.CreatedOn),
+                LnDConstants.SORT_FIELDS.CREATED_ON => isAscending
+                    ? query.OrderBy(a => a.CreatedOn)
+                    : query.OrderByDescending(a => a.CreatedOn),
 
-                LnDConstants.SORT_FIELDS.DEADLINE =>
-                    isAscending
-                        ? query.OrderBy(a => a.Deadline)
-                        : query.OrderByDescending(a => a.Deadline),
+                LnDConstants.SORT_FIELDS.DEADLINE => isAscending
+                    ? query.OrderBy(a => a.Deadline)
+                    : query.OrderByDescending(a => a.Deadline),
 
-                LnDConstants.SORT_FIELDS.COMPLETION_RATING =>
-                    isAscending
-                        ? query.OrderBy(a => a.CompletionRating ?? 0)
-                        : query.OrderByDescending(a => a.CompletionRating ?? 0),
+                LnDConstants.SORT_FIELDS.COMPLETION_RATING => isAscending
+                    ? query.OrderBy(a => a.CompletionRating ?? 0)
+                    : query.OrderByDescending(a => a.CompletionRating ?? 0),
 
-                _ =>
-                    query.OrderByDescending(a => a.CreatedOn)
+                _ => query.OrderByDescending(a => a.CreatedOn),
             };
         }
-
-
     }
 }

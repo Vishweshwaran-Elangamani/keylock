@@ -1,10 +1,10 @@
+using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repositories.Interface;
 using Serilog;
-using Microsoft.EntityFrameworkCore;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -40,31 +40,34 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             Log.Information(
                 "GetSubordinateEmployees started. ManagerId={ManagerId}, SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
-                managerId, request.SearchTerm ?? "none", request.PageNumber, request.PageSize
+                managerId,
+                request.SearchTerm ?? "none",
+                request.PageNumber,
+                request.PageSize
             );
 
             var manager = await _repository.GetEmployeeById(managerId);
 
             if (manager == null)
             {
-                Log.Warning("GetSubordinateEmployees: Manager not found. ManagerId={ManagerId}", managerId);
+                Log.Warning(
+                    "GetSubordinateEmployees: Manager not found. ManagerId={ManagerId}",
+                    managerId
+                );
 
                 return new ApiResponse<PaginatedResponse<SubordinateEmployeeResponseModel>>
                 {
                     Success = false,
                     Message = LnDConstants.RESPONSE_MESSAGES.MANAGER_NOT_FOUND,
-
                 };
             }
 
-            var (items, totalCount) = await _repository.GetSubordinateEmployees(
-                managerId,
-                request
-            );
+            var (items, totalCount) = await _repository.GetSubordinateEmployees(managerId, request);
 
             Log.Debug(
                 "GetSubordinateEmployees: Retrieved {ItemCount} employees. TotalCount={TotalCount}",
-                items.Count, totalCount
+                items.Count,
+                totalCount
             );
 
             var employeeModels = items
@@ -89,16 +92,18 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             Log.Information(
                 "GetSubordinateEmployees succeeded. ManagerId={ManagerId}, ReturnedCount={Count}, TotalCount={TotalCount}",
-                managerId, employeeModels.Count, totalCount
+                managerId,
+                employeeModels.Count,
+                totalCount
             );
 
             return new ApiResponse<PaginatedResponse<SubordinateEmployeeResponseModel>>
             {
                 Success = true,
                 Message = string.Format(
-    LnDConstants.RESPONSE_MESSAGES.SUBORDINATES_FOUND,
-    totalCount
-),
+                    LnDConstants.RESPONSE_MESSAGES.SUBORDINATES_FOUND,
+                    totalCount
+                ),
 
                 Data = paginatedResponse,
             };
@@ -118,18 +123,25 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var skills = await _repository.GetAllSkills();
 
             var skillResponseModels = skills
-                .Select(s => new SkillResponseModel { SkillId = s.SkillId, SkillName = s.SkillName })
+                .Select(s => new SkillResponseModel
+                {
+                    SkillId = s.SkillId,
+                    SkillName = s.SkillName,
+                })
                 .ToList();
 
-            Log.Information("GetAllSkills succeeded. SkillCount={Count}", skillResponseModels.Count);
+            Log.Information(
+                "GetAllSkills succeeded. SkillCount={Count}",
+                skillResponseModels.Count
+            );
 
             return new ApiResponse<List<SkillResponseModel>>
             {
                 Success = true,
                 Message = string.Format(
-    LnDConstants.RESPONSE_MESSAGES.SKILLS_FOUND,
-    skillResponseModels.Count
-),
+                    LnDConstants.RESPONSE_MESSAGES.SKILLS_FOUND,
+                    skillResponseModels.Count
+                ),
 
                 Data = skillResponseModels,
             };
@@ -138,10 +150,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         /// <summary>
         /// Gets paginated skills for subordinate employees with optional employee filter
         /// </summary>
-        public async Task<ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>> GetSubordinateSkills(
-       int managerId,
-       SubordinateSkillsRequestModel request
-   )
+        public async Task<
+            ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>
+        > GetSubordinateSkills(int managerId, SubordinateSkillsRequestModel request)
         {
             Log.Information(
                 "GetSubordinateSkills started. ManagerId={ManagerId}, EmployeeId={EmployeeId}, SearchTerm={SearchTerm}, SortBy={SortBy}, Page={PageNumber}",
@@ -164,20 +175,17 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>
                 {
                     Success = false,
-                    Message = LnDConstants.RESPONSE_MESSAGES.MANAGER_NOT_FOUND
+                    Message = LnDConstants.RESPONSE_MESSAGES.MANAGER_NOT_FOUND,
                 };
             }
 
-            var (items, totalCount) =
-                await _repository.GetSubordinateSkills(managerId, request);
+            var (items, totalCount) = await _repository.GetSubordinateSkills(managerId, request);
 
-            var sortedItems = ApplySubordinateSkillSorting(
-                items.AsQueryable(),
-                request.SortBy
-            ).ToList();
+            var sortedItems = ApplySubordinateSkillSorting(items.AsQueryable(), request.SortBy)
+                .ToList();
 
-            var skillResponseModels = sortedItems.Select(m =>
-                new EmployeeSkillResponseModel
+            var skillResponseModels = sortedItems
+                .Select(m => new EmployeeSkillResponseModel
                 {
                     MapperId = m.MapperId,
                     EmployeeId = m.EmployeeId,
@@ -191,9 +199,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     CanBecomeSme = m.Rating >= LnDConstants.MIN_SME_RATING,
                     IsSme = m.Skill.Lndsmes.Any(s =>
                         s.EmployeeId == m.EmployeeId && s.IsActive == true
-                    )
-                }
-            ).ToList();
+                    ),
+                })
+                .ToList();
 
             Log.Information(
                 "GetSubordinateSkills succeeded. ManagerId={ManagerId}, ReturnedCount={Count}, TotalCount={TotalCount}",
@@ -210,8 +218,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     Items = skillResponseModels,
                     TotalCount = totalCount,
                     PageNumber = request.PageNumber,
-                    PageSize = 1_000_000
-                }
+                    PageSize = 1_000_000,
+                },
             };
         }
 
@@ -225,12 +233,19 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             Log.Information(
                 "GetMySkills started. EmployeeId={EmployeeId}, SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
-                employeeId, request.SearchTerm ?? "none", request.PageNumber, request.PageSize
+                employeeId,
+                request.SearchTerm ?? "none",
+                request.PageNumber,
+                request.PageSize
             );
 
             var (items, totalCount) = await _repository.GetMySkills(employeeId, request);
 
-            Log.Debug("GetMySkills: Retrieved {ItemCount} skills. TotalCount={TotalCount}", items.Count, totalCount);
+            Log.Debug(
+                "GetMySkills: Retrieved {ItemCount} skills. TotalCount={TotalCount}",
+                items.Count,
+                totalCount
+            );
 
             var skillResponseModels = items
                 .Select(m => new EmployeeSkillResponseModel
@@ -253,7 +268,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             Log.Information(
                 "GetMySkills succeeded. EmployeeId={EmployeeId}, ReturnedCount={Count}, TotalCount={TotalCount}",
-                employeeId, skillResponseModels.Count, totalCount
+                employeeId,
+                skillResponseModels.Count,
+                totalCount
             );
 
             return new ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>
@@ -283,7 +300,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             Log.Information(
                 "RecordEmployeeSkill started. ManagerId={ManagerId}, EmployeeId={EmployeeId}, SkillId={SkillId}, Rating={Rating}",
-                managerId, request.EmployeeId, request.SkillId, request.Rating
+                managerId,
+                request.EmployeeId,
+                request.SkillId,
+                request.Rating
             );
 
             var employee = await _repository.GetEmployeeById(request.EmployeeId);
@@ -292,14 +312,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 Log.Warning(
                     "RecordEmployeeSkill: Employee validation failed. EmployeeId={EmployeeId}, ManagerId={ManagerId}",
-                    request.EmployeeId, managerId
+                    request.EmployeeId,
+                    managerId
                 );
 
                 return new ApiResponse<EmployeeSkillResponseModel>
                 {
                     Success = false,
                     Message = LnDConstants.RESPONSE_MESSAGES.EMPLOYEE_NOT_FOUND_OR_NOT_SUBORDINATE,
-
                 };
             }
 
@@ -307,13 +327,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             if (skill == null)
             {
-                Log.Warning("RecordEmployeeSkill: Skill not found. SkillId={SkillId}", request.SkillId);
+                Log.Warning(
+                    "RecordEmployeeSkill: Skill not found. SkillId={SkillId}",
+                    request.SkillId
+                );
 
                 return new ApiResponse<EmployeeSkillResponseModel>
                 {
                     Success = false,
                     Message = LnDConstants.RESPONSE_MESSAGES.SKILL_NOT_FOUND,
-
                 };
             }
 
@@ -326,14 +348,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 Log.Warning(
                     "RecordEmployeeSkill: Skill already exists. EmployeeId={EmployeeId}, SkillId={SkillId}",
-                    request.EmployeeId, request.SkillId
+                    request.EmployeeId,
+                    request.SkillId
                 );
 
                 return new ApiResponse<EmployeeSkillResponseModel>
                 {
                     Success = false,
                     Message = LnDConstants.RESPONSE_MESSAGES.SKILL_ALREADY_RECORDED,
-
                 };
             }
 
@@ -353,7 +375,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             Log.Information(
                 "RecordEmployeeSkill succeeded. MapperId={MapperId}, EmployeeId={EmployeeId}, SkillId={SkillId}, Rating={Rating}",
-                savedMapper.MapperId, request.EmployeeId, request.SkillId, request.Rating
+                savedMapper.MapperId,
+                request.EmployeeId,
+                request.SkillId,
+                request.Rating
             );
 
             return new ApiResponse<EmployeeSkillResponseModel>
@@ -388,7 +413,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             Log.Information(
                 "BulkRecordEmployeeSkills started. ManagerId={ManagerId}, EmployeeId={EmployeeId}, SkillCount={Count}",
-                managerId, request.EmployeeId, request.Skills?.Count ?? 0
+                managerId,
+                request.EmployeeId,
+                request.Skills?.Count ?? 0
             );
 
             var employee = await _repository.GetEmployeeById(request.EmployeeId);
@@ -397,14 +424,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 Log.Warning(
                     "BulkRecordEmployeeSkills: Employee validation failed. EmployeeId={EmployeeId}, ManagerId={ManagerId}",
-                    request.EmployeeId, managerId
+                    request.EmployeeId,
+                    managerId
                 );
 
                 return new ApiResponse<List<EmployeeSkillResponseModel>>
                 {
                     Success = false,
                     Message = LnDConstants.RESPONSE_MESSAGES.EMPLOYEE_NOT_FOUND_OR_NOT_SUBORDINATE,
-
                 };
             }
 
@@ -419,7 +446,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             Log.Debug(
                 "BulkRecordEmployeeSkills: ExistingMappings={ExistingCount}, RequestedSkills={RequestedCount}",
-                existingMappings.Count, request.Skills.Count
+                existingMappings.Count,
+                request.Skills.Count
             );
 
             var newMappings = new List<Lndemployeeskillmapper>();
@@ -430,9 +458,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 if (existingMappings.Contains(skillRating.SkillId))
                     continue;
 
-                var skill = relevantSkills.FirstOrDefault(s =>
-                    s.SkillId == skillRating.SkillId
-                );
+                var skill = relevantSkills.FirstOrDefault(s => s.SkillId == skillRating.SkillId);
                 if (skill == null)
                     continue;
 
@@ -475,7 +501,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             Log.Information(
                 "BulkRecordEmployeeSkills succeeded. ManagerId={ManagerId}, EmployeeId={EmployeeId}, RecordedCount={Count}",
-                managerId, request.EmployeeId, results.Count
+                managerId,
+                request.EmployeeId,
+                results.Count
             );
 
             return new ApiResponse<List<EmployeeSkillResponseModel>>
@@ -497,7 +525,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             Log.Information(
                 "UpdateEmployeeSkillRating started. ManagerId={ManagerId}, MapperId={MapperId}, NewRating={NewRating}",
-                managerId, request.MapperId, request.Rating
+                managerId,
+                request.MapperId,
+                request.Rating
             );
 
             var mapper = await _repository.GetEmployeeSkillMappingById(request.MapperId);
@@ -506,14 +536,16 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 Log.Warning(
                     "UpdateEmployeeSkillRating: Mapper validation failed. MapperId={MapperId}, ManagerId={ManagerId}",
-                    request.MapperId, managerId
+                    request.MapperId,
+                    managerId
                 );
 
                 return new ApiResponse<EmployeeSkillResponseModel>
                 {
                     Success = false,
-                    Message = LnDConstants.RESPONSE_MESSAGES.SKILL_MAPPING_NOT_FOUND_OR_UNAUTHORIZED,
-
+                    Message = LnDConstants
+                        .RESPONSE_MESSAGES
+                        .SKILL_MAPPING_NOT_FOUND_OR_UNAUTHORIZED,
                 };
             }
 
@@ -522,16 +554,17 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             mapper.UpdatedByEmployeeId = managerId;
             mapper.UpdatedOn = DateOnly.FromDateTime(DateTime.Now);
 
-            var smeRecord = await _smeRepository.GetActiveSme(
-                mapper.EmployeeId,
-                mapper.SkillId
-            );
+            var smeRecord = await _smeRepository.GetActiveSme(mapper.EmployeeId, mapper.SkillId);
 
             if (smeRecord != null && request.Rating < LnDConstants.MIN_SME_RATING)
             {
                 Log.Information(
                     "UpdateEmployeeSkillRating: Deactivating SME. SmeId={SmeId}, EmployeeId={EmployeeId}, SkillId={SkillId}, OldRating={OldRating}, NewRating={NewRating}",
-                    smeRecord.SmeId, mapper.EmployeeId, mapper.SkillId, oldRating, request.Rating
+                    smeRecord.SmeId,
+                    mapper.EmployeeId,
+                    mapper.SkillId,
+                    oldRating,
+                    request.Rating
                 );
 
                 smeRecord.IsActive = false;
@@ -543,7 +576,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             Log.Information(
                 "UpdateEmployeeSkillRating succeeded. MapperId={MapperId}, EmployeeId={EmployeeId}, SkillId={SkillId}, OldRating={OldRating}, NewRating={NewRating}",
-                request.MapperId, mapper.EmployeeId, mapper.SkillId, oldRating, request.Rating
+                request.MapperId,
+                mapper.EmployeeId,
+                mapper.SkillId,
+                oldRating,
+                request.Rating
             );
 
             return new ApiResponse<EmployeeSkillResponseModel>
@@ -575,7 +612,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             Log.Information(
                 "DeleteEmployeeSkill started. ManagerId={ManagerId}, MapperId={MapperId}",
-                managerId, skillMapperId
+                managerId,
+                skillMapperId
             );
 
             var mapper = await _repository.GetEmployeeSkillMappingById(skillMapperId);
@@ -584,14 +622,16 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 Log.Warning(
                     "DeleteEmployeeSkill: Mapper validation failed. MapperId={MapperId}, ManagerId={ManagerId}",
-                    skillMapperId, managerId
+                    skillMapperId,
+                    managerId
                 );
 
                 return new ApiResponse<bool>
                 {
                     Success = false,
-                    Message = LnDConstants.RESPONSE_MESSAGES.SKILL_MAPPING_NOT_FOUND_OR_UNAUTHORIZED,
-
+                    Message = LnDConstants
+                        .RESPONSE_MESSAGES
+                        .SKILL_MAPPING_NOT_FOUND_OR_UNAUTHORIZED,
                 };
             }
 
@@ -604,7 +644,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 Log.Information(
                     "DeleteEmployeeSkill: Deleting {Count} pending skill approvals. EmployeeId={EmployeeId}, SkillId={SkillId}",
-                    pendingSkillApprovals.Count, mapper.EmployeeId, mapper.SkillId
+                    pendingSkillApprovals.Count,
+                    mapper.EmployeeId,
+                    mapper.SkillId
                 );
                 await _repository.DeleteApprovals(pendingSkillApprovals);
             }
@@ -618,7 +660,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 var assignmentIds = relatedAssignments.Select(a => a.AssignmentId).ToList();
 
-                var assignmentApprovals = await _repository.GetPendingAssignmentApprovals(assignmentIds);
+                var assignmentApprovals = await _repository.GetPendingAssignmentApprovals(
+                    assignmentIds
+                );
 
                 if (assignmentApprovals.Any())
                 {
@@ -631,21 +675,22 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 Log.Information(
                     "DeleteEmployeeSkill: Deleting {Count} related assignments. EmployeeId={EmployeeId}, SkillId={SkillId}",
-                    relatedAssignments.Count, mapper.EmployeeId, mapper.SkillId
+                    relatedAssignments.Count,
+                    mapper.EmployeeId,
+                    mapper.SkillId
                 );
                 await _repository.DeleteAssignments(relatedAssignments);
             }
 
-            var smeRecord = await _smeRepository.GetActiveSme(
-                mapper.EmployeeId,
-                mapper.SkillId
-            );
+            var smeRecord = await _smeRepository.GetActiveSme(mapper.EmployeeId, mapper.SkillId);
 
             if (smeRecord != null)
             {
                 Log.Information(
                     "DeleteEmployeeSkill: Deactivating SME. SmeId={SmeId}, EmployeeId={EmployeeId}, SkillId={SkillId}",
-                    smeRecord.SmeId, mapper.EmployeeId, mapper.SkillId
+                    smeRecord.SmeId,
+                    mapper.EmployeeId,
+                    mapper.SkillId
                 );
 
                 smeRecord.IsActive = false;
@@ -658,16 +703,19 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             Log.Information(
                 "DeleteEmployeeSkill succeeded. MapperId={MapperId}, EmployeeId={EmployeeId}, SkillId={SkillId}, DeletedAssignments={AssignmentCount}",
-                skillMapperId, mapper.EmployeeId, mapper.SkillId, relatedAssignments.Count
+                skillMapperId,
+                mapper.EmployeeId,
+                mapper.SkillId,
+                relatedAssignments.Count
             );
 
             return new ApiResponse<bool>
             {
                 Success = true,
                 Message = string.Format(
-    LnDConstants.RESPONSE_MESSAGES.SKILL_DELETE_WITH_ASSIGNMENTS,
-    relatedAssignments.Count
-),
+                    LnDConstants.RESPONSE_MESSAGES.SKILL_DELETE_WITH_ASSIGNMENTS,
+                    relatedAssignments.Count
+                ),
 
                 Data = true,
             };
@@ -676,25 +724,20 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         #endregion
 
         private IQueryable<Lndemployeeskillmapper> ApplySubordinateSkillSorting(
-    IQueryable<Lndemployeeskillmapper> query,
-    string? sortBy
-)
+            IQueryable<Lndemployeeskillmapper> query,
+            string? sortBy
+        )
         {
             return sortBy?.ToLower() switch
             {
-                LnDConstants.SORT_FIELDS.SKILL_NAME =>
-                    query.OrderBy(m => m.Skill.SkillName),
+                LnDConstants.SORT_FIELDS.SKILL_NAME => query.OrderBy(m => m.Skill.SkillName),
 
-                LnDConstants.SORT_FIELDS.RATING =>
-                    query.OrderByDescending(m => m.Rating),
+                LnDConstants.SORT_FIELDS.RATING => query.OrderByDescending(m => m.Rating),
 
-                LnDConstants.SORT_FIELDS.CREATED_ON =>
-                    query.OrderByDescending(m => m.CreatedOn),
+                LnDConstants.SORT_FIELDS.CREATED_ON => query.OrderByDescending(m => m.CreatedOn),
 
-                _ =>
-                    query.OrderBy(m => m.Employee.Userprofile.FirstName)
+                _ => query.OrderBy(m => m.Employee.Userprofile.FirstName),
             };
         }
-
     }
 }

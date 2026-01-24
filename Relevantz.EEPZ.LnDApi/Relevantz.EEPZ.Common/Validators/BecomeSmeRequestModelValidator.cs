@@ -8,12 +8,13 @@ namespace Relevantz.EEPZ.Common.Validators
     {
         public BecomeSmeRequestModelValidator()
         {
-            RuleFor(x => x.SkillId)
-                .GreaterThan(0).WithMessage("SkillId must be greater than 0");
+            RuleFor(x => x.SkillId).GreaterThan(0).WithMessage("SkillId must be greater than 0");
 
             RuleFor(x => x.ProofDocument)
-                .NotNull().WithMessage("ProofDocument is required")
-                .Must(BeAValidFile).WithMessage("Invalid file type. Only .pdf, .jpg, and .png files are allowed.");
+                .NotNull()
+                .WithMessage("ProofDocument is required")
+                .Must(BeAValidFile)
+                .WithMessage("Invalid file type. Only .pdf, .jpg, and .png files are allowed.");
         }
 
         private bool BeAValidFile(IFormFile file)
@@ -21,11 +22,21 @@ namespace Relevantz.EEPZ.Common.Validators
             if (file == null)
                 return false;
 
-            var allowedExtensions = new[] {
-    ".pdf", ".jpg", ".jpeg", ".png", 
-    ".docx", ".doc", ".xlsx", ".xls", 
-    ".pptx", ".ppt", ".txt", 
-    ".rtf",};
+            var allowedExtensions = new[]
+            {
+                ".pdf",
+                ".jpg",
+                ".jpeg",
+                ".png",
+                ".docx",
+                ".doc",
+                ".xlsx",
+                ".xls",
+                ".pptx",
+                ".ppt",
+                ".txt",
+                ".rtf",
+            };
             var fileExtension = System.IO.Path.GetExtension(file.FileName);
             return allowedExtensions.Contains(fileExtension.ToLower());
         }

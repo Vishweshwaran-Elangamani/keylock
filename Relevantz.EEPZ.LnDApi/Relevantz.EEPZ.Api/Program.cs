@@ -1,27 +1,24 @@
 using System.Text;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Relevantz.EEPZ.Api.Middleware;
 using Relevantz.EEPZ.Common.Configuration;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Validators;
 using Relevantz.EEPZ.Core.Services.Implementations;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repositories.Implementations;
 using Relevantz.EEPZ.Data.Repositories.Interface;
-using Relevantz.EEPZ.Api.Middleware;
-using FluentValidation;
-using FluentValidation.AspNetCore; 
-using Relevantz.EEPZ.Common.Validators; 
 using Serilog;
-
-
 
 var builder = WebApplication.CreateBuilder(args);
 Console.WriteLine("Building EEPZ Backend........");
-
 
 // Configure Serilog for Logging
 
@@ -36,8 +33,6 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
     .MinimumLevel.Override("Microsoft.EntityFrameworkCore", Serilog.Events.LogEventLevel.Warning)
     .CreateLogger();
-
-
 
 builder.Host.UseSerilog();
 
@@ -64,10 +59,10 @@ builder
             .Json
             .JsonNamingPolicy
             .CamelCase;
-    }).AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<Relevantz.EEPZ.Common.Validators.ApprovalDecisionRequestModelValidator>());
-
-
-
+    })
+    .AddFluentValidation(fv =>
+        fv.RegisterValidatorsFromAssemblyContaining<Relevantz.EEPZ.Common.Validators.ApprovalDecisionRequestModelValidator>()
+    );
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -84,8 +79,6 @@ builder.Services.AddSwaggerGen(options =>
             Description = "LnD API",
         }
     );
-
-
 
     options.AddSecurityDefinition(
         "Bearer",
@@ -119,7 +112,6 @@ builder.Services.AddSwaggerGen(options =>
     );
 });
 
-
 // Configure MySQL Database
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -132,7 +124,7 @@ if (string.IsNullOrEmpty(connectionString))
     );
 }
 
-// Register EEPZDbContext (the main context used by LnDService)           
+// Register EEPZDbContext (the main context used by LnDService)
 builder.Services.AddDbContext<EEPZDbContext>(options =>
 {
     options.UseMySql(
@@ -149,8 +141,7 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
         }
     );
 
-
-    // Enable sensitive data logging only in development 
+    // Enable sensitive data logging only in development
     if (builder.Environment.IsDevelopment())
     {
         options.EnableSensitiveDataLogging();
@@ -160,11 +151,9 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
 
 // Configure MongoDB Settings
 
-builder.Services.Configure<MongoDbSettings>(
-    builder.Configuration.GetSection("MongoDbSettings"));
+builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDbSettings"));
 
-
-// Validate MongoDB Configuration  
+// Validate MongoDB Configuration
 var mongoConfig = builder.Configuration.GetSection("MongoDbSettings");
 var mongoConnectionString = mongoConfig["ConnectionString"];
 var mongoDatabaseName = mongoConfig["DatabaseName"];
@@ -209,7 +198,6 @@ builder
             ClockSkew = TimeSpan.Zero,
         };
 
-
         options.Events = new JwtBearerEvents
         {
             OnAuthenticationFailed = context =>
@@ -231,17 +219,13 @@ builder
         };
     });
 
-
 builder.Services.AddAuthorization();
-
 
 // Register Application Services (DI)
 // File Storage Service - MongoDB GridFS
 
 builder.Services.AddSingleton<IFileStorageService, FileStorageService>();
 Log.Information("File Storage Service registered with MongoDB GridFS");
-
-
 
 // LnD Module - Complete Registration
 // LnD Repositories
@@ -252,15 +236,12 @@ builder.Services.AddScoped<ILnDApprovalRepository, LnDApprovalRepository>();
 builder.Services.AddScoped<ILnDHRRepository, LnDHRRepository>();
 builder.Services.AddScoped<ILnDBaseRepository, LnDBaseRepository>();
 
-
-
 // LnD Services
 builder.Services.AddScoped<ILnDEmployeeSkillService, LnDEmployeeSkillService>();
 builder.Services.AddScoped<ILnDSmeService, LnDSmeService>();
 builder.Services.AddScoped<ILnDAssignmentService, LnDAssignmentService>();
 builder.Services.AddScoped<ILnDApprovalService, LnDApprovalService>();
 builder.Services.AddScoped<ILnDHRService, LnDHRService>();
-
 
 // File Migration Service (Optional - for migrating existing files)
 // builder.Services.AddScoped<FileStorageMigrationService>();
@@ -291,14 +272,9 @@ builder.Services.AddCors(options =>
     );
 });
 
-
-
-
 // Add HTTP Client
 
 builder.Services.AddHttpClient();
-
-
 
 // Configure Session (if needed)
 
@@ -311,29 +287,19 @@ builder.Services.AddSession(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 });
 
-
-
-
 // Add Memory Cache
 
 builder.Services.AddMemoryCache();
-
-
 
 // Build Application
 
 var app = builder.Build();
 
-
 Log.Information("EEPZ Backend Application Starting...");
-
-
 
 // Configure HTTP Request Pipeline
 // Enable CORS
 app.UseCors("AllowAll");
-
-
 
 // Enable Swagger
 if (app.Environment.IsDevelopment())
@@ -346,13 +312,11 @@ if (app.Environment.IsDevelopment())
         c.DocumentTitle = "EEPZ Learning and Development API Documentation";
     });
 
-
-
     Log.Information("Swagger UI enabled at: /swagger");
 }
 else
 {
-    // Enable Swagger in Production 
+    // Enable Swagger in Production
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
@@ -360,8 +324,6 @@ else
         c.RoutePrefix = "swagger";
     });
 }
-
-
 
 // Enable Serilog Request Logging
 app.UseSerilogRequestLogging(options =>
@@ -375,17 +337,16 @@ app.UseSerilogRequestLogging(options =>
     };
 });
 
-
-
 // HTTPS Redirection
 app.UseHttpsRedirection();
 
-
 app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
+
 // No longer using wwwroot for file storage
 
 // Enable Session
 app.UseSession();
+
 // Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
@@ -395,85 +356,86 @@ app.MapControllers();
 
 // Health Check Endpoint
 
-app.MapGet("/health", async (EEPZDbContext eepzDbContext, IConfiguration config) =>
-{
-    bool mySqlConnected = false;
-    bool mongoConnected = false;
-
-    try
+app.MapGet(
+    "/health",
+    async (EEPZDbContext eepzDbContext, IConfiguration config) =>
     {
-        mySqlConnected = await eepzDbContext.Database.CanConnectAsync();
-    }
-    catch (Exception)
-    {
+        bool mySqlConnected = false;
+        bool mongoConnected = false;
 
-    }
-
-    // Test MongoDB Connection
-    try
-    {
-        var fileStorageService = app.Services.GetRequiredService<IFileStorageService>();
-        mongoConnected = true;
-    }
-    catch (Exception)
-    {
-        mongoConnected = false;
-    }
-
-    return Results.Ok(new
-    {
-        status = "Healthy",
-        timestamp = DateTime.UtcNow,
-        service = "EEPZ Learning and Development API",
-        version = "v1.0",
-        environment = app.Environment.EnvironmentName,
-
-        database = new
+        try
         {
-            mySQL = new
+            mySqlConnected = await eepzDbContext.Database.CanConnectAsync();
+        }
+        catch (Exception) { }
+
+        // Test MongoDB Connection
+        try
+        {
+            var fileStorageService = app.Services.GetRequiredService<IFileStorageService>();
+            mongoConnected = true;
+        }
+        catch (Exception)
+        {
+            mongoConnected = false;
+        }
+
+        return Results.Ok(
+            new
             {
-                connected = mySqlConnected,
-                provider = "MySQL (EF Core)",
-                connectionStringName = "DefaultConnection"
-            },
-            mongoDB = new
-            {
-                connected = mongoConnected,
-                provider = "MongoDB GridFS",
-                databaseName = config["MongoDbSettings:DatabaseName"]
+                status = "Healthy",
+                timestamp = DateTime.UtcNow,
+                service = "EEPZ Learning and Development API",
+                version = "v1.0",
+                environment = app.Environment.EnvironmentName,
+
+                database = new
+                {
+                    mySQL = new
+                    {
+                        connected = mySqlConnected,
+                        provider = "MySQL (EF Core)",
+                        connectionStringName = "DefaultConnection",
+                    },
+                    mongoDB = new
+                    {
+                        connected = mongoConnected,
+                        provider = "MongoDB GridFS",
+                        databaseName = config["MongoDbSettings:DatabaseName"],
+                    },
+                },
+
+                storage = new
+                {
+                    type = "MongoDB GridFS",
+                    enabled = !string.IsNullOrEmpty(config["MongoDbSettings:ConnectionString"]),
+                },
+
+                endpoints = new
+                {
+                    categories = new[]
+                    {
+                        "LnD Employee Skills",
+                        "LnD SME Management",
+                        "LnD Assignments",
+                        "LnD Approvals",
+                        "LnD HR Operations",
+                    },
+                },
+
+                authentication = new
+                {
+                    enabled = true,
+                    type = "JWT Bearer",
+                    issuerConfigured = !string.IsNullOrEmpty(config["JwtSettings:Issuer"]),
+                },
+
+                cors = "AllowAll Enabled",
+                swagger = app.Environment.IsDevelopment() || app.Environment.IsProduction(),
             }
-        },
-
-        storage = new
-        {
-            type = "MongoDB GridFS",
-            enabled = !string.IsNullOrEmpty(config["MongoDbSettings:ConnectionString"])
-        },
-
-        endpoints = new
-        {
-            categories = new[]
-            {
-                "LnD Employee Skills",
-                "LnD SME Management",
-                "LnD Assignments",
-                "LnD Approvals",
-                "LnD HR Operations"
-            }
-        },
-
-        authentication = new
-        {
-            enabled = true,
-            type = "JWT Bearer",
-            issuerConfigured = !string.IsNullOrEmpty(config["JwtSettings:Issuer"])
-        },
-
-        cors = "AllowAll Enabled",
-        swagger = app.Environment.IsDevelopment() || app.Environment.IsProduction()
-    });
-});
-
+        );
+    }
+);
 
 // Global Exception Handler
 
@@ -484,17 +446,11 @@ app.UseExceptionHandler(errorApp =>
         context.Response.StatusCode = StatusCodes.Status500InternalServerError;
         context.Response.ContentType = "application/json";
 
-
-
         var exceptionHandlerPathFeature =
             context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerPathFeature>();
         var exception = exceptionHandlerPathFeature?.Error;
 
-
-
         Log.Error(exception, "Unhandled exception occurred: {Message}", exception?.Message);
-
-
 
         var response = new
         {
@@ -504,12 +460,9 @@ app.UseExceptionHandler(errorApp =>
             stackTrace = app.Environment.IsDevelopment() ? exception?.StackTrace : null,
         };
 
-
-
         await context.Response.WriteAsJsonAsync(response);
     });
 });
-
 
 // Database Migration and Initialization
 
@@ -517,13 +470,9 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
 
-
-
     try
     {
         var eepzDbContext = services.GetRequiredService<EEPZDbContext>();
-
-
 
         if (eepzDbContext.Database.CanConnect())
         {
@@ -533,7 +482,6 @@ using (var scope = app.Services.CreateScope())
         {
             Log.Error("EEPZDbContext - Failed to connect to the MySQL database!");
         }
-
 
         try
         {
@@ -549,15 +497,12 @@ using (var scope = app.Services.CreateScope())
     {
         Log.Error(ex, "An error occurred during database initialization: {Message}", ex.Message);
 
-
-
         if (app.Environment.IsDevelopment())
         {
             throw;
         }
     }
 }
-
 
 // Application Startup
 
@@ -571,15 +516,10 @@ try
     Log.Information("File Storage: MongoDB GridFS");
     Log.Information("========================================");
 
-
-
     app.Run();
-
-
 
     Log.Information("EEPZ Backend Application Stopped Gracefully");
 }
-
 catch (Exception ex)
 {
     Log.Fatal(ex, "EEPZ Backend Application Terminated Unexpectedly");
@@ -589,4 +529,3 @@ finally
 {
     Log.CloseAndFlush();
 }
-

@@ -4,10 +4,9 @@ namespace Relevantz.EEPZ.Core.Services.Interface
 {
     public interface ILnDEmployeeSkillService
     {
-        Task<ApiResponse<PaginatedResponse<SubordinateEmployeeResponseModel>>> GetSubordinateEmployees(
-            int managerId,
-            SubordinateEmployeesRequestModel request
-        );
+        Task<
+            ApiResponse<PaginatedResponse<SubordinateEmployeeResponseModel>>
+        > GetSubordinateEmployees(int managerId, SubordinateEmployeesRequestModel request);
         Task<ApiResponse<List<SkillResponseModel>>> GetAllSkills();
         Task<ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>> GetSubordinateSkills(
             int managerId,

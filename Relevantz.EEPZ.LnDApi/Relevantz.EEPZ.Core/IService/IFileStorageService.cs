@@ -8,10 +8,11 @@ namespace Relevantz.EEPZ.Core.Services.Interface
         Task<string> SaveFileAsync(IFormFile file, string subFolder);
         Task<byte[]> GetFileAsync(string fileId);
         Task<bool> DeleteFileAsync(string fileId);
-        Task<(byte[] fileBytes, string contentType, string fileName)> GetFileForPreviewAsync(string fileId);
+        Task<(byte[] fileBytes, string contentType, string fileName)> GetFileForPreviewAsync(
+            string fileId
+        );
         Task<FileMetadata?> GetFileMetadataAsync(string fileId);
 
-       string GetContentType(string fileName);
-
+        string GetContentType(string fileName);
     }
 }

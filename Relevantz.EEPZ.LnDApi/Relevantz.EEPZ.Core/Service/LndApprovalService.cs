@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repositories.Interface;
 using Serilog;
@@ -41,9 +41,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         /// Gets approvals assigned to the specified employee as approver, with filtering, sorting and pagination.
         /// </summary>
         public async Task<ApiResponse<PaginatedResponse<ApprovalResponseModel>>> GetMyApprovals(
-        int employeeId,
-        MyApprovalsRequestModel request
-    )
+            int employeeId,
+            MyApprovalsRequestModel request
+        )
         {
             Log.Information(
                 "GetMyApprovals started. EmployeeId={EmployeeId}, ApprovalType={ApprovalType}, Status={Status}, Page={PageNumber}, PageSize={PageSize}, SearchTerm={SearchTerm}",
@@ -55,15 +55,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 request.SearchTerm ?? "none"
             );
 
-            var (items, totalCount) =
-                await _approvalRepository.GetMyApprovals(employeeId, request);
-
+            var (items, totalCount) = await _approvalRepository.GetMyApprovals(employeeId, request);
 
             var sortedItems = ApplyApprovalSorting(
-                items.AsQueryable(),
-                request.SortField,
-                request.SortOrder
-            ).ToList();
+                    items.AsQueryable(),
+                    request.SortField,
+                    request.SortOrder
+                )
+                .ToList();
 
             Log.Information(
                 "GetMyApprovals succeeded. EmployeeId={EmployeeId}, Returned={Returned}, Total={Total}",
@@ -85,7 +84,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
-
         /// <summary>
         /// Processes an approval decision (approve or reject) and applies the corresponding business workflow.
         /// </summary>
@@ -96,7 +94,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             Log.Information(
                 "ProcessApproval started. ApprovalId={ApprovalId}, ApproverId={ApproverId}, IsApproved={IsApproved}",
-                request.ApprovalId, approverId, request.IsApproved
+                request.ApprovalId,
+                approverId,
+                request.IsApproved
             );
 
             var approval = await _approvalRepository.GetApprovalById(request.ApprovalId);
@@ -105,14 +105,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 Log.Warning(
                     "ProcessApproval: Approval not found or approver mismatch. ApprovalId={ApprovalId}, ApproverId={ApproverId}",
-                    request.ApprovalId, approverId
+                    request.ApprovalId,
+                    approverId
                 );
 
                 return new ApiResponse<bool>
                 {
                     Success = false,
                     Message = LnDConstants.RESPONSE_MESSAGES.APPROVAL_NOT_FOUND_OR_NOT_APPROVER,
-
                 };
             }
 
@@ -120,14 +120,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 Log.Warning(
                     "ProcessApproval: Approval already processed. ApprovalId={ApprovalId}, Status={Status}",
-                    request.ApprovalId, approval.Status
+                    request.ApprovalId,
+                    approval.Status
                 );
 
                 return new ApiResponse<bool>
                 {
                     Success = false,
                     Message = LnDConstants.RESPONSE_MESSAGES.APPROVAL_ALREADY_PROCESSED,
-
                 };
             }
 
@@ -139,7 +139,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             Log.Debug(
                 "ProcessApproval: Status updated. ApprovalId={ApprovalId}, NewStatus={NewStatus}",
-                request.ApprovalId, approval.Status
+                request.ApprovalId,
+                approval.Status
             );
 
             if (request.IsApproved)
@@ -148,7 +149,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 {
                     Log.Information(
                         "ProcessApproval: SME registration flow. ApprovalId={ApprovalId}, RequesterEmployeeId={RequesterEmployeeId}, SkillId={SkillId}",
-                        approval.ApprovalId, approval.RequesterEmployeeId, approval.SkillId
+                        approval.ApprovalId,
+                        approval.RequesterEmployeeId,
+                        approval.SkillId
                     );
 
                     var sme = new Lndsme
@@ -171,9 +174,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         approval.ApprovalId
                     );
 
-                    var assignmentDetails = JsonSerializer.Deserialize<
-                        Dictionary<string, object>
-                    >(approval.Notes);
+                    var assignmentDetails = JsonSerializer.Deserialize<Dictionary<string, object>>(
+                        approval.Notes
+                    );
 
                     var sme = await _smeRepository.GetSmeFromEmployeeId(assignmentDetails);
 
@@ -188,7 +191,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         {
                             Success = false,
                             Message = LnDConstants.RESPONSE_MESSAGES.SME_NOT_FOUND,
-
                         };
                     }
 
@@ -227,13 +229,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     await _assignmentRepository.AddAssignment(assignment);
                 }
                 else if (
-                    approval.ApprovalType
-                    == LnDConstants.APPROVAL_TYPE.ASSIGNMENT_ACKNOWLEDGEMENT
+                    approval.ApprovalType == LnDConstants.APPROVAL_TYPE.ASSIGNMENT_ACKNOWLEDGEMENT
                 )
                 {
                     Log.Information(
                         "ProcessApproval: Assignment acknowledgement flow. ApprovalId={ApprovalId}, AssignmentId={AssignmentId}",
-                        approval.ApprovalId, approval.AssignmentId
+                        approval.ApprovalId,
+                        approval.AssignmentId
                     );
 
                     var assignment = await _assignmentRepository.GetAssignmentById(
@@ -251,7 +253,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         {
                             Success = false,
                             Message = LnDConstants.RESPONSE_MESSAGES.ASSIGNMENT_NOT_FOUND,
-
                         };
                     }
 
@@ -270,9 +271,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         SkillId = assignment.SkillId,
                         AttachmentId = approval.AttachmentId,
                         RequesterEmployeeId = assignment.MenteeEmployeeId,
-                        ApproverEmployeeId = assignment
-                            .MenteeEmployee
-                            .ReportingManagerEmployeeId,
+                        ApproverEmployeeId = assignment.MenteeEmployee.ReportingManagerEmployeeId,
                         Status = LnDConstants.APPROVAL_STATUS.PENDING,
                         Notes = approval.Notes,
                         RequestedOn = DateOnly.FromDateTime(DateTime.Now),
@@ -283,14 +282,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
             else
             {
-                if (
-                    approval.ApprovalType
-                    == LnDConstants.APPROVAL_TYPE.ASSIGNMENT_ACKNOWLEDGEMENT
-                )
+                if (approval.ApprovalType == LnDConstants.APPROVAL_TYPE.ASSIGNMENT_ACKNOWLEDGEMENT)
                 {
                     Log.Information(
                         "ProcessApproval: Rejecting assignment acknowledgement. ApprovalId={ApprovalId}, AssignmentId={AssignmentId}",
-                        approval.ApprovalId, approval.AssignmentId
+                        approval.ApprovalId,
+                        approval.AssignmentId
                     );
 
                     var assignment = await _assignmentRepository.GetAssignmentById(
@@ -315,30 +312,30 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             Log.Information(
                 "ProcessApproval succeeded. ApprovalId={ApprovalId}, ApproverId={ApproverId}, IsApproved={IsApproved}",
-                request.ApprovalId, approverId, request.IsApproved
+                request.ApprovalId,
+                approverId,
+                request.IsApproved
             );
 
             return new ApiResponse<bool>
             {
                 Success = true,
                 Message = request.IsApproved
-    ? LnDConstants.RESPONSE_MESSAGES.APPROVAL_PROCESSED_SUCCESS
-    : LnDConstants.RESPONSE_MESSAGES.APPROVAL_REJECTED_SUCCESS,
+                    ? LnDConstants.RESPONSE_MESSAGES.APPROVAL_PROCESSED_SUCCESS
+                    : LnDConstants.RESPONSE_MESSAGES.APPROVAL_REJECTED_SUCCESS,
 
                 Data = true,
             };
         }
-
-
 
         /// <summary>
         /// Gets complete approval history for an employee as requester or approver with filtering and pagination.
         /// Supports role-based filtering (requester/approver/all) and full-text search.
         /// </summary>
         public async Task<ApiResponse<PaginatedResponse<ApprovalResponseModel>>> GetApprovalHistory(
-int employeeId,
-ApprovalHistoryRequestModel request
-)
+            int employeeId,
+            ApprovalHistoryRequestModel request
+        )
         {
             Log.Information(
                 "GetApprovalHistory started. EmployeeId={EmployeeId}, Role={Role}, ApprovalType={ApprovalType}, Status={Status}, Page={PageNumber}, PageSize={PageSize}",
@@ -351,16 +348,21 @@ ApprovalHistoryRequestModel request
             );
 
             var pageSize = request.PageSize;
-            if (pageSize < 1) pageSize = 10;
-            if (pageSize > 100) pageSize = 100;
+            if (pageSize < 1)
+                pageSize = 10;
+            if (pageSize > 100)
+                pageSize = 100;
 
-            var (items, totalCount) =
-                await _approvalRepository.GetApprovalHistory(employeeId, request);
+            var (items, totalCount) = await _approvalRepository.GetApprovalHistory(
+                employeeId,
+                request
+            );
             var sortedItems = ApplyApprovalSorting(
-                items.AsQueryable(),
-                request.SortField,
-                request.SortOrder
-            ).ToList();
+                    items.AsQueryable(),
+                    request.SortField,
+                    request.SortOrder
+                )
+                .ToList();
 
             Log.Information(
                 "GetApprovalHistory succeeded for EmployeeId={EmployeeId}. Returned={Returned}, Total={Total}",
@@ -382,7 +384,6 @@ ApprovalHistoryRequestModel request
             };
         }
 
-
         /// <summary>
         /// Gets detailed information about a specific approval, including assignment and attachment details, enforcing access control.
         /// </summary>
@@ -393,20 +394,23 @@ ApprovalHistoryRequestModel request
         {
             Log.Debug(
                 "GetApprovalDetails started. ApprovalId={ApprovalId}, EmployeeId={EmployeeId}",
-                approvalId, employeeId
+                approvalId,
+                employeeId
             );
 
             var approval = await _approvalRepository.GetApprovalById(approvalId);
 
             if (approval == null)
             {
-                Log.Warning("GetApprovalDetails: Approval not found. ApprovalId={ApprovalId}", approvalId);
+                Log.Warning(
+                    "GetApprovalDetails: Approval not found. ApprovalId={ApprovalId}",
+                    approvalId
+                );
 
                 return new ApiResponse<ApprovalDetailsResponseModel>
                 {
                     Success = false,
                     Message = LnDConstants.RESPONSE_MESSAGES.APPROVAL_NOT_FOUND,
-
                 };
             }
 
@@ -425,7 +429,6 @@ ApprovalHistoryRequestModel request
                 {
                     Success = false,
                     Message = LnDConstants.RESPONSE_MESSAGES.ACCESS_DENIED,
-
                 };
             }
 
@@ -461,7 +464,9 @@ ApprovalHistoryRequestModel request
                 AttachmentType = approval.Attachment?.AttachmentType,
 
                 UserRole =
-                    approval.RequesterEmployeeId == employeeId ? LnDConstants.ROLE_FILTERS.REQUESTER : LnDConstants.ROLE_FILTERS.APPROVER,
+                    approval.RequesterEmployeeId == employeeId
+                        ? LnDConstants.ROLE_FILTERS.REQUESTER
+                        : LnDConstants.ROLE_FILTERS.APPROVER,
                 CanDownloadAttachment = approval.Attachment != null,
             };
 
@@ -486,7 +491,8 @@ ApprovalHistoryRequestModel request
 
             Log.Debug(
                 "GetApprovalDetails succeeded. ApprovalId={ApprovalId}, EmployeeId={EmployeeId}",
-                approvalId, employeeId
+                approvalId,
+                employeeId
             );
 
             return new ApiResponse<ApprovalDetailsResponseModel> { Success = true, Data = details };
@@ -502,7 +508,8 @@ ApprovalHistoryRequestModel request
         {
             Log.Information(
                 "GetApprovalAttachment started. ApprovalId={ApprovalId}, EmployeeId={EmployeeId}",
-                approvalId, employeeId
+                approvalId,
+                employeeId
             );
 
             var approval = await _approvalRepository.GetApprovalById(approvalId);
@@ -525,7 +532,6 @@ ApprovalHistoryRequestModel request
                 {
                     Success = false,
                     Message = LnDConstants.RESPONSE_MESSAGES.ATTACHMENT_ACCESS_DENIED,
-
                 };
             }
 
@@ -540,7 +546,6 @@ ApprovalHistoryRequestModel request
                 {
                     Success = false,
                     Message = LnDConstants.RESPONSE_MESSAGES.ATTACHMENT_NOT_FOUND,
-
                 };
             }
 
@@ -567,7 +572,6 @@ ApprovalHistoryRequestModel request
             };
         }
 
-
         /// <summary>
         /// Downloads the proof document of an assignment, enforcing mentee, SME, or manager access control.
         /// </summary>
@@ -578,7 +582,8 @@ ApprovalHistoryRequestModel request
         {
             Log.Information(
                 "GetAssignmentProof started. AssignmentId={AssignmentId}, EmployeeId={EmployeeId}",
-                assignmentId, employeeId
+                assignmentId,
+                employeeId
             );
 
             var assignment = await _assignmentRepository.GetAssignmentById(assignmentId);
@@ -602,7 +607,6 @@ ApprovalHistoryRequestModel request
                 {
                     Success = false,
                     Message = LnDConstants.RESPONSE_MESSAGES.ASSIGNMENT_ACCESS_DENIED,
-
                 };
             }
 
@@ -617,7 +621,6 @@ ApprovalHistoryRequestModel request
                 {
                     Success = false,
                     Message = LnDConstants.RESPONSE_MESSAGES.ASSIGNMENT_PROOF_NOT_FOUND,
-
                 };
             }
 
@@ -678,7 +681,6 @@ ApprovalHistoryRequestModel request
                 {
                     Success = false,
                     Message = LnDConstants.RESPONSE_MESSAGES.ATTACHMENT_ACCESS_DENIED,
-
                 };
             }
 
@@ -693,7 +695,6 @@ ApprovalHistoryRequestModel request
                 {
                     Success = false,
                     Message = LnDConstants.RESPONSE_MESSAGES.ATTACHMENT_NOT_FOUND,
-
                 };
             }
 
@@ -755,7 +756,6 @@ ApprovalHistoryRequestModel request
                 {
                     Success = false,
                     Message = LnDConstants.RESPONSE_MESSAGES.ASSIGNMENT_ACCESS_DENIED,
-
                 };
             }
 
@@ -770,7 +770,6 @@ ApprovalHistoryRequestModel request
                 {
                     Success = false,
                     Message = LnDConstants.RESPONSE_MESSAGES.ASSIGNMENT_PROOF_NOT_FOUND,
-
                 };
             }
 
@@ -800,10 +799,10 @@ ApprovalHistoryRequestModel request
         #endregion
 
         private IQueryable<ApprovalResponseModel> ApplyApprovalSorting(
-    IQueryable<ApprovalResponseModel> query,
-    string? sortField,
-    string? sortOrder
-)
+            IQueryable<ApprovalResponseModel> query,
+            string? sortField,
+            string? sortOrder
+        )
         {
             bool isAscending =
                 string.IsNullOrEmpty(sortOrder)
@@ -814,37 +813,28 @@ ApprovalHistoryRequestModel request
 
             return sortField?.ToLower() switch
             {
-                LnDConstants.SORT_FIELDS.APPROVAL_TYPE =>
-                    isAscending
-                        ? query.OrderBy(a => a.ApprovalType)
-                        : query.OrderByDescending(a => a.ApprovalType),
+                LnDConstants.SORT_FIELDS.APPROVAL_TYPE => isAscending
+                    ? query.OrderBy(a => a.ApprovalType)
+                    : query.OrderByDescending(a => a.ApprovalType),
 
-                LnDConstants.SORT_FIELDS.REQUESTER_NAME =>
-                    isAscending
-                        ? query.OrderBy(a => a.RequesterName)
-                        : query.OrderByDescending(a => a.RequesterName),
+                LnDConstants.SORT_FIELDS.REQUESTER_NAME => isAscending
+                    ? query.OrderBy(a => a.RequesterName)
+                    : query.OrderByDescending(a => a.RequesterName),
 
-                LnDConstants.SORT_FIELDS.APPROVER_NAME =>
-                    isAscending
-                        ? query.OrderBy(a => a.ApproverName)
-                        : query.OrderByDescending(a => a.ApproverName),
+                LnDConstants.SORT_FIELDS.APPROVER_NAME => isAscending
+                    ? query.OrderBy(a => a.ApproverName)
+                    : query.OrderByDescending(a => a.ApproverName),
 
-                LnDConstants.SORT_FIELDS.REQUESTED_ON =>
-                    isAscending
-                        ? query.OrderBy(a => a.RequestedOn)
-                        : query.OrderByDescending(a => a.RequestedOn),
+                LnDConstants.SORT_FIELDS.REQUESTED_ON => isAscending
+                    ? query.OrderBy(a => a.RequestedOn)
+                    : query.OrderByDescending(a => a.RequestedOn),
 
-                LnDConstants.SORT_FIELDS.STATUS =>
-                    isAscending
-                        ? query.OrderBy(a => a.Status)
-                        : query.OrderByDescending(a => a.Status),
+                LnDConstants.SORT_FIELDS.STATUS => isAscending
+                    ? query.OrderBy(a => a.Status)
+                    : query.OrderByDescending(a => a.Status),
 
-                _ =>
-                    query.OrderByDescending(a => a.RequestedOn)
+                _ => query.OrderByDescending(a => a.RequestedOn),
             };
         }
     }
 }
-
-
-

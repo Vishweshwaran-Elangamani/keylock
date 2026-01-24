@@ -1,8 +1,8 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repositories.Interface;
 using Serilog;
@@ -25,7 +25,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         #region SME Status Queries
 
         /// <summary>
-        /// Checks if an employee has any active SME status 
+        /// Checks if an employee has any active SME status
         /// </summary>
         public async Task<bool> IsEmployeeSme(int employeeId)
         {
@@ -37,20 +37,22 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             Log.Information(
                 "IsEmployeeSmeAsync completed. EmployeeId={EmployeeId}, IsSme={IsSme}",
-                employeeId, isSme
+                employeeId,
+                isSme
             );
 
             return isSme;
         }
 
         /// <summary>
-        /// Gets an active SME record for a specific employee and skill combination 
+        /// Gets an active SME record for a specific employee and skill combination
         /// </summary>
         public async Task<Lndsme?> GetActiveSme(int employeeId, int skillId)
         {
             Log.Debug(
                 "GetActiveSmeAsync called. EmployeeId={EmployeeId}, SkillId={SkillId}",
-                employeeId, skillId
+                employeeId,
+                skillId
             );
 
             var sme = await _context.Lndsmes.FirstOrDefaultAsync(s =>
@@ -61,14 +63,17 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             {
                 Log.Debug(
                     "GetActiveSmeAsync: Active SME not found. EmployeeId={EmployeeId}, SkillId={SkillId}",
-                    employeeId, skillId
+                    employeeId,
+                    skillId
                 );
             }
             else
             {
                 Log.Debug(
                     "GetActiveSmeAsync: Active SME found. SmeId={SmeId}, EmployeeId={EmployeeId}, SkillId={SkillId}",
-                    sme.SmeId, employeeId, skillId
+                    sme.SmeId,
+                    employeeId,
+                    skillId
                 );
             }
 
@@ -87,11 +92,16 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             Log.Debug("GetSmeFromEmployeeId called. SmeEmployeeId={SmeEmployeeId}", SmeEmployeeId);
 
-            var sme = await _context.Lndsmes.FirstOrDefaultAsync(s => s.EmployeeId == SmeEmployeeId);
+            var sme = await _context.Lndsmes.FirstOrDefaultAsync(s =>
+                s.EmployeeId == SmeEmployeeId
+            );
 
             if (sme == null)
             {
-                Log.Warning("GetSmeFromEmployeeId: SME not found. SmeEmployeeId={SmeEmployeeId}", SmeEmployeeId);
+                Log.Warning(
+                    "GetSmeFromEmployeeId: SME not found. SmeEmployeeId={SmeEmployeeId}",
+                    SmeEmployeeId
+                );
             }
 
             return sme;
@@ -102,7 +112,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         #region SME Assignment Queries
 
         /// <summary>
-        /// Gets in-progress assignment count for a specific SME 
+        /// Gets in-progress assignment count for a specific SME
         /// </summary>
         public async Task<int> GetSmeInProgressAssignmentCount(int smeId)
         {
@@ -114,7 +124,8 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             Log.Debug(
                 "GetSmeInProgressAssignmentCountAsync completed. SmeId={SmeId}, InProgressCount={Count}",
-                smeId, count
+                smeId,
+                count
             );
 
             return count;
@@ -125,7 +136,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         #region SME Retrieval
 
         /// <summary>
-        /// Gets paginated available SMEs for a skill filtered by max assignment limit 
+        /// Gets paginated available SMEs for a skill filtered by max assignment limit
         /// </summary>
         public async Task<(
             List<Lndsme> Items,
@@ -137,12 +148,16 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         {
             Log.Information(
                 "GetAvailableSmesWithAssignmentCountsAsync called. SkillId={SkillId}, SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}, MaxAssignments={MaxAssignments}",
-                request.SkillId, request.SearchTerm ?? "none", request.PageNumber, request.PageSize, maxAssignments
+                request.SkillId,
+                request.SearchTerm ?? "none",
+                request.PageNumber,
+                request.PageSize,
+                maxAssignments
             );
 
             var query = _context
                 .Lndsmes.Include(s => s.Employee)
-                .ThenInclude(e => e.Userprofile)
+                    .ThenInclude(e => e.Userprofile)
                 .Include(s => s.Skill)
                 .Where(s => s.SkillId == request.SkillId && s.IsActive == true);
 
@@ -195,40 +210,44 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             Log.Information(
                 "GetAvailableSmesWithAssignmentCountsAsync completed. SkillId={SkillId}, ReturnedCount={Count}, TotalCount={TotalCount}",
-                request.SkillId, items.Count, totalCount
+                request.SkillId,
+                items.Count,
+                totalCount
             );
 
             return (items, totalCount);
         }
 
         /// <summary>
-        /// Gets paginated all active SMEs with employee and department details 
+        /// Gets paginated all active SMEs with employee and department details
         /// </summary>
         public async Task<(List<SmeResponseModel> Items, int TotalCount)> GetAllActiveSmes(
-     ActiveSmesRequestModel request
- )
+            ActiveSmesRequestModel request
+        )
         {
             Log.Information(
                 "GetAllActiveSmesAsync started. SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
-                request.SearchTerm ?? "none", request.PageNumber, request.PageSize
+                request.SearchTerm ?? "none",
+                request.PageNumber,
+                request.PageSize
             );
 
-            var query = _context.Lndsmes
+            var query = _context
+                .Lndsmes.Include(s => s.Employee)
+                    .ThenInclude(e => e.Userprofile)
                 .Include(s => s.Employee)
-                .ThenInclude(e => e.Userprofile)
-                .Include(s => s.Employee)
-                .ThenInclude(e => e.Employeedetailsmasters)
-                .ThenInclude(ed => ed.Department)
+                    .ThenInclude(e => e.Employeedetailsmasters)
+                        .ThenInclude(ed => ed.Department)
                 .Include(s => s.Skill)
                 .Where(s => s.IsActive == true);
-
 
             if (!string.IsNullOrWhiteSpace(request.SearchTerm))
             {
                 var lowerSearchTerm = request.SearchTerm.ToLower();
                 query = query.Where(s =>
                     (s.Employee.Userprofile.FirstName + " " + s.Employee.Userprofile.LastName)
-                        .ToLower().Contains(lowerSearchTerm)
+                        .ToLower()
+                        .Contains(lowerSearchTerm)
                     || s.Skill.SkillName.ToLower().Contains(lowerSearchTerm)
                 );
             }
@@ -241,32 +260,38 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 {
                     SmeId = s.SmeId,
                     EmployeeId = s.EmployeeId,
-                    EmployeeName = s.Employee.Userprofile.FirstName + " " + s.Employee.Userprofile.LastName,
+                    EmployeeName =
+                        s.Employee.Userprofile.FirstName + " " + s.Employee.Userprofile.LastName,
                     SkillId = s.SkillId,
                     SkillName = s.Skill.SkillName,
-                    DepartmentName = s.Employee.Employeedetailsmasters.FirstOrDefault().Department != null
-                        ? s.Employee.Employeedetailsmasters.FirstOrDefault().Department.DepartmentName
-                        : null,
+                    DepartmentName =
+                        s.Employee.Employeedetailsmasters.FirstOrDefault().Department != null
+                            ? s
+                                .Employee.Employeedetailsmasters.FirstOrDefault()
+                                .Department.DepartmentName
+                            : null,
                     IsActive = s.IsActive ?? false,
-                    ApprovedDate = s.ApprovedOn
+                    ApprovedDate = s.ApprovedOn,
                 })
                 .ToListAsync();
 
             Log.Debug(
                 "GetAllActiveSmesAsync: Retrieved {ItemCount} SMEs. TotalCount={TotalCount}",
-                items.Count, totalCount
+                items.Count,
+                totalCount
             );
 
             Log.Information(
                 "GetAllActiveSmesAsync succeeded. ReturnedCount={Count}, TotalCount={TotalCount}",
-                items.Count, totalCount
+                items.Count,
+                totalCount
             );
 
             return (items, totalCount);
         }
 
         /// <summary>
-        /// Gets all active SMEs for Excel export without pagination 
+        /// Gets all active SMEs for Excel export without pagination
         /// </summary>
         public async Task<List<Lndsme>> GetAllActiveSmesForExport(
             ExportActiveSmesRequestModel request
@@ -280,10 +305,10 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             var query = _context
                 .Lndsmes.Where(s => s.IsActive.Value)
                 .Include(s => s.Employee)
-                .ThenInclude(e => e.Userprofile)
+                    .ThenInclude(e => e.Userprofile)
                 .Include(s => s.Employee)
-                .ThenInclude(e => e.Employeedetailsmasters)
-                .ThenInclude(ed => ed.Department)
+                    .ThenInclude(e => e.Employeedetailsmasters)
+                        .ThenInclude(ed => ed.Department)
                 .Include(s => s.Skill)
                 .AsQueryable();
 
@@ -326,7 +351,8 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         {
             Log.Information(
                 "AddSmeAsync called. EmployeeId={EmployeeId}, SkillId={SkillId}",
-                sme.EmployeeId, sme.SkillId
+                sme.EmployeeId,
+                sme.SkillId
             );
 
             _context.Lndsmes.Add(sme);
@@ -343,7 +369,10 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         {
             Log.Information(
                 "UpdateSmeAsync called. SmeId={SmeId}, EmployeeId={EmployeeId}, SkillId={SkillId}, IsActive={IsActive}",
-                sme.SmeId, sme.EmployeeId, sme.SkillId, sme.IsActive
+                sme.SmeId,
+                sme.EmployeeId,
+                sme.SkillId,
+                sme.IsActive
             );
 
             _context.Lndsmes.Update(sme);
