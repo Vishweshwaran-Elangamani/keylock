@@ -46,7 +46,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             _logger.LogInformation("Creating role: {RoleName}", request.RoleName);
             var result = await _roleService.CreateRoleAsync(request);
-            return Ok(ApiResponseDto<RoleResponseDto>.SuccessResponse(result, MessageConstants.RoleCreatedSuccess)); // ✅ CHANGED
+            return Ok(ApiResponseDto<RoleResponseDto>.SuccessResponse(result, MessageConstants.RoleCreatedSuccess)); 
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             _logger.LogInformation("Updating role: {RoleId}", request.RoleId);
             var result = await _roleService.UpdateRoleAsync(request);
-            return Ok(ApiResponseDto<RoleResponseDto>.SuccessResponse(result, MessageConstants.RoleUpdatedSuccess)); // ✅ CHANGED
+            return Ok(ApiResponseDto<RoleResponseDto>.SuccessResponse(result, MessageConstants.RoleUpdatedSuccess)); 
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             _logger.LogInformation("Creating department: {DepartmentName}", request.DepartmentName);
             var result = await _departmentService.CreateDepartmentAsync(request);
-            return Ok(ApiResponseDto<DepartmentResponseDto>.SuccessResponse(result, MessageConstants.DepartmentCreatedSuccess)); // ✅ CHANGED
+            return Ok(ApiResponseDto<DepartmentResponseDto>.SuccessResponse(result, MessageConstants.DepartmentCreatedSuccess)); 
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             _logger.LogInformation("Updating department: {DepartmentId}", request.DepartmentId);
             var result = await _departmentService.UpdateDepartmentAsync(request);
-            return Ok(ApiResponseDto<DepartmentResponseDto>.SuccessResponse(result, MessageConstants.DepartmentUpdatedSuccess)); // ✅ CHANGED
+            return Ok(ApiResponseDto<DepartmentResponseDto>.SuccessResponse(result, MessageConstants.DepartmentUpdatedSuccess)); 
         }
 
         /// <summary>

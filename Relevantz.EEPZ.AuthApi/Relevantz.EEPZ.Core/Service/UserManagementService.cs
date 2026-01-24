@@ -35,13 +35,13 @@ namespace Relevantz.EEPZ.Core.Service
 
         public async Task<UserResponseDto> CreateUserAsync(CreateUserRequestDto request, int createdByUserId)
         {
-            // Check if email already exists
+            
             if (await _userAuthRepository.EmailExistsAsync(request.Email))
             {
                 throw new InvalidOperationException(Constants.Messages.EmailAlreadyExists);
             }
 
-            // Auto-generate Employee Company ID if not provided or empty
+            
             if (string.IsNullOrWhiteSpace(request.EmployeeCompanyId))
             {
                 request.EmployeeCompanyId = await _employeeRepository.GetNextEmployeeCompanyIdAsync();
@@ -49,14 +49,14 @@ namespace Relevantz.EEPZ.Core.Service
             }
             else
             {
-                // Check if Employee Company ID already exists (if manually provided)
+                
                 if (await _employeeRepository.EmployeeCompanyIdExistsAsync(request.EmployeeCompanyId))
                 {
                     throw new InvalidOperationException(Constants.Messages.EmployeeIdAlreadyExists);
                 }
             }
 
-            // Clean mobile number
+            
             var cleanedMobileNumber = request.MobileNumber;
             if (!string.IsNullOrWhiteSpace(cleanedMobileNumber))
             {
@@ -68,7 +68,7 @@ namespace Relevantz.EEPZ.Core.Service
                     .Trim();
             }
 
-            // Clean alternate number
+            
             var cleanedAlternateNumber = request.AlternateNumber;
             if (!string.IsNullOrWhiteSpace(cleanedAlternateNumber))
             {
@@ -80,7 +80,7 @@ namespace Relevantz.EEPZ.Core.Service
                     .Trim();
             }
 
-            // Create Employee
+            
             var employee = new Employee
             {
                 EmployeeCompanyId = request.EmployeeCompanyId,
@@ -99,13 +99,13 @@ namespace Relevantz.EEPZ.Core.Service
 
             await _employeeRepository.CreateAsync(employee);
 
-            // Generate temporary password
+            
             var temporaryPassword = _passwordService.GenerateTemporaryPassword();
             var hashedPassword = _passwordService.HashPassword(temporaryPassword);
             Console.WriteLine($"Generated Temp Password: {temporaryPassword}");
             Console.WriteLine($"Hashed Password Length: {hashedPassword.Length}");
 
-            // Create User Authentication
+            
             var userAuth = new Userauthentication
             {
                 EmployeeId = employee.EmployeeId,
@@ -118,7 +118,7 @@ namespace Relevantz.EEPZ.Core.Service
 
             await _userAuthRepository.CreateAsync(userAuth);
 
-            // Create User Profile with cleaned mobile numbers
+            
             var userProfile = new Userprofile
             {
                 EmployeeId = employee.EmployeeId,
@@ -137,7 +137,7 @@ namespace Relevantz.EEPZ.Core.Service
 
             await _userProfileRepository.CreateAsync(userProfile);
 
-            // Assign Role and Department
+            
             var employeeDetails = new Employeedetailsmaster
             {
                 EmployeeId = employee.EmployeeId,
@@ -151,10 +151,10 @@ namespace Relevantz.EEPZ.Core.Service
 
             EEPZBusinessLog.Information($"User created successfully: {request.Email} with Employee ID: {request.EmployeeCompanyId}");
 
-            // Fetch complete user data
+            
             var createdUser = await _userAuthRepository.GetByIdAsync(userAuth.UserId);
             
-            // Ad-hoc mapping
+            
             var profile = createdUser!.Employee?.Userprofile;
             var empDetails = createdUser.Employee?.Employeedetailsmasters?.FirstOrDefault();
 
@@ -201,7 +201,7 @@ namespace Relevantz.EEPZ.Core.Service
 
             var employee = user.Employee;
 
-            // Update Employee fields if provided
+            
             if (request.EmploymentType != null) employee.EmploymentType = request.EmploymentType;
             if (request.EmploymentStatus != null) employee.EmploymentStatus = request.EmploymentStatus;
             if (request.ReportingManagerEmployeeId.HasValue) employee.ReportingManagerEmployeeId = request.ReportingManagerEmployeeId;
@@ -213,7 +213,7 @@ namespace Relevantz.EEPZ.Core.Service
             employee.UpdatedByUserId = updatedByUserId;
             await _employeeRepository.UpdateAsync(employee);
 
-            // Update User Authentication status if provided
+            
             if (request.Status != null)
             {
                 user.Status = request.Status;
@@ -223,7 +223,7 @@ namespace Relevantz.EEPZ.Core.Service
 
             var updatedUser = await _userAuthRepository.GetByIdAsync(request.UserId);
             
-            // Ad-hoc mapping
+            
             var profile = updatedUser!.Employee?.Userprofile;
             var empDetails = updatedUser.Employee?.Employeedetailsmasters?.FirstOrDefault();
 
@@ -268,7 +268,7 @@ namespace Relevantz.EEPZ.Core.Service
                 throw new KeyNotFoundException($"User with ID {userId} not found");
             }
 
-            // Ad-hoc mapping
+            
             var profile = user.Employee?.Userprofile;
             var empDetails = user.Employee?.Employeedetailsmasters?.FirstOrDefault();
 
@@ -309,7 +309,7 @@ namespace Relevantz.EEPZ.Core.Service
         {
             var users = await _userAuthRepository.GetAllAsync();
             
-            // Ad-hoc mapping for list
+            
             var userResponses = users.Select(user =>
             {
                 var profile = user.Employee?.Userprofile;
@@ -405,20 +405,20 @@ namespace Relevantz.EEPZ.Core.Service
 
         public async Task<List<UserResponseDto>> GetEmployeesByManagerAsync(int managerId)
         {
-            // Get the manager's employee record
+            
             var manager = await _employeeRepository.GetByIdAsync(managerId);
             if (manager == null)
             {
                 throw new KeyNotFoundException($"Manager with ID {managerId} not found");
             }
 
-            // Get all employees where ReportingManagerEmployeeId matches the manager's EmployeeId
+            
             var allEmployees = await _employeeRepository.GetAllAsync();
             var reportingEmployees = allEmployees
                 .Where(e => e.ReportingManagerEmployeeId == manager.EmployeeId && e.IsActive == true)
                 .ToList();
 
-            // Get user authentication data for these employees
+            
             var userResponses = new List<UserResponseDto>();
 
             foreach (var employee in reportingEmployees)
@@ -426,7 +426,7 @@ namespace Relevantz.EEPZ.Core.Service
                 var userAuth = await _userAuthRepository.GetByEmployeeIdAsync(employee.EmployeeId);
                 if (userAuth != null)
                 {
-                    // Ad-hoc mapping
+                    
                     var profile = userAuth.Employee?.Userprofile;
                     var empDetails = userAuth.Employee?.Employeedetailsmasters?.FirstOrDefault();
 

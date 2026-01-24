@@ -51,7 +51,7 @@ namespace Relevantz.EEPZ.Core.Service
             var role = await _roleRepository.GetByIdAsync(request.RoleId);
             if (role == null)
             {
-                throw new KeyNotFoundException(MessageConstants.RoleNotFound); // ✅ CHANGED
+                throw new KeyNotFoundException(MessageConstants.RoleNotFound); 
             }
 
             if (role.IsSystemRole == true)
@@ -77,7 +77,7 @@ namespace Relevantz.EEPZ.Core.Service
             var role = await _roleRepository.GetByIdAsync(roleId);
             if (role == null)
             {
-                throw new KeyNotFoundException(MessageConstants.RoleNotFound); // ✅ CHANGED
+                throw new KeyNotFoundException(MessageConstants.RoleNotFound);
             }
 
             var response = MapToRoleResponse(role);
@@ -96,7 +96,7 @@ namespace Relevantz.EEPZ.Core.Service
             var role = await _roleRepository.GetByIdAsync(roleId);
             if (role == null)
             {
-                throw new KeyNotFoundException(MessageConstants.RoleNotFound); // ✅ CHANGED
+                throw new KeyNotFoundException(MessageConstants.RoleNotFound); 
             }
 
             if (role.IsSystemRole == true)
