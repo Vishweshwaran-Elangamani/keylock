@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "sonner";
 import api from "../../../services/performancemanagement/api/api";
 import "../../../styles/performancemanagement/hr/FormProgressTracker.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
@@ -48,9 +49,12 @@ export default function FormProgressTrackerPage() {
 
   const handleExportCSV = () => {
     if (trackers.length === 0) {
-      alert("No data to export");
+      toast.warning("No data to export");
       return;
     }
+    
+    const exportId = toast.loading("Exporting CSV...");
+    
     const headers = [
       "Tracker ID",
       "Assignment ID",
@@ -100,6 +104,8 @@ export default function FormProgressTrackerPage() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    
+    toast.success("CSV exported successfully!", { id: exportId });
   };
 
   const totalPages = Math.ceil(trackers.length / itemsPerPage);
