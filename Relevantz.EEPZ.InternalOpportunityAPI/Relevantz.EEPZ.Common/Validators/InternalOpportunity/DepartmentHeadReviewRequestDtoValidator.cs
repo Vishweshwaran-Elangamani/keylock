@@ -9,8 +9,8 @@ namespace Relevantz.EEPZ.Common.Validators.InternalOpportunity
         {
             RuleFor(x => x.Action)
                 .MaximumLength(20).WithMessage("Action cannot exceed 20 characters")
-                .Must(action => string.IsNullOrEmpty(action) || new[] { "Approve", "Reject", "Review" }.Contains(action))
-                .WithMessage("Invalid action. Must be 'Approve', 'Reject', or 'Review'")
+                .Must(action => string.IsNullOrEmpty(action) || new[] { "Approved", "Rejected" }.Contains(action))
+                .WithMessage("Invalid action. Must be 'Approved', or 'Rejected'")
                 .When(x => !string.IsNullOrEmpty(x.Action));
 
             RuleFor(x => x.ReviewRemarks)
