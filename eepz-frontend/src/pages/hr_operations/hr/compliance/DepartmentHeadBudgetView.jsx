@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import budgetAllocationService from "../../../../services/hr_operations/hr/budgetAllocationService";
 import AllocationsList from "../../../../components/hr_operations/modals/AllocationsList";
@@ -7,6 +7,7 @@ import { FaSearch } from "react-icons/fa";
 import { Form } from "react-bootstrap";
 import "../../../../styles/hr_operations/hr/DeptHeadReviewModal.css";
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
+
 const YearDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
   const allOptions = [{ label: "All Years", value: "all" }, ...options];
@@ -48,6 +49,7 @@ const YearDropdown = ({ value, onChange, options }) => {
     </div>
   );
 };
+
 const DepartmentDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
   const allOptions = [
@@ -92,6 +94,7 @@ const DepartmentDropdown = ({ value, onChange, options }) => {
     </div>
   );
 };
+
 const DepartmentHeadBudgetView = () => {
   const [budgets, setBudgets] = useState([]);
   const [filteredBudgets, setFilteredBudgets] = useState([]);
@@ -100,6 +103,10 @@ const DepartmentHeadBudgetView = () => {
   const [selectedBudgetForAllocations, setSelectedBudgetForAllocations] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [showRowsDropdown, setShowRowsDropdown] = useState(false);
+  const rowsDropdownRef = useRef(null);
   const [filters, setFilters] = useState({
     year: "all",
     department: "",
@@ -108,9 +115,11 @@ const DepartmentHeadBudgetView = () => {
     years: [],
     departments: [],
   });
+
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const userDepartmentName = user.departmentName || "";
   const userName = ((user.firstName || "") + " " + (user.lastName || "")).trim();
+
   useEffect(() => {
     if (!userDepartmentName) {
       setError("Department information not found. Please log in again.");
@@ -119,9 +128,28 @@ const DepartmentHeadBudgetView = () => {
     }
     fetchBudgets();
   }, []);
+
   useEffect(() => {
     applyFilters();
+    setCurrentPage(1);
   }, [budgets, activeSearchTerm, filters]);
+
+  // Click outside handler for rows dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        rowsDropdownRef.current &&
+        !rowsDropdownRef.current.contains(event.target)
+      ) {
+        setShowRowsDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const fetchBudgets = async () => {
     setLoading(true);
     setError(null);
@@ -153,6 +181,7 @@ const DepartmentHeadBudgetView = () => {
       setLoading(false);
     }
   };
+
   const generateFilterOptions = (data) => {
     const years = [...new Set(data.map((b) => b.fiscalYear))].sort(
       (a, b) => b - a
@@ -162,6 +191,7 @@ const DepartmentHeadBudgetView = () => {
     ].sort();
     setFilterOptions({ years, departments });
   };
+
   const applyFilters = () => {
     let filtered = budgets;
     if (activeSearchTerm.trim()) {
@@ -183,6 +213,7 @@ const DepartmentHeadBudgetView = () => {
     }
     setFilteredBudgets(filtered);
   };
+
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({
@@ -190,9 +221,11 @@ const DepartmentHeadBudgetView = () => {
       [name]: value,
     }));
   };
+
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
   };
+
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
@@ -201,6 +234,51 @@ const DepartmentHeadBudgetView = () => {
       department: "",
     });
   };
+
+  const handleItemsPerPageChange = (newSize) => {
+    setItemsPerPage(newSize);
+    setCurrentPage(1);
+    setShowRowsDropdown(false);
+  };
+
+  const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const totalPages = Math.ceil(filteredBudgets.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentPageData = filteredBudgets.slice(startIndex, endIndex);
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxPagesToShow = 5;
+    if (totalPages <= maxPagesToShow) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        pages.push(1, 2, 3, "...", totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1, "...", totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(
+          1,
+          "...",
+          currentPage - 1,
+          currentPage,
+          currentPage + 1,
+          "...",
+          totalPages
+        );
+      }
+    }
+    return pages;
+  };
+
   const handleShowAllocations = async (budget) => {
     try {
       setLoading(true);
@@ -228,10 +306,12 @@ const DepartmentHeadBudgetView = () => {
       setLoading(false);
     }
   };
+
   const handleBackToList = () => {
     setSelectedBudgetForAllocations(null);
     fetchBudgets();
   };
+
   const getUtilizationColor = (percentage) => {
     if (!percentage) return "#cbd5e1";
     if (percentage >= 90) return "#ef4444";
@@ -239,6 +319,7 @@ const DepartmentHeadBudgetView = () => {
     if (percentage >= 50) return "#10b981";
     return "#3b82f6";
   };
+
   const getUtilizationStatus = (percentage) => {
     if (!percentage) return { text: "No Usage", color: "#94a3b8" };
     if (percentage >= 90) return { text: "Critical", color: "#ef4444" };
@@ -246,6 +327,7 @@ const DepartmentHeadBudgetView = () => {
     if (percentage >= 50) return { text: "Medium", color: "#10b981" };
     return { text: "Low", color: "#3b82f6" };
   };
+
   const summaryStats = filteredBudgets.length > 0 ? {
     totalBudget: filteredBudgets.reduce((sum, b) => sum + (b.totalBudget || 0), 0),
     totalAllocated: filteredBudgets.reduce((sum, b) => sum + (b.allocatedAmount || 0), 0),
@@ -255,6 +337,7 @@ const DepartmentHeadBudgetView = () => {
     totalAllocated: 0,
     totalUtilized: 0,
   };
+
   if (loading) {
     return (
       <div className="budget-loading-container">
@@ -264,6 +347,7 @@ const DepartmentHeadBudgetView = () => {
       </div>
     );
   }
+
   return (
     <div className="budget-page">
       {!selectedBudgetForAllocations ? (
@@ -355,7 +439,7 @@ const DepartmentHeadBudgetView = () => {
               Clear Filters
             </button>
             <div className="budget-results-count">
-              Showing {filteredBudgets.length}{" "}
+              Showing {currentPageData.length} of {filteredBudgets.length}{" "}
               {filteredBudgets.length === 1 ? "budget" : "budgets"}
             </div>
           </div>
@@ -396,7 +480,7 @@ const DepartmentHeadBudgetView = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredBudgets.map((budget) => {
+                    {currentPageData.map((budget) => {
                       const remaining =
                         (budget.allocatedAmount || 0) -
                         (budget.utilizedAmount || 0);
@@ -462,6 +546,96 @@ const DepartmentHeadBudgetView = () => {
                   </tbody>
                 </table>
               </div>
+              {filteredBudgets.length > 0 && (
+                <div className="budget-pagination-container">
+                  <div className="budget-pagination-info">
+                    <span className="budget-pagination-label">Show</span>
+                    <div ref={rowsDropdownRef} className="budget-rows-dropdown-wrapper">
+                      <button
+                        type="button"
+                        onClick={() => setShowRowsDropdown(!showRowsDropdown)}
+                        className="budget-rows-button"
+                      >
+                        <span>{itemsPerPage}</span>
+                        <i
+                          className={`bi bi-chevron-${
+                            showRowsDropdown ? "up" : "down"
+                          } budget-rows-chevron`}
+                        ></i>
+                      </button>
+                      {showRowsDropdown && (
+                        <div className="budget-rows-dropdown">
+                          {[5, 10, 25, 50].map((size) => (
+                            <div
+                              key={size}
+                              onClick={() => handleItemsPerPageChange(size)}
+                              className={`budget-rows-option ${
+                                itemsPerPage === size ? "budget-rows-active" : ""
+                              }`}
+                            >
+                              {size}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <span className="budget-pagination-label">entries</span>
+                  </div>
+                  <div className="budget-pagination-status">
+                    Showing {Math.min(startIndex + 1, filteredBudgets.length)}-
+                    {Math.min(endIndex, filteredBudgets.length)} of{" "}
+                    {filteredBudgets.length} entries
+                  </div>
+                  <nav className="budget-pagination-nav">
+                    <ul className="budget-pagination">
+                      <li
+                        className={`budget-page-item ${
+                          currentPage === 1 ? "disabled" : ""
+                        }`}
+                      >
+                        <button
+                          className="budget-page-link"
+                          onClick={() => goToPage(currentPage - 1)}
+                          disabled={currentPage === 1}
+                        >
+                          <i className="bi bi-chevron-left"></i>
+                        </button>
+                      </li>
+                      {getPageNumbers().map((page, index) => (
+                        <li
+                          key={index}
+                          className={`budget-page-item ${
+                            page === currentPage ? "active" : ""
+                          } ${typeof page !== "number" ? "disabled" : ""}`}
+                        >
+                          <button
+                            className="budget-page-link"
+                            onClick={() =>
+                              typeof page === "number" && goToPage(page)
+                            }
+                            disabled={typeof page !== "number"}
+                          >
+                            {page}
+                          </button>
+                        </li>
+                      ))}
+                      <li
+                        className={`budget-page-item ${
+                          currentPage === totalPages ? "disabled" : ""
+                        }`}
+                      >
+                        <button
+                          className="budget-page-link"
+                          onClick={() => goToPage(currentPage + 1)}
+                          disabled={currentPage === totalPages}
+                        >
+                          <i className="bi bi-chevron-right"></i>
+                        </button>
+                      </li>
+                    </ul>
+                  </nav>
+                </div>
+              )}
             </div>
           )}
         </>
@@ -480,4 +654,5 @@ const DepartmentHeadBudgetView = () => {
     </div>
   );
 };
+
 export default DepartmentHeadBudgetView;

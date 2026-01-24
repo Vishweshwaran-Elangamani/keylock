@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Form } from "react-bootstrap";
 import { FaSearch } from "react-icons/fa";
+
+
 const StatusDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
   const allOptions = [{ label: "All Status", value: "" }, ...options];
@@ -35,6 +37,58 @@ const StatusDropdown = ({ value, onChange, options }) => {
     </div>
   );
 };
+
+// ✅ CUSTOM PAGINATION ROWS DROPDOWN (DARK BLUE HOVER)
+const PaginationRowsDropdown = ({ value, onChange }) => {
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const options = [5, 10, 25, 50];
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  return (
+    <div ref={dropdownRef} className="crm-rows-dropdown-wrapper">
+      <button
+        type="button"
+        className="crm-rows-button"
+        onClick={() => setOpen(!open)}
+      >
+        <span>{value}</span>
+        <i className={`bi bi-chevron-${open ? "up" : "down"} crm-rows-chevron`}></i>
+      </button>
+      {open && (
+        <div className="crm-rows-dropdown">
+          {options.map((size) => (
+            <div
+              key={size}
+              onClick={() => {
+                onChange(size);
+                setOpen(false);
+              }}
+              className={`crm-rows-option ${
+                value === size ? "crm-rows-active" : ""
+              }`}
+            >
+              {size}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const getStatusBadge = (status) => {
   const statusClasses = {
     Pending: "crm-status-pending",
@@ -44,6 +98,7 @@ const getStatusBadge = (status) => {
   };
   return `crm-status-badge ${statusClasses[status] || "crm-status-badge-default"}`;
 };
+
 const formatDate = (dateString) => {
   if (!dateString) return "N/A";
   return new Date(dateString).toLocaleDateString("en-US", {
@@ -54,6 +109,7 @@ const formatDate = (dateString) => {
     minute: "2-digit",
   });
 };
+
 const getInitials = (name) => {
   if (!name) return "NA";
   const parts = name.split(" ");
@@ -62,6 +118,7 @@ const getInitials = (name) => {
   }
   return name.substring(0, 2).toUpperCase();
 };
+
 export const PendingRequests = ({ requests, handleProcessClick }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
@@ -70,9 +127,11 @@ export const PendingRequests = ({ requests, handleProcessClick }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredRequests, setFilteredRequests] = useState([]);
   const searchInputRef = useRef(null);
+
   useEffect(() => {
     applyFilters();
   }, [requests, activeSearchTerm, filterDate]);
+
   const applyFilters = () => {
     let filtered = requests.filter((req) => req.status === "Pending");
     if (activeSearchTerm.trim()) {
@@ -95,26 +154,32 @@ export const PendingRequests = ({ requests, handleProcessClick }) => {
     setFilteredRequests(filtered);
     setCurrentPage(1);
   };
+
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
   };
+
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
     setFilterDate("");
   };
+
   const handleSearchKeyDown = (e) => {
     if (e.key === "Enter") {
       handleSearch();
       if (searchInputRef.current) searchInputRef.current.blur();
     }
   };
+
   const totalPages = Math.ceil(filteredRequests.length / rowsPerPage) || 1;
+
   const getPaginatedRequests = () => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     return filteredRequests.slice(startIndex, endIndex);
   };
+
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
@@ -133,6 +198,7 @@ export const PendingRequests = ({ requests, handleProcessClick }) => {
     }
     return pages;
   };
+
   return (
     <>
       <div className="crm-filters-card">
@@ -170,6 +236,7 @@ export const PendingRequests = ({ requests, handleProcessClick }) => {
           </div>
         </div>
       </div>
+
       <div className="crm-table-card">
         <div className="crm-table-wrapper">
           <table className="crm-request-table">
@@ -243,22 +310,18 @@ export const PendingRequests = ({ requests, handleProcessClick }) => {
             </tbody>
           </table>
         </div>
+
         {filteredRequests.length > 0 && (
           <div className="crm-pagination">
             <div className="crm-pagination-info">
               <span>Show</span>
-              <select
+              <PaginationRowsDropdown
                 value={rowsPerPage}
-                onChange={(e) => {
-                  setRowsPerPage(Number(e.target.value));
+                onChange={(size) => {
+                  setRowsPerPage(size);
                   setCurrentPage(1);
                 }}
-              >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-              </select>
+              />
               <span>entries</span>
             </div>
             <div className="crm-pagination-status">
@@ -309,6 +372,7 @@ export const PendingRequests = ({ requests, handleProcessClick }) => {
     </>
   );
 };
+
 export const AllRequests = ({ requests, handleProcessClick }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
@@ -318,9 +382,11 @@ export const AllRequests = ({ requests, handleProcessClick }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredRequests, setFilteredRequests] = useState([]);
   const searchInputRef = useRef(null);
+
   useEffect(() => {
     applyFilters();
   }, [requests, activeSearchTerm, filterStatus, filterDate]);
+
   const applyFilters = () => {
     let filtered = [...requests];
     if (activeSearchTerm.trim()) {
@@ -346,33 +412,40 @@ export const AllRequests = ({ requests, handleProcessClick }) => {
     setFilteredRequests(filtered);
     setCurrentPage(1);
   };
+
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
   };
+
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
     setFilterStatus("");
     setFilterDate("");
   };
+
   const handleSearchKeyDown = (e) => {
     if (e.key === "Enter") {
       handleSearch();
       if (searchInputRef.current) searchInputRef.current.blur();
     }
   };
+
   const statusOptions = [
     { label: "Pending", value: "Pending" },
     { label: "Approved", value: "Approved" },
     { label: "Rejected", value: "Rejected" },
     { label: "Cancelled", value: "Cancelled" },
   ];
+
   const totalPages = Math.ceil(filteredRequests.length / rowsPerPage) || 1;
+
   const getPaginatedRequests = () => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     return filteredRequests.slice(startIndex, endIndex);
   };
+
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
@@ -391,6 +464,7 @@ export const AllRequests = ({ requests, handleProcessClick }) => {
     }
     return pages;
   };
+
   return (
     <>
       <div className="crm-filters-card">
@@ -433,6 +507,7 @@ export const AllRequests = ({ requests, handleProcessClick }) => {
           </div>
         </div>
       </div>
+
       <div className="crm-table-card">
         <div className="crm-table-wrapper">
           <table className="crm-request-table">
@@ -522,22 +597,18 @@ export const AllRequests = ({ requests, handleProcessClick }) => {
             </tbody>
           </table>
         </div>
+
         {filteredRequests.length > 0 && (
           <div className="crm-pagination">
             <div className="crm-pagination-info">
               <span>Show</span>
-              <select
+              <PaginationRowsDropdown
                 value={rowsPerPage}
-                onChange={(e) => {
-                  setRowsPerPage(Number(e.target.value));
+                onChange={(size) => {
+                  setRowsPerPage(size);
                   setCurrentPage(1);
                 }}
-              >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-              </select>
+              />
               <span>entries</span>
             </div>
             <div className="crm-pagination-status">

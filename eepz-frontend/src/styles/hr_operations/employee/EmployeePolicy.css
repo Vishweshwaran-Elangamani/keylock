@@ -728,6 +728,7 @@
 .table-wrapper-epd {
   overflow-x: auto;
   position: relative;
+  border-radius: 12px 12px 0 0;
 }
 
 .table-epd {
@@ -891,6 +892,7 @@
   border-radius: 0 0 12px 12px;
   position: relative;
   overflow: visible;
+  z-index: 1;
 }
 
 .pagination-info-epd {
@@ -909,7 +911,7 @@
 /* Custom Rows Per Page Dropdown */
 .rows-dropdown-wrapper-epd {
   position: relative;
-  z-index: 100;
+  z-index: 1000;
 }
 
 .rows-button-epd {
@@ -1177,20 +1179,4 @@
   .policy-card-description-epd {
     font-size: 13px;
   }
-}
-
-.table-card-epd {
-  overflow: hidden;       
-  border-radius: 12px;
-}
-
-
-.pagination-container-epd {
-  border-top: none;      
-}
-
-
-.pagination-container-epd {
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
 }
