@@ -65,10 +65,15 @@ const CustomDropdown = ({
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0, width: 0 });
 
-  const normalizedOptions = useMemo(() => normalizeOptions(options), [options]);
+  const normalizedOptions = useMemo(
+    () => normalizeOptions(options),
+    [options]
+  );
 
   const selected = useMemo(() => {
-    return normalizedOptions.find((o) => String(o.value) === String(value));
+    return normalizedOptions.find(
+      (o) => String(o.value) === String(value)
+    );
   }, [normalizedOptions, value]);
 
   const updatePosition = () => {
@@ -115,16 +120,23 @@ const CustomDropdown = ({
     const onClickOutside = (e) => {
       const trig = triggerRef.current;
       const drop = dropdownRef.current;
+      const anchor = anchorRef?.current;
 
-      const clickedTrigger = trig && trig.contains(e.target);
+      const clickedTrigger =
+        (trig && trig.contains(e.target)) ||
+        (anchor && anchor.contains(e.target));
+
       const clickedDropdown = drop && drop.contains(e.target);
 
-      if (!clickedTrigger && !clickedDropdown) setOpen(false);
+      if (!clickedTrigger && !clickedDropdown) {
+        setOpen(false);
+      }
     };
 
     document.addEventListener("mousedown", onClickOutside);
-    return () => document.removeEventListener("mousedown", onClickOutside);
-  }, []);
+    return () =>
+      document.removeEventListener("mousedown", onClickOutside);
+  }, [anchorRef]);
 
   const handleSelect = (opt) => {
     if (disabled) return;
@@ -144,7 +156,9 @@ const CustomDropdown = ({
               <button
                 key={String(opt.value)}
                 type="button"
-                className={`cdrop-item ${active ? "cdrop-item-active" : ""}`}
+                className={`cdrop-item ${
+                  active ? "cdrop-item-active" : ""
+                }`}
                 onClick={() => handleSelect(opt)}
               >
                 {opt.label}
@@ -167,15 +181,13 @@ const CustomDropdown = ({
       <button
         ref={triggerRef}
         type="button"
-        className={`cdrop-trigger ${open ? "cdrop-open" : ""} ${
-          disabled ? "cdrop-disabled" : ""
-        } ${error ? "cdrop-error" : ""}`}
+        className={`cdrop-trigger ${open ? "cdrop-open" : ""}`}
+        onMouseDown={(e) => e.stopPropagation()}
         onClick={() => {
           if (disabled) return;
           setOpen((o) => !o);
           setTimeout(updatePosition, 0);
         }}
-        disabled={disabled}
       >
         <span className={`cdrop-value ${!value ? "cdrop-placeholder" : ""}`}>
           {selected?.label || placeholder}
@@ -188,8 +200,7 @@ const CustomDropdown = ({
         />
       </button>
 
-      {error ? <div className="cdrop-error-text">{error}</div> : null}
-
+      {error && <div className="cdrop-error-text">{error}</div>}
       {createPortal(dropdownContent, document.body)}
     </div>
   );

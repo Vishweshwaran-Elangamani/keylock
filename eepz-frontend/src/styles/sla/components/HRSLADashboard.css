@@ -406,10 +406,15 @@
   min-height: 38px;
   position: relative;
 }
-
-.hr-sla-dd .cdrop-trigger * {
-  transform: none !important;
+.hr-sla-dd .cdrop-trigger .cdrop-icon {
+  transform: translateY(-50%) rotate(0deg) !important;
+  transition: transform 0.25s ease;
 }
+
+.hr-sla-dd .cdrop-trigger .cdrop-icon.cdrop-icon-open {
+  transform: translateY(-50%) rotate(180deg) !important;
+}
+
 
 .hr-sla-dd .cdrop-trigger:hover {
   border-color: #d1d5db;

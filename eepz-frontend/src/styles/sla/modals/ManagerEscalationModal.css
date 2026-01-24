@@ -283,17 +283,6 @@
 .mgr-required {
   color: #e01950;
 }
-
-.mgr-select-container {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.mgr-select-container--disabled {
-  opacity: 0.6;
-  pointer-events: none;
-}
-
 .mgr-select {
   position: relative;
   width: 100%;
@@ -310,7 +299,6 @@
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
-  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .mgr-select-control--open {
@@ -318,16 +306,9 @@
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
 }
 
-.mgr-select-value {
-  text-align: left;
-  color: #111827;
-  font-size: 0.875rem;
-}
-
 .mgr-select-icon {
   display: inline-flex;
   transition: transform 0.2s ease;
-  color: #6b7280;
 }
 
 .mgr-select-icon--open {
@@ -335,14 +316,17 @@
 }
 
 .mgr-select-menu {
-  margin-top: 0.25rem;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  background-color: #ffffff;
   border-radius: 8px;
   border: 1px solid #e5e7eb;
-  background-color: #ffffff;
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
   max-height: 220px;
   overflow-y: auto;
-  z-index: 20;
+  z-index: 9999;
 }
 
 .mgr-select-option {
@@ -350,20 +334,18 @@
   font-size: 0.875rem;
   cursor: pointer;
   color: #374151;
-  transition: background-color 0.15s, color 0.15s;
 }
 
 .mgr-select-option:hover {
-  background-color: #25235c !important;
-  color: #fff !important;
+  background-color: #25235c;
+  color: #ffffff;
 }
 
 .mgr-select-option--selected {
-  background-color: #efefef !important;
-  color: #000 !important;
-  font-weight: 500 !important;
-
+  background-color: #efefef;
+  font-weight: 500;
 }
+
 
 .mgr-textarea {
   width: 100%;

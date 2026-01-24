@@ -99,6 +99,17 @@
   font-size: 0.9375rem;
 }
 
+.cff-dd .cdrop-trigger .cdrop-icon {
+  transform: translateY(-50%) rotate(0deg) !important;
+  transition: transform 0.25s ease;
+  transform-origin: center;
+}
+
+.cff-dd .cdrop-trigger .cdrop-icon.cdrop-icon-open {
+  transform: translateY(-50%) rotate(180deg) !important;
+}
+
+
 .cff-required {
   color: #dc2626;
 }
