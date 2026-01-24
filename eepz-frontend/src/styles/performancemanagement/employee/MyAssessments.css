@@ -522,7 +522,6 @@
   border-spacing: 0;
   border: 1px solid black;
   border-radius: 8px;
-  overflow: hidden;
 }
 
 .empassper-table thead {
