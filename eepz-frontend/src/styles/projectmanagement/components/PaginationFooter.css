@@ -26,10 +26,33 @@
 .pf-rows-dd .cdrop-trigger {
   height: 30px;
   min-width: 60px;
-  padding: 0.3rem 0.625rem;
+  padding: 0.3rem 0.75rem;
   font-size: 0.875rem;
   font-weight: 600;
-  border-radius: 6px;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #27235c;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.pf-rows-dd .cdrop-trigger svg {
+  color: #27235c;
+}
+
+.pf-rows-dd .cdrop-trigger:hover {
+  background: #27235c;
+  color: #ffffff;
+  border-color: #27235c;
+  box-shadow: 0 4px 12px rgba(39, 35, 92, 0.25);
+}
+
+.pf-rows-dd .cdrop-trigger:hover svg {
+  color: #ffffff;
 }
 
 .pf-pagination-status {
@@ -67,6 +90,11 @@
   transition: all 0.15s ease;
 }
 
+.pf-rows-dd .cdrop-trigger:hover .cdrop-value {
+  color: #ffffff;
+}
+
+
 .pf-page-item button:hover:not(:disabled) {
   background: rgba(39, 35, 92, 0.05);
   border-color: #27235c;
@@ -97,6 +125,7 @@
     justify-content: center;
     text-align: center;
     width: 100%;
+    margin-left: 0;
   }
 
   .pf-pagination-nav {

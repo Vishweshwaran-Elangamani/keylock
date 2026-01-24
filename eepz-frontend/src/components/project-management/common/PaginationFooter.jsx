@@ -4,12 +4,9 @@ import CustomDropdown from "./CustomDropdown";
 import "../../../styles/projectmanagement/components/PaginationFooter.css";
 
 const PaginationFooter = ({
-  currentPage,
-  totalItems,
-  itemsPerPage,
-  onPageChange,
-  onItemsPerPageChange,
-  pageSizeOptions = [5, 10, 25, 50],
+  currentPage,totalItems,
+  itemsPerPage,onPageChange,
+  onItemsPerPageChange,pageSizeOptions = [5, 10, 25, 50],
   showPageSizeDropdown = true,
   showStatusText = true,
 }) => {
@@ -19,7 +16,6 @@ const PaginationFooter = ({
     totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage;
   const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
 
-  /* 🔒 ALWAYS COMPACT – ONLY 2 PAGE BOXES */
   const pageNumbers = useMemo(() => {
     if (totalPages === 1) return [1];
 
@@ -38,7 +34,6 @@ const PaginationFooter = ({
 
   return (
     <div className="pf-pagination">
-      {/* LEFT */}
       <div className="pf-pagination-info">
         {showPageSizeDropdown && (
           <>
@@ -65,7 +60,6 @@ const PaginationFooter = ({
         )}
       </div>
 
-      {/* CENTER */}
       {showStatusText && (
         <div className="pf-pagination-status">
           Showing {totalItems === 0 ? 0 : startIndex + 1} to {endIndex} of{" "}
@@ -73,7 +67,6 @@ const PaginationFooter = ({
         </div>
       )}
 
-      {/* RIGHT */}
       {totalPages > 1 && (
         <nav className="pf-pagination-nav">
           <ul className="pf-pagination-list">
