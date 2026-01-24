@@ -18,8 +18,6 @@ namespace Relevantz.EEPZ.Common.Constants
 
             public const string MomNotFound = "MOM not found";
             public const string ActionItemNotFound = "Action item not found";
-
-            public const string InternalServerError = "Server Side error";
         }
 
         public static class ResponseMessages
