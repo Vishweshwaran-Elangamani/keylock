@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { FaSearch } from "react-icons/fa";
 import { Form } from "react-bootstrap";
 import "../../../../styles/auth/department/DepartmentList.css";
+
 const StatusDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
   const options = [
@@ -25,7 +26,7 @@ const StatusDropdown = ({ value, onChange }) => {
     <div
       className="dlm-status-select custom-status-dropdown"
       tabIndex={0}
-      onBlur={() => setTimeout(() => setOpen(false), 200)} 
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
     >
       <div
         className="custom-status-selected"
@@ -53,6 +54,7 @@ const StatusDropdown = ({ value, onChange }) => {
     </div>
   );
 };
+
 const DepartmentList = () => {
   const navigate = useNavigate();
   const [departments, setDepartments] = useState([]);
@@ -69,9 +71,11 @@ const DepartmentList = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [showRowsDropdown, setShowRowsDropdown] = useState(false);
   const rowsDropdownRef = useRef(null);
+
   useEffect(() => {
     fetchDepartments();
   }, []);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -86,6 +90,7 @@ const DepartmentList = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
   const fetchDepartments = async () => {
     try {
       setLoading(true);
@@ -105,10 +110,12 @@ const DepartmentList = () => {
       setLoading(false);
     }
   };
+
   const handleDelete = (dept) => {
     setSelectedDepartment(dept);
     setShowDeleteModal(true);
   };
+
   const handleDeleteConfirm = async () => {
     try {
       toast.loading("Deleting department...");
@@ -131,20 +138,24 @@ const DepartmentList = () => {
       toast.error(error.message || "Error deleting department");
     }
   };
+
   const handleEdit = (department) => {
     setSelectedDepartment(department);
     setShowEditModal(true);
   };
+
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
     setCurrentPage(1);
   };
+
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
     setStatusFilter("All");
     setCurrentPage(1);
   };
+
   const applyFilters = () => {
     let filtered = [...departments];
     if (activeSearchTerm) {
@@ -161,6 +172,7 @@ const DepartmentList = () => {
     }
     return filtered;
   };
+
   const filteredDepartments = applyFilters();
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -169,6 +181,7 @@ const DepartmentList = () => {
     indexOfLastItem
   );
   const totalPages = Math.ceil(filteredDepartments.length / itemsPerPage) || 1;
+
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
@@ -195,6 +208,7 @@ const DepartmentList = () => {
     }
     return pages;
   };
+
   const formatDate = (date) => {
     return date
       ? new Date(date).toLocaleDateString("en-US", {
@@ -204,6 +218,7 @@ const DepartmentList = () => {
         })
       : "N/A";
   };
+
   const getDeptStats = () => {
     const total = filteredDepartments.length;
     const active = filteredDepartments.filter(
@@ -218,7 +233,9 @@ const DepartmentList = () => {
       inactiveDepartments: inactive,
     };
   };
+
   const stats = getDeptStats();
+
   if (loading) {
     return (
       <div className="dlm-loading-container">
@@ -228,6 +245,7 @@ const DepartmentList = () => {
       </div>
     );
   }
+
   return (
     <div className="dlm-page">
       <Breadcrumb
@@ -237,6 +255,7 @@ const DepartmentList = () => {
           },
         ]}
       />
+
       {/* KPI CARDS */}
       <div className="stats-cards-dl">
         <div className="stat-card-dl stat-total-dl">
@@ -267,6 +286,7 @@ const DepartmentList = () => {
           </div>
         </div>
       </div>
+
       {/* CONTROLS BAR */}
       <div className="dlm-controls">
         <div className="dlm-search-input">
@@ -295,6 +315,7 @@ const DepartmentList = () => {
             </button>
           </div>
         </div>
+
         <div className="dlm-status-filter">
           <StatusDropdown
             value={statusFilter}
@@ -304,9 +325,11 @@ const DepartmentList = () => {
             }}
           />
         </div>
+
         <button className="dlm-btn-clear" onClick={clearFilters}>
           Clear Filters
         </button>
+
         <div className="dlm-view-switcher">
           <button
             className={`dlm-view-btn ${viewMode === "table" ? "active" : ""}`}
@@ -331,10 +354,12 @@ const DepartmentList = () => {
             <i className="bi bi-grid-3x3-gap-fill"></i>
           </button>
         </div>
+
         <div className="dlm-results-count">
           Showing {currentItems.length} of {filteredDepartments.length}{" "}
           departments
         </div>
+
         <button
           className="dlm-btn-create"
           onClick={() => setShowAddModal(true)}
@@ -343,6 +368,7 @@ const DepartmentList = () => {
           Create Department
         </button>
       </div>
+
       {/* EMPTY STATE */}
       {filteredDepartments.length === 0 ? (
         <div className="dlm-empty">
@@ -385,12 +411,14 @@ const DepartmentList = () => {
                         </code>
                       </div>
                     </div>
+
                     {/* Card Body */}
                     <div className="dlm-card-body">
                       <h6 className="dlm-card-title">{dept.departmentName}</h6>
                       <p className="dlm-card-description">
                         {dept.description || "No description available"}
                       </p>
+
                       {/* Meta Info */}
                       <div className="dlm-card-meta">
                         <div className="dlm-meta-item">
@@ -433,6 +461,7 @@ const DepartmentList = () => {
                         </div>
                       </div>
                     </div>
+
                     {/* Card Footer - Actions */}
                     <div className="dlm-card-footer">
                       <button
@@ -453,64 +482,118 @@ const DepartmentList = () => {
                   </div>
                 ))}
               </div>
-              {/* GRID PAGINATION */}
-              {filteredDepartments.length > 0 && totalPages > 1 && (
+
+              {/* GRID PAGINATION WITH DROPDOWN (6, 9, 12, 18) */}
+              {filteredDepartments.length > 0 && (
                 <div className="dlm-pagination-wrapper">
-                  <nav className="dlm-pagination">
-                    <ul className="dlm-pagination-list">
-                      <li
-                        className={`dlm-page-item ${
-                          currentPage === 1 ? "disabled" : ""
-                        }`}
+                  <div className="dlm-pagination">
+                    <div className="dlm-pagination-info">
+                      <span>Show</span>
+                      <div
+                        ref={rowsDropdownRef}
+                        className="dlm-rows-dropdown-wrapper"
                       >
                         <button
-                          onClick={() =>
-                            setCurrentPage((prev) => Math.max(prev - 1, 1))
-                          }
-                          disabled={currentPage === 1}
+                          type="button"
+                          onClick={() => setShowRowsDropdown(!showRowsDropdown)}
+                          className="dlm-rows-button"
                         >
-                          <i className="bi bi-chevron-left"></i>
+                          <span>{itemsPerPage}</span>
+                          <i
+                            className={`bi bi-chevron-${
+                              showRowsDropdown ? "up" : "down"
+                            } dlm-rows-chevron`}
+                          ></i>
                         </button>
-                      </li>
-                      {getPageNumbers().map((page, index) => (
-                        <li
-                          key={index}
-                          className={`dlm-page-item ${
-                            page === currentPage ? "active" : ""
-                          } ${typeof page !== "number" ? "disabled" : ""}`}
-                        >
-                          <button
-                            onClick={() =>
-                              typeof page === "number" && setCurrentPage(page)
-                            }
-                            disabled={typeof page !== "number"}
+                        {showRowsDropdown && (
+                          <div className="dlm-rows-dropdown">
+                            {[6, 9, 12, 18].map((size) => (
+                              <div
+                                key={size}
+                                onClick={() => {
+                                  setItemsPerPage(size);
+                                  setCurrentPage(1);
+                                  setShowRowsDropdown(false);
+                                }}
+                                className={`dlm-rows-option ${
+                                  itemsPerPage === size ? "dlm-rows-active" : ""
+                                }`}
+                              >
+                                {size}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <span>entries</span>
+                    </div>
+
+                    <div className="dlm-pagination-status">
+                      Showing {indexOfFirstItem + 1} to{" "}
+                      {Math.min(indexOfLastItem, filteredDepartments.length)} of{" "}
+                      {filteredDepartments.length} entries
+                    </div>
+
+                    {totalPages > 1 && (
+                      <nav className="dlm-pagination-nav">
+                        <ul className="dlm-pagination-list">
+                          <li
+                            className={`dlm-page-item ${
+                              currentPage === 1 ? "disabled" : ""
+                            }`}
                           >
-                            {page}
-                          </button>
-                        </li>
-                      ))}
-                      <li
-                        className={`dlm-page-item ${
-                          currentPage === totalPages ? "disabled" : ""
-                        }`}
-                      >
-                        <button
-                          onClick={() =>
-                            setCurrentPage((prev) =>
-                              Math.min(prev + 1, totalPages)
-                            )
-                          }
-                          disabled={currentPage === totalPages}
-                        >
-                          <i className="bi bi-chevron-right"></i>
-                        </button>
-                      </li>
-                    </ul>
-                  </nav>
+                            <button
+                              onClick={() =>
+                                setCurrentPage((prev) => Math.max(prev - 1, 1))
+                              }
+                              disabled={currentPage === 1}
+                            >
+                              <i className="bi bi-chevron-left"></i>
+                            </button>
+                          </li>
+                          {getPageNumbers().map((page, index) => (
+                            <li
+                              key={index}
+                              className={`dlm-page-item ${
+                                page === currentPage ? "active" : ""
+                              } ${typeof page !== "number" ? "disabled" : ""}`}
+                            >
+                              <button
+                                onClick={() =>
+                                  typeof page === "number" &&
+                                  setCurrentPage(page)
+                                }
+                                disabled={typeof page !== "number"}
+                              >
+                                {page}
+                              </button>
+                            </li>
+                          ))}
+                          <li
+                            className={`dlm-page-item ${
+                              currentPage === totalPages ? "disabled" : ""
+                            }`}
+                          >
+                            <button
+                              onClick={() =>
+                                setCurrentPage((prev) =>
+                                  Math.min(prev + 1, totalPages)
+                                )
+                              }
+                              disabled={currentPage === totalPages}
+                            >
+                              <i className="bi bi-chevron-right"></i>
+                            </button>
+                          </li>
+                        </ul>
+                      </nav>
+                    )}
+                  </div>
                 </div>
               )}
             </>
           )}
+
           {/* TABLE VIEW */}
           {viewMode === "table" && (
             <div className="dlm-table-card">
@@ -583,6 +666,7 @@ const DepartmentList = () => {
                   </tbody>
                 </table>
               </div>
+
               {filteredDepartments.length > 0 && (
                 <div className="dlm-pagination">
                   <div className="dlm-pagination-info">
@@ -625,11 +709,13 @@ const DepartmentList = () => {
                     </div>
                     <span>entries</span>
                   </div>
+
                   <div className="dlm-pagination-status">
                     Showing {indexOfFirstItem + 1} to{" "}
                     {Math.min(indexOfLastItem, filteredDepartments.length)} of{" "}
                     {filteredDepartments.length} entries
                   </div>
+
                   {totalPages > 1 && (
                     <nav className="dlm-pagination-nav">
                       <ul className="dlm-pagination-list">
@@ -689,7 +775,8 @@ const DepartmentList = () => {
           )}
         </>
       )}
-    
+
+      {/* MODALS */}
       {showAddModal && (
         <AddDepartmentModal
           show={showAddModal}
@@ -729,4 +816,5 @@ const DepartmentList = () => {
     </div>
   );
 };
+
 export default DepartmentList;

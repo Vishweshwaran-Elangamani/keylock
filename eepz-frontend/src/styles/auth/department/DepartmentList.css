@@ -618,16 +618,16 @@
 }
 
 /* ========================================
-   PAGINATION WRAPPER (FROM REFERENCE)
+   PAGINATION WRAPPER - FIXED FOR DROPDOWN VISIBILITY
 ======================================== */
 
 .dlm-pagination-wrapper {
+  margin-top: 1.5rem;
   background: #ffffff;
-  border-radius: 12px 12px 0 0;
+  border-radius: 12px;
   border: 1px solid #e5e7eb;
-  border-bottom: none;
-  overflow: hidden;
-  margin-bottom: 0;
+  overflow: visible; /* CHANGED FROM hidden TO visible */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 
 .dlm-pagination {
@@ -635,13 +635,11 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.25rem;
-  border-top: 1px solid #e5e7eb;
   flex-wrap: wrap;
   gap: 1rem;
   background: #ffffff;
-  border-radius: 0 0 12px 12px;
   position: relative;
-  overflow: visible;
+  overflow: visible; /* MUST BE visible for dropdown */
 }
 
 .dlm-pagination-info {
@@ -652,10 +650,10 @@
   color: #6c757d;
 }
 
-/* Custom Rows Per Page Dropdown */
+/* CRITICAL FIX FOR DROPDOWN VISIBILITY */
 .dlm-rows-dropdown-wrapper {
   position: relative;
-  z-index: 100;
+  z-index: 10000; /* INCREASED z-index */
 }
 
 .dlm-rows-button {
@@ -694,7 +692,7 @@
   background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 6px;
-  z-index: 10000;
+  z-index: 10001; /* HIGHER than wrapper */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   overflow: hidden;
   animation: dropdownSlideDown 0.2s ease-out;
@@ -802,12 +800,13 @@
   border-radius: 12px;
   border: 1px solid #e5e7eb;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-  overflow: visible;
+  overflow: visible; /* CHANGED for dropdown visibility */
   position: relative;
 }
 
 .dlm-table-wrapper {
   overflow-x: auto;
+  overflow-y: visible; /* KEEP visible for dropdown */
   position: relative;
 }
 
@@ -914,7 +913,7 @@
 }
 
 /* ========================================
-   ACTION BUTTONS (FROM REFERENCE DESIGN)
+   ACTION BUTTONS
 ======================================== */
 
 .dlm-table-actions {
