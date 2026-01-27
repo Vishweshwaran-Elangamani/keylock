@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import policyService from "../../../services/hr_operations/hr/policyService";
 import "../../../styles/hr_operations/hr/AddPolicyModal.css";
+
 const CustomDropdown = ({
   value,
   onChange,
@@ -13,6 +14,7 @@ const CustomDropdown = ({
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const selectedOption = options.find((opt) => opt.value === value);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -26,17 +28,20 @@ const CustomDropdown = ({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
+
   const handleSelect = (optionValue) => {
     if (!disabled) {
       onChange({ target: { name, value: optionValue } });
       setIsOpen(false);
     }
   };
+
   const toggleDropdown = () => {
     if (!disabled) {
       setIsOpen(!isOpen);
     }
   };
+
   return (
     <div
       ref={dropdownRef}
@@ -70,6 +75,7 @@ const CustomDropdown = ({
     </div>
   );
 };
+
 const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
   const [formData, setFormData] = useState({
     policyName: "",
@@ -78,6 +84,7 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
     complianceGuidance: "",
     status: "Draft",
   });
+
   const [documentType, setDocumentType] = useState("none");
   const [selectedFile, setSelectedFile] = useState(null);
   const [documentLink, setDocumentLink] = useState("");
@@ -85,6 +92,7 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
   const [uploadingDoc, setUploadingDoc] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
   const categories = [
     "Attendance",
     "Leave",
@@ -97,12 +105,13 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
     "IT Policy",
     "Other",
   ];
-  const statuses = ["Active", "Inactive", "Draft"];
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -124,6 +133,7 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
       setSelectedFile(file);
     }
   };
+
   const validate = () => {
     const newErrors = {};
     if (!formData.policyName.trim())
@@ -140,12 +150,15 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
+
     try {
       setLoading(true);
       let documentData = {};
+
       if (documentType === "upload" && selectedFile) {
         setUploadingDoc(true);
         const uploadResult = await policyService.uploadDocument(selectedFile);
@@ -167,6 +180,7 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
           documentType: linkResult.documentType,
         };
       }
+
       const policyDataWithDoc = { ...formData, ...documentData };
       await policyService.createPolicy(policyDataWithDoc);
       if (typeof onToast === "function")
@@ -182,13 +196,15 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
       setUploadingDoc(false);
     }
   };
+
   if (!show) return null;
+
   // Dropdown options with placeholder
   const categoryOptions = [
     { value: "", label: "Select Category" },
     ...categories.map((cat) => ({ value: cat, label: cat })),
   ];
-  const statusOptions = statuses.map((st) => ({ value: st, label: st }));
+
   return (
     <>
       <div className="apm-backdrop" onClick={onClose} />
@@ -210,6 +226,7 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
+
           {/* Form */}
           <form onSubmit={handleSubmit} className="apm-form">
             {/* Modal Body */}
@@ -220,108 +237,91 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                   {errors.submit}
                 </div>
               )}
-              {/* Two Column Grid */}
-              <div className="apm-two-column-grid">
-                {/* LEFT COLUMN */}
-                <div className="apm-column-left">
-                  {/* Policy Name */}
-                  <div className="apm-form-group">
-                    <label className="apm-form-label">
-                      Policy Name{" "}
-                      <span className="apm-required-asterisk">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="policyName"
-                      placeholder="Enter policy name"
-                      value={formData.policyName}
-                      onChange={handleChange}
-                      className={`apm-form-input ${
-                        errors.policyName ? "apm-input-error" : ""
-                      }`}
-                    />
-                    {errors.policyName && (
-                      <div className="apm-form-error">{errors.policyName}</div>
-                    )}
-                  </div>
-                  {/* Category - CUSTOM DROPDOWN */}
-                  <div className="apm-form-group">
-                    <label className="apm-form-label">
-                      Category <span className="apm-required-asterisk">*</span>
-                    </label>
-                    <CustomDropdown
-                      name="category"
-                      options={categoryOptions}
-                      value={formData.category}
-                      onChange={handleChange}
-                      placeholder="Select Category"
-                      error={errors.category}
-                      disabled={loading}
-                    />
-                    {errors.category && (
-                      <div className="apm-form-error">{errors.category}</div>
-                    )}
-                  </div>
-                  {/* Status - CUSTOM DROPDOWN */}
-                  <div className="apm-form-group">
-                    <label className="apm-form-label">Status</label>
-                    <CustomDropdown
-                      name="status"
-                      options={statusOptions}
-                      value={formData.status}
-                      onChange={handleChange}
-                      placeholder="Select Status"
-                      disabled={loading}
-                    />
-                    <small className="apm-form-hint">
-                      Draft by default (publish later)
-                    </small>
-                  </div>
+
+              {/* NEW LAYOUT: Policy Name + Description Row */}
+              <div className="apm-name-description-row">
+                {/* Policy Name (Left) */}
+                <div className="apm-form-group apm-policy-name-group">
+                  <label className="apm-form-label">
+                    Policy Name <span className="apm-required-asterisk">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="policyName"
+                    placeholder="Enter policy name"
+                    value={formData.policyName}
+                    onChange={handleChange}
+                    className={`apm-form-input ${
+                      errors.policyName ? "apm-input-error" : ""
+                    }`}
+                  />
+                  {errors.policyName && (
+                    <div className="apm-form-error">{errors.policyName}</div>
+                  )}
                 </div>
-                {/* RIGHT COLUMN */}
-                <div className="apm-column-right">
-                  {/* Description */}
-                  <div className="apm-form-group">
-                    <label className="apm-form-label">
-                      Description{" "}
-                      <span className="apm-required-asterisk">*</span>
-                    </label>
-                    <textarea
-                      rows={3}
-                      name="description"
-                      placeholder="Enter policy description"
-                      value={formData.description}
-                      onChange={handleChange}
-                      className={`apm-form-textarea ${
-                        errors.description ? "apm-input-error" : ""
-                      }`}
-                    />
-                    {errors.description && (
-                      <div className="apm-form-error">{errors.description}</div>
-                    )}
-                  </div>
-                  {/* Compliance Guidance */}
-                  <div className="apm-form-group">
-                    <label className="apm-form-label">
-                      Compliance Guidance
-                    </label>
-                    <textarea
-                      rows={3}
-                      name="complianceGuidance"
-                      placeholder="Enter compliance guidance (optional)"
-                      value={formData.complianceGuidance}
-                      onChange={handleChange}
-                      className="apm-form-textarea"
-                    />
-                  </div>
+
+                {/* Description (Right - Tall) */}
+                <div className="apm-form-group apm-description-group">
+                  <label className="apm-form-label">
+                    Description <span className="apm-required-asterisk">*</span>
+                  </label>
+                  <textarea
+                    rows={5}
+                    name="description"
+                    placeholder="Enter policy description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    className={`apm-form-textarea apm-tall-textarea ${
+                      errors.description ? "apm-input-error" : ""
+                    }`}
+                  />
+                  {errors.description && (
+                    <div className="apm-form-error">{errors.description}</div>
+                  )}
                 </div>
               </div>
+
+              {/* Category Row (Left Side Only) */}
+              <div className="apm-category-row">
+                <div className="apm-form-group">
+                  <label className="apm-form-label">
+                    Category <span className="apm-required-asterisk">*</span>
+                  </label>
+                  <CustomDropdown
+                    name="category"
+                    options={categoryOptions}
+                    value={formData.category}
+                    onChange={handleChange}
+                    placeholder="Select Category"
+                    error={errors.category}
+                    disabled={loading}
+                  />
+                  {errors.category && (
+                    <div className="apm-form-error">{errors.category}</div>
+                  )}
+                </div>
+              </div>
+
+              {/* Compliance Guidance (Full Width) */}
+              <div className="apm-form-group apm-full-width-group">
+                <label className="apm-form-label">Compliance Guidance</label>
+                <textarea
+                  rows={4}
+                  name="complianceGuidance"
+                  placeholder="Enter compliance guidance (optional)"
+                  value={formData.complianceGuidance}
+                  onChange={handleChange}
+                  className="apm-form-textarea"
+                />
+              </div>
+
               {/* DOCUMENT SECTION */}
               <div className="apm-document-section">
                 <label className="apm-document-label">
                   <i className="bi bi-file-earmark-text apm-document-label-icon"></i>
                   Attach Policy Document (Optional)
                 </label>
+
                 {/* Three Button Group */}
                 <div className="apm-button-group">
                   <button
@@ -367,6 +367,7 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                     Add Link
                   </button>
                 </div>
+
                 {/* Upload File Section */}
                 {documentType === "upload" && (
                   <div className="apm-upload-container">
@@ -384,6 +385,7 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                     <small className="apm-upload-hint">
                       Supported: PDF, DOC, DOCX (Max 5MB)
                     </small>
+
                     {/* Selected File Display */}
                     {selectedFile && (
                       <div className="apm-selected-file">
@@ -410,6 +412,7 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                     )}
                   </div>
                 )}
+
                 {/* Link Section */}
                 {documentType === "link" && (
                   <div className="apm-link-container">
@@ -457,6 +460,7 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                 )}
               </div>
             </div>
+
             {/* Modal Footer */}
             <div className="apm-modal-footer">
               <button
@@ -497,4 +501,5 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
     </>
   );
 };
+
 export default AddPolicyModal;
