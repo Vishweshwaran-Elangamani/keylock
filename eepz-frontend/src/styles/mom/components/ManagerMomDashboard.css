@@ -596,3 +596,52 @@ margin-top: -5px;
     justify-content: center;
   }
 }
+
+.managermom-stat-icon-moms {
+  background-color: #e0f2fe;
+}
+.managermom-stat-icon-moms .managermom-stat-icon-glyph {
+  color: #0284c7; 
+}
+
+.managermom-stat-icon-oneonone {
+  background-color: #efeaff; 
+}
+.managermom-stat-icon-oneonone .managermom-stat-icon-glyph {
+  color: #6d28d9; 
+}
+
+.managermom-stat-icon-overdue {
+  background-color: #ffe5ea; 
+}
+.managermom-stat-icon-overdue .managermom-stat-icon-glyph {
+  color: #e11d48; 
+}
+
+.managermom-stat-icon-meetings {
+  background-color: #e4f7e8; 
+}
+.managermom-stat-icon-meetings .managermom-stat-icon-glyph {
+  color: #16a34a; 
+}
+
+.managermom-stat-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.managermom-stat-icon-glyph {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.managermom-stat-card:hover .managermom-stat-icon {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 0 0 4px rgba(39, 35, 92, 0.06);
+  transition: all 0.25s ease;
+}

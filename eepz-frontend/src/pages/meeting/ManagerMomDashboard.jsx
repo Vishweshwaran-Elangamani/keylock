@@ -204,30 +204,32 @@ const ManagerMomDashboard = () => {
 
       <div className="managermom-container">
         <div className="row g-3 mb-4">
-          <StatCard
-            icon="bi-clock"
-            variant="pending"
-            count={stats.teamMomsCount}
-            label="Pending Forms"
-          />
-          <StatCard
-            icon="bi-check-circle"
-            variant="submitted"
-            count={stats.oneOnOnesCount}
-            label="Submitted Forms"
-          />
-          <StatCard
-            icon="bi-star"
-            variant="reviews"
-            count={stats.overdueActionsCount}
-            label="Reviews Received"
-          />
-          <StatCard
-            icon="bi-people"
-            variant="peer"
-            count={stats.totalMeetingsCount}
-            label="Peer Feedback"
-          />
+         
+ <StatCard
+    icon="bi-file-text"
+    variant="moms"
+    count={stats.teamMomsCount}
+    label="Team MoMs"
+  />
+  <StatCard
+    icon="bi-person-lines-fill"
+    variant="oneonone"
+    count={stats.oneOnOnesCount}
+    label="1:1 Meetings"
+  />
+  <StatCard
+    icon="bi-exclamation-triangle"
+    variant="overdue"
+    count={stats.overdueActionsCount}
+    label="Overdue Action Items"
+  />
+  <StatCard
+    icon="bi-people"
+    variant="meetings"
+    count={stats.totalMeetingsCount}
+    label="Total Meetings"
+  />
+
         </div>
 
         <div className="managermom-toolbar">

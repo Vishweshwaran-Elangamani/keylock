@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import momService from "../../services/meeting/momService";
+import employeeService from "../../services/meeting/employeeservice"
 import toastr from "toastr";
 import { useNavigate } from "react-router-dom";
 import {
@@ -57,7 +58,7 @@ const MyMomsList = () => {
 
   const loadEmployees = async () => {
     try {
-      const response = await momService.getAllEmployees();
+      const response = await employeeService.getEmployees();
       if (response.success) {
         setEmployees(response.data || []);
       }
