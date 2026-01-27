@@ -188,7 +188,6 @@
   margin-left: 60px;
 }
 
-/* PRIMARY moved here */
 .mm2-modal-header,
 .mm2-detail-header {
   padding: 0.9rem 1.5rem;
@@ -223,12 +222,16 @@
 }
 
 .mm2-search-shell {
-  border-radius: 999px;
-  border: 1px solid #e2e8f0;
-  background-color: #ffffff;
+  position: relative;
   display: flex;
-  align-items: stretch;
+  align-items: center;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
   overflow: hidden;
+  background: #ffffff;
+  flex: 0 0 auto;
+  width: 1000px;
+  max-width: 100%;
 }
 
 .mm2-search-icon {
@@ -261,6 +264,7 @@
 .mm2-search-btn {
   background-color: #27235c;
   color: #ffffff;
+  height: 40px;
 }
 
 .mm2-cancel-btn {

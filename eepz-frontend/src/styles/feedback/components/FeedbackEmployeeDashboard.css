@@ -122,7 +122,6 @@
 }
 
 .fm-empdb-stat-card:hover {
-  border-color: #0f62fe;
   box-shadow: 0 4px 12px rgba(39, 35, 92, 0.1);
   transform: translateY(-2px);
 }
