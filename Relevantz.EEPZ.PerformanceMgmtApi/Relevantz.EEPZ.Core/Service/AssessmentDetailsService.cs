@@ -1,4 +1,4 @@
-
+// File: AssessmentDetailsService.cs
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,24 +15,13 @@ using Relevantz.EEPZ.Data.Repository.Interfaces;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
-    /// <summary>
-    /// Corrected service:
-    /// - Implements interface signatures exactly (no extra parameters or return-type changes).
-    /// - Reduces repeated LINQ per iteration by pre-indexing collections.
-    /// - Adds logging and exception handling around repository calls.
-    /// - Uses constants for status strings (no magic strings in logic).
-    /// - Centralizes reviewer name resolution.
-    /// - Validates/sanitizes storage Id before file retrieval.
-    /// - Avoids multiple returns in GetHrAttachmentAsync.
-    /// NOTE: For best performance, consider moving heavy query shaping into repo layer.
-    /// </summary>
     public class AssessmentDetailsService : IAssessmentDetailsService
     {
         private readonly IAssessmentDetailsRepository _repository;
         private readonly IFileStorageService _fileStorage;
         private readonly ILogger<AssessmentDetailsService> _logger;
 
-        // Accepts MongoDB ObjectId-like values (GridFS) – 24 hex chars
+        // Matches a 24-char hex ObjectId-like string
         private static readonly Regex ObjectIdRegex = new Regex("^[a-fA-F0-9]{24}$", RegexOptions.Compiled);
 
         private static class AssessmentStatuses
@@ -59,36 +48,20 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             try
             {
-                _logger.LogInformation("Fetching datasets from repository...");
+                _logger.LogInformation("Fetching datasets from repository (sequential to avoid DbContext concurrency)...");
 
-                // Fetch in parallel to reduce wall-clock time.
-                var profilesTask = _repository.GetAllUserProfilesAsync();
-                var userAuthsTask = _repository.GetAllUserAuthenticationsAsync();
-                var projectsTask = _repository.GetAllProjectsAsync();
-                var projectEmployeesTask = _repository.GetAllProjectEmployeesAsync();
-                var selfAssessmentsTask = _repository.GetAllSelfAssessmentsWithDetailsAsync();
-                var reviewsTask = _repository.GetAllAssessmentReviewsAsync();
-                var assignmentsTask = _repository.GetAssignmentsWithFormCompetenciesAsync();
-                var attachmentsTask = _repository.GetAllSelfAssessmentAttachmentsAsync();
-
-                await Task.WhenAll(
-                    profilesTask, userAuthsTask, projectsTask, projectEmployeesTask,
-                    selfAssessmentsTask, reviewsTask, assignmentsTask, attachmentsTask
-                );
-
-                // Null-safe materialization
-                var profiles = profilesTask.Result ?? new List<Userprofile>();
-                var userAuths = userAuthsTask.Result ?? new List<Userauthentication>();
-                var projects = projectsTask.Result ?? new List<Project>();
-                var projectEmployees = projectEmployeesTask.Result ?? new List<Projectemployee>();
-                var selfAssessments = selfAssessmentsTask.Result ?? new List<Selfassessment>();
-                var reviews = reviewsTask.Result ?? new List<Assessmentreview>();
-                var assignments = assignmentsTask.Result ?? new List<Assignment>();
-                var attachments = attachmentsTask.Result ?? new List<Selfassessmentattachment>();
+                // ✅ Sequential awaits to avoid running multiple EF operations concurrently
+                var profiles         = await _repository.GetAllUserProfilesAsync()                 ?? new List<Userprofile>();
+                var userAuths        = await _repository.GetAllUserAuthenticationsAsync()          ?? new List<Userauthentication>();
+                var projects         = await _repository.GetAllProjectsAsync()                      ?? new List<Project>();
+                var projectEmployees = await _repository.GetAllProjectEmployeesAsync()              ?? new List<Projectemployee>();
+                var selfAssessments  = await _repository.GetAllSelfAssessmentsWithDetailsAsync()    ?? new List<Selfassessment>();
+                var reviews          = await _repository.GetAllAssessmentReviewsAsync()             ?? new List<Assessmentreview>();
+                var assignments      = await _repository.GetAssignmentsWithFormCompetenciesAsync()  ?? new List<Assignment>();
+                var attachments      = await _repository.GetAllSelfAssessmentAttachmentsAsync()     ?? new List<Selfassessmentattachment>();
 
                 _logger.LogInformation("Datasets fetched. Building lookup dictionaries...");
 
-                // Lookups to avoid repeated .Where/.FirstOrDefault in loops
                 var profileByEmpId = profiles
                     .Where(p => p != null)
                     .GroupBy(p => p.EmployeeId)
@@ -109,7 +82,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     .GroupBy(p => p.ProjectId)
                     .ToDictionary(g => g.Key, g => g.First());
 
-                // Latest self-assessment per (EmployeeId, FormId)
                 var latestSelfAssessmentByEmpForm = selfAssessments
                     .Where(sa => sa != null)
                     .GroupBy(sa => (sa.EmployeeId, sa.FormId))
@@ -118,13 +90,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         g => g.OrderByDescending(sa => sa.SubmittedAt).First()
                     );
 
-                // Reviews by (DetailId, ReviewerUserId)
                 var reviewsByDetailAndReviewer = reviews
                     .Where(r => r != null)
                     .GroupBy(r => (r.DetailId, r.ReviewerId))
                     .ToDictionary(g => g.Key, g => g.First());
 
-                // Attachments by AssessmentId
                 var attachmentsByAssessmentId = attachments
                     .Where(a => a != null)
                     .GroupBy(a => a.AssessmentId)
@@ -139,26 +109,23 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 {
                     if (assignment == null) continue;
 
-                    // Resolve employee auth & profile
                     if (!userAuthByEmpId.TryGetValue(assignment.EmployeeId, out var employeeAuth) || employeeAuth == null)
                         continue;
 
                     if (!profileByEmpId.TryGetValue(employeeAuth.EmployeeId, out var profile) || profile == null)
                         continue;
 
-                    // Resolve primary project
                     Project? project = null;
                     if (primaryProjectEmployeeByEmpId.TryGetValue(profile.EmployeeId, out var pe) && pe != null)
                     {
                         projectById.TryGetValue(pe.ProjectId, out project);
                     }
 
-                    // Latest self assessment for this employee & form
                     latestSelfAssessmentByEmpForm.TryGetValue((assignment.EmployeeId, assignment.FormId), out var selfAssessment);
 
-                    // Approver user-auth by approver employee id
                     Userauthentication? l1Auth = null;
                     Userauthentication? l2Auth = null;
+
                     var l1EmpId = project?.L1approverEmployeeId;
                     var l2EmpId = project?.L2approverEmployeeId;
 
@@ -168,7 +135,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     var hasL1 = l1Auth != null;
                     var hasL2 = l2Auth != null;
 
-                    // Build competencies
                     var competencies = new List<object>();
 
                     if (selfAssessment != null && selfAssessment.Assessmentdetails != null && selfAssessment.Assessmentdetails.Any())
@@ -182,7 +148,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                             if (hasL1 && l1Auth != null)
                                 reviewsByDetailAndReviewer.TryGetValue((detail.DetailId, l1Auth.UserId), out l1Review);
-
                             if (hasL2 && l2Auth != null)
                                 reviewsByDetailAndReviewer.TryGetValue((detail.DetailId, l2Auth.UserId), out l2Review);
 
@@ -203,26 +168,21 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                                 CompetencyName = detail.Competency?.Name ?? "Unknown",
                                 EmployeeRating = detail.EmployeeRating,
                                 EmployeeComments = detail.EmployeeComments ?? string.Empty,
-
                                 L1ReviewerName = l1ReviewerName,
                                 L1Rating = l1Review?.Rating,
                                 L1Comments = l1Review?.Comments,
                                 L1ReviewStatus = l1Review?.ReviewStatus,
-
                                 L2ReviewerName = l2ReviewerName,
                                 L2Rating = l2Review?.Rating,
                                 L2Comments = l2Review?.Comments,
                                 L2ReviewStatus = l2Review?.ReviewStatus,
-
                                 Status = status
                             });
                         }
                     }
                     else
                     {
-                        // No self-assessment yet: seed from form competencies
                         var formComps = assignment.Form?.Competencies ?? new List<Competency>();
-
                         var l1ReviewerName = GetReviewerName(hasL1, l1EmpId, profileByEmpId, "No L1");
                         var l2ReviewerName = GetReviewerName(hasL2, l2EmpId, profileByEmpId, "No L2");
 
@@ -235,23 +195,19 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                                 CompetencyName = fc.Name ?? "Unknown",
                                 EmployeeRating = (int?)null,
                                 EmployeeComments = string.Empty,
-
                                 L1ReviewerName = l1ReviewerName,
                                 L1Rating = (int?)null,
                                 L1Comments = string.Empty,
                                 L1ReviewStatus = string.Empty,
-
                                 L2ReviewerName = l2ReviewerName,
                                 L2Rating = (int?)null,
                                 L2Comments = string.Empty,
                                 L2ReviewStatus = string.Empty,
-
                                 Status = AssessmentStatuses.Pending
                             });
                         }
                     }
 
-                    // Build attachments for latest assessment
                     var assessmentAttachments = new List<object>();
                     if (selfAssessment != null &&
                         attachmentsByAssessmentId.TryGetValue(selfAssessment.AssessmentId, out var attList) &&
@@ -280,7 +236,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         EmployeeName = BuildFullName(profile.FirstName, profile.LastName),
                         ProjectName = project?.ProjectName ?? string.Empty,
                         Competencies = competencies,
-                        Goals = new List<object>(), // Reserved
+                        Goals = new List<object>(),
                         Attachments = assessmentAttachments
                     });
                 }
@@ -302,6 +258,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         public async Task<AssessmentDownloadResult> GetHrAttachmentAsync(int attachmentId)
         {
             using var scope = _logger.BeginScope("AssessmentDetailsService.GetHrAttachment {AttachmentId}", attachmentId);
+
             var result = new AssessmentDownloadResult
             {
                 Success = false
@@ -310,14 +267,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             try
             {
                 _logger.LogInformation("Fetching attachment metadata for AttachmentId={AttachmentId}", attachmentId);
-                var attachment = await _repository.GetAttachmentByIdAsync(attachmentId);
 
+                var attachment = await _repository.GetAttachmentByIdAsync(attachmentId);
                 if (attachment == null)
                 {
                     result.Success = false;
                     result.ErrorMessage = "Attachment not found";
                     _logger.LogWarning("Attachment not found. AttachmentId={AttachmentId}", attachmentId);
-                    return result; // Single early return on not-found for clarity
+                    return result;
                 }
 
                 _logger.LogInformation(
@@ -326,7 +283,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     attachment.UploadedAt, attachment.DisplayOrder
                 );
 
-                // Validate/sanitize storage id (GridFS ObjectId format expected)
                 var storageId = SanitizeStorageId(attachment.FilePath);
                 if (storageId == null)
                 {
@@ -336,7 +292,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     return result;
                 }
 
-                // Download from storage (service signature expects just the id/path)
                 byte[] fileBytes;
                 string contentType;
                 string storageFileName;
@@ -361,7 +316,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     return result;
                 }
 
-                // Prefer original filename for download; log storage filename for diagnostics
                 _logger.LogInformation("Storage file resolved for AttachmentId={AttachmentId}: {StorageFileName}", attachmentId, storageFileName);
 
                 result.Success = true;
@@ -406,15 +360,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             Assessmentreview? l1Review,
             Assessmentreview? l2Review)
         {
-            // If employee hasn't provided anything yet
             if (employeeRating == null && string.IsNullOrWhiteSpace(employeeComments))
                 return AssessmentStatuses.Pending;
 
-            // If there are no approvers at all
             if (!hasL1 && !hasL2)
                 return AssessmentStatuses.PendingReview;
 
-            // If approvers exist but any expected review is missing
             var l1Pending = hasL1 && l1Review == null;
             var l2Pending = hasL2 && l2Review == null;
 
