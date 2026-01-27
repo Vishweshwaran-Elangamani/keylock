@@ -1,21 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
   <ItemGroup>
     <!-- Project reference -->
     <ProjectReference Include="..\Relevantz.EEPZ.Data\Relevantz.EEPZ.Data.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <!-- Framework reference -->
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
-
   <ItemGroup>
     <!-- EPPlus package reference -->
     <PackageReference Include="EPPlus" Version="6.3.0" />
@@ -23,5 +19,4 @@
     <PackageReference Include="MailKit" Version="4.14.1" />
     <PackageReference Include="MongoDB.Driver" Version="3.5.2" />
   </ItemGroup>
-
 </Project>

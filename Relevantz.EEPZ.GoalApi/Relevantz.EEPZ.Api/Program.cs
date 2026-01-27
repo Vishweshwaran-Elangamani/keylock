@@ -3,12 +3,14 @@ global using Serilog.Events;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Relevantz.EEPZ.Common.Configuration;
 using Relevantz.EEPZ.Common.Middleware;
+using Relevantz.EEPZ.Common.Validators;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Core.Service;
 using Relevantz.EEPZ.Core.Services.Implementations;
@@ -34,6 +36,7 @@ Log.Information("Starting EEPZ Backend Application");
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateGoalModelValidator>();
 
 builder.Services.AddSwaggerGen(options =>
 {

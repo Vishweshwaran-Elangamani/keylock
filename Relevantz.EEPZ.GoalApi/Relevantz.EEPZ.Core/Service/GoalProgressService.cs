@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
@@ -17,13 +18,17 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private readonly IGoalRepository _goalRepo;
         private readonly IBaseGoalService _baseService;
         private readonly IWebHostEnvironment _environment;
+        private readonly IValidator<ToggleChecklistModel> _toggleChecklistValidator;
+        private readonly IValidator<ManualProgressUpdateModel> _manualProgressValidator;
 
         public GoalProgressService(
             IGoalProgressRepository repo,
             IBaseGoalRepository baseRepo,
             IGoalRepository goalRepository,
             IBaseGoalService baseService,
-            IWebHostEnvironment environment
+            IWebHostEnvironment environment,
+            IValidator<ToggleChecklistModel> toggleChecklistValidator,
+            IValidator<ManualProgressUpdateModel> manualProgressValidator
         )
         {
             _repo = repo;
@@ -31,6 +36,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _goalRepo = goalRepository;
             _baseService = baseService;
             _environment = environment;
+            _toggleChecklistValidator = toggleChecklistValidator;
+            _manualProgressValidator = manualProgressValidator;
         }
 
         public async Task<ApiResponseModel> ToggleChecklistAsync(
@@ -39,6 +46,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             int currentUserEmployeeMasterId
         )
         {
+            var validationResult = await _toggleChecklistValidator.ValidateAsync(dto);
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                throw new BadRequestException("VALIDATION_FAILED", string.Join("; ", errors));
+            }
+
             var goal = await _baseRepo.GetGoalByIdAsync(goalId);
             if (goal == null)
             {
@@ -155,6 +169,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             int currentUserEmployeeMasterId
         )
         {
+            var validationResult = await _manualProgressValidator.ValidateAsync(dto);
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                throw new BadRequestException("VALIDATION_FAILED", string.Join("; ", errors));
+            }
+
             var goal = await _baseRepo.GetGoalByIdAsync(goalId);
             if (goal == null)
             {

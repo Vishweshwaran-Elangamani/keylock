@@ -26,7 +26,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         {
             var result = await _db
                 .Employeedetailsmasters.Include(e => e.Employee)
-                    .ThenInclude(e => e.Userprofile)
+                .ThenInclude(e => e.Userprofile)
                 .Include(e => e.Role)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(e => e.EmployeeMasterId == employeeMasterId);
@@ -38,7 +38,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         {
             var result = await _db
                 .Goals.Include(g => g.GoalChecklists)
-                    .ThenInclude(c => c.Goalchecklistprogresses)
+                .ThenInclude(c => c.Goalchecklistprogresses)
                 .Include(g => g.GoalAssignments)
                 .Include(g => g.GoalApprovals)
                 .Include(g => g.GoalAttachments)

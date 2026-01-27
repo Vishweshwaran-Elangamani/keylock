@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
@@ -19,6 +20,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private readonly IGoalInteractionRepository _interactionRepo;
         private readonly IBaseGoalService _baseService;
         private readonly IWebHostEnvironment _environment;
+        private readonly IValidator<CreateGoalModel> _createGoalValidator;
+        private readonly IValidator<UpdateGoalModel> _updateGoalValidator;
+        private readonly IValidator<AssignGoalModel> _assignGoalValidator;
+        private readonly IValidator<GoalQueryModel> _goalQueryValidator;
 
         public GoalService(
             IGoalRepository repo,
@@ -27,7 +32,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             IGoalApprovalsRepository approvalsRepo,
             IGoalInteractionRepository interactionRepo,
             IBaseGoalService baseService,
-            IWebHostEnvironment environment
+            IWebHostEnvironment environment,
+            IValidator<CreateGoalModel> createGoalValidator,
+            IValidator<UpdateGoalModel> updateGoalValidator,
+            IValidator<AssignGoalModel> assignGoalValidator,
+            IValidator<GoalQueryModel> goalQueryValidator
         )
         {
             _repo = repo;
@@ -37,6 +46,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _interactionRepo = interactionRepo;
             _baseService = baseService;
             _environment = environment;
+            _createGoalValidator = createGoalValidator;
+            _updateGoalValidator = updateGoalValidator;
+            _assignGoalValidator = assignGoalValidator;
+            _goalQueryValidator = goalQueryValidator;
         }
 
         public async Task<ApiResponseModel<int>> CreateGoalAsync(
@@ -45,6 +58,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string currentUserRole
         )
         {
+            var validationResult = await _createGoalValidator.ValidateAsync(dto);
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                throw new BadRequestException("VALIDATION_FAILED", string.Join("; ", errors));
+            }
+
             if (!_baseService.CanCreate(currentUserRole, dto.GoalType))
             {
                 throw new ForbiddenException(
@@ -53,86 +73,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
             }
 
-            if (dto.Checklist == null || dto.Checklist.Count < 3)
-            {
-                throw new BusinessRuleException(
-                    ResponseMessages.Codes.GOAL_CHECKLIST_INSUFFICIENT,
-                    "Goal must have at least 3 checklist items."
-                );
-            }
-
             var validChecklistItems = dto
                 .Checklist.Where(c => !string.IsNullOrWhiteSpace(c.Title))
                 .ToList();
-
-            if (validChecklistItems.Count < 3)
-            {
-                throw new BusinessRuleException(
-                    ResponseMessages.Codes.GOAL_CHECKLIST_INSUFFICIENT,
-                    "Goal must have at least 3 valid checklist items with titles."
-                );
-            }
 
             if (dto.GoalType == GOAL_TYPE.SELF)
             {
                 foreach (var item in validChecklistItems)
                 {
                     item.AddedForEmployeeMasterId = currentUserEmployeeMasterId;
-                }
-            }
-
-            var unassignedItems = validChecklistItems
-                .Where(c => !c.AddedForEmployeeMasterId.HasValue)
-                .ToList();
-
-            if (unassignedItems.Any())
-            {
-                throw new BusinessRuleException(
-                    ResponseMessages.Codes.GOAL_CHECKLIST_UNASSIGNED,
-                    $"Found {unassignedItems.Count} unassigned checklist item(s). Please assign each item to a team member."
-                );
-            }
-
-            if (dto.Deadline <= DateTime.UtcNow)
-            {
-                throw new BusinessRuleException(
-                    ResponseMessages.Codes.GOAL_DEADLINE_PAST,
-                    "Deadline must be in the future."
-                );
-            }
-
-            if (dto.GoalType == GOAL_TYPE.TEAM)
-            {
-                var checklistAssignees = validChecklistItems
-                    .Select(c => c.AddedForEmployeeMasterId!.Value)
-                    .Distinct()
-                    .ToList();
-
-                var invalidAssignees = checklistAssignees
-                    .Except(dto.AssignedToEmployeeMasterIds)
-                    .ToList();
-
-                if (invalidAssignees.Any())
-                {
-                    throw new BusinessRuleException(
-                        ResponseMessages.Codes.GOAL_CHECKLIST_UNASSIGNED,
-                        $"Invalid assignees found: {string.Join(", ", invalidAssignees)}. Valid assignees: {string.Join(", ", dto.AssignedToEmployeeMasterIds)}"
-                    );
-                }
-
-                foreach (var assigneeId in dto.AssignedToEmployeeMasterIds)
-                {
-                    var assigneeItems = validChecklistItems
-                        .Where(c => c.AddedForEmployeeMasterId == assigneeId)
-                        .ToList();
-
-                    if (!assigneeItems.Any())
-                    {
-                        throw new BusinessRuleException(
-                            ResponseMessages.Codes.GOAL_CHECKLIST_UNASSIGNED,
-                            $"Assignee {assigneeId} has no checklist items assigned."
-                        );
-                    }
                 }
             }
 
@@ -310,6 +259,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string currentUserRole
         )
         {
+            var validationResult = await _goalQueryValidator.ValidateAsync(query);
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                throw new BadRequestException("VALIDATION_FAILED", string.Join("; ", errors));
+            }
+
             var goals = await _repo.QueryGoalsAsync(
                 new GoalQueryModel
                 {
@@ -488,6 +444,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string currentUserRole
         )
         {
+            var validationResult = await _updateGoalValidator.ValidateAsync(dto);
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                throw new BadRequestException("VALIDATION_FAILED", string.Join("; ", errors));
+            }
+
             var goal = await _baseRepo.GetGoalByIdAsync(goalId);
             if (goal == null)
             {
@@ -502,14 +465,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (goal.GoalType != GOAL_TYPE.ORG && goal.CreatedBy != currentUserEmployeeMasterId)
             {
                 throw new GoalAccessDeniedException();
-            }
-
-            if (dto.Deadline.HasValue && dto.Deadline.Value <= DateTime.UtcNow)
-            {
-                throw new BusinessRuleException(
-                    ResponseMessages.Codes.GOAL_DEADLINE_PAST,
-                    "Deadline must be in the future."
-                );
             }
 
             if (dto.Checklist != null && dto.Checklist.Any())
@@ -659,6 +614,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string currentUserRole
         )
         {
+            var validationResult = await _assignGoalValidator.ValidateAsync(dto);
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                throw new BadRequestException("VALIDATION_FAILED", string.Join("; ", errors));
+            }
+
             var goal = await _baseRepo.GetGoalByIdAsync(goalId);
             if (goal == null)
             {
@@ -720,26 +682,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw new ConflictException(
                     ResponseMessages.Codes.ASSIGNMENT_DUPLICATE,
                     $"The following users are already assigned to this goal: {string.Join(", ", duplicateAssignees)}"
-                );
-            }
-
-            if (dto.AdditionalChecklist == null || dto.AdditionalChecklist.Count == 0)
-            {
-                throw new BusinessRuleException(
-                    ResponseMessages.Codes.ASSIGNMENT_CHECKLIST_REQUIRED,
-                    "You must provide at least one checklist item for each newly assigned user."
-                );
-            }
-
-            var sharedItems = dto
-                .AdditionalChecklist.Where(c => !c.AddedForEmployeeMasterId.HasValue)
-                .ToList();
-
-            if (sharedItems.Any())
-            {
-                throw new BusinessRuleException(
-                    ResponseMessages.Codes.ASSIGNMENT_CHECKLIST_REQUIRED,
-                    "Shared checklist items are not allowed. All items must be assigned to a specific user."
                 );
             }
 

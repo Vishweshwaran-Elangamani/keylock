@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
@@ -18,6 +19,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private readonly IGoalRepository _goalRepo;
         private readonly IBaseGoalService _baseService;
         private readonly IWebHostEnvironment _environment;
+        private readonly IValidator<CreateApprovalRequestModel> _createApprovalValidator;
+        private readonly IValidator<ApprovalDesicionModel> _approvalDecisionValidator;
+        private readonly IValidator<ApprovalQueryModel> _approvalQueryValidator;
 
         public GoalApprovalsService(
             IGoalApprovalsRepository repo,
@@ -25,7 +29,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             IGoalAttachmentRepository attachmentRepo,
             IGoalRepository goalRepository,
             IBaseGoalService baseService,
-            IWebHostEnvironment environment
+            IWebHostEnvironment environment,
+            IValidator<CreateApprovalRequestModel> createApprovalValidator,
+            IValidator<ApprovalDesicionModel> approvalDecisionValidator,
+            IValidator<ApprovalQueryModel> approvalQueryValidator
         )
         {
             _repo = repo;
@@ -34,6 +41,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _goalRepo = goalRepository;
             _baseService = baseService;
             _environment = environment;
+            _createApprovalValidator = createApprovalValidator;
+            _approvalDecisionValidator = approvalDecisionValidator;
+            _approvalQueryValidator = approvalQueryValidator;
         }
 
         public async Task<ApiResponseModel<int>> CreateApprovalRequestAsync(
@@ -43,6 +53,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string requesterRole
         )
         {
+            var validationResult = await _createApprovalValidator.ValidateAsync(dto);
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                throw new BadRequestException("VALIDATION_FAILED", string.Join("; ", errors));
+            }
+
             var goal = await _baseRepo.GetGoalByIdAsync(goalId);
             if (goal == null)
             {
@@ -381,6 +398,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string approverRole
         )
         {
+            var validationResult = await _approvalDecisionValidator.ValidateAsync(dto);
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                throw new BadRequestException("VALIDATION_FAILED", string.Join("; ", errors));
+            }
+
             var approval = await _repo.GetApprovalByIdAsync(approvalId);
             if (approval == null)
             {
@@ -407,17 +431,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw new ConflictException(
                     ResponseMessages.Codes.APPROVAL_ALREADY_DECIDED,
                     $"This approval has already been {approval.ApprovalStatus}. Decision was made on {approval.ApprovedOn:yyyy-MM-dd HH:mm}."
-                );
-            }
-
-            if (
-                dto.Decision != APPROVAL_STATUS.APPROVED
-                && dto.Decision != APPROVAL_STATUS.REJECTED
-            )
-            {
-                throw new BadRequestException(
-                    ResponseMessages.Codes.APPROVAL_INVALID_DECISION,
-                    $"Invalid decision: '{dto.Decision}'. Must be 'approved' or 'rejected'."
                 );
             }
 
@@ -680,6 +693,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string userRole
         )
         {
+            var validationResult = await _approvalQueryValidator.ValidateAsync(query);
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                throw new BadRequestException("VALIDATION_FAILED", string.Join("; ", errors));
+            }
+
             var baseQuery = _repo
                 .GetGoalApprovalsQueryable()
                 .Where(ga =>

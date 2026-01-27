@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
@@ -18,6 +19,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private readonly IGoalRepository _goalRepo;
         private readonly IBaseGoalService _baseService;
         private readonly IWebHostEnvironment _environment;
+        private readonly IValidator<CreateCommentModel> _createCommentValidator;
 
         public GoalInteractionService(
             IGoalInteractionRepository repo,
@@ -25,7 +27,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             IGoalApprovalsRepository approvalsRepo,
             IGoalRepository goalRepository,
             IBaseGoalService baseService,
-            IWebHostEnvironment environment
+            IWebHostEnvironment environment,
+            IValidator<CreateCommentModel> createCommentValidator
         )
         {
             _repo = repo;
@@ -34,6 +37,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _goalRepo = goalRepository;
             _baseService = baseService;
             _environment = environment;
+            _createCommentValidator = createCommentValidator;
         }
 
         public async Task<ApiResponseModel> AddCommentAsync(
@@ -43,6 +47,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string currentUserRole
         )
         {
+            var validationResult = await _createCommentValidator.ValidateAsync(dto);
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                throw new BadRequestException("VALIDATION_FAILED", string.Join("; ", errors));
+            }
+
             var goal = await _baseRepo.GetGoalByIdAsync(goalId);
             if (goal == null)
             {

@@ -29,7 +29,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         {
             var result = await _db
                 .GoalApprovals.Include(a => a.Goal)
-                    .ThenInclude(g => g.GoalAttachments)
+                .ThenInclude(g => g.GoalAttachments)
                 .FirstOrDefaultAsync(a => a.ApprovalId == approvalId);
 
             return result;
@@ -57,7 +57,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         {
             var result = await _db
                 .GoalApprovals.Include(a => a.Goal)
-                    .ThenInclude(g => g.GoalAttachments)
+                .ThenInclude(g => g.GoalAttachments)
                 .Where(a =>
                     a.ApprovedBy == approverEmployeeMasterId && a.ApprovalStatus == "pending"
                 )
@@ -89,9 +89,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         {
             var query = _db
                 .GoalApprovals.Include(ga => ga.Goal)
-                    .ThenInclude(g => g.GoalAssignments)
+                .ThenInclude(g => g.GoalAssignments)
                 .Include(ga => ga.Goal)
-                    .ThenInclude(g => g.GoalAttachments)
+                .ThenInclude(g => g.GoalAttachments)
                 .AsQueryable();
 
             query = query.Where(ga =>
@@ -114,9 +114,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         {
             return _db
                 .GoalApprovals.Include(ga => ga.Goal)
-                    .ThenInclude(g => g.GoalAssignments)
+                .ThenInclude(g => g.GoalAssignments)
                 .Include(ga => ga.Goal)
-                    .ThenInclude(g => g.GoalAttachments)
+                .ThenInclude(g => g.GoalAttachments)
                 .AsQueryable();
         }
 
