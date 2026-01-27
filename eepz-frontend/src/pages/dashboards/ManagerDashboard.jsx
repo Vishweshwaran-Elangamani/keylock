@@ -19,6 +19,7 @@ import goalService from "../../services/goals/goalService";
 import lndService from "../../services/lnd/lndService";
 import { getTeamMembers, getMyNominations } from "../../services/performancemanagement/manager/managernominationapi";
 import meetingService from "../../services/meeting/meetingService";
+import rsvpService from "../../services/meeting/rsvpService";
 import slaService from "../../services/sla/slaService";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
@@ -79,9 +80,16 @@ const ManagerDashboard = () => {
       const managerId = user.empMasterId || user.employeeMasterId || user.id;
 
       const [
-        dashboardSummaryRes, allGoalsRes, myProjectsRes, pendingApprovalsRes,
-        managerNominationsRes, teamMembersRes, teamAssignmentsRes,
-        subordinateEmployeesRes, myMeetingsRes, oneOnOneReportsRes, managerEscalationsRes
+        dashboardSummaryRes, 
+        allGoalsRes, 
+        myProjectsRes, 
+        pendingApprovalsRes,
+        managerNominationsRes, 
+        teamMembersRes, 
+        teamAssignmentsRes,
+        subordinateEmployeesRes, 
+        myMeetingsRes, 
+        managerEscalationsRes
       ] = await Promise.all([
         goalService.getDashboardSummary().catch(() => ({ data: null })),
         goalService.queryGoals({ pageSize: 1000, status: "" }).catch(() => ({ data: [] })),
@@ -91,8 +99,7 @@ const ManagerDashboard = () => {
         getTeamMembers(managerId).catch(() => ({ data: [] })),
         lndService.getTeamAssignments(1).catch(() => ({ data: { data: { items: [] } } })),
         lndService.getSubordinateEmployees(1).catch(() => ({ data: { data: { items: [] } } })),
-        meetingService.getMyMeetings().catch(() => ({ data: [] })),
-        meetingService.getOneOnOneReports().catch(() => ({ data: [] })),
+       meetingService.getMyMeetings().catch(() => ({ data: { meetings: [] } })),
         slaService.getManagerEscalations(managerId).catch(() => ({ data: [] }))
       ]);
 
@@ -122,6 +129,31 @@ const ManagerDashboard = () => {
         ...extractedOrgGoals.map((g) => ({ ...g, goalType: "org" }))
       ];
 
+          const allMeetings = myMeetingsRes?.data?.meetings || [];
+    
+    console.log('Total Meetings Retrieved:', allMeetings.length);
+    console.log('First Meeting:', allMeetings[0]);
+      
+      // Filter one-on-one meetings from all meetings
+      const oneOnOneReports = allMeetings.filter(m => {
+        const title = (m.title || m.meetingTitle || m.subject || '').toLowerCase();
+        const type = (m.meetingType || m.type || '').toLowerCase();
+        const description = (m.description || '').toLowerCase();
+        
+        return title.includes('one-on-one') || 
+               title.includes('1-on-1') || 
+               title.includes('1:1') ||
+               title.includes('one on one') ||
+               type === 'one-on-one' ||
+               type === '1-on-1' ||
+               type === 'oneonone' ||
+               description.includes('one-on-one') ||
+               description.includes('1:1');
+      });
+
+      console.log('Total Meetings:', allMeetings.length);
+      console.log('One-on-one Meetings:', oneOnOneReports.length);
+
       setDashboardData({
         dashboardSummary: dashboardSummaryRes?.data || null,
         allGoals: allGoalsCombined,
@@ -131,8 +163,8 @@ const ManagerDashboard = () => {
         teamMembers: extractData(teamMembersRes),
         teamAssignments: teamAssignmentsRes?.data?.data?.items?.$values || teamAssignmentsRes?.data?.data?.items || extractData(teamAssignmentsRes),
         subordinateEmployees: subordinateEmployeesRes?.data?.data?.items?.$values || subordinateEmployeesRes?.data?.data?.items || extractData(subordinateEmployeesRes),
-        myMeetings: extractData(myMeetingsRes),
-        oneOnOneReports: extractData(oneOnOneReportsRes),
+        myMeetings: allMeetings,
+        oneOnOneReports: oneOnOneReports,
         managerEscalations: extractData(managerEscalationsRes)
       });
     } catch (err) {
