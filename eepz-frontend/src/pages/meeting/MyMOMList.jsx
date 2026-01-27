@@ -341,8 +341,7 @@ const MyMomsList = () => {
                             <button
                               className="btn btn-sm btn-info d-flex align-items-center gap-2"
                               onClick={() => openShareModal(mom)}
-                              type="button"
-                            >
+                              type="button">
                               <Share2 size={16} />
                               Share
                             </button>

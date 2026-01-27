@@ -34,6 +34,7 @@
   margin: 0;
   font-weight: 500;
   text-align: left;
+  margin-top: -30px;
 }
 
 .sla-compliance-stats-grid {
@@ -53,6 +54,7 @@
   align-items: center;
   gap: 1rem;
   height: 110px;
+  
 }
 
 .sla-compliance-stat-icon-wrapper {
