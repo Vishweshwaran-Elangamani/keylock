@@ -3,11 +3,11 @@ using Relevantz.EEPZ.Data.IRepository;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Common.Utils;
 using ClosedXML.Excel;
-using System.IO;
 using System.Text.RegularExpressions;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Common.Constants;
+using System.Globalization;
 
 namespace Relevantz.EEPZ.Core.Service
 {
@@ -19,6 +19,11 @@ namespace Relevantz.EEPZ.Core.Service
         private readonly IRoleRepository _roleRepository;
         private readonly IDepartmentRepository _departmentRepository;
         private readonly IEmployeeRepository _employeeRepository;
+
+        // Compiled regex for performance
+        private static readonly Regex NameRegex = new(@"^[a-zA-Z\s]+$", RegexOptions.Compiled);
+        private static readonly Regex EmailRegex = new(@"^[^\s@]+@[^\s@]+\.[^\s@]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex PhoneRegex = new(@"^[6-9][0-9]{9}$", RegexOptions.Compiled);
 
         public BulkOperationService(
             IUserManagementService userManagementService,
@@ -47,77 +52,76 @@ namespace Relevantz.EEPZ.Core.Service
 
             var rowPrefix = $"Row {rowNumber} ({userIdentifier})";
 
+            // First Name
             if (string.IsNullOrWhiteSpace(user.FirstName))
             {
                 errors.Add($"{rowPrefix}: First name is required");
             }
-            else if (user.FirstName.Trim().Length < 2)
+            else
             {
-                errors.Add($"{rowPrefix}: First name must be at least 2 characters");
-            }
-            else if (!Regex.IsMatch(user.FirstName.Trim(), @"^[a-zA-Z\s]+$"))
-            {
-                errors.Add($"{rowPrefix}: First name must contain only letters");
+                var fn = user.FirstName.Trim();
+                if (fn.Length < 2)
+                    errors.Add($"{rowPrefix}: First name must be at least 2 characters");
+                else if (!NameRegex.IsMatch(fn))
+                    errors.Add($"{rowPrefix}: First name must contain only letters");
             }
 
+            // Last Name
             if (string.IsNullOrWhiteSpace(user.LastName))
             {
                 errors.Add($"{rowPrefix}: Last name is required");
             }
-            else if (user.LastName.Trim().Length < 2)
+            else
             {
-                errors.Add($"{rowPrefix}: Last name must be at least 2 characters");
-            }
-            else if (!Regex.IsMatch(user.LastName.Trim(), @"^[a-zA-Z\s]+$"))
-            {
-                errors.Add($"{rowPrefix}: Last name must contain only letters");
+                var ln = user.LastName.Trim();
+                if (ln.Length < 2)
+                    errors.Add($"{rowPrefix}: Last name must be at least 2 characters");
+                else if (!NameRegex.IsMatch(ln))
+                    errors.Add($"{rowPrefix}: Last name must contain only letters");
             }
 
+            // Email
             if (string.IsNullOrWhiteSpace(user.Email))
             {
                 errors.Add($"{rowPrefix}: Email is required");
             }
-            else if (!Regex.IsMatch(user.Email.Trim(), @"^[^\s@]+@[^\s@]+\.[^\s@]+$"))
+            else
             {
-                errors.Add($"{rowPrefix}: Invalid email format");
+                var em = user.Email.Trim();
+                if (!EmailRegex.IsMatch(em))
+                    errors.Add($"{rowPrefix}: Invalid email format");
             }
 
+            // Phone
             if (!string.IsNullOrWhiteSpace(user.MobileNumber))
             {
-                var cleanedNumber = user.MobileNumber.Replace("+91-", "").Replace("+91", "").Trim();
-                if (!Regex.IsMatch(cleanedNumber, @"^[6-9][0-9]{9}$"))
-                {
+                var cleanedNumber = CleanIndianMobile(user.MobileNumber);
+                if (!PhoneRegex.IsMatch(cleanedNumber))
                     errors.Add($"{rowPrefix}: Phone number must start with 6-9 and be exactly 10 digits");
-                }
             }
 
+            // Role/Department
             if (user.RoleId <= 0)
-            {
                 errors.Add($"{rowPrefix}: Valid Role is required");
-            }
 
             if (user.DepartmentId <= 0)
-            {
                 errors.Add($"{rowPrefix}: Valid Department is required");
-            }
 
+            // DOB official (if present)
             if (user.DateOfBirthOfficial.HasValue)
             {
                 var dob = user.DateOfBirthOfficial.Value.ToDateTime(TimeOnly.MinValue);
                 var today = DateTime.Today;
                 var age = today.Year - dob.Year;
-
                 if (dob > today)
-                {
                     errors.Add($"{rowPrefix}: Date of birth cannot be in the future");
-                }
-                else if (age < 18)
+                else
                 {
-                    errors.Add($"{rowPrefix}: User must be at least 18 years old (current age: {age})");
-                }
-                else if (age > 100)
-                {
-                    errors.Add($"{rowPrefix}: Invalid date of birth (age cannot exceed 100 years)");
+                    if (dob.Date > today.AddYears(-age)) age--; // adjust if birthday not yet reached
+                    if (age < 18)
+                        errors.Add($"{rowPrefix}: User must be at least 18 years old (current age: {age})");
+                    else if (age > 100)
+                        errors.Add($"{rowPrefix}: Invalid date of birth (age cannot exceed 100 years)");
                 }
             }
 
@@ -126,24 +130,35 @@ namespace Relevantz.EEPZ.Core.Service
 
         public async Task<BulkOperationResponseDto> BulkCreateUsersAsync(List<CreateUserRequestDto> users, int performedByUserId)
         {
+            // Pre-allocate to reduce re-allocations
+            var errors = new List<string>(capacity: Math.Max(16, users.Count / 10));
+            var successfulUsers = new List<SuccessfulUserDto>(capacity: Math.Max(16, users.Count / 2));
+
             var successCount = 0;
             var failureCount = 0;
-            var errors = new List<string>();
-            var successfulUsers = new List<SuccessfulUserDto>();
             var rowNumber = 1;
 
             var nextIdString = await _employeeRepository.GetNextEmployeeCompanyIdAsync();
-            int nextEmployeeId = int.Parse(nextIdString);
+            if (!int.TryParse(nextIdString, NumberStyles.Integer, CultureInfo.InvariantCulture, out int nextEmployeeId))
+            {
+                // Fallback if repository returns unexpected format
+                EEPZBusinessLog.Warning($"GetNextEmployeeCompanyIdAsync returned non-integer '{nextIdString}'. Falling back to 1.");
+                nextEmployeeId = 1;
+            }
 
-            var roles = await _roleRepository.GetAllAsync();
-            var departments = await _departmentRepository.GetAllAsync();
+            var roles = await _roleRepository.GetAllAsync() ?? new List<Role>();
+            var departments = await _departmentRepository.GetAllAsync() ?? new List<Department>();
 
-            EEPZBusinessLog.Information($"Starting bulk user creation with Employee ID: {nextEmployeeId}");
+            // Build fast lookup for Role/Department names by Id to avoid per-row LINQ scans
+            var roleNameById = roles.GroupBy(r => r.RoleId).ToDictionary(g => g.Key, g => g.First().RoleName);
+            var departmentNameById = departments.GroupBy(d => d.DepartmentId).ToDictionary(g => g.Key, g => g.First().DepartmentName);
+
+            EEPZBusinessLog.Information($"Starting bulk user creation with starting EmployeeCompanyId: {nextEmployeeId}");
 
             foreach (var user in users)
             {
                 rowNumber++;
-                user.EmployeeCompanyId = nextEmployeeId.ToString();
+                user.EmployeeCompanyId = nextEmployeeId.ToString(CultureInfo.InvariantCulture);
                 nextEmployeeId++;
 
                 var validationErrors = ValidateUserData(user, rowNumber);
@@ -160,8 +175,8 @@ namespace Relevantz.EEPZ.Core.Service
                     await _userManagementService.CreateUserAsync(user, performedByUserId);
                     successCount++;
 
-                    var role = roles?.FirstOrDefault(r => r.RoleId == user.RoleId);
-                    var department = departments?.FirstOrDefault(d => d.DepartmentId == user.DepartmentId);
+                    var roleName = roleNameById.TryGetValue(user.RoleId, out var rname) ? rname : "Unknown";
+                    var departmentName = departmentNameById.TryGetValue(user.DepartmentId, out var dname) ? dname : "Unknown";
 
                     successfulUsers.Add(new SuccessfulUserDto
                     {
@@ -169,11 +184,9 @@ namespace Relevantz.EEPZ.Core.Service
                         FirstName = user.FirstName,
                         LastName = user.LastName,
                         EmployeeCompanyId = user.EmployeeCompanyId,
-                        Role = role?.RoleName ?? "Unknown",
-                        Department = department?.DepartmentName ?? "Unknown"
+                        Role = roleName,
+                        Department = departmentName
                     });
-
-                    EEPZBusinessLog.Information($"User created with Employee ID: {user.EmployeeCompanyId}");
                 }
                 catch (Exception ex)
                 {
@@ -206,7 +219,7 @@ namespace Relevantz.EEPZ.Core.Service
                 Message = $"Bulk operation completed: {successCount} successful, {failureCount} failed"
             };
 
-            EEPZBusinessLog.Information($"Bulk user creation completed: {successCount}/{users.Count} successful. Employee IDs assigned: {nextIdString} to {nextEmployeeId - 1}");
+            EEPZBusinessLog.Information($"Bulk user creation completed: {successCount}/{users.Count} successful. EmployeeCompanyIds assigned: {nextIdString} to {nextEmployeeId - 1}");
 
             return response;
         }
@@ -261,7 +274,7 @@ namespace Relevantz.EEPZ.Core.Service
 
         public async Task<BulkOperationResponseDto> BulkCreateUsersFromExcelAsync(Stream fileStream, int performedByUserId)
         {
-            var users = new List<CreateUserRequestDto>();
+            var users = new List<CreateUserRequestDto>(capacity: 256);
 
             using var workbook = new XLWorkbook(fileStream);
             var worksheet = workbook.Worksheet(1);
@@ -277,12 +290,23 @@ namespace Relevantz.EEPZ.Core.Service
                 throw new InvalidOperationException(ExcelMessages.NoDataRowsError);
             }
 
+            // Preload roles/departments ONCE to avoid O(N^2) repository calls
+            var roles = await _roleRepository.GetAllAsync() ?? new List<Role>();
+            var departments = await _departmentRepository.GetAllAsync() ?? new List<Department>();
+
+            // Build name -> Id dictionary for O(1) mapping (case-insensitive/trimmed)
+            var rolesByName = roles
+                .Where(r => !string.IsNullOrWhiteSpace(r.RoleName))
+                .ToDictionary(r => r.RoleName.Trim().ToLowerInvariant(), r => r.RoleId);
+
+            var departmentsByName = departments
+                .Where(d => !string.IsNullOrWhiteSpace(d.DepartmentName))
+                .ToDictionary(d => d.DepartmentName.Trim().ToLowerInvariant(), d => d.DepartmentId);
+
+            // Read Excel rows (ClosedXML)
             for (int row = 2; row <= rowCount; row++)
             {
-                var emailCell = worksheet.Cell(row, 1);
-                if (emailCell.IsEmpty() || string.IsNullOrWhiteSpace(emailCell.GetString()))
-                    continue;
-
+                // Skip empty rows quickly by checking 11 columns
                 bool isEmptyRow = true;
                 for (int col = 1; col <= 11; col++)
                 {
@@ -294,31 +318,66 @@ namespace Relevantz.EEPZ.Core.Service
                 }
                 if (isEmptyRow) continue;
 
-                var mobileCell = worksheet.Cell(row, 10);
-                var mobileNumber = mobileCell.IsEmpty()
-                    ? null
-                    : mobileCell.GetString().Replace("+91-", "").Replace("+91", "").Replace("-", "").Replace(" ", "").Trim();
+                var emailCell = worksheet.Cell(row, 1);
+                var email = emailCell.IsEmpty() ? null : emailCell.GetString()?.Trim();
+                if (string.IsNullOrWhiteSpace(email))
+                    continue; // keep behavior: ignore rows without email
+
+                var firstName = worksheet.Cell(row, 2).GetString().Trim();
+                var lastName = worksheet.Cell(row, 3).GetString().Trim();
+
+                var employmentType = worksheet.Cell(row, 4).IsEmpty()
+                    ? Constants.EmploymentTypes.Permanent
+                    : worksheet.Cell(row, 4).GetString().Trim();
+
+                var employmentStatus = worksheet.Cell(row, 5).IsEmpty()
+                    ? Constants.EmploymentStatuses.Active
+                    : worksheet.Cell(row, 5).GetString().Trim();
+
+                // Joining Date (robust parsing)
+                var jdCell = worksheet.Cell(row, 6);
+                var joiningDate = TryReadDateOnly(jdCell) ?? DateOnly.FromDateTime(DateTime.UtcNow);
+
+                var employeeType = worksheet.Cell(row, 7).IsEmpty()
+                    ? Constants.EmployeeTypes.FullTime
+                    : worksheet.Cell(row, 7).GetString().Trim();
 
                 var roleName = worksheet.Cell(row, 8).GetString().Trim();
-                var roleId = await GetRoleIdByNameAsync(roleName);
-
                 var departmentName = worksheet.Cell(row, 9).GetString().Trim();
-                var departmentId = await GetDepartmentIdByNameAsync(departmentName);
+
+                var mobileCell = worksheet.Cell(row, 10);
+                var rawMobile = mobileCell.IsEmpty() ? null : mobileCell.GetString();
+                var mobileNumber = string.IsNullOrWhiteSpace(rawMobile) ? null : CleanIndianMobile(rawMobile);
+
+                var gender = worksheet.Cell(row, 11).IsEmpty() ? null : worksheet.Cell(row, 11).GetString().Trim();
+
+                // Map names to IDs via dictionaries (no awaits inside the loop)
+                var roleId = 0;
+                if (!string.IsNullOrWhiteSpace(roleName))
+                {
+                    rolesByName.TryGetValue(roleName.Trim().ToLowerInvariant(), out roleId);
+                }
+
+                var departmentId = 0;
+                if (!string.IsNullOrWhiteSpace(departmentName))
+                {
+                    departmentsByName.TryGetValue(departmentName.Trim().ToLowerInvariant(), out departmentId);
+                }
 
                 var user = new CreateUserRequestDto
                 {
-                    EmployeeCompanyId = "",
-                    Email = worksheet.Cell(row, 1).GetString().Trim(),
-                    FirstName = worksheet.Cell(row, 2).GetString().Trim(),
-                    LastName = worksheet.Cell(row, 3).GetString().Trim(),
-                    EmploymentType = worksheet.Cell(row, 4).IsEmpty() ? Constants.EmploymentTypes.Permanent : worksheet.Cell(row, 4).GetString().Trim(),
-                    EmploymentStatus = worksheet.Cell(row, 5).IsEmpty() ? Constants.EmploymentStatuses.Active : worksheet.Cell(row, 5).GetString().Trim(),
-                    JoiningDate = DateOnly.TryParse(worksheet.Cell(row, 6).GetString(), out var joinDate) ? joinDate : DateOnly.FromDateTime(DateTime.UtcNow),
-                    EmployeeType = worksheet.Cell(row, 7).IsEmpty() ? Constants.EmployeeTypes.FullTime : worksheet.Cell(row, 7).GetString().Trim(),
+                    EmployeeCompanyId = "", // generated later
+                    Email = email,
+                    FirstName = firstName,
+                    LastName = lastName,
+                    EmploymentType = employmentType,
+                    EmploymentStatus = employmentStatus,
+                    JoiningDate = joiningDate,
+                    EmployeeType = employeeType,
                     RoleId = roleId,
                     DepartmentId = departmentId,
                     MobileNumber = mobileNumber,
-                    Gender = worksheet.Cell(row, 11).IsEmpty() ? null : worksheet.Cell(row, 11).GetString().Trim()
+                    Gender = gender
                 };
 
                 users.Add(user);
@@ -329,25 +388,53 @@ namespace Relevantz.EEPZ.Core.Service
                 throw new InvalidOperationException(ExcelMessages.NoValidUsersError);
             }
 
+            // Continue to the existing flow
             return await BulkCreateUsersAsync(users, performedByUserId);
         }
 
-        private async Task<int> GetRoleIdByNameAsync(string roleName)
+        private static string CleanIndianMobile(string? mobile)
         {
-            if (string.IsNullOrWhiteSpace(roleName)) return 0;
-
-            var roles = await _roleRepository.GetAllAsync();
-            var role = roles?.FirstOrDefault(r => r.RoleName.Equals(roleName, StringComparison.OrdinalIgnoreCase));
-            return role?.RoleId ?? 0;
+            if (string.IsNullOrWhiteSpace(mobile)) return string.Empty;
+            // Normalize +91-, +91, spaces, dashes
+            var cleaned = mobile
+                .Replace("+91-", "", StringComparison.Ordinal)
+                .Replace("+91", "", StringComparison.Ordinal)
+                .Replace("-", "", StringComparison.Ordinal)
+                .Replace(" ", "", StringComparison.Ordinal)
+                .Trim();
+            return cleaned;
         }
 
-        private async Task<int> GetDepartmentIdByNameAsync(string departmentName)
+        private static DateOnly? TryReadDateOnly(IXLCell cell)
         {
-            if (string.IsNullOrWhiteSpace(departmentName)) return 0;
+            if (cell.IsEmpty()) return null;
 
-            var departments = await _departmentRepository.GetAllAsync();
-            var dept = departments?.FirstOrDefault(d => d.DepartmentName.Equals(departmentName, StringComparison.OrdinalIgnoreCase));
-            return dept?.DepartmentId ?? 0;
+            try
+            {
+                if (cell.DataType == XLDataType.DateTime)
+                {
+                    var dt = cell.GetDateTime();
+                    return DateOnly.FromDateTime(dt);
+                }
+
+                var str = cell.GetString();
+                if (DateTime.TryParse(str, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var parsed))
+                {
+                    return DateOnly.FromDateTime(parsed);
+                }
+
+                // Excel serial number scenario
+                if (double.TryParse(str, NumberStyles.Float, CultureInfo.InvariantCulture, out var oa))
+                {
+                    var dt = DateTime.FromOADate(oa);
+                    return DateOnly.FromDateTime(dt);
+                }
+            }
+            catch
+            {
+                // swallow and return null to keep previous behavior (default to UtcNow at caller)
+            }
+            return null;
         }
 
         public async Task<byte[]> GenerateExcelTemplateAsync()

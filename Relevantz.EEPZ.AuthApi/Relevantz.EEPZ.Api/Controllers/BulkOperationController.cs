@@ -45,7 +45,9 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpPost("bulk-create-users")]
         public async Task<IActionResult> BulkCreateUsers([FromBody] BulkUserCreateRequestDto request)
         {
-            var performedByUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            if (!TryGetUserId(out var performedByUserId))
+                return Unauthorized(new { success = false, message = "Invalid user context" });
+
             var result = await _bulkOperationService.BulkCreateUsersAsync(request.Users, performedByUserId);
             return Ok(result);
         }
@@ -60,7 +62,9 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpPost("bulk-inactivate-users")]
         public async Task<IActionResult> BulkInactivateUsers([FromBody] BulkUserInactivateRequestDto request)
         {
-            var performedByUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            if (!TryGetUserId(out var performedByUserId))
+                return Unauthorized(new { success = false, message = "Invalid user context" });
+
             var result = await _bulkOperationService.BulkInactivateUsersAsync(request, performedByUserId);
             return Ok(result);
         }
@@ -74,7 +78,9 @@ namespace Relevantz.EEPZ.Api.Controllers
         /// 400 Bad Request if validation fails (missing/invalid file, size limit exceeded).
         /// </returns>
         [HttpPost("bulk-create-from-excel")]
-        public async Task<IActionResult> BulkCreateUsersFromExcel(IFormFile file)
+        [Consumes("multipart/form-data")]
+        [RequestSizeLimit(5 * 1024 * 1024)] // enforce 5 MB at action level
+        public async Task<IActionResult> BulkCreateUsersFromExcel([FromForm] IFormFile file)
         {
             if (file == null || file.Length == 0)
                 return BadRequest(new { success = false, message = "Please upload a valid Excel file" });
@@ -88,7 +94,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             if (file.Length > 5 * 1024 * 1024)
                 return BadRequest(new { success = false, message = "File size exceeds 5MB limit" });
 
-            var performedByUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            if (!TryGetUserId(out var performedByUserId))
+                return Unauthorized(new { success = false, message = "Invalid user context" });
 
             using var stream = file.OpenReadStream();
             var result = await _bulkOperationService.BulkCreateUsersFromExcelAsync(stream, performedByUserId);
@@ -194,6 +201,14 @@ namespace Relevantz.EEPZ.Api.Controllers
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 fileName
             );
+        }
+
+        // ---------- Helper (no flow change) ----------
+        private bool TryGetUserId(out int userId)
+        {
+            userId = 0;
+            var idStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return int.TryParse(idStr, out userId) && userId > 0;
         }
     }
 }
