@@ -6,6 +6,7 @@ import AppraisalDetailsModal from "../../../components/performance_management/mo
 import Breadcrumb from "../../../components/common/Breadcrumb";
 import styles from "../../../styles/performancemanagement/hr/HRViewAssessment.module.css";
 
+/* ----------------------------- UI HELPERS ----------------------------- */
 
 const CustomDropdown = ({
   value,
@@ -17,10 +18,11 @@ const CustomDropdown = ({
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  const selected = options.find((o) => o.value === value) || {
-    label: placeholder || "Select",
-    value: "",
-  };
+  const selected =
+    options.find((o) => o.value === value) || {
+      label: placeholder || "Select",
+      value: "",
+    };
 
   const handleSelect = (val) => {
     onChange(val);
@@ -45,8 +47,9 @@ const CustomDropdown = ({
       onBlur={() => setTimeout(() => setOpen(false), 200)}
     >
       <div
-        className={`${styles.customSelected} ${disabled ? styles.customDisabled : ""
-          }`}
+        className={`${styles.customSelected} ${
+          disabled ? styles.customDisabled : ""
+        }`}
         onClick={() => !disabled && setOpen((prev) => !prev)}
       >
         {selected.label}
@@ -58,8 +61,9 @@ const CustomDropdown = ({
           {options.map((opt) => (
             <div
               key={opt.value}
-              className={`${styles.customOption} ${opt.value === value ? styles.customOptionActive : ""
-                }`}
+              className={`${styles.customOption} ${
+                opt.value === value ? styles.customOptionActive : ""
+              }`}
               onClick={() => handleSelect(opt.value)}
             >
               {opt.label}
@@ -70,7 +74,6 @@ const CustomDropdown = ({
     </div>
   );
 };
-
 
 const PaginationDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
@@ -106,8 +109,9 @@ const PaginationDropdown = ({ value, onChange, options }) => {
           {options.map((opt) => (
             <div
               key={opt}
-              className={`${styles.paginationOption} ${opt === value ? styles.paginationOptionActive : ""
-                }`}
+              className={`${styles.paginationOption} ${
+                opt === value ? styles.paginationOptionActive : ""
+              }`}
               onClick={() => handleSelect(opt)}
             >
               {opt}
@@ -119,6 +123,7 @@ const PaginationDropdown = ({ value, onChange, options }) => {
   );
 };
 
+/* ----------------------------- UTILITIES ------------------------------ */
 
 function exportToCsv(filename, rows) {
   if (!rows || !rows.length) return;
@@ -150,27 +155,21 @@ function exportToCsv(filename, rows) {
   document.body.removeChild(link);
 }
 
-
 function average(values) {
-  const arr = values.filter((v) => typeof v === "number");
+  const arr = (values ?? []).filter((v) => typeof v === "number");
   if (!arr.length) return "N/A";
   return (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(2);
 }
 
-
 function normalizeStatus(status) {
   if (!status || typeof status !== "string") return "completed";
   const normalized = status.toLowerCase().trim();
-
-  if (normalized === "completed" || normalized === "complete") {
-    return "completed";
-  }
+  if (normalized === "completed" || normalized === "complete") return "completed";
   if (normalized.startsWith("pending") || normalized.includes("pending")) {
     return "pending";
   }
   return "completed";
 }
-
 
 function statusBadge(status) {
   const normalized = normalizeStatus(status);
@@ -180,7 +179,7 @@ function statusBadge(status) {
       <span
         className={`${styles.hrViewAssessmentBadge} ${styles.hrViewAssessmentBadgeCompleted}`}
       >
-        <i className="bi bi-check-circle-fill" style={{ marginRight: 6 }}></i>
+        <i className="bi bi-check-circle-fill" style={{ marginRight: 6 }} />
         Completed
       </span>
     );
@@ -203,6 +202,7 @@ function statusBadge(status) {
   );
 }
 
+/* -------------------------- MAIN COMPONENT ---------------------------- */
 
 function HRViewAppraisals() {
   const [loading, setLoading] = useState(true);
@@ -220,59 +220,99 @@ function HRViewAppraisals() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(() => {
+    let mounted = true;
+
     async function fetchAppraisals() {
       try {
-        const response = await api.get("/AssessmentDetails/all-details");
-        if (response.data?.success) {
-          const initiatedAppraisals = response.data.data.filter((appraisal) => {
-            const hasInitiatedCompetency = appraisal.competencies.some(
-              (comp) => {
-                const action = (comp.action || comp.Action || "").toLowerCase();
-                return action === "send";
-              }
-            );
-            const hasValidStatus = appraisal.competencies.some((comp) => {
-              const status = (comp.status || comp.Status || "").toLowerCase();
-              return (
-                status !== "" &&
-                status !== "draft" &&
-                status !== "save as draft"
-              );
-            });
-            return hasInitiatedCompetency || hasValidStatus;
-          });
-          setAppraisals(initiatedAppraisals);
-        } else {
-          setError("Failed to load data");
+        setLoading(true);
+        setError(null);
+
+        const res = await api.get("/AssessmentDetails/all-details");
+        const p = res?.data;
+
+        // Accept: [], {success:true, data:[…]}, or {success:true, data:{success:true, data:[…]}}
+        const list =
+          Array.isArray(p) ? p :
+          Array.isArray(p?.data) ? p.data :
+          Array.isArray(p?.data?.data) ? p.data.data :
+          null;
+
+        // API signaled failure?
+        if (!list && (p?.success === false || p?.data?.success === false)) {
+          throw new Error(p?.error || p?.data?.error || "Failed to load data");
         }
+
+        if (!list) {
+          console.error("Unexpected response schema from /AssessmentDetails/all-details:", p);
+          throw new Error("Unexpected response format");
+        }
+
+        // Normalize to avoid runtime errors if fields are missing
+        const safe = list.map((a) => ({
+          employeeId: a?.employeeId,
+          employeeName: a?.employeeName ?? "",
+          projectName: a?.projectName ?? "",
+          competencies: Array.isArray(a?.competencies) ? a.competencies : [],
+          attachments: Array.isArray(a?.attachments) ? a.attachments : [],
+        }));
+
+        // Consider “initiated” if there is at least one competency OR any competency with a meaningful status
+        const initiatedAppraisals = safe.filter((appraisal) => {
+          const comps = Array.isArray(appraisal.competencies) ? appraisal.competencies : [];
+
+          const hasValidStatus = comps.some((comp) => {
+            const status = String(comp?.status ?? comp?.Status ?? "")
+              .trim()
+              .toLowerCase();
+            return status && status !== "draft" && status !== "save as draft";
+          });
+
+          const hasAnyCompetency = comps.length > 0;
+
+          return hasValidStatus || hasAnyCompetency;
+        });
+
+        if (!mounted) return;
+        setAppraisals(initiatedAppraisals);
       } catch (err) {
-        setError("Error fetching data");
+        const serverMsg =
+          err?.response?.data?.error ??
+          err?.response?.data?.message ??
+          err?.message ??
+          "Error fetching data";
+        if (mounted) setError(serverMsg);
+        console.error("HRViewAppraisals fetch error:", err);
       } finally {
-        setLoading(false);
+        mounted && setLoading(false);
       }
     }
+
     fetchAppraisals();
+    return () => {
+      mounted = false;
+    };
   }, []);
+
+  /* If current page goes out of range after filters change, clamp it */
+  useEffect(() => {
+    const totalPages = Math.max(1, Math.ceil(appraisals.length / rowsPerPage));
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [appraisals, rowsPerPage, currentPage]);
+
+  /* --------------------------- Derived values -------------------------- */
 
   const allSummaryRows = useMemo(() => {
     return appraisals.map((a, idx) => {
-      const empRatings = a.competencies
-        .map((c) => c.employeeRating)
-        .filter((r) => typeof r === "number");
-      const l1Name = a.competencies[0]?.l1ReviewerName || "N/A";
-      const l1Ratings = a.competencies
-        .map((c) => c.l1Rating)
-        .filter((r) => typeof r === "number");
-      const l2Name = a.competencies[0]?.l2ReviewerName || "N/A";
-      const l2Ratings = a.competencies
-        .map((c) => c.l2Rating)
-        .filter((r) => typeof r === "number");
+      const comps = Array.isArray(a.competencies) ? a.competencies : [];
 
-      let rawStatus = a.competencies[0]?.status ?? "N/A";
-      if (a.competencies.some((c) => c.status !== rawStatus)) {
-        rawStatus = "Mixed";
-      }
+      const empRatings = comps.map((c) => c?.employeeRating).filter((r) => typeof r === "number");
+      const l1Name = comps[0]?.l1ReviewerName ?? "N/A";
+      const l1Ratings = comps.map((c) => c?.l1Rating).filter((r) => typeof r === "number");
+      const l2Name = comps[0]?.l2ReviewerName ?? "N/A";
+      const l2Ratings = comps.map((c) => c?.l2Rating).filter((r) => typeof r === "number");
 
+      let rawStatus = comps[0]?.status ?? "N/A";
+      if (comps.some((c) => c?.status !== rawStatus)) rawStatus = "Mixed";
       const normalizedStatus = normalizeStatus(rawStatus);
 
       return {
@@ -286,9 +326,9 @@ function HRViewAppraisals() {
         l2ReviewerName: l2Name,
         l2Avg: average(l2Ratings),
         status: normalizedStatus,
-        rawStatus: rawStatus,
-        competencies: a.competencies,
-        attachments: a.attachments || [],
+        rawStatus,
+        competencies: comps,
+        attachments: Array.isArray(a.attachments) ? a.attachments : [],
       };
     });
   }, [appraisals]);
@@ -332,7 +372,7 @@ function HRViewAppraisals() {
     return filtered;
   }, [allSummaryRows, filterStatus, filterProject, searchTerm]);
 
-  const totalPages = Math.ceil(summaryRows.length / rowsPerPage);
+  const totalPages = Math.max(1, Math.ceil(summaryRows.length / rowsPerPage));
   const indexOfLastItem = currentPage * rowsPerPage;
   const indexOfFirstItem = indexOfLastItem - rowsPerPage;
   const currentItems = summaryRows.slice(indexOfFirstItem, indexOfLastItem);
@@ -341,9 +381,7 @@ function HRViewAppraisals() {
     const pages = [];
     const maxPagesToShow = 5;
     if (totalPages <= maxPagesToShow) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
     } else {
       if (currentPage <= 3) {
         pages.push(1, 2, 3, "...", totalPages);
@@ -398,6 +436,8 @@ function HRViewAppraisals() {
   const hasActiveFilters =
     searchTerm !== "" || filterStatus !== "all" || filterProject !== "all";
 
+  /* ------------------------------- Render ------------------------------ */
+
   if (loading)
     return (
       <div className={styles.hrViewAssessmentLoading}>
@@ -443,14 +483,13 @@ function HRViewAppraisals() {
               placeholder="Search by employee name..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === "Enter") {
-                  handleSearch();
-                }
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSearch();
               }}
               className={styles.hrViewAssessmentSearchInput}
             />
             <button
+              type="button"
               onClick={handleSearch}
               className={styles.hrViewAssessmentSearchBtn}
             >
@@ -484,6 +523,7 @@ function HRViewAppraisals() {
 
           <div className={styles.hrViewAssessmentFilterGroup}>
             <button
+              type="button"
               className={styles.hrViewAssessmentBtnClearFilters}
               onClick={handleClearFilters}
               disabled={!hasActiveFilters}
@@ -495,6 +535,7 @@ function HRViewAppraisals() {
 
           <div className={styles.hrViewAssessmentFilterGroup}>
             <button
+              type="button"
               className={styles.hrViewAssessmentBtnExport}
               onClick={() => exportToCsv("appraisals.csv", csvData)}
             >
@@ -544,6 +585,7 @@ function HRViewAppraisals() {
                       <td>
                         <div className={styles.hrViewAssessmentActionButtons}>
                           <button
+                            type="button"
                             className={`${styles.hrViewAssessmentActionBtn} ${styles.hrViewAssessmentBtnView}`}
                             title="View Details"
                             onClick={() => handleViewDetails(row)}
@@ -561,9 +603,7 @@ function HRViewAppraisals() {
 
           <div className={styles.hrViewAssessmentPaginationContainer}>
             <div className={styles.hrViewAssessmentPaginationInfo}>
-              <span className={styles.hrViewAssessmentPaginationLabel}>
-                Show
-              </span>
+              <span className={styles.hrViewAssessmentPaginationLabel}>Show</span>
               <PaginationDropdown
                 value={rowsPerPage}
                 onChange={(val) => {
@@ -576,20 +616,22 @@ function HRViewAppraisals() {
                 entries
               </span>
             </div>
+
             <div className={styles.hrViewAssessmentPaginationStatus}>
               Showing {summaryRows.length === 0 ? 0 : indexOfFirstItem + 1} to{" "}
               {Math.min(indexOfLastItem, summaryRows.length)} of{" "}
               {summaryRows.length} entries
             </div>
+
             <nav className={styles.hrViewAssessmentPaginationNav}>
               <ul className={styles.hrViewAssessmentPagination}>
                 <li
-                  className={`${styles.hrViewAssessmentPageItem}${currentPage === 1
-                      ? ` ${styles.hrViewAssessmentDisabled}`
-                      : ""
-                    }`}
+                  className={`${styles.hrViewAssessmentPageItem}${
+                    currentPage === 1 ? ` ${styles.hrViewAssessmentDisabled}` : ""
+                  }`}
                 >
                   <button
+                    type="button"
                     className={styles.hrViewAssessmentPageLink}
                     onClick={() =>
                       setCurrentPage((prev) => Math.max(prev - 1, 1))
@@ -599,18 +641,20 @@ function HRViewAppraisals() {
                     <i className="bi bi-chevron-left"></i>
                   </button>
                 </li>
+
                 {getPageNumbers().map((page, idx) => (
                   <li
                     key={idx}
-                    className={`${styles.hrViewAssessmentPageItem}${page === currentPage
-                        ? ` ${styles.hrViewAssessmentActive}`
-                        : ""
-                      } ${typeof page !== "number"
+                    className={`${styles.hrViewAssessmentPageItem}${
+                      page === currentPage ? ` ${styles.hrViewAssessmentActive}` : ""
+                    } ${
+                      typeof page !== "number"
                         ? ` ${styles.hrViewAssessmentDisabled}`
                         : ""
-                      }`}
+                    }`}
                   >
                     <button
+                      type="button"
                       className={styles.hrViewAssessmentPageLink}
                       onClick={() =>
                         typeof page === "number" && setCurrentPage(page)
@@ -621,13 +665,16 @@ function HRViewAppraisals() {
                     </button>
                   </li>
                 ))}
+
                 <li
-                  className={`${styles.hrViewAssessmentPageItem}${currentPage === totalPages
+                  className={`${styles.hrViewAssessmentPageItem}${
+                    currentPage === totalPages
                       ? ` ${styles.hrViewAssessmentDisabled}`
                       : ""
-                    }`}
+                  }`}
                 >
                   <button
+                    type="button"
                     className={styles.hrViewAssessmentPageLink}
                     onClick={() =>
                       setCurrentPage((prev) => Math.min(prev + 1, totalPages))
@@ -643,23 +690,21 @@ function HRViewAppraisals() {
         </div>
       </div>
 
-      {modalRow && (
-        <AppraisalDetailsModal
-          show={!!modalRow}
-          onClose={() => {
-            setModalRow(null);
-            setModalAttachments([]);
-          }}
-          employeeId={modalRow.employeeId}
-          employeeName={modalRow.employeeName}
-          projectName={modalRow.projectName}
-          competencies={modalRow.competencies}
-          attachments={modalAttachments}
-        />
-      )}
+      {/* Mount once; control visibility with `show` */}
+      <AppraisalDetailsModal
+        show={!!modalRow}
+        onClose={() => {
+          setModalRow(null);
+          setModalAttachments([]);
+        }}
+        employeeId={modalRow?.employeeId}
+        employeeName={modalRow?.employeeName}
+        projectName={modalRow?.projectName}
+        competencies={modalRow?.competencies ?? []}
+        attachments={modalAttachments}
+      />
     </div>
   );
 }
-
 
 export default HRViewAppraisals;
