@@ -14,6 +14,9 @@ using System.Text;
 using System.IO.Compression;
 using Relevantz.EEPZ.Api.Middleware;
 using Serilog;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+
 var builder = WebApplication.CreateBuilder(args);
 // Configure Serilog with structured logging
 Log.Logger = new LoggerConfiguration()
@@ -148,6 +151,13 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("EmployeeAccess", policy => 
         policy.RequireRole("Employee", "HR", "Admin"));
 });
+
+// Add FluentValidation
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<Relevantz.EEPZ.Common.Validators.CreatePolicyRequestDtoValidator>();
+
+Log.Information("FluentValidation registered successfully");
 // Register Repositories
 builder.Services.AddScoped<IPolicyRepository, PolicyRepository>();
 builder.Services.AddScoped<IViolationRepository, ViolationRepository>();
