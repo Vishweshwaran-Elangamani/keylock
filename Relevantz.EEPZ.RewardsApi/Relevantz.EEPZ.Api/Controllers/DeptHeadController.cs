@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Business.Services.Interfaces;
 using System.ComponentModel.DataAnnotations;
 
-namespace PerformanceManagement.Controllers
+namespace Relevantz.EEPZ.Api.Controllers
 {
     [ApiController]
     [Authorize]
@@ -25,7 +25,7 @@ namespace PerformanceManagement.Controllers
         }
         
 [HttpGet("throw")]
-[AllowAnonymous] // optional, makes it easy to test without JWT
+[AllowAnonymous] 
 public IActionResult Throw() => throw new InvalidOperationException("Boom from controller!");
 
 

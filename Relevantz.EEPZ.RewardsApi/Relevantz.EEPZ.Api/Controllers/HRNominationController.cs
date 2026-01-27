@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 
-namespace PerformanceManagement.Controllers
+namespace Relevantz.EEPZ.Api.Controllers
 {
     [ApiController]
     [Authorize]
