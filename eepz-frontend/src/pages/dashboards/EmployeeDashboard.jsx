@@ -7,7 +7,7 @@ import goalService from "../../services/goals/goalService";
 import lndService from "../../services/lnd/lndService";
 import rsvpService from "../../services/meeting/rsvpService";
 import slaService from "../../services/sla/slaService";
-import { getApprovedProfiles, getStatistics } from "../../services/performancemanagement/api/nominationapi";
+import { getEmployeeNominations } from "../../services/performancemanagement/api/nominationapi";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import "../../styles/auth/EmployeeDashboard.css";
@@ -16,10 +16,13 @@ const EmployeeDashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState({
-    goals: [], lndAssignments: [], lndSkills: [], meetings: [], slas: [],
+    goals: [], 
+    lndAssignments: [], 
+    lndSkills: [], 
+    meetings: [], 
+    slas: [],
     performance: { myRecognitions: [], stats: null }
   });
-
 
   const BLUE_COLORS = ["#1E40AF", "#3B82F6", "#60A5FA", "#93C5FD", "#DBEAFE", "#2563EB"];
 
@@ -49,18 +52,31 @@ const EmployeeDashboard = () => {
       }
 
       const empId = user.empMasterId || user.employeeMasterId || user.id;
-      const [selfGoalsRes, orgGoalsRes, teamGoalsRes, myLndAssignmentsRes, myLndSkillsRes, myMeetingsRes, mySlasRes, approvedProfilesRes, statsRes] =
-        await Promise.all([
-          goalService.queryGoals({ type: "self", pageSize: 1000 }).catch(() => ({ data: [] })),
-          goalService.queryGoals({ type: "org", pageSize: 1000 }).catch(() => ({ data: [] })),
-          goalService.queryGoals({ type: "team", pageSize: 1000 }).catch(() => ({ data: [] })),
-          lndService.getMyAssignments(1, "", "", "", "", 1000).catch(() => ({ data: [] })),
-          lndService.getMySkills(1, "", "", "asc", 1000).catch(() => ({ data: { items: [] } })),
-          rsvpService.getMyInvitations().catch(() => []),
-          slaService.getEmployeeSLAs(empId).catch(() => ({ data: [] })),
-          getApprovedProfiles().catch(() => ({ data: [] })),
-          getStatistics().catch(() => ({ data: null }))
-        ]);
+      
+      console.log('Fetching data for Employee ID:', empId);
+
+      const [
+        selfGoalsRes, 
+        orgGoalsRes, 
+        teamGoalsRes, 
+        myLndAssignmentsRes, 
+        myLndSkillsRes, 
+        myMeetingsRes, 
+        mySlasRes, 
+        myNominationsRes
+      ] = await Promise.all([
+        goalService.queryGoals({ type: "self", pageSize: 1000 }).catch(() => ({ data: [] })),
+        goalService.queryGoals({ type: "org", pageSize: 1000 }).catch(() => ({ data: [] })),
+        goalService.queryGoals({ type: "team", pageSize: 1000 }).catch(() => ({ data: [] })),
+        lndService.getMyAssignments(1, "", "", "", "", 1000).catch(() => ({ data: [] })),
+        lndService.getMySkills(1, "", "", "asc", 1000).catch(() => ({ data: { items: [] } })),
+        rsvpService.getMyInvitations().catch(() => []),
+        slaService.getEmployeeSLAs(empId).catch(() => ({ data: [] })),
+        getEmployeeNominations(empId).catch(err => {
+          console.warn('Could not fetch nominations:', err.message);
+          return { data: [] };
+        })
+      ]);
 
       const allGoals = [
         ...extractData(selfGoalsRes).map(g => ({ ...g, goalType: "self" })),
@@ -68,11 +84,49 @@ const EmployeeDashboard = () => {
         ...extractData(teamGoalsRes).map(g => ({ ...g, goalType: "team" }))
       ];
 
-      const allApprovedProfiles = extractData(approvedProfilesRes);
-      const myRecognitions = allApprovedProfiles.filter(p => {
-        const nomineeId = p.nominee?.employeeId || p.nomineeEmployeeId || p.employeeId || p.employeeMasterId;
-        return nomineeId == empId;
+      const myNominations = extractData(myNominationsRes);
+      
+      console.log('My Nominations (FULL DATA):', JSON.stringify(myNominations, null, 2));
+      
+      if (myNominations.length > 0) {
+        console.log('First nomination keys:', Object.keys(myNominations[0]));
+      }
+
+      const myRecognitions = myNominations.filter(n => {
+        const status = (
+          n.status || 
+          n.nominationStatus || 
+          n.approvalStatus || 
+          n.state || 
+          ''
+        ).toLowerCase();
+        
+        console.log(`Nomination ${n.nominationId} status:`, status);
+        
+        if (!status) {
+          console.warn('No status field found, treating all nominations as approved');
+          return true;
+        }
+        
+        return status === 'approved';
       });
+
+      console.log('Filtered Recognitions:', myRecognitions);
+
+      const stats = {
+        totalNominations: myNominations.length,
+        approvedNominations: myRecognitions.length,
+        pendingNominations: myNominations.filter(n => {
+          const status = (n.status || n.nominationStatus || n.approvalStatus || '').toLowerCase();
+          return status === 'pending' || status === 'submitted';
+        }).length,
+        rejectedNominations: myNominations.filter(n => {
+          const status = (n.status || n.nominationStatus || n.approvalStatus || '').toLowerCase();
+          return status === 'rejected' || status === 'declined';
+        }).length
+      };
+
+      console.log('Performance Stats:', stats);
 
       setDashboardData({
         goals: allGoals,
@@ -80,8 +134,9 @@ const EmployeeDashboard = () => {
         lndSkills: extractData(myLndSkillsRes),
         meetings: Array.isArray(myMeetingsRes) ? myMeetingsRes : extractData(myMeetingsRes),
         slas: extractData(mySlasRes),
-        performance: { myRecognitions, stats: statsRes?.data?.data || statsRes?.data || null }
+        performance: { myRecognitions, stats }
       });
+
     } catch (err) {
       console.error("Error in fetchAllData:", err);
       toast.error("Failed to load dashboard data");
@@ -106,12 +161,28 @@ const EmployeeDashboard = () => {
 
   const getPerformanceOverview = () => {
     const { myRecognitions, stats } = dashboardData.performance;
+    
+    console.log('getPerformanceOverview - myRecognitions:', myRecognitions);
+    console.log('getPerformanceOverview - stats:', stats);
+    
     const byRewardType = {};
+    
     myRecognitions.forEach(r => {
-      const type = r.opportunity?.rewardType || r.rewardTypeName || r.rewardType || "Other";
+      const type = (
+        r.rewardType || 
+        r.roleType || 
+        r.rewardTypeName || 
+        r.awardType ||
+        r.opportunity?.rewardType || 
+        "Other"
+      );
+      
+      console.log(`Processing nomination ${r.nominationId}, type: ${type}`);
+      
       byRewardType[type] = (byRewardType[type] || 0) + 1;
     });
 
+    console.log('Reward types breakdown:', byRewardType);
 
     const chartData = Object.entries(byRewardType).map(([name, value], i) => ({
       name,
@@ -121,8 +192,9 @@ const EmployeeDashboard = () => {
 
     return {
       totalRecognitions: myRecognitions.length,
-      chartData,
-      orgTotalNoms: stats?.data?.totalNominations || stats?.totalNominations || 0
+      totalNominations: stats?.totalNominations || 0,
+      pendingNominations: stats?.pendingNominations || 0,
+      chartData
     };
   };
 
@@ -133,7 +205,6 @@ const EmployeeDashboard = () => {
     const completed = goals.filter(g => (g.status || g.goalStatus || "").toLowerCase() === "completed").length;
     const inProgress = goals.filter(g => (g.status || g.goalStatus || "").toLowerCase() === "inprogress").length;
     const pending = goals.filter(g => ["pending", "open", "approved"].includes((g.status || g.goalStatus || "").toLowerCase())).length;
-
 
     const chartData = [
       completed > 0 && { name: "Completed", value: completed, fill: BLUE_COLORS[0] },
@@ -157,7 +228,6 @@ const EmployeeDashboard = () => {
         else high++;
       }
     });
-
 
     const chartData = [
       low > 0 && { name: "Rating 1-4", value: low, fill: BLUE_COLORS[2] },
@@ -197,7 +267,6 @@ const EmployeeDashboard = () => {
     const open = slas.length - closed;
     const overdue = slas.filter(s => isOverdue(s.deadline || s.dueDate)).length;
 
-
     const chartData = [
       open > 0 && { name: "Open / In Progress", value: open, fill: BLUE_COLORS[1] },
       overdue > 0 && { name: "Overdue", value: overdue, fill: BLUE_COLORS[3] },
@@ -230,11 +299,42 @@ const EmployeeDashboard = () => {
   const slaData = getSlaOverview();
 
   const kpiCards = [
-    { icon: "trophy", value: perfOverview.totalRecognitions, label: "My Recognitions", subtitle: `Organization nominations: ${perfOverview.orgTotalNoms}`, iconClass: "admin-purple" },
-    { icon: Target, value: kpiStats.totalGoals, label: "My Goals", subtitle: "Self, Team & Org", iconClass: "admin-blue", showTrend: true },
-    { icon: BookOpen, value: dashboardData.lndSkills.length, label: "My Skills", subtitle: "From L&D module", iconClass: "admin-pink" },
-    { icon: Calendar, value: kpiStats.totalMeetings, label: "Meetings", subtitle: `${kpiStats.upcomingMeetings} upcoming`, iconClass: "admin-green" },
-    { icon: AlertTriangle, value: kpiStats.totalSlas, label: "My SLAs", subtitle: `${kpiStats.overdueSlas} overdue`, iconClass: "admin-cyan" }
+    { 
+      icon: "trophy", 
+      value: perfOverview.totalRecognitions, 
+      label: "My Recognitions", 
+      subtitle: `Total nominations: ${perfOverview.totalNominations}`, 
+      iconClass: "admin-purple" 
+    },
+    { 
+      icon: Target, 
+      value: kpiStats.totalGoals, 
+      label: "My Goals", 
+      subtitle: "Self, Team & Org", 
+      iconClass: "admin-blue", 
+      showTrend: true 
+    },
+    { 
+      icon: BookOpen, 
+      value: dashboardData.lndSkills.length, 
+      label: "My Skills", 
+      subtitle: "From L&D module", 
+      iconClass: "admin-pink" 
+    },
+    { 
+      icon: Calendar, 
+      value: kpiStats.totalMeetings, 
+      label: "Meetings", 
+      subtitle: `${kpiStats.upcomingMeetings} upcoming`, 
+      iconClass: "admin-green" 
+    },
+    { 
+      icon: AlertTriangle, 
+      value: kpiStats.totalSlas, 
+      label: "My SLAs", 
+      subtitle: `${kpiStats.overdueSlas} overdue`, 
+      iconClass: "admin-cyan" 
+    }
   ];
 
   return (
@@ -262,7 +362,6 @@ const EmployeeDashboard = () => {
       </div>
 
       <div className="dashboard-cards-container">
-        {/* FIRST ROW - 3 CARDS */}
         <div className="dashboard-row">
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
@@ -276,7 +375,7 @@ const EmployeeDashboard = () => {
                 <>
                   <div className="emp-stats-grid emp-stats-2col">
                     <StatCard type="recognition" value={perfOverview.totalRecognitions} label="My Recognitions" />
-                    <StatCard type="org-noms" value={perfOverview.orgTotalNoms} label="Total Organization Nominations" />
+                    <StatCard type="org-noms" value={perfOverview.totalNominations} label="Total Nominations" />
                   </div>
                   <div className="emp-trophy-section">
                     <div className="emp-trophy-container">
@@ -392,7 +491,6 @@ const EmployeeDashboard = () => {
           </div>
         </div>
 
-        {/* SECOND ROW - 2 CARDS AUTO-ADJUST */}
         <div className="dashboard-row dashboard-row-2">
           <div className="dashboard-card">
             <div className="card-header-dark">
