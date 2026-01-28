@@ -7,10 +7,13 @@ import axios from "axios";
 import goalService from "../../services/goals/goalService";
 import nominationService from "../../services/internal/nominationService";
 import slaService from "../../services/sla/slaService";
+import { getDeptHeadSubmittedRatings, getApprovedEmployees } from "../../services/performancemanagement/api/rolesapi";
+import { getEmployeeIdForFilter } from "../../utils/PerformanceManagement/jwtDecoder";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import "../../styles/auth/DepartmentHeadDashboard.css";
 import { getComplianceSummary } from "../../utils/sla/slaCalculations";
+
 
 const DepartmentHeadDashboard = () => {
   const navigate = useNavigate();
@@ -21,22 +24,27 @@ const DepartmentHeadDashboard = () => {
     allGoals: [], approvedNominations: [], complianceTrend: []
   });
 
+
   useEffect(() => { fetchAllData(); }, []);
+
 
   const getUserData = () => {
     try { return JSON.parse(localStorage.getItem("user")); }
     catch { return null; }
   };
 
+
   const getToken = () => localStorage.getItem("token") || localStorage.getItem("accessToken");
 
+
   const createApiPort5222 = () => {
-    const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5222";
+    const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5113";
     const instance = axios.create({
       baseURL: `${BASE_URL}/api`,
       headers: { "Content-Type": "application/json" },
       timeout: 30000
     });
+
 
     instance.interceptors.request.use((config) => {
       const token = getToken();
@@ -44,11 +52,10 @@ const DepartmentHeadDashboard = () => {
       return config;
     }, (error) => Promise.reject(error));
 
+
     return instance;
   };
 
-  const getDeptHeadSubmittedRatings = () => createApiPort5222().get("/DeptHeadApprovals/submitted-ratings");
-  const getApprovedEmployees = (page = 1, pageSize = 100) => createApiPort5222().get("/DeptHeadApprovals/approved-employees", { params: { page, pageSize } });
 
   const extractData = (response) => {
     if (!response) return [];
@@ -57,6 +64,7 @@ const DepartmentHeadDashboard = () => {
     const paths = [data?.data?.items, data?.data?.$values, data?.data, data?.items, data?.$values, data];
     return paths.find(p => Array.isArray(p)) || [];
   };
+
 
   const fetchAllData = async () => {
     try {
@@ -68,7 +76,15 @@ const DepartmentHeadDashboard = () => {
         return;
       }
 
+
       const deptHeadId = user.empMasterId || user.employeeMasterId || user.userId || user.id;
+
+      if (!deptHeadId) {
+        toast.error("Unable to identify department head. Please login again.");
+        console.error("Department Head ID not found");
+        return;
+      }
+
 
       const [
         pendingGoalApprovalsRes, pendingNominationsRes, performanceReviewsRes,
@@ -76,29 +92,34 @@ const DepartmentHeadDashboard = () => {
       ] = await Promise.all([
         goalService.getPendingApprovals().catch(() => ({ data: [] })),
         nominationService.getPendingDeptHeadReview().catch(() => ({ success: false, data: [] })),
-        getDeptHeadSubmittedRatings().catch(() => ({ data: [] })),
-        getApprovedEmployees(1, 100).catch(() => ({ data: [] })),
+        getDeptHeadSubmittedRatings(deptHeadId).catch(() => ({ data: { success: false, data: [] } })),
+        getApprovedEmployees(1, 100, deptHeadId).catch(() => ({ data: { success: false, data: [] } })),
         goalService.queryGoals({ pageSize: 1000 }).catch(() => ({ data: [] })),
         slaService.getAllEmployees().catch(() => ({ data: [] })),
         slaService.getAllSLAs().catch(() => ({ success: false, data: [] }))
       ]);
 
+
       const extractedAllEmployees = extractData(allEmployeesRes);
       const allSlas = allSlasRes?.success && Array.isArray(allSlasRes.data) ? allSlasRes.data : [];
+
 
       const deptHeadEmployee = extractedAllEmployees.find((emp) => {
         const empId = emp.empMasterId || emp.employeeMasterId || emp.userId || emp.id;
         return String(empId) === String(deptHeadId);
       });
 
+
       const departmentId = deptHeadEmployee ? (deptHeadEmployee.departmentId || deptHeadEmployee.deptId || deptHeadEmployee.department?.departmentId || deptHeadEmployee.department?.id || null) : null;
       const deptSLAs = departmentId ? allSlas.filter((sla) => String(sla.departmentId) === String(departmentId)) : allSlas;
+
 
       const extractedAllGoals = extractData(allGoalsRes);
       const derivedPendingApprovals = extractedAllGoals.filter((g) => {
         const s = (g.status || g.goalStatus || "").toLowerCase();
         return s === "pending_depthead_review" || s === "submitted_to_depthead" || s === "pending_approval" || s === "pending";
       });
+
 
       let complianceTrendData = [];
       if (deptSLAs.length > 0) {
@@ -112,17 +133,16 @@ const DepartmentHeadDashboard = () => {
         }];
       }
 
-      const extractedPerformanceReviews = extractData(performanceReviewsRes);
-      const pendingPerformanceReviews = extractedPerformanceReviews.filter((r) => {
-        const status = (r.status || r.reviewStatus || "").toLowerCase();
-        return status === "pending" || status === "submitted" || status === "awaiting_approval" || status === "pending_depthead_review" || status === "pending_approval";
-      });
+
+      const extractedPendingPerformanceReviews = performanceReviewsRes?.data?.success ? (performanceReviewsRes.data.data || []) : [];
+      const extractedApprovedPerformanceReviews = approvedEmployeesRes?.data?.success ? (approvedEmployeesRes.data.data || []) : [];
+
 
       setDashboardData({
         pendingGoalApprovals: derivedPendingApprovals,
         pendingNominations: extractData(pendingNominationsRes),
-        pendingPerformanceReviews,
-        approvedPerformanceReviews: extractData(approvedEmployeesRes),
+        pendingPerformanceReviews: extractedPendingPerformanceReviews,
+        approvedPerformanceReviews: extractedApprovedPerformanceReviews,
         departmentSLAs: deptSLAs,
         departmentEmployees: extractedAllEmployees,
         allGoals: extractedAllGoals,
@@ -137,11 +157,13 @@ const DepartmentHeadDashboard = () => {
     }
   };
 
+
   const getKPIStats = () => {
     const overdueSLAs = dashboardData.departmentSLAs.filter((s) => {
       const deadline = new Date(s.deadline || s.dueDate);
       return deadline < new Date() && s.status?.toLowerCase() !== "closed";
     }).length;
+
 
     return {
       totalTeamMembers: dashboardData.departmentEmployees.length,
@@ -153,28 +175,31 @@ const DepartmentHeadDashboard = () => {
     };
   };
 
+
   const getGoalsOverview = () => {
     const goals = dashboardData.allGoals;
     if (!goals?.length) return { total: 0, completed: 0, inProgress: 0, pending: 0, chartData: [] };
+
 
     const completed = goals.filter((g) => (g.status || g.goalStatus || "").toLowerCase() === "completed").length;
     const inProgress = goals.filter((g) => (g.status || g.goalStatus || "").toLowerCase() === "inprogress").length;
     const pending = goals.filter((g) => ["pending", "open", "approved"].includes((g.status || g.goalStatus || "").toLowerCase())).length;
 
-    // BLUE THEME CHART COLORS
+
     const chartData = [
       completed > 0 && { name: "Completed", value: completed, fill: "#3B82F6" },
       inProgress > 0 && { name: "In Progress", value: inProgress, fill: "#60A5FA" },
       pending > 0 && { name: "Pending", value: pending, fill: "#1E40AF" }
     ].filter(Boolean);
 
+
     return { total: goals.length, completed, inProgress, pending, chartData };
   };
+
 
   const getPerformanceReviewsOverview = () => {
     const pending = dashboardData.pendingPerformanceReviews.length;
     const approved = dashboardData.approvedPerformanceReviews.length;
-    // BLUE THEME CHART COLORS
     const chartData = [
       pending > 0 && { name: "Pending Review", value: pending, fill: "#60A5FA" },
       approved > 0 && { name: "Approved", value: approved, fill: "#3B82F6" }
@@ -182,25 +207,29 @@ const DepartmentHeadDashboard = () => {
     return { total: pending + approved, pending, approved, chartData };
   };
 
+
   const getNominationsOverview = () => {
     const nominations = dashboardData.pendingNominations;
     const pending = nominations.filter((n) => n.status?.toLowerCase().includes("pending")).length;
     const approved = nominations.filter((n) => n.status?.toLowerCase() === "approved").length;
     const rejected = nominations.filter((n) => n.status?.toLowerCase().includes("rejected")).length;
 
-    // BLUE THEME CHART COLORS
+
     const chartData = [
       pending > 0 && { name: "Pending", value: pending, fill: "#60A5FA" },
       approved > 0 && { name: "Approved", value: approved, fill: "#3B82F6" },
       rejected > 0 && { name: "Rejected", value: rejected, fill: "#1E40AF" }
     ].filter(Boolean);
 
+
     return { total: nominations.length, pending, approved, rejected, chartData };
   };
+
 
   const getSLAOverview = () => {
     const slas = dashboardData.departmentSLAs;
     if (!slas?.length) return { total: 0, open: 0, overdue: 0, closed: 0, chartData: [] };
+
 
     const closed = slas.filter((s) => s.status?.toLowerCase() === "closed").length;
     const open = slas.filter((s) => ["open", "inprogress"].includes(s.status?.toLowerCase())).length;
@@ -209,15 +238,17 @@ const DepartmentHeadDashboard = () => {
       return deadline < new Date() && s.status?.toLowerCase() !== "closed";
     }).length;
 
-    // BLUE THEME CHART COLORS
+
     const chartData = [
       overdue > 0 && { name: "Overdue", value: overdue, fill: "#1E40AF" },
       open > 0 && { name: "Open", value: open, fill: "#60A5FA" },
       closed > 0 && { name: "Closed", value: closed, fill: "#3B82F6" }
     ].filter(Boolean);
 
+
     return { total: slas.length, open, overdue, closed, chartData };
   };
+
 
   if (loading) return (
     <div className="ada-loading-container">
@@ -227,6 +258,7 @@ const DepartmentHeadDashboard = () => {
     </div>
   );
 
+
   const kpiStats = getKPIStats();
   const goalsData = getGoalsOverview();
   const performanceData = getPerformanceReviewsOverview();
@@ -234,6 +266,7 @@ const DepartmentHeadDashboard = () => {
   const slaData = getSLAOverview();
   const complianceTrend = dashboardData.complianceTrend || [];
   const hasCompliancePoints = complianceTrend.some((p) => !isNaN(p.compliance));
+
 
   const kpiCards = [
     { icon: Users, value: kpiStats.totalTeamMembers, label: "Team Members", subtitle: "Department size", iconClass: "admin-purple" },
@@ -243,6 +276,7 @@ const DepartmentHeadDashboard = () => {
     { icon: AlertTriangle, value: kpiStats.totalDepartmentSLAs, label: "Department SLAs", subtitle: `${kpiStats.overdueSLAs} overdue`, iconClass: "admin-cyan" }
   ];
 
+
   const StatCard = ({ type, value, label }) => (
     <div className={`emp-stat-card emp-stat-${type}`}>
       <div className="emp-stat-value">{value}</div>
@@ -250,9 +284,11 @@ const DepartmentHeadDashboard = () => {
     </div>
   );
 
+
   return (
     <div className="hr-dashboard-container">
       <Breadcrumb items={[{ label: "Department Head Dashboard" }]} />
+
 
       <div className="admin-kpi-grid">
         {kpiCards.map(({ icon: IconComponent, value, label, subtitle, iconClass, showTrend }, i) => (
@@ -270,6 +306,7 @@ const DepartmentHeadDashboard = () => {
           </div>
         ))}
       </div>
+
 
       <div className="dashboard-cards-container">
         <div className="dashboard-row">
@@ -311,6 +348,7 @@ const DepartmentHeadDashboard = () => {
             </div>
           </div>
 
+
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -343,6 +381,7 @@ const DepartmentHeadDashboard = () => {
               )}
             </div>
           </div>
+
 
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
@@ -383,6 +422,7 @@ const DepartmentHeadDashboard = () => {
           </div>
         </div>
 
+
         <div className="dashboard-row dashboard-row-2">
           <div className="dashboard-card">
             <div className="card-header-dark">
@@ -422,6 +462,7 @@ const DepartmentHeadDashboard = () => {
             </div>
           </div>
 
+
           <div className="dashboard-card">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -457,5 +498,6 @@ const DepartmentHeadDashboard = () => {
     </div>
   );
 };
+
 
 export default DepartmentHeadDashboard;
