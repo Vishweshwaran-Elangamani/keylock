@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
-using Relevantz.EEPZ.Common.Enums;
+using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Exceptions;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;

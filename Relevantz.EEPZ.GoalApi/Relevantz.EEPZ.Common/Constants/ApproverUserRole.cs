@@ -1,4 +1,4 @@
-namespace Relevantz.EEPZ.Common.Enums
+namespace Relevantz.EEPZ.Common.Constants
 {  
      // Approval user role context 
     public static class APPROVAL_USER_ROLE

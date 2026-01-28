@@ -1,4 +1,4 @@
-namespace Relevantz.EEPZ.Common.Enums
+namespace Relevantz.EEPZ.Common.Constants
 {
     // User role constants
     public static class USER_ROLE

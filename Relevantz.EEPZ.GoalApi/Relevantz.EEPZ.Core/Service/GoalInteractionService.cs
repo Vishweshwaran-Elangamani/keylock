@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
-using Relevantz.EEPZ.Common.Enums;
+using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Exceptions;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
-using Relevantz.EEPZ.Data.Repository.Interface;
+using Relevantz.EEPZ.Data.Repository.Interface;                   
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -105,7 +105,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
         }
 
-        public async Task<List<GoalCommentModel>> ListCommentsAsync(int goalId)
+        public async Task<List<GoalCommentModel>> GetAllCommentsAsync(int goalId)
         {
             var comments = await _repo.GetCommentsByGoalAsync(goalId);
             var result = new List<GoalCommentModel>();
@@ -134,7 +134,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return result;
         }
 
-        public async Task<GoalDashboardSummaryModel> GetDashboardSummaryAsync(
+        public async Task<GoalDashboardSummaryModel> GetDashboardDetailsAsync(
             int currentUserEmployeeMasterId
         )
         {

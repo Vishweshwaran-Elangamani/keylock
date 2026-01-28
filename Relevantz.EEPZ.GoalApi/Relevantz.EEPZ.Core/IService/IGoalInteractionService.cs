@@ -12,8 +12,8 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             int currentUserEmployeeMasterId,
             string currentUserRole
         );
-        Task<List<GoalCommentModel>> ListCommentsAsync(int goalId);
-        Task<GoalDashboardSummaryModel> GetDashboardSummaryAsync(int currentUserEmployeeMasterId);
+        Task<List<GoalCommentModel>> GetAllCommentsAsync(int goalId);
+        Task<GoalDashboardSummaryModel> GetDashboardDetailsAsync(int currentUserEmployeeMasterId);
         Task<List<GoalSummaryModel>> GetOngoingAsync(string type, int currentUserEmployeeMasterId);
         Task<List<TimelineEventModel>> GetGoalTimelineAsync(
             int goalId,

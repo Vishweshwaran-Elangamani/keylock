@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Enums;
+using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
@@ -31,7 +31,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Toggles the completion state of a checklist item for a specific goal.
         /// </summary>
-        [HttpPut("api/goal-progress/{goalId:int}/checklist/toggle")]
+        [HttpPut("api/goal-progress/{goalId}/checklist/toggle")]
         public async Task<IActionResult> ToggleChecklist(
             int goalId,
             [FromBody] ToggleChecklistModel dto
@@ -47,18 +47,18 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Updates the progress of a goal manually by an authorized user.
         /// </summary>
-        [HttpPut("api/goal-progress/{goalId:int}/manual")]
+        [HttpPut("api/goal-progress/{goalId}/manual")]
         [Authorize(
             Roles = $"{USER_ROLE.EMPLOYEE},{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD},{USER_ROLE.LEADERSHIP}"
-        )]
-        public async Task<IActionResult> ManualProgress(
+        )] 
+        public async Task<IActionResult> UpdateManualProgress(
             int goalId,
             [FromBody] ManualProgressUpdateModel dto
         )
         {
             var userId = GetEmpMasterId();
 
-            var result = await _service.ManualUpdateProgressAsync(goalId, dto, userId);
+            var result = await _service.UpdateManualProgressAsync(goalId, dto, userId);
 
             return Ok(result);
         }
@@ -66,7 +66,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Retrieves the progress percentage of a specific goal for the current user.
         /// </summary>
-        [HttpGet("api/goal-progress/{goalId:int}")]
+        [HttpGet("api/goal-progress/{goalId}")]
         public async Task<IActionResult> GetProgress(int goalId)
         {
             var userId = GetEmpMasterId();
@@ -85,7 +85,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Retrieves the team progress percentage for a specific goal, accessible by managers and leadership roles.
         /// </summary>
-        [HttpGet("api/goal-progress/{goalId:int}/team")]
+        [HttpGet("api/goal-progress/{goalId}/team")]
         [Authorize(
             Roles = $"{USER_ROLE.EMPLOYEE},{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD},{USER_ROLE.LEADERSHIP}"
         )]
@@ -107,7 +107,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Retrieves cascading progress for a specific goal, reflecting dependent goals' progress.
         /// </summary>
-        [HttpGet("api/goal-progress/{goalId:int}/cascading")]
+        [HttpGet("api/goal-progress/{goalId}/cascading")]
         public async Task<IActionResult> GetCascadingProgress(int goalId)
         {
             var userId = GetEmpMasterId();
@@ -126,7 +126,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Retrieves the progress hierarchy for a specific goal, showing structured progress details.
         /// </summary>
-        [HttpGet("api/goal-progress/{goalId:int}/hierarchy")]
+        [HttpGet("api/goal-progress/{goalId}/hierarchy")]
         public async Task<IActionResult> GetProgressHierarchy(int goalId)
         {
             var userId = GetEmpMasterId();

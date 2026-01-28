@@ -2,7 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Enums;
+using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Exceptions;
 using Relevantz.EEPZ.Core.Services.Interface;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
@@ -51,5 +51,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
             return int.Parse(claim);
         }
+
+
     }
 }

@@ -1,4 +1,4 @@
-namespace Relevantz.EEPZ.Common.Enums
+namespace Relevantz.EEPZ.Common.Constants
 {
     // Goal type enumeration
     public static class GOAL_TYPE

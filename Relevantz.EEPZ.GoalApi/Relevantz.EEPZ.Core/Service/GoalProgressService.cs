@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
-using Relevantz.EEPZ.Common.Enums;
+using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Exceptions;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
@@ -96,7 +96,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 currentUserEmployeeMasterId
             );
             var total = await _baseRepo.CountTotalForUserAsync(goalId, currentUserEmployeeMasterId);
-            var percent = total == 0 ? 0 : (int)Math.Round((double)completed / total * 100);
+            var percent = total == 0 ? 0 : (int)Math.Round((double)completed / total * 100);   
 
             if (percent < 100)
             {
@@ -161,9 +161,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 ResponseMessages.Codes.CHECKLIST_TOGGLED_SUCCESS,
                 metadata
             );
-        }
+        } 
 
-        public async Task<ApiResponseModel> ManualUpdateProgressAsync(
+        public async Task<ApiResponseModel> UpdateManualProgressAsync(
             int goalId,
             ManualProgressUpdateModel dto,
             int currentUserEmployeeMasterId

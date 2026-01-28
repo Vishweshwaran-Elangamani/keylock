@@ -11,7 +11,7 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             ToggleChecklistModel dto,
             int currentUserEmployeeMasterId
         );
-        Task<ApiResponseModel> ManualUpdateProgressAsync(
+        Task<ApiResponseModel> UpdateManualProgressAsync(
             int goalId,
             ManualProgressUpdateModel dto,
             int currentUserEmployeeMasterId

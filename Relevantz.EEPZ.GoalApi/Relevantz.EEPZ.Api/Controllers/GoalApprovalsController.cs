@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
-using Relevantz.EEPZ.Common.Enums;
+using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using ILogger = Microsoft.Extensions.Logging.ILogger;

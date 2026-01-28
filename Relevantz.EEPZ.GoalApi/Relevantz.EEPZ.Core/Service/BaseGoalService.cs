@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
-using Relevantz.EEPZ.Common.Enums;
+using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Exceptions;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
@@ -32,13 +32,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         public string? GetCreationApprovalType(string goalType) =>
             goalType == GOAL_TYPE.SELF ? APPROVAL_TYPE.SELF_GOAL_ACTIVATION
             : goalType == GOAL_TYPE.TEAM ? APPROVAL_TYPE.CREATION
-            : null; 
+            : null;
 
         public async Task<int?> GetApproverForUserAsync(int employeeMasterId, string approvalType)
         {
             var managerId = await _repo.GetReportingManagerEmployeeMasterIdAsync(employeeMasterId);
             return managerId;
-        }     
+        }
 
         public async Task<string> GetEmployeeNameAsync(int? employeeMasterId)
         {
@@ -384,7 +384,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return result;
         }
 
-        public async Task<CanMarkCompleteModel> GetCanMarkCompleteDetailsAsync(int goalId, int employeeMasterId, string role)
+        public async Task<CanMarkCompleteModel> GetMarkCompleteEligibilityAsync(int goalId, int employeeMasterId, string role)
         {
             var goal = await _repo.GetGoalByIdAsync(goalId);
             if (goal == null)

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Enums;
+using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
@@ -47,7 +47,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Retrieves detailed information about a specific goal by its ID.
         /// </summary>
-        [HttpGet("/api/goals/{id:int}")]
+        [HttpGet("/api/goals/{id}")] 
         public async Task<IActionResult> GetGoalDetailsById(int id)
         {
             var userId = GetEmpMasterId();
@@ -93,7 +93,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Updates an existing goal by its ID.
         /// </summary>
-        [HttpPut("/api/goals/{id:int}")]
+        [HttpPut("/api/goals/{id}")]
         public async Task<IActionResult> UpdateGoal(int id, [FromBody] UpdateGoalModel dto)
         {
             var userId = GetEmpMasterId();
@@ -107,7 +107,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Retrieves the list of assignees for a specific goal.
         /// </summary>
-        [HttpGet("/api/goals/{id:int}/assignees")]
+        [HttpGet("/api/goals/{id}/assignees")]
         public async Task<IActionResult> GetAssignees(int id)
         {
             var assignees = await _service.GetAssigneesAsync(id);
@@ -124,7 +124,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Assigns a goal to employees, restricted to managers and department heads.
         /// </summary>
-        [HttpPost("/api/goals/{id:int}/assign")]
+        [HttpPost("/api/goals/{id}/assign")]
         [Authorize(Roles = $"{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD}")]
         public async Task<IActionResult> Assign(int id, [FromBody] AssignGoalModel dto)
         {
@@ -178,7 +178,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Retrieves details of a specific project by its ID.
         /// </summary>
-        [HttpGet("/api/goals/projects/{projectId:int}")]
+        [HttpGet("/api/goals/projects/{projectId}")]
         public async Task<IActionResult> GetProject(int projectId)
         {
             var project = await _service.GetProjectAsync(projectId);

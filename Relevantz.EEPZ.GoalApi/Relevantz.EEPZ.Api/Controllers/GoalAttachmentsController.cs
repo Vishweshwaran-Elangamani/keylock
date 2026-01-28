@@ -48,7 +48,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             );
 
             return Ok(response);
-        }
+        } 
 
         /// <summary>
         /// Retrieves a list of all attachments for a specific goal.

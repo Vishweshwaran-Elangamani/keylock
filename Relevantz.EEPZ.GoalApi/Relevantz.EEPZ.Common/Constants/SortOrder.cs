@@ -1,4 +1,4 @@
-namespace Relevantz.EEPZ.Common.Enums
+namespace Relevantz.EEPZ.Common.Constants
 {
     public static class SORT_ORDER
     {

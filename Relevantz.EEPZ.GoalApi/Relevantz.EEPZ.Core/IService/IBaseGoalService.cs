@@ -14,7 +14,7 @@ namespace Relevantz.EEPZ.Core.Services.Interface
         Task<bool> CanCommentOnGoalAsync(
             int goalId,
             int currentUserEmployeeMasterId,
-            string currentUserRole 
+            string currentUserRole
         ); 
         Task<bool> CanUserCommentOnGoalAsync(int goalId, int employeeMasterId, string role);
         Task<bool> IsGoalCommentableAsync(int goalId);
@@ -23,6 +23,6 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             int currentUserEmployeeMasterId,
             string currentUserRole
         );
-         Task<CanMarkCompleteModel> GetCanMarkCompleteDetailsAsync(int goalId, int employeeMasterId, string role);
+         Task<CanMarkCompleteModel> GetMarkCompleteEligibilityAsync(int goalId, int employeeMasterId, string role);
     }
 }

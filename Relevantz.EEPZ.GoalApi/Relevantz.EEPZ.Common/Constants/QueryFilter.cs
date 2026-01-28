@@ -1,4 +1,4 @@
-namespace Relevantz.EEPZ.Common.Enums
+namespace Relevantz.EEPZ.Common.Constants
 {
     // Query filter constants
     public static class QUERY_FILTER

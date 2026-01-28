@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Enums;
+using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
@@ -29,7 +29,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Adds a comment to a specific goal.
         /// </summary>
-        [HttpPost("api/goal-interaction/{id:int}/comments")]
+        [HttpPost("api/goal-interaction/{id}/comments")] 
         public async Task<IActionResult> AddComment(int id, [FromBody] CreateCommentModel dto)
         {
             var userId = GetEmpMasterId();
@@ -38,15 +38,15 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             var result = await _service.AddCommentAsync(id, dto, userId, role);
 
             return Ok(result);
-        }
+        }    
 
         /// <summary>
         /// Retrieves all comments for a specific goal.
         /// </summary>
-        [HttpGet("api/goal-interaction/{id:int}/comments")]
-        public async Task<IActionResult> ListComments(int id)
+        [HttpGet("api/goal-interaction/{id}/comments")]
+        public async Task<IActionResult> GetAllComments(int id)
         {
-            var items = await _service.ListCommentsAsync(id);
+            var items = await _service.GetAllCommentsAsync(id);
 
             var response = ApiResponseModel<List<GoalCommentModel>>.SuccessResponse(
                 ResponseMessages.Codes.COMMENTS_RETRIEVED_SUCCESS,
@@ -60,7 +60,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Retrieves the timeline of events for a specific goal.
         /// </summary>
-        [HttpGet("api/goal-interaction/{id:int}/timeline")]
+        [HttpGet("api/goal-interaction/{id}/timeline")]
         public async Task<IActionResult> GetTimeline(int id)
         {
             var userId = GetEmpMasterId();
@@ -80,11 +80,11 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// Retrieves a dashboard summary for the current user.
         /// </summary>
         [HttpGet("api/goal-interaction/dashboard/summary")]
-        public async Task<IActionResult> DashboardSummary()
+        public async Task<IActionResult> GetDashboardDetails()
         {
             var userId = GetEmpMasterId();
 
-            var summary = await _service.GetDashboardSummaryAsync(userId);
+            var summary = await _service.GetDashboardDetailsAsync(userId);
 
             var response = ApiResponseModel<GoalDashboardSummaryModel>.SuccessResponse(
                 ResponseMessages.Codes.DASHBOARD_RETRIEVED_SUCCESS,
@@ -93,18 +93,18 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             );
 
             return Ok(response);
-        }
+        }   
 
         /// <summary>
         /// Checks whether a specific goal can be marked as complete by the current user.
         /// </summary>
-        [HttpGet("api/goal-interaction/{id:int}/can-complete")]
-        public async Task<IActionResult> CanMarkComplete(int id)
+        [HttpGet("api/goal-interaction/{id}/complete-eligibility")]
+        public async Task<IActionResult> GetMarkCompleteEligibility(int id)
         {
-            var userId = GetEmpMasterId();
+            var userId = GetEmpMasterId();   
             var role = GetUserRole();
 
-            var result = await _baseService.GetCanMarkCompleteDetailsAsync(id, userId, role);
+            var result = await _baseService.GetMarkCompleteEligibilityAsync(id, userId, role);
 
             var response = ApiResponseModel<CanMarkCompleteModel>.SuccessResponse(
                 ResponseMessages.Codes.GOAL_RETRIEVED_SUCCESS,
@@ -119,7 +119,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Retrieves the list of subordinates for a specific project.
         /// </summary>
-        [HttpGet("api/goal-interaction/projects/{projectId:int}/subordinates")]
+        [HttpGet("api/goal-interaction/projects/{projectId}/subordinates")]
         public async Task<IActionResult> GetProjectSubordinates(int projectId)
         {
             var currentUserId = GetEmpMasterId();
