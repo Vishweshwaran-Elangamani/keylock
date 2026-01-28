@@ -12,7 +12,7 @@ namespace Relevantz.EEPZ.Core.Service
         private readonly IRoleRepository _roleRepository;
         private readonly IDepartmentRepository _departmentRepository;
         private readonly IUserAuthenticationRepository _userAuthRepository;
-        private const string EXPORT_PASSWORD = "rZ@26012025#Rix";
+        private const string EXPORT_PASSWORD = ExcelPasswordConstant.EXPORT_PASSWORD;
 
         public ExportService(
             IRoleRepository roleRepository,
