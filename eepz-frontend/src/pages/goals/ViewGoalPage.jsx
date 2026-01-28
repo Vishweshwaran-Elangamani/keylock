@@ -45,7 +45,7 @@ const ViewGoalPage = () => {
     canAssign: false,
     canComplete: false,
     canComment: false,
-  });
+  });  
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(false);
@@ -98,7 +98,7 @@ const ViewGoalPage = () => {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  };  
 
   const handleEdit = () => {
     setShowEditModal(true);

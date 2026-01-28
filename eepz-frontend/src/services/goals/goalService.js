@@ -97,7 +97,7 @@ const goalService = {
       console.error("Error fetching dashboard summary:", error);
       throw error;
     }
-  },
+  }, 
   getOngoingGoals: async (type = "self", pageSize = 6) => {
     try {
       const response = await goalApi.get("/goals/query", {
@@ -290,7 +290,7 @@ const goalService = {
       console.error("Error fetching comments:", error);
       throw error;
     }
-  },
+  },  
   //  TIMELINE 
   getTimeline: async (goalId) => {
     try {
@@ -321,7 +321,7 @@ const goalService = {
       console.error("Error uploading attachment:", error);
       throw error;
     }
-  },
+  },  
   previewAttachment: async (attachmentId, filename) => {
     try {
       if (!isFilePreviewable(filename)) {
@@ -403,21 +403,21 @@ const goalService = {
   //  PERMISSIONS 
   canMarkComplete: async (goalId) => {
     try {
-      const response = await goalApi.get(`/goal-interaction/${goalId}/can-complete`);
+      const response = await goalApi.get(`/goal-interaction/${goalId}/complete-eligibility`);
       return response.data;
     } catch (error) {
       console.error("Error checking completion permission:", error);
       return { canMarkComplete: false };
     }
   },
-};
+};  
 //  HELPER FUNCTIONS 
 export const canUserComment = (goal, user) => {
   if (!goal || !user) return false;
   const isCreator = goal.createdByEmployeeMasterId === user.empMasterId;
   const isAssignee = goal.assignees?.some(
     (a) => a.employeeMasterId === user.empMasterId
-  );
+  );  
   const isLeadership = user.role === "Leadership";
   const isManager = ["Manager", "Department Head", "Leadership"].includes(
     user.role
@@ -432,7 +432,7 @@ export const canUserComment = (goal, user) => {
     default:
       return false;
   }
-};
+};  
 export const getStatusBadgeColor = (status) => {
   const statusMap = {
     pending: "warning",
@@ -442,9 +442,9 @@ export const getStatusBadgeColor = (status) => {
     closed: "danger",
     expired: "dark",
     reopened: "warning",
-  };
+  }; 
   return statusMap[status?.toLowerCase()] || "secondary";
-};
+}; 
 export const getStatusLabel = (status) => {
   const labelMap = {
     pending: "Pending",
@@ -454,7 +454,7 @@ export const getStatusLabel = (status) => {
     closed: "Closed",
     expired: "Expired",
     reopened: "Reopened",
-  };
+  }; 
   return labelMap[status?.toLowerCase()] || "Unknown";
 };
 export default goalService;

@@ -7,8 +7,6 @@ import {
   Check,
 } from "lucide-react";
 
-
-
 // Assignment Status
 export const ASSIGNMENT_STATUS = {
   IN_PROGRESS: "IN_PROGRESS",
@@ -105,7 +103,7 @@ export const STATUS_CONFIG = {
     bg: "#f8d7da",
     icon: XCircle,
   },
-};
+};  
 
 // Sort Options
 export const SORT_OPTIONS = {

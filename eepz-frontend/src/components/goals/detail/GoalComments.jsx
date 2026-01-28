@@ -26,10 +26,8 @@ const GoalComments = ({
   const [filter, setFilter] = useState("all");
   const [sortOrder, setSortOrder] = useState("desc");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [characterCount, setCharacterCount] = useState(0);
-
+  const [characterCount, setCharacterCount] = useState(0);  
   const MAX_CHARS = 1000;
-
   const isManagerOrDeptHead =
     user.role === "Manager" || user.role === "Department Head";
   const isCreator = goal?.createdByEmployeeMasterId === user.empMasterId;
@@ -37,11 +35,9 @@ const GoalComments = ({
     (a) => a.employeeMasterId === user.empMasterId
   );
   const isTeamGoal = goal?.goalType === "team";
-
   const isDeptHeadMonitoring =
     isManagerOrDeptHead && isTeamGoal && !isCreator && !isAssignee;
   const effectiveCanComment = canComment || isDeptHeadMonitoring;
-
   useEffect(() => {
     loadComments();
   }, [goalId]);
@@ -60,7 +56,7 @@ const GoalComments = ({
     } finally {
       setLoading(false);
     }
-  };
+  };          
 
   const handleCommentChange = (e) => {
     const value = e.target.value;
