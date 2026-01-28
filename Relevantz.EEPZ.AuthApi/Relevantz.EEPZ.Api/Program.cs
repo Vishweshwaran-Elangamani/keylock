@@ -17,6 +17,11 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Relevantz.EEPZ.Api.Middleware;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Relevantz.EEPZ.Core.Mapping;
+using Mapster;
+using MapsterMapper;
+using System.Reflection;
+
 var builder = WebApplication.CreateBuilder(args);
 // Configure Serilog with structured logging
 Log.Logger = new LoggerConfiguration()
@@ -184,6 +189,13 @@ builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IChangeRequestService, ChangeRequestService>();
 builder.Services.AddScoped<IBulkOperationService, BulkOperationService>();
 builder.Services.AddScoped<IExportService, ExportService>();
+builder.Services.AddScoped<IAddressRepository, AddressRepository>();
+
+
+MappingConfig.RegisterMappings(); // Call our configuration
+builder.Services.AddSingleton(TypeAdapterConfig.GlobalSettings);
+builder.Services.AddScoped<IMapper, ServiceMapper>();
+
 Log.Information("Services registered successfully");
 // Configure CORS with environment-specific policies
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins")

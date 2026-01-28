@@ -42,5 +42,12 @@ namespace Relevantz.EEPZ.Common.Constants
         // Statistics Messages
         public const string TotalDepartmentsCount = "Total departments: {0}";
         public const string ActiveDepartmentsCount = "Active departments: {0}";
+        // Missing messages
+public const string DepartmentNotFound = "Department not found";
+public const string DepartmentCodeExists = "Department code already exists";
+public const string CannotBeOwnParent = "Department cannot be its own parent";
+public const string CannotDeleteWithChildren = "Cannot delete department with child departments. Please delete or reassign child departments first.";
+public const string CannotDeleteWithEmployees = "Cannot delete department with assigned employees. Please reassign employees first.";
+
     }
 }

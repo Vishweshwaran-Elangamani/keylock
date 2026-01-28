@@ -15,28 +15,43 @@ namespace Relevantz.EEPZ.Data.Repository
             _context = context;
         }
 
+        // Include for navigation properties
         public async Task<Department?> GetByIdAsync(int departmentId)
         {
-            return await _context.Departments.FindAsync(departmentId);
+            return await _context.Departments
+                .Include(d => d.ParentDepartment)
+                .Include(d => d.HodEmployee)
+                    .ThenInclude(e => e.Userprofile) 
+                .FirstOrDefaultAsync(d => d.DepartmentId == departmentId);
         }
 
+        // Include for navigation properties
         public async Task<Department?> GetByNameAsync(string departmentName)
         {
             return await _context.Departments
+                .Include(d => d.ParentDepartment)
+                .Include(d => d.HodEmployee)
+                    .ThenInclude(e => e.Userprofile) 
                 .FirstOrDefaultAsync(d => d.DepartmentName == departmentName);
         }
 
+        // Include for navigation properties
         public async Task<Department?> GetByCodeAsync(string departmentCode)
         {
             return await _context.Departments
+                .Include(d => d.ParentDepartment)
+                .Include(d => d.HodEmployee)
+                    .ThenInclude(e => e.Userprofile) 
                 .FirstOrDefaultAsync(d => d.DepartmentCode == departmentCode);
         }
 
+        // ThenInclude for Userprofile
         public async Task<List<Department>> GetAllAsync()
         {
             return await _context.Departments
                 .Include(d => d.ParentDepartment)
                 .Include(d => d.HodEmployee)
+                    .ThenInclude(e => e.Userprofile) 
                 .OrderBy(d => d.DepartmentName)
                 .ToListAsync();
         }
@@ -93,10 +108,13 @@ namespace Relevantz.EEPZ.Data.Repository
                 .AnyAsync(e => e.DepartmentId == departmentId);
         }
 
+        // ThenInclude for Userprofile
         public async Task<List<Department>> GetChildDepartmentsAsync(int parentDepartmentId)
         {
             return await _context.Departments
+                .Include(d => d.ParentDepartment)
                 .Include(d => d.HodEmployee)
+                    .ThenInclude(e => e.Userprofile) 
                 .Where(d => d.ParentDepartmentId == parentDepartmentId)
                 .OrderBy(d => d.DepartmentName)
                 .ToListAsync();
@@ -117,29 +135,37 @@ namespace Relevantz.EEPZ.Data.Repository
             return allChildren;
         }
 
+        // Include for HodEmployee navigation
         public async Task<Department?> GetParentDepartmentAsync(int departmentId)
         {
             var department = await _context.Departments
                 .Include(d => d.ParentDepartment)
+                    .ThenInclude(p => p.HodEmployee)
+                        .ThenInclude(e => e.Userprofile) 
                 .FirstOrDefaultAsync(d => d.DepartmentId == departmentId);
 
             return department?.ParentDepartment;
         }
 
+        // ThenInclude for Userprofile
         public async Task<List<Department>> GetRootDepartmentsAsync()
         {
             return await _context.Departments
                 .Include(d => d.HodEmployee)
+                    .ThenInclude(e => e.Userprofile)
                 .Where(d => d.ParentDepartmentId == null)
                 .OrderBy(d => d.DepartmentName)
                 .ToListAsync();
         }
 
+        // ThenInclude for Userprofile
         public async Task<List<Department>> GetDepartmentHierarchyAsync(int departmentId)
         {
             var hierarchy = new List<Department>();
             var currentDepartment = await _context.Departments
                 .Include(d => d.ParentDepartment)
+                .Include(d => d.HodEmployee)
+                    .ThenInclude(e => e.Userprofile) 
                 .FirstOrDefaultAsync(d => d.DepartmentId == departmentId);
 
             while (currentDepartment != null)
@@ -150,6 +176,8 @@ namespace Relevantz.EEPZ.Data.Repository
 
                 currentDepartment = await _context.Departments
                     .Include(d => d.ParentDepartment)
+                    .Include(d => d.HodEmployee)
+                        .ThenInclude(e => e.Userprofile) 
                     .FirstOrDefaultAsync(d => d.DepartmentId == currentDepartment.ParentDepartmentId);
             }
 
@@ -179,11 +207,13 @@ namespace Relevantz.EEPZ.Data.Repository
             return level;
         }
 
+        // ThenInclude for Userprofile
         public async Task<List<Department>> GetDepartmentsByHodAsync(int hodEmployeeId)
         {
             return await _context.Departments
                 .Include(d => d.ParentDepartment)
                 .Include(d => d.HodEmployee)
+                    .ThenInclude(e => e.Userprofile) 
                 .Where(d => d.HodEmployeeId == hodEmployeeId)
                 .OrderBy(d => d.DepartmentName)
                 .ToListAsync();
@@ -195,51 +225,64 @@ namespace Relevantz.EEPZ.Data.Repository
                 .AnyAsync(d => d.HodEmployeeId == employeeId);
         }
 
+        // ThenInclude for Userprofile
         public async Task<List<Department>> GetActiveDepartmentsAsync()
         {
             return await _context.Departments
                 .Include(d => d.ParentDepartment)
                 .Include(d => d.HodEmployee)
+                    .ThenInclude(e => e.Userprofile) 
                 .Where(d => d.Status == DepartmentConstants.DepartmentStatus.Active)
                 .OrderBy(d => d.DepartmentName)
                 .ToListAsync();
         }
 
+        // ThenInclude for Userprofile
         public async Task<List<Department>> GetInactiveDepartmentsAsync()
         {
             return await _context.Departments
                 .Include(d => d.ParentDepartment)
                 .Include(d => d.HodEmployee)
+                    .ThenInclude(e => e.Userprofile)  
                 .Where(d => d.Status == DepartmentConstants.DepartmentStatus.Inactive)
                 .OrderBy(d => d.DepartmentName)
                 .ToListAsync();
         }
 
+        // ThenInclude for Userprofile
         public async Task<List<Department>> GetDepartmentsByStatusAsync(string status)
         {
             return await _context.Departments
                 .Include(d => d.ParentDepartment)
                 .Include(d => d.HodEmployee)
+                    .ThenInclude(e => e.Userprofile) 
                 .Where(d => d.Status == status)
                 .OrderBy(d => d.DepartmentName)
                 .ToListAsync();
         }
 
+        // ThenInclude for Userprofile to all includes
         public async Task<Department?> GetDepartmentWithDetailsAsync(int departmentId)
         {
             return await _context.Departments
                 .Include(d => d.ParentDepartment)
+                    .ThenInclude(p => p.HodEmployee)
+                        .ThenInclude(e => e.Userprofile)  
                 .Include(d => d.HodEmployee)
+                    .ThenInclude(e => e.Userprofile)  
                 .Include(d => d.InverseParentDepartment)
                     .ThenInclude(child => child.HodEmployee)
+                        .ThenInclude(e => e.Userprofile)  
                 .FirstOrDefaultAsync(d => d.DepartmentId == departmentId);
         }
 
+        // ThenInclude for Userprofile
         public async Task<List<Department>> SearchDepartmentsAsync(string searchTerm)
         {
             return await _context.Departments
                 .Include(d => d.ParentDepartment)
                 .Include(d => d.HodEmployee)
+                    .ThenInclude(e => e.Userprofile)  
                 .Where(d => d.DepartmentName.Contains(searchTerm) ||
                            d.DepartmentCode.Contains(searchTerm) ||
                            (d.Description != null && d.Description.Contains(searchTerm)))

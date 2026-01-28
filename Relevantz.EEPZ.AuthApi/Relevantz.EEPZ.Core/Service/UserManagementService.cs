@@ -1,119 +1,102 @@
 using Relevantz.EEPZ.Common.Entities;
-using Relevantz.EEPZ.Common.DTOs.Request;
-using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Data.IRepository;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Common.Utils;
+using Relevantz.EEPZ.Common.DTOs.Request;
+using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Common.Constants;
+using MapsterMapper;
+
 namespace Relevantz.EEPZ.Core.Service
 {
     public class UserManagementService : IUserManagementService
     {
-        private readonly IEmployeeRepository _employeeRepository;
         private readonly IUserAuthenticationRepository _userAuthRepository;
+        private readonly IEmployeeRepository _employeeRepository;
         private readonly IUserProfileRepository _userProfileRepository;
         private readonly IEmployeeDetailsMasterRepository _employeeDetailsRepository;
+        private readonly IRoleRepository _roleRepository;
+        private readonly IDepartmentRepository _departmentRepository;
         private readonly IPasswordService _passwordService;
         private readonly IEmailService _emailService;
+        private readonly IMapper _mapper;
+
         public UserManagementService(
-            IEmployeeRepository employeeRepository,
             IUserAuthenticationRepository userAuthRepository,
+            IEmployeeRepository employeeRepository,
             IUserProfileRepository userProfileRepository,
             IEmployeeDetailsMasterRepository employeeDetailsRepository,
+            IRoleRepository roleRepository,
+            IDepartmentRepository departmentRepository,
             IPasswordService passwordService,
-            IEmailService emailService)
+            IEmailService emailService,
+            IMapper mapper)
         {
-            _employeeRepository = employeeRepository;
             _userAuthRepository = userAuthRepository;
+            _employeeRepository = employeeRepository;
             _userProfileRepository = userProfileRepository;
             _employeeDetailsRepository = employeeDetailsRepository;
+            _roleRepository = roleRepository;
+            _departmentRepository = departmentRepository;
             _passwordService = passwordService;
             _emailService = emailService;
+            _mapper = mapper;
         }
+
         public async Task<UserResponseDto> CreateUserAsync(CreateUserRequestDto request, int createdByUserId)
         {
-            if (await _userAuthRepository.EmailExistsAsync(request.Email))
+            // Validate email uniqueness
+            var existingUser = await _userAuthRepository.GetByEmailAsync(request.Email);
+            if (existingUser != null)
             {
-                throw new InvalidOperationException(Constants.Messages.EmailAlreadyExists);
+                throw new InvalidOperationException(UserManagementConstants.Messages.EmailAlreadyExists);
             }
-            if (string.IsNullOrWhiteSpace(request.EmployeeCompanyId))
+
+            // Validate EmployeeCompanyId uniqueness
+            var existingEmployee = await _employeeRepository.GetByEmployeeCompanyIdAsync(request.EmployeeCompanyId);
+            if (existingEmployee != null)
             {
-                request.EmployeeCompanyId = await _employeeRepository.GetNextEmployeeCompanyIdAsync();
-                EEPZBusinessLog.Information($"Auto-generated Employee Company ID: {request.EmployeeCompanyId}");
+                throw new InvalidOperationException(UserManagementConstants.Messages.EmployeeCompanyIdExists);
             }
-            else
+
+            // Validate Role exists
+            var role = await _roleRepository.GetByIdAsync(request.RoleId);
+            if (role == null)
             {
-                if (await _employeeRepository.EmployeeCompanyIdExistsAsync(request.EmployeeCompanyId))
-                {
-                    throw new InvalidOperationException(Constants.Messages.EmployeeIdAlreadyExists);
-                }
+                throw new KeyNotFoundException(UserManagementConstants.Messages.RoleNotFound);
             }
-            var cleanedMobileNumber = request.MobileNumber;
-            if (!string.IsNullOrWhiteSpace(cleanedMobileNumber))
+
+            // Validate Department exists
+            var department = await _departmentRepository.GetByIdAsync(request.DepartmentId);
+            if (department == null)
             {
-                cleanedMobileNumber = cleanedMobileNumber
-                    .Replace(UserManagementConstants.Prefixes.CountryCodeIndiaWithDash, UserManagementConstants.Separators.EmptyString)
-                    .Replace(UserManagementConstants.Prefixes.CountryCodeIndia, UserManagementConstants.Separators.EmptyString)
-                    .Replace(UserManagementConstants.Separators.Dash, UserManagementConstants.Separators.EmptyString)
-                    .Replace(UserManagementConstants.Separators.Space, UserManagementConstants.Separators.EmptyString)
-                    .Trim();
+                throw new KeyNotFoundException(UserManagementConstants.Messages.DepartmentNotFound);
             }
-            var cleanedAlternateNumber = request.AlternateNumber;
-            if (!string.IsNullOrWhiteSpace(cleanedAlternateNumber))
-            {
-                cleanedAlternateNumber = cleanedAlternateNumber
-                    .Replace(UserManagementConstants.Prefixes.CountryCodeIndiaWithDash, UserManagementConstants.Separators.EmptyString)
-                    .Replace(UserManagementConstants.Prefixes.CountryCodeIndia, UserManagementConstants.Separators.EmptyString)
-                    .Replace(UserManagementConstants.Separators.Dash, UserManagementConstants.Separators.EmptyString)
-                    .Replace(UserManagementConstants.Separators.Space, UserManagementConstants.Separators.EmptyString)
-                    .Trim();
-            }
-            var employee = new Employee
-            {
-                EmployeeCompanyId = request.EmployeeCompanyId,
-                EmploymentType = request.EmploymentType,
-                EmploymentStatus = request.EmploymentStatus,
-                JoiningDate = request.JoiningDate,
-                ConfirmationDate = request.ConfirmationDate,
-                ReportingManagerEmployeeId = request.ReportingManagerEmployeeId,
-                WorkLocation = request.WorkLocation,
-                EmployeeType = request.EmployeeType,
-                NoticePeriodDays = request.NoticePeriodDays,
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow,
-                CreatedByUserId = createdByUserId
-            };
+
+            // Use Mapster to create Employee from Request
+            var employee = _mapper.Map<Employee>(request);
+            employee.CreatedByUserId = createdByUserId;
             await _employeeRepository.CreateAsync(employee);
+
+            // Create UserProfile using Mapster
+            var userProfile = _mapper.Map<Userprofile>(request);
+            userProfile.EmployeeId = employee.EmployeeId;
+            await _userProfileRepository.CreateAsync(userProfile);
+
+            // Create UserAuthentication
             var temporaryPassword = _passwordService.GenerateTemporaryPassword();
-            var hashedPassword = _passwordService.HashPassword(temporaryPassword);
-            Console.WriteLine($"Generated Temp Password: {temporaryPassword}");
-            Console.WriteLine($"Hashed Password Length: {hashedPassword.Length}");
             var userAuth = new Userauthentication
             {
                 EmployeeId = employee.EmployeeId,
                 Email = request.Email,
-                PasswordHash = hashedPassword,
+                PasswordHash = _passwordService.HashPassword(temporaryPassword),
                 Status = Constants.UserStatuses.Active,
                 IsFirstLogin = true,
                 CreatedAt = DateTime.UtcNow
             };
             await _userAuthRepository.CreateAsync(userAuth);
-            var userProfile = new Userprofile
-            {
-                EmployeeId = employee.EmployeeId,
-                FirstName = request.FirstName,
-                MiddleName = request.MiddleName,
-                LastName = request.LastName,
-                CallingName = request.CallingName,
-                ReferredBy = request.ReferredBy,
-                Gender = request.Gender,
-                DateOfBirthOfficial = request.DateOfBirthOfficial,
-                DateOfBirthActual = request.DateOfBirthActual,
-                MobileNumber = cleanedMobileNumber,
-                AlternateNumber = cleanedAlternateNumber,
-                PersonalEmail = request.PersonalEmail
-            };
-            await _userProfileRepository.CreateAsync(userProfile);
+
+            // Create EmployeeDetailsMaster
             var employeeDetails = new Employeedetailsmaster
             {
                 EmployeeId = employee.EmployeeId,
@@ -121,210 +104,177 @@ namespace Relevantz.EEPZ.Core.Service
                 DepartmentId = request.DepartmentId
             };
             await _employeeDetailsRepository.CreateAsync(employeeDetails);
+
+            // Send welcome email
             await _emailService.SendWelcomeEmailAsync(request.Email, request.FirstName, temporaryPassword);
-            EEPZBusinessLog.Information($"User created successfully: {request.Email} with Employee ID: {request.EmployeeCompanyId}");
+
+            EEPZBusinessLog.Information($"User created successfully: {request.Email} (EmployeeCompanyId: {request.EmployeeCompanyId})");
+
+            // Get the complete user data for response using Mapster
             var createdUser = await _userAuthRepository.GetByIdAsync(userAuth.UserId);
-            var profile = createdUser!.Employee?.Userprofile;
-            var empDetails = createdUser.Employee?.Employeedetailsmasters?.FirstOrDefault();
-            var userResponse = new UserResponseDto
-            {
-                UserId = createdUser.UserId,
-                EmployeeId = createdUser.EmployeeId,
-                EmployeeCompanyId = createdUser.Employee?.EmployeeCompanyId ?? string.Empty,
-                Email = createdUser.Email,
-                Status = createdUser.Status,
-                IsFirstLogin = createdUser.IsFirstLogin ?? false,
-                LastLoginAt = createdUser.LastLoginAt,
-                EmploymentType = createdUser.Employee?.EmploymentType ?? string.Empty,
-                EmploymentStatus = createdUser.Employee?.EmploymentStatus ?? string.Empty,
-                JoiningDate = createdUser.Employee?.JoiningDate ?? DateOnly.MinValue,
-                ConfirmationDate = createdUser.Employee?.ConfirmationDate,
-                ExitDate = createdUser.Employee?.ExitDate,
-                WorkLocation = createdUser.Employee?.WorkLocation,
-                EmployeeType = createdUser.Employee?.EmployeeType ?? string.Empty,
-                NoticePeriodDays = createdUser.Employee?.NoticePeriodDays ?? 0,
-                IsActive = createdUser.Employee?.IsActive ?? false,
-                FirstName = profile?.FirstName ?? string.Empty,
-                MiddleName = profile?.MiddleName,
-                LastName = profile?.LastName ?? string.Empty,
-                CallingName = profile?.CallingName,
-                Gender = profile?.Gender,
-                DateOfBirthOfficial = profile?.DateOfBirthOfficial,
-                MobileNumber = profile?.MobileNumber,
-                PersonalEmail = profile?.PersonalEmail,
-                RoleName = empDetails?.Role?.RoleName,
-                DepartmentName = empDetails?.Department?.DepartmentName
-            };
-            return userResponse;
+            return _mapper.Map<UserResponseDto>(createdUser);
         }
+
         public async Task<UserResponseDto> UpdateUserAsync(UpdateUserRequestDto request, int updatedByUserId)
         {
             var user = await _userAuthRepository.GetByIdAsync(request.UserId);
             if (user == null)
             {
-                throw new KeyNotFoundException($"User with ID {request.UserId} not found");
+                throw new KeyNotFoundException(UserManagementConstants.Messages.UserNotFound);
             }
-            var employee = user.Employee;
-            if (request.EmploymentType != null) employee.EmploymentType = request.EmploymentType;
-            if (request.EmploymentStatus != null) employee.EmploymentStatus = request.EmploymentStatus;
-            if (request.ReportingManagerEmployeeId.HasValue) employee.ReportingManagerEmployeeId = request.ReportingManagerEmployeeId;
-            if (request.WorkLocation != null) employee.WorkLocation = request.WorkLocation;
-            if (request.EmployeeType != null) employee.EmployeeType = request.EmployeeType;
-            if (request.NoticePeriodDays.HasValue) employee.NoticePeriodDays = request.NoticePeriodDays.Value;
-            if (request.IsActive.HasValue) employee.IsActive = request.IsActive.Value;
+
+            var employee = await _employeeRepository.GetByIdAsync(user.EmployeeId);
+            if (employee == null)
+            {
+                throw new KeyNotFoundException(UserManagementConstants.Messages.EmployeeNotFound);
+            }
+
+            // Update employee fields
+            if (!string.IsNullOrWhiteSpace(request.EmploymentType))
+                employee.EmploymentType = request.EmploymentType;
+
+            if (!string.IsNullOrWhiteSpace(request.EmploymentStatus))
+                employee.EmploymentStatus = request.EmploymentStatus;
+
+            if (request.ConfirmationDate.HasValue)
+                employee.ConfirmationDate = DateOnly.FromDateTime(request.ConfirmationDate.Value);
+
+            if (request.ExitDate.HasValue)
+                employee.ExitDate = DateOnly.FromDateTime(request.ExitDate.Value);
+
+            if (request.ReportingManagerEmployeeId.HasValue)
+                employee.ReportingManagerEmployeeId = request.ReportingManagerEmployeeId.Value;
+
+            if (!string.IsNullOrWhiteSpace(request.WorkLocation))
+                employee.WorkLocation = request.WorkLocation;
+
+            if (!string.IsNullOrWhiteSpace(request.EmployeeType))
+                employee.EmployeeType = request.EmployeeType;
+
+            if (request.NoticePeriodDays.HasValue)
+                employee.NoticePeriodDays = request.NoticePeriodDays.Value;
+
+            if (request.IsActive.HasValue)
+                employee.IsActive = request.IsActive.Value;
+
+            employee.UpdatedAt = DateTime.UtcNow;
             employee.UpdatedByUserId = updatedByUserId;
             await _employeeRepository.UpdateAsync(employee);
-            if (request.Status != null)
+
+            // Update user authentication status
+            if (!string.IsNullOrWhiteSpace(request.Status))
             {
                 user.Status = request.Status;
+                user.UpdatedAt = DateTime.UtcNow;
                 await _userAuthRepository.UpdateAsync(user);
             }
+
             EEPZBusinessLog.Information($"User updated successfully: UserId {request.UserId}");
+
+            // Get updated user data using Mapster
             var updatedUser = await _userAuthRepository.GetByIdAsync(request.UserId);
-            var profile = updatedUser!.Employee?.Userprofile;
-            var empDetails = updatedUser.Employee?.Employeedetailsmasters?.FirstOrDefault();
-            var userResponse = new UserResponseDto
-            {
-                UserId = updatedUser.UserId,
-                EmployeeId = updatedUser.EmployeeId,
-                EmployeeCompanyId = updatedUser.Employee?.EmployeeCompanyId ?? string.Empty,
-                Email = updatedUser.Email,
-                Status = updatedUser.Status,
-                IsFirstLogin = updatedUser.IsFirstLogin ?? false,
-                LastLoginAt = updatedUser.LastLoginAt,
-                EmploymentType = updatedUser.Employee?.EmploymentType ?? string.Empty,
-                EmploymentStatus = updatedUser.Employee?.EmploymentStatus ?? string.Empty,
-                JoiningDate = updatedUser.Employee?.JoiningDate ?? DateOnly.MinValue,
-                ConfirmationDate = updatedUser.Employee?.ConfirmationDate,
-                ExitDate = updatedUser.Employee?.ExitDate,
-                WorkLocation = updatedUser.Employee?.WorkLocation,
-                EmployeeType = updatedUser.Employee?.EmployeeType ?? string.Empty,
-                NoticePeriodDays = updatedUser.Employee?.NoticePeriodDays ?? 0,
-                IsActive = updatedUser.Employee?.IsActive ?? false,
-                FirstName = profile?.FirstName ?? string.Empty,
-                MiddleName = profile?.MiddleName,
-                LastName = profile?.LastName ?? string.Empty,
-                CallingName = profile?.CallingName,
-                Gender = profile?.Gender,
-                DateOfBirthOfficial = profile?.DateOfBirthOfficial,
-                MobileNumber = profile?.MobileNumber,
-                PersonalEmail = profile?.PersonalEmail,
-                RoleName = empDetails?.Role?.RoleName,
-                DepartmentName = empDetails?.Department?.DepartmentName
-            };
-            return userResponse;
+            return _mapper.Map<UserResponseDto>(updatedUser);
         }
+
         public async Task<UserResponseDto> GetUserByIdAsync(int userId)
         {
             var user = await _userAuthRepository.GetByIdAsync(userId);
             if (user == null)
             {
-                throw new KeyNotFoundException($"User with ID {userId} not found");
+                throw new KeyNotFoundException(UserManagementConstants.Messages.UserNotFound);
             }
-            var profile = user.Employee?.Userprofile;
-            var empDetails = user.Employee?.Employeedetailsmasters?.FirstOrDefault();
-            var userResponse = new UserResponseDto
-            {
-                UserId = user.UserId,
-                EmployeeId = user.EmployeeId,
-                EmployeeCompanyId = user.Employee?.EmployeeCompanyId ?? string.Empty,
-                Email = user.Email,
-                Status = user.Status,
-                IsFirstLogin = user.IsFirstLogin ?? false,
-                LastLoginAt = user.LastLoginAt,
-                EmploymentType = user.Employee?.EmploymentType ?? string.Empty,
-                EmploymentStatus = user.Employee?.EmploymentStatus ?? string.Empty,
-                JoiningDate = user.Employee?.JoiningDate ?? DateOnly.MinValue,
-                ConfirmationDate = user.Employee?.ConfirmationDate,
-                ExitDate = user.Employee?.ExitDate,
-                WorkLocation = user.Employee?.WorkLocation,
-                EmployeeType = user.Employee?.EmployeeType ?? string.Empty,
-                NoticePeriodDays = user.Employee?.NoticePeriodDays ?? 0,
-                IsActive = user.Employee?.IsActive ?? false,
-                FirstName = profile?.FirstName ?? string.Empty,
-                MiddleName = profile?.MiddleName,
-                LastName = profile?.LastName ?? string.Empty,
-                CallingName = profile?.CallingName,
-                Gender = profile?.Gender,
-                DateOfBirthOfficial = profile?.DateOfBirthOfficial,
-                MobileNumber = profile?.MobileNumber,
-                PersonalEmail = profile?.PersonalEmail,
-                RoleName = empDetails?.Role?.RoleName,
-                DepartmentName = empDetails?.Department?.DepartmentName
-            };
-            return userResponse;
+
+            // Use Mapster for mapping
+            return _mapper.Map<UserResponseDto>(user);
         }
+
         public async Task<List<UserResponseDto>> GetAllUsersAsync()
         {
             var users = await _userAuthRepository.GetAllAsync();
-            var userResponses = users.Select(user =>
-            {
-                var profile = user.Employee?.Userprofile;
-                var empDetails = user.Employee?.Employeedetailsmasters?.FirstOrDefault();
-                return new UserResponseDto
-                {
-                    UserId = user.UserId,
-                    EmployeeId = user.EmployeeId,
-                    EmployeeCompanyId = user.Employee?.EmployeeCompanyId ?? string.Empty,
-                    Email = user.Email,
-                    Status = user.Status,
-                    IsFirstLogin = user.IsFirstLogin ?? false,
-                    LastLoginAt = user.LastLoginAt,
-                    EmploymentType = user.Employee?.EmploymentType ?? string.Empty,
-                    EmploymentStatus = user.Employee?.EmploymentStatus ?? string.Empty,
-                    JoiningDate = user.Employee?.JoiningDate ?? DateOnly.MinValue,
-                    ConfirmationDate = user.Employee?.ConfirmationDate,
-                    ExitDate = user.Employee?.ExitDate,
-                    WorkLocation = user.Employee?.WorkLocation,
-                    EmployeeType = user.Employee?.EmployeeType ?? string.Empty,
-                    NoticePeriodDays = user.Employee?.NoticePeriodDays ?? 0,
-                    IsActive = user.Employee?.IsActive ?? false,
-                    FirstName = profile?.FirstName ?? string.Empty,
-                    MiddleName = profile?.MiddleName,
-                    LastName = profile?.LastName ?? string.Empty,
-                    CallingName = profile?.CallingName,
-                    Gender = profile?.Gender,
-                    DateOfBirthOfficial = profile?.DateOfBirthOfficial,
-                    MobileNumber = profile?.MobileNumber,
-                    PersonalEmail = profile?.PersonalEmail,
-                    RoleName = empDetails?.Role?.RoleName,
-                    DepartmentName = empDetails?.Department?.DepartmentName
-                };
-            }).ToList();
-            return userResponses;
+            // Use Mapster for mapping list
+            return _mapper.Map<List<UserResponseDto>>(users);
         }
+
         public async Task DeactivateUserAsync(int userId)
         {
             var user = await _userAuthRepository.GetByIdAsync(userId);
             if (user == null)
             {
-                throw new KeyNotFoundException($"User with ID {userId} not found");
+                throw new KeyNotFoundException(UserManagementConstants.Messages.UserNotFound);
             }
+
+            // Prevent deactivation of protected employee (1000)
+            var employeeCompanyId = user.Employee?.EmployeeCompanyId;
+            if (!string.IsNullOrEmpty(employeeCompanyId) && employeeCompanyId == "1000")
+            {
+                throw new InvalidOperationException(UserManagementConstants.Messages.CannotDeactivateProtectedUser);
+            }
+
             user.Status = Constants.UserStatuses.Inactive;
-            user.Employee.IsActive = false;
+            user.UpdatedAt = DateTime.UtcNow;
             await _userAuthRepository.UpdateAsync(user);
+
+            var employee = await _employeeRepository.GetByIdAsync(user.EmployeeId);
+            if (employee != null)
+            {
+                employee.IsActive = false;
+                employee.UpdatedAt = DateTime.UtcNow;
+                await _employeeRepository.UpdateAsync(employee);
+            }
+
             EEPZBusinessLog.Information($"User deactivated: UserId {userId}");
         }
+
         public async Task ActivateUserAsync(int userId)
         {
             var user = await _userAuthRepository.GetByIdAsync(userId);
             if (user == null)
             {
-                throw new KeyNotFoundException($"User with ID {userId} not found");
+                throw new KeyNotFoundException(UserManagementConstants.Messages.UserNotFound);
             }
+
             user.Status = Constants.UserStatuses.Active;
-            user.Employee.IsActive = true;
+            user.UpdatedAt = DateTime.UtcNow;
             await _userAuthRepository.UpdateAsync(user);
+
+            var employee = await _employeeRepository.GetByIdAsync(user.EmployeeId);
+            if (employee != null)
+            {
+                employee.IsActive = true;
+                employee.UpdatedAt = DateTime.UtcNow;
+                await _employeeRepository.UpdateAsync(employee);
+            }
+
             EEPZBusinessLog.Information($"User activated: UserId {userId}");
         }
+
         public async Task AssignRoleAndDepartmentAsync(AssignRoleDepartmentRequestDto request)
         {
-            var existingDetails = await _employeeDetailsRepository.GetByEmployeeIdAsync(request.EmployeeId);
-            if (existingDetails != null)
+            var employee = await _employeeRepository.GetByIdAsync(request.EmployeeId);
+            if (employee == null)
             {
-                existingDetails.RoleId = request.RoleId;
-                existingDetails.DepartmentId = request.DepartmentId;
-                await _employeeDetailsRepository.UpdateAsync(existingDetails);
+                throw new KeyNotFoundException(UserManagementConstants.Messages.EmployeeNotFound);
+            }
+
+            var role = await _roleRepository.GetByIdAsync(request.RoleId);
+            if (role == null)
+            {
+                throw new KeyNotFoundException(UserManagementConstants.Messages.RoleNotFound);
+            }
+
+            var department = await _departmentRepository.GetByIdAsync(request.DepartmentId);
+            if (department == null)
+            {
+                throw new KeyNotFoundException(UserManagementConstants.Messages.DepartmentNotFound);
+            }
+
+            var employeeDetails = await _employeeDetailsRepository.GetByEmployeeIdAsync(request.EmployeeId);
+
+            if (employeeDetails != null)
+            {
+                employeeDetails.RoleId = request.RoleId;
+                employeeDetails.DepartmentId = request.DepartmentId;
+                await _employeeDetailsRepository.UpdateAsync(employeeDetails);
             }
             else
             {
@@ -336,62 +286,30 @@ namespace Relevantz.EEPZ.Core.Service
                 };
                 await _employeeDetailsRepository.CreateAsync(newDetails);
             }
-            EEPZBusinessLog.Information($"Role and Department assigned to EmployeeId: {request.EmployeeId}");
+
+            EEPZBusinessLog.Information($"Role and Department assigned: EmployeeId {request.EmployeeId}, RoleId {request.RoleId}, DepartmentId {request.DepartmentId}");
         }
+
         public async Task<List<UserResponseDto>> GetEmployeesByManagerAsync(int managerId)
         {
-            var manager = await _employeeRepository.GetByIdAsync(managerId);
-            if (manager == null)
+            var employees = await _employeeRepository.GetByReportingManagerAsync(managerId);
+
+            var userIds = employees.Select(e => e.EmployeeId).ToList();
+            var users = new List<Userauthentication>();
+
+            foreach (var employeeId in userIds)
             {
-                throw new KeyNotFoundException($"Manager with ID {managerId} not found");
-            }
-            var allEmployees = await _employeeRepository.GetAllAsync();
-            var reportingEmployees = allEmployees
-                .Where(e => e.ReportingManagerEmployeeId == manager.EmployeeId && e.IsActive == true)
-                .ToList();
-            var userResponses = new List<UserResponseDto>();
-            foreach (var employee in reportingEmployees)
-            {
-                var userAuth = await _userAuthRepository.GetByEmployeeIdAsync(employee.EmployeeId);
-                if (userAuth != null)
+                var user = await _userAuthRepository.GetByEmployeeIdAsync(employeeId);
+                if (user != null)
                 {
-                    var profile = userAuth.Employee?.Userprofile;
-                    var empDetails = userAuth.Employee?.Employeedetailsmasters?.FirstOrDefault();
-                    var userResponse = new UserResponseDto
-                    {
-                        UserId = userAuth.UserId,
-                        EmployeeId = userAuth.EmployeeId,
-                        EmployeeCompanyId = userAuth.Employee?.EmployeeCompanyId ?? string.Empty,
-                        Email = userAuth.Email,
-                        Status = userAuth.Status,
-                        IsFirstLogin = userAuth.IsFirstLogin ?? false,
-                        LastLoginAt = userAuth.LastLoginAt,
-                        EmploymentType = userAuth.Employee?.EmploymentType ?? string.Empty,
-                        EmploymentStatus = userAuth.Employee?.EmploymentStatus ?? string.Empty,
-                        JoiningDate = userAuth.Employee?.JoiningDate ?? DateOnly.MinValue,
-                        ConfirmationDate = userAuth.Employee?.ConfirmationDate,
-                        ExitDate = userAuth.Employee?.ExitDate,
-                        WorkLocation = userAuth.Employee?.WorkLocation,
-                        EmployeeType = userAuth.Employee?.EmployeeType ?? string.Empty,
-                        NoticePeriodDays = userAuth.Employee?.NoticePeriodDays ?? 0,
-                        IsActive = userAuth.Employee?.IsActive ?? false,
-                        FirstName = profile?.FirstName ?? string.Empty,
-                        MiddleName = profile?.MiddleName,
-                        LastName = profile?.LastName ?? string.Empty,
-                        CallingName = profile?.CallingName,
-                        Gender = profile?.Gender,
-                        DateOfBirthOfficial = profile?.DateOfBirthOfficial,
-                        MobileNumber = profile?.MobileNumber,
-                        PersonalEmail = profile?.PersonalEmail,
-                        RoleName = empDetails?.Role?.RoleName,
-                        DepartmentName = empDetails?.Department?.DepartmentName
-                    };
-                    userResponses.Add(userResponse);
+                    users.Add(user);
                 }
             }
-            EEPZBusinessLog.Information($"Retrieved {userResponses.Count} employees for manager: {managerId}");
-            return userResponses;
+
+            // Use Mapster for mapping list
+            return _mapper.Map<List<UserResponseDto>>(users);
         }
+
         public async Task<string> GetNextEmployeeCompanyIdAsync()
         {
             return await _employeeRepository.GetNextEmployeeCompanyIdAsync();

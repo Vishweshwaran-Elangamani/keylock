@@ -27,5 +27,9 @@ namespace Relevantz.EEPZ.Common.Constants
         // Authorization Messages
         public const string UnauthorizedToCancel = "You are not authorized to cancel this request";
         public const string OnlyPendingCanBeCancelled = "Only pending requests can be cancelled";
+        public const string AlreadyProcessed = "Change request has already been processed";
+        public const string InvalidStatusValue = "Invalid status value. Must be 'Approved' or 'Rejected'";
+        public const string NewEmailMissing = "New email is missing from change request";
+        public const string NewEmployeeCompanyIdMissing = "New Employee Company ID is missing from change request";
     }
 }

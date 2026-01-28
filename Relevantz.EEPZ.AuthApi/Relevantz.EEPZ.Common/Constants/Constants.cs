@@ -113,5 +113,10 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string Widowed = "Widowed";
             public const string PreferNotToSay = "Prefer not to say";
         }
+        public static class Statuses
+        {
+            public const string Active = "Active";
+            public const string Inactive = "Inactive";
+        }
     }
 }

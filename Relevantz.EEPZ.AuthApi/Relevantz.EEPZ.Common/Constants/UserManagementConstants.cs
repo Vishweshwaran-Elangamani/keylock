@@ -10,6 +10,13 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string UserActivatedSuccess = "User activated successfully";
             public const string RoleDepartmentAssignedSuccess = "Role and Department assigned successfully";
             public const string ManagerNotFound = "Manager not found";
+            public const string EmailAlreadyExists = "Email already exists";
+            public const string EmployeeCompanyIdExists = "Employee Company ID already exists";
+            public const string RoleNotFound = "Role not found";
+            public const string DepartmentNotFound = "Department not found";
+            public const string UserNotFound = "User not found";
+            public const string EmployeeNotFound = "Employee not found";
+            public const string CannotDeactivateProtectedUser = "Cannot deactivate protected user (Employee ID: 1000)";
         }
         public static class Prefixes
         {
