@@ -103,7 +103,6 @@ const EditOpportunityModal = ({
   }, [departments]);
   const statusOptions = [
     { label: "Active", value: "Active" },
-    { label: "Pending", value: "Pending" },
     { label: "Closed", value: "Closed" },
   ];
   const handleChange = (e) => {
