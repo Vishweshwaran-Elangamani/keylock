@@ -645,3 +645,34 @@ margin-top: -5px;
   box-shadow: 0 0 0 4px rgba(39, 35, 92, 0.06);
   transition: all 0.25s ease;
 }
+
+.managermom-view-btn {
+  background: #27235c;           
+  color: #ffffff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.managermom-view-btn:hover {
+  background: #1e1b4d;            
+  color: #ffffff;
+  transform: translateY(-2px);   
+  box-shadow: 0 4px 10px rgba(39, 35, 92, 0.25);
+}
+
+.managermom-view-btn:active {
+  transform: scale(0.97);
+}
+
+.managermom-view-btn i {
+  font-size: 0.85rem;
+}
+
