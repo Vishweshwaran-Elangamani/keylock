@@ -237,7 +237,6 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
               className={`btn-close btn-close-white ${styles.btnClose}`}
             />
           </div>
-
           <div className={styles.body}>
             {loading ? (
               <div className={styles.loading}>
@@ -274,11 +273,9 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
                         )}
                       </div>
                     </div>
-
                     <div className={styles.ratingContainer}>
                       <RatingDisplay rating={skill.rating} size="sm" />
                     </div>
-
                     {!isReadOnly && (
                       <div className={styles.actionButtons}>
                         <button
@@ -288,7 +285,6 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
                         >
                           <Edit size={14} />
                         </button>
-
                         <button
                           onClick={() => handleDeleteClick(skill)}
                           className={`${styles.actionBtn} ${styles.actionBtnDelete}`}
@@ -296,7 +292,6 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
                         >
                           <Trash2 size={14} />
                         </button>
-
                         {!skill.isSme &&
                           skill.rating < 5 &&
                           (hasPendingSmeRequest(skill.skillId) ? (
@@ -343,7 +338,6 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
               </div>
             )}
           </div>
-
           <div className={styles.footer}>
             <button
               type="button"
@@ -361,7 +355,6 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
           </div>
         </div>
       </div>
-
       {/* Child Modals */}
       {!isReadOnly && showRecordModal && (
         <RecordSkillModal

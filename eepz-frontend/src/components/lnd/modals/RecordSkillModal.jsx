@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import styles from "../../../styles/lnd/components/RecordSkillModal.module.css";
 import { LND_TOASTS } from "../../../constants/lnd/lndToasts";
 
-// Custom Dropdown Component
 const CustomDropdown = ({
   value,
   onChange,
@@ -245,7 +244,7 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
     if (rating < RATING.MIN_SME) return "#0d6efd";
     return "#198754";
   };
-  // Prepare dropdown options
+
   const employeeOptions = [
     {
       value: "",
@@ -327,7 +326,6 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                         placeholder="Select Employee"
                       />
                     </div>
-
                     <div className={styles.formField}>
                       <label
                         className={`${styles.formLabel} ${
@@ -384,7 +382,6 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                           ? styles.ratingBtnMedium
                           : styles.ratingBtnHigh
                         : styles.ratingBtn;
-
                       return (
                         <button
                           type="button"
@@ -407,7 +404,6 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                       <span className={styles.ratingScaleLabel}>Min</span>
                       <span className={styles.ratingScaleValueMin}>1</span>
                     </div>
-
                     <div className={styles.ratingScaleCenter}>
                       <span
                         className={styles.ratingBadge}
@@ -420,7 +416,6 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                         {getRatingLabel(rating)}
                       </span>
                     </div>
-
                     <div className={styles.ratingScaleMax}>
                       <span className={styles.ratingScaleLabel}>Max</span>
                       <span className={styles.ratingScaleValueMax}>10</span>
@@ -428,7 +423,6 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                   </div>
                 </div>
               </div>
-
               <div className={styles.footer}>
                 <button
                   type="button"

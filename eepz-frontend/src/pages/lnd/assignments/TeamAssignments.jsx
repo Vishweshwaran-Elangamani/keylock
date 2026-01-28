@@ -59,7 +59,7 @@ const TeamAssignments = () => {
     };
     return prefixMap[role] || "/employee";
   };
-  // Close dropdown when clicking outside
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -84,10 +84,8 @@ const TeamAssignments = () => {
   const fetchTeamAssignments = async () => {
     try {
       setLoading(true);
-      // Pass empty string to backend when overdue is selected
       const backendStatusFilter =
         statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter;
-      // UPDATED: Pass parameters as an object
       const response = await lndService.getTeamAssignments({
         pageNumber: currentPage,
         statusFilter: backendStatusFilter,
@@ -98,7 +96,6 @@ const TeamAssignments = () => {
       });
       if (response.data.success) {
         let items = response.data.data.items;
-        // Client-side filtering for overdue
         if (statusFilter === ASSIGNMENT_STATUS.OVERDUE) {
           items = items.filter((a) => a.isOverdue === true);
         }

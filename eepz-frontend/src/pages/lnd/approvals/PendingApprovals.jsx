@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 import Pagination from "../../../components/lnd/common/Pagination";
-import StatusBadge from "../../../components/lnd/common/StatusBadge";     
+import StatusBadge from "../../../components/lnd/common/StatusBadge";
 import EmptyState from "../../../components/lnd/common/EmptyState";
 import ApprovalDecisionModal from "../../../components/lnd/modals/ApprovalDecisionModal";
 import { lndService, downloadFile } from "../../../services/lnd/lndService";
@@ -63,7 +63,6 @@ const PendingApprovals = () => {
     return prefixMap[role] || "/employee";
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -105,8 +104,7 @@ const PendingApprovals = () => {
         searchTerm: searchTerm,
       });
 
-      if (response.data.success) 
-        {
+      if (response.data.success) {
         setApprovals(response.data.data.items);
         setTotalItems(response.data.data.totalCount);
         setTotalPages(response.data.data.totalPages);
@@ -249,7 +247,6 @@ const PendingApprovals = () => {
     }`.trim();
   };
 
-  // Show initial loading spinner only when no data
   if (loading && approvals.length === 0) {
     return (
       <div className={styles.loadingContainer}>

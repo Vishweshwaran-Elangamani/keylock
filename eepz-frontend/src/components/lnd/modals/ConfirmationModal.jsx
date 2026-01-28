@@ -103,10 +103,9 @@ const ConfirmationModal = ({
                 e.currentTarget.style.color = "white";
               }}
             >
-             <X size={20} />
+              <X size={20} />
             </button>
           </div>
-
           {/* Body */}
           <div style={{ padding: "1.5rem" }}>
             <p
@@ -120,7 +119,6 @@ const ConfirmationModal = ({
               {message}
             </p>
           </div>
-
           {/* Footer */}
           <div
             style={{

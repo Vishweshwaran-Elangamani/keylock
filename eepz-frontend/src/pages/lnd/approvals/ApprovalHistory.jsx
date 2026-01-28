@@ -113,8 +113,6 @@ const ApprovalHistory = () => {
   const fetchApprovalHistory = async () => {
     try {
       setLoading(true);
-
-      // UPDATED: Pass parameters as an object
       const response = await lndService.getApprovalHistory({
         pageNumber: currentPage,
         role: roleFilter,
@@ -287,7 +285,6 @@ const ApprovalHistory = () => {
     }`.trim();
   };
 
-  // Show initial loading spinner only when no data
   if (loading && approvals.length === 0) {
     return (
       <div className={styles.loadingContainer}>

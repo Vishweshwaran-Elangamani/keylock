@@ -74,7 +74,6 @@ const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
   const isSubmitEnabled =
     !loading && availableSmes.length > 0 && selectedSmeId && deadline;
 
-  // Get minimum date (today)
   const getMinDate = () => {
     const today = new Date();
     return today.toISOString().split("T")[0];
@@ -116,7 +115,6 @@ const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           <form onSubmit={handleSubmit}>
             <div className={styles.body}>
               {availableSmes.length === 0 ? (
@@ -171,7 +169,6 @@ const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
                       ))}
                     </div>
                   </div>
-
                   <div className={styles.deadlineField}>
                     <label className={styles.deadlineLabel}>
                       <Calendar size={16} />
@@ -189,7 +186,6 @@ const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
                 </>
               )}
             </div>
-
             <div className={styles.footer}>
               <button
                 type="button"

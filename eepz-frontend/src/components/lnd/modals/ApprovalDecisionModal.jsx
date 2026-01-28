@@ -56,7 +56,7 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
     "zip",
     "rar",
     "7z",
-  ];  
+  ];
 
   const hasAttachment = approval.attachmentPath || approval.attachmentFileName;
 
@@ -77,9 +77,7 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
   }
   const handlePreview = async () => {
     if (!canPreview) {
-      toast.warning( LND_TOASTS.PREVIEW_NOT_SUPPORTED
-        
-      );
+      toast.warning(LND_TOASTS.PREVIEW_NOT_SUPPORTED);
       return;
     }
     try {
@@ -105,23 +103,19 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
         const blockedContentTypes = [
           "application/msword",
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-          "application/vnd.ms-excel",                                         
+          "application/vnd.ms-excel",
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           "application/vnd.ms-powerpoint",
           "application/vnd.openxmlformats-officedocument.presentationml.presentation",
         ];
 
         if (blockedContentTypes.includes(contentType)) {
-          toast.warning(
-            LND_TOASTS.PREVIEW_NOT_SUPPORTED
-          );
+          toast.warning(LND_TOASTS.PREVIEW_NOT_SUPPORTED);
           return;
         }
 
         if (!previewableContentTypes.includes(contentType)) {
-          toast.warning(
-            LND_TOASTS.PREVIEW_NOT_SUPPORTED
-          );
+          toast.warning(LND_TOASTS.PREVIEW_NOT_SUPPORTED);
           return;
         }
 
@@ -144,8 +138,8 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
       );
 
       const contentDisposition = response.headers["content-disposition"];
-      const typeLabel = getApprovalTypeLabel(approval.approvalType); 
-      let filename = `${approval.requesterName}_${typeLabel}${approval.approvalId}`; 
+      const typeLabel = getApprovalTypeLabel(approval.approvalType);
+      let filename = `${approval.requesterName}_${typeLabel}${approval.approvalId}`;
 
       if (contentDisposition) {
         const fileNameMatch = contentDisposition.match(
@@ -206,11 +200,14 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
           toast.success(LND_TOASTS.ASSIGNMENT_COMPLETED_MESSAGE);
           onSuccess();
         } else {
-          toast.error(response.data.message || LND_TOASTS.ASSIGNMENT_FAILED_TO_COMPLETE);
+          toast.error(
+            response.data.message || LND_TOASTS.ASSIGNMENT_FAILED_TO_COMPLETE
+          );
         }
       } catch (error) {
         toast.error(
-          error.response?.data?.message || LND_TOASTS.ASSIGNMENT_FAILED_TO_COMPLETE
+          error.response?.data?.message ||
+            LND_TOASTS.ASSIGNMENT_FAILED_TO_COMPLETE
         );
       } finally {
         setProcessing(false);
@@ -238,16 +235,17 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
       const response = await lndService.processApproval(data);
 
       if (response.data.success) {
-        toast.success(
-          LND_TOASTS.APPROVAL_PROCESSED_MESSAGE
-        );
+        toast.success(LND_TOASTS.APPROVAL_PROCESSED_MESSAGE);
         onSuccess();
       } else {
-        toast.error(response.data.message || LND_TOASTS.APPROVAL_NOT_PROCESSED_MESSAGE);
+        toast.error(
+          response.data.message || LND_TOASTS.APPROVAL_NOT_PROCESSED_MESSAGE
+        );
       }
     } catch (error) {
       toast.error(
-        error.response?.data?.message || LND_TOASTS.APPROVAL_NOT_PROCESSED_MESSAGE
+        error.response?.data?.message ||
+          LND_TOASTS.APPROVAL_NOT_PROCESSED_MESSAGE
       );
     } finally {
       setProcessing(false);
@@ -320,7 +318,7 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
                       {canPreview
                         ? "Preview Document"
                         : "Preview Not Supported"}
-                    </button>                     
+                    </button>
 
                     {/* Download Button */}
                     <button
@@ -350,7 +348,6 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
                       <CheckCircle size={16} />
                       Approve
                     </button>
-
                     <button
                       type="button"
                       onClick={() => setDecision("reject")}
@@ -495,4 +492,4 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
   );
 };
 
-export default ApprovalDecisionModal;  
+export default ApprovalDecisionModal;
