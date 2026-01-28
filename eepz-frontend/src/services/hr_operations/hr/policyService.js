@@ -101,18 +101,25 @@ const policyService = {
     }
   },
   addDocumentLink: async (documentUrl, documentName) => {
-    try {
-      const formData = new FormData();
-      formData.append("documentUrl", documentUrl);
-      formData.append("documentName", documentName);
-      formData.append("documentType", "link");
-      const response = await hrApi.post("/Policy/upload-document", formData);
-      return response.data.data;
-    } catch (error) {
-      console.error("Error adding document link:", error);
-      throw error;
-    }
-  },
+  try {
+    const formData = new FormData();
+    formData.append("documentUrl", documentUrl);
+    formData.append("documentName", documentName);
+    formData.append("documentType", "link");
+    
+    const response = await hrApi.post("/Policy/upload-document", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    
+    return response.data.data;
+  } catch (error) {
+    console.error("Error adding document link:", error);
+    throw error;
+  }
+},
+
   publishPolicy: async (policyId) => {
     try {
       const response = await hrApi.post(`/Policy/publish/${policyId}`);
