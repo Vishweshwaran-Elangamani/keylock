@@ -32,5 +32,7 @@ namespace Relevantz.EEPZ.Core.Services.Interface
         Task<List<ProjectModel>> GetUserProjectsAsync(int employeeMasterId);
         Task<List<ProjectModel>> GetAllProjectsAsync();
         Task<ProjectModel> GetProjectAsync(int projectId);
+
+       
     }
 }

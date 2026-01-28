@@ -54,7 +54,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                 new { GoalId = id, CommentCount = items.Count }
             );
 
-            return Ok(response);
+            return Ok(response); 
         }
 
         /// <summary>
@@ -104,50 +104,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             var userId = GetEmpMasterId();
             var role = GetUserRole();
 
-            var canComplete = await _baseService.CanMarkCompleteAsync(id, userId);
-            var goal = await _baseService.GetGoalAsync(id, userId, role);
-
-            var isOverdue = goal.IsOverdue;
-            var hasRequiredProgress = goal.ProgressPercent >= 100;
-            var hasValidStatus =
-                goal.Status == GOAL_STATUS.OPEN
-                || goal.Status == GOAL_STATUS.IN_PROGRESS
-                || goal.Status == GOAL_STATUS.REOPENED;
-            var isNotOverdue = !isOverdue || goal.Status == GOAL_STATUS.REOPENED;
-
-            bool isCreator = goal.CreatedByEmployeeMasterId == userId;
-            bool isAssignee = goal.Assignees?.Any(a => a.EmployeeMasterId == userId) ?? false;
-            var isParticipant = isCreator || isAssignee;
-
-            List<string> reasons = new List<string>();
-            if (!hasRequiredProgress)
-                reasons.Add($"Progress must be 100% (current: {goal.ProgressPercent}%)");
-            if (isOverdue && goal.Status != GOAL_STATUS.REOPENED)
-                reasons.Add("Goal is overdue");
-            if (!hasValidStatus)
-                reasons.Add($"Invalid status: {goal.Status}");
-            if (!isParticipant)
-                reasons.Add("Not a participant");
-
-            var shouldRequestReopen = isOverdue && goal.Status != GOAL_STATUS.REOPENED;
-
-            var result = new CanMarkCompleteModel
-            {
-                CanComplete = canComplete,
-                Reason = reasons.Any() ? string.Join(", ", reasons) : null,
-                Reasons = reasons.Any() ? reasons : null,
-                IsOverdue = isOverdue,
-                ShouldRequestReopen = shouldRequestReopen,
-                Details = new CanMarkCompleteDetailsModel
-                {
-                    HasRequiredProgress = hasRequiredProgress,
-                    CurrentProgress = goal.ProgressPercent,
-                    IsNotOverdue = isNotOverdue,
-                    HasValidStatus = hasValidStatus,
-                    CurrentStatus = goal.Status,
-                    IsParticipant = isParticipant,
-                },
-            };
+            var result = await _baseService.GetCanMarkCompleteDetailsAsync(id, userId, role);
 
             var response = ApiResponseModel<CanMarkCompleteModel>.SuccessResponse(
                 ResponseMessages.Codes.GOAL_RETRIEVED_SUCCESS,
@@ -157,6 +114,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
 
             return Ok(response);
         }
+
 
         /// <summary>
         /// Retrieves the list of subordinates for a specific project.
@@ -177,7 +135,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                     UserId = currentUserId,
                     Count = subordinates.Count,
                 }
-            );
+            ); 
 
             return Ok(response);
         }

@@ -240,7 +240,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     }
                 );
             }
-
+  
             Log.Information(
                 "GetAvailableSmes succeeded. SkillId={SkillId}, ReturnedCount={Count}, TotalCount={TotalCount}",
                 request.SkillId,

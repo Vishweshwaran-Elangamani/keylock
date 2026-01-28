@@ -32,13 +32,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         public string? GetCreationApprovalType(string goalType) =>
             goalType == GOAL_TYPE.SELF ? APPROVAL_TYPE.SELF_GOAL_ACTIVATION
             : goalType == GOAL_TYPE.TEAM ? APPROVAL_TYPE.CREATION
-            : null;
+            : null; 
 
         public async Task<int?> GetApproverForUserAsync(int employeeMasterId, string approvalType)
         {
             var managerId = await _repo.GetReportingManagerEmployeeMasterIdAsync(employeeMasterId);
             return managerId;
-        }
+        }     
 
         public async Task<string> GetEmployeeNameAsync(int? employeeMasterId)
         {
@@ -383,5 +383,61 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             return result;
         }
+
+        public async Task<CanMarkCompleteModel> GetCanMarkCompleteDetailsAsync(int goalId, int employeeMasterId, string role)
+        {
+            var goal = await _repo.GetGoalByIdAsync(goalId);
+            if (goal == null)
+            {
+                return new CanMarkCompleteModel
+                {
+                    CanComplete = false,
+                    Reason = "Goal not found",
+                    Reasons = new List<string> { "Goal not found" }
+                };
+            } 
+
+            bool isParticipant = await _repo.IsGoalParticipantAsync(goalId, employeeMasterId);
+            var progress = await GetGoalProgressPercentAsync(goalId, employeeMasterId);
+
+            var isOverdue = goal.Goalendat.HasValue && goal.Goalendat.Value < DateTime.UtcNow;
+            var hasRequiredProgress = progress >= 100;
+            var hasValidStatus =
+                goal.Goalstatus == GOAL_STATUS.OPEN
+                || goal.Goalstatus == GOAL_STATUS.IN_PROGRESS
+                || goal.Goalstatus == GOAL_STATUS.REOPENED;
+            var isNotOverdue = !isOverdue || goal.Goalstatus == GOAL_STATUS.REOPENED;
+
+            var reasons = new List<string>();
+            if (!hasRequiredProgress)
+                reasons.Add($"Progress must be 100% (current: {progress}%)");
+            if (isOverdue && goal.Goalstatus != GOAL_STATUS.REOPENED)
+                reasons.Add("Goal is overdue");
+            if (!hasValidStatus)
+                reasons.Add($"Invalid status: {goal.Goalstatus}");
+            if (!isParticipant)
+                reasons.Add("Not a participant");
+
+            var shouldRequestReopen = isOverdue && goal.Goalstatus != GOAL_STATUS.REOPENED;
+
+            return new CanMarkCompleteModel
+            {
+                CanComplete = reasons.Count == 0,
+                Reason = reasons.Any() ? string.Join(", ", reasons) : null,
+                Reasons = reasons.Any() ? reasons : null,
+                IsOverdue = isOverdue,
+                ShouldRequestReopen = shouldRequestReopen,
+                Details = new CanMarkCompleteDetailsModel
+                {
+                    HasRequiredProgress = hasRequiredProgress,
+                    CurrentProgress = progress,
+                    IsNotOverdue = isNotOverdue,
+                    HasValidStatus = hasValidStatus,
+                    CurrentStatus = goal.Goalstatus,
+                    IsParticipant = isParticipant,
+                },
+            }; 
+        }  
+
     }
 }

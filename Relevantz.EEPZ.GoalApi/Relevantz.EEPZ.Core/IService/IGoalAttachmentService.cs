@@ -33,7 +33,7 @@ namespace Relevantz.EEPZ.Core.IService
         /// <param name="attachmentId">The attachment ID</param>
         /// <param name="currentUserEmployeeMasterId">Current user's employee master ID</param>
         /// <returns>File bytes, content type, and filename</returns>
-        Task<(byte[] fileBytes, string contentType, string fileName)> DownloadFileAsync(
+        Task<(byte[] fileBytes, string contentType, string fileName)> GetAttachmentFileAsync(
             int attachmentId,
             int currentUserEmployeeMasterId
         );
@@ -44,7 +44,7 @@ namespace Relevantz.EEPZ.Core.IService
         /// <param name="attachmentId">The attachment ID</param>
         /// <param name="currentUserEmployeeMasterId">Current user's employee master ID</param>
         /// <returns>File bytes, content type, and filename, or null if not accessible</returns>
-        Task<(byte[] fileBytes, string contentType, string fileName)?> PreviewFileAsync(
+        Task<FilePreviewResult?> GetAttachmentFilePreviewAsync(
             int attachmentId,
             int currentUserEmployeeMasterId
         );

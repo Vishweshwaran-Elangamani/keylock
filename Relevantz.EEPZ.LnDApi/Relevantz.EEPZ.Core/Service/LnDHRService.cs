@@ -11,7 +11,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
     public class LnDHRService : ILnDHRService
     {
         #region Dependencies
-
         private readonly ILnDHRRepository _hrRepository;
         private readonly ILnDBaseRepository _baseRepository;
 
@@ -45,7 +44,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 "GetAllOrganizationEmployees: Retrieved {ItemCount} employees from database. TotalCount={TotalCount}",
                 items.Count,
                 totalCount
-            );
+            ); 
 
             var paginatedResponse = new PaginatedResponse<SubordinateEmployeeResponseModel>
             {
@@ -53,7 +52,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize,
-            };
+            };      
 
             Log.Information(
                 "GetAllOrganizationEmployees succeeded. ReturnedCount={Count}, TotalCount={TotalCount}",
@@ -166,7 +165,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     var daysOverdue =
                         isOverdue && deadlineDate.HasValue
                             ? (int)(today - deadlineDate.Value).TotalDays
-                            : (int?)null;
+                            : (int?)null; 
 
                     return new AssignmentResponseModel
                     {
@@ -252,7 +251,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             worksheet.Cell(1, 8).Value = LnDConstants.ORG_EXPORT.SCORE;
             worksheet.Cell(1, 9).Value = LnDConstants.ORG_EXPORT.COMMENTS;
 
-            int row = 2;
+            int row = 2; 
 
             foreach (var assignment in sortedAssignments)
             {

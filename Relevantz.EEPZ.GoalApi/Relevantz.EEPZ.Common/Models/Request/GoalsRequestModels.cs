@@ -89,6 +89,7 @@ namespace Relevantz.EEPZ.Common.Models
         public List<int>? ProofAttachmentIds { get; set; }
     }
 
+
     public class ApprovalDesicionModel
     {
         public string Decision { get; set; } = default!;
@@ -115,4 +116,12 @@ namespace Relevantz.EEPZ.Common.Models
     {
         public string Comment { get; set; } = default!;
     }
+
+    public class FilePreviewResult
+    {
+        public byte[] FileBytes { get; set; } = Array.Empty<byte>();
+        public string ContentType { get; set; } = string.Empty;
+        public string FileName { get; set; } = string.Empty;
+    }
+
 }

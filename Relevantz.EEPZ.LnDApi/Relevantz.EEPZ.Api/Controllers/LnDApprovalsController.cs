@@ -53,7 +53,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                     employeeId,
                     result.Data?.TotalCount ?? 0
                 );
-                return Ok(result);
+                return Ok(result);        
             }
             else
             {

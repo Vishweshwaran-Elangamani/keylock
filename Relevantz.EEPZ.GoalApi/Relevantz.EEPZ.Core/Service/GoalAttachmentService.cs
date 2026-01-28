@@ -29,11 +29,9 @@ namespace Relevantz.EEPZ.Core.Service
             _fileStorage = fileStorage;
         }
 
-        public async Task<(
-            byte[] fileBytes,
-            string contentType,
-            string fileName
-        )?> PreviewFileAsync(int attachmentId, int currentUserEmployeeMasterId)
+        public async Task<FilePreviewResult> GetAttachmentFilePreviewAsync(
+     int attachmentId,
+     int currentUserEmployeeMasterId)
         {
             var attachment = await _repo.GetAttachmentByIdAsync(attachmentId);
 
@@ -59,8 +57,17 @@ namespace Relevantz.EEPZ.Core.Service
             }
 
             var (fileBytes, contentType, fileName) = await _fileStorage.GetFileForPreviewAsync(
-                attachment.Attachments ?? ""
+                attachment.Attachments ?? string.Empty
             );
+
+            if (fileBytes == null || fileBytes.Length == 0)
+            {
+                throw new ArgumentException("File is empty or corrupted.");
+            }
+            if (string.IsNullOrWhiteSpace(contentType))
+            {
+                throw new ArgumentException("Invalid content type.");
+            }
 
             var displayFileName = !string.IsNullOrEmpty(attachment.AttachmentTitle)
                 ? attachment.AttachmentTitle
@@ -72,8 +79,17 @@ namespace Relevantz.EEPZ.Core.Service
                 displayFileName += extension;
             }
 
-            return (fileBytes, contentType, displayFileName);
+            // sanitize file name
+            displayFileName = Path.GetFileName(displayFileName);
+
+            return new FilePreviewResult
+            {
+                FileBytes = fileBytes,
+                ContentType = contentType,
+                FileName = displayFileName
+            };
         }
+
 
         public async Task<FileUploadResponseModel> UploadFileAsync(
             int goalId,
@@ -164,7 +180,7 @@ namespace Relevantz.EEPZ.Core.Service
             byte[] fileBytes,
             string contentType,
             string fileName
-        )> DownloadFileAsync(int attachmentId, int currentUserEmployeeMasterId)
+        )> GetAttachmentFileAsync(int attachmentId, int currentUserEmployeeMasterId)
         {
             var attachment = await _repo.GetAttachmentByIdAsync(attachmentId);
             if (attachment == null)
