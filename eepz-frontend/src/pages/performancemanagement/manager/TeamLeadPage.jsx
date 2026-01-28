@@ -74,36 +74,53 @@ const getL1Categories = (allSubs) => {
   return { pending, submitted, rejected };
 };
  
-const CustomPaginationDropdown = ({ value, onChange, options }) => {
+const CustomPaginationDropdown = ({ value, onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    if (isOpen) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen]);
+
   const handleSelect = (val) => {
     onChange(val);
     setIsOpen(false);
   };
+
+  const handleToggle = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setIsOpen(prev => !prev);
+  };
+
+  const optionsList = [5, 10, 25];
+
   return (
-    <div className="custom-tl-pagination-dropdown" ref={dropdownRef} tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { setIsOpen(!isOpen); } }}>
-      <div className="custom-tl-selected" onClick={() => setIsOpen(!isOpen)}>
+    <div className="custom-tl-pagination-dropdown" ref={dropdownRef}>
+      <div 
+        className="custom-tl-selected" 
+        onClick={handleToggle}
+        tabIndex={0}
+        role="button"
+      >
         {value}
         <span className="custom-tl-arrow"></span>
       </div>
+      
       {isOpen && (
         <div className="custom-tl-menu">
-          {options.map((option) => (
-            <div key={option} className={`custom-tl-option ${value === option ? 'custom-tl-option-active' : ''}`} onClick={() => handleSelect(option)}>
+          {optionsList.map(option => (
+            <div 
+              key={option} 
+              className={`custom-tl-option ${value === option ? 'custom-tl-option-active' : ''}`}
+              onClick={() => handleSelect(option)}
+            >
               {option}
             </div>
           ))}
@@ -112,6 +129,7 @@ const CustomPaginationDropdown = ({ value, onChange, options }) => {
     </div>
   );
 };
+
  
 function TeamLeadPage() {
   const user = JSON.parse(localStorage.getItem("user"));

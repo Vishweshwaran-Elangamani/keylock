@@ -239,6 +239,8 @@ const ReviewModal = ({
           )}
 
         <div className="tl-modal-body">
+        <div className="tl-modal-table-wrapper">
+
           <table
             className="tl-modal-table"
             role="table"
@@ -327,6 +329,7 @@ const ReviewModal = ({
               )}
             </tbody>
           </table>
+          </div>
 
           {modalData?.attachments && modalData.attachments.length > 0 && (
             <div className="tl-attachments-section">

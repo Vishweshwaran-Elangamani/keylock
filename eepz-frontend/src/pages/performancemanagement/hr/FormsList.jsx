@@ -103,7 +103,7 @@ function FormsList() {
     "Manager Forms": "bi-person-badge",
     "Delivery Forms": "bi-folder",
     "Enablement Forms": "bi-lightbulb",
-    "Assigned Users": "bi-people",
+    
   };
 
   const analyticsIconBg = {
@@ -111,29 +111,27 @@ function FormsList() {
     "Manager Forms": "#d2fbe7",
     "Delivery Forms": "#fbe7d2",
     "Enablement Forms": "#f9eaff",
-    "Assigned Users": "#e2e7fa",
+    
   };
 
   function AnalyticsStatCard({ title, value }) {
+    const iconBgColor = {
+      "Total Forms": "linear-gradient(135deg, #3b82f6, #1d4ed8)",
+      "Manager Forms": "linear-gradient(135deg, #10b981, #059669)",
+      "Delivery Forms": "linear-gradient(135deg, #f59e0b, #d97706)",
+      "Enablement Forms": "linear-gradient(135deg, #8b5cf6, #7c3aed)"
+    };
+  
     return (
       <div className="ad-stat-card">
-        <div
-          className="stat-icon"
+        <div 
+          className="stat-icon" 
           style={{
-            background: analyticsIconBg[title] || "#f0f0f0",
-            width: 50,
-            height: 50,
-            borderRadius: 16,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: "8px",
+            background: iconBgColor[title] || "#e5e7eb",
+            color: "#ffffff"
           }}
         >
-          <i
-            className={`bi ${analyticsIcons[title]}`}
-            style={{ fontSize: "26px", color: "#27235C" }}
-          />
+          <i className={`bi ${analyticsIcons[title] || "bi-journal-text"}`} />
         </div>
         <div className="stat-content">
           <h3 className="stat-value">{value}</h3>
@@ -142,6 +140,7 @@ function FormsList() {
       </div>
     );
   }
+  
 
   // current user
   useEffect(() => {
@@ -596,38 +595,12 @@ function FormsList() {
           ]}
         />
 
-        <div className="row row-cols-2 row-cols-lg-3 row-cols-xl-5 g-4 mb-3">
-          <div className="col">
-            <AnalyticsStatCard
-              title="Total Forms"
-              value={analytics.totalForms}
-            />
-          </div>
-          <div className="col">
-            <AnalyticsStatCard
-              title="Manager Forms"
-              value={analytics.managerForms}
-            />
-          </div>
-          <div className="col">
-            <AnalyticsStatCard
-              title="Delivery Forms"
-              value={analytics.deliveryForms}
-            />
-          </div>
-          <div className="col">
-            <AnalyticsStatCard
-              title="Enablement Forms"
-              value={analytics.enablementForms}
-            />
-          </div>
-          <div className="col">
-            <AnalyticsStatCard
-              title="Assigned Users"
-              value={analytics.assignedUsersCount}
-            />
-          </div>
-        </div>
+<div className="flp-stat-grid">
+  <AnalyticsStatCard title="Total Forms" value={analytics.totalForms} />
+  <AnalyticsStatCard title="Manager Forms" value={analytics.managerForms} />
+  <AnalyticsStatCard title="Delivery Forms" value={analytics.deliveryForms} />
+  <AnalyticsStatCard title="Enablement Forms" value={analytics.enablementForms} />
+</div>
 
         <ViewFormDetailsModal
           formDetails={viewFormDetails}

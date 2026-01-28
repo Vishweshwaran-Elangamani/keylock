@@ -28,12 +28,59 @@
 }
 
 .formlistperf .ad-stat-card {
-  min-height: 100px;
-  display: flex;
-  align-items: center;
-  border-radius: 12px;
-  border: 1px solid #27235c;
-  padding: 1.5rem;
+  height: 120px !important;
+  background: #ffffff !important;    
+  border: 1px solid  #27235c !important;
+  border-radius: 16px !important;
+  padding: 1.5rem !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 1.25rem !important;           
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06) !important;
+  transition: all 0.3s ease !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.formlistperf .ad-stat-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 8px 25px rgba(39,35,92,0.12) !important;
+  border-color: #27235c !important;
+}
+
+.formlistperf .stat-icon {
+  width: 56px !important;
+  height: 56px !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.5rem !important;
+  flex-shrink: 0 !important;
+}
+
+.formlistperf .stat-content {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: flex-start !important; 
+}
+
+.formlistperf .stat-value {
+  font-size: 2.25rem !important;
+  font-weight: 800 !important;
+  color: #27235c !important;
+  line-height: 1 !important;
+  margin: 0 0 0.25rem 0 !important;
+}
+.formlistperf .stat-label {
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  color: #6c757d !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  margin: 0 !important;
 }
 
 .formlistperf .flp-main-area {
@@ -751,6 +798,17 @@
 .formlistperf .custom-fc-dropdown:focus-within .custom-fc-arrow {
   transform: translateY(-50%) rotate(225deg);
 }
+.formlistperf .flp-stat-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;  /* Exactly 4 cards */
+  gap: 1.5rem !important;
+  margin-bottom: 2rem !important;
+  justify-content: center !important;
+  width: 100% !important;
+  padding: 0 !important;
+  margin-left: 0 !important;   /* 🆕 NO LEFT GAP */
+  margin-right: 0 !important;
+}
 
 .formlistperf .custom-fc-menu {
   position: absolute;
@@ -922,6 +980,18 @@
   .formlistperf .flp-pagination-container,
   .formlistperf .flp-panel-footer {
     flex-shrink: 0;
+  }
+}
+
+@media (max-width: 992px) {
+  .formlistperf .flp-stat-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .formlistperf .flp-stat-grid {
+    grid-template-columns: 1fr !important;
   }
 }
 

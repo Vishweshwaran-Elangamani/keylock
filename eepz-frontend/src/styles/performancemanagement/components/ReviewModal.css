@@ -34,6 +34,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  justify-content: space-between;  /* 🆕 PERFECT spacing */
+  gap: 16px;  /* 🆕 Proper spacing */
   padding: 16px 32px 14px 32px;
   background: #ffffff;
   border-bottom: 2px solid #27235c;
@@ -58,8 +60,9 @@
 }
 
 .tl-modal-header-center {
-  text-align: center;
-}
+  flex: 1;              /* 🆕 Takes remaining space */
+  text-align: center;   /* 🆕 Perfectly centered */
+  position: relative; }
 
 .tl-modal-title {
   font-size: 18px;
@@ -76,16 +79,23 @@
 }
 
 .tl-modal-close {
-  position: absolute;
-  right: 24px;
-  top: 50%;
-  transform: translateY(-50%);
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  color: #6c757d;
-  font-size: 14px;
-  padding: 4px;
+  margin-left: auto !important;    
+  order: 3 !important;            
+  background: transparent !important;
+  border: none !important;
+  color: #27235c !important;
+  font-size: 24px !important;
+  cursor: pointer !important;
+  padding: 4px 8px !important;    
+  width: 36px !important;
+  height: 36px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 6px !important;
+  line-height: 1 !important;
+  font-weight: 400 !important;
+  transition: all 0.2s ease !important;
 }
 
 .tl-modal-close:hover {
@@ -147,14 +157,46 @@
   flex: 1;
 }
 
-.tl-modal-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  border: 2px solid #26225a;
+.tl-modal-table-wrapper {
+  overflow-x: auto;              /* Horizontal scroll */
+  overflow-y: hidden;            /* No vertical here */
+  max-width: 100%;
   border-radius: 8px;
-  overflow: hidden;
+  margin-bottom: 16px;
+  -webkit-overflow-scrolling: touch;  /* Smooth mobile */
+  scrollbar-width: thin;         /* Firefox */
+  scrollbar-color: #26225a #f1f5f9;
 }
+
+/* Custom horizontal scrollbar */
+.tl-modal-table-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.tl-modal-table-wrapper::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.tl-modal-table-wrapper::-webkit-scrollbar-thumb {
+  background: #26225a;
+  border-radius: 4px;
+}
+
+.tl-modal-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #1a1740;
+}
+
+  .tl-modal-table {
+    width: max-content;            /* Table wider than container */
+    min-width: 1100px;              /* Minimum scrollable width */
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 2px solid #26225a;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
 
 .tl-modal-table th,
 .tl-modal-table td {
@@ -226,8 +268,9 @@
 
 .tl-modal-table th:nth-child(5),
 .tl-modal-table td:nth-child(5) {
-  width: auto;
-  min-width: 300px;
+  width: 450px !important;
+  min-width: 450px !important;
+  max-width: 550px !important;
 }
 
 .tl-custom-rating-dropdown {
@@ -640,7 +683,7 @@
 
 @media (max-width: 768px) {
   .tl-modal {
-    max-width: 95%;
+    max-width: 750px;
     margin: 10px;
   }
 
@@ -649,8 +692,10 @@
   }
 
   .tl-modal-header-left {
-    position: static;
-    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0; 
   }
 
   .tl-modal-body {
