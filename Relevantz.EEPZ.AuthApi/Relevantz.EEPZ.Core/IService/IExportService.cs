@@ -6,5 +6,6 @@ namespace Relevantz.EEPZ.Core.IService
         Task<byte[]> ExportDepartmentsToExcelAsync();
         Task<byte[]> ExportUsersToExcelAsync();
         Task<byte[]> ExportAllDataToExcelAsync();
+        string GetLastExportPassword();
     }
 }

@@ -4,6 +4,7 @@ using Relevantz.EEPZ.Common.Utils;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using Relevantz.EEPZ.Common.Constants;
+
 namespace Relevantz.EEPZ.Core.Service
 {
     public class ExportService : IExportService
@@ -11,6 +12,8 @@ namespace Relevantz.EEPZ.Core.Service
         private readonly IRoleRepository _roleRepository;
         private readonly IDepartmentRepository _departmentRepository;
         private readonly IUserAuthenticationRepository _userAuthRepository;
+        private const string EXPORT_PASSWORD = "rZ@26012025#Rix";
+
         public ExportService(
             IRoleRepository roleRepository,
             IDepartmentRepository departmentRepository,
@@ -20,12 +23,19 @@ namespace Relevantz.EEPZ.Core.Service
             _departmentRepository = departmentRepository;
             _userAuthRepository = userAuthRepository;
         }
+
+        public string GetLastExportPassword()
+        {
+            return EXPORT_PASSWORD;
+        }
+
         public async Task<byte[]> ExportRolesToExcelAsync()
         {
             var roles = await _roleRepository.GetAllAsync();
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using var package = new ExcelPackage();
             var worksheet = package.Workbook.Worksheets.Add(ExportConstants.SheetNames.Roles);
+            
             worksheet.Cells[1, 1].Value = ExportConstants.ColumnHeaders.Roles.RoleId;
             worksheet.Cells[1, 2].Value = ExportConstants.ColumnHeaders.Roles.RoleName;
             worksheet.Cells[1, 3].Value = ExportConstants.ColumnHeaders.Roles.RoleCode;
@@ -33,6 +43,7 @@ namespace Relevantz.EEPZ.Core.Service
             worksheet.Cells[1, 5].Value = ExportConstants.ColumnHeaders.Roles.IsSystemRole;
             worksheet.Cells[1, 6].Value = ExportConstants.ColumnHeaders.Roles.CreatedAt;
             worksheet.Cells[1, 7].Value = ExportConstants.ColumnHeaders.Roles.UpdatedAt;
+            
             using (var range = worksheet.Cells[1, 1, 1, 7])
             {
                 range.Style.Font.Bold = true;
@@ -41,6 +52,7 @@ namespace Relevantz.EEPZ.Core.Service
                 range.Style.Font.Color.SetColor(ExportConstants.Styling.HeaderFontColor);
                 range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             }
+            
             int row = 2;
             foreach (var role in roles)
             {
@@ -53,7 +65,9 @@ namespace Relevantz.EEPZ.Core.Service
                 worksheet.Cells[row, 7].Value = role.UpdatedAt?.ToString(ExportConstants.DateFormats.DateTimeFormat) ?? ExportConstants.Defaults.NotAvailable;
                 row++;
             }
+            
             worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+            
             using (var range = worksheet.Cells[1, 1, row - 1, 7])
             {
                 range.Style.Border.Top.Style = ExcelBorderStyle.Thin;
@@ -61,21 +75,28 @@ namespace Relevantz.EEPZ.Core.Service
                 range.Style.Border.Right.Style = ExcelBorderStyle.Thin;
                 range.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
             }
-            EEPZBusinessLog.Information(ExportConstants.LogMessages.RolesExported);
+
+            package.Encryption.IsEncrypted = true;
+            package.Encryption.Password = EXPORT_PASSWORD;
+
+            EEPZBusinessLog.Information($"{ExportConstants.LogMessages.RolesExported} - Password protected");
             return package.GetAsByteArray();
         }
+
         public async Task<byte[]> ExportDepartmentsToExcelAsync()
         {
             var departments = await _departmentRepository.GetAllAsync();
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using var package = new ExcelPackage();
             var worksheet = package.Workbook.Worksheets.Add(ExportConstants.SheetNames.Departments);
+            
             worksheet.Cells[1, 1].Value = ExportConstants.ColumnHeaders.Departments.DepartmentId;
             worksheet.Cells[1, 2].Value = ExportConstants.ColumnHeaders.Departments.DepartmentName;
             worksheet.Cells[1, 3].Value = ExportConstants.ColumnHeaders.Departments.BudgetAllocated;
             worksheet.Cells[1, 4].Value = ExportConstants.ColumnHeaders.Departments.CostCenter;
             worksheet.Cells[1, 5].Value = ExportConstants.ColumnHeaders.Departments.CreatedAt;
             worksheet.Cells[1, 6].Value = ExportConstants.ColumnHeaders.Departments.UpdatedAt;
+            
             using (var range = worksheet.Cells[1, 1, 1, 6])
             {
                 range.Style.Font.Bold = true;
@@ -84,6 +105,7 @@ namespace Relevantz.EEPZ.Core.Service
                 range.Style.Font.Color.SetColor(ExportConstants.Styling.HeaderFontColor);
                 range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             }
+            
             int row = 2;
             foreach (var dept in departments)
             {
@@ -95,7 +117,9 @@ namespace Relevantz.EEPZ.Core.Service
                 worksheet.Cells[row, 6].Value = dept.UpdatedAt?.ToString(ExportConstants.DateFormats.DateTimeFormat) ?? ExportConstants.Defaults.NotAvailable;
                 row++;
             }
+            
             worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+            
             using (var range = worksheet.Cells[1, 1, row - 1, 6])
             {
                 range.Style.Border.Top.Style = ExcelBorderStyle.Thin;
@@ -103,15 +127,21 @@ namespace Relevantz.EEPZ.Core.Service
                 range.Style.Border.Right.Style = ExcelBorderStyle.Thin;
                 range.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
             }
-            EEPZBusinessLog.Information(ExportConstants.LogMessages.DepartmentsExported);
+
+            package.Encryption.IsEncrypted = true;
+            package.Encryption.Password = EXPORT_PASSWORD;
+
+            EEPZBusinessLog.Information($"{ExportConstants.LogMessages.DepartmentsExported} - Password protected");
             return package.GetAsByteArray();
         }
+
         public async Task<byte[]> ExportUsersToExcelAsync()
         {
             var users = await _userAuthRepository.GetAllAsync();
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using var package = new ExcelPackage();
             var worksheet = package.Workbook.Worksheets.Add(ExportConstants.SheetNames.Users);
+            
             worksheet.Cells[1, 1].Value = ExportConstants.ColumnHeaders.Users.UserId;
             worksheet.Cells[1, 2].Value = ExportConstants.ColumnHeaders.Users.EmployeeCompanyId;
             worksheet.Cells[1, 3].Value = ExportConstants.ColumnHeaders.Users.Email;
@@ -130,6 +160,7 @@ namespace Relevantz.EEPZ.Core.Service
             worksheet.Cells[1, 16].Value = ExportConstants.ColumnHeaders.Users.IsActive;
             worksheet.Cells[1, 17].Value = ExportConstants.ColumnHeaders.Users.LastLogin;
             worksheet.Cells[1, 18].Value = ExportConstants.ColumnHeaders.Users.CreatedAt;
+            
             using (var range = worksheet.Cells[1, 1, 1, 18])
             {
                 range.Style.Font.Bold = true;
@@ -138,11 +169,13 @@ namespace Relevantz.EEPZ.Core.Service
                 range.Style.Font.Color.SetColor(ExportConstants.Styling.HeaderFontColor);
                 range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             }
+            
             int row = 2;
             foreach (var user in users)
             {
                 var profile = user.Employee?.Userprofile;
                 var employeeDetails = user.Employee?.Employeedetailsmasters?.FirstOrDefault();
+                
                 worksheet.Cells[row, 1].Value = user.UserId;
                 worksheet.Cells[row, 2].Value = user.Employee?.EmployeeCompanyId ?? ExportConstants.Defaults.NotAvailable;
                 worksheet.Cells[row, 3].Value = user.Email;
@@ -163,7 +196,9 @@ namespace Relevantz.EEPZ.Core.Service
                 worksheet.Cells[row, 18].Value = user.CreatedAt.ToString(ExportConstants.DateFormats.DateTimeFormat);
                 row++;
             }
+            
             worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+            
             using (var range = worksheet.Cells[1, 1, row - 1, 18])
             {
                 range.Style.Border.Top.Style = ExcelBorderStyle.Thin;
@@ -171,22 +206,30 @@ namespace Relevantz.EEPZ.Core.Service
                 range.Style.Border.Right.Style = ExcelBorderStyle.Thin;
                 range.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
             }
-            EEPZBusinessLog.Information($"Users exported to Excel successfully - Total: {users.Count}");
+
+            package.Encryption.IsEncrypted = true;
+            package.Encryption.Password = EXPORT_PASSWORD;
+
+            EEPZBusinessLog.Information($"Users exported to Excel successfully - Total: {users.Count} - Password protected");
             return package.GetAsByteArray();
         }
+
         public async Task<byte[]> ExportAllDataToExcelAsync()
         {
             var roles = await _roleRepository.GetAllAsync();
             var departments = await _departmentRepository.GetAllAsync();
             var users = await _userAuthRepository.GetAllAsync();
+            
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using var package = new ExcelPackage();
+            
             var rolesSheet = package.Workbook.Worksheets.Add(ExportConstants.SheetNames.Roles);
             rolesSheet.Cells[1, 1].Value = ExportConstants.ColumnHeaders.Roles.RoleId;
             rolesSheet.Cells[1, 2].Value = ExportConstants.ColumnHeaders.Roles.RoleName;
             rolesSheet.Cells[1, 3].Value = ExportConstants.ColumnHeaders.Roles.RoleCode;
             rolesSheet.Cells[1, 4].Value = ExportConstants.ColumnHeaders.Roles.Description;
             rolesSheet.Cells[1, 5].Value = ExportConstants.ColumnHeaders.Roles.IsSystemRole;
+            
             using (var range = rolesSheet.Cells[1, 1, 1, 5])
             {
                 range.Style.Font.Bold = true;
@@ -194,6 +237,7 @@ namespace Relevantz.EEPZ.Core.Service
                 range.Style.Fill.BackgroundColor.SetColor(ExportConstants.Styling.HeaderBackgroundColor);
                 range.Style.Font.Color.SetColor(ExportConstants.Styling.HeaderFontColor);
             }
+            
             int roleRow = 2;
             foreach (var role in roles)
             {
@@ -205,11 +249,13 @@ namespace Relevantz.EEPZ.Core.Service
                 roleRow++;
             }
             rolesSheet.Cells[rolesSheet.Dimension.Address].AutoFitColumns();
+            
             var deptSheet = package.Workbook.Worksheets.Add(ExportConstants.SheetNames.Departments);
             deptSheet.Cells[1, 1].Value = ExportConstants.ColumnHeaders.Departments.DepartmentId;
             deptSheet.Cells[1, 2].Value = ExportConstants.ColumnHeaders.Departments.DepartmentName;
             deptSheet.Cells[1, 3].Value = ExportConstants.ColumnHeaders.Departments.BudgetAllocated;
             deptSheet.Cells[1, 4].Value = ExportConstants.ColumnHeaders.Departments.CostCenter;
+            
             using (var range = deptSheet.Cells[1, 1, 1, 4])
             {
                 range.Style.Font.Bold = true;
@@ -217,6 +263,7 @@ namespace Relevantz.EEPZ.Core.Service
                 range.Style.Fill.BackgroundColor.SetColor(ExportConstants.Styling.HeaderBackgroundColor);
                 range.Style.Font.Color.SetColor(ExportConstants.Styling.HeaderFontColor);
             }
+            
             int deptRow = 2;
             foreach (var dept in departments)
             {
@@ -227,6 +274,7 @@ namespace Relevantz.EEPZ.Core.Service
                 deptRow++;
             }
             deptSheet.Cells[deptSheet.Dimension.Address].AutoFitColumns();
+            
             var usersSheet = package.Workbook.Worksheets.Add(ExportConstants.SheetNames.Users);
             usersSheet.Cells[1, 1].Value = ExportConstants.ColumnHeaders.Users.UserId;
             usersSheet.Cells[1, 2].Value = ExportConstants.ColumnHeaders.Users.EmployeeCompanyId;
@@ -238,6 +286,7 @@ namespace Relevantz.EEPZ.Core.Service
             usersSheet.Cells[1, 8].Value = ExportConstants.ColumnHeaders.Users.Department;
             usersSheet.Cells[1, 9].Value = ExportConstants.ColumnHeaders.Users.Status;
             usersSheet.Cells[1, 10].Value = ExportConstants.ColumnHeaders.Users.IsActive;
+            
             using (var range = usersSheet.Cells[1, 1, 1, 10])
             {
                 range.Style.Font.Bold = true;
@@ -245,11 +294,13 @@ namespace Relevantz.EEPZ.Core.Service
                 range.Style.Fill.BackgroundColor.SetColor(ExportConstants.Styling.HeaderBackgroundColor);
                 range.Style.Font.Color.SetColor(ExportConstants.Styling.HeaderFontColor);
             }
+            
             int userRow = 2;
             foreach (var user in users)
             {
                 var profile = user.Employee?.Userprofile;
                 var employeeDetails = user.Employee?.Employeedetailsmasters?.FirstOrDefault();
+                
                 usersSheet.Cells[userRow, 1].Value = user.UserId;
                 usersSheet.Cells[userRow, 2].Value = user.Employee?.EmployeeCompanyId ?? ExportConstants.Defaults.NotAvailable;
                 usersSheet.Cells[userRow, 3].Value = user.Email;
@@ -263,7 +314,11 @@ namespace Relevantz.EEPZ.Core.Service
                 userRow++;
             }
             usersSheet.Cells[usersSheet.Dimension.Address].AutoFitColumns();
-            EEPZBusinessLog.Information(ExportConstants.LogMessages.AllDataExported);
+
+            package.Encryption.IsEncrypted = true;
+            package.Encryption.Password = EXPORT_PASSWORD;
+
+            EEPZBusinessLog.Information($"{ExportConstants.LogMessages.AllDataExported} - Password protected");
             return package.GetAsByteArray();
         }
     }
