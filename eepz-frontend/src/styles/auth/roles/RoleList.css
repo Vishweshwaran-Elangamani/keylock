@@ -1090,3 +1090,11 @@
     min-width: 900px;
   }
 }
+body.modal-open .rlm-pagination-wrapper,
+body.modal-open .rlm-pagination {
+  display: none !important;
+}
+
+body.modal-open .rlm-rows-dropdown {
+  display: none !important;
+}

@@ -1013,3 +1013,10 @@
     border-radius: 40px !important;
   }
 }
+body.modal-open .crm-pagination {
+  display: none !important;
+}
+
+body.modal-open .crm-rows-dropdown {
+  display: none !important;
+}

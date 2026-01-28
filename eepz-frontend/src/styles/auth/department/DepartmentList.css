@@ -1124,3 +1124,12 @@
     min-width: 900px;
   }
 }
+body.modal-open .dlm-pagination-wrapper,
+body.modal-open .dlm-pagination {
+  display: none !important;
+}
+
+body.modal-open .dlm-rows-dropdown {
+  display: none !important;
+}
+
