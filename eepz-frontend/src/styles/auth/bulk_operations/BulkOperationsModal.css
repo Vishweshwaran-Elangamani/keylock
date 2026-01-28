@@ -1214,3 +1214,25 @@
 .bom-footer-close-button:hover {
   background: #5a6268;
 }
+
+.bom-password-info-banner {
+  background-color: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #856404;
+}
+
+.bom-info-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.bom-password-info-banner span {
+  font-size: 14px;
+  line-height: 1.5;
+}

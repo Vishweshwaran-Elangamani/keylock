@@ -32,22 +32,47 @@ const useBulkOperations = () => {
         setExportingAll(true);
       }
 
+      let result;
       switch (type) {
         case "roles":
-          await ExportService.exportRoles();
-          toast.success("Roles exported successfully!");
+          result = await ExportService.exportRoles();
+          if (result.password) {
+            toast.success(`Roles exported successfully! Password: ${result.password}`, {
+              duration: 10000,
+            });
+          } else {
+            toast.success("Roles exported successfully!");
+          }
           break;
         case "departments":
-          await ExportService.exportDepartments();
-          toast.success("Departments exported successfully!");
+          result = await ExportService.exportDepartments();
+          if (result.password) {
+            toast.success(`Departments exported successfully! Password: ${result.password}`, {
+              duration: 10000,
+            });
+          } else {
+            toast.success("Departments exported successfully!");
+          }
           break;
         case "users":
-          await ExportService.exportUsers();
-          toast.success("Users exported successfully!");
+          result = await ExportService.exportUsers();
+          if (result.password) {
+            toast.success(`Users exported successfully! Password: ${result.password}`, {
+              duration: 10000,
+            });
+          } else {
+            toast.success("Users exported successfully!");
+          }
           break;
         case "all":
-          await ExportService.exportAllData();
-          toast.success("All data exported successfully!");
+          result = await ExportService.exportAllData();
+          if (result.password) {
+            toast.success(`All data exported successfully! Password: ${result.password}`, {
+              duration: 10000,
+            });
+          } else {
+            toast.success("All data exported successfully!");
+          }
           break;
         default:
           break;
@@ -118,8 +143,6 @@ const useBulkOperations = () => {
 
       toast.dismiss(loadingToastId);
 
-      // ✅ NEW: Handle direct response (no wrapper)
-      // Check if response has the direct data structure
       const data = result.success ? result.data : result;
 
       setUploadResult({
@@ -173,9 +196,7 @@ const useBulkOperations = () => {
 
       toast.error(errorMessage, { duration: 5000 });
 
-      // ✅ NEW: Handle error response (direct structure)
       if (responseData) {
-        // Check if responseData itself contains the error data (direct response)
         const errorData = responseData.data || responseData;
 
         if (errorData.errors && Array.isArray(errorData.errors)) {
