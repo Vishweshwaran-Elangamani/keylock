@@ -8,7 +8,6 @@ using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Utils;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Common.Constants;
-
 namespace Relevantz.EEPZ.Data.DBContexts
 {
     public class DbInitializer

@@ -14,7 +14,6 @@ namespace Relevantz.EEPZ.Common.Constants
         public const string MobileNumber = "MobileNumber";
         public const string Gender = "Gender";
     }
-
     public static class ExcelMessages
     {
         public const string BulkImportInstructions = "Bulk User Import Instructions";
@@ -25,7 +24,6 @@ namespace Relevantz.EEPZ.Common.Constants
         public const string NoDataRowsError = "Excel file must contain at least one data row besides the header";
         public const string NoValidUsersError = "No valid users found in Excel file";
     }
-
     public static class EmploymentTypeValues
     {
         public const string Permanent = "Permanent";
@@ -33,37 +31,30 @@ namespace Relevantz.EEPZ.Common.Constants
         public const string Temporary = "Temporary";
         public const string Intern = "Intern";
         public const string Probation = "Probation";
-
         public static string[] GetAll() => new[] { Permanent, Contract, Temporary, Intern, Probation };
         public static string GetCommaSeparated() => string.Join(",", GetAll().Select(x => $"\"{x}\""));
     }
-
     public static class EmploymentStatusValues
     {
         public const string Active = "Active";
         public const string Inactive = "Inactive";
         public const string OnLeave = "OnLeave";
-
         public static string[] GetAll() => new[] { Active, Inactive, OnLeave };
         public static string GetCommaSeparated() => string.Join(",", GetAll().Select(x => $"\"{x}\""));
     }
-
     public static class EmployeeTypeValues
     {
         public const string FullTime = "FullTime";
         public const string PartTime = "PartTime";
         public const string Intern = "Intern";
-
         public static string[] GetAll() => new[] { FullTime, PartTime, Intern };
         public static string GetCommaSeparated() => string.Join(",", GetAll().Select(x => $"\"{x}\""));
     }
-
     public static class GenderValues
     {
         public const string Male = "Male";
         public const string Female = "Female";
         public const string PreferNotToSay = "PreferNotToSay";
-
         public static string[] GetAll() => new[] { Male, Female, PreferNotToSay };
         public static string GetCommaSeparated() => string.Join(",", GetAll().Select(x => $"\"{x}\""));
     }

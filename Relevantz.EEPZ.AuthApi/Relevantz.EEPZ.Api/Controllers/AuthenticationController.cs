@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Relevantz.EEPZ.Common.Constants;
-
 namespace Relevantz.EEPZ.Api.Controllers
 {
     /// <summary>
@@ -20,7 +19,6 @@ namespace Relevantz.EEPZ.Api.Controllers
     {
         private readonly IAuthenticationService _authenticationService;
         private readonly ILogger<AuthenticationController> _logger;
-
         /// <summary>
         /// Initializes a new instance of <see cref="AuthenticationController"/>.
         /// </summary>
@@ -31,7 +29,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             _authenticationService = authenticationService;
             _logger = logger;
         }
-
         /// <summary>
         /// Initiates user login and triggers OTP delivery.
         /// </summary>
@@ -40,12 +37,9 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             var maskedEmail = EmailMaskingUtil.MaskEmail(request.Email);
             _logger.LogInformation("Login attempt initiated for {MaskedEmail}", maskedEmail);
-
             request.IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
             request.UserAgent = HttpContext.Request.Headers["User-Agent"].ToString();
-
             var result = await _authenticationService.LoginAsync(request);
-
             if (!result.Success)
             {
                 _logger.LogWarning(
@@ -54,14 +48,11 @@ namespace Relevantz.EEPZ.Api.Controllers
                     result.Message);
                 return Unauthorized(result);
             }
-
             _logger.LogInformation(
                 "Login successful for {MaskedEmail}. OTP sent.",
                 maskedEmail);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Verifies the OTP sent during login and completes authentication.
         /// </summary>
@@ -70,9 +61,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             var maskedEmail = EmailMaskingUtil.MaskEmail(request.Email);
             _logger.LogInformation("OTP verification attempt for {MaskedEmail}", maskedEmail);
-
             var result = await _authenticationService.VerifyOtpAndLoginAsync(request);
-
             if (!result.Success)
             {
                 _logger.LogWarning(
@@ -81,14 +70,11 @@ namespace Relevantz.EEPZ.Api.Controllers
                     result.Message);
                 return BadRequest(result);
             }
-
             _logger.LogInformation(
                 "OTP verified successfully for {MaskedEmail}. User authenticated.",
                 maskedEmail);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Initiates the forgot password flow and sends a password reset OTP.
         /// </summary>
@@ -97,9 +83,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             var maskedEmail = EmailMaskingUtil.MaskEmail(request.Email);
             _logger.LogInformation("Password reset requested for {MaskedEmail}", maskedEmail);
-
             var result = await _authenticationService.ForgotPasswordAsync(request);
-
             if (result.Success)
             {
                 _logger.LogInformation(
@@ -113,10 +97,8 @@ namespace Relevantz.EEPZ.Api.Controllers
                     maskedEmail,
                     result.Message);
             }
-
             return Ok(result);
         }
-
         /// <summary>
         /// Confirms password reset using OTP and sets a new password.
         /// </summary>
@@ -125,9 +107,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             var maskedEmail = EmailMaskingUtil.MaskEmail(request.Email);
             _logger.LogInformation("Password reset confirmation for {MaskedEmail}", maskedEmail);
-
             var result = await _authenticationService.ResetPasswordAsync(request);
-
             if (!result.Success)
             {
                 _logger.LogWarning(
@@ -136,14 +116,11 @@ namespace Relevantz.EEPZ.Api.Controllers
                     result.Message);
                 return BadRequest(result);
             }
-
             _logger.LogInformation(
                 "Password reset successful for {MaskedEmail}",
                 maskedEmail);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Changes the password for the authenticated user.
         /// </summary>
@@ -152,23 +129,18 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDto request)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
             if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
             {
                 _logger.LogWarning("Change password attempted with invalid authentication token");
                 return Unauthorized(new { success = false, message = "Invalid user authentication" });
             }
-
             if (userId == 0)
             {
                 _logger.LogWarning("Change password attempted with userId = 0");
                 return Unauthorized(new { success = false, message = "User ID not found" });
             }
-
             _logger.LogInformation("Change password initiated for UserId: {UserId}", userId);
-
             var result = await _authenticationService.ChangePasswordAsync(userId, request);
-
             if (!result.Success)
             {
                 _logger.LogWarning(
@@ -177,14 +149,11 @@ namespace Relevantz.EEPZ.Api.Controllers
                     result.Message);
                 return BadRequest(result);
             }
-
             _logger.LogInformation(
                 "Password changed successfully for UserId: {UserId}",
                 userId);
-
             return Ok(result);
         }
-
         /// <summary>
         /// Logs out the authenticated user.
         /// </summary>
@@ -194,9 +163,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
             _logger.LogInformation("Logout initiated for UserId: {UserId}", userId);
-
             var result = await _authenticationService.LogoutAsync(userId);
-
             if (result.Success)
             {
                 _logger.LogInformation("Logout successful for UserId: {UserId}", userId);
@@ -208,7 +175,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                     userId,
                     result.Message);
             }
-
             return Ok(result);
         }
     }

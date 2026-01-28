@@ -10,7 +10,6 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using Relevantz.EEPZ.Common.Constants;
-
 namespace Relevantz.EEPZ.Core.Service
 {
     public class ProfileService : IProfileService
@@ -19,7 +18,6 @@ namespace Relevantz.EEPZ.Core.Service
         private readonly IUserAuthenticationRepository _userAuthRepository;
         private readonly IProfileImageRepository _profileImageRepository;
         private readonly EEPZDbContext _context;
-
         public ProfileService(
             IUserProfileRepository userProfileRepository,
             IUserAuthenticationRepository userAuthRepository,
@@ -31,7 +29,6 @@ namespace Relevantz.EEPZ.Core.Service
             _profileImageRepository = profileImageRepository;
             _context = context;
         }
-
         public async Task<ProfileResponseDto> GetProfileByUserIdAsync(int userId)
         {
             var user = await _context.Userauthentications
@@ -46,24 +43,19 @@ namespace Relevantz.EEPZ.Core.Service
                 .Include(u => u.Employee)
                     .ThenInclude(e => e.Addresses)
                 .FirstOrDefaultAsync(u => u.UserId == userId);
-
             if (user == null)
             {
                 throw new KeyNotFoundException(Constants.Messages.UserNotFound);
             }
-
             var employee = user.Employee;
             var profile = employee?.Userprofile;
-
             if (profile == null)
             {
                 throw new KeyNotFoundException(ProfileConstants.Messages.ProfileNotFound);
             }
-
             var employeeDetails = employee.Employeedetailsmasters?.FirstOrDefault();
             var currentAddress = employee.Addresses?.FirstOrDefault(a => a.AddressType == Constants.AddressTypes.Current);
             var permanentAddress = employee.Addresses?.FirstOrDefault(a => a.AddressType == Constants.AddressTypes.Permanent);
-
             string profilePhotoBase64 = null;
             var profileImage = await _profileImageRepository.GetImageAsync(employee.EmployeeId);
             if (profileImage != null && profileImage.ImageData != null)
@@ -71,7 +63,6 @@ namespace Relevantz.EEPZ.Core.Service
                 profilePhotoBase64 = Convert.ToBase64String(profileImage.ImageData);
                 EEPZBusinessLog.Information($"Profile image retrieved from MongoDB for EmployeeId: {employee.EmployeeId}");
             }
-
             // Ad-hoc mapping
             var response = new ProfileResponseDto
             {
@@ -127,14 +118,11 @@ namespace Relevantz.EEPZ.Core.Service
                     PinCode = permanentAddress.PinCode
                 } : null
             };
-
             return response;
         }
-
         public async Task<ProfileResponseDto> UpdateProfileAsync(int userId, UpdateProfileRequestDto request)
         {
             EEPZBusinessLog.Information($"Updating profile for UserId: {userId}");
-
             var user = await _context.Userauthentications
                 .Include(u => u.Employee)
                     .ThenInclude(e => e.Userprofile)
@@ -147,20 +135,16 @@ namespace Relevantz.EEPZ.Core.Service
                 .Include(u => u.Employee)
                     .ThenInclude(e => e.Addresses)
                 .FirstOrDefaultAsync(u => u.UserId == userId);
-
             if (user == null)
             {
                 throw new KeyNotFoundException(Constants.Messages.UserNotFound);
             }
-
             var employee = user.Employee;
             var profile = employee?.Userprofile;
-
             if (profile == null)
             {
                 throw new KeyNotFoundException(ProfileConstants.Messages.ProfileNotFound);
             }
-
             if (!string.IsNullOrEmpty(request.FirstName)) profile.FirstName = request.FirstName;
             if (request.MiddleName != null) profile.MiddleName = request.MiddleName;
             if (!string.IsNullOrEmpty(request.LastName)) profile.LastName = request.LastName;
@@ -173,14 +157,11 @@ namespace Relevantz.EEPZ.Core.Service
             if (request.PersonalEmail != null) profile.PersonalEmail = request.PersonalEmail;
             if (request.MaritalStatus != null) profile.MaritalStatus = request.MaritalStatus;
             if (request.Nationality != null) profile.Nationality = request.Nationality;
-
             if (request.ProfilePhoto != null && request.ProfilePhoto.Length > 0)
             {
                 EEPZBusinessLog.Information($"Processing profile photo upload for UserId: {userId}, EmployeeId: {employee.EmployeeId}");
-
                 using var imageStream = request.ProfilePhoto.OpenReadStream();
                 using var image = await Image.LoadAsync(imageStream);
-
                 if (image.Width > 300 || image.Height > 300)
                 {
                     image.Mutate(x => x.Resize(new ResizeOptions
@@ -189,26 +170,20 @@ namespace Relevantz.EEPZ.Core.Service
                         Mode = ResizeMode.Max
                     }));
                 }
-
                 using var ms = new MemoryStream();
                 await image.SaveAsJpegAsync(ms, new JpegEncoder { Quality = 85 });
                 byte[] compressedImageData = ms.ToArray();
-
                 await _profileImageRepository.UploadImageAsync(employee.EmployeeId, compressedImageData, request.ProfilePhoto.FileName ?? $"profile_{employee.EmployeeId}.jpg", ProfileConstants.ImageTypes.Jpeg);
-
                 if (profile.ProfilePhoto != null && profile.ProfilePhoto.Length > 0)
                 {
                     profile.ProfilePhoto = null;
                     EEPZBusinessLog.Information($"Removed profile photo from MySQL for EmployeeId: {employee.EmployeeId}");
                 }
             }
-
             await _userProfileRepository.UpdateAsync(profile);
-
             if (request.CurrentAddress != null)
             {
                 var currentAddress = employee.Addresses?.FirstOrDefault(a => a.AddressType == Constants.AddressTypes.Current);
-
                 if (currentAddress != null)
                 {
                     currentAddress.DoorNumber = request.CurrentAddress.DoorNumber;
@@ -220,7 +195,6 @@ namespace Relevantz.EEPZ.Core.Service
                     currentAddress.Country = request.CurrentAddress.Country ?? ProfileConstants.Defaults.DefaultCountry;
                     currentAddress.PinCode = request.CurrentAddress.PinCode;
                     currentAddress.UpdatedAt = DateTime.UtcNow;
-
                     _context.Addresses.Update(currentAddress);
                 }
                 else
@@ -239,15 +213,12 @@ namespace Relevantz.EEPZ.Core.Service
                         PinCode = request.CurrentAddress.PinCode,
                         CreatedAt = DateTime.UtcNow
                     };
-
                     await _context.Addresses.AddAsync(newCurrentAddress);
                 }
             }
-
             if (request.PermanentAddress != null)
             {
                 var permanentAddress = employee.Addresses?.FirstOrDefault(a => a.AddressType == Constants.AddressTypes.Permanent);
-
                 if (permanentAddress != null)
                 {
                     permanentAddress.DoorNumber = request.PermanentAddress.DoorNumber;
@@ -259,7 +230,6 @@ namespace Relevantz.EEPZ.Core.Service
                     permanentAddress.Country = request.PermanentAddress.Country ?? ProfileConstants.Defaults.DefaultCountry;
                     permanentAddress.PinCode = request.PermanentAddress.PinCode;
                     permanentAddress.UpdatedAt = DateTime.UtcNow;
-
                     _context.Addresses.Update(permanentAddress);
                 }
                 else
@@ -278,26 +248,20 @@ namespace Relevantz.EEPZ.Core.Service
                         PinCode = request.PermanentAddress.PinCode,
                         CreatedAt = DateTime.UtcNow
                     };
-
                     await _context.Addresses.AddAsync(newPermanentAddress);
                 }
             }
-
             await _context.SaveChangesAsync();
-
             await _context.Entry(employee).Collection(e => e.Addresses).LoadAsync();
-
             var employeeDetails = employee.Employeedetailsmasters?.FirstOrDefault();
             var updatedCurrentAddress = employee.Addresses?.FirstOrDefault(a => a.AddressType == Constants.AddressTypes.Current);
             var updatedPermanentAddress = employee.Addresses?.FirstOrDefault(a => a.AddressType == Constants.AddressTypes.Permanent);
-
             string profilePhotoBase64 = null;
             var profileImage = await _profileImageRepository.GetImageAsync(employee.EmployeeId);
             if (profileImage != null && profileImage.ImageData != null)
             {
                 profilePhotoBase64 = Convert.ToBase64String(profileImage.ImageData);
             }
-
             // Ad-hoc mapping
             var response = new ProfileResponseDto
             {
@@ -353,9 +317,7 @@ namespace Relevantz.EEPZ.Core.Service
                     PinCode = updatedPermanentAddress.PinCode
                 } : null
             };
-
             EEPZBusinessLog.Information($"Profile updated successfully for UserId: {userId}");
-
             return response;
         }
     }

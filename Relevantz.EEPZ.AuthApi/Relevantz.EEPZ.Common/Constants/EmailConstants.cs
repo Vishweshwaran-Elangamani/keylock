@@ -12,7 +12,6 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string Username = "SmtpSettings:Username";
             public const string Password = "SmtpSettings:Password";
         }
-
         public static class Subjects
         {
             public const string Welcome = "Welcome to EEPZ System";
@@ -20,7 +19,6 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string PasswordResetConfirmation = "Password Reset Successful - EEPZ System";
             public const string ChangeRequestNotification = "Change Request Submitted - EEPZ System";
         }
-
         public static class Defaults
         {
             public const string EmptyRecipientName = "";

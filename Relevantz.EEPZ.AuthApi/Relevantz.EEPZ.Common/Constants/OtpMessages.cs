@@ -11,7 +11,6 @@ namespace Relevantz.EEPZ.Common.Constants
         public const string OtpResent = "OTP resent for {0} - Attempt {1}/{2}";
         public const string StartingExpiredOtpCleanup = "Starting expired OTP cleanup at {0} IST";
         public const string ExpiredOtpsCleaned = "Expired OTPs cleaned up successfully";
-        
         // Default User Name
         public const string DefaultUserName = "User";
     }

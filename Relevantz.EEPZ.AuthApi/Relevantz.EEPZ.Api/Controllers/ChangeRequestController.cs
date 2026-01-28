@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Relevantz.EEPZ.Common.Constants;
-
 namespace Relevantz.EEPZ.Api.Controllers
 {
     /// <summary>
@@ -19,7 +18,6 @@ namespace Relevantz.EEPZ.Api.Controllers
     public class ChangeRequestController : ControllerBase
     {
         private readonly IChangeRequestService _changeRequestService;
-
         /// <summary>
         /// Initializes a new instance of <see cref="ChangeRequestController"/>.
         /// </summary>
@@ -28,7 +26,6 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             _changeRequestService = changeRequestService;
         }
-
         /// <summary>
         /// Submits a new change request for the logged-in user.
         /// </summary>
@@ -44,7 +41,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _changeRequestService.SubmitChangeRequestAsync(userId, request);
             return Ok(ApiResponseDto<ChangeRequestResponseDto>.SuccessResponse(result, Constants.Messages.ChangeRequestSubmitted));
         }
-
         /// <summary>
         /// Processes a pending change request (approve or reject).
         /// Admin only.
@@ -62,7 +58,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _changeRequestService.ProcessChangeRequestAsync(request, adminUserId);
             return Ok(ApiResponseDto<ChangeRequestResponseDto>.SuccessResponse(result, Constants.Messages.ChangeRequestProcessed));
         }
-
         /// <summary>
         /// Retrieves all pending change requests.
         /// Admin only.
@@ -77,7 +72,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _changeRequestService.GetPendingRequestsAsync();
             return Ok(ApiResponseDto<List<ChangeRequestResponseDto>>.SuccessResponse(result, "Pending requests retrieved successfully"));
         }
-
         /// <summary>
         /// Retrieves all change requests submitted by the logged-in user.
         /// </summary>
@@ -91,7 +85,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _changeRequestService.GetUserChangeRequestsAsync(userId);
             return Ok(ApiResponseDto<List<ChangeRequestResponseDto>>.SuccessResponse(result, "User change requests retrieved successfully"));
         }
-
         /// <summary>
         /// Retrieves all change requests in the system.
         /// Admin only.
@@ -106,7 +99,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _changeRequestService.GetAllChangeRequestsAsync();
             return Ok(ApiResponseDto<List<ChangeRequestResponseDto>>.SuccessResponse(result, "All change requests retrieved successfully"));
         }
-
         /// <summary>
         /// Cancels a specific change request submitted by the logged-in user.
         /// </summary>
@@ -122,7 +114,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _changeRequestService.CancelChangeRequestAsync(userId, requestId);
             return Ok(ApiResponseDto<bool>.SuccessResponse(result, "Change request cancelled successfully"));
         }
-
         /// <summary>
         /// Checks whether the logged-in user has any pending change requests.
         /// </summary>
@@ -134,12 +125,10 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
             var result = await _changeRequestService.HasPendingRequestAsync(userId);
-            
             if (result != null)
             {
                 return Ok(ApiResponseDto<ChangeRequestResponseDto?>.SuccessResponse(result, "Pending request found"));
             }
-            
             return Ok(ApiResponseDto<ChangeRequestResponseDto?>.SuccessResponse(null, "No pending request found"));
         }
     }

@@ -1,6 +1,5 @@
 using FluentValidation;
 using Relevantz.EEPZ.Common.DTOs.Request;
-
 namespace Relevantz.EEPZ.Common.Validators
 {
     public class ForgotPasswordRequestDtoValidator : AbstractValidator<ForgotPasswordRequestDto>

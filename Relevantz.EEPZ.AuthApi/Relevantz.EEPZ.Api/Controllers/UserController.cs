@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Relevantz.EEPZ.Common.Constants;
-
 namespace Relevantz.EEPZ.Api.Controllers
 {
     /// <summary>
@@ -22,7 +21,6 @@ namespace Relevantz.EEPZ.Api.Controllers
     {
         private readonly IProfileService _profileService;
         private readonly IUserManagementService _userManagementService;
-
         public UserController(
             IProfileService profileService,
             IUserManagementService userManagementService)
@@ -30,7 +28,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             _profileService = profileService;
             _userManagementService = userManagementService;
         }
-
         /// <summary>
         /// Gets the current logged-in user's profile.
         /// </summary>
@@ -45,14 +42,12 @@ namespace Relevantz.EEPZ.Api.Controllers
                     ApiResponseDto<ProfileResponseDto>.FailureResponse(
                         MessageConstants.InvalidUserToken));
             }
-
             var profile = await _profileService.GetProfileByUserIdAsync(userId);
             return Ok(
                 ApiResponseDto<ProfileResponseDto>.SuccessResponse(
                     profile,
                     MessageConstants.ProfileRetrievedSuccess));
         }
-
         /// <summary>
         /// Gets profile for specific user by ID (Admin/HR only).
         /// </summary>
@@ -68,7 +63,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                     profile,
                     MessageConstants.ProfileRetrievedSuccess));
         }
-
         /// <summary>
         /// Updates current user's profile.
         /// </summary>
@@ -83,7 +77,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                     ApiResponseDto<ProfileResponseDto>.FailureResponse(
                         MessageConstants.InvalidRequestData));
             }
-
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
             {
@@ -91,14 +84,12 @@ namespace Relevantz.EEPZ.Api.Controllers
                     ApiResponseDto<ProfileResponseDto>.FailureResponse(
                         MessageConstants.InvalidUserToken));
             }
-
             var updatedProfile = await _profileService.UpdateProfileAsync(userId, request);
             return Ok(
                 ApiResponseDto<ProfileResponseDto>.SuccessResponse(
                     updatedProfile,
                     MessageConstants.ProfileUpdatedSuccess));
         }
-
         /// <summary>
         /// Uploads/updates current user's profile photo (JPEG/PNG/GIF/WEBP, 5MB max).
         /// </summary>
@@ -114,14 +105,12 @@ namespace Relevantz.EEPZ.Api.Controllers
                     ApiResponseDto<ProfileResponseDto>.FailureResponse(
                         MessageConstants.InvalidUserToken));
             }
-
             if (ProfilePhoto == null || ProfilePhoto.Length == 0)
             {
                 return BadRequest(
                     ApiResponseDto<ProfileResponseDto>.FailureResponse(
                         MessageConstants.NoPhotoProvided));
             }
-
             var allowedTypes = new[]
             {
                 "image/jpeg",
@@ -130,14 +119,12 @@ namespace Relevantz.EEPZ.Api.Controllers
                 "image/gif",
                 "image/webp"
             };
-
             if (!allowedTypes.Contains(ProfilePhoto.ContentType.ToLower()))
             {
                 return BadRequest(
                     ApiResponseDto<ProfileResponseDto>.FailureResponse(
                         MessageConstants.InvalidPhotoType));
             }
-
             const long maxFileSize = 5 * 1024 * 1024;
             if (ProfilePhoto.Length > maxFileSize)
             {
@@ -145,20 +132,16 @@ namespace Relevantz.EEPZ.Api.Controllers
                     ApiResponseDto<ProfileResponseDto>.FailureResponse(
                         $"{MessageConstants.PhotoTooLarge} Your file is {ProfilePhoto.Length / 1024 / 1024:F2}MB."));
             }
-
             var request = new UpdateProfileRequestDto
             {
                 ProfilePhoto = ProfilePhoto
             };
-
             var updatedProfile = await _profileService.UpdateProfileAsync(userId, request);
-
             return Ok(
                 ApiResponseDto<ProfileResponseDto>.SuccessResponse(
                     updatedProfile,
                     MessageConstants.PhotoUploadedSuccess));
         }
-
         /// <summary>
         /// Creates new user (Admin operation).
         /// </summary>
@@ -169,17 +152,14 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             var createdByUserId =
                 int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-
             var user = await _userManagementService.CreateUserAsync(
                 request,
                 createdByUserId);
-
             return Ok(
                 ApiResponseDto<UserResponseDto>.SuccessResponse(
                     user,
                     MessageConstants.UserCreatedSuccess));
         }
-
         /// <summary>
         /// Updates existing user (Admin operation).
         /// </summary>
@@ -190,17 +170,14 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             var updatedByUserId =
                 int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-
             var user = await _userManagementService.UpdateUserAsync(
                 request,
                 updatedByUserId);
-
             return Ok(
                 ApiResponseDto<UserResponseDto>.SuccessResponse(
                     user,
                     MessageConstants.UserUpdatedSuccess));
         }
-
         /// <summary>
         /// Gets user by identifier.
         /// </summary>
@@ -210,13 +187,11 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> GetUserById(int userId)
         {
             var user = await _userManagementService.GetUserByIdAsync(userId);
-
             return Ok(
                 ApiResponseDto<UserResponseDto>.SuccessResponse(
                     user,
                     MessageConstants.UserRetrievedSuccess));
         }
-
         /// <summary>
         /// Gets all users.
         /// </summary>
@@ -225,13 +200,11 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> GetAllUsers()
         {
             var users = await _userManagementService.GetAllUsersAsync();
-
             return Ok(
                 ApiResponseDto<List<UserResponseDto>>.SuccessResponse(
                     users,
                     MessageConstants.UsersRetrievedSuccess));
         }
-
         /// <summary>
         /// Deactivates a user.
         /// </summary>
@@ -241,13 +214,11 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> DeactivateUser(int Id)
         {
             await _userManagementService.DeactivateUserAsync(Id);
-
             return Ok(
                 ApiResponseDto<object>.SuccessResponse(
                     null,
                     MessageConstants.UserDeactivatedSuccess));
         }
-
         /// <summary>
         /// Activates a deactivated user.
         /// </summary>
@@ -257,13 +228,11 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> ActivateUser(int Id)
         {
             await _userManagementService.ActivateUserAsync(Id);
-
             return Ok(
                 ApiResponseDto<object>.SuccessResponse(
                     null,
                     MessageConstants.UserActivatedSuccess));
         }
-
         /// <summary>
         /// Gets employees reporting to manager (Manager/HR/Admin only).
         /// </summary>
@@ -274,9 +243,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             var currentUserId =
                 int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-
             if (userRole != "HR" &&
                 userRole != "Admin" &&
                 currentUserId != managerId)
@@ -286,16 +253,13 @@ namespace Relevantz.EEPZ.Api.Controllers
                     ApiResponseDto<List<UserResponseDto>>.FailureResponse(
                         MessageConstants.ManagerForbidden));
             }
-
             var employees =
                 await _userManagementService.GetEmployeesByManagerAsync(managerId);
-
             return Ok(
                 ApiResponseDto<List<UserResponseDto>>.SuccessResponse(
                     employees,
                     MessageConstants.EmployeesRetrievedSuccess));
         }
-
         /// <summary>
         /// Assigns role and department to user.
         /// </summary>
@@ -306,13 +270,11 @@ namespace Relevantz.EEPZ.Api.Controllers
             [FromBody] AssignRoleDepartmentRequestDto request)
         {
             await _userManagementService.AssignRoleAndDepartmentAsync(request);
-
             return Ok(
                 ApiResponseDto<object>.SuccessResponse(
                     null,
                     MessageConstants.RoleDepartmentAssignedSuccess));
         }
-
         /// <summary>
         /// Gets next available employee company ID (Admin/HR only).
         /// </summary>
@@ -323,13 +285,10 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             var nextId =
                 await _userManagementService.GetNextEmployeeCompanyIdAsync();
-
             return Ok(
                 ApiResponseDto<string>.SuccessResponse(
                     nextId,
                     MessageConstants.NextEmpIdSuccess));
         }
-
-
     }
 }

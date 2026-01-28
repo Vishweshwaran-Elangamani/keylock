@@ -10,7 +10,6 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string AccessTokenExpirationMinutes = "Jwt:AccessTokenExpirationMinutes";
             public const string RefreshTokenExpirationDays = "Jwt:RefreshTokenExpirationDays";
         }
-
         public static class Defaults
         {
             public const string DefaultIssuer = "EEPZ";
@@ -18,12 +17,10 @@ namespace Relevantz.EEPZ.Common.Constants
             public const int DefaultAccessTokenExpirationMinutes = 60;
             public const int DefaultRefreshTokenExpirationDays = 7;
         }
-
         public static class ErrorMessages
         {
             public const string SecretKeyNotConfigured = "JWT Secret Key not configured";
         }
-
         public static class LogMessages
         {
             public const string RefreshTokenRevoked = "Refresh token revoked";

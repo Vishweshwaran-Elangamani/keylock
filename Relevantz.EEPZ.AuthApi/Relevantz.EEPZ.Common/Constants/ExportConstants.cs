@@ -1,5 +1,4 @@
 using System.Drawing;
-
 namespace Relevantz.EEPZ.Common.Constants
 {
     public static class ExportConstants
@@ -10,7 +9,6 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string Departments = "Departments";
             public const string Users = "Users";
         }
-
         public static class ColumnHeaders
         {
             public static class Roles
@@ -23,7 +21,6 @@ namespace Relevantz.EEPZ.Common.Constants
                 public const string CreatedAt = "Created At";
                 public const string UpdatedAt = "Updated At";
             }
-
             public static class Departments
             {
                 public const string DepartmentId = "Department ID";
@@ -33,7 +30,6 @@ namespace Relevantz.EEPZ.Common.Constants
                 public const string CreatedAt = "Created At";
                 public const string UpdatedAt = "Updated At";
             }
-
             public static class Users
             {
                 public const string UserId = "User ID";
@@ -59,7 +55,6 @@ namespace Relevantz.EEPZ.Common.Constants
                 public const string CreatedAt = "Created At";
             }
         }
-
         public static class Defaults
         {
             public const string NotAvailable = "N/A";
@@ -67,24 +62,20 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string No = "No";
             public const string Never = "Never";
         }
-
         public static class DateFormats
         {
             public const string DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             public const string DateFormat = "yyyy-MM-dd";
         }
-
         public static class NumberFormats
         {
             public const string DecimalFormat = "N2";
         }
-
         public static class Styling
         {
             public static readonly Color HeaderBackgroundColor = Color.FromArgb(79, 129, 189);
             public static readonly Color HeaderFontColor = Color.White;
         }
-
         public static class LogMessages
         {
             public const string RolesExported = "Roles exported to Excel successfully";

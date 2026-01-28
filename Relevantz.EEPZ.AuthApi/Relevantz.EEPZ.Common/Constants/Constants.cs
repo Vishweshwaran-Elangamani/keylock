@@ -10,7 +10,6 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string Intern = "Intern";
             public const string Probation = "Probation";
         }
-
         public static class EmploymentStatuses
         {
             public const string Active = "Active";
@@ -19,7 +18,6 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string Resigned = "Resigned";
             public const string Retired = "Retired";
         }
-
         public static class EmployeeTypes
         {
             public const string FullTime = "FullTime";
@@ -28,7 +26,6 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string Intern = "Intern";
             public const string Consultant = "Consultant";
         }
-
         public static class Genders
         {
             public const string Male = "Male";
@@ -36,14 +33,12 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string Other = "Other";
             public const string PreferNotToSay = "PreferNotToSay";
         }
-
         public static class UserStatuses
         {
             public const string Active = "Active";
             public const string Inactive = "Inactive";
             public const string Locked = "Locked";
         }
-
         public static class Roles
         {
             public const string Admin = "Admin";
@@ -52,13 +47,11 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string HR = "HR";
             public const string Finance = "Finance";
         }
-
         public static class OtpTypes
         {
             public const string Login2FA = "Login2FA";
             public const string ForgotPassword = "ForgotPassword";
         }
-
         public static class ChangeTypes
         {
             public const string Email = "Email";
@@ -67,7 +60,6 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string Address = "Address";
             public const string Username = "Username";
         }
-
         public static class RequestStatuses
         {
             public const string Pending = "Pending";
@@ -75,7 +67,6 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string Rejected = "Rejected";
             public const string Cancelled = "Cancelled";
         }
-
         public static class Messages
         {
             // Authentication
@@ -85,27 +76,22 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string OtpInvalid = "Invalid or expired OTP";
             public const string PasswordResetSuccess = "Password reset successfully";
             public const string PasswordChangeSuccess = "Password changed successfully";
-
             // User Management
             public const string UserNotFound = "User not found";
             public const string UserCreatedSuccess = "User created successfully";
             public const string UserUpdatedSuccess = "User updated successfully";
             public const string EmailAlreadyExists = "Email already exists";
             public const string EmployeeIdAlreadyExists = "Employee ID already exists";
-
             // Role Management
             public const string RoleNotFound = "Role not found";
             public const string RoleCreatedSuccess = "Role created successfully";
             public const string RoleUpdatedSuccess = "Role updated successfully";
-
             // Department Management
             public const string DepartmentNotFound = "Department not found";
             public const string DepartmentCreatedSuccess = "Department created successfully";
             public const string DepartmentUpdatedSuccess = "Department updated successfully";
-
             // Profile
             public const string ProfileUpdatedSuccess = "Profile updated successfully";
-
             // Change Requests
             public const string ChangeRequestSubmitted = "Change request submitted successfully";
             public const string ChangeRequestProcessed = "Change request processed successfully";
@@ -114,13 +100,11 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string InvalidCurrentPassword = "Invalid Current Password!";
             public const string PasswordChangedSuccess = "Password Changed Success!";
         }
-
         public static class AddressTypes
         {
             public const string Current = "Current";
             public const string Permanent = "Permanent";
         }
-
         public static class MaritalStatuses
         {
             public const string Single = "Single";

@@ -11,13 +11,11 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string RoleDepartmentAssignedSuccess = "Role and Department assigned successfully";
             public const string ManagerNotFound = "Manager not found";
         }
-
         public static class Prefixes
         {
             public const string CountryCodeIndia = "+91";
             public const string CountryCodeIndiaWithDash = "+91-";
         }
-
         public static class Separators
         {
             public const string Dash = "-";
