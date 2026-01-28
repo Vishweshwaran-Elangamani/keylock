@@ -197,7 +197,10 @@ const SLAEscalations = () => {
             );
 
             return (
-              <div key={escalation.escalationId} className="sla-escalation-card">
+              <div
+                key={escalation.escalationId}
+                className="sla-escalation-card"
+              >
                 <div className="sla-escalation-card-body">
                   <div className="sla-escalation-header">
                     <div className="sla-escalation-header-left">

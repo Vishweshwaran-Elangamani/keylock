@@ -1,8 +1,7 @@
 export const getComplianceRating = (percentage) => {
   const pct = Number(percentage) || 0;
 
-  if (pct >= 95)
-    return { rating: "Outstanding", color: "#24A148", icon: "🌟" };
+  if (pct >= 95) return { rating: "Outstanding", color: "#24A148", icon: "🌟" };
   if (pct >= 85) return { rating: "Excellent", color: "#0F62FE", icon: "⭐" };
   if (pct >= 75) return { rating: "Good", color: "#F1C21B", icon: "" };
   if (pct >= 60) return { rating: "Fair", color: "#FF832B", icon: "⚠️" };
@@ -38,10 +37,12 @@ export const getComplianceSummary = (slaData) => {
     )?.length ?? 0;
 
   const breachedSLAs =
-    closedSLAs?.filter?.((sla) => sla?.complianceStatus === "Breached")?.length ?? 0;
+    closedSLAs?.filter?.((sla) => sla?.complianceStatus === "Breached")
+      ?.length ?? 0;
 
   const extendedSLAs =
-    closedSLAs?.filter?.((sla) => sla?.complianceStatus === "Extended")?.length ?? 0;
+    closedSLAs?.filter?.((sla) => sla?.complianceStatus === "Extended")
+      ?.length ?? 0;
 
   const compliancePercentage =
     closedSLAs?.length > 0
@@ -133,7 +134,8 @@ export const calculateDepartmentCompliance = (slaData, departmentId) => {
       totalSLAs: departmentSLAs?.length ?? 0,
       closedSLAs: 0,
       openSLAs:
-        departmentSLAs?.filter?.((sla) => sla?.status !== "Closed")?.length ?? 0,
+        departmentSLAs?.filter?.((sla) => sla?.status !== "Closed")?.length ??
+        0,
       onTimeSLAs: 0,
       autoClosedCount: 0,
       compliancePercentage: 0,
@@ -181,14 +183,17 @@ export const calculateAllDepartmentsCompliance = (slaData) => {
     return [];
   }
 
-  const departments = [...new Set(slaData?.map?.((sla) => sla?.departmentId))].filter(
-    Boolean
-  );
+  const departments = [
+    ...new Set(slaData?.map?.((sla) => sla?.departmentId)),
+  ].filter(Boolean);
 
   return (
     departments
       ?.map?.((deptId) => calculateDepartmentCompliance(slaData, deptId))
       ?.filter?.((result) => result !== null)
-      ?.sort?.((a, b) => (b?.compliancePercentage ?? 0) - (a?.compliancePercentage ?? 0)) ?? []
+      ?.sort?.(
+        (a, b) =>
+          (b?.compliancePercentage ?? 0) - (a?.compliancePercentage ?? 0)
+      ) ?? []
   );
 };

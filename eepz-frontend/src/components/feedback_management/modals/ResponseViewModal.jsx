@@ -232,7 +232,11 @@ const ResponseViewModal = ({ show, response, onClose, type }) => {
               </div>
 
               {response?.rating && (
-                <div className={`rvm-rating-display ${getRatingClass(response.rating)}`}>
+                <div
+                  className={`rvm-rating-display ${getRatingClass(
+                    response.rating
+                  )}`}
+                >
                   <p className="rvm-rating-display__value">{response.rating}</p>
                   <p className="rvm-rating-item__label">
                     {RATING_LABELS[response.rating] || "N/A"}
@@ -272,7 +276,11 @@ const ResponseViewModal = ({ show, response, onClose, type }) => {
               </div>
 
               {response?.rating && (
-                <div className={`rvm-rating-display ${getRatingClass(response.rating)}`}>
+                <div
+                  className={`rvm-rating-display ${getRatingClass(
+                    response.rating
+                  )}`}
+                >
                   <p className="rvm-rating-display__value">{response.rating}</p>
                   <p className="rvm-rating-item__label">
                     {RATING_LABELS[response.rating] || "N/A"}

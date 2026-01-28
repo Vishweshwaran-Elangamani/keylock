@@ -63,7 +63,13 @@ const HRSLADashboard = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [activeSearchTerm, statusFilter, typeFilter, complianceFilter, itemsPerPage]);
+  }, [
+    activeSearchTerm,
+    statusFilter,
+    typeFilter,
+    complianceFilter,
+    itemsPerPage,
+  ]);
 
   const fetchSLAs = async () => {
     setLoading(true);
@@ -110,7 +116,9 @@ const HRSLADashboard = () => {
     }
 
     if (complianceFilter !== "All") {
-      filtered = filtered.filter((sla) => sla.complianceStatus === complianceFilter);
+      filtered = filtered.filter(
+        (sla) => sla.complianceStatus === complianceFilter
+      );
     }
 
     setFilteredSlas(filtered);
@@ -285,7 +293,8 @@ const HRSLADashboard = () => {
   const safeTotal = filteredSlas.length;
   const totalPages = Math.max(1, Math.ceil(safeTotal / itemsPerPage));
   const startIndex = safeTotal === 0 ? 0 : (currentPage - 1) * itemsPerPage;
-  const endIndex = safeTotal === 0 ? 0 : Math.min(currentPage * itemsPerPage, safeTotal);
+  const endIndex =
+    safeTotal === 0 ? 0 : Math.min(currentPage * itemsPerPage, safeTotal);
   const currentSLAs = filteredSlas.slice(startIndex, endIndex);
 
   useEffect(() => {
@@ -342,10 +351,30 @@ const HRSLADashboard = () => {
 
       <div className="hr-sla-stats-grid">
         {[
-          { label: "Total SLAs", value: stats.total, icon: FileText, iconClass: "hr-sla-stat-bg-total" },
-          { label: "Open", value: stats.open, icon: Clock, iconClass: "hr-sla-stat-bg-open" },
-          { label: "Closed", value: stats.closed, icon: CheckCircle, iconClass: "hr-sla-stat-bg-closed" },
-          { label: "On Time", value: stats.onTime, icon: TrendingUp, iconClass: "hr-sla-stat-bg-ontime" },
+          {
+            label: "Total SLAs",
+            value: stats.total,
+            icon: FileText,
+            iconClass: "hr-sla-stat-bg-total",
+          },
+          {
+            label: "Open",
+            value: stats.open,
+            icon: Clock,
+            iconClass: "hr-sla-stat-bg-open",
+          },
+          {
+            label: "Closed",
+            value: stats.closed,
+            icon: CheckCircle,
+            iconClass: "hr-sla-stat-bg-closed",
+          },
+          {
+            label: "On Time",
+            value: stats.onTime,
+            icon: TrendingUp,
+            iconClass: "hr-sla-stat-bg-ontime",
+          },
         ].map(({ label, value, icon: Icon, iconClass }) => (
           <div key={label} className="hr-sla-stat-col">
             <div className="hr-sla-stat-card">
@@ -435,7 +464,10 @@ const HRSLADashboard = () => {
               <Download size={16} /> Export
             </button>
 
-            <button className="hr-sla-btn-create" onClick={() => setShowCreateModal(true)}>
+            <button
+              className="hr-sla-btn-create"
+              onClick={() => setShowCreateModal(true)}
+            >
               <Plus size={16} /> Create SLA
             </button>
           </div>
@@ -482,38 +514,58 @@ const HRSLADashboard = () => {
                     className="hr-sla-clickable-row"
                   >
                     <td>
-                      <div className="hr-sla-employee-name">{sla.employeeName}</div>
-                      <div className="hr-sla-employee-email">{sla.employeeEmail}</div>
+                      <div className="hr-sla-employee-name">
+                        {sla.employeeName}
+                      </div>
+                      <div className="hr-sla-employee-email">
+                        {sla.employeeEmail}
+                      </div>
                     </td>
 
                     <td>
-                      <span className="hr-sla-badge hr-sla-badge-type">{sla.slatype}</span>
+                      <span className="hr-sla-badge hr-sla-badge-type">
+                        {sla.slatype}
+                      </span>
                     </td>
 
                     <td>
                       {sla.assignedToName ? (
-                        <span className="hr-sla-assigned-name">{sla.assignedToName}</span>
+                        <span className="hr-sla-assigned-name">
+                          {sla.assignedToName}
+                        </span>
                       ) : (
-                        <span className="hr-sla-not-assigned">Not assigned</span>
+                        <span className="hr-sla-not-assigned">
+                          Not assigned
+                        </span>
                       )}
                     </td>
 
                     <td>
-                      <div className="hr-sla-deadline-date">{formatDate(sla.deadline)}</div>
+                      <div className="hr-sla-deadline-date">
+                        {formatDate(sla.deadline)}
+                      </div>
                       {sla.closedAt && (
-                        <div className="hr-sla-closed-date">Closed: {formatDate(sla.closedAt)}</div>
+                        <div className="hr-sla-closed-date">
+                          Closed: {formatDate(sla.closedAt)}
+                        </div>
                       )}
                     </td>
 
                     <td>
-                      <span className={`hr-sla-badge ${getStatusBadgeClass(sla.status)}`}>
+                      <span
+                        className={`hr-sla-badge ${getStatusBadgeClass(
+                          sla.status
+                        )}`}
+                      >
                         {sla.status}
                       </span>
                     </td>
 
                     <td>
                       <span
-                        className={`hr-sla-badge ${getComplianceBadgeClass(sla.complianceStatus)}`}
+                        className={`hr-sla-badge ${getComplianceBadgeClass(
+                          sla.complianceStatus
+                        )}`}
                       >
                         {sla.complianceStatus}
                       </span>
@@ -545,19 +597,20 @@ const HRSLADashboard = () => {
           </div>
 
           {filteredSlas.length > 0 && (
-          <PaginationFooter
-           currentPage={currentPage}
-           totalItems={filteredSlas.length}
-           itemsPerPage={itemsPerPage}
-           onPageChange={setCurrentPage}
-           onItemsPerPageChange={(size) => {
-           setItemsPerPage(size);
-           setCurrentPage(1);
-        }}
-         pageSizeOptions={[5, 10, 25, 50]}
-         showPageSizeDropdown={true}
-         showStatusText={true}
-         pageNumberMode="compact"/>
+            <PaginationFooter
+              currentPage={currentPage}
+              totalItems={filteredSlas.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              onItemsPerPageChange={(size) => {
+                setItemsPerPage(size);
+                setCurrentPage(1);
+              }}
+              pageSizeOptions={[5, 10, 25, 50]}
+              showPageSizeDropdown={true}
+              showStatusText={true}
+              pageNumberMode="compact"
+            />
           )}
         </div>
       )}

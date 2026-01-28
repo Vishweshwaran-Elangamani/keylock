@@ -147,10 +147,7 @@ export default function EditManagerReview() {
             title="Refresh"
             type="button"
           >
-            <RefreshCw
-              size={18}
-              className={loadingData ? "emr-spin" : ""}
-            />
+            <RefreshCw size={18} className={loadingData ? "emr-spin" : ""} />
           </button>
         </div>
 

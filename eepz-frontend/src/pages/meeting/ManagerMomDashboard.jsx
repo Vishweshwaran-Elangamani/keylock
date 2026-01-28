@@ -179,7 +179,10 @@ const ManagerMomDashboard = () => {
     <div className="managermom-page">
       <div className="row justify-content-center">
         <div className="col-lg-10 col-xl-9">
-          <nav aria-label="breadcrumb" className="sched-breadcrumb-nav-dashboard">
+          <nav
+            aria-label="breadcrumb"
+            className="sched-breadcrumb-nav-dashboard"
+          >
             <ol className="breadcrumb mb-0 d-flex align-items-center sched-breadcrumb">
               <li className="breadcrumb-item d-flex align-items-center">
                 <button
@@ -195,7 +198,9 @@ const ManagerMomDashboard = () => {
               <li className="breadcrumb-separator">/</li>
 
               <li className="breadcrumb-item active" aria-current="page">
-                <span className="sched-breadcrumb-active">Meetings and MoM</span>
+                <span className="sched-breadcrumb-active">
+                  Meetings and MoM
+                </span>
               </li>
             </ol>
           </nav>
@@ -204,32 +209,30 @@ const ManagerMomDashboard = () => {
 
       <div className="managermom-container">
         <div className="row g-3 mb-4">
-         
- <StatCard
-    icon="bi-file-text"
-    variant="moms"
-    count={stats.teamMomsCount}
-    label="Team MoMs"
-  />
-  <StatCard
-    icon="bi-person-lines-fill"
-    variant="oneonone"
-    count={stats.oneOnOnesCount}
-    label="1:1 Meetings"
-  />
-  <StatCard
-    icon="bi-exclamation-triangle"
-    variant="overdue"
-    count={stats.overdueActionsCount}
-    label="Overdue Action Items"
-  />
-  <StatCard
-    icon="bi-people"
-    variant="meetings"
-    count={stats.totalMeetingsCount}
-    label="Total Meetings"
-  />
-
+          <StatCard
+            icon="bi-file-text"
+            variant="moms"
+            count={stats.teamMomsCount}
+            label="Team MoMs"
+          />
+          <StatCard
+            icon="bi-person-lines-fill"
+            variant="oneonone"
+            count={stats.oneOnOnesCount}
+            label="1:1 Meetings"
+          />
+          <StatCard
+            icon="bi-exclamation-triangle"
+            variant="overdue"
+            count={stats.overdueActionsCount}
+            label="Overdue Action Items"
+          />
+          <StatCard
+            icon="bi-people"
+            variant="meetings"
+            count={stats.totalMeetingsCount}
+            label="Total Meetings"
+          />
         </div>
 
         <div className="managermom-toolbar">

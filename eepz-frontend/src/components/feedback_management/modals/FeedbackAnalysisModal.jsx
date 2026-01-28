@@ -14,7 +14,13 @@ import {
 } from "lucide-react";
 import "../../../styles/feedback/modals/FeedbackAnalysisModal.css";
 
-const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) => {
+const FeedbackAnalysisModal = ({
+  show,
+  onClose,
+  analysisData,
+  loading,
+  error,
+}) => {
   if (!show) return null;
 
   const getSentimentColorClass = (sentiment) => {
@@ -59,7 +65,9 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
             <div className="fa-loading-container">
               <div className="fa-spinner"></div>
               <p className="fa-loading-text">Analyzing Feedback...</p>
-              <p className="fa-loading-subtext">Running multi-engine analysis</p>
+              <p className="fa-loading-subtext">
+                Running multi-engine analysis
+              </p>
             </div>
           )}
 
@@ -154,8 +162,8 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                     <div className="fa-metric-value">
                       {analysisData.feedback_metrics
                         ? (
-                            analysisData.feedback_metrics.professionalism_score *
-                            100
+                            analysisData.feedback_metrics
+                              .professionalism_score * 100
                           ).toFixed(0)
                         : 0}
                       %
@@ -207,16 +215,18 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                         {analysisData.sentiment_analysis.sentiment_category})
                       </div>
                       <div className="fa-sentiment-confidence">
-                        {(analysisData.sentiment_analysis.confidence * 100).toFixed(
-                          0
-                        )}
+                        {(
+                          analysisData.sentiment_analysis.confidence * 100
+                        ).toFixed(0)}
                         % Confidence
                       </div>
                     </div>
 
                     <div className="fa-sentiment-metrics">
                       <div className="fa-sentiment-metric-item">
-                        <div className="fa-sentiment-metric-label">Polarity</div>
+                        <div className="fa-sentiment-metric-label">
+                          Polarity
+                        </div>
                         <div className="fa-sentiment-metric-value">
                           {analysisData.sentiment_analysis.polarity.toFixed(2)}
                         </div>
@@ -227,12 +237,16 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                           Subjectivity
                         </div>
                         <div className="fa-sentiment-metric-value">
-                          {analysisData.sentiment_analysis.subjectivity.toFixed(2)}
+                          {analysisData.sentiment_analysis.subjectivity.toFixed(
+                            2
+                          )}
                         </div>
                       </div>
 
                       <div className="fa-sentiment-metric-item">
-                        <div className="fa-sentiment-metric-label">Intensity</div>
+                        <div className="fa-sentiment-metric-label">
+                          Intensity
+                        </div>
                         <div className="fa-sentiment-metric-value">
                           {analysisData.sentiment_analysis.intensity.toFixed(2)}
                         </div>
@@ -254,7 +268,8 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                           </div>
                           <span className="fa-vader-bar-value">
                             {(
-                              analysisData.sentiment_analysis.vader_positive * 100
+                              analysisData.sentiment_analysis.vader_positive *
+                              100
                             ).toFixed(1)}
                             %
                           </span>
@@ -271,7 +286,8 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                           </div>
                           <span className="fa-vader-bar-value">
                             {(
-                              analysisData.sentiment_analysis.vader_neutral * 100
+                              analysisData.sentiment_analysis.vader_neutral *
+                              100
                             ).toFixed(1)}
                             %
                           </span>
@@ -288,7 +304,8 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                           </div>
                           <span className="fa-vader-bar-value">
                             {(
-                              analysisData.sentiment_analysis.vader_negative * 100
+                              analysisData.sentiment_analysis.vader_negative *
+                              100
                             ).toFixed(1)}
                             %
                           </span>
@@ -373,7 +390,8 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
 
                     <div className="fa-bias-score">
                       Score:{" "}
-                      {(analysisData.bias_analysis.bias_score * 100).toFixed(0)}%
+                      {(analysisData.bias_analysis.bias_score * 100).toFixed(0)}
+                      %
                     </div>
                   </div>
                 </div>
@@ -439,7 +457,10 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
 
                     <div className="fa-action-items">
                       <strong>Action Items:</strong>{" "}
-                      {analysisData.constructiveness_analysis.action_items_count}
+                      {
+                        analysisData.constructiveness_analysis
+                          .action_items_count
+                      }
                     </div>
                   </div>
                 </div>
@@ -485,9 +506,9 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                         Complexity Score
                       </div>
                       <div className="fa-feedback-metric-value">
-                        {(analysisData.feedback_metrics.complexity_score * 100).toFixed(
-                          2
-                        )}
+                        {(
+                          analysisData.feedback_metrics.complexity_score * 100
+                        ).toFixed(2)}
                       </div>
                     </div>
 
@@ -496,9 +517,9 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                         Formality Score
                       </div>
                       <div className="fa-feedback-metric-value">
-                        {(analysisData.feedback_metrics.formality_score * 100).toFixed(
-                          2
-                        )}
+                        {(
+                          analysisData.feedback_metrics.formality_score * 100
+                        ).toFixed(2)}
                       </div>
                     </div>
 
@@ -507,9 +528,9 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                         Clarity Score
                       </div>
                       <div className="fa-feedback-metric-value">
-                        {(analysisData.feedback_metrics.clarity_score * 100).toFixed(
-                          2
-                        )}
+                        {(
+                          analysisData.feedback_metrics.clarity_score * 100
+                        ).toFixed(2)}
                       </div>
                     </div>
 
@@ -519,7 +540,8 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                       </div>
                       <div className="fa-feedback-metric-value">
                         {(
-                          analysisData.feedback_metrics.professionalism_score * 100
+                          analysisData.feedback_metrics.professionalism_score *
+                          100
                         ).toFixed(2)}
                       </div>
                     </div>
@@ -527,20 +549,21 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                 </div>
               )}
 
-              {analysisData.key_insights && analysisData.key_insights.length > 0 && (
-                <div className="fa-section">
-                  <div className="fa-section-header">
-                    <BookOpen size={16} />
-                    <h3>KEY INSIGHTS</h3>
-                  </div>
+              {analysisData.key_insights &&
+                analysisData.key_insights.length > 0 && (
+                  <div className="fa-section">
+                    <div className="fa-section-header">
+                      <BookOpen size={16} />
+                      <h3>KEY INSIGHTS</h3>
+                    </div>
 
-                  <ul className="fa-insights-list">
-                    {analysisData.key_insights.map((insight, idx) => (
-                      <li key={idx}>{insight}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+                    <ul className="fa-insights-list">
+                      {analysisData.key_insights.map((insight, idx) => (
+                        <li key={idx}>{insight}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
               {analysisData.suggestions && (
                 <div className="fa-section">
@@ -558,9 +581,11 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                           </div>
 
                           <ol className="fa-suggestions-list">
-                            {analysisData.suggestions.suggestions.map((rec, idx) => (
-                              <li key={idx}>{rec}</li>
-                            ))}
+                            {analysisData.suggestions.suggestions.map(
+                              (rec, idx) => (
+                                <li key={idx}>{rec}</li>
+                              )
+                            )}
                           </ol>
                         </div>
                       )}

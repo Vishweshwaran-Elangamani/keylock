@@ -76,7 +76,9 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
               <div className="mmdm-meeting-link-card">
                 <div className="mmdm-meeting-link-header">
                   <i className="bi bi-link-45deg mmdm-meeting-link-icon"></i>
-                  <small className="mmdm-meeting-link-label">Meeting Link</small>
+                  <small className="mmdm-meeting-link-label">
+                    Meeting Link
+                  </small>
                 </div>
 
                 <a

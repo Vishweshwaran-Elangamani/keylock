@@ -282,7 +282,8 @@ export default function CreateManagerReview() {
 
               <div className="col-12">
                 <label className="cmr-label">
-                  Project Context <span className="cmr-optional">(Optional)</span>
+                  Project Context{" "}
+                  <span className="cmr-optional">(Optional)</span>
                 </label>
                 <textarea
                   className="cmr-textarea"
