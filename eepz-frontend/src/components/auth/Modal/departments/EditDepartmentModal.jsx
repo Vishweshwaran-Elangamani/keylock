@@ -99,7 +99,8 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
         }
       };
       document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
     }, []);
     const selectedOption = options.find((opt) => opt.value === value);
     return (
@@ -198,7 +199,6 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
       <div className="edm-backdrop" onClick={onClose} />
       <div className="edm-modal-container">
         <div className="edm-modal-dialog">
-          {/* Header */}
           <div className="edm-modal-header">
             <div className="edm-header-title">
               <i className="bi bi-pencil-square"></i>
@@ -211,7 +211,6 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
               disabled={loading}
             />
           </div>
-          {/* Body */}
           <form onSubmit={handleSubmit} autoComplete="off" className="edm-form">
             <div className="edm-modal-body">
               {loadingDropdowns ? (
@@ -221,7 +220,6 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
                 </div>
               ) : (
                 <div className="edm-form-content">
-                  {/* Row 1: Department Name & Code (READ-ONLY) */}
                   <div className="edm-form-row">
                     <div className="edm-form-group">
                       <label className="edm-form-label">Department Name</label>
@@ -248,7 +246,6 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
                       </div>
                     </div>
                   </div>
-                  {/* Row 2: Description (EDITABLE) */}
                   <div className="edm-form-row-full">
                     <label className="edm-form-label">Description</label>
                     <textarea
@@ -262,9 +259,7 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
                       className="edm-form-input edm-form-textarea"
                     />
                   </div>
-                  {/* Row 3: Status & Parent Department (CUSTOM DROPDOWNS) */}
                   <div className="edm-form-row">
-                    {/* Status - CUSTOM DROPDOWN */}
                     <div className="edm-form-group">
                       <label className="edm-form-label">Status</label>
                       <CustomDropdown
@@ -276,7 +271,6 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
                         disabled={loading}
                       />
                     </div>
-                    {/* Parent Department - CUSTOM DROPDOWN */}
                     <div className="edm-form-group">
                       <label className="edm-form-label">
                         Parent Department
@@ -295,7 +289,6 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
                       </div>
                     </div>
                   </div>
-                  {/* Row 4: HOD (CUSTOM DROPDOWN) */}
                   <div className="edm-form-row-full">
                     <label className="edm-form-label">
                       Head of Department (HOD)
@@ -322,7 +315,6 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
                 </div>
               )}
             </div>
-            {/* Footer */}
             <div className="edm-modal-footer">
               <button
                 type="button"

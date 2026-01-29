@@ -129,7 +129,8 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
         }
       };
       document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
     }, []);
     const selectedOption = options.find((opt) => opt.value === value);
     return (
@@ -149,9 +150,7 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
         </div>
         {isOpen && (
           <div
-            className={`adm-custom-menu ${
-              openUpward ? "adm-menu-upward" : ""
-            }`}
+            className={`adm-custom-menu ${openUpward ? "adm-menu-upward" : ""}`}
           >
             {options.map((option, index) => (
               <div
@@ -232,7 +231,6 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
       <div className="adm-backdrop" onClick={onClose} />
       <div className="adm-modal-container">
         <div className="adm-modal-dialog">
-          {/* Header */}
           <div className="adm-modal-header">
             <div className="adm-header-title">
               <i className="bi bi-plus-circle"></i>
@@ -245,7 +243,6 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
               disabled={loading}
             />
           </div>
-          {/* Body */}
           <form onSubmit={handleSubmit} autoComplete="off" className="adm-form">
             <div className="adm-modal-body">
               {loadingDropdowns ? (
@@ -255,7 +252,6 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
                 </div>
               ) : (
                 <div className="adm-form-content">
-                  {/* Row 1: Department Name & Code */}
                   <div className="adm-form-row">
                     <div className="adm-form-group">
                       <label className="adm-form-label">
@@ -305,7 +301,6 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
                       )}
                     </div>
                   </div>
-                  {/* Row 2: Description */}
                   <div className="adm-form-row-full">
                     <label className="adm-form-label">Description</label>
                     <textarea
@@ -319,9 +314,7 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
                       className="adm-form-input adm-form-textarea"
                     />
                   </div>
-                  {/* Row 3: Status & Parent Department */}
                   <div className="adm-form-row">
-                    {/* Status */}
                     <div className="adm-form-group">
                       <label className="adm-form-label">
                         Status <span className="adm-required-asterisk">*</span>
@@ -337,7 +330,6 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
                         forceUpward={false}
                       />
                     </div>
-                    {/* Parent Department */}
                     <div className="adm-form-group">
                       <label className="adm-form-label">
                         Parent Department
@@ -354,7 +346,6 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
                       />
                     </div>
                   </div>
-                  {/* Row 4: HOD */}
                   <div className="adm-form-row-full">
                     <label className="adm-form-label">
                       Head of Department (HOD)
@@ -379,7 +370,6 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
                 </div>
               )}
             </div>
-            {/* Footer */}
             <div className="adm-modal-footer">
               <button
                 type="button"

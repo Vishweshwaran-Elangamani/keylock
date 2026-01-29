@@ -302,9 +302,7 @@ const AllocationsList = ({
               <h3 className="allocations-stat-value">
                 {summaryStats.avgUtilization}%
               </h3>
-              <p className="allocations-stat-label">
-                Avg Utilization
-              </p>
+              <p className="allocations-stat-label">Avg Utilization</p>
             </div>
           </div>
         </div>
@@ -362,12 +360,16 @@ const AllocationsList = ({
           <div className="allocations-empty-state">
             <i className="bi bi-inbox"></i>
             <p>
-              {activeSearchTerm || filters.type !== "all" || filters.allocationName
+              {activeSearchTerm ||
+              filters.type !== "all" ||
+              filters.allocationName
                 ? "No allocations found matching your filters"
                 : "No allocations created yet"}
             </p>
             <small>
-              {activeSearchTerm || filters.type !== "all" || filters.allocationName
+              {activeSearchTerm ||
+              filters.type !== "all" ||
+              filters.allocationName
                 ? "Try adjusting your search criteria"
                 : 'Click "Allocate" button to create new allocations'}
             </small>
@@ -385,7 +387,9 @@ const AllocationsList = ({
                     <th>Amount</th>
                     <th>Utilized</th>
                     <th>Utilization</th>
-                    {isDeptHead && <th className="allocations-text-center">Actions</th>}
+                    {isDeptHead && (
+                      <th className="allocations-text-center">Actions</th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
@@ -485,9 +489,8 @@ const AllocationsList = ({
                   <span className="allocations-pagination-label">entries</span>
                 </div>
                 <div className="allocations-pagination-status">
-                  Showing{" "}
-                  {Math.min(startIndex + 1, filteredAllocations.length)}-
-                  {Math.min(endIndex, filteredAllocations.length)} of{" "}
+                  Showing {Math.min(startIndex + 1, filteredAllocations.length)}
+                  -{Math.min(endIndex, filteredAllocations.length)} of{" "}
                   {filteredAllocations.length} entries
                 </div>
                 <nav className="allocations-pagination-nav">

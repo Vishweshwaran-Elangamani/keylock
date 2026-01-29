@@ -7,7 +7,6 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
   const [preview, setPreview] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
-  // Image positioning states
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
@@ -43,7 +42,7 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
     }
     setSelectedFile(file);
     setPreview(URL.createObjectURL(file));
-    setPosition({ x: 0, y: 0 }); // Reset position
+    setPosition({ x: 0, y: 0 });
   };
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -62,9 +61,6 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
     const file = e.dataTransfer.files[0];
     processFile(file);
   };
-  // ========================
-  // IMAGE REPOSITIONING
-  // ========================
   const handleMouseDown = (e) => {
     if (!preview) return;
     setDragging(true);
@@ -105,12 +101,12 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
     return new Promise((resolve) => {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
-      const size = 300; // Output size
+      const size = 300;
       canvas.width = size;
       canvas.height = size;
       const img = new Image();
       img.onload = () => {
-        const containerSize = 160; 
+        const containerSize = 160;
         ctx.beginPath();
         ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
         ctx.closePath();
@@ -189,7 +185,6 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
       <div className="ppum-backdrop" onClick={onClose} />
       <div className="ppum-modal-container">
         <div className="ppum-modal-dialog">
-          {/* HEADER */}
           <div className="ppum-modal-header">
             <div className="ppum-header-title">
               <i className="bi bi-camera-fill"></i>
@@ -204,13 +199,10 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-          {/* BODY */}
           <form onSubmit={handleSubmit}>
             <div className="ppum-modal-body">
-              {/* Preview Section with Drag */}
               {preview ? (
                 <div className="ppum-preview-section">
-                  {/* Circular Image Preview - Draggable */}
                   <div
                     className={`ppum-preview-container ${
                       dragging ? "dragging" : "draggable"
@@ -234,18 +226,15 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
                       }}
                     />
                   </div>
-                  {/* Drag Instruction */}
                   <p className="ppum-drag-instruction">
                     <i className="bi bi-hand-index"></i> Drag to reposition
                   </p>
-                  {/* File Info */}
                   <p className="ppum-file-name">{selectedFile?.name}</p>
                   <p className="ppum-file-size">
                     {(selectedFile?.size / 1024).toFixed(2)} KB
                   </p>
                 </div>
               ) : (
-                /* Upload Area */
                 <div
                   className={`ppum-upload-area ${
                     dragActive ? "drag-active" : ""
@@ -278,7 +267,6 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
                   />
                 </div>
               )}
-              {/* Info */}
               <div className="ppum-info-box">
                 <i className="bi bi-info-circle"></i>
                 <small>
@@ -286,7 +274,6 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
                 </small>
               </div>
             </div>
-            {/* FOOTER */}
             <div className="ppum-modal-footer">
               <button
                 type="button"

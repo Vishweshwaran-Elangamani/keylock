@@ -104,7 +104,8 @@ const EditUserModal = ({
         }
       };
       document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
     }, []);
     const selectedOption = options.find((opt) => opt.value === value);
     return (
@@ -124,9 +125,7 @@ const EditUserModal = ({
         </div>
         {isOpen && (
           <div
-            className={`eum-custom-menu ${
-              openUpward ? "eum-menu-upward" : ""
-            }`}
+            className={`eum-custom-menu ${openUpward ? "eum-menu-upward" : ""}`}
           >
             {options.map((option, index) => (
               <div
@@ -268,7 +267,6 @@ const EditUserModal = ({
       <div className="eum-backdrop" onClick={onHide} />
       <div className="eum-modal-container">
         <div className="eum-modal-dialog">
-          {/* MODAL HEADER */}
           <div className="eum-modal-header">
             <div className="eum-header-title">
               <i className="bi bi-pencil-square"></i>
@@ -284,7 +282,6 @@ const EditUserModal = ({
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-          {/* MODAL BODY - FORM */}
           <form onSubmit={handleSubmit} className="eum-form">
             <div className="eum-modal-body">
               <div className="eum-form-grid">
@@ -309,7 +306,6 @@ const EditUserModal = ({
                     </div>
                   )}
                 </div>
-                {/* Exit Date Field (Optional) */}
                 <div className="eum-form-group">
                   <label className="eum-form-label">Exit Date</label>
                   <input
@@ -329,7 +325,6 @@ const EditUserModal = ({
                     Must be after joining/confirmation date
                   </small>
                 </div>
-                {/* Work Location Field (Optional) */}
                 <div className="eum-form-group">
                   <label className="eum-form-label">Work Location</label>
                   <input
@@ -349,7 +344,6 @@ const EditUserModal = ({
                   )}
                   <small className="eum-form-hint">Minimum 2 characters</small>
                 </div>
-                {/* Employee Type Field (Required) - CUSTOM DROPDOWN */}
                 <div className="eum-form-group">
                   <label className="eum-form-label">
                     Employee Type{" "}
@@ -369,11 +363,8 @@ const EditUserModal = ({
                     <div className="eum-form-error">{errors.employeeType}</div>
                   )}
                 </div>
-                {/* Notice Period Field (Optional) */}
                 <div className="eum-form-group">
-                  <label className="eum-form-label">
-                    Notice Period (Days)
-                  </label>
+                  <label className="eum-form-label">Notice Period (Days)</label>
                   <input
                     type="number"
                     name="noticePeriodDays"
@@ -395,7 +386,6 @@ const EditUserModal = ({
                   <small className="eum-form-hint">Maximum 365 days</small>
                 </div>
               </div>
-              {/* Info Alert */}
               <div className="eum-info-alert">
                 <i className="bi bi-info-circle"></i>
                 <small>
@@ -404,7 +394,6 @@ const EditUserModal = ({
                 </small>
               </div>
             </div>
-            {/* MODAL FOOTER - ACTION BUTTONS */}
             <div className="eum-modal-footer">
               <button
                 type="button"

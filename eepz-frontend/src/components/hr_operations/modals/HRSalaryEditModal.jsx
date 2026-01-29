@@ -73,7 +73,6 @@ const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
       minimumFractionDigits: 0,
     }).format(amount);
   };
-  // AUTO-CALCULATE
   const currentSalary = nomination?.oldSalary || 0;
   const proposedNewSalary = parseFloat(newSalary) || 0;
   const increment = proposedNewSalary - currentSalary;

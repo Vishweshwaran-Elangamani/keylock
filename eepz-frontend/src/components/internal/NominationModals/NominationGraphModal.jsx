@@ -126,7 +126,11 @@ const NominationGraphModal = ({ show, onHide }) => {
       },
       y: {
         beginAtZero: true,
-        ticks: { color: "#27235C", stepSize: 1, font: { weight: 600, size: 11 } },
+        ticks: {
+          color: "#27235C",
+          stepSize: 1,
+          font: { weight: 600, size: 11 },
+        },
         grid: { color: "#f4f4f4" },
       },
     },
@@ -161,7 +165,11 @@ const NominationGraphModal = ({ show, onHide }) => {
       },
       y: {
         beginAtZero: true,
-        ticks: { color: "#27235C", stepSize: 1, font: { weight: 600, size: 11 } },
+        ticks: {
+          color: "#27235C",
+          stepSize: 1,
+          font: { weight: 600, size: 11 },
+        },
         grid: { color: "#f4f4f4" },
       },
     },

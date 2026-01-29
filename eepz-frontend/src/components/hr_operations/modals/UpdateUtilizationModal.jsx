@@ -93,7 +93,7 @@ const UpdateUtilizationModal = ({
       <div className="uum-backdrop" onClick={handleClose} />
       <div className="uum-modal-container">
         <div className="uum-modal-dialog">
-          {/* HEADER - Fixed */}
+          {/* HEADER -  */}
           <div className="uum-modal-header">
             <div className="uum-header-title">
               <i className="bi bi-pencil-square"></i>
@@ -258,7 +258,7 @@ const UpdateUtilizationModal = ({
                 </div>
               )}
             </div>
-            {/* FOOTER - Fixed */}
+            {/* FOOTER -  */}
             <div className="uum-modal-footer">
               <button
                 type="button"

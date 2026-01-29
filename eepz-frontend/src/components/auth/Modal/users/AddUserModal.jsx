@@ -288,7 +288,6 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
       <div className="aum-backdrop" onClick={onHide} />
       <div className="aum-modal-container">
         <div className="aum-modal-dialog">
-          {/* HEADER */}
           <div className="aum-modal-header">
             <div className="aum-header-title">
               <i className="bi bi-person-plus-fill"></i>
@@ -304,11 +303,9 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-          {/* BODY/FORM */}
           <form onSubmit={handleSubmit} className="aum-form">
             <div className="aum-modal-body">
               <div className="aum-form-grid">
-                {/* First Name */}
                 <div className="aum-form-group">
                   <label className="aum-form-label">
                     First Name <span className="aum-required-asterisk">*</span>
@@ -328,7 +325,6 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                     <div className="aum-form-error">{errors.firstName}</div>
                   )}
                 </div>
-                {/* Last Name */}
                 <div className="aum-form-group">
                   <label className="aum-form-label">
                     Last Name <span className="aum-required-asterisk">*</span>
@@ -348,7 +344,6 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                     <div className="aum-form-error">{errors.lastName}</div>
                   )}
                 </div>
-                {/* Employee Company Id - AUTO-GENERATED READ-ONLY */}
                 <div className="aum-form-group">
                   <label className="aum-form-label">
                     Employee ID <span className="aum-required-asterisk">*</span>
@@ -403,7 +398,6 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                     (sequential from last ID)
                   </small>
                 </div>
-                {/* Email */}
                 <div className="aum-form-group">
                   <label className="aum-form-label">
                     Email <span className="aum-required-asterisk">*</span>
@@ -421,7 +415,6 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                     <div className="aum-form-error">{errors.email}</div>
                   )}
                 </div>
-                {/* Mobile Number */}
                 <div className="aum-form-group">
                   <label className="aum-form-label">
                     Mobile <span className="aum-required-asterisk">*</span>
@@ -447,7 +440,6 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                     Must start with 6-9 (10 digits)
                   </small>
                 </div>
-                {/* Date of Birth */}
                 <div className="aum-form-group">
                   <label className="aum-form-label">
                     Date of Birth{" "}
@@ -470,7 +462,6 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                   )}
                   <small className="aum-form-hint">Must be 18+ years old</small>
                 </div>
-                {/* Gender - Custom Dropdown */}
                 <div className="aum-form-group">
                   <label className="aum-form-label">
                     Gender <span className="aum-required-asterisk">*</span>
@@ -487,7 +478,6 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                     <div className="aum-form-error">{errors.gender}</div>
                   )}
                 </div>
-                {/* Employment Type - Custom Dropdown */}
                 <div className="aum-form-group">
                   <label className="aum-form-label">
                     Employment Type{" "}
@@ -507,7 +497,6 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                     </div>
                   )}
                 </div>
-                {/* Role - Custom Dropdown */}
                 <div className="aum-form-group">
                   <label className="aum-form-label">
                     Role <span className="aum-required-asterisk">*</span>
@@ -524,7 +513,6 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                     <div className="aum-form-error">{errors.roleId}</div>
                   )}
                 </div>
-                {/* Department - Custom Dropdown */}
                 <div className="aum-form-group">
                   <label className="aum-form-label">
                     Department <span className="aum-required-asterisk">*</span>
@@ -542,7 +530,6 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                   )}
                 </div>
               </div>
-              {/* Info Alert */}
               <div className="aum-info-alert">
                 <i className="bi bi-info-circle"></i>
                 <small>
@@ -551,7 +538,6 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                 </small>
               </div>
             </div>
-            {/* FOOTER */}
             <div className="aum-modal-footer">
               <button
                 type="button"

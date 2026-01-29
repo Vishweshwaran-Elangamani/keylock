@@ -8,7 +8,6 @@ const EscalationDetailModal = ({
   getStatusBadge,
 }) => {
   if (!show || !escalation) return null;
-  // Custom Badge Component
   const CustomBadge = ({ variant, children }) => {
     const variantClass = `edm-badge edm-badge-${variant || "secondary"}`;
     return <span className={variantClass}>{children}</span>;
@@ -171,7 +170,6 @@ const EscalationDetailModal = ({
               )}
             </div>
           </div>
-          {/* FOOTER - Fixed */}
           <div className="edm-modal-footer">
             <button type="button" onClick={onHide} className="edm-btn-close">
               Close

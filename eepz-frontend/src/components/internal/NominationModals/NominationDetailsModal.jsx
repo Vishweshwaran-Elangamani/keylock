@@ -29,7 +29,7 @@ const NominationDetailsModal = ({ show, onHide, nomination }) => {
       <div className="ndm-backdrop" onClick={onHide} />
       <div className="ndm-modal-container">
         <div className="ndm-modal-dialog">
-          {/* HEADER - Fixed */}
+          {/* HEADER -  */}
           <div className="ndm-modal-header">
             <div className="ndm-header-title">
               <i className="bi bi-info-circle"></i>
@@ -156,7 +156,7 @@ const NominationDetailsModal = ({ show, onHide, nomination }) => {
               </div>
             )}
           </div>
-          {/* FOOTER - Fixed */}
+          {/* FOOTER -  */}
           <div className="ndm-modal-footer">
             <button type="button" onClick={onHide} className="ndm-btn-close">
               <i className="bi bi-x-circle"></i> Close

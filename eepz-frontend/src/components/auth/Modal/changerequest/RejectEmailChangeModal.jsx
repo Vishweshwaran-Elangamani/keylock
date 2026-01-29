@@ -40,7 +40,6 @@ const RejectEmailChangeModal = ({
       <div className="recm-backdrop" onClick={handleClose} />
       <div className="recm-modal-container">
         <div className="recm-modal-dialog">
-          {/* HEADER */}
           <div className="recm-modal-header">
             <div className="recm-header-title">
               <i className="bi bi-x-circle-fill"></i>
@@ -56,9 +55,7 @@ const RejectEmailChangeModal = ({
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-          {/* BODY */}
           <div className="recm-modal-body">
-            {/* Request Details Box */}
             <div className="recm-details-box">
               <h6 className="recm-details-title">
                 <i className="bi bi-info-circle"></i>
@@ -95,7 +92,6 @@ const RejectEmailChangeModal = ({
                 )}
               </div>
             </div>
-            {/* Admin Remarks - REQUIRED */}
             <div className="recm-remarks-section">
               <label className="recm-remarks-label">
                 Admin Remarks <span className="recm-required-asterisk">*</span>
@@ -113,7 +109,6 @@ const RejectEmailChangeModal = ({
                 {adminRemarks.length}/500 characters
               </small>
             </div>
-            {/* Warning Alert */}
             <div className="recm-warning-alert">
               <i className="bi bi-exclamation-triangle-fill recm-warning-icon"></i>
               <div className="recm-warning-content">
@@ -123,7 +118,6 @@ const RejectEmailChangeModal = ({
               </div>
             </div>
           </div>
-          {/* FOOTER */}
           <div className="recm-modal-footer">
             <button
               type="button"

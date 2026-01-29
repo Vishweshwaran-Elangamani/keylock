@@ -17,12 +17,10 @@ const AllocateByCategoryModal = ({
     goalStatus: "Approved",
     notes: "",
   });
-  const [loading, setLoading] = useState(false); 
-  const [error, setError] = useState(null); 
-  // Current logged-in user ID from localStorage
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const currentUserId = parseInt(localStorage.getItem("userId"));
   const ALLOCATION_TYPES = ["Promotion", "Training", "Bonus", "Other"];
-  // Handle input change, updating form state
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -30,30 +28,25 @@ const AllocateByCategoryModal = ({
       [name]: value,
     }));
   };
-  // Form submission handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     try {
-      // Validate allocation type selection
       if (!formData.allocationType) {
         toast.error("Please select allocation type");
         setLoading(false);
         return;
       }
-      // Validate amount must be > 0
       if (!formData.amount || parseFloat(formData.amount) <= 0) {
         toast.error("Amount must be greater than zero");
         setLoading(false);
         return;
       }
       const allocationAmount = parseFloat(formData.amount);
-      // Calculate remaining budget
       const totalAlreadyAllocated = budget.totalAlreadyAllocated || 0;
       const remainingBudget =
         (budget.allocatedAmount || 0) - totalAlreadyAllocated;
-      // Reject if allocation exceeds remaining budget
       if (allocationAmount > remainingBudget) {
         toast.error(
           `Cannot allocate Rs.${allocationAmount.toLocaleString(
@@ -69,24 +62,21 @@ const AllocateByCategoryModal = ({
         setLoading(false);
         return;
       }
-      // Use provided allocationName or generate a default descriptive name
       const allocationName = formData.allocationName.trim()
         ? formData.allocationName
         : `${
             formData.allocationType
           } Allocation - ${new Date().toLocaleDateString()}`;
-      // Prepare data payload for backend API
       const allocationData = {
-        budgetId: budget.budgetId, // From props, must be valid positive ID
-        departmentId: budget.departmentId, // From props, valid department ID
+        budgetId: budget.budgetId,
+        departmentId: budget.departmentId,
         allocationType: formData.allocationType,
         allocationName: allocationName,
         amount: allocationAmount,
-        goalStatus: "Approved", 
+        goalStatus: "Approved",
         notes: formData.notes,
-        allocatedByUserId: currentUserId, // Logged-in user ID
+        allocatedByUserId: currentUserId,
       };
-      // Call backend API to create the allocation
       const response = await budgetAllocationService.createBudgetAllocation(
         allocationData
       );
@@ -95,7 +85,6 @@ const AllocateByCategoryModal = ({
         setLoading(false);
         return;
       }
-      // Construct allocation object with data, fallback ID with timestamp
       const newAllocation = {
         allocationId:
           response.data?.allocationId ||
@@ -112,10 +101,8 @@ const AllocateByCategoryModal = ({
         utilizedAmount: 0,
         allocatedAt: new Date().toISOString(),
       };
-      // Notify parent component so it can update UI accordingly
       onAllocationCreated(newAllocation);
       handleClose();
-      // Success toast
       toast.success("Budget allocation created successfully");
     } catch (err) {
       console.error("Error creating allocation:", err);
@@ -129,7 +116,6 @@ const AllocateByCategoryModal = ({
       setLoading(false);
     }
   };
-  // Reset form and close modal
   const handleClose = () => {
     setFormData({
       allocationType: "Promotion",
@@ -141,7 +127,6 @@ const AllocateByCategoryModal = ({
     setError(null);
     onHide();
   };
-  // Calculate remaining budget for display
   const totalAlreadyAllocated = budget.totalAlreadyAllocated || 0;
   const remainingBudget = (budget.allocatedAmount || 0) - totalAlreadyAllocated;
   return (

@@ -97,7 +97,6 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
       <div className="erm-backdrop" onClick={onClose} />
       <div className="erm-modal-container">
         <div className="erm-modal-dialog">
-          {/* HEADER */}
           <div className="erm-modal-header">
             <div className="erm-header-title">
               <i className="bi bi-pencil-square"></i>
@@ -113,7 +112,6 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-          {/* BODY/FORM */}
           <form onSubmit={handleSubmit} className="erm-form">
             <div className="erm-modal-body">
               {role?.isSystemRole && (
@@ -125,9 +123,7 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
                   </div>
                 </div>
               )}
-              {/* 2 column layout */}
               <div className="erm-two-column">
-                {/* LEFT COLUMN */}
                 <div className="erm-column-left">
                   <div className="erm-form-group">
                     <label className="erm-form-label">
@@ -170,7 +166,6 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
                     )}
                   </div>
                 </div>
-                {/* RIGHT COLUMN */}
                 <div className="erm-column-right">
                   <div className="erm-form-group-full-height">
                     <label className="erm-form-label">
@@ -200,15 +195,12 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
                   </div>
                 </div>
               </div>
-              {/* Info Alert */}
               <div className="erm-info-alert">
                 <i className="bi bi-info-circle"></i>
                 <small>All fields are required for updating the role</small>
               </div>
             </div>
-            {/* FOOTER */}
             <div className="erm-modal-footer">
-              {/* Cancel Button */}
               <button
                 type="button"
                 onClick={onClose}
@@ -218,7 +210,6 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
                 <i className="bi bi-x-circle"></i>
                 Cancel
               </button>
-              {/* Update Button */}
               <button
                 type="submit"
                 disabled={loading}

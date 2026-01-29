@@ -3,7 +3,6 @@ import { toast } from "sonner";
 import periodAllocationService from "../../../services/hr_operations/hr/periodAllocationService";
 import { formatCurrency } from "../../../utils/auth/currencyFormatter";
 import "../../../styles/hr_operations/hr/CreatePeriodAllocationModal.css";
-/* Custom Dropdown Component */
 const CustomDropdown = ({
   value,
   onChange,
@@ -82,7 +81,6 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-  // Calculate available budget
   const availableBudget = budget.totalBudget - (budget.allocatedAmount || 0);
   const periods = [
     { value: "Q1", label: "Q1 - Quarter 1" },

@@ -77,7 +77,7 @@ const UpdatePeriodAllocationModal = ({
       <div className="upam-backdrop" onClick={onClose} />
       <div className="upam-modal-container">
         <div className="upam-modal-dialog">
-          {/* HEADER - Fixed */}
+          {/* HEADER -  */}
           <div className="upam-modal-header">
             <div className="upam-header-title">
               <i className="bi bi-pencil-square"></i>
@@ -188,7 +188,7 @@ const UpdatePeriodAllocationModal = ({
                 />
               </div>
             </div>
-            {/* FOOTER - Fixed */}
+            {/* FOOTER -  */}
             <div className="upam-modal-footer">
               <button
                 type="button"

@@ -105,7 +105,6 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
           ? parseInt(value)
           : value,
     }));
-    // Clear error for this field
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -170,7 +169,6 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
   const currentYear = new Date().getFullYear();
   const years = [currentYear, currentYear + 1, currentYear + 2];
   if (!show) return null;
-  // Dropdown options
   const departmentOptions = [
     { value: "", label: "Select Department" },
     ...departments.map((dept) => ({

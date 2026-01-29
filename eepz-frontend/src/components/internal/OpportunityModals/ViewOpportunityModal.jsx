@@ -27,7 +27,7 @@ const ViewOpportunityModal = ({ show, opportunity, onClose }) => {
       <div className="vom-backdrop" onClick={onClose} />
       <div className="vom-modal-wrapper">
         <div className="vom-modal-dialog">
-          {/* HEADER - Fixed */}
+          {/* HEADER -  */}
           <div className="vom-modal-header">
             <div className="vom-header-title">
               <i className="bi bi-eye"></i>
@@ -132,7 +132,7 @@ const ViewOpportunityModal = ({ show, opportunity, onClose }) => {
               </div>
             </div>
           </div>
-          {/* FOOTER - Fixed */}
+          {/* FOOTER -  */}
           <div className="vom-modal-footer">
             <button type="button" onClick={onClose} className="vom-btn-close">
               Close

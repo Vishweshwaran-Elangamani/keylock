@@ -3,7 +3,15 @@ import nominationService from "../../../services/internal/nominationService";
 import userService from "../../../services/auth/userService";
 import { toast } from "sonner";
 import "../../../styles/internal/ManagerNominateModal.css";
-const CustomDropdown = ({ value, onChange, options, placeholder, name, error, disabled }) => {
+const CustomDropdown = ({
+  value,
+  onChange,
+  options,
+  placeholder,
+  name,
+  error,
+  disabled,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const selectedOption = options.find((opt) => opt.value === value);
@@ -34,12 +42,11 @@ const CustomDropdown = ({ value, onChange, options, placeholder, name, error, di
   return (
     <div
       ref={dropdownRef}
-      className={`mgnm-custom-dropdown ${error ? "error" : ""} ${disabled ? "disabled" : ""}`}
+      className={`mgnm-custom-dropdown ${error ? "error" : ""} ${
+        disabled ? "disabled" : ""
+      }`}
     >
-      <div
-        className="mgnm-custom-dropdown-selected"
-        onClick={handleToggle}
-      >
+      <div className="mgnm-custom-dropdown-selected" onClick={handleToggle}>
         <span className="mgnm-custom-dropdown-text">
           {selectedOption ? selectedOption.label : placeholder}
         </span>
@@ -112,7 +119,6 @@ const ManagerNominateModal = ({
       setLoadingEmployees(false);
     }
   };
-  // Prepare employee options for dropdown
   const employeeOptions = useMemo(() => {
     return employees.map((emp) => ({
       label: `${emp.firstName} ${emp.lastName}`,

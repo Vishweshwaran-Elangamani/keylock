@@ -7,12 +7,13 @@ const ExportTab = ({ handleExport, exportingUsers, exportingAll }) => {
           Download data in Excel format for backup or analysis
         </p>
       </div>
-      
       <div className="bom-password-info-banner">
         <i className="bi bi-shield-lock bom-info-icon"></i>
-        <span>All exported files are password-protected. The password will be displayed after download.</span>
+        <span>
+          All exported files are password-protected. The password will be
+          displayed after download.
+        </span>
       </div>
-
       <div className="bom-export-cards-grid">
         <div className="bom-export-card">
           <div className="bom-export-card-icon">
@@ -60,5 +61,4 @@ const ExportTab = ({ handleExport, exportingUsers, exportingAll }) => {
     </div>
   );
 };
-
 export default ExportTab;

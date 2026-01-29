@@ -17,7 +17,7 @@ const GoalSuggestionsModal = ({
       <div className="gsm-backdrop" onClick={onHide} />
       <div className="gsm-modal-container">
         <div className="gsm-modal-dialog">
-          {/* HEADER - Fixed */}
+          {/* HEADER -  */}
           <div className="gsm-modal-header">
             <div className="gsm-header-content">
               <span className="gsm-header-title">
@@ -84,7 +84,7 @@ const GoalSuggestionsModal = ({
               </ul>
             )}
           </div>
-          {/* FOOTER - Fixed */}
+          {/* FOOTER -  */}
           <div className="gsm-modal-footer">
             <button type="button" onClick={onHide} className="gsm-btn-close">
               Close

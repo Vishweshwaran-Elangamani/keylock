@@ -3,7 +3,6 @@ import { toast } from "sonner";
 import budgetAllocationService from "../../../services/hr_operations/hr/budgetAllocationService";
 import { formatCurrency } from "../../../utils/auth/currencyFormatter";
 import "../../../styles/hr_operations/hr/AllocateFromPeriodModal.css";
-/* Custom Dropdown Component */
 const CustomDropdown = ({
   value,
   onChange,

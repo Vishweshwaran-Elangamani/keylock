@@ -12,7 +12,7 @@ const PolicyDetailModal = ({ show, policy, onClose }) => {
       <div className="pdm-backdrop" onClick={onClose} />
       <div className="pdm-modal-container">
         <div className="pdm-modal-dialog">
-          {/* HEADER - Fixed */}
+          {/* HEADER -  */}
           <div className="pdm-modal-header">
             <div className="pdm-header-title">
               <i className="bi bi-shield-check"></i>
@@ -108,7 +108,7 @@ const PolicyDetailModal = ({ show, policy, onClose }) => {
               </div>
             </div>
           </div>
-          {/* FOOTER - Fixed */}
+          {/* FOOTER -  */}
           <div className="pdm-modal-footer">
             <button type="button" onClick={onClose} className="pdm-btn-close">
               <i className="bi bi-x-circle"></i>

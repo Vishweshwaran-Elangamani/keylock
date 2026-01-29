@@ -67,7 +67,7 @@ const ViewBudgetDetailsModal = ({ show, budget, onHide }) => {
       <div className="vbdm-backdrop" onClick={onHide} />
       <div className="vbdm-modal-container">
         <div className="vbdm-modal-dialog">
-          {/* HEADER - Fixed */}
+          {/* HEADER - */}
           <div className="vbdm-modal-header">
             <div className="vbdm-header-title">
               <i className="bi bi-eye"></i>
@@ -275,7 +275,7 @@ const ViewBudgetDetailsModal = ({ show, budget, onHide }) => {
               </div>
             </div>
           </div>
-          {/* FOOTER - Fixed */}
+          {/* FOOTER - */}
           <div className="vbdm-modal-footer">
             <button type="button" onClick={onHide} className="vbdm-btn-close">
               Close

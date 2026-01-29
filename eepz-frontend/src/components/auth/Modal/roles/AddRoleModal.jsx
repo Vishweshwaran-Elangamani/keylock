@@ -84,7 +84,6 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
       <div className="arm-backdrop" onClick={onClose} />
       <div className="arm-modal-container">
         <div className="arm-modal-dialog">
-          {/* HEADER */}
           <div className="arm-modal-header">
             <div className="arm-header-title">
               <i className="bi bi-plus-circle"></i>
@@ -100,11 +99,9 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-          {/* BODY/FORM */}
           <form onSubmit={handleSubmit} className="arm-form">
             <div className="arm-modal-body">
               <div className="arm-form-content">
-                {/* Role Name */}
                 <div className="arm-form-group">
                   <label className="arm-form-label">
                     Role Name <span className="arm-required-asterisk">*</span>
@@ -125,7 +122,6 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
                     <div className="arm-form-error">{errors.roleName}</div>
                   )}
                 </div>
-                {/* Role Code */}
                 <div className="arm-form-group">
                   <label className="arm-form-label">
                     Role Code <span className="arm-required-asterisk">*</span>
@@ -146,7 +142,6 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
                     <div className="arm-form-error">{errors.roleCode}</div>
                   )}
                 </div>
-                {/* Description */}
                 <div className="arm-form-group">
                   <label className="arm-form-label">
                     Description <span className="arm-required-asterisk">*</span>
@@ -171,7 +166,6 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
                   </small>
                 </div>
               </div>
-              {/* Info Alert */}
               <div className="arm-info-alert">
                 <i className="bi bi-info-circle"></i>
                 <small>
@@ -180,7 +174,6 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
                 </small>
               </div>
             </div>
-            {/* FOOTER */}
             <div className="arm-modal-footer">
               <button
                 type="button"

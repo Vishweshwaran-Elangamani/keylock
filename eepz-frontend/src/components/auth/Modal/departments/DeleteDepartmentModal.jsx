@@ -31,7 +31,6 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
     }
   };
   if (!show) return null;
-  // Check if deletion is blocked
   const isDeleteBlocked =
     department?.hodEmployeeId ||
     (department?.hasChildren && department?.childDepartmentCount > 0);
@@ -40,7 +39,6 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
       <div className="ddm-backdrop" onClick={onClose} />
       <div className="ddm-modal-container">
         <div className="ddm-modal-dialog">
-          {/* HEADER */}
           <div className="ddm-modal-header">
             <div className="ddm-header-title">
               <i className="bi bi-trash-fill"></i>
@@ -56,9 +54,7 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-          {/* BODY */}
           <div className="ddm-modal-body">
-            {/* Department Info Card */}
             <div className="ddm-info-card">
               <div className="ddm-info-header">
                 <i className="bi bi-building ddm-info-icon"></i>
@@ -80,8 +76,7 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
                 )}
                 {department?.hodEmployeeName && (
                   <div className="ddm-info-row ddm-info-warning">
-                    <strong> HOD Assigned:</strong>{" "}
-                    {department.hodEmployeeName}
+                    <strong> HOD Assigned:</strong> {department.hodEmployeeName}
                   </div>
                 )}
                 {department?.hasChildren && (
@@ -97,7 +92,6 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
                 )}
               </div>
             </div>
-            {/* Blocking Warning */}
             {isDeleteBlocked && (
               <div className="ddm-blocking-alert">
                 <div className="ddm-blocking-title">
@@ -121,7 +115,6 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
                 </ul>
               </div>
             )}
-            {/* Normal Warning */}
             {!isDeleteBlocked && (
               <>
                 <p className="ddm-confirm-text">
@@ -152,7 +145,6 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
                 </div>
               </>
             )}
-            {/* Info Note */}
             <div className="ddm-info-note">
               <i className="bi bi-info-circle"></i>
               <small>
@@ -163,9 +155,7 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
               </small>
             </div>
           </div>
-          {/* FOOTER */}
           <div className="ddm-modal-footer">
-            {/* Cancel Button */}
             <button
               type="button"
               onClick={onClose}
@@ -175,7 +165,6 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
               <i className="bi bi-x-circle"></i>
               Cancel
             </button>
-            {/* Delete Button */}
             <button
               type="button"
               onClick={handleDelete}

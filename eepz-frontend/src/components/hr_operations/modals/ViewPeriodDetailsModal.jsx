@@ -207,7 +207,7 @@ const ViewPeriodDetailsModal = ({ period, onClose }) => {
               </div>
             )}
           </div>
-          {/* FOOTER - Fixed */}
+          {/* FOOTER -  */}
           <div className="vpdm-modal-footer">
             <button type="button" onClick={onClose} className="vpdm-btn-close">
               Close

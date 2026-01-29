@@ -9,16 +9,23 @@ const SuccessDetails = ({ uploadResult }) => {
         <div className="bom-success-header-text">
           <h3 className="bom-success-title-modern">Import Successful</h3>
           <p className="bom-success-subtitle">
-            {uploadResult.successCount} {uploadResult.successCount === 1 ? 'user' : 'users'} added to the system
+            {uploadResult.successCount}{" "}
+            {uploadResult.successCount === 1 ? "user" : "users"} added to the
+            system
           </p>
         </div>
-        <div className="bom-success-count-modern">{uploadResult.successCount}</div>
+        <div className="bom-success-count-modern">
+          {uploadResult.successCount}
+        </div>
       </div>
-
-      {uploadResult.successfulUsers && uploadResult.successfulUsers.length > 0 ? (
+      {uploadResult.successfulUsers &&
+      uploadResult.successfulUsers.length > 0 ? (
         <div className="bom-timeline-container">
           {uploadResult.successfulUsers.map((user, index) => (
-            <div key={`success-${index}`} className="bom-timeline-item bom-timeline-success">
+            <div
+              key={`success-${index}`}
+              className="bom-timeline-item bom-timeline-success"
+            >
               <div className="bom-timeline-marker">
                 <div className="bom-timeline-dot"></div>
                 <div className="bom-timeline-line"></div>
@@ -26,10 +33,13 @@ const SuccessDetails = ({ uploadResult }) => {
               <div className="bom-timeline-card">
                 <div className="bom-timeline-card-header">
                   <div className="bom-user-avatar bom-avatar-success">
-                    {user.firstName.charAt(0)}{user.lastName.charAt(0)}
+                    {user.firstName.charAt(0)}
+                    {user.lastName.charAt(0)}
                   </div>
                   <div className="bom-timeline-card-title">
-                    <h4 className="bom-user-fullname">{user.firstName} {user.lastName}</h4>
+                    <h4 className="bom-user-fullname">
+                      {user.firstName} {user.lastName}
+                    </h4>
                     <p className="bom-user-email-modern">{user.email}</p>
                   </div>
                   <div className="bom-status-badge bom-status-success">
@@ -58,12 +68,13 @@ const SuccessDetails = ({ uploadResult }) => {
           </div>
           <p className="bom-empty-title">All Users Imported Successfully!</p>
           <p className="bom-empty-subtitle">
-            {uploadResult.successCount} {uploadResult.successCount === 1 ? 'user is' : 'users are'} now active in the system
+            {uploadResult.successCount}{" "}
+            {uploadResult.successCount === 1 ? "user is" : "users are"} now
+            active in the system
           </p>
         </div>
       )}
     </div>
   );
 };
-
 export default SuccessDetails;

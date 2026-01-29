@@ -2,7 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import nominationService from "../../../services/internal/nominationService";
 import { toast } from "sonner";
 import "../../../styles/internal/NominationReviewModal.css";
-const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) => {
+const CustomDropdown = ({
+  value,
+  onChange,
+  options,
+  placeholder,
+  name,
+  error,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const selectedOption = options.find((opt) => opt.value === value);
@@ -32,7 +39,11 @@ const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) 
         className="nrm-custom-dropdown-selected"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span className={`nrm-custom-dropdown-text ${!selectedOption ? "placeholder" : ""}`}>
+        <span
+          className={`nrm-custom-dropdown-text ${
+            !selectedOption ? "placeholder" : ""
+          }`}
+        >
           {selectedOption ? selectedOption.label : placeholder}
         </span>
         <span className={`nrm-custom-dropdown-arrow ${isOpen ? "open" : ""}`}>
@@ -67,7 +78,7 @@ const NominationReviewModal = ({
   const [formData, setFormData] = useState({
     action: "",
     remarks: "",
-    // Department Head specific fields
+
     meritScore: "",
     diversityScore: "",
     conflictOfInterest: "",
@@ -183,7 +194,7 @@ const NominationReviewModal = ({
       <div className="nrm-backdrop" onClick={onHide} />
       <div className="nrm-modal-wrapper">
         <div className="nrm-modal-dialog">
-          {/* HEADER - Fixed */}
+          {/* HEADER -  */}
           <div className="nrm-modal-header">
             <div className="nrm-header-title">
               <i className="bi bi-clipboard-check"></i>
@@ -375,7 +386,7 @@ const NominationReviewModal = ({
                 />
               </div>
             </div>
-            {/* FOOTER - Fixed */}
+            {/* FOOTER -  */}
             <div className="nrm-modal-footer">
               <button
                 type="button"

@@ -108,7 +108,12 @@ export const NationalityDropdown = ({
     </div>
   );
 };
-export const MaritalStatusDropdown = ({ value, onChange, disabled, showError }) => {
+export const MaritalStatusDropdown = ({
+  value,
+  onChange,
+  disabled,
+  showError,
+}) => {
   const [open, setOpen] = useState(false);
   const options = [
     { label: "Select Status", value: "" },
@@ -160,7 +165,13 @@ export const MaritalStatusDropdown = ({ value, onChange, disabled, showError }) 
     </div>
   );
 };
-export const StateDropdown = ({ value, onChange, disabled, showError, options }) => {
+export const StateDropdown = ({
+  value,
+  onChange,
+  disabled,
+  showError,
+  options,
+}) => {
   const [open, setOpen] = useState(false);
   const allOptions = [
     { label: "Select State", value: "" },

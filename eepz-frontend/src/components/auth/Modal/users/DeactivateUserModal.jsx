@@ -29,7 +29,6 @@ const DeactivateUserModal = ({ show, onHide, onUserDeactivated, user }) => {
       <div className="dum-backdrop" onClick={onHide} />
       <div className="dum-modal-container">
         <div className="dum-modal-dialog">
-          {/* MODAL HEADER */}
           <div className="dum-modal-header">
             <div className="dum-header-title">
               <i className="bi bi-x-circle-fill"></i>
@@ -45,9 +44,7 @@ const DeactivateUserModal = ({ show, onHide, onUserDeactivated, user }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-          {/* MODAL BODY */}
           <div className="dum-modal-body">
-            {/* Confirmation Question */}
             <p className="dum-confirm-text">
               Are you sure you want to permanently deactivate{" "}
               <strong className="dum-user-name">
@@ -55,21 +52,17 @@ const DeactivateUserModal = ({ show, onHide, onUserDeactivated, user }) => {
               </strong>
               ?
             </p>
-            {/* Critical Warning Box */}
             <div className="dum-warning-box">
-              {/* Warning Header with Icon */}
               <div className="dum-warning-header">
                 <i className="bi bi-exclamation-triangle-fill dum-warning-icon"></i>
                 <span>Critical Warning</span>
               </div>
-              {/* Warning Text */}
               <p className="dum-warning-text">
                 <strong>
                   This action is PERMANENT and CANNOT be reversed!
                 </strong>
                 <br />
               </p>
-              {/* Warning List */}
               <ul className="dum-warning-list">
                 <strong>Once deactivated, this user will:</strong>
                 <li>Lose all access to the system immediately</li>
@@ -77,7 +70,6 @@ const DeactivateUserModal = ({ show, onHide, onUserDeactivated, user }) => {
                 <li>Not be able to be reactivated</li>
               </ul>
             </div>
-            {/* Info Alert */}
             <div className="dum-info-alert">
               <i className="bi bi-info-circle"></i>
               <small>
@@ -86,9 +78,7 @@ const DeactivateUserModal = ({ show, onHide, onUserDeactivated, user }) => {
               </small>
             </div>
           </div>
-          {/* MODAL FOOTER - ACTION BUTTONS */}
           <div className="dum-modal-footer">
-            {/* Cancel Button */}
             <button
               type="button"
               onClick={onHide}
@@ -97,7 +87,6 @@ const DeactivateUserModal = ({ show, onHide, onUserDeactivated, user }) => {
             >
               <i className="bi bi-arrow-left"></i> Cancel
             </button>
-            {/* Deactivate Button */}
             <button
               type="button"
               onClick={handleDeactivate}

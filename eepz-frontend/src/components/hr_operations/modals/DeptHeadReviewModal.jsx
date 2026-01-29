@@ -13,7 +13,7 @@ const DeptHeadReviewModal = ({
   const [approvalComments, setApprovalComments] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
   const [loading, setLoading] = useState(false);
-  const [decision, setDecision] = useState(""); 
+  const [decision, setDecision] = useState("");
   const [error, setError] = useState(null);
   const handleApprove = async () => {
     setDecision("approve");

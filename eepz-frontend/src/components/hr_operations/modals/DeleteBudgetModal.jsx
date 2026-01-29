@@ -29,10 +29,7 @@ const DeleteBudgetModal = ({ show, onHide, onBudgetDeleted, budget }) => {
   return (
     <>
       {/* Blurred Backdrop */}
-      <div
-        className="delete-budget-backdrop"
-        onClick={onHide}
-      />
+      <div className="delete-budget-backdrop" onClick={onHide} />
       {/* Modal Container */}
       <div className="delete-budget-modal-wrapper">
         <div className="delete-budget-modal-container">
@@ -71,7 +68,9 @@ const DeleteBudgetModal = ({ show, onHide, onBudgetDeleted, budget }) => {
               </div>
               {/* Warning Text */}
               <p className="delete-budget-warning-text">
-                <strong>This action is PERMANENT and CANNOT be reversed!</strong>
+                <strong>
+                  This action is PERMANENT and CANNOT be reversed!
+                </strong>
                 <br />
               </p>
               {/* Warning List */}
@@ -85,7 +84,11 @@ const DeleteBudgetModal = ({ show, onHide, onBudgetDeleted, budget }) => {
             {/* Confirmation Input */}
             <div className="delete-budget-input-section">
               <label className="delete-budget-input-label">
-                Type <strong className="delete-budget-confirm-keyword">confirm</strong> to proceed:
+                Type{" "}
+                <strong className="delete-budget-confirm-keyword">
+                  confirm
+                </strong>{" "}
+                to proceed:
               </label>
               <input
                 type="text"
@@ -121,7 +124,9 @@ const DeleteBudgetModal = ({ show, onHide, onBudgetDeleted, budget }) => {
               type="button"
               onClick={handleDelete}
               disabled={loading || !isConfirmValid}
-              className={`delete-budget-btn-delete ${!isConfirmValid ? 'disabled' : ''}`}
+              className={`delete-budget-btn-delete ${
+                !isConfirmValid ? "disabled" : ""
+              }`}
             >
               {loading ? (
                 <>

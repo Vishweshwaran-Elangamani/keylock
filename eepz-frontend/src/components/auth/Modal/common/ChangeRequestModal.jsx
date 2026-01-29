@@ -75,7 +75,11 @@ const ChangeRequestModal = ({
     const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
     const eepzRegex = /^[a-zA-Z0-9._%+-]+@eepz\.com$/i;
     const relevantzRegex = /^[a-zA-Z0-9._%+-]+@relevantz\.com$/i;
-    return gmailRegex.test(email) || eepzRegex.test(email) || relevantzRegex.test(email);
+    return (
+      gmailRegex.test(email) ||
+      eepzRegex.test(email) ||
+      relevantzRegex.test(email)
+    );
   };
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -84,7 +88,9 @@ const ChangeRequestModal = ({
       return;
     }
     if (!validateEmailDomain(formData.newEmail.trim())) {
-      toast.error("Only Gmail (@gmail.com), Eepz (@eepz.com), or Relevantz (@relevantz.com) addresses are allowed");
+      toast.error(
+        "Only Gmail (@gmail.com), Eepz (@eepz.com), or Relevantz (@relevantz.com) addresses are allowed"
+      );
       return;
     }
     if (
@@ -251,7 +257,9 @@ const ChangeRequestModal = ({
                 <i className="bi bi-info-circle-fill crm-alert-icon"></i>
                 <div>
                   <strong>Note:</strong> You can only request to change your
-                  email to a <strong>Gmail (@gmail.com)</strong>, <strong>Eepz (@eepz.com)</strong>, or <strong>Relevantz (@relevantz.com)</strong> address. Your
+                  email to a <strong>Gmail (@gmail.com)</strong>,{" "}
+                  <strong>Eepz (@eepz.com)</strong>, or{" "}
+                  <strong>Relevantz (@relevantz.com)</strong> address. Your
                   current password is required for security verification. Your
                   request will be sent to admin for approval. You can only have
                   one pending request at a time.
@@ -284,7 +292,8 @@ const ChangeRequestModal = ({
                 />
                 <small className="crm-form-help">
                   <i className="bi bi-envelope" style={{ marginRight: 4 }}></i>
-                  Only Gmail (@gmail.com), Eepz (@eepz.com), or Relevantz (@relevantz.com) addresses are allowed
+                  Only Gmail (@gmail.com), Eepz (@eepz.com), or Relevantz
+                  (@relevantz.com) addresses are allowed
                 </small>
               </div>
               <div className="crm-form-group">

@@ -199,7 +199,7 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
 
   if (!show) return null;
 
-  // Dropdown options with placeholder
+  
   const categoryOptions = [
     { value: "", label: "Select Category" },
     ...categories.map((cat) => ({ value: cat, label: cat })),

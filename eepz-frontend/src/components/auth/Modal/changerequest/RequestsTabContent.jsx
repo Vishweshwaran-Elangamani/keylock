@@ -1,8 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Form } from "react-bootstrap";
 import { FaSearch } from "react-icons/fa";
-
-
 const StatusDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
   const allOptions = [{ label: "All Status", value: "" }, ...options];
@@ -17,7 +15,10 @@ const StatusDropdown = ({ value, onChange, options }) => {
       tabIndex={0}
       onBlur={() => setTimeout(() => setOpen(false), 200)}
     >
-      <div className="custom-crm-selected" onClick={() => setOpen((prev) => !prev)}>
+      <div
+        className="custom-crm-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
         {selected.label}
         <span className="custom-crm-arrow" />
       </div>
@@ -26,7 +27,10 @@ const StatusDropdown = ({ value, onChange, options }) => {
           {allOptions.map((opt) => (
             <div
               key={opt.value || "all-status"}
-              className={"custom-crm-option" + (opt.value === value ? " custom-crm-option-active" : "")}
+              className={
+                "custom-crm-option" +
+                (opt.value === value ? " custom-crm-option-active" : "")
+              }
               onClick={() => handleSelect(opt.value)}
             >
               {opt.label}
@@ -37,14 +41,10 @@ const StatusDropdown = ({ value, onChange, options }) => {
     </div>
   );
 };
-
-
 const PaginationRowsDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
-
   const options = [5, 10, 25, 50];
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -56,7 +56,6 @@ const PaginationRowsDropdown = ({ value, onChange }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
   return (
     <div ref={dropdownRef} className="crm-rows-dropdown-wrapper">
       <button
@@ -65,7 +64,9 @@ const PaginationRowsDropdown = ({ value, onChange }) => {
         onClick={() => setOpen(!open)}
       >
         <span>{value}</span>
-        <i className={`bi bi-chevron-${open ? "up" : "down"} crm-rows-chevron`}></i>
+        <i
+          className={`bi bi-chevron-${open ? "up" : "down"} crm-rows-chevron`}
+        ></i>
       </button>
       {open && (
         <div className="crm-rows-dropdown">
@@ -88,7 +89,6 @@ const PaginationRowsDropdown = ({ value, onChange }) => {
     </div>
   );
 };
-
 const getStatusBadge = (status) => {
   const statusClasses = {
     Pending: "crm-status-pending",
@@ -96,9 +96,10 @@ const getStatusBadge = (status) => {
     Rejected: "crm-status-rejected",
     Cancelled: "crm-status-cancelled",
   };
-  return `crm-status-badge ${statusClasses[status] || "crm-status-badge-default"}`;
+  return `crm-status-badge ${
+    statusClasses[status] || "crm-status-badge-default"
+  }`;
 };
-
 const formatDate = (dateString) => {
   if (!dateString) return "N/A";
   return new Date(dateString).toLocaleDateString("en-US", {
@@ -109,7 +110,6 @@ const formatDate = (dateString) => {
     minute: "2-digit",
   });
 };
-
 const getInitials = (name) => {
   if (!name) return "NA";
   const parts = name.split(" ");
@@ -118,7 +118,6 @@ const getInitials = (name) => {
   }
   return name.substring(0, 2).toUpperCase();
 };
-
 export const PendingRequests = ({ requests, handleProcessClick }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
@@ -127,11 +126,9 @@ export const PendingRequests = ({ requests, handleProcessClick }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredRequests, setFilteredRequests] = useState([]);
   const searchInputRef = useRef(null);
-
   useEffect(() => {
     applyFilters();
   }, [requests, activeSearchTerm, filterDate]);
-
   const applyFilters = () => {
     let filtered = requests.filter((req) => req.status === "Pending");
     if (activeSearchTerm.trim()) {
@@ -154,32 +151,26 @@ export const PendingRequests = ({ requests, handleProcessClick }) => {
     setFilteredRequests(filtered);
     setCurrentPage(1);
   };
-
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
   };
-
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
     setFilterDate("");
   };
-
   const handleSearchKeyDown = (e) => {
     if (e.key === "Enter") {
       handleSearch();
       if (searchInputRef.current) searchInputRef.current.blur();
     }
   };
-
   const totalPages = Math.ceil(filteredRequests.length / rowsPerPage) || 1;
-
   const getPaginatedRequests = () => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     return filteredRequests.slice(startIndex, endIndex);
   };
-
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
@@ -193,12 +184,19 @@ export const PendingRequests = ({ requests, handleProcessClick }) => {
       } else if (currentPage >= totalPages - 2) {
         pages.push(1, "...", totalPages - 2, totalPages - 1, totalPages);
       } else {
-        pages.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages);
+        pages.push(
+          1,
+          "...",
+          currentPage - 1,
+          currentPage,
+          currentPage + 1,
+          "...",
+          totalPages
+        );
       }
     }
     return pages;
   };
-
   return (
     <>
       <div className="crm-filters-card">
@@ -217,7 +215,11 @@ export const PendingRequests = ({ requests, handleProcessClick }) => {
                 onKeyPress={handleSearchKeyDown}
                 className="crm-search-field"
               />
-              <button type="button" className="crm-search-btn" onClick={handleSearch}>
+              <button
+                type="button"
+                className="crm-search-btn"
+                onClick={handleSearch}
+              >
                 Search
               </button>
             </div>
@@ -232,11 +234,11 @@ export const PendingRequests = ({ requests, handleProcessClick }) => {
             Clear Filters
           </button>
           <div className="crm-results-count">
-            Showing {getPaginatedRequests().length} of {filteredRequests.length} requests
+            Showing {getPaginatedRequests().length} of {filteredRequests.length}{" "}
+            requests
           </div>
         </div>
       </div>
-
       <div className="crm-table-card">
         <div className="crm-table-wrapper">
           <table className="crm-request-table">
@@ -263,14 +265,22 @@ export const PendingRequests = ({ requests, handleProcessClick }) => {
                 getPaginatedRequests().map((request) => (
                   <tr key={request.requestId}>
                     <td>
-                      <span className="crm-request-id">#{request.requestId}</span>
+                      <span className="crm-request-id">
+                        #{request.requestId}
+                      </span>
                     </td>
                     <td>
                       <div className="crm-user-info">
-                        <div className="crm-user-avatar">{getInitials(request.employeeName)}</div>
+                        <div className="crm-user-avatar">
+                          {getInitials(request.employeeName)}
+                        </div>
                         <div>
-                          <span className="crm-user-name">{request.employeeName}</span>
-                          <small className="crm-user-id">@{request.employeeCompanyId}</small>
+                          <span className="crm-user-name">
+                            {request.employeeName}
+                          </span>
+                          <small className="crm-user-id">
+                            @{request.employeeCompanyId}
+                          </small>
                         </div>
                       </div>
                     </td>
@@ -280,24 +290,34 @@ export const PendingRequests = ({ requests, handleProcessClick }) => {
                       </code>
                     </td>
                     <td>
-                      <code className="crm-value-display crm-new-value">{request.newValue}</code>
+                      <code className="crm-value-display crm-new-value">
+                        {request.newValue}
+                      </code>
                     </td>
                     <td>
-                      <span className={getStatusBadge(request.status)}>{request.status}</span>
+                      <span className={getStatusBadge(request.status)}>
+                        {request.status}
+                      </span>
                     </td>
-                    <td className="text-muted">{formatDate(request.requestedAt)}</td>
+                    <td className="text-muted">
+                      {formatDate(request.requestedAt)}
+                    </td>
                     <td>
                       <div className="crm-action-buttons">
                         <button
                           className="crm-action-btn crm-action-approve"
-                          onClick={() => handleProcessClick(request, "Approved")}
+                          onClick={() =>
+                            handleProcessClick(request, "Approved")
+                          }
                           title="Approve Request"
                         >
                           <i className="bi bi-check-circle"></i>
                         </button>
                         <button
                           className="crm-action-btn crm-action-reject"
-                          onClick={() => handleProcessClick(request, "Rejected")}
+                          onClick={() =>
+                            handleProcessClick(request, "Rejected")
+                          }
                           title="Reject Request"
                         >
                           <i className="bi bi-x-circle"></i>
@@ -310,7 +330,6 @@ export const PendingRequests = ({ requests, handleProcessClick }) => {
             </tbody>
           </table>
         </div>
-
         {filteredRequests.length > 0 && (
           <div className="crm-pagination">
             <div className="crm-pagination-info">
@@ -332,9 +351,15 @@ export const PendingRequests = ({ requests, handleProcessClick }) => {
             {totalPages > 1 && (
               <nav className="crm-pagination-nav">
                 <ul className="crm-pagination-list">
-                  <li className={`crm-page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                  <li
+                    className={`crm-page-item ${
+                      currentPage === 1 ? "disabled" : ""
+                    }`}
+                  >
                     <button
-                      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
                       disabled={currentPage === 1}
                     >
                       <i className="bi bi-chevron-left"></i>
@@ -343,21 +368,29 @@ export const PendingRequests = ({ requests, handleProcessClick }) => {
                   {getPageNumbers().map((page, index) => (
                     <li
                       key={index}
-                      className={`crm-page-item ${page === currentPage ? "active" : ""} ${
-                        typeof page !== "number" ? "disabled" : ""
-                      }`}
+                      className={`crm-page-item ${
+                        page === currentPage ? "active" : ""
+                      } ${typeof page !== "number" ? "disabled" : ""}`}
                     >
                       <button
-                        onClick={() => typeof page === "number" && setCurrentPage(page)}
+                        onClick={() =>
+                          typeof page === "number" && setCurrentPage(page)
+                        }
                         disabled={typeof page !== "number"}
                       >
                         {page}
                       </button>
                     </li>
                   ))}
-                  <li className={`crm-page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                  <li
+                    className={`crm-page-item ${
+                      currentPage === totalPages ? "disabled" : ""
+                    }`}
+                  >
                     <button
-                      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                      }
                       disabled={currentPage === totalPages}
                     >
                       <i className="bi bi-chevron-right"></i>
@@ -372,7 +405,6 @@ export const PendingRequests = ({ requests, handleProcessClick }) => {
     </>
   );
 };
-
 export const AllRequests = ({ requests, handleProcessClick }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
@@ -382,11 +414,9 @@ export const AllRequests = ({ requests, handleProcessClick }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredRequests, setFilteredRequests] = useState([]);
   const searchInputRef = useRef(null);
-
   useEffect(() => {
     applyFilters();
   }, [requests, activeSearchTerm, filterStatus, filterDate]);
-
   const applyFilters = () => {
     let filtered = [...requests];
     if (activeSearchTerm.trim()) {
@@ -412,40 +442,33 @@ export const AllRequests = ({ requests, handleProcessClick }) => {
     setFilteredRequests(filtered);
     setCurrentPage(1);
   };
-
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
   };
-
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
     setFilterStatus("");
     setFilterDate("");
   };
-
   const handleSearchKeyDown = (e) => {
     if (e.key === "Enter") {
       handleSearch();
       if (searchInputRef.current) searchInputRef.current.blur();
     }
   };
-
   const statusOptions = [
     { label: "Pending", value: "Pending" },
     { label: "Approved", value: "Approved" },
     { label: "Rejected", value: "Rejected" },
     { label: "Cancelled", value: "Cancelled" },
   ];
-
   const totalPages = Math.ceil(filteredRequests.length / rowsPerPage) || 1;
-
   const getPaginatedRequests = () => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     return filteredRequests.slice(startIndex, endIndex);
   };
-
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
@@ -459,12 +482,19 @@ export const AllRequests = ({ requests, handleProcessClick }) => {
       } else if (currentPage >= totalPages - 2) {
         pages.push(1, "...", totalPages - 2, totalPages - 1, totalPages);
       } else {
-        pages.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages);
+        pages.push(
+          1,
+          "...",
+          currentPage - 1,
+          currentPage,
+          currentPage + 1,
+          "...",
+          totalPages
+        );
       }
     }
     return pages;
   };
-
   return (
     <>
       <div className="crm-filters-card">
@@ -483,7 +513,11 @@ export const AllRequests = ({ requests, handleProcessClick }) => {
                 onKeyPress={handleSearchKeyDown}
                 className="crm-search-field"
               />
-              <button type="button" className="crm-search-btn" onClick={handleSearch}>
+              <button
+                type="button"
+                className="crm-search-btn"
+                onClick={handleSearch}
+              >
                 Search
               </button>
             </div>
@@ -503,11 +537,11 @@ export const AllRequests = ({ requests, handleProcessClick }) => {
             Clear Filters
           </button>
           <div className="crm-results-count">
-            Showing {getPaginatedRequests().length} of {filteredRequests.length} requests
+            Showing {getPaginatedRequests().length} of {filteredRequests.length}{" "}
+            requests
           </div>
         </div>
       </div>
-
       <div className="crm-table-card">
         <div className="crm-table-wrapper">
           <table className="crm-request-table">
@@ -534,14 +568,22 @@ export const AllRequests = ({ requests, handleProcessClick }) => {
                 getPaginatedRequests().map((request) => (
                   <tr key={request.requestId}>
                     <td>
-                      <span className="crm-request-id">#{request.requestId}</span>
+                      <span className="crm-request-id">
+                        #{request.requestId}
+                      </span>
                     </td>
                     <td>
                       <div className="crm-user-info">
-                        <div className="crm-user-avatar">{getInitials(request.employeeName)}</div>
+                        <div className="crm-user-avatar">
+                          {getInitials(request.employeeName)}
+                        </div>
                         <div>
-                          <span className="crm-user-name">{request.employeeName}</span>
-                          <small className="crm-user-id">@{request.employeeCompanyId}</small>
+                          <span className="crm-user-name">
+                            {request.employeeName}
+                          </span>
+                          <small className="crm-user-id">
+                            @{request.employeeCompanyId}
+                          </small>
                         </div>
                       </div>
                     </td>
@@ -551,26 +593,36 @@ export const AllRequests = ({ requests, handleProcessClick }) => {
                       </code>
                     </td>
                     <td>
-                      <code className="crm-value-display crm-new-value">{request.newValue}</code>
+                      <code className="crm-value-display crm-new-value">
+                        {request.newValue}
+                      </code>
                     </td>
                     <td>
-                      <span className={getStatusBadge(request.status)}>{request.status}</span>
+                      <span className={getStatusBadge(request.status)}>
+                        {request.status}
+                      </span>
                     </td>
-                    <td className="text-muted">{formatDate(request.requestedAt)}</td>
+                    <td className="text-muted">
+                      {formatDate(request.requestedAt)}
+                    </td>
                     <td>
                       <div className="crm-action-buttons">
                         {request.status === "Pending" ? (
                           <>
                             <button
                               className="crm-action-btn crm-action-approve"
-                              onClick={() => handleProcessClick(request, "Approved")}
+                              onClick={() =>
+                                handleProcessClick(request, "Approved")
+                              }
                               title="Approve Request"
                             >
                               <i className="bi bi-check-circle"></i>
                             </button>
                             <button
                               className="crm-action-btn crm-action-reject"
-                              onClick={() => handleProcessClick(request, "Rejected")}
+                              onClick={() =>
+                                handleProcessClick(request, "Rejected")
+                              }
                               title="Reject Request"
                             >
                               <i className="bi bi-x-circle"></i>
@@ -578,7 +630,9 @@ export const AllRequests = ({ requests, handleProcessClick }) => {
                           </>
                         ) : (
                           <div className="crm-processed-info">
-                            <small className="text-muted">{formatDate(request.processedAt)}</small>
+                            <small className="text-muted">
+                              {formatDate(request.processedAt)}
+                            </small>
                             {request.adminRemarks && (
                               <div
                                 className="crm-admin-remarks-tooltip"
@@ -597,7 +651,6 @@ export const AllRequests = ({ requests, handleProcessClick }) => {
             </tbody>
           </table>
         </div>
-
         {filteredRequests.length > 0 && (
           <div className="crm-pagination">
             <div className="crm-pagination-info">
@@ -619,9 +672,15 @@ export const AllRequests = ({ requests, handleProcessClick }) => {
             {totalPages > 1 && (
               <nav className="crm-pagination-nav">
                 <ul className="crm-pagination-list">
-                  <li className={`crm-page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                  <li
+                    className={`crm-page-item ${
+                      currentPage === 1 ? "disabled" : ""
+                    }`}
+                  >
                     <button
-                      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
                       disabled={currentPage === 1}
                     >
                       <i className="bi bi-chevron-left"></i>
@@ -630,21 +689,29 @@ export const AllRequests = ({ requests, handleProcessClick }) => {
                   {getPageNumbers().map((page, index) => (
                     <li
                       key={index}
-                      className={`crm-page-item ${page === currentPage ? "active" : ""} ${
-                        typeof page !== "number" ? "disabled" : ""
-                      }`}
+                      className={`crm-page-item ${
+                        page === currentPage ? "active" : ""
+                      } ${typeof page !== "number" ? "disabled" : ""}`}
                     >
                       <button
-                        onClick={() => typeof page === "number" && setCurrentPage(page)}
+                        onClick={() =>
+                          typeof page === "number" && setCurrentPage(page)
+                        }
                         disabled={typeof page !== "number"}
                       >
                         {page}
                       </button>
                     </li>
                   ))}
-                  <li className={`crm-page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                  <li
+                    className={`crm-page-item ${
+                      currentPage === totalPages ? "disabled" : ""
+                    }`}
+                  >
                     <button
-                      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                      }
                       disabled={currentPage === totalPages}
                     >
                       <i className="bi bi-chevron-right"></i>

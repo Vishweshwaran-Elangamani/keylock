@@ -31,7 +31,6 @@ const ApproveEmailChangeModal = ({
       <div className="aecm-backdrop" onClick={handleClose} />
       <div className="aecm-modal-container">
         <div className="aecm-modal-dialog">
-          {/* HEADER */}
           <div className="aecm-modal-header">
             <div className="aecm-header-title">
               <i className="bi bi-check-circle-fill"></i>
@@ -47,9 +46,7 @@ const ApproveEmailChangeModal = ({
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-          {/* BODY */}
           <div className="aecm-modal-body">
-            {/* Request Details Box */}
             <div className="aecm-details-box">
               <h6 className="aecm-details-title">
                 <i className="bi bi-info-circle"></i>
@@ -87,7 +84,6 @@ const ApproveEmailChangeModal = ({
                 )}
               </div>
             </div>
-            {/* Admin Remarks */}
             <div className="aecm-remarks-section">
               <label className="aecm-remarks-label">
                 Admin Remarks (Optional)
@@ -105,7 +101,6 @@ const ApproveEmailChangeModal = ({
                 {adminRemarks.length}/500 characters
               </small>
             </div>
-            {/* Info Alert */}
             <div className="aecm-info-alert">
               <i className="bi bi-info-circle aecm-info-icon"></i>
               <div className="aecm-info-content">
@@ -115,7 +110,6 @@ const ApproveEmailChangeModal = ({
               </div>
             </div>
           </div>
-          {/* FOOTER */}
           <div className="aecm-modal-footer">
             <button
               type="button"
