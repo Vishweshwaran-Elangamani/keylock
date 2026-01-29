@@ -5,9 +5,7 @@ import "../../../styles/mom/modals/ManagerMeetingDetailsModal.css";
 const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
   useEffect(() => {
     document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "unset";
-    };
+    return () => (document.body.style.overflow = "unset");
   }, []);
 
   if (!meeting) return null;
@@ -23,10 +21,9 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
     return `${dd}-${mm}-${yyyy} ${hh}:${min}`;
   };
 
-  const countAccepted =
-    meeting.rsvpParticipants?.filter((p) => p.rsvpStatus === 1)?.length || 0;
-
-  const totalParticipants = meeting.rsvpParticipants?.length || 0;
+  // ✅ USE VALUES FROM DASHBOARD
+  const countAccepted = meeting.rsvpAcceptedCount || 0;
+  const totalParticipants = meeting.rsvpTotalInvitations || 0;
 
   const acceptedPercentage =
     totalParticipants > 0 ? (countAccepted / totalParticipants) * 100 : 0;
@@ -40,9 +37,7 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
             <i className="bi bi-calendar3"></i>
             {formatDateTime(meeting.meetingDate)}
           </p>
-          <button className="mmdm-close-icon" onClick={onClose} type="button">
-            ×
-          </button>
+          <button className="mmdm-close-icon" onClick={onClose}>×</button>
         </div>
 
         <div className="mmdm-body">
@@ -67,7 +62,6 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
               className="mmdm-progress"
               value={acceptedPercentage}
               max="100"
-              aria-label="Accepted percentage"
             />
           </div>
 
@@ -75,12 +69,9 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
             <div className="mmdm-meeting-link-wrapper">
               <div className="mmdm-meeting-link-card">
                 <div className="mmdm-meeting-link-header">
-                  <i className="bi bi-link-45deg mmdm-meeting-link-icon"></i>
-                  <small className="mmdm-meeting-link-label">
-                    Meeting Link
-                  </small>
+                  <i className="bi bi-link-45deg"></i>
+                  <small>Meeting Link</small>
                 </div>
-
                 <a
                   href={meeting.meetingLink}
                   target="_blank"
@@ -88,48 +79,44 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
                   className="mmdm-meeting-link"
                 >
                   Join Meeting
-                  <i className="bi bi-box-arrow-up-right mmdm-meeting-link-external"></i>
                 </a>
               </div>
             </div>
           )}
 
           <h6 className="mmdm-participants-title">
-            <span className="mmdm-participants-label">
-              <i className="bi bi-people mmdm-participants-icon"></i>
-              Participants
-            </span>
-
-            {totalParticipants > 0 && (
-              <span className="mmdm-participants-count">
-                {totalParticipants}
-              </span>
-            )}
+            <i className="bi bi-people"></i> Participants ({totalParticipants})
           </h6>
 
           {meeting.rsvpParticipants?.length === 0 ? (
             <div className="mmdm-no-participants">
-              <i className="bi bi-info-circle"></i>
-              No participants found
+              <i className="bi bi-info-circle"></i> No participants found
             </div>
           ) : (
             <div className="mmdm-participants-list">
-              {meeting.rsvpParticipants?.map((p) => (
-                <div key={p.participantId} className="mmdm-participant-card">
-                  <div className="mmdm-participant-header">
-                    <div className="mmdm-participant-main">
-                      <div className="mmdm-participant-name">
-                        {p.employeeName}
-                      </div>
+              {meeting.rsvpParticipants.map((p) => (
+                <div key={p.employeeId} className="mmdm-participant-card">
+                  <div className="mmdm-participant-name">{p.employeeName}</div>
 
-                      {p.rsvpComments && (
-                        <small className="mmdm-participant-comment">
-                          <i className="bi bi-chat-dots"></i>
-                          {p.rsvpComments}
-                        </small>
-                      )}
-                    </div>
-                  </div>
+                  <span
+                    className={`badge ${
+                      p.rsvpStatus === "Accepted"
+                        ? "bg-success"
+                        : p.rsvpStatus === "Declined"
+                        ? "bg-danger"
+                        : p.rsvpStatus === "Tentative"
+                        ? "bg-warning text-dark"
+                        : "bg-secondary"
+                    }`}
+                  >
+                    {p.rsvpStatus}
+                  </span>
+
+                  {p.rsvpComments && (
+                    <small className="mmdm-participant-comment">
+                      <i className="bi bi-chat-dots"></i> {p.rsvpComments}
+                    </small>
+                  )}
                 </div>
               ))}
             </div>
@@ -137,7 +124,7 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
         </div>
 
         <div className="mmdm-footer">
-          <button className="mmdm-close-btn" onClick={onClose} type="button">
+          <button className="mmdm-close-btn" onClick={onClose}>
             Close
           </button>
         </div>

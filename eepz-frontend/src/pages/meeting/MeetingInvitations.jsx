@@ -16,28 +16,28 @@ import {
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "../../styles/mom/components/MeetingInvitations.css";
-
+ 
 const RSVP_STATUS = {
-  ACCEPTED: { label: "Accepted", value: 1 },
-  DECLINED: { label: "Declined", value: 2 },
-  TENTATIVE: { label: "Tentative", value: 3 },
-  PENDING: { label: "Pending", value: 0 },
+  ACCEPTED: { label: "Accepted", value: "Accepted" },
+  DECLINED: { label: "Declined", value: "Declined" },
+  TENTATIVE: { label: "Tentative", value: "Tentative" },
+  PENDING: { label: "Pending", value: "Pending" },
 };
-
+ 
 const MeetingInvitations = () => {
   const navigate = useNavigate();
   const [invitations, setInvitations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedInvitation, setSelectedInvitation] = useState(null);
   const [rsvpComment, setRsvpComment] = useState("");
-  const [rsvpStatus, setRsvpStatus] = useState(RSVP_STATUS.ACCEPTED);
+  const [rsvpStatus, setRsvpStatus] = useState(RSVP_STATUS.ACCEPTED.value);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
+ 
   useEffect(() => {
     loadInvitations();
   }, []);
-
+ 
   const loadInvitations = async () => {
     setLoading(true);
     try {
@@ -55,60 +55,60 @@ const MeetingInvitations = () => {
       setLoading(false);
     }
   };
-
+ 
   const openRsvpModal = (invitation) => {
     setSelectedInvitation(invitation);
     setErrorMessage("");
-
-    const currentStatus = invitation.rsvpStatus ?? RSVP_STATUS.PENDING.value;
-
-    setRsvpStatus(currentStatus);
+ 
+const currentStatus = invitation.rsvpStatus || RSVP_STATUS.PENDING.value;
+setRsvpStatus(currentStatus);
+ 
     setRsvpComment(invitation.rsvpComments || "");
   };
-
+ 
   const closeRsvpModal = () => {
     setSelectedInvitation(null);
     setRsvpComment("");
     setErrorMessage("");
   };
-
+ 
   const handleRsvpSubmit = async () => {
     if (!selectedInvitation) return;
-
+ 
     const meetingId =
       selectedInvitation.meetingId || selectedInvitation.MeetingId;
-
+ 
     if (!meetingId || Number(meetingId) === 0) {
       setErrorMessage("Invalid meeting ID.");
       return;
     }
-
+ 
     try {
       setSubmitting(true);
       setErrorMessage("");
-
+ 
       const payload = {
         meetingId: Number(meetingId),
         rsvpStatus: rsvpStatus,
         rsvpComments: rsvpComment.trim(),
       };
-
+ 
       const response = await rsvpService.submitRsvp(payload);
-
+ 
       if (response && response.success === false) {
         const errorMsg = response.message || "Failed to submit RSVP.";
         setErrorMessage(errorMsg);
         return;
       }
-
+ 
       toastr.success("RSVP submitted successfully.");
       closeRsvpModal();
       loadInvitations();
     } catch (err) {
       console.error("RSVP submit error:", err);
-
+ 
       let errorMsg = "Failed to submit RSVP.";
-
+ 
       if (err && typeof err === "object") {
         if (err.success === false && err.message) {
           errorMsg = err.message;
@@ -120,13 +120,13 @@ const MeetingInvitations = () => {
           errorMsg = err.data.message;
         }
       }
-
+ 
       setErrorMessage(errorMsg);
     } finally {
       setSubmitting(false);
     }
   };
-
+ 
   const getStatusBadge = (status) => {
     switch (status) {
       case RSVP_STATUS.ACCEPTED.value:
@@ -155,7 +155,7 @@ const MeetingInvitations = () => {
         );
     }
   };
-
+ 
   const formatDateTime = (dateString) => {
     if (!dateString) return "Not scheduled";
     try {
@@ -173,7 +173,7 @@ const MeetingInvitations = () => {
       return "Invalid date";
     }
   };
-
+ 
   const formatDate = (dateString) => {
     if (!dateString) return "-";
     try {
@@ -190,7 +190,7 @@ const MeetingInvitations = () => {
       return "-";
     }
   };
-
+ 
   const getField = (obj, ...fieldNames) => {
     for (const field of fieldNames) {
       if (obj && obj[field] !== undefined && obj[field] !== null) {
@@ -199,7 +199,7 @@ const MeetingInvitations = () => {
     }
     return null;
   };
-
+ 
   if (loading) {
     return (
       <div className="mi-loading-wrapper">
@@ -209,7 +209,7 @@ const MeetingInvitations = () => {
       </div>
     );
   }
-
+ 
   return (
     <div className="mi-page">
       <div className="row justify-content-center">
@@ -242,7 +242,7 @@ const MeetingInvitations = () => {
                   Meetings and MoM
                 </button>
               </li>
-
+ 
               <li className="mi-breadcrumb-separator">/</li>
               <li
                 className="breadcrumb-item active mi-breadcrumb-item"
@@ -254,7 +254,7 @@ const MeetingInvitations = () => {
               </li>
             </ol>
           </nav>
-
+ 
           {invitations.length === 0 ? (
             <div className="card mi-card">
               <div className="card-body mi-empty-body">
@@ -276,8 +276,9 @@ const MeetingInvitations = () => {
                   "Untitled Meeting";
                 const meetingDate = getField(inv, "meetingDate", "MeetingDate");
                 const rsvpStatusValue =
-                  getField(inv, "rsvpStatus", "RSVPStatus") ||
-                  RSVP_STATUS.PENDING;
+               getField(inv, "rsvpStatus", "RSVPStatus") ||
+               RSVP_STATUS.PENDING.value;
+ 
                 const invitedAt = getField(inv, "invitedAt", "InvitedAt");
                 const schedulerName = getField(
                   inv,
@@ -286,7 +287,7 @@ const MeetingInvitations = () => {
                   "organizerName",
                   "OrganizerName"
                 );
-
+ 
                 return (
                   <div key={meetingId || index} className="col-12">
                     <div className="card mi-card">
@@ -300,7 +301,7 @@ const MeetingInvitations = () => {
                               />
                             </div>
                           </div>
-
+ 
                           <div className="col">
                             <div className="mi-card-header-row">
                               <h5 className="mi-meeting-title">
@@ -318,7 +319,7 @@ const MeetingInvitations = () => {
                                 </button>
                               </div>
                             </div>
-
+ 
                             <div className="row g-3 text-start">
                               {schedulerName && (
                                 <div className="col-md-4">
@@ -335,7 +336,7 @@ const MeetingInvitations = () => {
                                   </div>
                                 </div>
                               )}
-
+ 
                               <div
                                 className={
                                   schedulerName ? "col-md-8" : "col-md-6"
@@ -353,7 +354,7 @@ const MeetingInvitations = () => {
                                   </div>
                                 </div>
                               </div>
-
+ 
                               {!schedulerName && invitedAt && (
                                 <div className="col-md-6">
                                   <div className="mi-info-row">
@@ -371,7 +372,7 @@ const MeetingInvitations = () => {
               })}
             </div>
           )}
-
+ 
           {selectedInvitation && (
             <div
               className="modal mi-modal-backdrop show"
@@ -394,7 +395,7 @@ const MeetingInvitations = () => {
                     </div>
                     <button type="button" className="btn-close btn-close-white" onClick={closeRsvpModal}></button>
                   </div>
-
+ 
                   <div className="modal-body mi-modal-body">
                     {errorMessage && (
                       <div className="alert alert-danger mi-error-alert">
@@ -405,7 +406,7 @@ const MeetingInvitations = () => {
                         <button type="button" className="btn-close btn-sm mi-error-close"onClick={() => setErrorMessage("")}></button>
                       </div>
                     )}
-
+ 
                     <div className="card mi-modal-info-card">
                       <div className="card-body">
                         <h6 className="mi-modal-info-title">
@@ -428,7 +429,7 @@ const MeetingInvitations = () => {
                               )}
                             </span>
                           </div>
-
+ 
                           {getField(
                             selectedInvitation,
                             "schedulerName",
@@ -455,7 +456,7 @@ const MeetingInvitations = () => {
                         </div>
                       </div>
                     </div>
-
+ 
                     {getField(
                       selectedInvitation,
                       "rsvpStatus",
@@ -485,38 +486,38 @@ const MeetingInvitations = () => {
                         </div>
                       </div>
                     )}
-
+ 
                     <div className="mi-rsvp-section">
                       <label className="form-label mi-rsvp-label">
                         <span>Your Response</span>
                         <span className="mi-required">*</span>
                       </label>
-
+ 
                       <div className="btn-group w-100" role="group">
                         <input type="radio"className="btn-check" name="rsvpStatus" id="rsvp-accepted"
                           value={RSVP_STATUS.ACCEPTED.value} checked={rsvpStatus === RSVP_STATUS.ACCEPTED.value}
-                          onChange={(e) =>setRsvpStatus(Number(e.target.value))
+                           onChange={(e) => setRsvpStatus(e.target.value)
                           }/>
-                        
+                       
                         <label className="btn btn-outline-success mi-rsvp-option"htmlFor="rsvp-accepted">
                           <CheckCircle size={16} className="me-1" />
                           Accept
                         </label>
-
+ 
                         <input type="radio" className="btn-check" name="rsvpStatus" id="rsvp-tentative"
                           value={RSVP_STATUS.TENTATIVE.value}
                           checked={rsvpStatus === RSVP_STATUS.TENTATIVE.value}
-                          onChange={(e) => setRsvpStatus(Number(e.target.value)) }/>
+                          onChange={(e) => setRsvpStatus(e.target.value) }/>
                        
                         <label className="btn btn-outline-info mi-rsvp-option" htmlFor="rsvp-tentative">
                           <AlertCircle size={16} className="me-1" />
                           Tentative
                         </label>
-
+ 
                         <input type="radio"className="btn-check" name="rsvpStatus"
                           id="rsvp-declined"  value={RSVP_STATUS.DECLINED.value}
                           checked={rsvpStatus === RSVP_STATUS.DECLINED.value}
-                          onChange={(e) =>setRsvpStatus(Number(e.target.value))
+                           onChange={(e) => setRsvpStatus(e.target.value)
                           }/>
                         <label className="btn btn-outline-danger mi-rsvp-option" htmlFor="rsvp-declined">
                           <XCircle size={16} className="me-1" />
@@ -524,7 +525,7 @@ const MeetingInvitations = () => {
                         </label>
                       </div>
                     </div>
-
+ 
                     <div className="mi-comment-section">
                       <label className="form-label mi-comment-label">
                         <span>Add Comment (Optional)</span>
@@ -533,7 +534,7 @@ const MeetingInvitations = () => {
                         className="form-control"rows="3"
                         value={rsvpComment} onChange={(e) => setRsvpComment(e.target.value)}
                         placeholder="Add any comments or notes..."/>
-
+ 
                       {getField(
                         selectedInvitation,
                         "rsvpComments",
@@ -551,7 +552,7 @@ const MeetingInvitations = () => {
                       )}
                     </div>
                   </div>
-
+ 
                   <div className="modal-footer mi-modal-footer">
                     <button className="btn btn-light mi-cancel-button"onClick={closeRsvpModal} type="button">
                       Cancel
@@ -586,5 +587,7 @@ const MeetingInvitations = () => {
     </div>
   );
 };
-
+ 
 export default MeetingInvitations;
+ 
+ 
