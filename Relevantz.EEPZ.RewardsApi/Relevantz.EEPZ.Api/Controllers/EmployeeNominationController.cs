@@ -1,28 +1,29 @@
- 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.Services.Interfaces;
- 
+
 namespace Relevantz.EEPZ.API.Controllers
 {
     [ApiController]
-    [Authorize] 
+    [Authorize]
     [Route("api/[controller]")]
     [Produces(MediaTypeNames.Application.Json)]
     public class EmployeeNominationController : ControllerBase
     {
         private readonly IEmployeeNominationService _service;
         private readonly ILogger<EmployeeNominationController> _logger;
- 
+
         public EmployeeNominationController(
             IEmployeeNominationService service,
-            ILogger<EmployeeNominationController> logger
-        )
+            ILogger<EmployeeNominationController> logger)
         {
             _service = service ?? throw new ArgumentNullException(nameof(service));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -31,59 +32,95 @@ namespace Relevantz.EEPZ.API.Controllers
         /// <summary>
         /// Searches nomination notifications for the given employee.
         /// </summary>
-        /// <param name="employeeId">Employee identifier (must be a positive integer).</param>
-         [Authorize(Roles = "Manager,HR,Department Head,Employee")]
+        /// <param name="query">Query parameters.</param>
+        /// <param name="cancellationToken">Cancellation token for the request.</param>
+        /// <returns>Notification search result.</returns>
+        [Authorize(Roles = "Manager,HR,Department Head,Employee")]
         [HttpGet("search")]
-        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(EmployeeNotificationSearchResultDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> SearchEmployeeNotifications([FromQuery] int employeeId)
+        public async Task<ActionResult<EmployeeNotificationSearchResultDto>> SearchEmployeeNotifications(
+            [FromQuery] EmployeeNotificationSearchQuery query,
+            CancellationToken cancellationToken)
         {
-            
-            if (employeeId <= 0)
+            // ApiController automatically validates ModelState, but returning ValidationProblem keeps response consistent.
+            if (!ModelState.IsValid)
             {
-                _logger.LogWarning("Validation failed: employeeId must be positive. Provided: {EmployeeId}", employeeId);
+                _logger.LogWarning("Validation failed for SearchEmployeeNotifications. ModelState={ModelState}", ModelState);
+                return ValidationProblem(ModelState);
+            }
+
+            _logger.LogInformation("Employee notification search requested. EmployeeId={EmployeeId}", query.EmployeeId);
+
+            try
+            {
+                // Combine request cancellation + explicit cancellation.
+                using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(
+                    cancellationToken,
+                    HttpContext.RequestAborted);
+
+                var result = await _service.SearchEmployeeNotificationsAsync(query.EmployeeId, linkedCts.Token);
+
+                if (!result.Success)
+                {
+                    // Validation failures should return 400.
+                    // Use message check only if service sets a known validation message.
+                    if (string.Equals(result.Message, "Please enter a valid employee ID", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return BadRequest(BuildProblem(
+                            status: StatusCodes.Status400BadRequest,
+                            title: "Invalid employee id",
+                            detail: result.Message));
+                    }
+
+                    // For other failures, return 500 with generic message (avoid leaking internals).
+                    _logger.LogError("Employee notification search failed. EmployeeId={EmployeeId}", query.EmployeeId);
+
+                    return StatusCode(
+                        StatusCodes.Status500InternalServerError,
+                        BuildProblem(
+                            status: StatusCodes.Status500InternalServerError,
+                            title: "Search failed",
+                            detail: "An unexpected error occurred while processing the request."));
+                }
+
+                return Ok(result);
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogInformation("Employee notification search cancelled. EmployeeId={EmployeeId}", query.EmployeeId);
+
                 return BadRequest(BuildProblem(
                     status: StatusCodes.Status400BadRequest,
-                    title: "Invalid employee id",
-                    detail: "Employee id must be a positive integer."));
+                    title: "Request cancelled",
+                    detail: "The request was cancelled."));
             }
-            var result = await _service.SearchEmployeeNotificationsAsync(employeeId);
-            return MapServiceResult(result);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unhandled exception in SearchEmployeeNotifications. EmployeeId={EmployeeId}", query.EmployeeId);
+
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    BuildProblem(
+                        status: StatusCodes.Status500InternalServerError,
+                        title: "Server error",
+                        detail: "An unexpected error occurred."));
+            }
         }
- 
+
         /// <summary>
-        /// Centralizes success/error mapping to HTTP responses for this controller.
+        /// Query model for validation at the API boundary.
         /// </summary>
-        private IActionResult MapServiceResult(dynamic result)
+        public sealed class EmployeeNotificationSearchQuery
         {
-            // Known validation failure → 400 (ProblemDetails)
-            if (!result.Success &&
-                string.Equals(result.Message, "Please enter a valid employee ID", StringComparison.OrdinalIgnoreCase))
-            {
-                return BadRequest(BuildProblem(
-                    status: StatusCodes.Status400BadRequest,
-                    title: "Invalid employee id",
-                    detail: result.Message ?? "Please enter a valid employee ID."));
-            }
- 
-            if (!result.Success)
-            {
-                throw new InvalidOperationException(result.Message ?? "Search failed.");
-            }
- 
-            return Ok(new
-            {
-                success = true,
-                data = result.Data,
-                count = result.Count,
-                message = result.Message
-            });
+            [Required]
+            [Range(1, int.MaxValue, ErrorMessage = "Employee id must be a positive integer.")]
+            public int EmployeeId { get; init; }
         }
- 
+
         /// <summary>
-        /// Builds a ProblemDetails instance consistently for 4xx from this controller.
-        /// (Global middleware also returns ProblemDetails for 5xx/499.)
+        /// Builds ProblemDetails consistently.
         /// </summary>
         private ProblemDetails BuildProblem(int status, string title, string detail) =>
             new ProblemDetails
