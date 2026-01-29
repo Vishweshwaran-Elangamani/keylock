@@ -178,23 +178,19 @@ export const getApproverAssessments = (userId, page = 1, pageSize = 25) => {
 };
 
 export const getApproverSubmittedForms = (userId, page = 1, pageSize = 25) => {
-  return apiPort5113.get(`/approver/${userId}/submitted-forms`, {
+  return apiPort5113.get(`/approver/${userId}/submitted-appraisal-forms`, {
     params: { page, pageSize },
   });
 };
 
 export const getApproverReworkForms = (userId, page = 1, pageSize = 25) => {
-  return apiPort5113.get(`/approver/${userId}/rework-forms`, {
+  return apiPort5113.get(`/approver/${userId}/pending-rework-forms`, {  
     params: { page, pageSize },
   });
 };
 
-export const getApproverSubmittedL1Ratings = (
-  userId,
-  page = 1,
-  pageSize = 25
-) => {
-  return apiPort5113.get(`/approver/${userId}/submitted-l1-ratings`, {
+export const getApproverSubmittedL1Ratings = (userId, page = 1, pageSize = 25) => {
+  return apiPort5113.get(`/approver/${userId}/submitted-l1-appraisal-ratings`, { 
     params: { page, pageSize },
   });
 };
@@ -231,8 +227,9 @@ export const getApproverAssessmentAttachments = (userId, assessmentId) => {
 };
 
 export const submitApproverReviews = (userId, payload) => {
-  return apiPort5113.post(`/approver/${userId}/reviews`, payload);
+  return apiPort5113.post(`/approver/${userId}/approverReviews`, payload);  
 };
+
 
 export const submitApproverDecision = (userId, payload) => {
   return apiPort5113.post(`/approver/${userId}/decision`, payload);

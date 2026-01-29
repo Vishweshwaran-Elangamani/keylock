@@ -719,7 +719,6 @@ body {
 
 }
 
-/* ✅ FIXED: Dropdown trigger */
 .custom-tl-selected {
   padding: 0.4rem 0.8rem !important;
   height: 38px !important;
@@ -758,10 +757,7 @@ body {
   pointer-events: none;
   transition: transform 0.2s ease;
 }
-/* .custom-tl-selected:hover .custom-tl-arrow,
-.custom-tl-pagination-dropdown:focus-within .custom-tl-arrow {
-  transform: translateY(-50%) rotate(45deg) !important;
-} */
+
 
 
 .custom-tl-pagination-dropdown:focus-within .custom-tl-arrow {
@@ -770,19 +766,19 @@ body {
 
 .custom-tl-menu {
   position: absolute !important;
-  top: -1px !important;              /* 🆕 Touching top edge */
+  top: -1px !important;              
   left: 0 !important;
   right: 0 !important;
-  transform: translateY(-100%) !important;  /* 🆕 Pulls upward */
+  transform: translateY(-100%) !important; 
   background: #ffffff !important;
   border: 2px solid #27235c !important;
-  border-top: 2px solid #27235c !important;  /* 🆕 Top border */
-  border-radius: 8px 8px 0 0 !important;     /* 🆕 Top-rounded */
-  box-shadow: 0 -8px 32px rgba(0,0,0,0.15) !important;  /* 🆕 Upward shadow */
+  border-top: 2px solid #27235c !important;  
+  border-radius: 8px 8px 0 0 !important;    
+  box-shadow: 0 -8px 32px rgba(0,0,0,0.15) !important;  
   z-index: 1000001 !important;
   max-height: 180px !important;
   min-width: 75px !important;
-  padding: 4px 0 !important;  /* 🆕 Internal padding */
+  padding: 4px 0 !important; 
 }
 
 @keyframes tlDropdownSlideUp {
@@ -815,13 +811,13 @@ body {
 }
 
 .custom-tl-option {
-  padding: 0.6rem 0.8rem !important;  /* 🆕 Better padding */
+  padding: 0.6rem 0.8rem !important;  
   font-size: 0.8rem !important;
   text-align: center !important;
   cursor: pointer !important;
   transition: all 0.2s ease !important;
   border-bottom: 1px solid #f0f0f0 !important;
-  min-height: 36px !important;  /* 🆕 Clickable area */
+  min-height: 36px !important;  
 }
 
 
@@ -833,7 +829,7 @@ body {
 
 .custom-tl-option:last-child {
   border-bottom: none !important;
-  border-radius: 0 0 0 0 !important;  /* Matches top-rounded */
+  border-radius: 0 0 0 0 !important;  
 
 }
 
