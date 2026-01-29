@@ -91,7 +91,7 @@ const goalService = {
   // DASHBOARD
   getDashboardSummary: async () => {
     try {
-      const response = await goalApi.get("/goal-interaction/dashboard/summary");
+      const response = await goalApi.get("/goals/dashboard/summary");
       return response.data;
     } catch (error) {
       console.error("Error fetching dashboard summary:", error);
@@ -146,7 +146,7 @@ const goalService = {
     return goalApi.get(`/goals/subordinates/${managerId}`);
   },
   getProjectSubordinates: async (projectId) => {
-    return goalApi.get(`/goal-interaction/projects/${projectId}/subordinates`);
+    return goalApi.get(`/goals/projects/${projectId}/subordinates`);
   },
   // GOAL CRUD 
   createGoal: async (goalData) => {
@@ -178,7 +178,7 @@ const goalService = {
   },
   updateGoal: async (goalId, updateData) => {
     try {
-      const response = await goalApi.put(`/goals/${goalId}`, updateData);
+      const response = await goalApi.put(`/goals/update/${goalId}`, updateData);
       return response.data;
     } catch (error) {
       console.error(`Error updating goal ${goalId}:`, error);
@@ -198,7 +198,7 @@ const goalService = {
   toggleChecklist: async (goalId, checklistId, isCompleted) => {
     try {
       const response = await goalApi.put(
-        `/goal-progress/${goalId}/checklist/toggle`,
+        `/goals/${goalId}/checklist/toggle`,
         {
           checklistId,
           isCompleted,
@@ -227,7 +227,7 @@ const goalService = {
   requestApproval: async (goalId, approvalData) => {
     try {
       const response = await goalApi.post(
-        `/goal-approvals/${goalId}`,
+        `/goals/${goalId}`,
         approvalData
       );
       return response.data;
@@ -238,7 +238,7 @@ const goalService = {
   },
   getMyApprovals: async (filters = {}) => {
     try {
-      const response = await goalApi.get("/goal-approvals/query", {
+      const response = await goalApi.get("/goals/fetch-approvals", {
         params: filters,
       });
       return response.data;
@@ -249,7 +249,7 @@ const goalService = {
   },
   getPendingApprovals: async () => {
     try {
-      const response = await goalApi.get("/goal-approvals/pending");
+      const response = await goalApi.get("/goals/pending");
       return response.data;
     } catch (error) {
       console.error("Error fetching pending approvals:", error);
@@ -259,7 +259,7 @@ const goalService = {
   decideApproval: async (approvalId, decision) => {
     try {
       const response = await goalApi.put(
-        `/goal-approvals/${approvalId}`,
+        `/goals/approval/${approvalId}`,
         decision
       );
       return response.data;
@@ -271,7 +271,7 @@ const goalService = {
   // COMMENTS 
   addComment: async (goalId, comment) => {
     try {
-      const response = await goalApi.post(`/goal-interaction/${goalId}/comments`, {
+      const response = await goalApi.post(`/goals/${goalId}/comments`, {
         comment,
       });
       return response.data;
@@ -282,7 +282,7 @@ const goalService = {
   },
   listComments: async (goalId, filters = {}) => {
     try {
-      const response = await goalApi.get(`/goal-interaction/${goalId}/comments`, {
+      const response = await goalApi.get(`/goals/${goalId}/comments`, {
         params: filters,
       });
       return response.data;
@@ -294,7 +294,7 @@ const goalService = {
   //  TIMELINE 
   getTimeline: async (goalId) => {
     try {
-      const response = await goalApi.get(`/goal-interaction/${goalId}/timeline`);
+      const response = await goalApi.get(`/goals/${goalId}/timeline`);
       return response.data;
     } catch (error) {
       console.error("Error fetching timeline:", error);
@@ -308,7 +308,7 @@ const goalService = {
       formData.append("file", file);
       formData.append("title", title || file.name);
       const response = await goalApi.post(
-        `/goal-attachments/${goalId}/upload`,
+        `/goals/${goalId}/upload`,
         formData,
         {
           headers: {
@@ -330,7 +330,7 @@ const goalService = {
         );
       }
       const response = await goalApi.get(
-        `/goal-attachments/${attachmentId}/preview`,
+        `/goals/${attachmentId}/preview`,
         {
           responseType: "blob",
         }
@@ -354,12 +354,12 @@ const goalService = {
   },
   getPreviewUrl: (attachmentId) => {
     const token = localStorage.getItem("token");
-    return `${GOAL_API_BASE_URL}/goal-attachments/${attachmentId}/preview?token=${token}`;
+    return `${GOAL_API_BASE_URL}/goals/${attachmentId}/preview?token=${token}`;
   },
   downloadAttachment: async (attachmentId) => {
     try {
       const response = await goalApi.get(
-        `/goal-attachments/${attachmentId}/download`,
+        `/goals/${attachmentId}/download`,
         {
           responseType: "blob",
         }
@@ -392,7 +392,7 @@ const goalService = {
   deleteAttachment: async (attachmentId) => {
     try {
       const response = await goalApi.delete(
-        `/goal-attachments/${attachmentId}`
+        `/goals/${attachmentId}`
       );
       return response.data;
     } catch (error) {
@@ -403,7 +403,7 @@ const goalService = {
   //  PERMISSIONS 
   canMarkComplete: async (goalId) => {
     try {
-      const response = await goalApi.get(`/goal-interaction/${goalId}/complete-eligibility`);
+      const response = await goalApi.get(`/goals/${goalId}/complete-eligibility`);
       return response.data;
     } catch (error) {
       console.error("Error checking completion permission:", error);
