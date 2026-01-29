@@ -29,85 +29,156 @@ namespace Relevantz.EEPZ.Core.Service
         }
 
         public async Task<NominationResponseDto> CreateSelfNominationAsync(int employeeId, CreateSelfNominationRequestDto request)
+{
+    try
+    {
+        Console.WriteLine($"[Service] CreateSelfNomination - UserId: {employeeId}, OpportunityId: {request.OpportunityId}");
+
+        var isDuplicate = await _nominationRepository.ExistsDuplicateAsync(request.OpportunityId, employeeId);
+        if (isDuplicate)
         {
-            try
-            {
-                Console.WriteLine($"[Service] CreateSelfNomination - UserId: {employeeId}, OpportunityId: {request.OpportunityId}");
-
-                var isDuplicate = await _nominationRepository.ExistsDuplicateAsync(request.OpportunityId, employeeId);
-                if (isDuplicate)
-                {
-                    throw new Exception("You have already applied for this opportunity. You can reapply only if your previous application was rejected.");
-                }
-
-                var managerUserId = await _nominationRepository.GetManagerFromProjectAsync(employeeId);
-
-                if (managerUserId == null)
-                {
-                    Console.WriteLine($"[Service] No manager from project, trying ReportingManagerEmployeeId");
-                    managerUserId = await _nominationRepository.GetManagerFromReportingHierarchyAsync(employeeId);
-                }
-
-                if (managerUserId == null)
-                {
-                    Console.WriteLine($"[Service] No reporting manager, using default Manager");
-                    managerUserId = await _nominationRepository.GetFirstAvailableManagerAsync();
-                }
-
-                if (managerUserId == null)
-                {
-                    throw new Exception("Cannot find Manager (L2) from your primary project. Please contact HR.");
-                }
-
-                var nomination = new Nomination
-                {
-                    OpportunityId = request.OpportunityId,
-                    NomineeUserId = employeeId,
-                    NominationType = "employee_self",
-                    NominatedByUserId = employeeId,
-                    Justification = request.Justification,
-                    CurrentApprovalLevel = 1,
-                    Status = "Pending_Manager_Review",
-                    L2managerUserId = managerUserId.Value,
-                    SubmittedAt = DateTime.UtcNow
-                };
-
-                var created = await _nominationRepository.CreateAsync(nomination);
-                Console.WriteLine($"[Service] Self-nomination created with ID: {created.NominationId}");
-
-                var nominationDetail = await _nominationRepository.GetByIdAsync(created.NominationId);
-                if (nominationDetail != null)
-                {
-                    var nomineeProfile = nominationDetail.NomineeUser?.Employee?.Userprofile;
-                    var l2Profile = nominationDetail.L2managerUser?.Employee?.Userprofile;
-                    var opportunity = nominationDetail.Opportunity;
-
-                    if (nomineeProfile != null && l2Profile != null && opportunity != null)
-                    {
-                        await _notificationService.SendNominationCreatedEmailAsync(
-                            nominationDetail.NomineeUser.Email,
-                            $"{nomineeProfile.FirstName} {nomineeProfile.LastName}",
-                            opportunity.OpportunityName,
-                            "Yourself (Self-nomination)"
-                        );
-
-                        await _notificationService.SendL2ReviewRequestEmailAsync(
-                            nominationDetail.L2managerUser.Email,
-                            $"{l2Profile.FirstName} {l2Profile.LastName}",
-                            $"{nomineeProfile.FirstName} {nomineeProfile.LastName}",
-                            opportunity.OpportunityName
-                        );
-                    }
-                }
-
-                return _mapper.Map<NominationResponseDto>(created);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[Service] Error: {ex.Message}");
-                throw;
-            }
+            throw new Exception("You have already applied for this opportunity. You can reapply only if your previous application was rejected.");
         }
+
+        // Check if the employee themselves is an L2 Manager
+        var isL2Manager = await _nominationRepository.IsUserL2ManagerAsync(employeeId);
+        
+        if (isL2Manager)
+        {
+            // L2 Manager self-nominating → Skip L2 review, go directly to DeptHead
+            Console.WriteLine($"[Service] L2 Manager self-nominating - Skipping L2 review, going to DeptHead");
+            
+            var deptHeadUserId = await _nominationRepository.GetDeptHeadFromProjectAsync(employeeId);
+            if (deptHeadUserId == null)
+            {
+                deptHeadUserId = await _nominationRepository.GetFirstAvailableDeptHeadAsync();
+            }
+            
+            if (deptHeadUserId == null)
+            {
+                throw new Exception("Cannot find Department Head for review. Please contact HR.");
+            }
+
+            var nomination = new Nomination
+            {
+                OpportunityId = request.OpportunityId,
+                NomineeUserId = employeeId,
+                NominationType = "employee_self",
+                NominatedByUserId = employeeId,
+                Justification = request.Justification,
+                CurrentApprovalLevel = 2, // Skip level 1
+                Status = "Pending_DeptHead_Review",
+                L2managerUserId = employeeId, // Self as L2
+                L2reviewRemarks = "Auto-skipped (L2 Manager self-nomination)",
+                L2reviewedAt = DateTime.UtcNow,
+                L2status = "Auto_Skipped",
+                DeptHeadUserId = deptHeadUserId.Value,
+                SubmittedAt = DateTime.UtcNow
+            };
+
+            var created = await _nominationRepository.CreateAsync(nomination);
+            Console.WriteLine($"[Service] L2 self-nomination created with ID: {created.NominationId}, going to DeptHead");
+
+            var nominationDetail = await _nominationRepository.GetByIdAsync(created.NominationId);
+            if (nominationDetail != null)
+            {
+                var nomineeProfile = nominationDetail.NomineeUser?.Employee?.Userprofile;
+                var deptHeadProfile = nominationDetail.DeptHeadUser?.Employee?.Userprofile;
+                var opportunity = nominationDetail.Opportunity;
+
+                if (nomineeProfile != null && deptHeadProfile != null && opportunity != null)
+                {
+                    await _notificationService.SendNominationCreatedEmailAsync(
+                        nominationDetail.NomineeUser.Email,
+                        $"{nomineeProfile.FirstName} {nomineeProfile.LastName}",
+                        opportunity.OpportunityName,
+                        "Yourself (Self-nomination)"
+                    );
+
+                    await _notificationService.SendDeptHeadReviewRequestEmailAsync(
+                        nominationDetail.DeptHeadUser.Email,
+                        $"{deptHeadProfile.FirstName} {deptHeadProfile.LastName}",
+                        $"{nomineeProfile.FirstName} {nomineeProfile.LastName}",
+                        opportunity.OpportunityName
+                    );
+                }
+            }
+
+            return _mapper.Map<NominationResponseDto>(created);
+        }
+        else
+        {
+            // Regular employee self-nominating → Normal flow (L2 review first)
+            var managerUserId = await _nominationRepository.GetManagerFromProjectAsync(employeeId);
+
+            if (managerUserId == null)
+            {
+                Console.WriteLine($"[Service] No manager from project, trying ReportingManagerEmployeeId");
+                managerUserId = await _nominationRepository.GetManagerFromReportingHierarchyAsync(employeeId);
+            }
+
+            if (managerUserId == null)
+            {
+                Console.WriteLine($"[Service] No reporting manager, using default Manager");
+                managerUserId = await _nominationRepository.GetFirstAvailableManagerAsync();
+            }
+
+            if (managerUserId == null)
+            {
+                throw new Exception("Cannot find Manager (L2) from your primary project. Please contact HR.");
+            }
+
+            var nomination = new Nomination
+            {
+                OpportunityId = request.OpportunityId,
+                NomineeUserId = employeeId,
+                NominationType = "employee_self",
+                NominatedByUserId = employeeId,
+                Justification = request.Justification,
+                CurrentApprovalLevel = 1,
+                Status = "Pending_Manager_Review",
+                L2managerUserId = managerUserId.Value,
+                SubmittedAt = DateTime.UtcNow
+            };
+
+            var created = await _nominationRepository.CreateAsync(nomination);
+            Console.WriteLine($"[Service] Self-nomination created with ID: {created.NominationId}");
+
+            var nominationDetail = await _nominationRepository.GetByIdAsync(created.NominationId);
+            if (nominationDetail != null)
+            {
+                var nomineeProfile = nominationDetail.NomineeUser?.Employee?.Userprofile;
+                var l2Profile = nominationDetail.L2managerUser?.Employee?.Userprofile;
+                var opportunity = nominationDetail.Opportunity;
+
+                if (nomineeProfile != null && l2Profile != null && opportunity != null)
+                {
+                    await _notificationService.SendNominationCreatedEmailAsync(
+                        nominationDetail.NomineeUser.Email,
+                        $"{nomineeProfile.FirstName} {nomineeProfile.LastName}",
+                        opportunity.OpportunityName,
+                        "Yourself (Self-nomination)"
+                    );
+
+                    await _notificationService.SendL2ReviewRequestEmailAsync(
+                        nominationDetail.L2managerUser.Email,
+                        $"{l2Profile.FirstName} {l2Profile.LastName}",
+                        $"{nomineeProfile.FirstName} {nomineeProfile.LastName}",
+                        opportunity.OpportunityName
+                    );
+                }
+            }
+
+            return _mapper.Map<NominationResponseDto>(created);
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[Service] Error: {ex.Message}");
+        throw;
+    }
+}
+
 
         public async Task<NominationResponseDto> CreateManagerNominationAsync(int managerId, CreateManagerNominationRequestDto request)
         {

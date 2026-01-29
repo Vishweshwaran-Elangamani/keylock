@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Relevantz.EEPZ.Common.Entities;
 
+
 namespace Relevantz.EEPZ.Data.IRepository
 {
     public interface INominationRepository
@@ -23,6 +24,6 @@ namespace Relevantz.EEPZ.Data.IRepository
         Task<int?> GetManagerFromReportingHierarchyAsync(int employeeId);
         Task<int?> GetFirstAvailableManagerAsync();
         Task<int?> GetFirstAvailableDeptHeadAsync();
-
+        Task<bool> IsUserL2ManagerAsync(int userId);
     }
 }
