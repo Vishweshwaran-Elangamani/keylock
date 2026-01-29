@@ -5,6 +5,8 @@ using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Data.IRepository;
+using MapsterMapper;
+using Mapster;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,15 +21,18 @@ namespace Relevantz.EEPZ.Core.Service
         private readonly IBudgetPeriodAllocationRepository _periodAllocationRepository;
         private readonly IDepartmentBudgetRepository _budgetRepository;
         private readonly ILogger<PeriodAllocationService> _logger;
+        private readonly IMapper _mapper;
 
         public PeriodAllocationService(
             IBudgetPeriodAllocationRepository periodAllocationRepository,
             IDepartmentBudgetRepository budgetRepository,
-            ILogger<PeriodAllocationService> logger)
+            ILogger<PeriodAllocationService> logger,
+            IMapper mapper)
         {
             _periodAllocationRepository = periodAllocationRepository;
             _budgetRepository = budgetRepository;
             _logger = logger;
+            _mapper = mapper;
         }
 
         public async Task<ApiResponseDto<PeriodAllocationResponseDto>> CreatePeriodAllocationAsync(
@@ -46,10 +51,8 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<PeriodAllocationResponseDto>
                     .FailureResponse(ServiceMessages.BudgetNotFound);
 
-            var existingPeriod =
-                await _periodAllocationRepository.GetByBudgetPeriodYearAsync(
-                    request.BudgetId, request.Period, request.PeriodYear);
-
+            var existingPeriod = await _periodAllocationRepository.GetByBudgetPeriodYearAsync(
+                request.BudgetId, request.Period, request.PeriodYear);
             if (existingPeriod != null)
             {
                 return ApiResponseDto<PeriodAllocationResponseDto>.FailureResponse(
@@ -59,9 +62,7 @@ namespace Relevantz.EEPZ.Core.Service
                         request.PeriodYear));
             }
 
-            var totalAllocated =
-                await _periodAllocationRepository.GetTotalAllocatedByBudgetAsync(request.BudgetId);
-
+            var totalAllocated = await _periodAllocationRepository.GetTotalAllocatedByBudgetAsync(request.BudgetId);
             if (totalAllocated + request.AllocatedAmount > budget.TotalBudget)
             {
                 return ApiResponseDto<PeriodAllocationResponseDto>.FailureResponse(
@@ -71,18 +72,11 @@ namespace Relevantz.EEPZ.Core.Service
                         budget.TotalBudget));
             }
 
-            var periodAllocation = new Budgetperiodallocation
-            {
-                BudgetId = request.BudgetId,
-                Period = request.Period,
-                PeriodYear = request.PeriodYear,
-                AllocatedAmount = request.AllocatedAmount,
-                UtilizedAmount = 0,
-                UtilizationPercentage = 0,
-                AllocatedByUserId = request.AllocatedByUserId,
-                AllocatedAt = DateTime.UtcNow,
-                Notes = request.Notes
-            };
+            // Map using Mapster
+            var periodAllocation = _mapper.Map<Budgetperiodallocation>(request);
+            periodAllocation.UtilizedAmount = 0;
+            periodAllocation.UtilizationPercentage = 0;
+            periodAllocation.AllocatedAt = DateTime.UtcNow;
 
             var created = await _periodAllocationRepository.CreateAsync(periodAllocation);
 
@@ -90,9 +84,8 @@ namespace Relevantz.EEPZ.Core.Service
             budget.UpdatedAt = DateTime.UtcNow;
             await _budgetRepository.UpdateAsync(budget);
 
-            var response =
-                await _periodAllocationRepository.GetPeriodAllocationDetailsAsync(
-                    created.PeriodAllocationId);
+            var response = await _periodAllocationRepository.GetPeriodAllocationDetailsAsync(
+                created.PeriodAllocationId);
 
             return ApiResponseDto<PeriodAllocationResponseDto>.SuccessResponse(
                 response!,
@@ -110,9 +103,7 @@ namespace Relevantz.EEPZ.Core.Service
                 "Updating period allocation {Id}",
                 request.PeriodAllocationId);
 
-            var periodAllocation =
-                await _periodAllocationRepository.GetByIdAsync(request.PeriodAllocationId);
-
+            var periodAllocation = await _periodAllocationRepository.GetByIdAsync(request.PeriodAllocationId);
             if (periodAllocation == null)
                 return ApiResponseDto<PeriodAllocationResponseDto>
                     .FailureResponse(ServiceMessages.PeriodAllocationNotFound);
@@ -122,10 +113,9 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<PeriodAllocationResponseDto>
                     .FailureResponse(ServiceMessages.ParentBudgetNotFound);
 
-            var otherPeriodsTotal =
-                await _periodAllocationRepository.GetTotalAllocatedByBudgetExceptIdAsync(
-                    periodAllocation.BudgetId,
-                    request.PeriodAllocationId);
+            var otherPeriodsTotal = await _periodAllocationRepository.GetTotalAllocatedByBudgetExceptIdAsync(
+                periodAllocation.BudgetId,
+                request.PeriodAllocationId);
 
             if (otherPeriodsTotal + request.AllocatedAmount > budget.TotalBudget)
             {
@@ -135,27 +125,24 @@ namespace Relevantz.EEPZ.Core.Service
             }
 
             var oldAmount = periodAllocation.AllocatedAmount;
-
             periodAllocation.AllocatedAmount = request.AllocatedAmount;
             periodAllocation.Notes = request.Notes;
             periodAllocation.UpdatedAt = DateTime.UtcNow;
 
             if (periodAllocation.AllocatedAmount > 0)
             {
-                periodAllocation.UtilizationPercentage =
+                periodAllocation.UtilizationPercentage = 
                     (periodAllocation.UtilizedAmount / periodAllocation.AllocatedAmount) * 100;
             }
 
             await _periodAllocationRepository.UpdateAsync(periodAllocation);
 
-            budget.AllocatedAmount =
-                (budget.AllocatedAmount ?? 0) - oldAmount + request.AllocatedAmount;
+            budget.AllocatedAmount = (budget.AllocatedAmount ?? 0) - oldAmount + request.AllocatedAmount;
             budget.UpdatedAt = DateTime.UtcNow;
             await _budgetRepository.UpdateAsync(budget);
 
-            var response =
-                await _periodAllocationRepository.GetPeriodAllocationDetailsAsync(
-                    periodAllocation.PeriodAllocationId);
+            var response = await _periodAllocationRepository.GetPeriodAllocationDetailsAsync(
+                periodAllocation.PeriodAllocationId);
 
             return ApiResponseDto<PeriodAllocationResponseDto>.SuccessResponse(
                 response!,
@@ -170,18 +157,15 @@ namespace Relevantz.EEPZ.Core.Service
 
             _logger.LogInformation("Deleting period allocation {Id}", periodAllocationId);
 
-            var periodAllocation =
-                await _periodAllocationRepository.GetByIdAsync(periodAllocationId);
-
+            var periodAllocation = await _periodAllocationRepository.GetByIdAsync(periodAllocationId);
             if (periodAllocation == null)
                 return ApiResponseDto<bool>
                     .FailureResponse(ServiceMessages.PeriodAllocationNotFound);
 
-            var hasSubAllocations =
-                await _periodAllocationRepository.HasSubAllocationsAsync(
-                    periodAllocation.BudgetId,
-                    periodAllocation.Period,
-                    periodAllocation.PeriodYear);
+            var hasSubAllocations = await _periodAllocationRepository.HasSubAllocationsAsync(
+                periodAllocation.BudgetId,
+                periodAllocation.Period,
+                periodAllocation.PeriodYear);
 
             if (hasSubAllocations)
                 return ApiResponseDto<bool>
@@ -190,8 +174,7 @@ namespace Relevantz.EEPZ.Core.Service
             var budget = await _budgetRepository.GetByIdAsync(periodAllocation.BudgetId);
             var amount = periodAllocation.AllocatedAmount;
 
-            var deleted =
-                await _periodAllocationRepository.DeleteAsync(periodAllocationId);
+            var deleted = await _periodAllocationRepository.DeleteAsync(periodAllocationId);
 
             if (deleted && budget != null)
             {
@@ -212,8 +195,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<PeriodAllocationResponseDto>
                     .FailureResponse(ServiceMessages.InvalidPeriodAllocationId);
 
-            var response =
-                await _periodAllocationRepository.GetPeriodAllocationDetailsAsync(periodAllocationId);
+            var response = await _periodAllocationRepository.GetPeriodAllocationDetailsAsync(periodAllocationId);
 
             if (response == null)
                 return ApiResponseDto<PeriodAllocationResponseDto>
@@ -231,10 +213,8 @@ namespace Relevantz.EEPZ.Core.Service
 
             foreach (var allocation in periodAllocations)
             {
-                var dto =
-                    await _periodAllocationRepository.GetPeriodAllocationDetailsAsync(
-                        allocation.PeriodAllocationId);
-
+                var dto = await _periodAllocationRepository.GetPeriodAllocationDetailsAsync(
+                    allocation.PeriodAllocationId);
                 if (dto != null)
                     response.Add(dto);
             }
@@ -253,17 +233,13 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<List<PeriodAllocationResponseDto>>
                     .FailureResponse(ServiceMessages.InvalidBudgetId);
 
-            var periodAllocations =
-                await _periodAllocationRepository.GetByBudgetIdAsync(budgetId);
-
+            var periodAllocations = await _periodAllocationRepository.GetByBudgetIdAsync(budgetId);
             var response = new List<PeriodAllocationResponseDto>();
 
             foreach (var allocation in periodAllocations)
             {
-                var dto =
-                    await _periodAllocationRepository.GetPeriodAllocationDetailsAsync(
-                        allocation.PeriodAllocationId);
-
+                var dto = await _periodAllocationRepository.GetPeriodAllocationDetailsAsync(
+                    allocation.PeriodAllocationId);
                 if (dto != null)
                     response.Add(dto);
             }

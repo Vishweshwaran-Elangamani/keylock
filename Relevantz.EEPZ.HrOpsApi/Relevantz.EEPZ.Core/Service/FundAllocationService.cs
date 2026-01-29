@@ -6,6 +6,8 @@ using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Data.IRepository;
+using MapsterMapper;
+using Mapster;
 
 namespace Relevantz.EEPZ.Core.Service
 {
@@ -16,13 +18,16 @@ namespace Relevantz.EEPZ.Core.Service
     {
         private readonly IFundAllocationRepository _fundAllocationRepository;
         private readonly ILogger<FundAllocationService> _logger;
+        private readonly IMapper _mapper;
 
         public FundAllocationService(
             IFundAllocationRepository fundAllocationRepository,
-            ILogger<FundAllocationService> logger)
+            ILogger<FundAllocationService> logger,
+            IMapper mapper)
         {
             _fundAllocationRepository = fundAllocationRepository;
             _logger = logger;
+            _mapper = mapper;
         }
 
         public async Task<ApiResponseDto<FundAllocationResponseDto>> CreateFundAllocationAsync(
@@ -50,23 +55,13 @@ namespace Relevantz.EEPZ.Core.Service
                     return periodValidationError;
             }
 
-            var allocation = new Budgetallocation
-            {
-                BudgetId = request.BudgetId,
-                DepartmentId = request.DepartmentId,
-                EmployeeUserId = request.EmployeeUserId,
-                AllocationType = request.AllocationType,
-                Amount = request.Amount,
-                GoalStatus = request.GoalStatus ?? "Pending",
-                Notes = request.Notes,
-                AllocatedByUserId = request.AllocatedByUserId,
-                AllocatedAt = DateTime.UtcNow,
-                UtilizedAmount = 0,
-                UtilizationPercentage = 0,
-                UpdatedAt = DateTime.UtcNow,
-                Period = request.Period,
-                PeriodYear = request.PeriodYear
-            };
+            // Map using Mapster
+            var allocation = _mapper.Map<Budgetallocation>(request);
+            allocation.UtilizedAmount = 0;
+            allocation.UtilizationPercentage = 0;
+            allocation.AllocatedAt = DateTime.UtcNow;
+            allocation.UpdatedAt = DateTime.UtcNow;
+            allocation.GoalStatus = request.GoalStatus ?? "Pending";
 
             var createdAllocation = await _fundAllocationRepository.CreateAsync(allocation);
 
@@ -194,11 +189,10 @@ namespace Relevantz.EEPZ.Core.Service
         {
             if (string.IsNullOrWhiteSpace(allocationType))
                 return ApiResponseDto<List<FundAllocationResponseDto>>.FailureResponse(
-                    ServiceMessages.InvalidAllocationTypeForFund);
+                    "Allocation type cannot be empty");
 
             var allocations = await _fundAllocationRepository
                 .GetByAllocationTypeAsync(allocationType);
-
             var response = await BuildFundAllocationResponses(allocations);
 
             return ApiResponseDto<List<FundAllocationResponseDto>>.SuccessResponse(
@@ -220,7 +214,6 @@ namespace Relevantz.EEPZ.Core.Service
             {
                 var dto = await _fundAllocationRepository
                     .GetFundAllocationDetailsAsync(allocation.AllocationId);
-
                 if (dto != null)
                     response.Add(dto);
             }
@@ -231,11 +224,10 @@ namespace Relevantz.EEPZ.Core.Service
         private async Task<ApiResponseDto<FundAllocationResponseDto>?> ValidatePeriodAllocation(
             CreateFundAllocationRequestDto request)
         {
-            var (exists, availableInPeriod) =
-                await _fundAllocationRepository.ValidatePeriodAndGetAvailableAsync(
-                    request.BudgetId,
-                    request.Period!,
-                    request.PeriodYear!.Value);
+            var (exists, availableInPeriod) = await _fundAllocationRepository.ValidatePeriodAndGetAvailableAsync(
+                request.BudgetId,
+                request.Period!,
+                request.PeriodYear!.Value);
 
             if (!exists)
             {
@@ -275,7 +267,7 @@ namespace Relevantz.EEPZ.Core.Service
 
             if (string.IsNullOrWhiteSpace(request.AllocationType))
                 return ApiResponseDto<FundAllocationResponseDto>
-                    .FailureResponse(ServiceMessages.InvalidAllocationTypeForFund);
+                    .FailureResponse("Allocation type is required");
 
             return null;
         }

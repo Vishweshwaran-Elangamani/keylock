@@ -10,6 +10,8 @@ using Relevantz.EEPZ.Core.IService;
 using Microsoft.Extensions.Logging;
 using Relevantz.EEPZ.Common.Constants;
 using Microsoft.EntityFrameworkCore;
+using MapsterMapper;
+using Mapster;
 
 namespace Relevantz.EEPZ.Core.Service
 {
@@ -17,85 +19,113 @@ namespace Relevantz.EEPZ.Core.Service
     {
         private readonly IPolicyRepository _policyRepository;
         private readonly ILogger<PolicyService> _logger;
+        private readonly IMapper _mapper;
 
-        public PolicyService(IPolicyRepository policyRepository, ILogger<PolicyService> logger)
+        public PolicyService(
+            IPolicyRepository policyRepository,
+            ILogger<PolicyService> logger,
+            IMapper mapper)
         {
             _policyRepository = policyRepository;
             _logger = logger;
+            _mapper = mapper;
         }
 
-        public async Task<ApiResponseDto<PolicyResponseDto>> CreatePolicyAsync(
-            CreatePolicyRequestDto request, int createdByUserId)
-        {
-            if (await _policyRepository.PolicyNameExistsAsync(request.PolicyName))
-            {
-                return ApiResponseDto<PolicyResponseDto>
-                    .ErrorResponse(PolicyMessages.PolicyNameExists);
-            }
+       public async Task<ApiResponseDto<PolicyResponseDto>> CreatePolicyAsync(
+    CreatePolicyRequestDto request,
+    int createdByUserId)
+{
+    if (await _policyRepository.PolicyNameExistsAsync(request.PolicyName))
+    {
+        return ApiResponseDto<PolicyResponseDto>
+            .ErrorResponse(PolicyMessages.PolicyNameExists);
+    }
 
-            var policy = new Organizationalpolicy
-            {
-                PolicyName = request.PolicyName,
-                Category = request.Category,
-                Description = request.Description,
-                ComplianceGuidance = request.ComplianceGuidance,
-                Status = request.Status ?? "Draft",
-                CreatedByUserId = createdByUserId,
-                DocumentUrl = request.DocumentUrl,
-                DocumentName = request.DocumentName,
-                DocumentType = request.DocumentType,
-                DocumentSize = request.DocumentSize,
-                DocumentUploadedAt = !string.IsNullOrEmpty(request.DocumentUrl)
-                    ? DateTime.Now
-                    : null
-            };
+    var policy = _mapper.Map<Organizationalpolicy>(request);
+    policy.CreatedByUserId = createdByUserId;
+    policy.CreatedAt = DateTime.Now;
+    policy.IsPublished = false;
+    policy.Status = request.Status ?? "Draft";
 
-            var createdPolicy = await _policyRepository.CreatePolicyAsync(policy);
+    if (!string.IsNullOrEmpty(request.DocumentUrl))
+    {
+        policy.DocumentUploadedAt = DateTime.Now;
+    }
 
-            _logger.LogInformation(
-                PolicyMessages.LogPolicyCreated,
-                createdPolicy.PolicyName,
-                createdPolicy.PolicyId,
-                createdByUserId);
+    var createdPolicy = await _policyRepository.CreatePolicyAsync(policy);
 
-            return ApiResponseDto<PolicyResponseDto>.SuccessResponse(
-                MapToResponseDto(createdPolicy),
-                PolicyMessages.PolicyCreatedSuccess);
-        }
+    _logger.LogInformation(
+        PolicyMessages.LogPolicyCreated,
+        createdPolicy.PolicyName,
+        createdPolicy.PolicyId,
+        createdByUserId);
+
+    // Fetch complete entity with navigation properties
+    var fullPolicy = await _policyRepository.GetPolicyByIdAsync(createdPolicy.PolicyId);
+    
+    // Map to response DTO using Mapster
+    var response = _mapper.Map<PolicyResponseDto>(fullPolicy);
+
+    return ApiResponseDto<PolicyResponseDto>.SuccessResponse(
+        response,
+        PolicyMessages.PolicyCreatedSuccess);
+}
+
+
 
         public async Task<ApiResponseDto<List<PolicyResponseDto>>> GetAllPoliciesAsync()
         {
             var policies = await _policyRepository.GetAllPoliciesAsync();
+            
+            // Map list using Mapster
+            var response = _mapper.Map<List<PolicyResponseDto>>(policies);
+
             return ApiResponseDto<List<PolicyResponseDto>>
-                .SuccessResponse(MapPolicies(policies));
+                .SuccessResponse(response);
         }
 
         public async Task<ApiResponseDto<List<PolicyResponseDto>>> GetActivePoliciesAsync()
         {
             var policies = await _policyRepository.GetActivePoliciesAsync();
+            
+            // Map using Mapster
+            var response = _mapper.Map<List<PolicyResponseDto>>(policies);
+
             return ApiResponseDto<List<PolicyResponseDto>>
-                .SuccessResponse(MapPolicies(policies));
+                .SuccessResponse(response);
         }
 
         public async Task<ApiResponseDto<List<PolicyResponseDto>>> GetInactivePoliciesAsync()
         {
             var policies = await _policyRepository.GetInactivePoliciesAsync();
+            
+            // Map using Mapster
+            var response = _mapper.Map<List<PolicyResponseDto>>(policies);
+
             return ApiResponseDto<List<PolicyResponseDto>>
-                .SuccessResponse(MapPolicies(policies));
+                .SuccessResponse(response);
         }
 
         public async Task<ApiResponseDto<List<PolicyResponseDto>>> GetPublishedPoliciesAsync()
         {
             var policies = await _policyRepository.GetPublishedPoliciesAsync();
+            
+            // Map using Mapster
+            var response = _mapper.Map<List<PolicyResponseDto>>(policies);
+
             return ApiResponseDto<List<PolicyResponseDto>>
-                .SuccessResponse(MapPolicies(policies));
+                .SuccessResponse(response);
         }
 
         public async Task<ApiResponseDto<List<PolicyResponseDto>>> GetDraftPoliciesAsync()
         {
             var policies = await _policyRepository.GetDraftPoliciesAsync();
+            
+            // Map using Mapster
+            var response = _mapper.Map<List<PolicyResponseDto>>(policies);
+
             return ApiResponseDto<List<PolicyResponseDto>>
-                .SuccessResponse(MapPolicies(policies));
+                .SuccessResponse(response);
         }
 
         public async Task<ApiResponseDto<PolicyResponseDto>> GetPolicyByIdAsync(int policyId)
@@ -108,12 +138,16 @@ namespace Relevantz.EEPZ.Core.Service
                     .ErrorResponse(PolicyMessages.PolicyNotFound);
             }
 
+            // Map using Mapster
+            var response = _mapper.Map<PolicyResponseDto>(policy);
+
             return ApiResponseDto<PolicyResponseDto>
-                .SuccessResponse(MapToResponseDto(policy));
+                .SuccessResponse(response);
         }
 
         public async Task<ApiResponseDto<PolicyResponseDto>> UpdatePolicyAsync(
-            int policyId, UpdatePolicyRequestDto request)
+            int policyId,
+            UpdatePolicyRequestDto request)
         {
             var policy = await _policyRepository.GetPolicyByIdAsync(policyId);
 
@@ -155,6 +189,8 @@ namespace Relevantz.EEPZ.Core.Service
                 policy.DocumentUploadedAt = DateTime.Now;
             }
 
+            policy.UpdatedAt = DateTime.Now;
+
             var updatedPolicy = await _policyRepository.UpdatePolicyAsync(policy);
 
             _logger.LogInformation(
@@ -162,8 +198,11 @@ namespace Relevantz.EEPZ.Core.Service
                 updatedPolicy.PolicyName,
                 updatedPolicy.PolicyId);
 
+            // Map to response using Mapster
+            var response = _mapper.Map<PolicyResponseDto>(updatedPolicy);
+
             return ApiResponseDto<PolicyResponseDto>.SuccessResponse(
-                MapToResponseDto(updatedPolicy),
+                response,
                 PolicyMessages.PolicyUpdatedSuccess);
         }
 
@@ -210,7 +249,8 @@ namespace Relevantz.EEPZ.Core.Service
         }
 
         public async Task<ApiResponseDto<PolicyResponseDto>> UnpublishPolicyAsync(
-            int policyId, int userId)
+            int policyId,
+            int userId)
         {
             var policy = await _policyRepository.GetPolicyByIdAsync(policyId);
 
@@ -229,62 +269,12 @@ namespace Relevantz.EEPZ.Core.Service
                 PolicyMessages.LogPolicyUnpublished,
                 policyId);
 
+            // Map using Mapster
+            var response = _mapper.Map<PolicyResponseDto>(policy);
+
             return ApiResponseDto<PolicyResponseDto>.SuccessResponse(
-                MapToResponseDto(policy),
+                response,
                 PolicyMessages.PolicyUnpublishedSuccess);
-        }
-
-        private List<PolicyResponseDto> MapPolicies(IEnumerable<Organizationalpolicy> policies)
-        {
-            return policies.Select(MapToResponseDto).ToList();
-        }
-
-        private PolicyResponseDto MapToResponseDto(Organizationalpolicy policy)
-        {
-            return new PolicyResponseDto
-            {
-                PolicyId = policy.PolicyId,
-                PolicyName = policy.PolicyName,
-                Category = policy.Category,
-                Description = policy.Description,
-                ComplianceGuidance = policy.ComplianceGuidance,
-                Status = policy.Status,
-                CreatedByUserId = policy.CreatedByUserId,
-                CreatedByEmail = policy.CreatedByUser?.Email,
-                CreatedAt = policy.CreatedAt,
-                UpdatedAt = policy.UpdatedAt,
-                ViolationsCount = policy.Policyviolations?.Count ?? 0,
-                DocumentUrl = policy.DocumentUrl,
-                DocumentName = policy.DocumentName,
-                DocumentType = policy.DocumentType,
-                DocumentSize = policy.DocumentSize,
-                DocumentSizeFormatted = FormatFileSize(policy.DocumentSize),
-                DocumentUploadedAt = policy.DocumentUploadedAt,
-                IsPublished = policy.IsPublished,
-                PublishedAt = policy.PublishedAt,
-                PublishedBy = policy.PublishedBy,
-                PublishedByEmail = policy.PublishedBy.HasValue
-                    ? "TODO: Get from PublishedBy UserId"
-                    : null
-            };
-        }
-
-        private string FormatFileSize(long? bytes)
-        {
-            if (!bytes.HasValue || bytes.Value == 0)
-                return null;
-
-            string[] sizes = { "B", "KB", "MB", "GB" };
-            double len = bytes.Value;
-            int order = 0;
-
-            while (len >= 1024 && order < sizes.Length - 1)
-            {
-                order++;
-                len /= 1024;
-            }
-
-            return $"{len:0.##} {sizes[order]}";
         }
     }
 }

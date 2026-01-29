@@ -9,6 +9,8 @@ using Relevantz.EEPZ.Data.IRepository;
 using Relevantz.EEPZ.Core.IService;
 using Microsoft.Extensions.Logging;
 using Relevantz.EEPZ.Common.Constants;
+using MapsterMapper;
+using Mapster;
 
 namespace Relevantz.EEPZ.Core.Service
 {
@@ -16,17 +18,21 @@ namespace Relevantz.EEPZ.Core.Service
     {
         private readonly IViolationRepository _violationRepository;
         private readonly ILogger<ViolationService> _logger;
+        private readonly IMapper _mapper;
 
         public ViolationService(
             IViolationRepository violationRepository,
-            ILogger<ViolationService> logger)
+            ILogger<ViolationService> logger,
+            IMapper mapper)
         {
             _violationRepository = violationRepository;
             _logger = logger;
+            _mapper = mapper;
         }
 
         public async Task<ApiResponseDto<ViolationResponseDto>> ReportViolationAsync(
-            ReportViolationRequestDto request, int reportedByUserId)
+            ReportViolationRequestDto request,
+            int reportedByUserId)
         {
             if (request.EmployeeUserId <= 0)
                 return ApiResponseDto<ViolationResponseDto>
@@ -40,25 +46,16 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<ViolationResponseDto>
                     .ErrorResponse(ViolationMessages.InvalidViolationType);
 
-            var violation = new Policyviolation
-            {
-                EmployeeUserId = request.EmployeeUserId,
-                PolicyId = request.PolicyId,
-                ViolationType = request.ViolationType,
-                Description = request.Description,
-                Severity = request.Severity,
-                Status = "Reported",
-                ReportedByUserId = reportedByUserId,
-                ReportedDate = DateOnly.FromDateTime(DateTime.Now),
-                EscalatedToUserId = request.EscalatedToUserId
-            };
+            // Map using Mapster
+            var violation = _mapper.Map<Policyviolation>(request);
+            violation.ReportedByUserId = reportedByUserId;
+            violation.Status = "Reported";
+            violation.ReportedDate = DateOnly.FromDateTime(DateTime.Now);
 
-            var createdViolation =
-                await _violationRepository.CreateViolationAsync(violation);
+            var createdViolation = await _violationRepository.CreateViolationAsync(violation);
 
-            var fullViolation =
-                await _violationRepository.GetViolationByIdAsync(
-                    createdViolation.ViolationId);
+            var fullViolation = await _violationRepository.GetViolationByIdAsync(
+                createdViolation.ViolationId);
 
             _logger.LogInformation(
                 ViolationMessages.LogViolationReported,
@@ -66,18 +63,23 @@ namespace Relevantz.EEPZ.Core.Service
                 reportedByUserId,
                 request.EmployeeUserId);
 
+            // Map to response using Mapster
+            var response = _mapper.Map<ViolationResponseDto>(fullViolation!);
+
             return ApiResponseDto<ViolationResponseDto>.SuccessResponse(
-                MapToResponseDto(fullViolation!),
+                response,
                 ViolationMessages.ViolationReportedSuccess);
         }
 
         public async Task<ApiResponseDto<List<ViolationResponseDto>>> GetAllViolationsAsync()
         {
-            var violations =
-                await _violationRepository.GetAllViolationsAsync();
+            var violations = await _violationRepository.GetAllViolationsAsync();
+            
+            // Map list using Mapster
+            var response = _mapper.Map<List<ViolationResponseDto>>(violations);
 
             return ApiResponseDto<List<ViolationResponseDto>>
-                .SuccessResponse(MapViolations(violations));
+                .SuccessResponse(response);
         }
 
         public async Task<ApiResponseDto<ViolationResponseDto>> GetViolationByIdAsync(int violationId)
@@ -86,15 +88,17 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<ViolationResponseDto>
                     .ErrorResponse(ViolationMessages.InvalidViolationId);
 
-            var violation =
-                await _violationRepository.GetViolationByIdAsync(violationId);
+            var violation = await _violationRepository.GetViolationByIdAsync(violationId);
 
             if (violation == null)
                 return ApiResponseDto<ViolationResponseDto>
                     .ErrorResponse(ViolationMessages.ViolationNotFound);
 
+            // Map using Mapster
+            var response = _mapper.Map<ViolationResponseDto>(violation);
+
             return ApiResponseDto<ViolationResponseDto>
-                .SuccessResponse(MapToResponseDto(violation));
+                .SuccessResponse(response);
         }
 
         public async Task<ApiResponseDto<List<ViolationResponseDto>>> GetViolationsByEmployeeAsync(
@@ -104,11 +108,13 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<List<ViolationResponseDto>>
                     .ErrorResponse(ViolationMessages.InvalidEmployeeUserId);
 
-            var violations =
-                await _violationRepository.GetViolationsByEmployeeAsync(employeeUserId);
+            var violations = await _violationRepository.GetViolationsByEmployeeAsync(employeeUserId);
+            
+            // Map using Mapster
+            var response = _mapper.Map<List<ViolationResponseDto>>(violations);
 
             return ApiResponseDto<List<ViolationResponseDto>>
-                .SuccessResponse(MapViolations(violations));
+                .SuccessResponse(response);
         }
 
         public async Task<ApiResponseDto<List<ViolationResponseDto>>> GetViolationsByPolicyAsync(
@@ -118,23 +124,26 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<List<ViolationResponseDto>>
                     .ErrorResponse(ViolationMessages.InvalidPolicyId);
 
-            var violations =
-                await _violationRepository.GetViolationsByPolicyAsync(policyId);
+            var violations = await _violationRepository.GetViolationsByPolicyAsync(policyId);
+            
+            // Map using Mapster
+            var response = _mapper.Map<List<ViolationResponseDto>>(violations);
 
             return ApiResponseDto<List<ViolationResponseDto>>
-                .SuccessResponse(MapViolations(violations));
+                .SuccessResponse(response);
         }
 
         public async Task<ApiResponseDto<ViolationResponseDto>> ResolveViolationAsync(
-            int violationId, ResolveViolationRequestDto request)
+            int violationId,
+            ResolveViolationRequestDto request)
         {
             if (violationId <= 0)
                 return ApiResponseDto<ViolationResponseDto>
                     .ErrorResponse(ViolationMessages.InvalidViolationId);
 
-            var resolved =
-                await _violationRepository.ResolveViolationAsync(
-                    violationId, request.ResolutionNotes);
+            var resolved = await _violationRepository.ResolveViolationAsync(
+                violationId,
+                request.ResolutionNotes);
 
             if (!resolved)
                 return ApiResponseDto<ViolationResponseDto>
@@ -145,60 +154,31 @@ namespace Relevantz.EEPZ.Core.Service
                 violationId,
                 request.ResolutionNotes);
 
-            var violation =
-                await _violationRepository.GetViolationByIdAsync(violationId);
+            var violation = await _violationRepository.GetViolationByIdAsync(violationId);
+
+            // Map using Mapster
+            var response = _mapper.Map<ViolationResponseDto>(violation!);
 
             return ApiResponseDto<ViolationResponseDto>.SuccessResponse(
-                MapToResponseDto(violation!),
+                response,
                 ViolationMessages.ViolationResolvedSuccess);
         }
 
         public async Task<ApiResponseDto<ViolationStatsDto>> GetViolationStatsAsync()
+{
+    var bySeverity = await _violationRepository.GetViolationCountBySeverityAsync();
+    var byStatus = await _violationRepository.GetViolationCountByStatusAsync();
+    // Remove the following line since the method doesn't exist:
+    // var byType = await _violationRepository.GetViolationCountByTypeAsync();
+
+    return ApiResponseDto<ViolationStatsDto>.SuccessResponse(
+        new ViolationStatsDto
         {
-            var bySeverity =
-                await _violationRepository.GetViolationCountBySeverityAsync();
+            BySeverity = bySeverity,
+            ByStatus = byStatus
+            // Remove: ByType = byType
+        });
+}
 
-            var byStatus =
-                await _violationRepository.GetViolationCountByStatusAsync();
-
-            return ApiResponseDto<ViolationStatsDto>.SuccessResponse(
-                new ViolationStatsDto
-                {
-                    BySeverity = bySeverity,
-                    ByStatus = byStatus
-                });
-        }
-
-        private List<ViolationResponseDto> MapViolations(
-            IEnumerable<Policyviolation> violations)
-        {
-            return violations.Select(MapToResponseDto).ToList();
-        }
-
-        private ViolationResponseDto MapToResponseDto(Policyviolation violation)
-        {
-            return new ViolationResponseDto
-            {
-                ViolationId = violation.ViolationId,
-                EmployeeUserId = violation.EmployeeUserId,
-                EmployeeName = violation.EmployeeUser?.Employee?.Userprofile != null
-                    ? $"{violation.EmployeeUser.Employee.Userprofile.FirstName} {violation.EmployeeUser.Employee.Userprofile.LastName}"
-                    : null,
-                EmployeeEmail = violation.EmployeeUser?.Email,
-                PolicyId = violation.PolicyId,
-                PolicyName = violation.Policy?.PolicyName,
-                ViolationType = violation.ViolationType,
-                Description = violation.Description,
-                Severity = violation.Severity,
-                Status = violation.Status,
-                ReportedByUserId = violation.ReportedByUserId,
-                ReportedByEmail = violation.ReportedByUser?.Email,
-                ReportedDate = violation.ReportedDate,
-                EscalatedToUserId = violation.EscalatedToUserId,
-                EscalatedToEmail = violation.EscalatedToUser?.Email,
-                ResolutionNotes = violation.ResolutionNotes,
-                ResolvedAt = violation.ResolvedAt
-            };
-        }
     }
 }
