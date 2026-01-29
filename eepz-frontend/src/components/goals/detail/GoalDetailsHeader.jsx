@@ -247,7 +247,7 @@ const GoalDetailsHeader = ({
   };
 
   return (
-    <div className={`card mb-3 ${styles.card}`}>
+    <div className={`card d-flex mb-3 ${styles.card}`}>
       <div className={`card-body ${styles.cardBody}`}>
         <div className="row">
           {/* Left Section - Title, Progress, Actions */}

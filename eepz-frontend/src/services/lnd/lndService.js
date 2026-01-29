@@ -71,27 +71,27 @@ export const lndService = {
    * @param {string} sortOrder - Sort order: 'asc' or 'desc' (optional)
    * @param {number} pageSize - Items per page (default: 10)
    * @returns {Promise} API response
-   */// Used params object
-getMySkills: async (params = {}) => {
-  try {
-    const defaultParams = {
-      searchTerm: "",
-      pageNumber: 1,
-      pageSize: 10,
-    };
+   */ // Used params object
+  getMySkills: async (params = {}) => {
+    try {
+      const defaultParams = {
+        searchTerm: "",
+        pageNumber: 1,
+        pageSize: 10,
+      };
 
-    const finalParams = { ...defaultParams, ...params };
-    const query = buildQueryString(finalParams);
+      const finalParams = { ...defaultParams, ...params };
+      const query = buildQueryString(finalParams);
 
-    const response = await axios.get(
-      `${API_BASE_URL}/lnd-skills/my-skills${query}`,
-      { headers: getHeaders() }
-    );
-    return response;
-  } catch (error) {
-    return handleError(error);
-  }
-},
+      const response = await axios.get(
+        `${API_BASE_URL}/lnd-skills/my-skills${query}`,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
 
   /**
    * Get subordinate employees' skills (Manager only)
@@ -182,12 +182,11 @@ getMySkills: async (params = {}) => {
    * @param {number} skillMapperId - Skill mapper ID
    * @returns {Promise} API response
    */
-  deleteSkill: async (skillMapperId) => {
+  deleteSkill: async (Id) => {
     try {
-      const response = await axios.delete(
-        `${API_BASE_URL}/lnd-skills/${skillMapperId}`,
-        { headers: getHeaders() }
-      );
+      const response = await axios.delete(`${API_BASE_URL}/lnd-skills/${Id}`, {
+        headers: getHeaders(),
+      });
       return response;
     } catch (error) {
       return handleError(error);
@@ -202,31 +201,30 @@ getMySkills: async (params = {}) => {
    * @returns {Promise} API response with paginated employees
    */
   /**
- * Get subordinate employees for manager with pagination and search
- * @param {object} params - { pageNumber, searchTerm, pageSize }
- * @returns {Promise} API response with paginated employees
- */
-getSubordinateEmployees: async (params = {}) => {
-  try {
-    const defaultParams = {
-      PageNumber: 1,
-      SearchTerm: "",
-      PageSize: 12,
-    };
+   * Get subordinate employees for manager with pagination and search
+   * @param {object} params - { pageNumber, searchTerm, pageSize }
+   * @returns {Promise} API response with paginated employees
+   */
+  getSubordinateEmployees: async (params = {}) => {
+    try {
+      const defaultParams = {
+        PageNumber: 1,
+        SearchTerm: "",
+        PageSize: 12,
+      };
 
-    const finalParams = { ...defaultParams, ...params };
-    const query = buildQueryString(finalParams);
+      const finalParams = { ...defaultParams, ...params };
+      const query = buildQueryString(finalParams);
 
-    const response = await axios.get(
-      `${API_BASE_URL}/lnd-skills/employees/subordinates${query}`,
-      { headers: getHeaders() }
-    );
-    return response;
-  } catch (error) {
-    return handleError(error);
-  }
-},
-
+      const response = await axios.get(
+        `${API_BASE_URL}/lnd-skills/employees/subordinates${query}`,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
 
   /**
    * Get all available skills for dropdown
@@ -278,32 +276,32 @@ getSubordinateEmployees: async (params = {}) => {
     }
   },
 
- /**
- * Get available SMEs for a skill
- * @param {object} params - { skillId, searchTerm, pageNumber, pageSize }
- * @returns {Promise} API response
- */
-getAvailableSmes: async (params = {}) => {
-  try {
-    const defaultParams = {
-      skillId: null,
-      searchTerm: "",
-      pageNumber: 1,
-      pageSize: 10,
-    };
+  /**
+   * Get available SMEs for a skill
+   * @param {object} params - { skillId, searchTerm, pageNumber, pageSize }
+   * @returns {Promise} API response
+   */
+  getAvailableSmes: async (params = {}) => {
+    try {
+      const defaultParams = {
+        skillId: null,
+        searchTerm: "",
+        pageNumber: 1,
+        pageSize: 10,
+      };
 
-    const finalParams = { ...defaultParams, ...params };
-    const query = buildQueryString(finalParams);
+      const finalParams = { ...defaultParams, ...params };
+      const query = buildQueryString(finalParams);
 
-    const response = await axios.get(
-      `${API_BASE_URL}/lnd-sme/available${query}`,
-      { headers: getHeaders() }
-    );
-    return response;
-  } catch (error) {
-    return handleError(error);
-  }
-},
+      const response = await axios.get(
+        `${API_BASE_URL}/lnd-sme/available${query}`,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
 
   // ASSIGNMENTS (LnDAssignmentsController)
 
@@ -494,7 +492,7 @@ getAvailableSmes: async (params = {}) => {
         pageNumber: 1,
         searchTerm: "",
         pageSize: 12,
-        excludeDepartment: "Administration"
+        excludeDepartment: "Administration",
       };
 
       const finalParams = { ...defaultParams, ...params };
@@ -508,7 +506,7 @@ getAvailableSmes: async (params = {}) => {
     } catch (error) {
       return handleError(error);
     }
-  }, 
+  },
 
   /**
    * Get all organization assignments (HR only)
@@ -544,7 +542,7 @@ getAvailableSmes: async (params = {}) => {
    * Export all organization assignments to Excel (HR only)
    * UPDATED: Now uses request model instead of individual parameters
    * @param {object} params - { statusFilter, searchTerm, sortField, sortOrder }
-   * @returns {Promise} Blob response 
+   * @returns {Promise} Blob response
    */
   exportOrganizationAssignments: async (params = {}) => {
     try {
@@ -553,7 +551,7 @@ getAvailableSmes: async (params = {}) => {
         searchTerm: "",
         sortField: "",
         sortOrder: "",
-      };   
+      };
 
       const finalParams = { ...defaultParams, ...params };
       const query = buildQueryString(finalParams);
@@ -629,11 +627,11 @@ getAvailableSmes: async (params = {}) => {
   /**
    * Get employee skills for HR view
    * UPDATED: Now uses request model instead of individual parameters
-   * @param {number} employeeId - Employee ID
+   * @param {number} Id - Employee ID
    * @param {object} params - { pageNumber, searchTerm, sortBy }
-   * @returns {Promise} API response    
+   * @returns {Promise} API response
    */
-  getEmployeeSkillsForHR: async (employeeId, params = {}) => {
+  getEmployeeSkillsForHR: async (Id, params = {}) => {
     try {
       const defaultParams = {
         pageNumber: 1,
@@ -645,7 +643,7 @@ getAvailableSmes: async (params = {}) => {
       const query = buildQueryString(finalParams);
 
       const response = await axios.get(
-        `${API_BASE_URL}/lnd-hr/skills/employee/${employeeId}${query}`,
+        `${API_BASE_URL}/lnd-hr/skills/employee/${Id}${query}`,
         { headers: getHeaders() }
       );
       return response;
@@ -662,35 +660,34 @@ getAvailableSmes: async (params = {}) => {
    * @param {object} params - { pageNumber, approvalType, status, sortField, sortOrder, pageSize, searchTerm }
    * @returns {Promise} API response
    */
- /**
- * Get current user's pending approvals (as approver)
- * Backend Model: MyApprovalsRequestModel (PascalCase)
- */
-getMyApprovals: async (params = {}) => {
-  try {
-    const defaultParams = {
-      PageNumber: 1,        //  PascalCase
-      ApprovalType: "",     //  PascalCase
-      Status: "",           //  PascalCase
-      SortField: "",        //  PascalCase
-      SortOrder: "asc",     // PascalCase
-      PageSize: 10,         // PascalCase
-      SearchTerm: "",       //  PascalCase
-    };
+  /**
+   * Get current user's pending approvals (as approver)
+   * Backend Model: MyApprovalsRequestModel (PascalCase)
+   */
+  getMyApprovals: async (params = {}) => {
+    try {
+      const defaultParams = {
+        PageNumber: 1, //  PascalCase
+        ApprovalType: "", //  PascalCase
+        Status: "", //  PascalCase
+        SortField: "", //  PascalCase
+        SortOrder: "asc", // PascalCase
+        PageSize: 10, // PascalCase
+        SearchTerm: "", //  PascalCase
+      };
 
-    const finalParams = { ...defaultParams, ...params };
-    const query = buildQueryString(finalParams);
+      const finalParams = { ...defaultParams, ...params };
+      const query = buildQueryString(finalParams);
 
-    const response = await axios.get(
-      `${API_BASE_URL}/lnd-approvals/my-approvals${query}`,
-      { headers: getHeaders() }
-    );
-    return response;
-  } catch (error) {
-    return handleError(error);
-  }
-},
-
+      const response = await axios.get(
+        `${API_BASE_URL}/lnd-approvals/my-approvals${query}`,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
 
   /**
    * Process approval (approve/reject)
@@ -748,10 +745,10 @@ getMyApprovals: async (params = {}) => {
    * @param {number} approvalId - Approval ID
    * @returns {Promise} API response
    */
-  getApprovalDetails: async (approvalId) => {
+  getApprovalDetails: async (Id) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/approvals/${approvalId}/details`,
+        `${API_BASE_URL}/approvals/${Id}/details`,
         { headers: getHeaders() }
       );
       return response;
@@ -765,10 +762,10 @@ getMyApprovals: async (params = {}) => {
    * @param {number} approvalId - Approval ID
    * @returns {Promise} Blob response
    */
-  downloadApprovalAttachment: async (approvalId) => {
+  downloadApprovalAttachment: async (Id) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/lnd-approvals/${approvalId}/download`,
+        `${API_BASE_URL}/lnd-approvals/${Id}/download`,
         {
           headers: getHeaders(),
           responseType: "blob",
@@ -786,10 +783,10 @@ getMyApprovals: async (params = {}) => {
    * @param {number} approvalId - Approval ID
    * @returns {Promise} Blob response for inline viewing
    */
-  previewApprovalAttachment: async (approvalId) => {
+  previewApprovalAttachment: async (Id) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/approvals/${approvalId}/preview-attachment`,
+        `${API_BASE_URL}/approvals/${Id}/preview-attachment`,
         {
           headers: getHeaders(),
           responseType: "blob",
@@ -807,10 +804,10 @@ getMyApprovals: async (params = {}) => {
    * @param {number} assignmentId - Assignment ID
    * @returns {Promise} Blob response
    */
-  downloadAssignmentProof: async (assignmentId) => {
+  downloadAssignmentProof: async (Id) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/lnd-approvals/assignments/${assignmentId}/download-proof`,
+        `${API_BASE_URL}/lnd-approvals/assignments/${Id}/download-proof`,
         {
           headers: getHeaders(),
           responseType: "blob",
@@ -828,10 +825,10 @@ getMyApprovals: async (params = {}) => {
    * @param {number} assignmentId - Assignment ID
    * @returns {Promise} Blob response for inline viewing
    */
-  previewAssignmentProof: async (assignmentId) => {
+  previewAssignmentProof: async (Id) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/lnd-approvals/assignments/${assignmentId}/proof/preview`,
+        `${API_BASE_URL}/lnd-approvals/assignments/${Id}/proof/preview`,
         {
           headers: getHeaders(),
           responseType: "blob",
@@ -857,7 +854,7 @@ export const downloadFile = (blob, filename = "download") => {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-  window.URL.revokeObjectURL(url);  
+  window.URL.revokeObjectURL(url);
 };
 
 /**

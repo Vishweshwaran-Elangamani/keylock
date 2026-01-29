@@ -406,7 +406,7 @@ const YourGoalsPage = () => {
                   <div
                     key={goal.goalId}
                     className={`col-12 col-md-6 col-lg-4 col-xl-3 ${styles.goalCardColumn}`}
-                  >
+                  >  
                     <GoalCard
                       goal={goal}
                       onComment={handleCommentClick}

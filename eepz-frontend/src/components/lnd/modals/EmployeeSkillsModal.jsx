@@ -183,6 +183,9 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
         setShowConfirmModal(false);
         setSkillToDelete(null);
         fetchEmployeeSkills();
+        fetchApprovalHistory(); 
+      fetchTeamAssignments();
+        
       } else {
         toast.error(response.data.message || LND_TOASTS.FAILED_TO_DELETE_SKILL);
       }
@@ -199,6 +202,8 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
     setShowRecordModal(false);
     setSelectedSkill(null);
     fetchEmployeeSkills();
+    fetchApprovalHistory();  
+      fetchTeamAssignments();
   };
 
   const handleOpenRequestSme = (skill) => {
