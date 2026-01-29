@@ -56,7 +56,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _mapper = mapper;
         }
 
-        // CreateGoalAsync remains UNCHANGED - no mapping needed
         public async Task<ApiResponseModel<int>> CreateGoalAsync(
             CreateGoalModel dto,
             int currentUserEmployeeMasterId,
@@ -158,7 +157,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
         }
 
-        // CreateGoalInternalAsync remains UNCHANGED
         private async Task<int> CreateGoalInternalAsync(
             CreateGoalModel dto,
             int currentUserEmployeeMasterId,
@@ -259,7 +257,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return goal.GoalId;
         }
 
-        // REFACTORED: QueryGoalsAsync with Mapster
         public async Task<List<GoalSummaryModel>> QueryGoalsAsync(
             GoalQueryModel query,
             int currentUserEmployeeMasterId,
@@ -297,10 +294,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             foreach (var goal in goals)
             {
-                // Use Mapster for base mapping
-                var summary = _mapper.Map<GoalSummaryModel>(goal);
 
-                // Set computed properties
+                var summary = _mapper.Map<GoalSummaryModel>(goal);
                 summary.DescriptionShort = GetShortDescription(goal.GoalDescription);
                 summary.ProgressPercent = await CalculateGoalProgressAsync(
                     goal.GoalId,
@@ -308,8 +303,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
                 summary.ProjectName = await GetProjectNameAsync(goal.ProjectId);
                 summary.CreatedByName = await _baseService.GetEmployeeNameAsync(goal.CreatedBy);
-
-                // Calculate flags
                 summary.IsOverdue = IsGoalOverdue(goal);
                 summary.CanAssign = CanAssignGoal(
                     goal,
@@ -317,7 +310,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     currentUserRole
                 );
 
-                // Set user-specific data
                 var isCreator = goal.CreatedBy == currentUserEmployeeMasterId;
                 var isAssignee = goal.GoalAssignments.Any(a =>
                     a.AssignedTo == currentUserEmployeeMasterId
@@ -341,7 +333,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     .GoalAssignments.Where(a => a.AssignedTo == currentUserEmployeeMasterId)
                     .Any(a => a.IsAcknowledged == true);
 
-                // Set assignees for team goals
+
                 if (goal.GoalType == GOAL_TYPE.TEAM)
                 {
                     var assignees = await GetAssigneesWithDetailsAsync(goal.GoalId);
@@ -381,7 +373,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return (int)Math.Round((double)completedCount / userItems.Count * 100);
         }
 
-        // UpdateGoalAsync remains mostly UNCHANGED
         public async Task<ApiResponseModel> UpdateGoalAsync(
             int goalId,
             UpdateGoalModel dto,
@@ -519,7 +510,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return await GetAssigneesWithDetailsAsync(goalId);
         }
 
-        // REFACTORED: GetAssigneesWithDetailsAsync with Mapster
         private async Task<List<AssigneeModel>> GetAssigneesWithDetailsAsync(int goalId)
         {
             var assignments = await _baseRepo.GetAssigneesAsync(goalId);
@@ -536,10 +526,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 if (edm?.Employee?.Userprofile == null)
                     continue;
 
-                // Use Mapster for base mapping
                 var assignee = _mapper.Map<AssigneeModel>(assignment);
-
-                // Set employee details
                 var profile = edm.Employee.Userprofile;
                 assignee.Name = $"{profile.FirstName} {profile.LastName}".Trim();
                 assignee.Role = edm.Role?.RoleName ?? USER_ROLE.EMPLOYEE;
@@ -550,7 +537,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return result;
         }
 
-        // AssignAsync remains UNCHANGED - complex business logic
         public async Task<ApiResponseModel> AssignAsync(
             int goalId,
             AssignGoalModel dto,
@@ -683,7 +669,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
         }
 
-        // REFACTORED: GetUserProjectsAsync with Mapster
         public async Task<List<ProjectModel>> GetUserProjectsAsync(int employeeMasterId)
         {
             var userRole = await _baseRepo.GetUserRoleAsync(employeeMasterId);
@@ -708,30 +693,25 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return _mapper.Map<List<ProjectModel>>(userProjects);
         }
 
-        // REFACTORED: GetAllProjectsAsync with Mapster
         public async Task<List<ProjectModel>> GetAllProjectsAsync()
         {
             var allProjects = await _repo.GetAllProjectsAsync();
             return _mapper.Map<List<ProjectModel>>(allProjects);
         }
-
-        // REFACTORED: GetProjectAsync with Mapster
         public async Task<ProjectModel> GetProjectAsync(int projectId)
         {
             var project = await _repo.GetProjectAsync(projectId);
             if (project == null)
                 throw new ProjectNotFoundException(projectId);
 
-            // Use Mapster for base mapping
-            var projectModel = _mapper.Map<ProjectModel>(project);
 
-            // Set employees
+            var projectModel = _mapper.Map<ProjectModel>(project);
             projectModel.Employees = await _interactionRepo.GetProjectEmployeesAsync(projectId);
 
             return projectModel;
         }
 
-        // ==================== HELPER METHODS ====================
+        // HELPER METHODS 
 
         private string? GetShortDescription(string? description)
         {

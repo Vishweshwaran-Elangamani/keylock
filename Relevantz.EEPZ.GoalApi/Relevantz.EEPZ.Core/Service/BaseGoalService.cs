@@ -254,25 +254,24 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             // Use Mapster to map base properties
             var goalDetail = _mapper.Map<GoalDetailModel>(goal);
 
-            // Calculate progress
+
             goalDetail.ProgressPercent = await CalculateGoalProgressAsync(
                 goalId,
                 currentUserEmployeeMasterId
             );
 
-            // Set project name
+
             goalDetail.ProjectName = await GetProjectNameAsync(goal.ProjectId);
 
-            // Set creator name
             goalDetail.CreatedByName = await GetEmployeeNameAsync(goal.CreatedBy);
 
-            // Map checklist with completion status
+
             goalDetail.Checklist = await MapChecklistItemsAsync(
                 goal.GoalChecklists.ToList(),
                 currentUserEmployeeMasterId
             );
 
-            // Get assignees with details
+
             goalDetail.Assignees = await GetAssigneesWithDetailsAsync(goalId);
 
             // Set permission flags
@@ -292,7 +291,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 currentUserEmployeeMasterId
             );
 
-            // Calculate overdue status
+
             bool isOverdue =
                 goal.Goalendat.HasValue
                 && goal.Goalendat.Value < DateTime.UtcNow
@@ -397,10 +396,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 if (edm?.Employee?.Userprofile == null)
                     continue;
 
-                // Use Mapster for base mapping
+
                 var assignee = _mapper.Map<AssigneeModel>(assignment);
 
-                // Set employee details
+
                 var profile = edm.Employee.Userprofile;
                 assignee.Name = $"{profile.FirstName} {profile.LastName}".Trim();
                 assignee.Role = edm.Role?.RoleName ?? USER_ROLE.EMPLOYEE;

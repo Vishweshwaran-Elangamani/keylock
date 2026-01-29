@@ -85,7 +85,7 @@ namespace Relevantz.EEPZ.Core.Service
             };
         }
 
-        // REFACTORED: UploadFileAsync with Mapster
+
         public async Task<FileUploadResponseModel> UploadFileAsync(
             int goalId,
             IFormFile file,
@@ -105,13 +105,13 @@ namespace Relevantz.EEPZ.Core.Service
                 throw new FileAccessDeniedException();
             }
 
-            // Validate file
+
             ValidateFile(file);
 
-            // Save file
+
             var fileId = await _fileStorage.SaveFileAsync(file, "goals/attachments");
 
-            // Create attachment entity
+
             var attachment = new GoalAttachment
             {
                 GoalId = goalId,
@@ -124,10 +124,8 @@ namespace Relevantz.EEPZ.Core.Service
             await _repo.AddAttachmentAsync(attachment);
             await _baseRepo.SaveChangesAsync();
 
-            // Use Mapster for base mapping
-            var response = _mapper.Map<FileUploadResponseModel>(attachment);
 
-            // Set file-specific properties
+            var response = _mapper.Map<FileUploadResponseModel>(attachment);
             response.FileName = file.FileName;
             response.FileSize = file.Length;
             response.ContentType = file.ContentType;
@@ -219,7 +217,7 @@ namespace Relevantz.EEPZ.Core.Service
             return attachment;
         }
 
-        // NEW: Helper method for file validation
+
         private void ValidateFile(IFormFile file)
         {
             if (file == null || file.Length == 0)
@@ -263,7 +261,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
 
-        // NEW: Helper method for display file name
+
         private string GetDisplayFileName(string? attachmentTitle, string originalFileName)
         {
             var displayFileName = !string.IsNullOrEmpty(attachmentTitle)
@@ -276,7 +274,7 @@ namespace Relevantz.EEPZ.Core.Service
                 displayFileName += extension;
             }
 
-            // Sanitize file name
+
             displayFileName = Path.GetFileName(displayFileName);
 
             return displayFileName;

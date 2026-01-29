@@ -50,7 +50,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _mapper = mapper;
         }
 
-        // CreateApprovalRequestAsync remains UNCHANGED - no mapping needed
+
         public async Task<ApiResponseModel<int>> CreateApprovalRequestAsync(
             int goalId,
             CreateApprovalRequestModel dto,
@@ -58,8 +58,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string requesterRole
         )
         {
-            // ... keep all your existing code exactly as is ...
-            // This method doesn't do object mapping, so no changes needed
+
             var validationResult = await _createApprovalValidator.ValidateAsync(dto);
             if (!validationResult.IsValid)
             {
@@ -398,7 +397,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
         }
 
-        // ClosePendingApprovalAsync remains UNCHANGED - no mapping needed
+
         public async Task<ApiResponseModel> ClosePendingApprovalAsync(
             int approvalId,
             ApprovalDesicionModel dto,
@@ -406,8 +405,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string approverRole
         )
         {
-            // ... keep all your existing code exactly as is ...
-            // This method doesn't do object mapping, so no changes needed
+
             var validationResult = await _approvalDecisionValidator.ValidateAsync(dto);
             if (!validationResult.IsValid)
             {
@@ -637,7 +635,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
         }
 
-        // REFACTORED: GetPendingApprovalsAsync with Mapster
         public async Task<List<GoalApprovalModel>> GetPendingApprovalsAsync(
             int approverEmployeeMasterId
         )
@@ -649,15 +646,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             foreach (var approval in approvals)
             {
-                // Use Mapster for base mapping
-                var approvalModel = _mapper.Map<GoalApprovalModel>(approval);
 
-                // Set requester name
+                var approvalModel = _mapper.Map<GoalApprovalModel>(approval);
                 approvalModel.RequestedByName = await _baseService.GetEmployeeNameAsync(
                     approval.RequestedBy
                 );
 
-                // Map attachments
+
                 var (allAttachments, proofAttachments) = await MapAttachmentsForApprovalAsync(
                     approval
                 );
@@ -670,7 +665,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return result;
         }
 
-        // Helper method to map attachments
+
         private async Task<(
             List<GoalAttachmentModel>,
             List<GoalAttachmentModel>?
@@ -683,12 +678,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 foreach (var att in approval.Goal.GoalAttachments)
                 {
-                    // Use Mapster for base mapping
+
                     var attachmentModel = _mapper.Map<GoalAttachmentModel>(att);
                     allAttachments.Add(attachmentModel);
                 }
 
-                // Filter proof attachments for completion types
+
                 if (
                     approval.ApprovalType == APPROVAL_TYPE.COMPLETION
                     || approval.ApprovalType == APPROVAL_TYPE.TASK_ACKNOWLEDGMENT
@@ -705,7 +700,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return (allAttachments, proofAttachments);
         }
 
-        // GetUserApprovalsAsync remains mostly unchanged
+
         public async Task<PagedApprovalsModel> GetUserApprovalsAsync(
             ApprovalQueryModel query,
             int userId,
@@ -913,38 +908,36 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 && approval.RequestedBy != userId;
         }
 
-        // REFACTORED: MapToUserGoalApprovalModelAsync with Mapster
+
         private async Task<UserGoalApprovalModel> MapToUserGoalApprovalModelAsync(
             GoalApproval approval,
             int userId,
             string userRole
         )
         {
-            // Use Mapster for base mapping
-            var model = _mapper.Map<UserGoalApprovalModel>(approval);
 
-            // Set employee names
+            var model = _mapper.Map<UserGoalApprovalModel>(approval);
             model.RequestedByName = await _baseService.GetEmployeeNameAsync(approval.RequestedBy);
             model.ApproverName = await _baseService.GetEmployeeNameAsync(approval.ApprovedBy);
             model.GoalCreatedByName = await _baseService.GetEmployeeNameAsync(
                 approval.Goal?.CreatedBy
             );
 
-            // Set approver role
+
             if (approval.ApprovedBy.HasValue)
             {
                 model.ApproverRole = await _baseRepo.GetUserRoleAsync(approval.ApprovedBy.Value);
             }
 
-            // Map goal assignees
+
             model.GoalAssignees = await MapGoalAssigneesAsync(approval.Goal?.GoalAssignments);
 
-            // Map attachments
+
             var (allAttachments, proofAttachments) = await MapAllAttachmentsAsync(approval);
             model.AllAttachments = allAttachments;
             model.ProofAttachments = proofAttachments;
 
-            // Set user context fields
+
             model.UserRole = DetermineUserRoleInApproval(approval, userId, userRole);
             model.CanMakeDecision = CanUserMakeDecision(approval, userId, userRole);
             model.UserContext = GenerateUserContext(approval, userId, userRole);
@@ -964,10 +957,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 {
                     if (assignment.AssignedTo.HasValue)
                     {
-                        // Use Mapster for base mapping
+
                         var assignee = _mapper.Map<AssigneeModel>(assignment);
 
-                        // Set name and role
+
                         assignee.Name = await _baseService.GetEmployeeNameAsync(
                             assignment.AssignedTo
                         );
@@ -995,10 +988,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 foreach (var att in approval.Goal.GoalAttachments)
                 {
-                    // Use Mapster for base mapping
+
                     var attachmentModel = _mapper.Map<GoalAttachmentModel>(att);
 
-                    // Set attacher name
+
                     attachmentModel.AttachedByName = await _baseService.GetEmployeeNameAsync(
                         att.AttachedBy
                     );

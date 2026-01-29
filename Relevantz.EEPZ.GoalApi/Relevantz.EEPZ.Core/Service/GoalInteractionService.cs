@@ -45,7 +45,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _mapper = mapper;
         }
 
-        // AddCommentAsync remains UNCHANGED - no mapping needed
         public async Task<ApiResponseModel> AddCommentAsync(
             int goalId,
             CreateCommentModel dto,
@@ -111,7 +110,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
         }
 
-        // REFACTORED: GetAllCommentsAsync with Mapster
         public async Task<List<GoalCommentModel>> GetAllCommentsAsync(int goalId)
         {
             var comments = await _repo.GetCommentsByGoalAsync(goalId);
@@ -119,10 +117,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             foreach (var comment in comments)
             {
-                // Use Mapster for base mapping
-                var commentModel = _mapper.Map<GoalCommentModel>(comment);
 
-                // Set user details
+                var commentModel = _mapper.Map<GoalCommentModel>(comment);
                 commentModel.CommentedByName = await _baseService.GetEmployeeNameAsync(
                     comment.CommentedBy
                 );
@@ -140,7 +136,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return result;
         }
 
-        // GetDashboardDetailsAsync remains UNCHANGED - no mapping needed
         public async Task<GoalDashboardSummaryModel> GetDashboardDetailsAsync(
             int currentUserEmployeeMasterId
         )
@@ -196,7 +191,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
-        // REFACTORED: GetOngoingAsync with Mapster
         public async Task<List<GoalSummaryModel>> GetOngoingAsync(
             string type,
             int currentUserEmployeeMasterId
@@ -218,25 +212,16 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             foreach (var goal in ongoing)
             {
-                // Use Mapster for base mapping
+
                 var summary = _mapper.Map<GoalSummaryModel>(goal);
 
-                // Set description short
                 summary.DescriptionShort = GetShortDescription(goal.GoalDescription);
-
-                // Set progress from latest log
                 var latestProgress = goal
                     .Goalprogresslogs.OrderByDescending(p => p.UpdatedOn)
                     .FirstOrDefault();
                 summary.ProgressPercent = latestProgress?.ProgressPercent ?? 0;
-
-                // Set project name
                 summary.ProjectName = await GetProjectNameAsync(goal.ProjectId);
-
-                // Set creator name
                 summary.CreatedByName = await _baseService.GetEmployeeNameAsync(goal.CreatedBy);
-
-                // Calculate overdue status
                 summary.IsOverdue =
                     goal.Goalendat.HasValue
                     && goal.Goalendat.Value < DateTime.UtcNow
@@ -248,7 +233,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return result;
         }
 
-        // REFACTORED: GetGoalTimelineAsync with Mapster
         public async Task<List<TimelineEventModel>> GetGoalTimelineAsync(
             int goalId,
             int currentUserEmployeeMasterId
@@ -264,35 +248,35 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             var events = new List<TimelineEventModel>();
 
-            // Goal created event
+
             events.Add(await CreateGoalCreatedEventAsync(goal));
 
-            // Progress log events
+
             var progressLogs = await _repo.GetProgressLogsByGoalAsync(goalId);
             foreach (var progressLog in progressLogs)
             {
                 events.Add(await MapProgressLogToTimelineEventAsync(progressLog));
             }
 
-            // Approval events
+
             foreach (var approval in goal.GoalApprovals)
             {
                 events.AddRange(await MapApprovalToTimelineEventsAsync(approval));
             }
 
-            // Comment events
+
             foreach (var comment in goal.GoalComments)
             {
                 events.Add(await MapCommentToTimelineEventAsync(comment));
             }
 
-            // Assignment events
+
             foreach (var assignment in goal.GoalAssignments)
             {
                 events.Add(await MapAssignmentToTimelineEventAsync(assignment));
             }
 
-            // Attachment events
+
             foreach (var attachment in goal.GoalAttachments)
             {
                 events.Add(await MapAttachmentToTimelineEventAsync(attachment));
@@ -309,7 +293,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return await _repo.FetchProjectTeamAsync(projectId, managerEmployeeMasterId);
         }
 
-        // ==================== HELPER METHODS ====================
+        // HELPER METHODS
 
         private string? GetShortDescription(string? description)
         {
@@ -347,10 +331,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             Goalprogresslog progressLog
         )
         {
-            // Use Mapster for base mapping
+
             var timelineEvent = _mapper.Map<TimelineEventModel>(progressLog);
 
-            // Set user details
+
             timelineEvent.UserName = await _baseService.GetEmployeeNameAsync(progressLog.UpdatedBy);
 
             if (progressLog.UpdatedBy.HasValue)
@@ -360,7 +344,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
             }
 
-            // Set metadata
+
             timelineEvent.Metadata = new
             {
                 ProgressPercent = progressLog.ProgressPercent,
@@ -376,7 +360,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             var events = new List<TimelineEventModel>();
 
-            // Approval request event
+
             string requestDescription = GetApprovalRequestDescription(approval.ApprovalType);
 
             events.Add(
@@ -398,7 +382,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
             );
 
-            // Approval decision event (if approved/rejected)
+
             if (approval.ApprovedOn.HasValue)
             {
                 string decisionDescription = GetApprovalDecisionDescription(
@@ -431,10 +415,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         private async Task<TimelineEventModel> MapCommentToTimelineEventAsync(GoalComment comment)
         {
-            // Use Mapster for base mapping
+
             var timelineEvent = _mapper.Map<TimelineEventModel>(comment);
 
-            // Set user details
+
             timelineEvent.UserName = await _baseService.GetEmployeeNameAsync(comment.CommentedBy);
 
             if (comment.CommentedBy.HasValue)
@@ -444,7 +428,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
             }
 
-            // Set metadata
+
             timelineEvent.Metadata = new { Comment = comment.GoalComment1 };
 
             return timelineEvent;
@@ -454,14 +438,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             GoalAssignment assignment
         )
         {
-            // Use Mapster for base mapping
+
             var timelineEvent = _mapper.Map<TimelineEventModel>(assignment);
 
-            // Set description with assignee name
+
             var assigneeName = await _baseService.GetEmployeeNameAsync(assignment.AssignedTo);
             timelineEvent.Description = $"Assigned to {assigneeName}";
 
-            // Set user details (assigner)
             timelineEvent.UserName = await _baseService.GetEmployeeNameAsync(assignment.AssignedBy);
 
             if (assignment.AssignedBy.HasValue)
@@ -478,10 +461,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             GoalAttachment attachment
         )
         {
-            // Use Mapster for base mapping
-            var timelineEvent = _mapper.Map<TimelineEventModel>(attachment);
 
-            // Set user details
+            var timelineEvent = _mapper.Map<TimelineEventModel>(attachment);
             timelineEvent.UserName = await _baseService.GetEmployeeNameAsync(attachment.AttachedBy);
 
             if (attachment.AttachedBy.HasValue)

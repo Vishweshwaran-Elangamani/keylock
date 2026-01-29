@@ -229,7 +229,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
         }
 
-        // GetGoalProgressPercentAsync remains UNCHANGED - pure calculation
         public async Task<int> GetGoalProgressPercentAsync(int goalId, int forEmployeeMasterId)
         {
             var latestLog = await _baseRepo.GetLatestProgressLogAsync(goalId);
@@ -249,7 +248,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-        // GetTeamGoalProgressForManagerAsync remains UNCHANGED - pure calculation
         public async Task<int> GetTeamGoalProgressForManagerAsync(
             int goalId,
             int managerEmployeeMasterId
@@ -334,19 +332,16 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (goal == null)
                 throw new GoalNotFoundException(goalId);
 
-            // Calculate own progress
             var ownProgress = await CalculateUserOwnProgressAsync(goalId, userId);
             var ownItems = await _repo.GetUserOwnChecklistItemsAsync(goalId, userId);
             var ownItemsCompleted = await _repo.CountUserOwnCompletedItemsAsync(goalId, userId);
 
-            // Get subordinates
             var subordinateIds = await _repo.GetSubordinatesAssignedToGoalAsync(goalId, userId);
             var subordinateDetails = await BuildSubordinateProgressListAsync(
                 goalId,
                 subordinateIds
             );
 
-            // Calculate team progress
             int? teamProgress = null;
             if (subordinateDetails.Any())
             {
@@ -403,7 +398,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 teamWeight = 0;
             }
 
-            // Build hierarchy model
             return new GoalProgressHierarchyModel
             {
                 GoalId = goalId,
@@ -421,7 +415,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
-        // ==================== HELPER METHODS ====================
+        //HELPER METHODS 
 
         private async Task<int> CalculateUserOwnProgressAsync(int goalId, int userId)
         {
@@ -451,7 +445,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
-        // NEW: Helper method to build subordinate progress list
+
         private async Task<List<SubordinateProgressModel>> BuildSubordinateProgressListAsync(
             int goalId,
             List<int> subordinateIds
@@ -492,7 +486,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return subordinateDetails;
         }
 
-        // NEW: Helper method to get full name
+
         private string GetFullName(Employeedetailsmaster employeeDetails)
         {
             var profile = employeeDetails.Employee?.Userprofile;
