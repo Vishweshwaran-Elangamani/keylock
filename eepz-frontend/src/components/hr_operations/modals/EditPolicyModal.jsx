@@ -334,19 +334,7 @@ const EditPolicyModal = ({
                     {errors.category && (
                       <div className="epm-form-error">{errors.category}</div>
                     )}
-                  </div>
-                  {/* Status - CUSTOM DROPDOWN */}
-                  <div className="epm-form-group">
-                    <label className="epm-form-label">Status</label>
-                    <CustomDropdown
-                      name="status"
-                      options={statusOptions}
-                      value={formData.status}
-                      onChange={handleChange}
-                      placeholder="Select Status"
-                      disabled={loading}
-                    />
-                  </div>
+                  </div>                  
                 </div>
                 {/* Right Column */}
                 <div className="epm-form-column">
