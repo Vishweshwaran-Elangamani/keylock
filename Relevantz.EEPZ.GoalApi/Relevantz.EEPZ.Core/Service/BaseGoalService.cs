@@ -2,11 +2,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
-using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Exceptions;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repository.Interface;
+using MapsterMapper;
+using Mapster;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -14,11 +15,16 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
     {
         private readonly IBaseGoalRepository _repo;
         private readonly IWebHostEnvironment _environment;
+        private readonly IMapper _mapper;
 
-        public BaseGoalService(IBaseGoalRepository repo, IWebHostEnvironment environment)
+        public BaseGoalService(
+            IBaseGoalRepository repo, 
+            IWebHostEnvironment environment,
+            IMapper mapper)
         {
             _repo = repo;
             _environment = environment;
+            _mapper = mapper;
         }
 
         public bool CanCreate(string role, string goalType) =>
@@ -172,6 +178,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 currentUserEmployeeMasterId
             );
             var isLeadership = currentUserRole == USER_ROLE.LEADERSHIP;
+            
             switch (goal.GoalType?.ToLower())
             {
                 case GOAL_TYPE.SELF:
@@ -243,112 +250,125 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (!canView)
                 throw new GoalAccessDeniedException();
 
-            int progressPercent;
-            var latestLog = await _repo.GetLatestProgressLogAsync(goalId);
-            if (latestLog != null && latestLog.Source == PROGRESS_SOURCE.MANUAL)
-            {
-                progressPercent = latestLog.ProgressPercent ?? 0;
-            }
-            else
-            {
-                var allChecklistItems = await _repo.GetChecklistItemsByGoalIdAsync(goalId);
-                if (allChecklistItems == null || !allChecklistItems.Any())
-                {
-                    progressPercent = 0;
-                }
-                else
-                {
-                    int completedCount = 0;
-                    foreach (var item in allChecklistItems)
-                    {
-                        var isCompleted = await _repo.ChecklistHasProgressAsync(
-                            item.ChecklistId,
-                            item.AddedFor ?? currentUserEmployeeMasterId
-                        );
-                        if (isCompleted)
-                            completedCount++;
-                    }
-                    progressPercent = (int)
-                        Math.Round((double)completedCount / allChecklistItems.Count * 100);
-                }
-            }
+            // Use Mapster to map base properties
+            var goalDetail = _mapper.Map<GoalDetailModel>(goal);
 
-            string? projectName = null;
-            if (goal.ProjectId.HasValue)
-            {
-                var project = await _repo.GetProjectByIdAsync(goal.ProjectId.Value);
-                projectName = project?.ProjectName;
-            }
+            // Calculate progress
+            goalDetail.ProgressPercent = await CalculateGoalProgressAsync(
+                goalId, 
+                currentUserEmployeeMasterId
+            );
 
-            var creatorName = await GetEmployeeNameAsync(goal.CreatedBy);
+            // Set project name
+            goalDetail.ProjectName = await GetProjectNameAsync(goal.ProjectId);
 
-            var assignees = await GetAssigneesWithDetailsAsync(goalId);
+            // Set creator name
+            goalDetail.CreatedByName = await GetEmployeeNameAsync(goal.CreatedBy);
 
-            bool canEdit =
-                goal.CreatedBy == currentUserEmployeeMasterId
+            // Map checklist with completion status
+            goalDetail.Checklist = await MapChecklistItemsAsync(
+                goal.GoalChecklists.ToList(), 
+                currentUserEmployeeMasterId
+            );
+
+            // Get assignees with details
+            goalDetail.Assignees = await GetAssigneesWithDetailsAsync(goalId);
+
+            // Set permission flags
+            goalDetail.CanEdit = goal.CreatedBy == currentUserEmployeeMasterId
                 && goal.Goalstatus != GOAL_STATUS.COMPLETED
                 && goal.Goalstatus != GOAL_STATUS.CLOSED;
-            bool canComment = await CanCommentOnGoalAsync(
+            
+            goalDetail.CanComment = await CanCommentOnGoalAsync(
                 goalId,
                 currentUserEmployeeMasterId,
                 currentUserRole
             );
-            bool canMarkComplete = await CanMarkCompleteAsync(goalId, currentUserEmployeeMasterId);
-            bool isOverdue =
-                goal.Goalendat.HasValue
+            
+            goalDetail.CanMarkComplete = await CanMarkCompleteAsync(
+                goalId, 
+                currentUserEmployeeMasterId
+            );
+
+            // Calculate overdue status
+            bool isOverdue = goal.Goalendat.HasValue
                 && goal.Goalendat.Value < DateTime.UtcNow
                 && goal.Goalstatus != GOAL_STATUS.COMPLETED
                 && goal.Goalstatus != GOAL_STATUS.CLOSED;
-            bool canRequestReopen = (
-                isOverdue
-                && (
-                    goal.CreatedBy == currentUserEmployeeMasterId
-                    || await _repo.IsUserAssignedToGoalAsync(goalId, currentUserEmployeeMasterId)
-                )
-            );
-            bool hasPendingApproval = await _repo.HasPendingApprovalAsync(
+            
+            goalDetail.IsOverdue = isOverdue;
+            
+            goalDetail.CanRequestReopen = isOverdue
+                && (goal.CreatedBy == currentUserEmployeeMasterId
+                    || await _repo.IsUserAssignedToGoalAsync(goalId, currentUserEmployeeMasterId));
+
+            goalDetail.HasPendingApproval = await _repo.HasPendingApprovalAsync(
                 goalId,
                 currentUserEmployeeMasterId
             );
 
-            return new GoalDetailModel
+            return goalDetail;
+        }
+
+        private async Task<int> CalculateGoalProgressAsync(int goalId, int currentUserEmployeeMasterId)
+        {
+            var latestLog = await _repo.GetLatestProgressLogAsync(goalId);
+            
+            if (latestLog != null && latestLog.Source == PROGRESS_SOURCE.MANUAL)
             {
-                GoalId = goal.GoalId,
-                GoalType = goal.GoalType ?? GOAL_TYPE.SELF,
-                ProjectId = goal.ProjectId,
-                ProjectName = projectName,
-                Title = goal.GoalTitle ?? "",
-                Description = goal.GoalDescription,
-                CreatedAt = goal.Goalcreatedat,
-                CreatedByEmployeeMasterId = goal.CreatedBy,
-                CreatedByName = creatorName,
-                EndAt = goal.Goalendat,
-                Status = goal.Goalstatus ?? GOAL_STATUS.PENDING,
-                ProgressPercent = progressPercent,
-                HasPendingApproval = hasPendingApproval,
-                Checklist = goal
-                    .GoalChecklists.Select(c => new GoalChecklistItemModel
-                    {
-                        ChecklistId = c.ChecklistId,
-                        Title = c.ItemTitle ?? "",
-                        Description = c.ItemDescription,
-                        IsShared = c.IsShared ?? false,
-                        AddedForEmployeeMasterId = c.AddedFor,
-                        IsCompletedForCurrentUser = c.Goalchecklistprogresses.Any(p =>
-                            p.UserId == (c.AddedFor ?? currentUserEmployeeMasterId)
-                            && p.IsCompleted == true
-                        ),
-                    })
-                    .ToList(),
+                return latestLog.ProgressPercent ?? 0;
+            }
 
-                Assignees = assignees,
+            var allChecklistItems = await _repo.GetChecklistItemsByGoalIdAsync(goalId);
+            if (allChecklistItems == null || !allChecklistItems.Any())
+            {
+                return 0;
+            }
 
-                CanEdit = canEdit,
-                CanComment = canComment,
-                CanMarkComplete = canMarkComplete,
-                IsOverdue = isOverdue,
-                CanRequestReopen = canRequestReopen,
-            };
+            int completedCount = 0;
+            foreach (var item in allChecklistItems)
+            {
+                var isCompleted = await _repo.ChecklistHasProgressAsync(
+                    item.ChecklistId,
+                    item.AddedFor ?? currentUserEmployeeMasterId
+                );
+                if (isCompleted)
+                    completedCount++;
+            }
+            
+            return (int)Math.Round((double)completedCount / allChecklistItems.Count * 100);
+        }
+
+        private async Task<string?> GetProjectNameAsync(int? projectId)
+        {
+            if (!projectId.HasValue)
+                return null;
+
+            var project = await _repo.GetProjectByIdAsync(projectId.Value);
+            return project?.ProjectName;
+        }
+
+        private async Task<List<GoalChecklistItemModel>> MapChecklistItemsAsync(
+            List<GoalChecklist> checklists, 
+            int currentUserEmployeeMasterId)
+        {
+            var checklistModels = new List<GoalChecklistItemModel>();
+
+            foreach (var checklist in checklists)
+            {
+                // Use Mapster for base mapping
+                var item = _mapper.Map<GoalChecklistItemModel>(checklist);
+                
+                // Set completion status
+                item.IsCompletedForCurrentUser = checklist.Goalchecklistprogresses.Any(p =>
+                    p.UserId == (checklist.AddedFor ?? currentUserEmployeeMasterId)
+                    && p.IsCompleted == true
+                );
+
+                checklistModels.Add(item);
+            }
+
+            return checklistModels;
         }
 
         private async Task<List<AssigneeModel>> GetAssigneesWithDetailsAsync(int goalId)
@@ -367,24 +387,24 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 if (edm?.Employee?.Userprofile == null)
                     continue;
 
+                // Use Mapster for base mapping
+                var assignee = _mapper.Map<AssigneeModel>(assignment);
+                
+                // Set employee details
                 var profile = edm.Employee.Userprofile;
+                assignee.Name = $"{profile.FirstName} {profile.LastName}".Trim();
+                assignee.Role = edm.Role?.RoleName ?? USER_ROLE.EMPLOYEE;
 
-                result.Add(
-                    new AssigneeModel
-                    {
-                        EmployeeMasterId = assignment.AssignedTo.Value,
-                        Name = $"{profile.FirstName} {profile.LastName}".Trim(),
-                        Role = edm.Role?.RoleName ?? USER_ROLE.EMPLOYEE,
-                        IsAcknowledged = assignment.IsAcknowledged ?? false,
-                        AcknowledgedOn = assignment.AcknowledgedOn,
-                    }
-                );
+                result.Add(assignee);
             }
 
             return result;
         }
 
-        public async Task<CanMarkCompleteModel> GetMarkCompleteEligibilityAsync(int goalId, int employeeMasterId, string role)
+        public async Task<CanMarkCompleteModel> GetMarkCompleteEligibilityAsync(
+            int goalId, 
+            int employeeMasterId, 
+            string role)
         {
             var goal = await _repo.GetGoalByIdAsync(goalId);
             if (goal == null)
@@ -395,7 +415,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     Reason = "Goal not found",
                     Reasons = new List<string> { "Goal not found" }
                 };
-            } 
+            }
 
             bool isParticipant = await _repo.IsGoalParticipantAsync(goalId, employeeMasterId);
             var progress = await GetGoalProgressPercentAsync(goalId, employeeMasterId);
@@ -436,8 +456,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     CurrentStatus = goal.Goalstatus,
                     IsParticipant = isParticipant,
                 },
-            }; 
-        }  
-
+            };
+        }
     }
 }

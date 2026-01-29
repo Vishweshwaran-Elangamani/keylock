@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
-using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Exceptions;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repository.Interface;
+using MapsterMapper;  // ← ADD THIS
+using Mapster;        // ← ADD THIS
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -24,6 +25,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private readonly IValidator<UpdateGoalModel> _updateGoalValidator;
         private readonly IValidator<AssignGoalModel> _assignGoalValidator;
         private readonly IValidator<GoalQueryModel> _goalQueryValidator;
+        private readonly IMapper _mapper;  // ← ADD THIS
 
         public GoalService(
             IGoalRepository repo,
@@ -36,8 +38,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             IValidator<CreateGoalModel> createGoalValidator,
             IValidator<UpdateGoalModel> updateGoalValidator,
             IValidator<AssignGoalModel> assignGoalValidator,
-            IValidator<GoalQueryModel> goalQueryValidator
-        )
+            IValidator<GoalQueryModel> goalQueryValidator,
+            IMapper mapper)  // ← ADD THIS
         {
             _repo = repo;
             _baseRepo = baseRepo;
@@ -50,8 +52,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _updateGoalValidator = updateGoalValidator;
             _assignGoalValidator = assignGoalValidator;
             _goalQueryValidator = goalQueryValidator;
+            _mapper = mapper;  // ← ADD THIS
         }
 
+        // CreateGoalAsync remains UNCHANGED - no mapping needed
         public async Task<ApiResponseModel<int>> CreateGoalAsync(
             CreateGoalModel dto,
             int currentUserEmployeeMasterId,
@@ -153,7 +157,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
         }
 
-
+        // CreateGoalInternalAsync remains UNCHANGED
         private async Task<int> CreateGoalInternalAsync(
             CreateGoalModel dto,
             int currentUserEmployeeMasterId,
@@ -254,6 +258,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return goal.GoalId;
         }
 
+        // REFACTORED: QueryGoalsAsync with Mapster
         public async Task<List<GoalSummaryModel>> QueryGoalsAsync(
             GoalQueryModel query,
             int currentUserEmployeeMasterId,
@@ -289,123 +294,60 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             var result = new List<GoalSummaryModel>();
 
-            foreach (var g in goals)
+            foreach (var goal in goals)
             {
-                int latestProgress;
-                var latestLog = await _baseRepo.GetLatestProgressLogAsync(g.GoalId);
-                if (latestLog != null && latestLog.Source == PROGRESS_SOURCE.MANUAL)
-                {
-                    latestProgress = latestLog.ProgressPercent ?? 0;
-                }
-                else
-                {
-                    var allChecklistItems = await _baseRepo.GetChecklistItemsByGoalIdAsync(
-                        g.GoalId
-                    );
-                    if (allChecklistItems == null || !allChecklistItems.Any())
-                    {
-                        latestProgress = 0;
-                    }
-                    else
-                    {
-                        int completedCount = 0;
-                        foreach (var item in allChecklistItems)
-                        {
-                            var isCompleted = await _baseRepo.ChecklistHasProgressAsync(
-                                item.ChecklistId,
-                                item.AddedFor ?? currentUserEmployeeMasterId
-                            );
-                            if (isCompleted)
-                                completedCount++;
-                        }
-                        latestProgress = (int)
-                            Math.Round((double)completedCount / allChecklistItems.Count * 100);
-                    }
-                }
+                // Use Mapster for base mapping
+                var summary = _mapper.Map<GoalSummaryModel>(goal);
 
-                var isOverdue =
-                    g.Goalendat.HasValue
-                    && g.Goalendat.Value < DateTime.UtcNow
-                    && g.Goalstatus != GOAL_STATUS.COMPLETED
-                    && g.Goalstatus != GOAL_STATUS.CLOSED;
+                // Set computed properties
+                summary.DescriptionShort = GetShortDescription(goal.GoalDescription);
+                summary.ProgressPercent = await CalculateGoalProgressAsync(
+                    goal.GoalId, 
+                    currentUserEmployeeMasterId
+                );
+                summary.ProjectName = await GetProjectNameAsync(goal.ProjectId);
+                summary.CreatedByName = await _baseService.GetEmployeeNameAsync(goal.CreatedBy);
+                
+                // Calculate flags
+                summary.IsOverdue = IsGoalOverdue(goal);
+                summary.CanAssign = CanAssignGoal(
+                    goal, 
+                    currentUserEmployeeMasterId, 
+                    currentUserRole
+                );
 
-                var canAssign =
-                    (
-                        currentUserRole == USER_ROLE.MANAGER
-                        || currentUserRole == USER_ROLE.DEPARTMENT_HEAD
-                    )
-                    && g.GoalType == GOAL_TYPE.TEAM
-                    && g.CreatedBy == currentUserEmployeeMasterId
-                    && g.Goalstatus == GOAL_STATUS.OPEN;
-
-                string? projectName = null;
-                if (g.ProjectId.HasValue)
-                {
-                    var project = await _baseRepo.GetProjectByIdAsync(g.ProjectId.Value);
-                    projectName = project?.ProjectName;
-                }
-
-                var creatorName = await _baseService.GetEmployeeNameAsync(g.CreatedBy);
-
-                int? myProgress = null;
-                var isCreator = g.CreatedBy == currentUserEmployeeMasterId;
-                var isAssignee = g.GoalAssignments.Any(a =>
+                // Set user-specific data
+                var isCreator = goal.CreatedBy == currentUserEmployeeMasterId;
+                var isAssignee = goal.GoalAssignments.Any(a =>
                     a.AssignedTo == currentUserEmployeeMasterId
                 );
 
-                if (g.GoalType == GOAL_TYPE.TEAM && !isCreator && isAssignee)
+                if (goal.GoalType == GOAL_TYPE.TEAM && !isCreator && isAssignee)
                 {
-                    myProgress = await CalculatePersonalProgressAsync(
-                        g.GoalId,
+                    summary.MyProgress = await CalculatePersonalProgressAsync(
+                        goal.GoalId,
                         currentUserEmployeeMasterId
                     );
                 }
 
-                var hasPendingApproval = g.GoalApprovals.Any(a =>
+                summary.HasPendingApproval = goal.GoalApprovals.Any(a =>
                     a.RequestedBy == currentUserEmployeeMasterId
                     && a.ApprovalType == APPROVAL_TYPE.TASK_ACKNOWLEDGMENT
                     && a.ApprovalStatus == APPROVAL_STATUS.PENDING
                 );
 
-                var isAcknowledged = g
+                summary.IsAcknowledged = goal
                     .GoalAssignments.Where(a => a.AssignedTo == currentUserEmployeeMasterId)
                     .Any(a => a.IsAcknowledged == true);
 
-                var assignees = new List<AssigneeModel>();
-                if (g.GoalType == GOAL_TYPE.TEAM)
+                // Set assignees for team goals
+                if (goal.GoalType == GOAL_TYPE.TEAM)
                 {
-                    assignees = await GetAssigneesWithDetailsAsync(g.GoalId);
+                    var assignees = await GetAssigneesWithDetailsAsync(goal.GoalId);
+                    summary.Assignees = assignees.Any() ? assignees : null;
                 }
 
-                result.Add(
-                    new GoalSummaryModel
-                    {
-                        GoalId = g.GoalId,
-                        Title = g.GoalTitle ?? "",
-                        DescriptionShort = string.IsNullOrWhiteSpace(g.GoalDescription)
-                            ? null
-                            : (
-                                g.GoalDescription!.Length > 80
-                                    ? g.GoalDescription.Substring(0, 80) + "..."
-                                    : g.GoalDescription
-                            ),
-                        GoalType = g.GoalType ?? GOAL_TYPE.SELF,
-                        Status = g.Goalstatus ?? GOAL_STATUS.PENDING,
-                        CreatedAt = g.Goalcreatedat,
-                        EndAt = g.Goalendat,
-                        ProgressPercent = latestProgress,
-                        ProjectId = g.ProjectId,
-                        ProjectName = projectName,
-                        CreatedByEmployeeMasterId = g.CreatedBy,
-                        CreatedByName = creatorName,
-                        IsOverdue = isOverdue,
-                        CanAssign = canAssign,
-                        MyProgress = myProgress,
-                        HasPendingApproval = hasPendingApproval,
-                        IsAcknowledged = isAcknowledged,
-                        Assignees = assignees.Any() ? assignees : null,
-                    }
-                );
+                result.Add(summary);
             }
 
             return result;
@@ -438,6 +380,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return (int)Math.Round((double)completedCount / userItems.Count * 100);
         }
 
+        // UpdateGoalAsync remains mostly UNCHANGED
         public async Task<ApiResponseModel> UpdateGoalAsync(
             int goalId,
             UpdateGoalModel dto,
@@ -575,6 +518,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return await GetAssigneesWithDetailsAsync(goalId);
         }
 
+        // REFACTORED: GetAssigneesWithDetailsAsync with Mapster
         private async Task<List<AssigneeModel>> GetAssigneesWithDetailsAsync(int goalId)
         {
             var assignments = await _baseRepo.GetAssigneesAsync(goalId);
@@ -591,23 +535,21 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 if (edm?.Employee?.Userprofile == null)
                     continue;
 
-                var profile = edm.Employee.Userprofile;
+                // Use Mapster for base mapping
+                var assignee = _mapper.Map<AssigneeModel>(assignment);
 
-                result.Add(
-                    new AssigneeModel
-                    {
-                        EmployeeMasterId = assignment.AssignedTo.Value,
-                        Name = $"{profile.FirstName} {profile.LastName}".Trim(),
-                        Role = edm.Role?.RoleName ?? USER_ROLE.EMPLOYEE,
-                        IsAcknowledged = assignment.IsAcknowledged ?? false,
-                        AcknowledgedOn = assignment.AcknowledgedOn,
-                    }
-                );
+                // Set employee details
+                var profile = edm.Employee.Userprofile;
+                assignee.Name = $"{profile.FirstName} {profile.LastName}".Trim();
+                assignee.Role = edm.Role?.RoleName ?? USER_ROLE.EMPLOYEE;
+
+                result.Add(assignee);
             }
 
             return result;
         }
 
+        // AssignAsync remains UNCHANGED - complex business logic
         public async Task<ApiResponseModel> AssignAsync(
             int goalId,
             AssignGoalModel dto,
@@ -740,6 +682,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
         }
 
+        // REFACTORED: GetUserProjectsAsync with Mapster
         public async Task<List<ProjectModel>> GetUserProjectsAsync(int employeeMasterId)
         {
             var userRole = await _baseRepo.GetUserRoleAsync(employeeMasterId);
@@ -747,17 +690,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (userRole == USER_ROLE.LEADERSHIP)
             {
                 var allProjects = await _repo.GetAllProjectsAsync();
-                return allProjects
-                    .Select(p => new ProjectModel
-                    {
-                        ProjectId = p.ProjectId,
-                        ProjectName = p.ProjectName ?? "",
-                        Description = p.Description,
-                        Status = p.Status ?? PROJECT_STATUS.UNKNOWN,
-                        StartDate = p.StartDate,
-                        EndDate = p.EndDate,
-                    })
-                    .ToList();
+                return _mapper.Map<List<ProjectModel>>(allProjects);
             }
 
             var employeeDetails = await _baseRepo.GetEmployeeDetailsByMasterIdAsync(
@@ -769,58 +702,99 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
 
             var employeeId = employeeDetails.EmployeeId;
-
             var userProjects = await _repo.GetUserProjectsByEmployeeIdAsync(employeeId);
 
-            return userProjects
-                .Select(p => new ProjectModel
-                {
-                    ProjectId = p.ProjectId,
-                    ProjectName = p.ProjectName ?? "",
-                    Description = p.Description,
-                    Status = p.Status ?? PROJECT_STATUS.UNKNOWN,
-                    StartDate = p.StartDate,
-                    EndDate = p.EndDate,
-                })
-                .ToList();
+            return _mapper.Map<List<ProjectModel>>(userProjects);
         }
 
+        // REFACTORED: GetAllProjectsAsync with Mapster
         public async Task<List<ProjectModel>> GetAllProjectsAsync()
         {
             var allProjects = await _repo.GetAllProjectsAsync();
-            return allProjects
-                .Select(p => new ProjectModel
-                {
-                    ProjectId = p.ProjectId,
-                    ProjectName = p.ProjectName ?? "",
-                    Description = p.Description,
-                    Status = p.Status ?? PROJECT_STATUS.UNKNOWN,
-                    StartDate = p.StartDate,
-                    EndDate = p.EndDate,
-                })
-                .ToList();
+            return _mapper.Map<List<ProjectModel>>(allProjects);
         }
 
+        // REFACTORED: GetProjectAsync with Mapster
         public async Task<ProjectModel> GetProjectAsync(int projectId)
         {
             var project = await _repo.GetProjectAsync(projectId);
             if (project == null)
                 throw new ProjectNotFoundException(projectId);
 
-            var employees = await _interactionRepo.GetProjectEmployeesAsync(projectId);
+            // Use Mapster for base mapping
+            var projectModel = _mapper.Map<ProjectModel>(project);
 
-            return new ProjectModel
-            {
-                ProjectId = project.ProjectId,
-                ProjectName = project.ProjectName ?? "",
-                Description = project.Description,
-                Status = project.Status ?? PROJECT_STATUS.UNKNOWN,
-                StartDate = project.StartDate,
-                EndDate = project.EndDate,
-                Employees = employees,
-            };
+            // Set employees
+            projectModel.Employees = await _interactionRepo.GetProjectEmployeesAsync(projectId);
+
+            return projectModel;
         }
-        
-     
+
+        // ==================== HELPER METHODS ====================
+
+        private string? GetShortDescription(string? description)
+        {
+            if (string.IsNullOrWhiteSpace(description))
+                return null;
+
+            return description.Length > 80
+                ? description.Substring(0, 80) + "..."
+                : description;
+        }
+
+        private async Task<int> CalculateGoalProgressAsync(int goalId, int currentUserEmployeeMasterId)
+        {
+            var latestLog = await _baseRepo.GetLatestProgressLogAsync(goalId);
+            
+            if (latestLog != null && latestLog.Source == PROGRESS_SOURCE.MANUAL)
+            {
+                return latestLog.ProgressPercent ?? 0;
+            }
+
+            var allChecklistItems = await _baseRepo.GetChecklistItemsByGoalIdAsync(goalId);
+            
+            if (allChecklistItems == null || !allChecklistItems.Any())
+            {
+                return 0;
+            }
+
+            int completedCount = 0;
+            foreach (var item in allChecklistItems)
+            {
+                var isCompleted = await _baseRepo.ChecklistHasProgressAsync(
+                    item.ChecklistId,
+                    item.AddedFor ?? currentUserEmployeeMasterId
+                );
+                if (isCompleted)
+                    completedCount++;
+            }
+            
+            return (int)Math.Round((double)completedCount / allChecklistItems.Count * 100);
+        }
+
+        private async Task<string?> GetProjectNameAsync(int? projectId)
+        {
+            if (!projectId.HasValue)
+                return null;
+
+            var project = await _baseRepo.GetProjectByIdAsync(projectId.Value);
+            return project?.ProjectName;
+        }
+
+        private bool IsGoalOverdue(Goal goal)
+        {
+            return goal.Goalendat.HasValue
+                && goal.Goalendat.Value < DateTime.UtcNow
+                && goal.Goalstatus != GOAL_STATUS.COMPLETED
+                && goal.Goalstatus != GOAL_STATUS.CLOSED;
+        }
+
+        private bool CanAssignGoal(Goal goal, int userId, string userRole)
+        {
+            return (userRole == USER_ROLE.MANAGER || userRole == USER_ROLE.DEPARTMENT_HEAD)
+                && goal.GoalType == GOAL_TYPE.TEAM
+                && goal.CreatedBy == userId
+                && goal.Goalstatus == GOAL_STATUS.OPEN;
+        }
     }
 }

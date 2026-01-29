@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
-using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Exceptions;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
-using Relevantz.EEPZ.Data.Repository.Interface;                   
+using Relevantz.EEPZ.Data.Repository.Interface;
+using MapsterMapper;  // ← ADD THIS
+using Mapster;        // ← ADD THIS
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -20,6 +21,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private readonly IBaseGoalService _baseService;
         private readonly IWebHostEnvironment _environment;
         private readonly IValidator<CreateCommentModel> _createCommentValidator;
+        private readonly IMapper _mapper;  // ← ADD THIS
 
         public GoalInteractionService(
             IGoalInteractionRepository repo,
@@ -28,8 +30,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             IGoalRepository goalRepository,
             IBaseGoalService baseService,
             IWebHostEnvironment environment,
-            IValidator<CreateCommentModel> createCommentValidator
-        )
+            IValidator<CreateCommentModel> createCommentValidator,
+            IMapper mapper)  // ← ADD THIS
         {
             _repo = repo;
             _baseRepo = baseRepo;
@@ -38,8 +40,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _baseService = baseService;
             _environment = environment;
             _createCommentValidator = createCommentValidator;
+            _mapper = mapper;  // ← ADD THIS
         }
 
+        // AddCommentAsync remains UNCHANGED - no mapping needed
         public async Task<ApiResponseModel> AddCommentAsync(
             int goalId,
             CreateCommentModel dto,
@@ -105,35 +109,36 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
         }
 
+        // REFACTORED: GetAllCommentsAsync with Mapster
         public async Task<List<GoalCommentModel>> GetAllCommentsAsync(int goalId)
         {
             var comments = await _repo.GetCommentsByGoalAsync(goalId);
             var result = new List<GoalCommentModel>();
 
-            foreach (var c in comments)
+            foreach (var comment in comments)
             {
-                var commenterName = await _baseService.GetEmployeeNameAsync(c.CommentedBy);
-                var commenterRole = c.CommentedBy.HasValue
-                    ? await _baseRepo.GetUserRoleAsync(c.CommentedBy.Value)
-                    : null;
+                // Use Mapster for base mapping
+                var commentModel = _mapper.Map<GoalCommentModel>(comment);
 
-                result.Add(
-                    new GoalCommentModel
-                    {
-                        GoalCommentId = c.Goalcommentid,
-                        GoalId = c.GoalId,
-                        Comment = c.GoalComment1 ?? "",
-                        CommentedByEmployeeMasterId = c.CommentedBy,
-                        CommentedByName = commenterName,
-                        CommentedByRole = commenterRole,
-                        CommentedOn = c.CommentedOn,
-                    }
+                // Set user details
+                commentModel.CommentedByName = await _baseService.GetEmployeeNameAsync(
+                    comment.CommentedBy
                 );
+                
+                if (comment.CommentedBy.HasValue)
+                {
+                    commentModel.CommentedByRole = await _baseRepo.GetUserRoleAsync(
+                        comment.CommentedBy.Value
+                    );
+                }
+
+                result.Add(commentModel);
             }
 
             return result;
         }
 
+        // GetDashboardDetailsAsync remains UNCHANGED - no mapping needed
         public async Task<GoalDashboardSummaryModel> GetDashboardDetailsAsync(
             int currentUserEmployeeMasterId
         )
@@ -189,6 +194,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
+        // REFACTORED: GetOngoingAsync with Mapster
         public async Task<List<GoalSummaryModel>> GetOngoingAsync(
             string type,
             int currentUserEmployeeMasterId
@@ -207,54 +213,39 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 .ToList();
 
             var result = new List<GoalSummaryModel>();
-            foreach (var g in ongoing)
+            
+            foreach (var goal in ongoing)
             {
-                var latestProgress = g
+                // Use Mapster for base mapping
+                var summary = _mapper.Map<GoalSummaryModel>(goal);
+
+                // Set description short
+                summary.DescriptionShort = GetShortDescription(goal.GoalDescription);
+
+                // Set progress from latest log
+                var latestProgress = goal
                     .Goalprogresslogs.OrderByDescending(p => p.UpdatedOn)
                     .FirstOrDefault();
-                var isOverdue =
-                    g.Goalendat.HasValue
-                    && g.Goalendat.Value < DateTime.UtcNow
-                    && g.Goalstatus != GOAL_STATUS.COMPLETED;
+                summary.ProgressPercent = latestProgress?.ProgressPercent ?? 0;
 
-                string? projectName = null;
-                if (g.ProjectId.HasValue)
-                {
-                    var project = await _baseRepo.GetProjectByIdAsync(g.ProjectId.Value);
-                    projectName = project?.ProjectName;
-                }
+                // Set project name
+                summary.ProjectName = await GetProjectNameAsync(goal.ProjectId);
 
-                var creatorName = await _baseService.GetEmployeeNameAsync(g.CreatedBy);
+                // Set creator name
+                summary.CreatedByName = await _baseService.GetEmployeeNameAsync(goal.CreatedBy);
 
-                result.Add(
-                    new GoalSummaryModel
-                    {
-                        GoalId = g.GoalId,
-                        Title = g.GoalTitle ?? "",
-                        DescriptionShort = string.IsNullOrWhiteSpace(g.GoalDescription)
-                            ? null
-                            : (
-                                g.GoalDescription!.Length > 80
-                                    ? g.GoalDescription.Substring(0, 80) + "..."
-                                    : g.GoalDescription
-                            ),
-                        GoalType = g.GoalType ?? GOAL_TYPE.SELF,
-                        Status = g.Goalstatus ?? GOAL_STATUS.PENDING,
-                        CreatedAt = g.Goalcreatedat,
-                        EndAt = g.Goalendat,
-                        ProgressPercent = latestProgress?.ProgressPercent ?? 0,
-                        ProjectId = g.ProjectId,
-                        ProjectName = projectName,
-                        CreatedByEmployeeMasterId = g.CreatedBy,
-                        CreatedByName = creatorName,
-                        IsOverdue = isOverdue,
-                    }
-                );
+                // Calculate overdue status
+                summary.IsOverdue = goal.Goalendat.HasValue
+                    && goal.Goalendat.Value < DateTime.UtcNow
+                    && goal.Goalstatus != GOAL_STATUS.COMPLETED;
+
+                result.Add(summary);
             }
 
             return result;
         }
 
+        // REFACTORED: GetGoalTimelineAsync with Mapster
         public async Task<List<TimelineEventModel>> GetGoalTimelineAsync(
             int goalId,
             int currentUserEmployeeMasterId
@@ -270,158 +261,38 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             var events = new List<TimelineEventModel>();
 
-            events.Add(
-                new TimelineEventModel
-                {
-                    Type = TIMELINE_EVENT_TYPE.GOAL_CREATED,
-                    Timestamp = goal.Goalcreatedat ?? DateTime.UtcNow,
-                    Description = "Goal created",
-                    UserId = goal.CreatedBy,
-                    UserName = await _baseService.GetEmployeeNameAsync(goal.CreatedBy),
-                    UserRole = goal.CreatedBy.HasValue
-                        ? await _baseRepo.GetUserRoleAsync(goal.CreatedBy.Value)
-                        : null,
-                }
-            );
+            // Goal created event
+            events.Add(await CreateGoalCreatedEventAsync(goal));
 
+            // Progress log events
             var progressLogs = await _repo.GetProgressLogsByGoalAsync(goalId);
-            foreach (var p in progressLogs)
+            foreach (var progressLog in progressLogs)
             {
-                events.Add(
-                    new TimelineEventModel
-                    {
-                        Type = TIMELINE_EVENT_TYPE.PROGRESS,
-                        Timestamp = p.UpdatedOn ?? DateTime.UtcNow,
-                        Description = $"Progress updated to {p.ProgressPercent}%",
-                        UserId = p.UpdatedBy,
-                        UserName = await _baseService.GetEmployeeNameAsync(p.UpdatedBy),
-                        UserRole = p.UpdatedBy.HasValue
-                            ? await _baseRepo.GetUserRoleAsync(p.UpdatedBy.Value)
-                            : null,
-                        Metadata = new { ProgressPercent = p.ProgressPercent, Source = p.Source },
-                    }
-                );
+                events.Add(await MapProgressLogToTimelineEventAsync(progressLog));
             }
 
-            foreach (var a in goal.GoalApprovals)
+            // Approval events
+            foreach (var approval in goal.GoalApprovals)
             {
-                string requestDescription = a.ApprovalType switch
-                {
-                    APPROVAL_TYPE.TASK_ACKNOWLEDGMENT => "Task acknowledgment requested",
-                    APPROVAL_TYPE.COMPLETION => "Completion approval requested",
-                    APPROVAL_TYPE.CREATION => "Creation approval requested",
-                    APPROVAL_TYPE.DELEGATION => "Delegation approval requested",
-                    APPROVAL_TYPE.SELF_GOAL_ACTIVATION => "Self goal activation requested",
-                    APPROVAL_TYPE.REOPENING => "Reopen approval requested",
-                    APPROVAL_TYPE.CLOSURE => "Goal Closure requested",
-                    APPROVAL_TYPE.REACTIVATION => "Goal Reactivation requested",
-                    _ => $"{a.ApprovalType} requested",
-                };
-
-                events.Add(
-                    new TimelineEventModel
-                    {
-                        Type = TIMELINE_EVENT_TYPE.APPROVAL,
-                        Timestamp = a.RequestedOn ?? DateTime.UtcNow,
-                        Description = requestDescription,
-                        UserId = a.RequestedBy,
-                        UserName = await _baseService.GetEmployeeNameAsync(a.RequestedBy),
-                        UserRole = a.RequestedBy.HasValue
-                            ? await _baseRepo.GetUserRoleAsync(a.RequestedBy.Value)
-                            : null,
-                        Metadata = new { ApprovalType = a.ApprovalType, Status = a.ApprovalStatus },
-                    }
-                );
-
-                if (a.ApprovedOn.HasValue)
-                {
-                    string decisionDescription = a.ApprovalType switch
-                    {
-                        APPROVAL_TYPE.TASK_ACKNOWLEDGMENT =>
-                            $"Task acknowledgment {a.ApprovalStatus}",
-                        APPROVAL_TYPE.COMPLETION => $"Completion {a.ApprovalStatus}",
-                        APPROVAL_TYPE.CREATION => $"Creation {a.ApprovalStatus}",
-                        APPROVAL_TYPE.DELEGATION => $"Delegation {a.ApprovalStatus}",
-                        APPROVAL_TYPE.SELF_GOAL_ACTIVATION =>
-                            $"Self goal activation {a.ApprovalStatus}",
-                        APPROVAL_TYPE.REOPENING => $"Reopen request {a.ApprovalStatus}",
-                        APPROVAL_TYPE.CLOSURE => $"Closure request {a.ApprovalStatus}",
-                        APPROVAL_TYPE.REACTIVATION => $"Reactivation request {a.ApprovalStatus}",
-                        _ => $"{a.ApprovalType} {a.ApprovalStatus}",
-                    };
-
-                    events.Add(
-                        new TimelineEventModel
-                        {
-                            Type = TIMELINE_EVENT_TYPE.APPROVAL,
-                            Timestamp = a.ApprovedOn.Value,
-                            Description = decisionDescription,
-                            UserId = a.ApprovedBy,
-                            UserName = await _baseService.GetEmployeeNameAsync(a.ApprovedBy),
-                            UserRole = a.ApprovedBy.HasValue
-                                ? await _baseRepo.GetUserRoleAsync(a.ApprovedBy.Value)
-                                : null,
-                            Metadata = new
-                            {
-                                ApprovalType = a.ApprovalType,
-                                Status = a.ApprovalStatus,
-                            },
-                        }
-                    );
-                }
+                events.AddRange(await MapApprovalToTimelineEventsAsync(approval));
             }
 
-            foreach (var c in goal.GoalComments)
+            // Comment events
+            foreach (var comment in goal.GoalComments)
             {
-                events.Add(
-                    new TimelineEventModel
-                    {
-                        Type = TIMELINE_EVENT_TYPE.COMMENT,
-                        Timestamp = c.CommentedOn ?? DateTime.UtcNow,
-                        Description = "Comment added",
-                        UserId = c.CommentedBy,
-                        UserName = await _baseService.GetEmployeeNameAsync(c.CommentedBy),
-                        UserRole = c.CommentedBy.HasValue
-                            ? await _baseRepo.GetUserRoleAsync(c.CommentedBy.Value)
-                            : null,
-                        Metadata = new { Comment = c.GoalComment1 },
-                    }
-                );
+                events.Add(await MapCommentToTimelineEventAsync(comment));
             }
 
-            foreach (var a in goal.GoalAssignments)
+            // Assignment events
+            foreach (var assignment in goal.GoalAssignments)
             {
-                events.Add(
-                    new TimelineEventModel
-                    {
-                        Type = TIMELINE_EVENT_TYPE.ASSIGNMENT,
-                        Timestamp = a.AssignedOn ?? DateTime.UtcNow,
-                        Description =
-                            $"Assigned to {await _baseService.GetEmployeeNameAsync(a.AssignedTo)}",
-                        UserId = a.AssignedBy,
-                        UserName = await _baseService.GetEmployeeNameAsync(a.AssignedBy),
-                        UserRole = a.AssignedBy.HasValue
-                            ? await _baseRepo.GetUserRoleAsync(a.AssignedBy.Value)
-                            : null,
-                    }
-                );
+                events.Add(await MapAssignmentToTimelineEventAsync(assignment));
             }
 
-            foreach (var att in goal.GoalAttachments)
+            // Attachment events
+            foreach (var attachment in goal.GoalAttachments)
             {
-                events.Add(
-                    new TimelineEventModel
-                    {
-                        Type = TIMELINE_EVENT_TYPE.ATTACHMENT,
-                        Timestamp = att.AttachedOn ?? DateTime.UtcNow,
-                        Description = $"Attachment added: {att.AttachmentTitle}",
-                        UserId = att.AttachedBy,
-                        UserName = await _baseService.GetEmployeeNameAsync(att.AttachedBy),
-                        UserRole = att.AttachedBy.HasValue
-                            ? await _baseRepo.GetUserRoleAsync(att.AttachedBy.Value)
-                            : null,
-                    }
-                );
+                events.Add(await MapAttachmentToTimelineEventAsync(attachment));
             }
 
             return events.OrderByDescending(e => e.Timestamp).ToList();
@@ -433,6 +304,221 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         )
         {
             return await _repo.GetProjectSubordinatesAsync(projectId, managerEmployeeMasterId);
+        }
+
+        // ==================== HELPER METHODS ====================
+
+        private string? GetShortDescription(string? description)
+        {
+            if (string.IsNullOrWhiteSpace(description))
+                return null;
+
+            return description.Length > 80
+                ? description.Substring(0, 80) + "..."
+                : description;
+        }
+
+        private async Task<string?> GetProjectNameAsync(int? projectId)
+        {
+            if (!projectId.HasValue)
+                return null;
+
+            var project = await _baseRepo.GetProjectByIdAsync(projectId.Value);
+            return project?.ProjectName;
+        }
+
+        private async Task<TimelineEventModel> CreateGoalCreatedEventAsync(Goal goal)
+        {
+            return new TimelineEventModel
+            {
+                Type = TIMELINE_EVENT_TYPE.GOAL_CREATED,
+                Timestamp = goal.Goalcreatedat ?? DateTime.UtcNow,
+                Description = "Goal created",
+                UserId = goal.CreatedBy,
+                UserName = await _baseService.GetEmployeeNameAsync(goal.CreatedBy),
+                UserRole = goal.CreatedBy.HasValue
+                    ? await _baseRepo.GetUserRoleAsync(goal.CreatedBy.Value)
+                    : null,
+            };
+        }
+
+        private async Task<TimelineEventModel> MapProgressLogToTimelineEventAsync(
+            Goalprogresslog progressLog
+        )
+        {
+            // Use Mapster for base mapping
+            var timelineEvent = _mapper.Map<TimelineEventModel>(progressLog);
+
+            // Set user details
+            timelineEvent.UserName = await _baseService.GetEmployeeNameAsync(progressLog.UpdatedBy);
+            
+            if (progressLog.UpdatedBy.HasValue)
+            {
+                timelineEvent.UserRole = await _baseRepo.GetUserRoleAsync(
+                    progressLog.UpdatedBy.Value
+                );
+            }
+
+            // Set metadata
+            timelineEvent.Metadata = new
+            {
+                ProgressPercent = progressLog.ProgressPercent,
+                Source = progressLog.Source
+            };
+
+            return timelineEvent;
+        }
+
+        private async Task<List<TimelineEventModel>> MapApprovalToTimelineEventsAsync(
+            GoalApproval approval
+        )
+        {
+            var events = new List<TimelineEventModel>();
+
+            // Approval request event
+            string requestDescription = GetApprovalRequestDescription(approval.ApprovalType);
+            
+            events.Add(new TimelineEventModel
+            {
+                Type = TIMELINE_EVENT_TYPE.APPROVAL,
+                Timestamp = approval.RequestedOn ?? DateTime.UtcNow,
+                Description = requestDescription,
+                UserId = approval.RequestedBy,
+                UserName = await _baseService.GetEmployeeNameAsync(approval.RequestedBy),
+                UserRole = approval.RequestedBy.HasValue
+                    ? await _baseRepo.GetUserRoleAsync(approval.RequestedBy.Value)
+                    : null,
+                Metadata = new
+                {
+                    ApprovalType = approval.ApprovalType,
+                    Status = approval.ApprovalStatus
+                },
+            });
+
+            // Approval decision event (if approved/rejected)
+            if (approval.ApprovedOn.HasValue)
+            {
+                string decisionDescription = GetApprovalDecisionDescription(
+                    approval.ApprovalType, 
+                    approval.ApprovalStatus
+                );
+
+                events.Add(new TimelineEventModel
+                {
+                    Type = TIMELINE_EVENT_TYPE.APPROVAL,
+                    Timestamp = approval.ApprovedOn.Value,
+                    Description = decisionDescription,
+                    UserId = approval.ApprovedBy,
+                    UserName = await _baseService.GetEmployeeNameAsync(approval.ApprovedBy),
+                    UserRole = approval.ApprovedBy.HasValue
+                        ? await _baseRepo.GetUserRoleAsync(approval.ApprovedBy.Value)
+                        : null,
+                    Metadata = new
+                    {
+                        ApprovalType = approval.ApprovalType,
+                        Status = approval.ApprovalStatus,
+                    },
+                });
+            }
+
+            return events;
+        }
+
+        private async Task<TimelineEventModel> MapCommentToTimelineEventAsync(GoalComment comment)
+        {
+            // Use Mapster for base mapping
+            var timelineEvent = _mapper.Map<TimelineEventModel>(comment);
+
+            // Set user details
+            timelineEvent.UserName = await _baseService.GetEmployeeNameAsync(comment.CommentedBy);
+            
+            if (comment.CommentedBy.HasValue)
+            {
+                timelineEvent.UserRole = await _baseRepo.GetUserRoleAsync(
+                    comment.CommentedBy.Value
+                );
+            }
+
+            // Set metadata
+            timelineEvent.Metadata = new { Comment = comment.GoalComment1 };
+
+            return timelineEvent;
+        }
+
+        private async Task<TimelineEventModel> MapAssignmentToTimelineEventAsync(
+            GoalAssignment assignment
+        )
+        {
+            // Use Mapster for base mapping
+            var timelineEvent = _mapper.Map<TimelineEventModel>(assignment);
+
+            // Set description with assignee name
+            var assigneeName = await _baseService.GetEmployeeNameAsync(assignment.AssignedTo);
+            timelineEvent.Description = $"Assigned to {assigneeName}";
+
+            // Set user details (assigner)
+            timelineEvent.UserName = await _baseService.GetEmployeeNameAsync(assignment.AssignedBy);
+            
+            if (assignment.AssignedBy.HasValue)
+            {
+                timelineEvent.UserRole = await _baseRepo.GetUserRoleAsync(
+                    assignment.AssignedBy.Value
+                );
+            }
+
+            return timelineEvent;
+        }
+
+        private async Task<TimelineEventModel> MapAttachmentToTimelineEventAsync(
+            GoalAttachment attachment
+        )
+        {
+            // Use Mapster for base mapping
+            var timelineEvent = _mapper.Map<TimelineEventModel>(attachment);
+
+            // Set user details
+            timelineEvent.UserName = await _baseService.GetEmployeeNameAsync(attachment.AttachedBy);
+            
+            if (attachment.AttachedBy.HasValue)
+            {
+                timelineEvent.UserRole = await _baseRepo.GetUserRoleAsync(
+                    attachment.AttachedBy.Value
+                );
+            }
+
+            return timelineEvent;
+        }
+
+        private string GetApprovalRequestDescription(string? approvalType)
+        {
+            return approvalType switch
+            {
+                APPROVAL_TYPE.TASK_ACKNOWLEDGMENT => "Task acknowledgment requested",
+                APPROVAL_TYPE.COMPLETION => "Completion approval requested",
+                APPROVAL_TYPE.CREATION => "Creation approval requested",
+                APPROVAL_TYPE.DELEGATION => "Delegation approval requested",
+                APPROVAL_TYPE.SELF_GOAL_ACTIVATION => "Self goal activation requested",
+                APPROVAL_TYPE.REOPENING => "Reopen approval requested",
+                APPROVAL_TYPE.CLOSURE => "Goal Closure requested",
+                APPROVAL_TYPE.REACTIVATION => "Goal Reactivation requested",
+                _ => $"{approvalType} requested",
+            };
+        }
+
+        private string GetApprovalDecisionDescription(string? approvalType, string? status)
+        {
+            return approvalType switch
+            {
+                APPROVAL_TYPE.TASK_ACKNOWLEDGMENT => $"Task acknowledgment {status}",
+                APPROVAL_TYPE.COMPLETION => $"Completion {status}",
+                APPROVAL_TYPE.CREATION => $"Creation {status}",
+                APPROVAL_TYPE.DELEGATION => $"Delegation {status}",
+                APPROVAL_TYPE.SELF_GOAL_ACTIVATION => $"Self goal activation {status}",
+                APPROVAL_TYPE.REOPENING => $"Reopen request {status}",
+                APPROVAL_TYPE.CLOSURE => $"Closure request {status}",
+                APPROVAL_TYPE.REACTIVATION => $"Reactivation request {status}",
+                _ => $"{approvalType} {status}",
+            };
         }
     }
 }

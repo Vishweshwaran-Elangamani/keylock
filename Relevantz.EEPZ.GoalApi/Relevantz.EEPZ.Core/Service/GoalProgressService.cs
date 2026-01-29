@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
-using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Exceptions;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repository.Interface;
+using MapsterMapper;  // ← ADD THIS
+using Mapster;        // ← ADD THIS
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -20,6 +21,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private readonly IWebHostEnvironment _environment;
         private readonly IValidator<ToggleChecklistModel> _toggleChecklistValidator;
         private readonly IValidator<ManualProgressUpdateModel> _manualProgressValidator;
+        private readonly IMapper _mapper;  // ← ADD THIS
 
         public GoalProgressService(
             IGoalProgressRepository repo,
@@ -28,8 +30,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             IBaseGoalService baseService,
             IWebHostEnvironment environment,
             IValidator<ToggleChecklistModel> toggleChecklistValidator,
-            IValidator<ManualProgressUpdateModel> manualProgressValidator
-        )
+            IValidator<ManualProgressUpdateModel> manualProgressValidator,
+            IMapper mapper)  // ← ADD THIS
         {
             _repo = repo;
             _baseRepo = baseRepo;
@@ -38,8 +40,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _environment = environment;
             _toggleChecklistValidator = toggleChecklistValidator;
             _manualProgressValidator = manualProgressValidator;
+            _mapper = mapper;  // ← ADD THIS
         }
 
+        // ToggleChecklistAsync remains UNCHANGED - no mapping needed
         public async Task<ApiResponseModel> ToggleChecklistAsync(
             int goalId,
             ToggleChecklistModel dto,
@@ -96,7 +100,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 currentUserEmployeeMasterId
             );
             var total = await _baseRepo.CountTotalForUserAsync(goalId, currentUserEmployeeMasterId);
-            var percent = total == 0 ? 0 : (int)Math.Round((double)completed / total * 100);   
+            var percent = total == 0 ? 0 : (int)Math.Round((double)completed / total * 100);
 
             if (percent < 100)
             {
@@ -161,8 +165,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 ResponseMessages.Codes.CHECKLIST_TOGGLED_SUCCESS,
                 metadata
             );
-        } 
+        }
 
+        // UpdateManualProgressAsync remains UNCHANGED - no mapping needed
         public async Task<ApiResponseModel> UpdateManualProgressAsync(
             int goalId,
             ManualProgressUpdateModel dto,
@@ -224,6 +229,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
         }
 
+        // GetGoalProgressPercentAsync remains UNCHANGED - pure calculation
         public async Task<int> GetGoalProgressPercentAsync(int goalId, int forEmployeeMasterId)
         {
             var latestLog = await _baseRepo.GetLatestProgressLogAsync(goalId);
@@ -243,6 +249,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
+        // GetTeamGoalProgressForManagerAsync remains UNCHANGED - pure calculation
         public async Task<int> GetTeamGoalProgressForManagerAsync(
             int goalId,
             int managerEmployeeMasterId
@@ -283,6 +290,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return totalProgress / relevantAssignees.Count;
         }
 
+        // GetCascadingProgressAsync remains UNCHANGED - pure calculation
         public async Task<int> GetCascadingProgressAsync(int goalId, int userId)
         {
             var goal = await _baseRepo.GetGoalByIdAsync(goalId);
@@ -314,6 +322,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return cascadingProgress;
         }
 
+        // REFACTORED: GetProgressHierarchyAsync with Mapster
         public async Task<GoalProgressHierarchyModel> GetProgressHierarchyAsync(
             int goalId,
             int userId
@@ -327,53 +336,26 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (goal == null)
                 throw new GoalNotFoundException(goalId);
 
+            // Calculate own progress
             var ownProgress = await CalculateUserOwnProgressAsync(goalId, userId);
             var ownItems = await _repo.GetUserOwnChecklistItemsAsync(goalId, userId);
             var ownItemsCompleted = await _repo.CountUserOwnCompletedItemsAsync(goalId, userId);
 
+            // Get subordinates
             var subordinateIds = await _repo.GetSubordinatesAssignedToGoalAsync(goalId, userId);
-            var subordinateDetails = new List<SubordinateProgressModel>();
+            var subordinateDetails = await BuildSubordinateProgressListAsync(
+                goalId, 
+                subordinateIds
+            );
+
+            // Calculate team progress
             int? teamProgress = null;
-
-            if (subordinateIds.Any())
+            if (subordinateDetails.Any())
             {
-                var subordinateProgressList = new List<int>();
-
-                foreach (var subId in subordinateIds)
-                {
-                    var subUser = await _baseRepo.GetEmployeeDetailsByMasterIdAsync(subId);
-
-                    if (subUser != null)
-                    {
-                        var subProgress = await GetCascadingProgressAsync(goalId, subId);
-                        subordinateProgressList.Add(subProgress);
-
-                        var subItems = await _repo.GetUserOwnChecklistItemsAsync(goalId, subId);
-                        var subItemsCompleted = await _repo.CountUserOwnCompletedItemsAsync(
-                            goalId,
-                            subId
-                        );
-
-                        subordinateDetails.Add(
-                            new SubordinateProgressModel
-                            {
-                                UserId = subId,
-                                UserName =
-                                    $"{subUser.Employee.Userprofile.FirstName} {subUser.Employee.Userprofile.LastName}",
-                                Role = subUser.Role.RoleName,
-                                Progress = subProgress,
-                                ItemCount = subItems.Count,
-                                ItemsCompleted = subItemsCompleted,
-                            }
-                        );
-                    }
-                }
-
-                teamProgress = subordinateProgressList.Any()
-                    ? (int)subordinateProgressList.Average()
-                    : 0;
+                teamProgress = (int)subordinateDetails.Average(s => s.Progress);
             }
 
+            // Calculate weights and cascading progress
             var userRole = await _baseRepo.GetUserRoleAsync(userId);
             var (ownWeight, teamWeight) = GetWeightsForRole(userRole);
 
@@ -390,13 +372,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 teamWeight = 0;
             }
 
+            // Build hierarchy model
             return new GoalProgressHierarchyModel
             {
                 GoalId = goalId,
                 UserId = userId,
-                UserName =
-                    $"{user.Employee.Userprofile.FirstName} {user.Employee.Userprofile.LastName}",
-                Role = user.Role.RoleName,
+                UserName = GetFullName(user),
+                Role = user.Role?.RoleName,
                 OwnProgress = ownProgress,
                 TeamProgress = teamProgress,
                 CascadingProgress = cascadingProgress,
@@ -407,6 +389,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 Subordinates = subordinateDetails,
             };
         }
+
+        // ==================== HELPER METHODS ====================
 
         private async Task<int> CalculateUserOwnProgressAsync(int goalId, int userId)
         {
@@ -434,6 +418,57 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 "leadership" => (20, 80),
                 _ => (50, 50),
             };
+        }
+
+        // NEW: Helper method to build subordinate progress list
+        private async Task<List<SubordinateProgressModel>> BuildSubordinateProgressListAsync(
+            int goalId,
+            List<int> subordinateIds
+        )
+        {
+            var subordinateDetails = new List<SubordinateProgressModel>();
+
+            if (!subordinateIds.Any())
+                return subordinateDetails;
+
+            foreach (var subId in subordinateIds)
+            {
+                var subUser = await _baseRepo.GetEmployeeDetailsByMasterIdAsync(subId);
+
+                if (subUser != null)
+                {
+                    var subProgress = await GetCascadingProgressAsync(goalId, subId);
+                    var subItems = await _repo.GetUserOwnChecklistItemsAsync(goalId, subId);
+                    var subItemsCompleted = await _repo.CountUserOwnCompletedItemsAsync(
+                        goalId,
+                        subId
+                    );
+
+                    subordinateDetails.Add(
+                        new SubordinateProgressModel
+                        {
+                            UserId = subId,
+                            UserName = GetFullName(subUser),
+                            Role = subUser.Role?.RoleName,
+                            Progress = subProgress,
+                            ItemCount = subItems.Count,
+                            ItemsCompleted = subItemsCompleted,
+                        }
+                    );
+                }
+            }
+
+            return subordinateDetails;
+        }
+
+        // NEW: Helper method to get full name
+        private string GetFullName(Employeedetailsmaster employeeDetails)
+        {
+            var profile = employeeDetails.Employee?.Userprofile;
+            if (profile == null)
+                return "Unknown";
+
+            return $"{profile.FirstName} {profile.LastName}".Trim();
         }
     }
 }

@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
-using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Exceptions;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repository.Interface;
+using MapsterMapper;  // ← ADD THIS
+using Mapster;        // ← ADD THIS
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -22,6 +23,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private readonly IValidator<CreateApprovalRequestModel> _createApprovalValidator;
         private readonly IValidator<ApprovalDesicionModel> _approvalDecisionValidator;
         private readonly IValidator<ApprovalQueryModel> _approvalQueryValidator;
+        private readonly IMapper _mapper;  // ← ADD THIS
 
         public GoalApprovalsService(
             IGoalApprovalsRepository repo,
@@ -32,8 +34,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             IWebHostEnvironment environment,
             IValidator<CreateApprovalRequestModel> createApprovalValidator,
             IValidator<ApprovalDesicionModel> approvalDecisionValidator,
-            IValidator<ApprovalQueryModel> approvalQueryValidator
-        )
+            IValidator<ApprovalQueryModel> approvalQueryValidator,
+            IMapper mapper)  // ← ADD THIS
         {
             _repo = repo;
             _baseRepo = baseRepo;
@@ -44,8 +46,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _createApprovalValidator = createApprovalValidator;
             _approvalDecisionValidator = approvalDecisionValidator;
             _approvalQueryValidator = approvalQueryValidator;
+            _mapper = mapper;  // ← ADD THIS
         }
 
+        // CreateApprovalRequestAsync remains UNCHANGED - no mapping needed
         public async Task<ApiResponseModel<int>> CreateApprovalRequestAsync(
             int goalId,
             CreateApprovalRequestModel dto,
@@ -53,6 +57,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string requesterRole
         )
         {
+            // ... keep all your existing code exactly as is ...
+            // This method doesn't do object mapping, so no changes needed
             var validationResult = await _createApprovalValidator.ValidateAsync(dto);
             if (!validationResult.IsValid)
             {
@@ -391,6 +397,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
         }
 
+        // ClosePendingApprovalAsync remains UNCHANGED - no mapping needed
         public async Task<ApiResponseModel> ClosePendingApprovalAsync(
             int approvalId,
             ApprovalDesicionModel dto,
@@ -398,6 +405,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string approverRole
         )
         {
+            // ... keep all your existing code exactly as is ...
+            // This method doesn't do object mapping, so no changes needed
             var validationResult = await _approvalDecisionValidator.ValidateAsync(dto);
             if (!validationResult.IsValid)
             {
@@ -627,6 +636,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
         }
 
+        // REFACTORED: GetPendingApprovalsAsync with Mapster
         public async Task<List<GoalApprovalModel>> GetPendingApprovalsAsync(
             int approverEmployeeMasterId
         )
@@ -636,57 +646,65 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
             var result = new List<GoalApprovalModel>();
 
-            foreach (var a in approvals)
+            foreach (var approval in approvals)
             {
-                var requesterName = await _baseService.GetEmployeeNameAsync(a.RequestedBy);
+                // Use Mapster for base mapping
+                var approvalModel = _mapper.Map<GoalApprovalModel>(approval);
 
-                var allAttachments = a
-                    .Goal?.GoalAttachments.Select(att => new GoalAttachmentModel
-                    {
-                        GoalAttachmentId = att.Goalattachmentsid,
-                        GoalId = att.GoalId,
-                        AttachmentTitle = att.AttachmentTitle ?? "",
-                        FilePath = att.Attachments ?? "",
-                        AttachedByEmployeeMasterId = att.AttachedBy,
-                        AttachedOn = att.AttachedOn,
-                        IsProofOfCompletion = att.IsProofOfCompletion ?? true,
-                        LinkedApprovalId = att.LinkedApprovalId,
-                    })
-                    .ToList();
-
-                List<GoalAttachmentModel>? proofAttachments = null;
-                if (
-                    a.ApprovalType == APPROVAL_TYPE.COMPLETION
-                    || a.ApprovalType == APPROVAL_TYPE.TASK_ACKNOWLEDGMENT
-                )
-                {
-                    proofAttachments = allAttachments
-                        ?.Where(att =>
-                            att.LinkedApprovalId == a.ApprovalId && att.IsProofOfCompletion
-                        )
-                        .ToList();
-                }
-
-                result.Add(
-                    new GoalApprovalModel
-                    {
-                        ApprovalId = a.ApprovalId,
-                        GoalId = a.GoalId,
-                        GoalTitle = a.Goal?.GoalTitle ?? "",
-                        ApprovalType = a.ApprovalType ?? "",
-                        RequestedByEmployeeMasterId = a.RequestedBy,
-                        RequestedByName = requesterName,
-                        RequestedOn = a.RequestedOn,
-                        ApprovalStatus = a.ApprovalStatus ?? APPROVAL_STATUS.PENDING,
-                        AllAttachments = allAttachments,
-                        ProofAttachments = proofAttachments,
-                        ReopenUntil = a.Goal?.ReopenUntil,
-                    }
+                // Set requester name
+                approvalModel.RequestedByName = await _baseService.GetEmployeeNameAsync(
+                    approval.RequestedBy
                 );
+
+                // Map attachments
+                var (allAttachments, proofAttachments) = await MapAttachmentsForApprovalAsync(
+                    approval
+                );
+                approvalModel.AllAttachments = allAttachments;
+                approvalModel.ProofAttachments = proofAttachments;
+
+                result.Add(approvalModel);
             }
+
             return result;
         }
 
+        // Helper method to map attachments
+        private async Task<(List<GoalAttachmentModel>, List<GoalAttachmentModel>?)> MapAttachmentsForApprovalAsync(
+            GoalApproval approval
+        )
+        {
+            var allAttachments = new List<GoalAttachmentModel>();
+            List<GoalAttachmentModel>? proofAttachments = null;
+
+            if (approval.Goal?.GoalAttachments != null)
+            {
+                foreach (var att in approval.Goal.GoalAttachments)
+                {
+                    // Use Mapster for base mapping
+                    var attachmentModel = _mapper.Map<GoalAttachmentModel>(att);
+                    allAttachments.Add(attachmentModel);
+                }
+
+                // Filter proof attachments for completion types
+                if (
+                    approval.ApprovalType == APPROVAL_TYPE.COMPLETION
+                    || approval.ApprovalType == APPROVAL_TYPE.TASK_ACKNOWLEDGMENT
+                )
+                {
+                    proofAttachments = allAttachments
+                        .Where(att =>
+                            att.LinkedApprovalId == approval.ApprovalId
+                            && att.IsProofOfCompletion
+                        )
+                        .ToList();
+                }
+            }
+
+            return (allAttachments, proofAttachments);
+        }
+
+        // GetUserApprovalsAsync remains mostly unchanged
         public async Task<PagedApprovalsModel> GetUserApprovalsAsync(
             ApprovalQueryModel query,
             int userId,
@@ -768,7 +786,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var approvalModels = new List<UserGoalApprovalModel>();
             foreach (var ga in approvals)
             {
-                var dto = await MapToUserGoalApprovalModel(ga, userId, userRole);
+                var dto = await MapToUserGoalApprovalModelAsync(ga, userId, userRole);
                 approvalModels.Add(dto);
             }
 
@@ -894,42 +912,80 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 && approval.RequestedBy != userId;
         }
 
-        private async Task<UserGoalApprovalModel> MapToUserGoalApprovalModel(
+        // REFACTORED: MapToUserGoalApprovalModelAsync with Mapster
+        private async Task<UserGoalApprovalModel> MapToUserGoalApprovalModelAsync(
             GoalApproval approval,
             int userId,
             string userRole
         )
         {
-            var requesterName = await _baseService.GetEmployeeNameAsync(approval.RequestedBy);
-            var approverName = await _baseService.GetEmployeeNameAsync(approval.ApprovedBy);
-            var goalCreatorName = await _baseService.GetEmployeeNameAsync(approval.Goal?.CreatedBy);
+            // Use Mapster for base mapping
+            var model = _mapper.Map<UserGoalApprovalModel>(approval);
 
-            var goalAssignees = new List<AssigneeModel>();
-            if (approval.Goal?.GoalAssignments != null)
+            // Set employee names
+            model.RequestedByName = await _baseService.GetEmployeeNameAsync(approval.RequestedBy);
+            model.ApproverName = await _baseService.GetEmployeeNameAsync(approval.ApprovedBy);
+            model.GoalCreatedByName = await _baseService.GetEmployeeNameAsync(
+                approval.Goal?.CreatedBy
+            );
+
+            // Set approver role
+            if (approval.ApprovedBy.HasValue)
             {
-                foreach (var assignment in approval.Goal.GoalAssignments)
+                model.ApproverRole = await _baseRepo.GetUserRoleAsync(approval.ApprovedBy.Value);
+            }
+
+            // Map goal assignees
+            model.GoalAssignees = await MapGoalAssigneesAsync(approval.Goal?.GoalAssignments);
+
+            // Map attachments
+            var (allAttachments, proofAttachments) = await MapAllAttachmentsAsync(approval);
+            model.AllAttachments = allAttachments;
+            model.ProofAttachments = proofAttachments;
+
+            // Set user context fields
+            model.UserRole = DetermineUserRoleInApproval(approval, userId, userRole);
+            model.CanMakeDecision = CanUserMakeDecision(approval, userId, userRole);
+            model.UserContext = GenerateUserContext(approval, userId, userRole);
+
+            return model;
+        }
+
+        private async Task<List<AssigneeModel>> MapGoalAssigneesAsync(
+            ICollection<GoalAssignment>? assignments
+        )
+        {
+            var assignees = new List<AssigneeModel>();
+
+            if (assignments != null)
+            {
+                foreach (var assignment in assignments)
                 {
                     if (assignment.AssignedTo.HasValue)
                     {
-                        var assigneeName = await _baseService.GetEmployeeNameAsync(
+                        // Use Mapster for base mapping
+                        var assignee = _mapper.Map<AssigneeModel>(assignment);
+
+                        // Set name and role
+                        assignee.Name = await _baseService.GetEmployeeNameAsync(
                             assignment.AssignedTo
                         );
-                        var assigneeRole = assignment.AssignedTo.HasValue
-                            ? await _baseRepo.GetUserRoleAsync(assignment.AssignedTo.Value)
-                            : null;
-
-                        goalAssignees.Add(
-                            new AssigneeModel
-                            {
-                                EmployeeMasterId = assignment.AssignedTo.Value,
-                                Name = assigneeName,
-                                Role = assigneeRole,
-                            }
+                        assignee.Role = await _baseRepo.GetUserRoleAsync(
+                            assignment.AssignedTo.Value
                         );
+
+                        assignees.Add(assignee);
                     }
                 }
             }
 
+            return assignees;
+        }
+
+        private async Task<(List<GoalAttachmentModel>, List<GoalAttachmentModel>)> MapAllAttachmentsAsync(
+            GoalApproval approval
+        )
+        {
             var allAttachments = new List<GoalAttachmentModel>();
             var proofAttachments = new List<GoalAttachmentModel>();
 
@@ -937,26 +993,19 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 foreach (var att in approval.Goal.GoalAttachments)
                 {
-                    var attacherName = await _baseService.GetEmployeeNameAsync(att.AttachedBy);
+                    // Use Mapster for base mapping
+                    var attachmentModel = _mapper.Map<GoalAttachmentModel>(att);
 
-                    var attachmentModel = new GoalAttachmentModel
-                    {
-                        GoalAttachmentId = att.Goalattachmentsid,
-                        GoalId = att.GoalId,
-                        AttachmentTitle = att.AttachmentTitle ?? "",
-                        FilePath = att.Attachments ?? "",
-                        AttachedByEmployeeMasterId = att.AttachedBy,
-                        AttachedByName = attacherName,
-                        AttachedOn = att.AttachedOn,
-                        IsProofOfCompletion = att.IsProofOfCompletion ?? true,
-                        LinkedApprovalId = att.LinkedApprovalId,
-                    };
+                    // Set attacher name
+                    attachmentModel.AttachedByName = await _baseService.GetEmployeeNameAsync(
+                        att.AttachedBy
+                    );
 
                     allAttachments.Add(attachmentModel);
 
                     if (
-                        att.IsProofOfCompletion
-                        ?? true && att.LinkedApprovalId == approval.ApprovalId
+                        (att.IsProofOfCompletion ?? true)
+                        && att.LinkedApprovalId == approval.ApprovalId
                     )
                     {
                         proofAttachments.Add(attachmentModel);
@@ -964,34 +1013,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
             }
 
-            var dto = new UserGoalApprovalModel
-            {
-                ApprovalId = approval.ApprovalId,
-                GoalId = approval.GoalId,
-                GoalTitle = approval.Goal?.GoalTitle ?? "",
-                ApprovalType = approval.ApprovalType ?? "",
-                RequestedByEmployeeMasterId = approval.RequestedBy,
-                RequestedByName = requesterName,
-                RequestedOn = approval.RequestedOn,
-                ApprovalStatus = approval.ApprovalStatus ?? APPROVAL_STATUS.PENDING,
-                ReopenUntil = approval.Goal?.ReopenUntil,
-                ApproverEmployeeMasterId = approval.ApprovedBy,
-                ApproverName = approverName,
-                ApproverRole = approval.ApprovedBy.HasValue
-                    ? await _baseRepo.GetUserRoleAsync(approval.ApprovedBy.Value)
-                    : null,
-                ApprovedOn = approval.ApprovedOn,
-                GoalCreatedByEmployeeMasterId = approval.Goal?.CreatedBy,
-                GoalCreatedByName = goalCreatorName,
-                GoalAssignees = goalAssignees,
-                AllAttachments = allAttachments,
-                ProofAttachments = proofAttachments,
-                UserRole = DetermineUserRoleInApproval(approval, userId, userRole),
-                CanMakeDecision = CanUserMakeDecision(approval, userId, userRole),
-                UserContext = GenerateUserContext(approval, userId, userRole),
-            };
-
-            return dto;
+            return (allAttachments, proofAttachments);
         }
 
         private string GenerateUserContext(GoalApproval approval, int userId, string userRole)

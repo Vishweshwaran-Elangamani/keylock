@@ -6,6 +6,8 @@ using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repository.Interface;
+using MapsterMapper;  // ← ADD THIS
+using Mapster;        // ← ADD THIS
 
 namespace Relevantz.EEPZ.Core.Service
 {
@@ -15,23 +17,25 @@ namespace Relevantz.EEPZ.Core.Service
         private readonly IBaseGoalRepository _baseRepo;
         private readonly IBaseGoalService _baseService;
         private readonly IFileStorageService _fileStorage;
+        private readonly IMapper _mapper;  // ← ADD THIS
 
         public GoalAttachmentService(
             IGoalAttachmentRepository repo,
             IBaseGoalRepository baseRepo,
             IBaseGoalService baseService,
-            IFileStorageService fileStorage
-        )
+            IFileStorageService fileStorage,
+            IMapper mapper)  // ← ADD THIS
         {
             _repo = repo;
             _baseRepo = baseRepo;
             _baseService = baseService;
             _fileStorage = fileStorage;
+            _mapper = mapper;  // ← ADD THIS
         }
 
         public async Task<FilePreviewResult> GetAttachmentFilePreviewAsync(
-     int attachmentId,
-     int currentUserEmployeeMasterId)
+            int attachmentId,
+            int currentUserEmployeeMasterId)
         {
             var attachment = await _repo.GetAttachmentByIdAsync(attachmentId);
 
@@ -69,18 +73,7 @@ namespace Relevantz.EEPZ.Core.Service
                 throw new ArgumentException("Invalid content type.");
             }
 
-            var displayFileName = !string.IsNullOrEmpty(attachment.AttachmentTitle)
-                ? attachment.AttachmentTitle
-                : fileName;
-
-            if (!Path.HasExtension(displayFileName))
-            {
-                var extension = Path.GetExtension(fileName);
-                displayFileName += extension;
-            }
-
-            // sanitize file name
-            displayFileName = Path.GetFileName(displayFileName);
+            var displayFileName = GetDisplayFileName(attachment.AttachmentTitle, fileName);
 
             return new FilePreviewResult
             {
@@ -90,7 +83,7 @@ namespace Relevantz.EEPZ.Core.Service
             };
         }
 
-
+        // REFACTORED: UploadFileAsync with Mapster
         public async Task<FileUploadResponseModel> UploadFileAsync(
             int goalId,
             IFormFile file,
@@ -110,48 +103,13 @@ namespace Relevantz.EEPZ.Core.Service
                 throw new FileAccessDeniedException();
             }
 
-            if (file == null || file.Length == 0)
-            {
-                throw new BadRequestException(
-                    ResponseMessages.Codes.BadRequest,
-                    "File is empty or null"
-                );
-            }
+            // Validate file
+            ValidateFile(file);
 
-            const long maxFileSize = 10 * 1024 * 1024;
-            if (file.Length > maxFileSize)
-            {
-                throw new BadRequestException(
-                    ResponseMessages.Codes.FILE_SIZE_EXCEEDED,
-                    "File size exceeds maximum limit of 10MB"
-                );
-            }
-
-            var allowedExtensions = new[]
-            {
-                ".pdf",
-                ".doc",
-                ".docx",
-                ".xls",
-                ".xlsx",
-                ".png",
-                ".jpg",
-                ".jpeg",
-                ".txt",
-                ".zip",
-            };
-            var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
-
-            if (!allowedExtensions.Contains(fileExtension))
-            {
-                throw new BadRequestException(
-                    ResponseMessages.Codes.FILE_TYPE_INVALID,
-                    $"File type '{fileExtension}' is not allowed"
-                );
-            }
-
+            // Save file
             var fileId = await _fileStorage.SaveFileAsync(file, "goals/attachments");
 
+            // Create attachment entity
             var attachment = new GoalAttachment
             {
                 GoalId = goalId,
@@ -164,16 +122,15 @@ namespace Relevantz.EEPZ.Core.Service
             await _repo.AddAttachmentAsync(attachment);
             await _baseRepo.SaveChangesAsync();
 
-            return new FileUploadResponseModel
-            {
-                AttachmentId = attachment.Goalattachmentsid,
-                AttachmentTitle = attachment.AttachmentTitle ?? "",
-                FilePath = attachment.Attachments ?? "",
-                FileName = file.FileName,
-                FileSize = file.Length,
-                ContentType = file.ContentType,
-                UploadedOn = attachment.AttachedOn ?? DateTime.UtcNow,
-            };
+            // Use Mapster for base mapping
+            var response = _mapper.Map<FileUploadResponseModel>(attachment);
+            
+            // Set file-specific properties
+            response.FileName = file.FileName;
+            response.FileSize = file.Length;
+            response.ContentType = file.ContentType;
+
+            return response;
         }
 
         public async Task<(
@@ -202,15 +159,7 @@ namespace Relevantz.EEPZ.Core.Service
                 attachment.Attachments ?? ""
             );
 
-            var downloadFileName = !string.IsNullOrEmpty(attachment.AttachmentTitle)
-                ? attachment.AttachmentTitle
-                : fileName;
-
-            if (!Path.HasExtension(downloadFileName))
-            {
-                var extension = Path.GetExtension(fileName);
-                downloadFileName += extension;
-            }
+            var downloadFileName = GetDisplayFileName(attachment.AttachmentTitle, fileName);
 
             return (fileBytes, contentType, downloadFileName);
         }
@@ -266,6 +215,69 @@ namespace Relevantz.EEPZ.Core.Service
             }
 
             return attachment;
+        }
+
+        // NEW: Helper method for file validation
+        private void ValidateFile(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                throw new BadRequestException(
+                    ResponseMessages.Codes.BadRequest,
+                    "File is empty or null"
+                );
+            }
+
+            const long maxFileSize = 10 * 1024 * 1024;
+            if (file.Length > maxFileSize)
+            {
+                throw new BadRequestException(
+                    ResponseMessages.Codes.FILE_SIZE_EXCEEDED,
+                    "File size exceeds maximum limit of 10MB"
+                );
+            }
+
+            var allowedExtensions = new[]
+            {
+                ".pdf",
+                ".doc",
+                ".docx",
+                ".xls",
+                ".xlsx",
+                ".png",
+                ".jpg",
+                ".jpeg",
+                ".txt",
+                ".zip",
+            };
+            var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+
+            if (!allowedExtensions.Contains(fileExtension))
+            {
+                throw new BadRequestException(
+                    ResponseMessages.Codes.FILE_TYPE_INVALID,
+                    $"File type '{fileExtension}' is not allowed"
+                );
+            }
+        }
+
+        // NEW: Helper method for display file name
+        private string GetDisplayFileName(string? attachmentTitle, string originalFileName)
+        {
+            var displayFileName = !string.IsNullOrEmpty(attachmentTitle)
+                ? attachmentTitle
+                : originalFileName;
+
+            if (!Path.HasExtension(displayFileName))
+            {
+                var extension = Path.GetExtension(originalFileName);
+                displayFileName += extension;
+            }
+
+            // Sanitize file name
+            displayFileName = Path.GetFileName(displayFileName);
+
+            return displayFileName;
         }
     }
 }

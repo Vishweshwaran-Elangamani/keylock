@@ -33,7 +33,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 .ToListAsync();
 
             return result;
-        }
+        }      
 
         public async Task<GoalAttachment?> GetAttachmentByIdAsync(int attachmentId)
         {
