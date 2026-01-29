@@ -7,50 +7,71 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
     public class AssessmentDetailsRepository : IAssessmentDetailsRepository
     {
-        private readonly EEPZDbContext _context;
+        private readonly EEPZDbContext _dbContext;
 
-        public AssessmentDetailsRepository(EEPZDbContext context)
+        public AssessmentDetailsRepository(EEPZDbContext dbContext)
         {
-            _context = context;
+            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
+        /// <summary>
+        /// Retrieves all user profiles from the database.
+        /// </summary>
         public async Task<List<Userprofile>> GetAllUserProfilesAsync()
         {
-            return await _context.Userprofiles.AsNoTracking().ToListAsync();
+            return await _dbContext.Userprofiles.AsNoTracking().ToListAsync();
         }
 
+        /// <summary>
+        /// Retrieves all user authentications from the database.
+        /// </summary>
         public async Task<List<Userauthentication>> GetAllUserAuthenticationsAsync()
         {
-            return await _context.Userauthentications.AsNoTracking().ToListAsync();
+            return await _dbContext.Userauthentications.AsNoTracking().ToListAsync();
         }
 
+        /// <summary>
+        /// Retrieves all projects from the database.
+        /// </summary>
         public async Task<List<Project>> GetAllProjectsAsync()
         {
-            return await _context.Projects.AsNoTracking().ToListAsync();
+            return await _dbContext.Projects.AsNoTracking().ToListAsync();
         }
 
+        /// <summary>
+        /// Retrieves all project employees from the database.
+        /// </summary>
         public async Task<List<Projectemployee>> GetAllProjectEmployeesAsync()
         {
-            return await _context.Projectemployees.AsNoTracking().ToListAsync();
+            return await _dbContext.Projectemployees.AsNoTracking().ToListAsync();
         }
 
+        /// <summary>
+        /// Retrieves all self-assessments with their details and competencies.
+        /// </summary>
         public async Task<List<Selfassessment>> GetAllSelfAssessmentsWithDetailsAsync()
         {
-            return await _context.Selfassessments
+            return await _dbContext.Selfassessments
                 .Include(sa => sa.Assessmentdetails)
                     .ThenInclude(ad => ad.Competency)
                 .AsNoTracking()
                 .ToListAsync();
         }
 
+        /// <summary>
+        /// Retrieves all assessment reviews from the database.
+        /// </summary>
         public async Task<List<Assessmentreview>> GetAllAssessmentReviewsAsync()
         {
-            return await _context.Assessmentreviews.AsNoTracking().ToListAsync();
+            return await _dbContext.Assessmentreviews.AsNoTracking().ToListAsync();
         }
 
+        /// <summary>
+        /// Retrieves assignments with their form competencies where action is 'Send'.
+        /// </summary>
         public async Task<List<Assignment>> GetAssignmentsWithFormCompetenciesAsync()
         {
-            return await _context.Assignments
+            return await _dbContext.Assignments
                 .Where(a => a.Action == "Send")
                 .Include(a => a.Form)
                     .ThenInclude(f => f.Competencies)
@@ -58,15 +79,23 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 .ToListAsync();
         }
 
+        /// <summary>
+        /// Retrieves all self-assessment attachments from the database.
+        /// </summary>
         public async Task<List<Selfassessmentattachment>> GetAllSelfAssessmentAttachmentsAsync()
         {
-            return await _context.Selfassessmentattachments.AsNoTracking().ToListAsync();
+            return await _dbContext.Selfassessmentattachments.AsNoTracking().ToListAsync();
         }
 
+        /// <summary>
+        /// Retrieves a self-assessment attachment by its ID without tracking.
+        /// </summary>
         public async Task<Selfassessmentattachment?> GetAttachmentByIdAsync(int attachmentId)
         {
-            return await _context.Selfassessmentattachments
+            return await _dbContext.Selfassessmentattachments
+                .AsNoTracking()
                 .FirstOrDefaultAsync(a => a.AttachmentId == attachmentId);
         }
     }
 }
+
