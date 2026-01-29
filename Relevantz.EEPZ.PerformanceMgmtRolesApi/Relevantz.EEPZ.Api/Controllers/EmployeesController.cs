@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Core.Services.Interfaces;
+using Relevantz.EEPZ.Common.Constants;
 
 namespace PerformanceManagement.Controllers
 {
@@ -26,45 +27,38 @@ namespace PerformanceManagement.Controllers
         [HttpGet("all-managers")]
         public async Task<IActionResult> GetAllManagers()
         {
-            try
+            var result = await _employeesService.GetAllManagersAsync();
+
+            if (result.Success)
             {
-                var result = await _employeesService.GetAllManagersAsync();
-                if (result.Success)
-                    return Ok(new { success = true, data = result.Data });
-                return StatusCode(
-                    500,
-                    new { success = false, message = string.Join(", ", result.Errors) }
-                );
+                return Ok(new { success = true, data = result.Data });
             }
-            catch (System.Exception ex)
-            {
-                _logger.LogError($"Error in GetAllManagers: {ex.Message}");
-                return StatusCode(500, new { success = false, message = ex.Message });
-            }
+
+            return StatusCode(
+                500,
+                new { success = false, message = string.Join(", ", result.Errors) }
+            );
         }
 
         [HttpGet("user/{userId}/role")]
         public async Task<IActionResult> GetUserRole(int userId)
         {
-            try
+            var result = await _employeesService.GetUserRoleAsync(userId);
+
+            if (result.Success)
             {
-                var result = await _employeesService.GetUserRoleAsync(userId);
-                if (result.Success)
-                    return Ok(new { success = true, data = result.Data });
-                if (result.Errors.Contains("User not found"))
-                    return NotFound(
-                        new { success = false, message = string.Join(", ", result.Errors) }
-                    );
-                return StatusCode(
-                    500,
-                    new { success = false, message = string.Join(", ", result.Errors) }
-                );
+                return Ok(new { success = true, data = result.Data });
             }
-            catch (System.Exception ex)
+
+            if (result.Errors.Contains(ErrorMessages.UserNotFound))
             {
-                _logger.LogError($"Error in GetUserRole: {ex.Message}");
-                return StatusCode(500, new { success = false, message = ex.Message });
+                return NotFound(new { success = false, message = string.Join(", ", result.Errors) });
             }
+
+            return StatusCode(
+                500,
+                new { success = false, message = string.Join(", ", result.Errors) }
+            );
         }
     }
 }
