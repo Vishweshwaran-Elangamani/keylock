@@ -1,4 +1,4 @@
-namespace PerformanceManagement.Constants
+namespace Relevantz.EEPZ.Common.Constants
 {
     public static class ApiMessages
     {

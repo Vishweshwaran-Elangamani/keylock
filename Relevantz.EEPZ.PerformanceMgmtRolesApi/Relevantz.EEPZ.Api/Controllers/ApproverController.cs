@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.Services.Interfaces;
+using Relevantz.EEPZ.Common.Constants;
+
 
 namespace eepzbackend.Controllers
 {
@@ -21,26 +23,19 @@ namespace eepzbackend.Controllers
             _configuration = configuration;
         }
 
-        [HttpGet("submitted-forms")]
-        public async Task<IActionResult> GetSubmittedForms(
+        [HttpGet("submitted-appraisal-forms")]
+        public async Task<IActionResult> GetSubmittedAppraisalForms(
             int approverUserId,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 25
         )
         {
-            try
-            {
-                var forms = await _service.GetSubmittedFormsAsync(approverUserId, page, pageSize);
-                return Ok(new { success = true, data = forms });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
+            var forms = await _service.GetSubmittedFormsAsync(approverUserId, page, pageSize);
+            return Ok(new { success = true, data = forms });
         }
 
-        [HttpGet("submitted-l1-ratings")]
-        public async Task<IActionResult> GetSubmittedL1Ratings(
+        [HttpGet("submitted-l1-appraisal-ratings")]
+        public async Task<IActionResult> GetSubmittedL1AppraisalRatings(
             int approverUserId,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 25
@@ -50,8 +45,8 @@ namespace eepzbackend.Controllers
             return Ok(rows);
         }
 
-        [HttpGet("rework-forms")]
-        public async Task<IActionResult> GetReworkForms(
+        [HttpGet("pending-rework-forms")]
+        public async Task<IActionResult> GetPendingReworkForms(
             int approverUserId,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 25
@@ -89,19 +84,20 @@ namespace eepzbackend.Controllers
         }
 
         [HttpGet("assessment/{assessmentId:int}/decision")]
-        public async Task<IActionResult> GetLatestReviewerDecision(
-            int approverUserId,
-            int assessmentId
-        )
+        public async Task<IActionResult> GetLatestReviewerDecision(int approverUserId, int assessmentId)
         {
             var decision = await _service.GetLatestReviewerDecisionAsync(assessmentId);
-            if (decision == null)
-                return NotFound();
 
-            return Ok(new { decision = decision.Decision, note = decision.Note });
+
+            return Ok(new
+            {
+                decision = decision?.Decision ?? "",
+                note = decision?.Note ?? ""
+            });
         }
 
-        [HttpPost("reviews")]
+
+        [HttpPost("approverReviews")]
         public async Task<IActionResult> PostApproverReviews(
             int approverUserId,
             [FromBody] SubmitReviewDto body
@@ -146,58 +142,35 @@ namespace eepzbackend.Controllers
 
         [HttpGet("assessment/{assessmentId:int}/attachments")]
         public async Task<IActionResult> GetAssessmentAttachments(
-            int approverUserId,
-            int assessmentId
-        )
+    int approverUserId,
+    int assessmentId
+)
         {
-            try
-            {
-                var attachments = await _service.GetAssessmentAttachmentsAsync(assessmentId);
-                return Ok(new { success = true, data = attachments });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(
-                    500,
-                    new { success = false, message = $"Error retrieving attachments: {ex.Message}" }
-                );
-            }
+            var attachments = await _service.GetAssessmentAttachmentsAsync(assessmentId);
+            return Ok(new { success = true, data = attachments });
         }
+
 
         [HttpGet("attachments/{attachmentId:int}/download")]
-        public async Task<IActionResult> DownloadAttachment(int approverUserId, int attachmentId)
+public async Task<IActionResult> DownloadAttachment(int approverUserId, int attachmentId)
+{
+    var (success, fileBytes, contentType, fileName, errors) =
+        await _service.DownloadAttachmentFromGridFSAsync(attachmentId);
+
+    if (!success)
+    {
+        if (errors.Contains(Relevantz.EEPZ.Common.Constants.AttachmentConstants.ATTACHMENT_NOT_FOUND) ||
+            errors.Contains(Relevantz.EEPZ.Common.Constants.AttachmentConstants.FILE_NOT_FOUND))
         {
-            try
-            {
-                var (success, fileBytes, contentType, fileName, errors) =
-                    await _service.DownloadAttachmentFromGridFSAsync(attachmentId);
-
-                if (!success)
-                {
-                    if (
-                        errors.Contains("ATTACHMENT_NOT_FOUND") || errors.Contains("FILE_NOT_FOUND")
-                    )
-                    {
-                        return NotFound(
-                            new { success = false, message = string.Join(", ", errors) }
-                        );
-                    }
-                    return StatusCode(
-                        500,
-                        new { success = false, message = string.Join(", ", errors) }
-                    );
-                }
-
-                return File(fileBytes, contentType, fileName);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Download Error: {ex.Message}");
-                return StatusCode(
-                    500,
-                    new { success = false, message = $"Error downloading file: {ex.Message}" }
-                );
-            }
+            return NotFound(new { success = false, message = string.Join(", ", errors) });
         }
+       
+        return StatusCode(500, new { success = false, message = string.Join(", ", errors) });
+    }
+
+   
+    return File(fileBytes, contentType, fileName);
+}
+
     }
 }

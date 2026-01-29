@@ -2,7 +2,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using PerformanceManagement.Constants;
+using Relevantz.EEPZ.Common.Constants;
 
 namespace PerformanceManagement.Middleware
 {

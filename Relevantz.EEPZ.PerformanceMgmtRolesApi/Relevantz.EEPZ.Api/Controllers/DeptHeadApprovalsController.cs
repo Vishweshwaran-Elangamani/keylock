@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Core.Services.Interfaces;
-using PerformanceManagement.Constants;
+using Relevantz.EEPZ.Common.Constants;
 
-namespace PerformanceManagement.Controllers
+namespace Relevantz.EEPZ.Common.Constants
 {
     [ApiController]
     [Authorize]
