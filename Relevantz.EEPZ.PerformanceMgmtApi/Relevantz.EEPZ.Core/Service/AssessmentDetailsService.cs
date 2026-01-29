@@ -1,4 +1,3 @@
-// File: AssessmentDetailsService.cs
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -49,8 +48,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             try
             {
                 _logger.LogInformation("Fetching datasets from repository (sequential to avoid DbContext concurrency)...");
-
-                // ✅ Sequential awaits to avoid running multiple EF operations concurrently
                 var profiles         = await _repository.GetAllUserProfilesAsync()                 ?? new List<Userprofile>();
                 var userAuths        = await _repository.GetAllUserAuthenticationsAsync()          ?? new List<Userauthentication>();
                 var projects         = await _repository.GetAllProjectsAsync()                      ?? new List<Project>();

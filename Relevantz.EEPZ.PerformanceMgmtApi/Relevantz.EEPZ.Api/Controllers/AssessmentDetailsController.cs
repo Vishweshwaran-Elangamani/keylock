@@ -25,7 +25,7 @@ namespace PerformanceManagement.Controllers
             _logger = logger;
         }
 
-        // Standardized error response DTO
+
         private IActionResult ErrorResponse(string message, int statusCode = 400)
         {
             var response = new { success = false, message };
@@ -71,7 +71,7 @@ namespace PerformanceManagement.Controllers
             _logger.LogInformation("Sending HR file: FileName={FileName}, ContentType={ContentType}, Size={Size} bytes",
                 safeFileName, contentType, result.FileBytes.Length);
 
-            // Use built-in overload to set headers safely
+
             return File(result.FileBytes, contentType, safeFileName);
         }
 

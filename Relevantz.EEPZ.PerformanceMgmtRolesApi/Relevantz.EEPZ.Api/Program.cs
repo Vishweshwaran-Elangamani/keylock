@@ -11,16 +11,18 @@ using Relevantz.EEPZ.Data.Repository.Implementations;
 using Relevantz.EEPZ.Data.DBContexts;
 using System.IdentityModel.Tokens.Jwt;
 using Serilog;
+using PerformanceManagement.Middleware; // <-- Make sure this namespace matches your middleware file
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+// -----------------------------------------------
+// Shared uploads folder
+// -----------------------------------------------
 var sharedUploadsPath = Path.GetFullPath(Path.Combine(
     Directory.GetCurrentDirectory(),
     "..", "..",
     "SharedUploads"
 ));
-
 
 if (!Directory.Exists(sharedUploadsPath))
 {
@@ -32,10 +34,11 @@ else
     Console.WriteLine($"Shared uploads directory exists at: {sharedUploadsPath}");
 }
 
-
 builder.Services.AddSingleton(new FileUploadSettings { UploadPath = sharedUploadsPath });
 
-
+// -----------------------------------------------
+// Serilog
+// -----------------------------------------------
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
@@ -46,10 +49,11 @@ builder.Host.UseSerilog();
 Log.Information("Starting EEPZ Performance Management Application...");
 Log.Information("Shared Uploads Path: {Path}", sharedUploadsPath);
 
-
+// -----------------------------------------------
+// MVC / Swagger
+// -----------------------------------------------
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -85,21 +89,28 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 
-    options.CustomSchemaIds(type => type.FullName.Replace("+", "."));
+    options.CustomSchemaIds(type => type.FullName!.Replace("+", "."));
 });
 
-
+// -----------------------------------------------
+// EF Core
+// -----------------------------------------------
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<EEPZDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-
+// -----------------------------------------------
+// JWT Authentication
+// -----------------------------------------------
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey not configured");
 
 Log.Information("JWT Issuer: {Issuer}", jwtSettings["Issuer"]);
 Log.Information("JWT Audience: {Audience}", jwtSettings["Audience"]);
 Log.Information("JWT SecretKey Length: {Length} characters", secretKey.Length);
+
+// Ensure inbound claim mapping is not altered by defaults
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -118,18 +129,22 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
         ClockSkew = TimeSpan.Zero,
+
+        // Ensure your controllers can rely on ClaimTypes.NameIdentifier & ClaimTypes.Role
         RoleClaimType = ClaimTypes.Role,
-        NameClaimType = JwtRegisteredClaimNames.Sub
+        NameClaimType = ClaimTypes.NameIdentifier
     };
+
     options.Events = new JwtBearerEvents
     {
         OnMessageReceived = context =>
         {
             var authHeader = context.Request.Headers["Authorization"].ToString();
-            if (!string.IsNullOrEmpty(authHeader))
+            if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             {
-                var token = authHeader.Replace("Bearer ", "");
-                Log.Debug("Token received (first 30 chars): {Token}...", token.Substring(0, Math.Min(30, token.Length)));
+                var token = authHeader.Substring("Bearer ".Length).Trim();
+                // Avoid logging the raw token for security. Log only length or a hash if needed.
+                Log.Debug("Token received (length): {Length}", token.Length);
             }
             else
             {
@@ -142,12 +157,12 @@ builder.Services.AddAuthentication(options =>
         {
             Log.Error("Authentication failed: {Message}", context.Exception.Message);
 
-            if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+            if (context.Exception is SecurityTokenExpiredException)
             {
                 Log.Warning("Token expired");
                 context.Response.Headers.Add("Token-Expired", "true");
             }
-            else if (context.Exception.Message.Contains("signature"))
+            else if (context.Exception.Message.Contains("signature", StringComparison.OrdinalIgnoreCase))
             {
                 Log.Error("Signature validation failed - Check JWT SecretKey!");
             }
@@ -159,18 +174,29 @@ builder.Services.AddAuthentication(options =>
         {
             Log.Information("Token validated successfully");
 
-            var claims = context.Principal?.Claims.Select(c => $"{c.Type}={c.Value}");
-            Log.Debug("All Claims: {Claims}", string.Join(" | ", claims ?? new List<string>()));
-
-            var roleClaim = context.Principal?.FindFirst(ClaimTypes.Role);
-
-            if (roleClaim != null)
+            // Map sub -> nameidentifier if token doesn't carry it
+            var principal = context.Principal;
+            if (principal is not null)
             {
-                Log.Information("Role found: {Role}", roleClaim.Value);
-            }
-            else
-            {
-                Log.Warning("No role claim found in token");
+                var nameId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var sub = principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+                if (string.IsNullOrEmpty(nameId) && !string.IsNullOrEmpty(sub))
+                {
+                    var identity = principal.Identity as ClaimsIdentity;
+                    identity?.AddClaim(new Claim(ClaimTypes.NameIdentifier, sub));
+                    Log.Debug("Added NameIdentifier claim from 'sub'");
+                }
+
+                var roleClaim = principal.FindFirst(ClaimTypes.Role);
+                if (roleClaim != null)
+                {
+                    Log.Information("Role found: {Role}", roleClaim.Value);
+                }
+                else
+                {
+                    Log.Warning("No role claim found in token");
+                }
             }
 
             return Task.CompletedTask;
@@ -186,34 +212,24 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
+// -----------------------------------------------
+// DI Registrations (deduplicated)
+// -----------------------------------------------
+builder.Services.AddScoped<IApproverRepository, ApproverRepository>();
+builder.Services.AddScoped<IApproverService, ApproverService>();
 
-
-builder.Services.AddScoped<Relevantz.EEPZ.Data.Repository.Interfaces.IApproverRepository,
-                           Relevantz.EEPZ.Data.Repository.Implementations.ApproverRepository>();
-builder.Services.AddScoped<Relevantz.EEPZ.Core.Services.Interfaces.IApproverService,
-                           Relevantz.EEPZ.Core.Services.Implementations.ApproverService>();
-
-
-builder.Services.AddScoped<Relevantz.EEPZ.Data.Repository.Interfaces.IReviewerRepository,
-                           Relevantz.EEPZ.Data.Repository.Implementations.ReviewerRepository>();
-builder.Services.AddScoped<Relevantz.EEPZ.Core.Services.Interfaces.IReviewerService,
-                           Relevantz.EEPZ.Core.Services.Implementations.ReviewerService>();
-
-
-builder.Services.AddScoped<IDeptHeadApprovalsService, DeptHeadApprovalsService>();
-
+builder.Services.AddScoped<IReviewerRepository, ReviewerRepository>();
+builder.Services.AddScoped<IReviewerService, ReviewerService>();
 
 builder.Services.AddScoped<IDeptHeadApprovalsRepository, DeptHeadApprovalsRepository>();
 builder.Services.AddScoped<IDeptHeadApprovalsService, DeptHeadApprovalsService>();
 
-
-builder.Services.AddScoped<IDeptHeadApprovalsRepository, DeptHeadApprovalsRepository>();
 builder.Services.AddScoped<IEmployeesRepository, EmployeesRepository>();
 builder.Services.AddScoped<IEmployeesService, EmployeesService>();
 
-
-
-
+// -----------------------------------------------
+// CORS
+// -----------------------------------------------
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -225,10 +241,11 @@ builder.Services.AddCors(options =>
     });
 });
 
-
 var app = builder.Build();
 
-
+// -----------------------------------------------
+// Pipeline
+// -----------------------------------------------
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -238,6 +255,8 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = string.Empty;
     });
 }
+
+// Serilog request logging
 app.UseSerilogRequestLogging(options =>
 {
     options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
@@ -247,11 +266,19 @@ app.UseSerilogRequestLogging(options =>
         diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
     };
 });
+
+// 🔐 Global exception handling early to catch downstream errors
+app.UseGlobalExceptionHandling();
+
 app.UseHttpsRedirection();
+
 app.UseCors("AllowAll");
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
+
 try
 {
     Log.Information("EEPZ Performance Management API started successfully on port 5222");
@@ -267,9 +294,10 @@ finally
     Log.CloseAndFlush();
 }
 
-
+// -----------------------------------------------
+// Support class
+// -----------------------------------------------
 public class FileUploadSettings
 {
     public string UploadPath { get; set; } = string.Empty;
 }
-
