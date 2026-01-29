@@ -157,29 +157,29 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Gets detailed approval information including all attachments and assignment details.
         /// Enforces access control for requester and approver only.
         /// </summary>
-        [HttpGet("api/approvals/{approvalId}/details")]
-        public async Task<IActionResult> GetApprovalDetails(int approvalId)
+        [HttpGet("api/approvals/{Id}/details")]
+        public async Task<IActionResult> GetApprovalDetails(int Id)
         {
             var employeeId = GetCurrentEmployeeId();
 
             Log.Debug(
                 "GetApprovalDetails API called. ApprovalId={ApprovalId}, EmployeeId={EmployeeId}",
-                approvalId,
+                Id,
                 employeeId
             );
 
-            var result = await _approvalService.GetApprovalDetails(employeeId, approvalId);
+            var result = await _approvalService.GetApprovalDetails(employeeId, Id);
 
             if (result.Success)
             {
-                Log.Debug("GetApprovalDetails API succeeded. ApprovalId={ApprovalId}", approvalId);
+                Log.Debug("GetApprovalDetails API succeeded. ApprovalId={ApprovalId}", Id);
                 return Ok(result);
             }
             else
             {
                 Log.Warning(
                     "GetApprovalDetails API failed. ApprovalId={ApprovalId}, Message={Message}",
-                    approvalId,
+                    Id,
                     result.Message
                 );
                 return BadRequest(result);
@@ -194,24 +194,24 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Downloads attachment file from approval record.
         /// Returns file with appropriate MIME type and content disposition header.
         /// </summary>
-        [HttpGet("api/lnd-approvals/{approvalId}/download")]
-        public async Task<IActionResult> GetApprovalAttachmentDownload(int approvalId)
+        [HttpGet("api/lnd-approvals/{Id}/download")]
+        public async Task<IActionResult> GetApprovalAttachmentDownload(int Id)
         {
             var employeeId = GetCurrentEmployeeId();
 
             Log.Information(
                 "DownloadApprovalAttachment API called. ApprovalId={ApprovalId}, EmployeeId={EmployeeId}",
-                approvalId,
+                Id,
                 employeeId
             );
 
-            var result = await _approvalService.GetApprovalAttachment(employeeId, approvalId);
+            var result = await _approvalService.GetApprovalAttachment(employeeId, Id);
 
             if (!result.Success)
             {
                 Log.Warning(
                     "DownloadApprovalAttachment API failed. ApprovalId={ApprovalId}, Message={Message}",
-                    approvalId,
+                    Id,
                     result.Message
                 );
                 return BadRequest(result);
@@ -223,7 +223,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             Log.Information(
                 "DownloadApprovalAttachment API succeeded. ApprovalId={ApprovalId}, FileName={FileName}, FileSize={FileSize} bytes",
-                approvalId,
+                Id,
                 fileName,
                 fileBytes.Length
             );
@@ -235,24 +235,24 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Downloads assignment completion proof document.
         /// Validates access for mentee, SME, or reporting manager only.
         /// </summary>
-        [HttpGet("api/lnd-approvals/assignments/{assignmentId}/download-proof")]
-        public async Task<IActionResult> GetAssignmentProofDownload(int assignmentId)
+        [HttpGet("api/lnd-approvals/assignments/{Id}/download-proof")]
+        public async Task<IActionResult> GetAssignmentProofDownload(int Id)
         {
             var employeeId = GetCurrentEmployeeId();
 
             Log.Information(
                 "DownloadAssignmentProof API called. AssignmentId={AssignmentId}, EmployeeId={EmployeeId}",
-                assignmentId,
+                Id,
                 employeeId
             );
 
-            var result = await _approvalService.GetAssignmentProof(employeeId, assignmentId);
+            var result = await _approvalService.GetAssignmentProof(employeeId, Id);
 
             if (!result.Success)
             {
                 Log.Warning(
                     "DownloadAssignmentProof API failed. AssignmentId={AssignmentId}, Message={Message}",
-                    assignmentId,
+                    Id,
                     result.Message
                 );
                 return BadRequest(result);
@@ -264,7 +264,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             Log.Information(
                 "DownloadAssignmentProof API succeeded. AssignmentId={AssignmentId}, FileName={FileName}, FileSize={FileSize} bytes",
-                assignmentId,
+                Id,
                 fileName,
                 fileBytes.Length
             );
@@ -280,27 +280,27 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Previews approval attachment in browser without download.
         /// Supports range processing for video and large file streaming.
         /// </summary>
-        [HttpGet("api/approvals/{approvalId}/preview-attachment")]
-        public async Task<IActionResult> GetApprovalAttachmentPreview(int approvalId)
+        [HttpGet("api/approvals/{Id}/preview-attachment")]
+        public async Task<IActionResult> GetApprovalAttachmentPreview(int Id)
         {
             var employeeId = GetCurrentEmployeeId();
 
             Log.Debug(
                 "GetApprovalAttachmentPreview API called. ApprovalId={ApprovalId}, EmployeeId={EmployeeId}",
-                approvalId,
+                Id,
                 employeeId
             );
 
             var result = await _approvalService.GetApprovalAttachmentPreview(
                 employeeId,
-                approvalId
+                Id
             );
 
             if (!result.Success)
             {
                 Log.Warning(
                     "GetApprovalAttachmentPreview API failed. ApprovalId={ApprovalId}, Message={Message}",
-                    approvalId,
+                    Id,
                     result.Message
                 );
                 return BadRequest(result);
@@ -308,7 +308,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             Log.Debug(
                 "GetApprovalAttachmentPreview API succeeded. ApprovalId={ApprovalId}, FileName={FileName}",
-                approvalId,
+                Id,
                 result.Data.FileName
             );
 
@@ -324,24 +324,24 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Previews assignment proof document in browser without download.
         /// Supports range processing for video and large file streaming.
         /// </summary>
-        [HttpGet("api/lnd-approvals/assignments/{assignmentId}/proof/preview")]
-        public async Task<IActionResult> GetAssignmentProofPreview(int assignmentId)
+        [HttpGet("api/lnd-approvals/assignments/{Id}/proof/preview")]
+        public async Task<IActionResult> GetAssignmentProofPreview(int Id)
         {
             var employeeId = GetCurrentEmployeeId();
 
             Log.Debug(
                 "GetAssignmentProofPreview API called. AssignmentId={AssignmentId}, EmployeeId={EmployeeId}",
-                assignmentId,
+                Id,
                 employeeId
             );
 
-            var result = await _approvalService.GetAssignmentProofPreview(employeeId, assignmentId);
+            var result = await _approvalService.GetAssignmentProofPreview(employeeId, Id);
 
             if (!result.Success)
             {
                 Log.Warning(
                     "GetAssignmentProofPreview API failed. AssignmentId={AssignmentId}, Message={Message}",
-                    assignmentId,
+                    Id,
                     result.Message
                 );
                 return BadRequest(result);
@@ -349,7 +349,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             Log.Debug(
                 "GetAssignmentProofPreview API succeeded. AssignmentId={AssignmentId}, FileName={FileName}",
-                assignmentId,
+                Id,
                 result.Data.FileName
             );
 

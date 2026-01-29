@@ -145,26 +145,26 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// <summary>
         /// Gets paginated skills for a specific employee by ID (HR only)
         /// </summary>
-        [HttpGet("api/lnd-hr/skills/employee/{employeeId}")]
+        [HttpGet("api/lnd-hr/skills/employee/{Id}")]
         public async Task<IActionResult> GetEmployeeSkillsById(
-            int employeeId,
+            int Id,
             [FromQuery] EmployeeSkillsByIdRequestModel request
         )
         {
             Log.Information(
                 "GetEmployeeSkillsById API called. EmployeeId={EmployeeId}, Page={PageNumber}, SearchTerm={SearchTerm}",
-                employeeId,
+                Id,
                 request.PageNumber,
                 request.SearchTerm ?? "none"
             );
 
-            var result = await _hrService.GetEmployeeSkillsById(employeeId, request);
+            var result = await _hrService.GetEmployeeSkillsById(Id, request);
 
             if (result.Success)
             {
                 Log.Information(
                     "GetEmployeeSkillsById API succeeded. EmployeeId={EmployeeId}, TotalCount={TotalCount}",
-                    employeeId,
+                    Id,
                     result.Data?.TotalCount ?? 0
                 );
                 return Ok(result);
@@ -173,14 +173,14 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             {
                 Log.Warning(
                     "GetEmployeeSkillsById API failed. EmployeeId={EmployeeId}, Message={Message}",
-                    employeeId,
+                    Id,
                     result.Message
                 );
                 return BadRequest(result);
             }
         }
 
-        #endregion
+        #endregion  
 
         #region SME Management
 
