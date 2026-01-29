@@ -20,7 +20,7 @@ namespace eepzbackend.Controllers
             _configuration = configuration;
         }
 
-        [HttpGet("submitted-forms")]
+        [HttpGet("forms")]
         public async Task<IActionResult> GetSubmittedForms(
             int reviewerUserId,
             [FromQuery] int page = 1,
@@ -112,54 +112,26 @@ namespace eepzbackend.Controllers
             int assessmentId
         )
         {
-            try
-            {
-                var attachments = await _service.GetAssessmentAttachmentsAsync(assessmentId);
-                return Ok(new { success = true, data = attachments });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(
-                    500,
-                    new { success = false, message = $"Error retrieving attachments: {ex.Message}" }
-                );
-            }
+            var attachments = await _service.GetAssessmentAttachmentsAsync(assessmentId);
+            return Ok(new { success = true, data = attachments });
         }
 
         [HttpGet("attachments/{attachmentId:int}/download")]
         public async Task<IActionResult> DownloadAttachment(int approverUserId, int attachmentId)
         {
-            try
-            {
-                var (success, fileBytes, contentType, fileName, errors) =
-                    await _service.DownloadAttachmentFromGridFSAsync(attachmentId);
+            var (success, fileBytes, contentType, fileName, errors) =
+                await _service.DownloadAttachmentFromGridFSAsync(attachmentId);
 
-                if (!success)
+            if (!success)
+            {
+                if (errors.Contains("ATTACHMENT_NOT_FOUND") || errors.Contains("FILE_NOT_FOUND"))
                 {
-                    if (
-                        errors.Contains("ATTACHMENT_NOT_FOUND") || errors.Contains("FILE_NOT_FOUND")
-                    )
-                    {
-                        return NotFound(
-                            new { success = false, message = string.Join(", ", errors) }
-                        );
-                    }
-                    return StatusCode(
-                        500,
-                        new { success = false, message = string.Join(", ", errors) }
-                    );
+                    return NotFound(new { success = false, message = string.Join(", ", errors) });
                 }
+                return StatusCode(500, new { success = false, message = string.Join(", ", errors) });
+            }
 
-                return File(fileBytes, contentType, fileName);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Download Error: {ex.Message}");
-                return StatusCode(
-                    500,
-                    new { success = false, message = $"Error downloading file: {ex.Message}" }
-                );
-            }
+            return File(fileBytes, contentType, fileName);
         }
     }
 }
