@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Constants;
+using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repository.Interface;
@@ -33,7 +33,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 .ToListAsync();
 
             return result;
-        }      
+        }
 
         public async Task<GoalAttachment?> GetAttachmentByIdAsync(int attachmentId)
         {

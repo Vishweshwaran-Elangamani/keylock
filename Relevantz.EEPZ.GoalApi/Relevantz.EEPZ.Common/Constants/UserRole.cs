@@ -69,5 +69,4 @@ namespace Relevantz.EEPZ.Common.Constants
             return ADMIN_ROLES.Contains(role ?? "");
         }
     }
-}  
-
+}

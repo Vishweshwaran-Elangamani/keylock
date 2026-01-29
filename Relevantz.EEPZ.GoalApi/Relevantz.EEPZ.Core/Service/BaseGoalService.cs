@@ -1,3 +1,5 @@
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
@@ -6,8 +8,6 @@ using Relevantz.EEPZ.Common.Exceptions;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repository.Interface;
-using MapsterMapper;
-using Mapster;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -18,9 +18,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private readonly IMapper _mapper;
 
         public BaseGoalService(
-            IBaseGoalRepository repo, 
+            IBaseGoalRepository repo,
             IWebHostEnvironment environment,
-            IMapper mapper)
+            IMapper mapper
+        )
         {
             _repo = repo;
             _environment = environment;
@@ -178,7 +179,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 currentUserEmployeeMasterId
             );
             var isLeadership = currentUserRole == USER_ROLE.LEADERSHIP;
-            
+
             switch (goal.GoalType?.ToLower())
             {
                 case GOAL_TYPE.SELF:
@@ -255,7 +256,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             // Calculate progress
             goalDetail.ProgressPercent = await CalculateGoalProgressAsync(
-                goalId, 
+                goalId,
                 currentUserEmployeeMasterId
             );
 
@@ -267,7 +268,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             // Map checklist with completion status
             goalDetail.Checklist = await MapChecklistItemsAsync(
-                goal.GoalChecklists.ToList(), 
+                goal.GoalChecklists.ToList(),
                 currentUserEmployeeMasterId
             );
 
@@ -275,32 +276,37 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             goalDetail.Assignees = await GetAssigneesWithDetailsAsync(goalId);
 
             // Set permission flags
-            goalDetail.CanEdit = goal.CreatedBy == currentUserEmployeeMasterId
+            goalDetail.CanEdit =
+                goal.CreatedBy == currentUserEmployeeMasterId
                 && goal.Goalstatus != GOAL_STATUS.COMPLETED
                 && goal.Goalstatus != GOAL_STATUS.CLOSED;
-            
+
             goalDetail.CanComment = await CanCommentOnGoalAsync(
                 goalId,
                 currentUserEmployeeMasterId,
                 currentUserRole
             );
-            
+
             goalDetail.CanMarkComplete = await CanMarkCompleteAsync(
-                goalId, 
+                goalId,
                 currentUserEmployeeMasterId
             );
 
             // Calculate overdue status
-            bool isOverdue = goal.Goalendat.HasValue
+            bool isOverdue =
+                goal.Goalendat.HasValue
                 && goal.Goalendat.Value < DateTime.UtcNow
                 && goal.Goalstatus != GOAL_STATUS.COMPLETED
                 && goal.Goalstatus != GOAL_STATUS.CLOSED;
-            
+
             goalDetail.IsOverdue = isOverdue;
-            
-            goalDetail.CanRequestReopen = isOverdue
-                && (goal.CreatedBy == currentUserEmployeeMasterId
-                    || await _repo.IsUserAssignedToGoalAsync(goalId, currentUserEmployeeMasterId));
+
+            goalDetail.CanRequestReopen =
+                isOverdue
+                && (
+                    goal.CreatedBy == currentUserEmployeeMasterId
+                    || await _repo.IsUserAssignedToGoalAsync(goalId, currentUserEmployeeMasterId)
+                );
 
             goalDetail.HasPendingApproval = await _repo.HasPendingApprovalAsync(
                 goalId,
@@ -310,10 +316,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return goalDetail;
         }
 
-        private async Task<int> CalculateGoalProgressAsync(int goalId, int currentUserEmployeeMasterId)
+        private async Task<int> CalculateGoalProgressAsync(
+            int goalId,
+            int currentUserEmployeeMasterId
+        )
         {
             var latestLog = await _repo.GetLatestProgressLogAsync(goalId);
-            
+
             if (latestLog != null && latestLog.Source == PROGRESS_SOURCE.MANUAL)
             {
                 return latestLog.ProgressPercent ?? 0;
@@ -335,7 +344,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 if (isCompleted)
                     completedCount++;
             }
-            
+
             return (int)Math.Round((double)completedCount / allChecklistItems.Count * 100);
         }
 
@@ -349,8 +358,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         private async Task<List<GoalChecklistItemModel>> MapChecklistItemsAsync(
-            List<GoalChecklist> checklists, 
-            int currentUserEmployeeMasterId)
+            List<GoalChecklist> checklists,
+            int currentUserEmployeeMasterId
+        )
         {
             var checklistModels = new List<GoalChecklistItemModel>();
 
@@ -358,7 +368,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 // Use Mapster for base mapping
                 var item = _mapper.Map<GoalChecklistItemModel>(checklist);
-                
+
                 // Set completion status
                 item.IsCompletedForCurrentUser = checklist.Goalchecklistprogresses.Any(p =>
                     p.UserId == (checklist.AddedFor ?? currentUserEmployeeMasterId)
@@ -389,7 +399,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 // Use Mapster for base mapping
                 var assignee = _mapper.Map<AssigneeModel>(assignment);
-                
+
                 // Set employee details
                 var profile = edm.Employee.Userprofile;
                 assignee.Name = $"{profile.FirstName} {profile.LastName}".Trim();
@@ -402,9 +412,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         public async Task<CanMarkCompleteModel> GetMarkCompleteEligibilityAsync(
-            int goalId, 
-            int employeeMasterId, 
-            string role)
+            int goalId,
+            int employeeMasterId,
+            string role
+        )
         {
             var goal = await _repo.GetGoalByIdAsync(goalId);
             if (goal == null)
@@ -413,7 +424,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 {
                     CanComplete = false,
                     Reason = "Goal not found",
-                    Reasons = new List<string> { "Goal not found" }
+                    Reasons = new List<string> { "Goal not found" },
                 };
             }
 

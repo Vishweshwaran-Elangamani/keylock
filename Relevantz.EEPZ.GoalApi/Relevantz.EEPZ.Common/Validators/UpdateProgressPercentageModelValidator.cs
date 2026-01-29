@@ -3,7 +3,7 @@ using Relevantz.EEPZ.Common.Models;
 
 namespace Relevantz.EEPZ.Common.Validators
 {
-    public class ManualProgressUpdateModelValidator : AbstractValidator<ManualProgressUpdateModel>
+    public class ManualProgressUpdateModelValidator : AbstractValidator<UpdateProgressPercentageModel>
     {
         private static readonly string[] ValidSources = { "manual", "auto" };
 

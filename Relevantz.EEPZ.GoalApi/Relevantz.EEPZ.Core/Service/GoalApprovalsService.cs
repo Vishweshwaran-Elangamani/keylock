@@ -1,4 +1,6 @@
 using FluentValidation;
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
@@ -7,8 +9,6 @@ using Relevantz.EEPZ.Common.Exceptions;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repository.Interface;
-using MapsterMapper;  // ← ADD THIS
-using Mapster;        // ← ADD THIS
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -23,7 +23,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private readonly IValidator<CreateApprovalRequestModel> _createApprovalValidator;
         private readonly IValidator<ApprovalDesicionModel> _approvalDecisionValidator;
         private readonly IValidator<ApprovalQueryModel> _approvalQueryValidator;
-        private readonly IMapper _mapper;  // ← ADD THIS
+        private readonly IMapper _mapper;
 
         public GoalApprovalsService(
             IGoalApprovalsRepository repo,
@@ -35,7 +35,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             IValidator<CreateApprovalRequestModel> createApprovalValidator,
             IValidator<ApprovalDesicionModel> approvalDecisionValidator,
             IValidator<ApprovalQueryModel> approvalQueryValidator,
-            IMapper mapper)  // ← ADD THIS
+            IMapper mapper
+        )
         {
             _repo = repo;
             _baseRepo = baseRepo;
@@ -46,7 +47,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _createApprovalValidator = createApprovalValidator;
             _approvalDecisionValidator = approvalDecisionValidator;
             _approvalQueryValidator = approvalQueryValidator;
-            _mapper = mapper;  // ← ADD THIS
+            _mapper = mapper;
         }
 
         // CreateApprovalRequestAsync remains UNCHANGED - no mapping needed
@@ -670,9 +671,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         // Helper method to map attachments
-        private async Task<(List<GoalAttachmentModel>, List<GoalAttachmentModel>?)> MapAttachmentsForApprovalAsync(
-            GoalApproval approval
-        )
+        private async Task<(
+            List<GoalAttachmentModel>,
+            List<GoalAttachmentModel>?
+        )> MapAttachmentsForApprovalAsync(GoalApproval approval)
         {
             var allAttachments = new List<GoalAttachmentModel>();
             List<GoalAttachmentModel>? proofAttachments = null;
@@ -694,8 +696,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 {
                     proofAttachments = allAttachments
                         .Where(att =>
-                            att.LinkedApprovalId == approval.ApprovalId
-                            && att.IsProofOfCompletion
+                            att.LinkedApprovalId == approval.ApprovalId && att.IsProofOfCompletion
                         )
                         .ToList();
                 }
@@ -982,9 +983,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return assignees;
         }
 
-        private async Task<(List<GoalAttachmentModel>, List<GoalAttachmentModel>)> MapAllAttachmentsAsync(
-            GoalApproval approval
-        )
+        private async Task<(
+            List<GoalAttachmentModel>,
+            List<GoalAttachmentModel>
+        )> MapAllAttachmentsAsync(GoalApproval approval)
         {
             var allAttachments = new List<GoalAttachmentModel>();
             var proofAttachments = new List<GoalAttachmentModel>();

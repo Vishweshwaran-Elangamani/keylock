@@ -3,7 +3,7 @@ using Relevantz.EEPZ.Common.Models;
 
 namespace Relevantz.EEPZ.Common.Validators
 {
-    public class ToggleChecklistModelValidator : AbstractValidator<ToggleChecklistModel>
+    public class ToggleChecklistModelValidator : AbstractValidator<UpdateChecklistStatusModel>
     {
         public ToggleChecklistModelValidator()
         {

@@ -1,14 +1,15 @@
 using FluentValidation;
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Exceptions;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repository.Interface;
-using MapsterMapper;  // ← ADD THIS
-using Mapster;        // ← ADD THIS
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -19,9 +20,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private readonly IGoalRepository _goalRepo;
         private readonly IBaseGoalService _baseService;
         private readonly IWebHostEnvironment _environment;
-        private readonly IValidator<ToggleChecklistModel> _toggleChecklistValidator;
-        private readonly IValidator<ManualProgressUpdateModel> _manualProgressValidator;
-        private readonly IMapper _mapper;  // ← ADD THIS
+        private readonly IValidator<UpdateChecklistStatusModel> _updateChecklistStatusValidator;
+        private readonly IValidator<UpdateProgressPercentageModel> _updateProgressPercentageModelValidator;
+        private readonly IMapper _mapper;
 
         public GoalProgressService(
             IGoalProgressRepository repo,
@@ -29,28 +30,28 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             IGoalRepository goalRepository,
             IBaseGoalService baseService,
             IWebHostEnvironment environment,
-            IValidator<ToggleChecklistModel> toggleChecklistValidator,
-            IValidator<ManualProgressUpdateModel> manualProgressValidator,
-            IMapper mapper)  // ← ADD THIS
+            IValidator<UpdateChecklistStatusModel> updateChecklistStatusValidator,
+            IValidator<UpdateProgressPercentageModel> updateProgressPercentageModelValidator,
+            IMapper mapper
+        )
         {
             _repo = repo;
             _baseRepo = baseRepo;
             _goalRepo = goalRepository;
             _baseService = baseService;
             _environment = environment;
-            _toggleChecklistValidator = toggleChecklistValidator;
-            _manualProgressValidator = manualProgressValidator;
-            _mapper = mapper;  // ← ADD THIS
+            _updateChecklistStatusValidator = updateChecklistStatusValidator;
+            _updateProgressPercentageModelValidator = updateProgressPercentageModelValidator;
+            _mapper = mapper;
         }
 
-        // ToggleChecklistAsync remains UNCHANGED - no mapping needed
-        public async Task<ApiResponseModel> ToggleChecklistAsync(
+        public async Task<ApiResponseModel> UpdateChecklistStatusAsync(
             int goalId,
-            ToggleChecklistModel dto,
+            UpdateChecklistStatusModel dto,
             int currentUserEmployeeMasterId
         )
         {
-            var validationResult = await _toggleChecklistValidator.ValidateAsync(dto);
+            var validationResult = await _updateChecklistStatusValidator.ValidateAsync(dto);
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
@@ -167,14 +168,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
         }
 
-        // UpdateManualProgressAsync remains UNCHANGED - no mapping needed
-        public async Task<ApiResponseModel> UpdateManualProgressAsync(
+        public async Task<ApiResponseModel> UpdateProgressPercentageAsync(
             int goalId,
-            ManualProgressUpdateModel dto,
+            UpdateProgressPercentageModel dto,
             int currentUserEmployeeMasterId
         )
         {
-            var validationResult = await _manualProgressValidator.ValidateAsync(dto);
+            var validationResult = await _updateProgressPercentageModelValidator.ValidateAsync(dto);
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
@@ -290,8 +290,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return totalProgress / relevantAssignees.Count;
         }
 
-        // GetCascadingProgressAsync remains UNCHANGED - pure calculation
-        public async Task<int> GetCascadingProgressAsync(int goalId, int userId)
+        public async Task<int> GetDependentProgressAsync(int goalId, int userId)
         {
             var goal = await _baseRepo.GetGoalByIdAsync(goalId);
             if (goal == null)
@@ -308,7 +307,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var subordinateProgressList = new List<int>();
             foreach (var subId in subordinates)
             {
-                var subProgress = await GetCascadingProgressAsync(goalId, subId);
+                var subProgress = await GetDependentProgressAsync(goalId, subId);
                 subordinateProgressList.Add(subProgress);
             }
 
@@ -322,8 +321,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return cascadingProgress;
         }
 
-        // REFACTORED: GetProgressHierarchyAsync with Mapster
-        public async Task<GoalProgressHierarchyModel> GetProgressHierarchyAsync(
+        public async Task<GoalProgressHierarchyModel> FetchGoalProgressTreeAsync(
             int goalId,
             int userId
         )
@@ -344,7 +342,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             // Get subordinates
             var subordinateIds = await _repo.GetSubordinatesAssignedToGoalAsync(goalId, userId);
             var subordinateDetails = await BuildSubordinateProgressListAsync(
-                goalId, 
+                goalId,
                 subordinateIds
             );
 
@@ -352,10 +350,43 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             int? teamProgress = null;
             if (subordinateDetails.Any())
             {
-                teamProgress = (int)subordinateDetails.Average(s => s.Progress);
+                var subordinateProgressList = new List<int>();
+
+                foreach (var subId in subordinateIds)
+                {
+                    var subUser = await _baseRepo.GetEmployeeDetailsByMasterIdAsync(subId);
+
+                    if (subUser != null)
+                    {
+                        var subProgress = await GetDependentProgressAsync(goalId, subId);
+                        subordinateProgressList.Add(subProgress);
+
+                        var subItems = await _repo.GetUserOwnChecklistItemsAsync(goalId, subId);
+                        var subItemsCompleted = await _repo.CountUserOwnCompletedItemsAsync(
+                            goalId,
+                            subId
+                        );
+
+                        subordinateDetails.Add(
+                            new SubordinateProgressModel
+                            {
+                                UserId = subId,
+                                UserName =
+                                    $"{subUser.Employee.Userprofile.FirstName} {subUser.Employee.Userprofile.LastName}",
+                                Role = subUser.Role.RoleName,
+                                Progress = subProgress,
+                                ItemCount = subItems.Count,
+                                ItemsCompleted = subItemsCompleted,
+                            }
+                        );
+                    }
+                }
+
+                teamProgress = subordinateProgressList.Any()
+                    ? (int)subordinateProgressList.Average()
+                    : 0;
             }
 
-            // Calculate weights and cascading progress
             var userRole = await _baseRepo.GetUserRoleAsync(userId);
             var (ownWeight, teamWeight) = GetWeightsForRole(userRole);
 
@@ -437,7 +468,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 if (subUser != null)
                 {
-                    var subProgress = await GetCascadingProgressAsync(goalId, subId);
+                    var subProgress = await GetDependentProgressAsync(goalId, subId);
                     var subItems = await _repo.GetUserOwnChecklistItemsAsync(goalId, subId);
                     var subItemsCompleted = await _repo.CountUserOwnCompletedItemsAsync(
                         goalId,

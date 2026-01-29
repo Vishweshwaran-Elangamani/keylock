@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
-using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Models;
 
 namespace Relevantz.EEPZ.Core.Services.Interface
 {
@@ -32,7 +32,5 @@ namespace Relevantz.EEPZ.Core.Services.Interface
         Task<List<ProjectModel>> GetUserProjectsAsync(int employeeMasterId);
         Task<List<ProjectModel>> GetAllProjectsAsync();
         Task<ProjectModel> GetProjectAsync(int projectId);
-
-       
     }
 }

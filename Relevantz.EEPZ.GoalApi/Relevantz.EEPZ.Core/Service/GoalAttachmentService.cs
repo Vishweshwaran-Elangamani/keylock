@@ -1,3 +1,5 @@
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
@@ -6,8 +8,6 @@ using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repository.Interface;
-using MapsterMapper;  // ← ADD THIS
-using Mapster;        // ← ADD THIS
 
 namespace Relevantz.EEPZ.Core.Service
 {
@@ -17,25 +17,27 @@ namespace Relevantz.EEPZ.Core.Service
         private readonly IBaseGoalRepository _baseRepo;
         private readonly IBaseGoalService _baseService;
         private readonly IFileStorageService _fileStorage;
-        private readonly IMapper _mapper;  // ← ADD THIS
+        private readonly IMapper _mapper;
 
         public GoalAttachmentService(
             IGoalAttachmentRepository repo,
             IBaseGoalRepository baseRepo,
             IBaseGoalService baseService,
             IFileStorageService fileStorage,
-            IMapper mapper)  // ← ADD THIS
+            IMapper mapper
+        )
         {
             _repo = repo;
             _baseRepo = baseRepo;
             _baseService = baseService;
             _fileStorage = fileStorage;
-            _mapper = mapper;  // ← ADD THIS
+            _mapper = mapper;
         }
 
         public async Task<FilePreviewResult> GetAttachmentFilePreviewAsync(
             int attachmentId,
-            int currentUserEmployeeMasterId)
+            int currentUserEmployeeMasterId
+        )
         {
             var attachment = await _repo.GetAttachmentByIdAsync(attachmentId);
 
@@ -79,7 +81,7 @@ namespace Relevantz.EEPZ.Core.Service
             {
                 FileBytes = fileBytes,
                 ContentType = contentType,
-                FileName = displayFileName
+                FileName = displayFileName,
             };
         }
 
@@ -124,7 +126,7 @@ namespace Relevantz.EEPZ.Core.Service
 
             // Use Mapster for base mapping
             var response = _mapper.Map<FileUploadResponseModel>(attachment);
-            
+
             // Set file-specific properties
             response.FileName = file.FileName;
             response.FileSize = file.Length;

@@ -12,5 +12,4 @@ namespace Relevantz.EEPZ.Common.Constants
             return ALL.Contains(order?.ToLower() ?? "");
         }
     }
-
 }

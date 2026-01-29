@@ -1,6 +1,5 @@
 namespace Relevantz.EEPZ.Common.Constants
 {
-
     // Approval type enumeration
     public static class APPROVAL_TYPE
     {

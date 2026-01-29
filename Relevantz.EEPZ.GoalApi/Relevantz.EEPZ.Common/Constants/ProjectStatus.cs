@@ -1,7 +1,5 @@
 namespace Relevantz.EEPZ.Common.Constants
 {
-
-
     public static class PROJECT_STATUS
     {
         public const string ACTIVE = "Active";

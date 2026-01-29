@@ -1,4 +1,6 @@
 using FluentValidation;
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
@@ -7,8 +9,6 @@ using Relevantz.EEPZ.Common.Exceptions;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repository.Interface;
-using MapsterMapper;  // ← ADD THIS
-using Mapster;        // ← ADD THIS
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -25,7 +25,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private readonly IValidator<UpdateGoalModel> _updateGoalValidator;
         private readonly IValidator<AssignGoalModel> _assignGoalValidator;
         private readonly IValidator<GoalQueryModel> _goalQueryValidator;
-        private readonly IMapper _mapper;  // ← ADD THIS
+        private readonly IMapper _mapper;
 
         public GoalService(
             IGoalRepository repo,
@@ -39,7 +39,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             IValidator<UpdateGoalModel> updateGoalValidator,
             IValidator<AssignGoalModel> assignGoalValidator,
             IValidator<GoalQueryModel> goalQueryValidator,
-            IMapper mapper)  // ← ADD THIS
+            IMapper mapper
+        )
         {
             _repo = repo;
             _baseRepo = baseRepo;
@@ -52,7 +53,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _updateGoalValidator = updateGoalValidator;
             _assignGoalValidator = assignGoalValidator;
             _goalQueryValidator = goalQueryValidator;
-            _mapper = mapper;  // ← ADD THIS
+            _mapper = mapper;
         }
 
         // CreateGoalAsync remains UNCHANGED - no mapping needed
@@ -302,17 +303,17 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 // Set computed properties
                 summary.DescriptionShort = GetShortDescription(goal.GoalDescription);
                 summary.ProgressPercent = await CalculateGoalProgressAsync(
-                    goal.GoalId, 
+                    goal.GoalId,
                     currentUserEmployeeMasterId
                 );
                 summary.ProjectName = await GetProjectNameAsync(goal.ProjectId);
                 summary.CreatedByName = await _baseService.GetEmployeeNameAsync(goal.CreatedBy);
-                
+
                 // Calculate flags
                 summary.IsOverdue = IsGoalOverdue(goal);
                 summary.CanAssign = CanAssignGoal(
-                    goal, 
-                    currentUserEmployeeMasterId, 
+                    goal,
+                    currentUserEmployeeMasterId,
                     currentUserRole
                 );
 
@@ -737,22 +738,23 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (string.IsNullOrWhiteSpace(description))
                 return null;
 
-            return description.Length > 80
-                ? description.Substring(0, 80) + "..."
-                : description;
+            return description.Length > 80 ? description.Substring(0, 80) + "..." : description;
         }
 
-        private async Task<int> CalculateGoalProgressAsync(int goalId, int currentUserEmployeeMasterId)
+        private async Task<int> CalculateGoalProgressAsync(
+            int goalId,
+            int currentUserEmployeeMasterId
+        )
         {
             var latestLog = await _baseRepo.GetLatestProgressLogAsync(goalId);
-            
+
             if (latestLog != null && latestLog.Source == PROGRESS_SOURCE.MANUAL)
             {
                 return latestLog.ProgressPercent ?? 0;
             }
 
             var allChecklistItems = await _baseRepo.GetChecklistItemsByGoalIdAsync(goalId);
-            
+
             if (allChecklistItems == null || !allChecklistItems.Any())
             {
                 return 0;
@@ -768,7 +770,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 if (isCompleted)
                     completedCount++;
             }
-            
+
             return (int)Math.Round((double)completedCount / allChecklistItems.Count * 100);
         }
 

@@ -89,7 +89,6 @@ namespace Relevantz.EEPZ.Common.Models
         public List<int>? ProofAttachmentIds { get; set; }
     }
 
-
     public class ApprovalDesicionModel
     {
         public string Decision { get; set; } = default!;
@@ -98,13 +97,13 @@ namespace Relevantz.EEPZ.Common.Models
 
     // ==================== PROGRESS Models ====================
 
-    public class ToggleChecklistModel
+    public class UpdateChecklistStatusModel
     {
         public int ChecklistId { get; set; }
         public bool IsCompleted { get; set; }
     }
 
-    public class ManualProgressUpdateModel
+    public class UpdateProgressPercentageModel
     {
         public int ProgressPercent { get; set; }
         public string Source { get; set; } = "manual";
@@ -123,5 +122,4 @@ namespace Relevantz.EEPZ.Common.Models
         public string ContentType { get; set; } = string.Empty;
         public string FileName { get; set; } = string.Empty;
     }
-
 }

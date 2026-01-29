@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
-using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Models;
 
 namespace Relevantz.EEPZ.Core.Services.Interface
 {

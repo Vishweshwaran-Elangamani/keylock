@@ -1,24 +1,24 @@
 using Microsoft.AspNetCore.Http;
-using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Models;
 
 namespace Relevantz.EEPZ.Core.Services.Interface
 {
     public interface IGoalProgressService
     {
-        Task<ApiResponseModel> ToggleChecklistAsync(
+        Task<ApiResponseModel> UpdateChecklistStatusAsync(
             int goalId,
-            ToggleChecklistModel dto,
+            UpdateChecklistStatusModel dto,
             int currentUserEmployeeMasterId
         );
-        Task<ApiResponseModel> UpdateManualProgressAsync(
+        Task<ApiResponseModel> UpdateProgressPercentageAsync(
             int goalId,
-            ManualProgressUpdateModel dto,
+            UpdateProgressPercentageModel dto,
             int currentUserEmployeeMasterId
         );
         Task<int> GetGoalProgressPercentAsync(int goalId, int forEmployeeMasterId);
         Task<int> GetTeamGoalProgressForManagerAsync(int goalId, int managerEmployeeMasterId);
-        Task<int> GetCascadingProgressAsync(int goalId, int userId);
-        Task<GoalProgressHierarchyModel> GetProgressHierarchyAsync(int goalId, int userId);
+        Task<int> GetDependentProgressAsync(int goalId, int userId);
+        Task<GoalProgressHierarchyModel> FetchGoalProgressTreeAsync(int goalId, int userId);
     }
 }

@@ -1,4 +1,3 @@
-
 namespace Relevantz.EEPZ.Common.Constants
 {
     public static class SORT_FIELDS
@@ -12,18 +11,17 @@ namespace Relevantz.EEPZ.Common.Constants
 
         public static readonly string[] ALL =
         {
-                CREATED_DATE,
-                UPDATED_DATE,
-                DEADLINE,
-                PROGRESS,
-                TITLE,
-                STATUS,
-            };
+            CREATED_DATE,
+            UPDATED_DATE,
+            DEADLINE,
+            PROGRESS,
+            TITLE,
+            STATUS,
+        };
 
         public static bool IsValid(string field)
         {
             return ALL.Contains(field?.ToLower() ?? "");
         }
     }
-
 }

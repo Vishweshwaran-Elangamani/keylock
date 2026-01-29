@@ -30,7 +30,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Uploads a file attachment for a specific goal.
         /// </summary>
-        [HttpPost("api/goal-attachments/{goalId}/upload")]
+        [HttpPost("api/goals/{goalId}/upload")]
         public async Task<IActionResult> UploadFile(
             int goalId,
             IFormFile file,
@@ -48,29 +48,29 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             );
 
             return Ok(response);
-        } 
-
-        /// <summary>
-        /// Retrieves a list of all attachments for a specific goal.
-        /// </summary>
-        [HttpGet("api/goal-attachments/{goalId}")]
-        public async Task<IActionResult> ListAttachments(int goalId)
-        {
-            var items = await _service.ListAttachmentsAsync(goalId);
-
-            var response = ApiResponseModel<List<GoalAttachment>>.SuccessResponse(
-                ResponseMessages.Codes.FILE_DOWNLOADED_SUCCESS,
-                items,
-                new { GoalId = goalId, AttachmentCount = items.Count }
-            );
-
-            return Ok(response);
         }
+
+        // /// <summary>
+        // /// Retrieves a list of all attachments for a specific goal.
+        // /// </summary>
+        // [HttpGet("api/goals/{goalId}")]
+        // public async Task<IActionResult> ListAttachments(int goalId)
+        // {
+        //     var items = await _service.ListAttachmentsAsync(goalId);
+
+        //     var response = ApiResponseModel<List<GoalAttachment>>.SuccessResponse(
+        //         ResponseMessages.Codes.FILE_DOWNLOADED_SUCCESS,
+        //         items,
+        //         new { GoalId = goalId, AttachmentCount = items.Count }
+        //     );
+
+        //     return Ok(response);
+        // }
 
         /// <summary>
         /// Downloads a specific attachment by its ID.
         /// </summary>
-        [HttpGet("api/goal-attachments/{attachmentId}/download")]
+        [HttpGet("api/goals/{attachmentId}/download")]
         public async Task<IActionResult> GetAttachmentFile(int attachmentId)
         {
             var userId = GetEmpMasterId();
@@ -89,21 +89,25 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Previews a specific attachment inline by its ID.
         /// </summary>
-        [HttpGet("api/goal-attachments/{attachmentId}/preview")]
+        [HttpGet("api/goals/{attachmentId}/preview")]
         public async Task<IActionResult> GetAttachmentFilePreview(int attachmentId)
         {
             var userId = GetEmpMasterId();
 
             var result = await _service.GetAttachmentFilePreviewAsync(attachmentId, userId);
 
-            return File(result.FileBytes, result.ContentType, result.FileName, enableRangeProcessing: true);
+            return File(
+                result.FileBytes,
+                result.ContentType,
+                result.FileName,
+                enableRangeProcessing: true
+            );
         }
-
 
         /// <summary>
         /// Deletes a specific attachment by its ID.
         /// </summary>
-        [HttpDelete("api/goal-attachments/{attachmentId}")]
+        [HttpDelete("api/goals/{attachmentId}")]
         public async Task<IActionResult> DeleteAttachment(int attachmentId)
         {
             var userId = GetEmpMasterId();

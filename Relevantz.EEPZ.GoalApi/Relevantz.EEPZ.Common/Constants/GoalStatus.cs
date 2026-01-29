@@ -62,6 +62,4 @@ namespace Relevantz.EEPZ.Common.Constants
             return status?.ToLower() != COMPLETED && status?.ToLower() != CLOSED;
         }
     }
-
-
 }

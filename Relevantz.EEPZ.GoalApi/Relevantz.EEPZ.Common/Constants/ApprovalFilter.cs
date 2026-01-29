@@ -1,6 +1,5 @@
 namespace Relevantz.EEPZ.Common.Constants
 {
-
     public static class APPROVAL_FILTERS
     {
         public const string ALL = "all";
@@ -12,17 +11,17 @@ namespace Relevantz.EEPZ.Common.Constants
 
         public static readonly string[] ALL_FILTERS =
         {
-                ALL,
-                PENDING_APPROVAL,
-                MY_REQUESTS,
-                TO_APPROVE,
-                APPROVED,
-                REJECTED,
-            };
+            ALL,
+            PENDING_APPROVAL,
+            MY_REQUESTS,
+            TO_APPROVE,
+            APPROVED,
+            REJECTED,
+        };
 
         public static bool IsValid(string filter)
         {
             return ALL_FILTERS.Contains(filter?.ToLower() ?? "");
         }
     }
-}  
+}

@@ -1,6 +1,5 @@
 namespace Relevantz.EEPZ.Common.Constants
 {
-
     // Approval status enumeration
     public static class APPROVAL_STATUS
     {

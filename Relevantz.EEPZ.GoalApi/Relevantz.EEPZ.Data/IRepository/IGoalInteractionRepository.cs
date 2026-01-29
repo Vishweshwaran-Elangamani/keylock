@@ -1,5 +1,5 @@
-using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Models;
 
 namespace Relevantz.EEPZ.Data.Repository.Interface
 {
@@ -9,7 +9,7 @@ namespace Relevantz.EEPZ.Data.Repository.Interface
         Task<List<GoalComment>> GetCommentsByGoalAsync(int goalId);
         Task<List<Goalprogresslog>> GetProgressLogsByGoalAsync(int goalId);
         Task<List<ProjectEmployeeModel>> GetProjectEmployeesAsync(int projectId);
-        Task<List<ProjectEmployeeModel>> GetProjectSubordinatesAsync(
+        Task<List<ProjectEmployeeModel>> FetchProjectTeamAsync(
             int projectId,
             int managerEmployeeMasterId
         );

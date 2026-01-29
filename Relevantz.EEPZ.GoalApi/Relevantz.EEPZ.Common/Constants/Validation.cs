@@ -1,6 +1,6 @@
 namespace Relevantz.EEPZ.Common.Constants
 {
-     // Validation constants
+    // Validation constants
     public static class VALIDATION
     {
         public const int MIN_CHECKLIST_ITEMS = 3;

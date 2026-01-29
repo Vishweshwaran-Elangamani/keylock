@@ -1,6 +1,5 @@
 namespace Relevantz.EEPZ.Common.Constants
 {
-
     // Timeline event type enumeration
     public static class TIMELINE_EVENT_TYPE
     {
@@ -55,5 +54,4 @@ namespace Relevantz.EEPZ.Common.Constants
             ATTACHMENT_DELETED,
         };
     }
-
 }

@@ -1,14 +1,15 @@
 using FluentValidation;
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Exceptions;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repository.Interface;
-using MapsterMapper;  // ← ADD THIS
-using Mapster;        // ← ADD THIS
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -21,7 +22,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private readonly IBaseGoalService _baseService;
         private readonly IWebHostEnvironment _environment;
         private readonly IValidator<CreateCommentModel> _createCommentValidator;
-        private readonly IMapper _mapper;  // ← ADD THIS
+        private readonly IMapper _mapper;
 
         public GoalInteractionService(
             IGoalInteractionRepository repo,
@@ -31,7 +32,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             IBaseGoalService baseService,
             IWebHostEnvironment environment,
             IValidator<CreateCommentModel> createCommentValidator,
-            IMapper mapper)  // ← ADD THIS
+            IMapper mapper
+        )
         {
             _repo = repo;
             _baseRepo = baseRepo;
@@ -40,7 +42,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _baseService = baseService;
             _environment = environment;
             _createCommentValidator = createCommentValidator;
-            _mapper = mapper;  // ← ADD THIS
+            _mapper = mapper;
         }
 
         // AddCommentAsync remains UNCHANGED - no mapping needed
@@ -124,7 +126,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 commentModel.CommentedByName = await _baseService.GetEmployeeNameAsync(
                     comment.CommentedBy
                 );
-                
+
                 if (comment.CommentedBy.HasValue)
                 {
                     commentModel.CommentedByRole = await _baseRepo.GetUserRoleAsync(
@@ -213,7 +215,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 .ToList();
 
             var result = new List<GoalSummaryModel>();
-            
+
             foreach (var goal in ongoing)
             {
                 // Use Mapster for base mapping
@@ -235,7 +237,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 summary.CreatedByName = await _baseService.GetEmployeeNameAsync(goal.CreatedBy);
 
                 // Calculate overdue status
-                summary.IsOverdue = goal.Goalendat.HasValue
+                summary.IsOverdue =
+                    goal.Goalendat.HasValue
                     && goal.Goalendat.Value < DateTime.UtcNow
                     && goal.Goalstatus != GOAL_STATUS.COMPLETED;
 
@@ -298,12 +301,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return events.OrderByDescending(e => e.Timestamp).ToList();
         }
 
-        public async Task<List<ProjectEmployeeModel>> GetProjectSubordinatesAsync(
+        public async Task<List<ProjectEmployeeModel>> FetchProjectTeamAsync(
             int projectId,
             int managerEmployeeMasterId
         )
         {
-            return await _repo.GetProjectSubordinatesAsync(projectId, managerEmployeeMasterId);
+            return await _repo.FetchProjectTeamAsync(projectId, managerEmployeeMasterId);
         }
 
         // ==================== HELPER METHODS ====================
@@ -313,9 +316,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (string.IsNullOrWhiteSpace(description))
                 return null;
 
-            return description.Length > 80
-                ? description.Substring(0, 80) + "..."
-                : description;
+            return description.Length > 80 ? description.Substring(0, 80) + "..." : description;
         }
 
         private async Task<string?> GetProjectNameAsync(int? projectId)
@@ -351,7 +352,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             // Set user details
             timelineEvent.UserName = await _baseService.GetEmployeeNameAsync(progressLog.UpdatedBy);
-            
+
             if (progressLog.UpdatedBy.HasValue)
             {
                 timelineEvent.UserRole = await _baseRepo.GetUserRoleAsync(
@@ -363,7 +364,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             timelineEvent.Metadata = new
             {
                 ProgressPercent = progressLog.ProgressPercent,
-                Source = progressLog.Source
+                Source = progressLog.Source,
             };
 
             return timelineEvent;
@@ -377,48 +378,52 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             // Approval request event
             string requestDescription = GetApprovalRequestDescription(approval.ApprovalType);
-            
-            events.Add(new TimelineEventModel
-            {
-                Type = TIMELINE_EVENT_TYPE.APPROVAL,
-                Timestamp = approval.RequestedOn ?? DateTime.UtcNow,
-                Description = requestDescription,
-                UserId = approval.RequestedBy,
-                UserName = await _baseService.GetEmployeeNameAsync(approval.RequestedBy),
-                UserRole = approval.RequestedBy.HasValue
-                    ? await _baseRepo.GetUserRoleAsync(approval.RequestedBy.Value)
-                    : null,
-                Metadata = new
-                {
-                    ApprovalType = approval.ApprovalType,
-                    Status = approval.ApprovalStatus
-                },
-            });
 
-            // Approval decision event (if approved/rejected)
-            if (approval.ApprovedOn.HasValue)
-            {
-                string decisionDescription = GetApprovalDecisionDescription(
-                    approval.ApprovalType, 
-                    approval.ApprovalStatus
-                );
-
-                events.Add(new TimelineEventModel
+            events.Add(
+                new TimelineEventModel
                 {
                     Type = TIMELINE_EVENT_TYPE.APPROVAL,
-                    Timestamp = approval.ApprovedOn.Value,
-                    Description = decisionDescription,
-                    UserId = approval.ApprovedBy,
-                    UserName = await _baseService.GetEmployeeNameAsync(approval.ApprovedBy),
-                    UserRole = approval.ApprovedBy.HasValue
-                        ? await _baseRepo.GetUserRoleAsync(approval.ApprovedBy.Value)
+                    Timestamp = approval.RequestedOn ?? DateTime.UtcNow,
+                    Description = requestDescription,
+                    UserId = approval.RequestedBy,
+                    UserName = await _baseService.GetEmployeeNameAsync(approval.RequestedBy),
+                    UserRole = approval.RequestedBy.HasValue
+                        ? await _baseRepo.GetUserRoleAsync(approval.RequestedBy.Value)
                         : null,
                     Metadata = new
                     {
                         ApprovalType = approval.ApprovalType,
                         Status = approval.ApprovalStatus,
                     },
-                });
+                }
+            );
+
+            // Approval decision event (if approved/rejected)
+            if (approval.ApprovedOn.HasValue)
+            {
+                string decisionDescription = GetApprovalDecisionDescription(
+                    approval.ApprovalType,
+                    approval.ApprovalStatus
+                );
+
+                events.Add(
+                    new TimelineEventModel
+                    {
+                        Type = TIMELINE_EVENT_TYPE.APPROVAL,
+                        Timestamp = approval.ApprovedOn.Value,
+                        Description = decisionDescription,
+                        UserId = approval.ApprovedBy,
+                        UserName = await _baseService.GetEmployeeNameAsync(approval.ApprovedBy),
+                        UserRole = approval.ApprovedBy.HasValue
+                            ? await _baseRepo.GetUserRoleAsync(approval.ApprovedBy.Value)
+                            : null,
+                        Metadata = new
+                        {
+                            ApprovalType = approval.ApprovalType,
+                            Status = approval.ApprovalStatus,
+                        },
+                    }
+                );
             }
 
             return events;
@@ -431,7 +436,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             // Set user details
             timelineEvent.UserName = await _baseService.GetEmployeeNameAsync(comment.CommentedBy);
-            
+
             if (comment.CommentedBy.HasValue)
             {
                 timelineEvent.UserRole = await _baseRepo.GetUserRoleAsync(
@@ -458,7 +463,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             // Set user details (assigner)
             timelineEvent.UserName = await _baseService.GetEmployeeNameAsync(assignment.AssignedBy);
-            
+
             if (assignment.AssignedBy.HasValue)
             {
                 timelineEvent.UserRole = await _baseRepo.GetUserRoleAsync(
@@ -478,7 +483,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             // Set user details
             timelineEvent.UserName = await _baseService.GetEmployeeNameAsync(attachment.AttachedBy);
-            
+
             if (attachment.AttachedBy.HasValue)
             {
                 timelineEvent.UserRole = await _baseRepo.GetUserRoleAsync(

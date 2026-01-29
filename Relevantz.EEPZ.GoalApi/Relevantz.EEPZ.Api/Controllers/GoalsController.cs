@@ -47,7 +47,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Retrieves detailed information about a specific goal by its ID.
         /// </summary>
-        [HttpGet("/api/goals/{id}")] 
+        [HttpGet("/api/goals/{id}")]
         public async Task<IActionResult> GetGoalDetailsById(int id)
         {
             var userId = GetEmpMasterId();
@@ -93,7 +93,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Updates an existing goal by its ID.
         /// </summary>
-        [HttpPut("/api/goals/{id}")]
+        [HttpPut("/api/goals/update/{id}")]
         public async Task<IActionResult> UpdateGoal(int id, [FromBody] UpdateGoalModel dto)
         {
             var userId = GetEmpMasterId();

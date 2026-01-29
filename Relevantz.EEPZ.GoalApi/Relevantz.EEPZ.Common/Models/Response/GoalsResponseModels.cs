@@ -154,7 +154,7 @@ namespace Relevantz.EEPZ.Common.Models
 
     // ==================== ATTACHMENT Models ====================
 
-    public class FileUploadResponseModel 
+    public class FileUploadResponseModel
     {
         public int AttachmentId { get; set; }
         public string AttachmentTitle { get; set; } = default!;
@@ -176,7 +176,7 @@ namespace Relevantz.EEPZ.Common.Models
         public DateTime? AttachedOn { get; set; }
         public bool IsProofOfCompletion { get; set; }
         public int? LinkedApprovalId { get; set; }
-    }     
+    }
 
     // ==================== COMMENT Models ====================
 

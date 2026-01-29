@@ -35,7 +35,9 @@ namespace Relevantz.EEPZ.Core.IService
         /// </summary>
         /// <param name="fileId">MongoDB ObjectId</param>
         /// <returns>File bytes, content type, and filename</returns>
-        Task<(byte[] fileBytes, string contentType, string fileName)> GetFileForPreviewAsync(string fileId);
+        Task<(byte[] fileBytes, string contentType, string fileName)> GetFileForPreviewAsync(
+            string fileId
+        );
 
         /// <summary>
         /// Get file metadata without downloading content

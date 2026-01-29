@@ -29,7 +29,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Adds a comment to a specific goal.
         /// </summary>
-        [HttpPost("api/goal-interaction/{id}/comments")] 
+        [HttpPost("api/goals/{id}/comments")]
         public async Task<IActionResult> AddComment(int id, [FromBody] CreateCommentModel dto)
         {
             var userId = GetEmpMasterId();
@@ -38,12 +38,12 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             var result = await _service.AddCommentAsync(id, dto, userId, role);
 
             return Ok(result);
-        }    
+        }
 
         /// <summary>
         /// Retrieves all comments for a specific goal.
         /// </summary>
-        [HttpGet("api/goal-interaction/{id}/comments")]
+        [HttpGet("api/goals/{id}/comments")]
         public async Task<IActionResult> GetAllComments(int id)
         {
             var items = await _service.GetAllCommentsAsync(id);
@@ -54,13 +54,13 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                 new { GoalId = id, CommentCount = items.Count }
             );
 
-            return Ok(response); 
+            return Ok(response);
         }
 
         /// <summary>
         /// Retrieves the timeline of events for a specific goal.
         /// </summary>
-        [HttpGet("api/goal-interaction/{id}/timeline")]
+        [HttpGet("api/goals/{id}/timeline")]
         public async Task<IActionResult> GetTimeline(int id)
         {
             var userId = GetEmpMasterId();
@@ -79,8 +79,8 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Retrieves a dashboard summary for the current user.
         /// </summary>
-        [HttpGet("api/goal-interaction/dashboard/summary")]
-        public async Task<IActionResult> GetDashboardDetails()
+        [HttpGet("api/goals/dashboard/summary")]
+        public async Task<IActionResult> GetDashboardStatistics()
         {
             var userId = GetEmpMasterId();
 
@@ -93,15 +93,15 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             );
 
             return Ok(response);
-        }   
+        }
 
         /// <summary>
         /// Checks whether a specific goal can be marked as complete by the current user.
         /// </summary>
-        [HttpGet("api/goal-interaction/{id}/complete-eligibility")]
+        [HttpGet("api/goals/{id}/complete-eligibility")]
         public async Task<IActionResult> GetMarkCompleteEligibility(int id)
         {
-            var userId = GetEmpMasterId();   
+            var userId = GetEmpMasterId();
             var role = GetUserRole();
 
             var result = await _baseService.GetMarkCompleteEligibilityAsync(id, userId, role);
@@ -115,16 +115,15 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return Ok(response);
         }
 
-
         /// <summary>
         /// Retrieves the list of subordinates for a specific project.
         /// </summary>
-        [HttpGet("api/goal-interaction/projects/{projectId}/subordinates")]
-        public async Task<IActionResult> GetProjectSubordinates(int projectId)
+        [HttpGet("api/goals/projects/{projectId}/subordinates")]
+        public async Task<IActionResult> FetchProjectTeam(int projectId)
         {
             var currentUserId = GetEmpMasterId();
 
-            var subordinates = await _service.GetProjectSubordinatesAsync(projectId, currentUserId);
+            var subordinates = await _service.FetchProjectTeamAsync(projectId, currentUserId);
 
             var response = ApiResponseModel<List<ProjectEmployeeModel>>.SuccessResponse(
                 ResponseMessages.Codes.SUBORDINATES_RETRIEVED_SUCCESS,
@@ -135,7 +134,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                     UserId = currentUserId,
                     Count = subordinates.Count,
                 }
-            ); 
+            );
 
             return Ok(response);
         }

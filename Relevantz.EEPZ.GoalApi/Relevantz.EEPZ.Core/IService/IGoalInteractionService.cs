@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
-using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Models;
 
 namespace Relevantz.EEPZ.Core.Services.Interface
 {
@@ -19,7 +19,7 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             int goalId,
             int currentUserEmployeeMasterId
         );
-        Task<List<ProjectEmployeeModel>> GetProjectSubordinatesAsync(
+        Task<List<ProjectEmployeeModel>> FetchProjectTeamAsync(
             int projectId,
             int managerEmployeeMasterId
         );

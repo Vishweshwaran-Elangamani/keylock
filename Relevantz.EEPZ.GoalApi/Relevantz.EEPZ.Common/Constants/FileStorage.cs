@@ -1,6 +1,5 @@
 namespace Relevantz.EEPZ.Common.Constants
 {
-
     // File storage paths
     public static class FILE_STORAGE
     {
@@ -8,5 +7,4 @@ namespace Relevantz.EEPZ.Common.Constants
         public const string UPLOADS = "uploads";
         public const string GOAL_ATTACHMENTS = "goal-attachments";
     }
-
 }

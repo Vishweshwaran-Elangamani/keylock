@@ -1,6 +1,6 @@
 namespace Relevantz.EEPZ.Common.Constants
-{  
-     // Approval user role context 
+{
+    // Approval user role context
     public static class APPROVAL_USER_ROLE
     {
         public const string REQUESTER = "Requester";

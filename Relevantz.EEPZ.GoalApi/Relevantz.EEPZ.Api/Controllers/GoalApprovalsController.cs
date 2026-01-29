@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
-using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
@@ -32,7 +31,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Creates a new approval request for a specific goal.
         /// </summary>
-        [HttpPost("api/goal-approvals/{goalId}")]
+        [HttpPost("api/goals/{goalId}")]
         public async Task<IActionResult> CreateApprovalRequest(
             int goalId,
             [FromBody] CreateApprovalRequestModel request
@@ -49,7 +48,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Closes a pending approval request for a specific goal approval ID.
         /// </summary>
-        [HttpPut("api/goal-approvals/{approvalId}")]
+        [HttpPut("api/goals/approval/{approvalId}")]
         [Authorize(
             Roles = $"{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD},{USER_ROLE.LEADERSHIP}"
         )]
@@ -61,7 +60,12 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             var userId = GetEmpMasterId();
             var role = GetUserRole();
 
-            var result = await _service.ClosePendingApprovalAsync(approvalId, desicion, userId, role);
+            var result = await _service.ClosePendingApprovalAsync(
+                approvalId,
+                desicion,
+                userId,
+                role
+            );
 
             return Ok(result);
         }
@@ -69,7 +73,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Retrieves all pending approval requests assigned to the current user.
         /// </summary>
-        [HttpGet("api/goal-approvals/pending")]
+        [HttpGet("api/goals/pending")]
         [Authorize(
             Roles = $"{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD},{USER_ROLE.LEADERSHIP}"
         )]
@@ -91,7 +95,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Retrieves approvals for the current user based on query filters.
         /// </summary>
-        [HttpGet("api/goal-approvals/query")]
+        [HttpGet("api/goals/fetch-approvals")]
         public async Task<IActionResult> GetUserApprovals([FromQuery] ApprovalQueryModel query)
         {
             var userId = GetEmpMasterId();

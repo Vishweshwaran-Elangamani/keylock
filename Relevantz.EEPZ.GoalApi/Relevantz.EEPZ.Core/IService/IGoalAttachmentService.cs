@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
-using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Models;
 
 namespace Relevantz.EEPZ.Core.IService
 {
@@ -55,10 +55,7 @@ namespace Relevantz.EEPZ.Core.IService
         /// <param name="attachmentId">The attachment ID to delete</param>
         /// <param name="currentUserEmployeeMasterId">Current user's employee master ID</param>
         /// <returns>True if deletion successful</returns>
-        Task<bool> DeleteAttachmentAsync(
-            int attachmentId,
-            int currentUserEmployeeMasterId
-        );
+        Task<bool> DeleteAttachmentAsync(int attachmentId, int currentUserEmployeeMasterId);
 
         /// <summary>
         /// List all attachments for a specific goal

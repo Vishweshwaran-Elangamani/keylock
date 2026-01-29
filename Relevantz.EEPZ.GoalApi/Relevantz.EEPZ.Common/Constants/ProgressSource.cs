@@ -13,5 +13,4 @@ namespace Relevantz.EEPZ.Common.Constants
             return ALL.Contains(source?.ToLower() ?? "");
         }
     }
-}  
-
+}

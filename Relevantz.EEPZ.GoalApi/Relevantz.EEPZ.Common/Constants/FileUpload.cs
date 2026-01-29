@@ -1,6 +1,6 @@
 namespace Relevantz.EEPZ.Common.Constants
-{ 
-     // File upload constants
+{
+    // File upload constants
     public static class FILE_UPLOAD
     {
         public const long MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
@@ -81,5 +81,4 @@ namespace Relevantz.EEPZ.Common.Constants
             return string.Join(", ", ALLOWED_EXTENSIONS.Select(e => e.ToUpper()));
         }
     }
-
 }

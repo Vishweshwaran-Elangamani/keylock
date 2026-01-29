@@ -1,6 +1,5 @@
 namespace Relevantz.EEPZ.Common.Constants
 {
-
     // HTTP route constants
     public static class ROUTES
     {
@@ -38,5 +37,4 @@ namespace Relevantz.EEPZ.Common.Constants
         public const string CAN_VIEW = "{id:int}/can-view";
         public const string CAN_COMMENT = "{id:int}/can-comment";
     }
-
 }

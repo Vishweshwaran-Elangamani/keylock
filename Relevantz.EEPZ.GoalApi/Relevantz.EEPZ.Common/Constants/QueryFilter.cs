@@ -35,6 +35,5 @@ namespace Relevantz.EEPZ.Common.Constants
                 return ALL_FILTERS.Contains(filter?.ToLower() ?? "");
             }
         }
-
     }
 }
