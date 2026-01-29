@@ -55,5 +55,10 @@ namespace Relevantz.EEPZ.Core.Services.Interfaces
         Task<int> GetPendingRsvpCountAsync(
             int employeeId,
             CancellationToken cancellationToken = default);
+
+
+        
     }
+
+    public interface IDateTimeProvider { DateTime Now { get; } DateOnly Today { get; } }
 }

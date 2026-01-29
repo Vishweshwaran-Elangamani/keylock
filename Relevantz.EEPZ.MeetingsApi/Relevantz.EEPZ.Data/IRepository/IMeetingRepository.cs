@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Relevantz.EEPZ.Common.Enums;
 
 namespace Relevantz.EEPZ.Data.Repository.Interfaces
 {
@@ -84,6 +85,11 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
 
         Task<int> GetPendingRsvpCountAsync(
             int employeeId,
+            CancellationToken cancellationToken = default);
+
+
+        Task<List<Employee>> GetEmployeesByIdsAsync(
+            List<int> employeeIds,
             CancellationToken cancellationToken = default);
     }
 }

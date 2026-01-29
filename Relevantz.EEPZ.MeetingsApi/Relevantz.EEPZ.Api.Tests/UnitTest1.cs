@@ -1,5 +1,3 @@
-// File: ControllersTests.cs
-
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading;
@@ -11,9 +9,11 @@ using Moq;
 using NUnit.Framework;
 using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.DTOs;
+using Relevantz.EEPZ.Common.Enums;  
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using eepzbackend.Controllers;
+
 
 #region Test Helpers
 
@@ -165,33 +165,38 @@ namespace EEPZ.Tests.Controllers
             Assert.IsInstanceOf<BadRequestObjectResult>(result.Result);
         }
 
-        [Test]
-        public async Task UpdateRsvpAsync_Valid_UsesRouteMeetingId_AndReturnsOk()
-        {
-            // Arrange
-            var controller = CreateController();
-            var routeMeetingId = 42;
-            var body = new RsvpResponseDto { MeetingId = 999, RsvpStatus = RsvpStatus.Accepted, RsvpComments = "ok" };
-            var serviceReturn = new MeetingInvitationDto();
+      [Test]
+public async Task UpdateRsvpAsync_Valid_UsesRouteMeetingId_AndReturnsOk()
+{
+    var controller = CreateController();
+    var routeMeetingId = 42;
 
-            _meetingService
-                .Setup(s => s.SubmitRsvpAsync(
-                    It.Is<RsvpResponseDto>(d =>
-                        d.MeetingId == routeMeetingId &&
-                        d.RsvpStatus == RsvpStatus.Accepted &&
-                        d.RsvpComments == "ok"),
-                    999,
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(serviceReturn);
+    var body = new RsvpResponseDto
+    {
+        MeetingId = 999,
+        RsvpStatus = RsvpStatus.Accepted.ToString(),   // ⭐ FIX
+        RsvpComments = "ok"
+    };
 
-            // Act
-            var result = await controller.UpdateRsvpAsync(routeMeetingId, body);
+    var serviceReturn = new MeetingInvitationDto();
 
-            // Assert
-            Assert.IsInstanceOf<OkObjectResult>(result.Result);
-            ControllerTestHelper.AssertCorrelationIdHeader(controller.Response);
-            _meetingService.VerifyAll();
-        }
+    _meetingService
+        .Setup(s => s.SubmitRsvpAsync(
+            It.Is<RsvpResponseDto>(d =>
+                d.MeetingId == routeMeetingId &&
+                d.RsvpStatus == RsvpStatus.Accepted.ToString() &&  // ⭐ FIX
+                d.RsvpComments == "ok"),
+            999,
+            It.IsAny<CancellationToken>()))
+        .ReturnsAsync(serviceReturn);
+
+    var result = await controller.UpdateRsvpAsync(routeMeetingId, body);
+
+    Assert.IsInstanceOf<OkObjectResult>(result.Result);
+    ControllerTestHelper.AssertCorrelationIdHeader(controller.Response);
+    _meetingService.VerifyAll();
+}
+
 
         [Test]
         public async Task GetPendingRsvpCountAsync_ReturnsOkWithHeader()
@@ -418,25 +423,28 @@ namespace EEPZ.Tests.Controllers
             Assert.IsInstanceOf<BadRequestObjectResult>(result.Result);
         }
 
-        [Test]
-        public async Task SubmitRsvp_Valid_ReturnsOk_AndHeader()
-        {
-            // Arrange
-            var controller = CreateController();
-            var dto = new RsvpResponseDto { MeetingId = 7, RsvpStatus = RsvpStatus.Accepted };
+      [Test]
+public async Task SubmitRsvp_Valid_ReturnsOk_AndHeader()
+{
+    var controller = CreateController();
 
-            _meetingService
-                .Setup(s => s.SubmitRsvpAsync(dto, 999, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new MeetingInvitationDto());
+    var dto = new RsvpResponseDto
+    {
+        MeetingId = 7,
+        RsvpStatus = RsvpStatus.Accepted.ToString()  // ⭐ FIX
+    };
 
-            // Act
-            var result = await controller.SubmitRsvp(dto);
+    _meetingService
+        .Setup(s => s.SubmitRsvpAsync(dto, 999, It.IsAny<CancellationToken>()))
+        .ReturnsAsync(new MeetingInvitationDto());
 
-            // Assert
-            Assert.IsInstanceOf<OkObjectResult>(result.Result);
-            ControllerTestHelper.AssertCorrelationIdHeader(controller.Response);
-            _meetingService.VerifyAll();
-        }
+    var result = await controller.SubmitRsvp(dto);
+
+    Assert.IsInstanceOf<OkObjectResult>(result.Result);
+    ControllerTestHelper.AssertCorrelationIdHeader(controller.Response);
+    _meetingService.VerifyAll();
+}
+
 
         [Test]
         public async Task GetMyInvitations_ReturnsOk_AndHeader()

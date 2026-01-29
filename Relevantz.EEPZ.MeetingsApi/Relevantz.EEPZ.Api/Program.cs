@@ -9,6 +9,7 @@ using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Data.Repository.Implementations;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Core.Services.Implementations;
+using Relevantz.EEPZ.Core.Config;   // ⭐ ADD THIS (Mapster Config)
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -69,17 +70,11 @@ var issuer = jwtSection["Issuer"];
 var audience = jwtSection["Audience"];
 
 if (string.IsNullOrEmpty(secretKey))
-{
-    throw new InvalidOperationException("JWT SecretKey is not configured. Please add 'Jwt:SecretKey' to appsettings.json.");
-}
+    throw new InvalidOperationException("JWT SecretKey missing.");
 if (string.IsNullOrEmpty(issuer))
-{
-    throw new InvalidOperationException("JWT Issuer is not configured. Please add 'Jwt:Issuer' to appsettings.json.");
-}
+    throw new InvalidOperationException("JWT Issuer missing.");
 if (string.IsNullOrEmpty(audience))
-{
-    throw new InvalidOperationException("JWT Audience is not configured. Please add 'Jwt:Audience' to appsettings.json.");
-}
+    throw new InvalidOperationException("JWT Audience missing.");
 
 builder.Services.AddAuthentication(options =>
 {
@@ -106,7 +101,6 @@ builder.Services.AddScoped<IMeetingService, MeetingService>();
 builder.Services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 builder.Services.AddScoped<IUserAuthenticationRepository, UserAuthenticationRepository>();
 
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -118,6 +112,12 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+
+// ⭐⭐⭐ MAPSTER REGISTRATION (THIS FIXES YOUR BUG) ⭐⭐⭐
+MappingConfig.RegisterMappings();
+// ⭐⭐⭐ MUST be BEFORE first request ⭐⭐⭐
+
 
 if (app.Environment.IsDevelopment())
 {

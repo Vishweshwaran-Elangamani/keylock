@@ -1,5 +1,6 @@
 using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.DTOs;
+using Relevantz.EEPZ.Common.Enums;
 using System;
 
 namespace Relevantz.EEPZ.Common.Utils
