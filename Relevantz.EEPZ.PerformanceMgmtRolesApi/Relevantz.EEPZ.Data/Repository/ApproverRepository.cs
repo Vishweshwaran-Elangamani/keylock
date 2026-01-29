@@ -8,464 +8,412 @@ using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
+using Relevantz.EEPZ.Common.Constants;
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
     public class ApproverRepository : IApproverRepository
     {
         private readonly EEPZDbContext _ctx;
+        private const int DefaultPageSize = 25;
+private const string DateFormat = "yyyy-MM-dd HH:mm:ss";
 
         public ApproverRepository(EEPZDbContext ctx)
         {
             _ctx = ctx;
         }
 
-        public async Task<IEnumerable<ApproverAssignmentRowDto>> GetApproverSubmittedFormsAsync(
-                int approverUserId, int page, int pageSize)
+public async Task<IEnumerable<ApproverAssignmentRowDto>> GetApproverSubmittedFormsAsync(
+    int approverUserId, int page, int pageSize)
+{
+    var (offset, size) = NormalizePaging(page, pageSize);
+
+    var l1EmployeeId = await GetL1EmployeeIdAsync(approverUserId);
+    if (l1EmployeeId == 0) return Enumerable.Empty<ApproverAssignmentRowDto>();
+
+    var scopeAssessmentIds = await GetScopeAssessmentIdsAsync(l1EmployeeId, AssessmentConstants.STATUS_SUBMITTED);
+    if (!scopeAssessmentIds.Any()) return Enumerable.Empty<ApproverAssignmentRowDto>();
+
+    await TouchLatestL1ReviewIdsAsync();
+
+    var assessmentsWithL1Details = await GetAssessmentsWithL1DetailsAsync();
+
+    var latestL2Reviews = await GetLatestReviewsByRoleAsync(AssessmentConstants.REVIEWER_ROLE_REVIEWER);
+
+    var fullyDecidedAssessmentIds = await GetFullyDecidedAssessmentIdsAsync(latestL2Reviews);
+
+    var visibleAssessmentIds = scopeAssessmentIds
+        .Where(id => !fullyDecidedAssessmentIds.Contains(id) && !assessmentsWithL1Details.Contains(id))
+        .ToList();
+
+    if (!visibleAssessmentIds.Any()) return Enumerable.Empty<ApproverAssignmentRowDto>();
+
+    return await GetApproverAssignmentRowsAsync(visibleAssessmentIds, offset, size, overrideStatus: null);
+}
+
+
+        public async Task<IEnumerable<ApproverAssignmentRowDto>> GetApproverReworkFormsAsync(
+            int approverUserId, int page, int pageSize)
         {
-            if (page < 1) page = 1;
-            if (pageSize < 1) pageSize = 25;
-            var offset = (page - 1) * pageSize;
+            var (offset, size) = NormalizePaging(page, pageSize);
 
-
-            var l1EmployeeId = await _ctx.Userauthentications
-                .Where(ua => ua.UserId == approverUserId)
-                .Select(ua => ua.Employee.EmployeeId)
-                .FirstOrDefaultAsync();
-
+            var l1EmployeeId = await GetL1EmployeeIdAsync(approverUserId);
             if (l1EmployeeId == 0) return Enumerable.Empty<ApproverAssignmentRowDto>();
 
+            var scopeAssessmentIds = await GetScopeAssessmentIdsAsync(l1EmployeeId, requiredStatus: null);
+            if (!scopeAssessmentIds.Any()) return Enumerable.Empty<ApproverAssignmentRowDto>();
 
-            var scopeAssessmentIds = await _ctx.Selfassessments
-                .Where(sa => sa.Status == "Submitted")
-                .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
-                .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, e })
-                .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, (x, edm) => new { x.sa, edm })
-                .Join(_ctx.Projectemployees
-                    .Where(pe => pe.IsPrimary),
-                    x => x.edm.EmployeeId,
-                    pe => pe.EmployeeId,
-                    (x, pe) => new { x.sa, pe })
-                .Join(_ctx.Projects
-                    .Where(p => p.L1approverEmployeeId == l1EmployeeId),
-                    x => x.pe.ProjectId,
-                    p => p.ProjectId,
-                    (x, p) => x.sa.AssessmentId)
-                .Distinct()
-                .ToListAsync();
+            var fullyL1CompleteAssessments = await GetFullyL1CompleteAssessmentIdsAsync(scopeAssessmentIds);
+            if (!fullyL1CompleteAssessments.Any()) return Enumerable.Empty<ApproverAssignmentRowDto>();
 
-
-            var latestL1ReviewIds = await _ctx.Assessmentreviews
-                .Where(ar => ar.ReviewerRole == "Approver" && ar.DetailId != null)
-                .GroupBy(ar => ar.DetailId)
-                .Select(g => g.Max(ar => ar.ReviewId))
-                .ToListAsync();
-
-
-            var hasL1AssessmentIds = await _ctx.Assessmentreviews
-                .Where(ar => ar.ReviewerRole == "Approver" && ar.DetailId != null)
-                .Select(ar => ar.DetailId)
-                .ToListAsync();
-
-            var assessmentsWithL1Details = await _ctx.Assessmentdetails
-                .Where(ad => hasL1AssessmentIds.Contains(ad.DetailId))
-                .Select(ad => ad.AssessmentId)
-                .Distinct()
-                .ToListAsync();
-
-
-            var latestL2Reviews = await _ctx.Assessmentreviews
-                .Where(ar => ar.ReviewerRole == "Reviewer" && ar.DetailId != null)
-                .GroupBy(ar => ar.DetailId)
-                .Select(g => g.OrderByDescending(ar => ar.ReviewId).First())
-                .ToListAsync();
-
-
-            var decidedAssessmentIds = latestL2Reviews
-                .Where(ar => ar.ReviewStatus == "Approved" || ar.ReviewStatus == "Rejected")
-                .Select(ar => ar.DetailId)
-                .ToList();
-
-            var decidedDetails = await _ctx.Assessmentdetails
-                .Where(ad => decidedAssessmentIds.Contains(ad.DetailId))
-                .GroupBy(ad => ad.AssessmentId)
-                .Select(g => new { AssessmentId = g.Key, Count = g.Count() })
-                .ToListAsync();
-
-            var fullyDecidedAssessmentIds = new List<int>();
-            foreach (var decided in decidedDetails)
-            {
-                var totalDetailsForAssessment = await _ctx.Assessmentdetails
-                    .CountAsync(ad => ad.AssessmentId == decided.AssessmentId);
-                if (decided.Count == totalDetailsForAssessment)
-                    fullyDecidedAssessmentIds.Add(decided.AssessmentId);
-            }
-
-
-            var visibleAssessmentIds = scopeAssessmentIds
-                .Where(id => !fullyDecidedAssessmentIds.Contains(id) && !assessmentsWithL1Details.Contains(id))
-                .ToList();
-
-
-            var result = await _ctx.Selfassessments
-                .Where(sa => visibleAssessmentIds.Contains(sa.AssessmentId))
-                .Join(_ctx.Assessmentforms, sa => sa.FormId, f => f.FormId, (sa, f) => new { sa, f })
-                .Join(_ctx.Userauthentications, x => x.sa.EmployeeId, ua => ua.UserId, (x, ua) => new { x.sa, x.f, ua })
-                .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, x.f, x.ua, e })
-                .GroupJoin(_ctx.Userprofiles, x => x.e.EmployeeId, up => up.EmployeeId,
-                    (x, up) => new { x.sa, x.f, x.ua, x.e, up = up.FirstOrDefault() })
-                .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId,
-                    (x, edm) => new { x.sa, x.f, x.ua, x.e, x.up, edm })
-                .Join(_ctx.Projectemployees.Where(pe => pe.IsPrimary),
-                    x => x.edm.EmployeeId, pe => pe.EmployeeId,
-                    (x, pe) => new { x.sa, x.f, x.ua, x.e, x.up, pe })
-                .Join(_ctx.Projects, x => x.pe.ProjectId, p => p.ProjectId,
-                    (x, p) => new { x.sa, x.f, x.ua, x.e, x.up, p })
-                .OrderByDescending(x => x.sa.SubmittedAt)
-                .Skip(offset)
-                .Take(pageSize)
-                .GroupBy(x => x.sa.AssessmentId)
-                .Select(g => new ApproverAssignmentRowDto
-                {
-                    AssessmentId = g.Key,
-                    EmployeeName = g.First().up != null
-                        ? string.Concat(g.First().up.FirstName, " ", g.First().up.LastName).Trim()
-                        : (string.IsNullOrWhiteSpace(g.First().ua.Email) ? g.First().e.EmployeeCompanyId : g.First().ua.Email),
-                    FormName = g.First().f.Name ?? string.Empty,
-                    SubmittedAt = (g.First().sa.SubmittedAt ?? DateTime.Now).ToString("yyyy-MM-dd HH:mm:ss"),
-                    Status = g.First().sa.Status,
-                    Project = string.Join(", ", g.Select(x => x.p.ProjectName).Distinct().OrderBy(x => x))
-                })
-                .ToListAsync();
-
-            return result;
-        }
-        public async Task<IEnumerable<ApproverAssignmentRowDto>> GetApproverReworkFormsAsync(
-           int approverUserId, int page, int pageSize)
-        {
-            if (page < 1) page = 1;
-            if (pageSize < 1) pageSize = 25;
-            var offset = (page - 1) * pageSize;
-
-            var l1EmployeeId = await _ctx.Userauthentications
-                .Where(ua => ua.UserId == approverUserId)
-                .Select(ua => ua.Employee.EmployeeId)
-                .FirstOrDefaultAsync();
-
-            if (l1EmployeeId == 0)
-                return Enumerable.Empty<ApproverAssignmentRowDto>();
-
-
-            var scopeAssessmentIds = await _ctx.Selfassessments
-                .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
-                .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, e })
-                .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, (x, edm) => new { x.sa, edm })
-                .Join(_ctx.Projectemployees.Where(pe => pe.IsPrimary == true), x => x.edm.EmployeeId, pe => pe.EmployeeId, (x, pe) => new { x.sa, pe })
-                .Join(_ctx.Projects.Where(p => p.L1approverEmployeeId == l1EmployeeId), x => x.pe.ProjectId, p => p.ProjectId, (x, p) => x.sa.AssessmentId)
-                .Distinct()
-                .ToListAsync();
-
-            if (!scopeAssessmentIds.Any())
-                return Enumerable.Empty<ApproverAssignmentRowDto>();
-
-
-            var fullyL1CompleteAssessments = new List<int>();
-            foreach (var assessmentId in scopeAssessmentIds)
-            {
-                var totalDetails = await _ctx.Assessmentdetails
-                    .CountAsync(ad => ad.AssessmentId == assessmentId);
-
-                var l1RatedDetails = await _ctx.Assessmentreviews
-                    .Where(ar => ar.ReviewerRole == "Approver" && ar.Rating > 0)
-                    .Join(_ctx.Assessmentdetails, ar => ar.DetailId, ad => ad.DetailId, (ar, ad) => ad)
-                    .CountAsync(ad => ad.AssessmentId == assessmentId);
-
-                if (totalDetails > 0 && totalDetails == l1RatedDetails)
-                    fullyL1CompleteAssessments.Add(assessmentId);
-            }
-
-            if (!fullyL1CompleteAssessments.Any())
-                return Enumerable.Empty<ApproverAssignmentRowDto>();
-
-
-            var latestReviewIds = await _ctx.Assessmentreviews
-                .Where(ar => ar.ReviewerRole == "Reviewer" && ar.DetailId != null)
-                .GroupBy(ar => ar.DetailId)
-                .Select(g => g.OrderByDescending(ar => ar.ReviewId).Select(ar => ar.ReviewId).First())
-                .ToListAsync();
-
-
-            var latestL2Reviews = await _ctx.Assessmentreviews
-                .Where(ar => latestReviewIds.Contains(ar.ReviewId))
-                .ToListAsync();
-
+            var latestReviewIds = await GetLatestReviewIdsByRoleAsync(AssessmentConstants.REVIEWER_ROLE_REVIEWER);
+            var latestL2Reviews = await GetReviewsByIdsAsync(latestReviewIds);
 
             var rejectedDetailIds = latestL2Reviews
-                .Where(ar => ar.ReviewStatus == "Rejected")
+                .Where(ar => ar.ReviewStatus == AssessmentConstants.REVIEW_STATUS_REJECTED)
                 .Select(ar => ar.DetailId)
                 .ToList();
 
-            if (!rejectedDetailIds.Any())
-                return Enumerable.Empty<ApproverAssignmentRowDto>();
+            if (!rejectedDetailIds.Any()) return Enumerable.Empty<ApproverAssignmentRowDto>();
 
-            var assessmentIdsWithRejectedDetails = await _ctx.Assessmentdetails
-                .Where(ad => rejectedDetailIds.Contains(ad.DetailId))
-                .Select(ad => ad.AssessmentId)
-                .Distinct()
-                .ToListAsync();
-
+            var assessmentIdsWithRejectedDetails = await GetAssessmentIdsByDetailIdsAsync(rejectedDetailIds);
 
             var reworkAssessmentIds = fullyL1CompleteAssessments
                 .Where(id => assessmentIdsWithRejectedDetails.Contains(id))
                 .ToList();
 
-            if (!reworkAssessmentIds.Any())
-                return Enumerable.Empty<ApproverAssignmentRowDto>();
+            if (!reworkAssessmentIds.Any()) return Enumerable.Empty<ApproverAssignmentRowDto>();
 
+            var paginatedIds = await GetPaginatedAssessmentIdsBySubmittedAtAsync(reworkAssessmentIds, offset, size);
+            if (!paginatedIds.Any()) return Enumerable.Empty<ApproverAssignmentRowDto>();
 
-            var paginatedIds = await _ctx.Selfassessments
-                .Where(sa => reworkAssessmentIds.Contains(sa.AssessmentId))
-                .OrderByDescending(sa => sa.SubmittedAt)
-                .Skip(offset)
-                .Take(pageSize)
-                .Select(sa => sa.AssessmentId)
-                .ToListAsync();
-
-            var query = await _ctx.Selfassessments
-                .Where(sa => paginatedIds.Contains(sa.AssessmentId))
-                .Join(_ctx.Assessmentforms, sa => sa.FormId, f => f.FormId, (sa, f) => new { sa, f })
-                .Join(_ctx.Userauthentications, x => x.sa.EmployeeId, ua => ua.UserId, (x, ua) => new { x.sa, x.f, ua })
-                .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, x.f, x.ua, e })
-                .GroupJoin(_ctx.Userprofiles, x => x.e.EmployeeId, up => up.EmployeeId, (x, upList) => new { x.sa, x.f, x.ua, x.e, upList })
-                .SelectMany(x => x.upList.DefaultIfEmpty(), (x, up) => new { x.sa, x.f, x.ua, x.e, up })
-                .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, (x, edm) => new { x.sa, x.f, x.ua, x.e, x.up, edm })
-                .Join(_ctx.Projectemployees.Where(pe => pe.IsPrimary == true), x => x.edm.EmployeeId, pe => pe.EmployeeId, (x, pe) => new { x.sa, x.f, x.ua, x.e, x.up, pe })
-                .Join(_ctx.Projects, x => x.pe.ProjectId, p => p.ProjectId, (x, p) => new { x.sa, x.f, x.ua, x.e, x.up, p })
-                .GroupBy(x => x.sa.AssessmentId)
-                .ToListAsync();
-
-            var result = query.Select(g => new ApproverAssignmentRowDto
-            {
-                AssessmentId = g.Key,
-                EmployeeName = g.First().up != null
-                    ? $"{g.First().up.FirstName} {g.First().up.LastName}".Trim()
-                    : (string.IsNullOrWhiteSpace(g.First().ua.Email)
-                        ? g.First().e.EmployeeCompanyId
-                        : g.First().ua.Email),
-                FormName = g.First().f.Name ?? string.Empty,
-                SubmittedAt = g.First().sa.SubmittedAt != null
-                    ? g.First().sa.SubmittedAt.Value.ToString("yyyy-MM-dd HH:mm:ss")
-                    : DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                Status = "Rejected",
-                Project = string.Join(", ", g.Select(x => x.p.ProjectName).Distinct().OrderBy(x => x))
-            }).ToList();
-
-            return result;
+            return await GetApproverAssignmentRowsAsync(paginatedIds, offset: 0, pageSize: int.MaxValue, overrideStatus: AssessmentConstants.STATUS_REJECTED);
         }
 
 
+private static (int Offset, int PageSize) NormalizePaging(int page, int pageSize)
+{
+    if (page < 1) page = 1;
+    if (pageSize < 1) pageSize = DefaultPageSize;
+    return ((page - 1) * pageSize, pageSize);
+}
+
+private Task<int> GetL1EmployeeIdAsync(int approverUserId)
+{
+    return _ctx.Userauthentications
+        .Where(ua => ua.UserId == approverUserId)
+        .Select(ua => ua.Employee.EmployeeId)
+        .FirstOrDefaultAsync();
+}
+
+private async Task<List<int>> GetScopeAssessmentIdsAsync(int l1EmployeeId, string? requiredStatus)
+{
+    var query = _ctx.Selfassessments.AsQueryable();
+
+    if (!string.IsNullOrWhiteSpace(requiredStatus))
+        query = query.Where(sa => sa.Status == requiredStatus);
+
+    return await query
+        .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
+        .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, e })
+        .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, (x, edm) => new { x.sa, edm })
+        .Join(_ctx.Projectemployees.Where(pe => pe.IsPrimary),
+              x => x.edm.EmployeeId,
+              pe => pe.EmployeeId,
+              (x, pe) => new { x.sa, pe })
+        .Join(_ctx.Projects.Where(p => p.L1approverEmployeeId == l1EmployeeId),
+              x => x.pe.ProjectId,
+              p => p.ProjectId,
+              (x, p) => x.sa.AssessmentId)
+        .Distinct()
+        .ToListAsync();
+}
 
 
-        public async Task<IEnumerable<ApproverAssignmentRowDto>> GetSubmittedL1RatingsAsync(
-            int approverUserId, int page, int pageSize)
+private async Task TouchLatestL1ReviewIdsAsync()
+{
+    _ = await _ctx.Assessmentreviews
+        .Where(ar => ar.ReviewerRole == AssessmentConstants.REVIEWER_ROLE_APPROVER && ar.DetailId != null)
+        .GroupBy(ar => ar.DetailId)
+        .Select(g => g.Max(ar => ar.ReviewId))
+        .ToListAsync();
+}
+
+private async Task<List<int>> GetAssessmentsWithL1DetailsAsync()
+{
+    var hasL1DetailIds = await _ctx.Assessmentreviews
+        .Where(ar => ar.ReviewerRole == AssessmentConstants.REVIEWER_ROLE_APPROVER && ar.DetailId != null)
+        .Select(ar => ar.DetailId)
+        .ToListAsync();
+
+    if (!hasL1DetailIds.Any())
+        return new List<int>();
+
+    return await _ctx.Assessmentdetails
+        .Where(ad => hasL1DetailIds.Contains(ad.DetailId))
+        .Select(ad => ad.AssessmentId)
+        .Distinct()
+        .ToListAsync();
+}
+
+private Task<List<Assessmentreview>> GetLatestReviewsByRoleAsync(string reviewerRole)
+{
+    return _ctx.Assessmentreviews
+        .Where(ar => ar.ReviewerRole == reviewerRole && ar.DetailId != null)
+        .GroupBy(ar => ar.DetailId)
+        .Select(g => g.OrderByDescending(ar => ar.ReviewId).First())
+        .ToListAsync();
+}
+
+private async Task<List<int>> GetFullyDecidedAssessmentIdsAsync(List<Assessmentreview> latestL2Reviews)
+{
+    var decidedDetailIds = latestL2Reviews
+        .Where(ar => ar.ReviewStatus == AssessmentConstants.REVIEW_STATUS_APPROVED
+                  || ar.ReviewStatus == AssessmentConstants.REVIEW_STATUS_REJECTED)
+        .Select(ar => ar.DetailId)
+        .ToList();
+
+    if (!decidedDetailIds.Any())
+        return new List<int>();
+
+    var decidedDetails = await _ctx.Assessmentdetails
+        .Where(ad => decidedDetailIds.Contains(ad.DetailId))
+        .GroupBy(ad => ad.AssessmentId)
+        .Select(g => new { AssessmentId = g.Key, Count = g.Count() })
+        .ToListAsync();
+
+    var fullyDecidedAssessmentIds = new List<int>();
+
+    foreach (var decided in decidedDetails)
+    {
+        var totalDetailsForAssessment = await _ctx.Assessmentdetails
+            .CountAsync(ad => ad.AssessmentId == decided.AssessmentId);
+
+        if (decided.Count == totalDetailsForAssessment)
+            fullyDecidedAssessmentIds.Add(decided.AssessmentId);
+    }
+
+    return fullyDecidedAssessmentIds;
+}
+
+private async Task<List<int>> GetFullyL1CompleteAssessmentIdsAsync(List<int> scopeAssessmentIds)
+{
+    var fullyL1Complete = new List<int>();
+
+    foreach (var assessmentId in scopeAssessmentIds)
+    {
+        var totalDetails = await _ctx.Assessmentdetails
+            .CountAsync(ad => ad.AssessmentId == assessmentId);
+
+        var l1RatedDetails = await _ctx.Assessmentreviews
+            .Where(ar => ar.ReviewerRole == AssessmentConstants.REVIEWER_ROLE_APPROVER && ar.Rating > 0)
+            .Join(_ctx.Assessmentdetails, ar => ar.DetailId, ad => ad.DetailId, (ar, ad) => ad)
+            .CountAsync(ad => ad.AssessmentId == assessmentId);
+
+        if (totalDetails > 0 && totalDetails == l1RatedDetails)
+            fullyL1Complete.Add(assessmentId);
+    }
+
+    return fullyL1Complete;
+}
+
+private Task<List<int>> GetLatestReviewIdsByRoleAsync(string reviewerRole)
+{
+    return _ctx.Assessmentreviews
+        .Where(ar => ar.ReviewerRole == reviewerRole && ar.DetailId != null)
+        .GroupBy(ar => ar.DetailId)
+        .Select(g => g.OrderByDescending(ar => ar.ReviewId).Select(ar => ar.ReviewId).First())
+        .ToListAsync();
+}
+
+private Task<List<Assessmentreview>> GetReviewsByIdsAsync(List<int> reviewIds)
+{
+    if (reviewIds == null || reviewIds.Count == 0)
+        return Task.FromResult(new List<Assessmentreview>());
+
+    return _ctx.Assessmentreviews
+        .Where(ar => reviewIds.Contains(ar.ReviewId))
+        .ToListAsync();
+}
+
+private Task<List<int>> GetAssessmentIdsByDetailIdsAsync(IEnumerable<int> detailIds)
+{
+    if (detailIds == null) return Task.FromResult(new List<int>());
+
+    var ids = detailIds.Distinct().ToList();
+    if (ids.Count == 0) return Task.FromResult(new List<int>());
+
+    return _ctx.Assessmentdetails
+        .Where(ad => ids.Contains(ad.DetailId))
+        .Select(ad => ad.AssessmentId)
+        .Distinct()
+        .ToListAsync();
+}
+
+private Task<List<int>> GetAssessmentIdsByDetailIdsAsync(IEnumerable<int?> detailIds)
+{
+    if (detailIds == null) return Task.FromResult(new List<int>());
+
+    var ids = detailIds
+        .Where(d => d.HasValue)
+        .Select(d => d.Value);
+
+    return GetAssessmentIdsByDetailIdsAsync(ids);
+}
+private Task<List<int>> GetPaginatedAssessmentIdsBySubmittedAtAsync(List<int> assessmentIds, int offset, int pageSize)
+{
+    return _ctx.Selfassessments
+        .Where(sa => assessmentIds.Contains(sa.AssessmentId))
+        .OrderByDescending(sa => sa.SubmittedAt)
+        .Skip(offset)
+        .Take(pageSize)
+        .Select(sa => sa.AssessmentId)
+        .ToListAsync();
+}
+
+private Task<List<ApproverAssignmentRowDto>> GetApproverAssignmentRowsAsync(
+    List<int> assessmentIds, int offset, int pageSize, string? overrideStatus)
+{
+    return _ctx.Selfassessments
+        .Where(sa => assessmentIds.Contains(sa.AssessmentId))
+        .Join(_ctx.Assessmentforms, sa => sa.FormId, f => f.FormId, (sa, f) => new { sa, f })
+        .Join(_ctx.Userauthentications, x => x.sa.EmployeeId, ua => ua.UserId, (x, ua) => new { x.sa, x.f, ua })
+        .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, x.f, x.ua, e })
+        .GroupJoin(_ctx.Userprofiles, x => x.e.EmployeeId, up => up.EmployeeId,
+            (x, up) => new { x.sa, x.f, x.ua, x.e, up = up.FirstOrDefault() })
+        .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId,
+            (x, edm) => new { x.sa, x.f, x.ua, x.e, x.up, edm })
+        .Join(_ctx.Projectemployees.Where(pe => pe.IsPrimary),
+            x => x.edm.EmployeeId, pe => pe.EmployeeId,
+            (x, pe) => new { x.sa, x.f, x.ua, x.e, x.up, pe })
+        .Join(_ctx.Projects, x => x.pe.ProjectId, p => p.ProjectId,
+            (x, p) => new { x.sa, x.f, x.ua, x.e, x.up, p })
+        .OrderByDescending(x => x.sa.SubmittedAt)
+        .Skip(offset)
+        .Take(pageSize)
+        .GroupBy(x => x.sa.AssessmentId)
+        .Select(g => new ApproverAssignmentRowDto
         {
-            if (page < 1) page = 1;
-            if (pageSize < 1) pageSize = 25;
-            var offset = (page - 1) * pageSize;
+            AssessmentId = g.Key,
+            EmployeeName = g.First().up != null
+                ? string.Concat(g.First().up.FirstName, " ", g.First().up.LastName).Trim()
+                : (string.IsNullOrWhiteSpace(g.First().ua.Email) ? g.First().e.EmployeeCompanyId : g.First().ua.Email),
+            FormName = g.First().f.Name ?? string.Empty,
+            SubmittedAt = (g.First().sa.SubmittedAt ?? DateTime.Now).ToString(DateFormat),
+            Status = overrideStatus ?? g.First().sa.Status,
+            Project = string.Join(", ", g.Select(x => x.p.ProjectName).Distinct().OrderBy(x => x))
+        })
+        .ToListAsync();
+}
 
-            var l1EmployeeId = await _ctx.Userauthentications
-                .Where(ua => ua.UserId == approverUserId)
-                .Select(ua => ua.Employee.EmployeeId)
-                .FirstOrDefaultAsync();
-
-            if (l1EmployeeId == 0)
-                return Enumerable.Empty<ApproverAssignmentRowDto>();
-
-
-            var scopeAssessmentIds = await _ctx.Selfassessments
-                .Where(sa => sa.Status == "Submitted")
-                .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
-                .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, e })
-                .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, (x, edm) => new { x.sa, edm })
-                .Join(_ctx.Projectemployees.Where(pe => pe.IsPrimary == true), x => x.edm.EmployeeId, pe => pe.EmployeeId, (x, pe) => new { x.sa, pe })
-                .Join(_ctx.Projects.Where(p => p.L1approverEmployeeId == l1EmployeeId), x => x.pe.ProjectId, p => p.ProjectId, (x, p) => x.sa.AssessmentId)
-                .Distinct()
-                .ToListAsync();
-
-            if (!scopeAssessmentIds.Any())
-                return Enumerable.Empty<ApproverAssignmentRowDto>();
-
-
-            var fullyL1CompleteAssessments = new List<int>();
-            foreach (var assessmentId in scopeAssessmentIds)
-            {
-                var totalDetails = await _ctx.Assessmentdetails
-                    .CountAsync(ad => ad.AssessmentId == assessmentId);
-
-                var l1RatedDetails = await _ctx.Assessmentreviews
-                    .Where(ar => ar.ReviewerRole == "Approver" && ar.Rating > 0)
-                    .Join(_ctx.Assessmentdetails, ar => ar.DetailId, ad => ad.DetailId, (ar, ad) => ad)
-                    .CountAsync(ad => ad.AssessmentId == assessmentId);
-
-                if (totalDetails > 0 && totalDetails == l1RatedDetails)
-                    fullyL1CompleteAssessments.Add(assessmentId);
-            }
-
-            if (!fullyL1CompleteAssessments.Any())
-                return Enumerable.Empty<ApproverAssignmentRowDto>();
-
-
-            var latestL2Reviews = await _ctx.Assessmentreviews
-                .Where(ar => ar.ReviewerRole == "Reviewer" && ar.DetailId != null)
-                .GroupBy(ar => ar.DetailId)
-                .Select(g => g.OrderByDescending(ar => ar.ReviewId).First())
-                .ToListAsync();
-
-            var rejectedDetailIds = latestL2Reviews
-                .Where(ar => ar.ReviewStatus == "Rejected")
-                .Select(ar => ar.DetailId)
-                .ToList();
-
-            var rejectedAssessmentIds = await _ctx.Assessmentdetails
-                .Where(ad => rejectedDetailIds.Contains(ad.DetailId))
-                .Select(ad => ad.AssessmentId)
-                .Distinct()
-                .ToListAsync();
-
-
-            var finalAssessmentIds = fullyL1CompleteAssessments
-                .Where(id => !rejectedAssessmentIds.Contains(id))
-                .ToList();
-
-            if (!finalAssessmentIds.Any())
-                return Enumerable.Empty<ApproverAssignmentRowDto>();
-
-
-            var paginatedIds = finalAssessmentIds
-                .OrderByDescending(id => _ctx.Selfassessments
-                    .Where(sa => sa.AssessmentId == id)
-                    .Select(sa => sa.SubmittedAt)
-                    .FirstOrDefault())
-                .Skip(offset)
-                .Take(pageSize)
-                .ToList();
-
-            var query = await _ctx.Selfassessments
-                .Where(sa => paginatedIds.Contains(sa.AssessmentId))
-                .Join(_ctx.Assessmentforms, sa => sa.FormId, f => f.FormId, (sa, f) => new { sa, f })
-                .Join(_ctx.Userauthentications, x => x.sa.EmployeeId, ua => ua.UserId, (x, ua) => new { x.sa, x.f, ua })
-                .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, x.f, x.ua, e })
-                .GroupJoin(_ctx.Userprofiles, x => x.e.EmployeeId, up => up.EmployeeId, (x, upList) => new { x.sa, x.f, x.ua, x.e, upList })
-                .SelectMany(x => x.upList.DefaultIfEmpty(), (x, up) => new { x.sa, x.f, x.ua, x.e, up })
-                .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, (x, edm) => new { x.sa, x.f, x.ua, x.e, x.up, edm })
-                .Join(_ctx.Projectemployees.Where(pe => pe.IsPrimary == true), x => x.edm.EmployeeId, pe => pe.EmployeeId, (x, pe) => new { x.sa, x.f, x.ua, x.e, x.up, pe })
-                .Join(_ctx.Projects, x => x.pe.ProjectId, p => p.ProjectId, (x, p) => new { x.sa, x.f, x.ua, x.e, x.up, p })
-                .GroupBy(x => x.sa.AssessmentId)
-                .ToListAsync();
-
-            var result = query.Select(g => new ApproverAssignmentRowDto
-            {
-                AssessmentId = g.Key,
-                EmployeeName = g.First().up != null
-                    ? $"{g.First().up.FirstName} {g.First().up.LastName}".Trim()
-                    : (string.IsNullOrWhiteSpace(g.First().ua.Email)
-                        ? g.First().e.EmployeeCompanyId
-                        : g.First().ua.Email),
-                FormName = g.First().f.Name ?? string.Empty,
-                SubmittedAt = g.First().sa.SubmittedAt != null
-                    ? g.First().sa.SubmittedAt.Value.ToString("yyyy-MM-dd HH:mm:ss")
-                    : DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                Status = g.First().sa.Status,
-                Project = string.Join(", ", g.Select(x => x.p.ProjectName).Distinct().OrderBy(x => x))
-            }).ToList();
-
-            return result;
-        }
-
-
-
-
-        public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetApproverAssessmentsWithDetailsAsync(int approverUserId, int page, int pageSize)
+        private static bool TryParseDecision(string decision, out string finalDecision)
         {
-            if (page < 1) page = 1;
-            if (pageSize < 1) pageSize = 25;
-            var offset = (page - 1) * pageSize;
+            decision = (decision ?? string.Empty).Trim();
 
-            var l1EmployeeId = await _ctx.Userauthentications
-                .Where(ua => ua.UserId == approverUserId)
-                .Select(ua => ua.Employee.EmployeeId)
-                .FirstOrDefaultAsync();
-
-            if (l1EmployeeId == 0)
-                return Enumerable.Empty<ReviewerAssessmentViewDto>();
-
-            var scopeAssessmentIds = await _ctx.Selfassessments
-                .Where(sa => sa.Status == "Submitted")
-                .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
-                .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, e })
-                .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, (x, edm) => new { x.sa, edm })
-                .Join(_ctx.Projectemployees.Where(pe => pe.IsPrimary == true), x => x.edm.EmployeeId, pe => pe.EmployeeId, (x, pe) => new { x.sa, pe })
-                .Join(_ctx.Projects.Where(p => p.L1approverEmployeeId == l1EmployeeId), x => x.pe.ProjectId, p => p.ProjectId, (x, p) => x.sa.AssessmentId)
-                .Distinct()
-                .ToListAsync();
-
-            var hasL1AssessmentIds = await _ctx.Assessmentreviews
-                .Where(ar => ar.ReviewerRole == "Approver" && ar.DetailId != null)
-                .Select(ar => ar.DetailId)
-                .ToListAsync();
-
-            var assessmentsWithL1 = await _ctx.Assessmentdetails
-                .Where(ad => hasL1AssessmentIds.Contains(ad.DetailId))
-                .Select(ad => ad.AssessmentId)
-                .Distinct()
-                .ToListAsync();
-
-            var latestL2Reviews = await _ctx.Assessmentreviews
-                .Where(ar => ar.ReviewerRole == "Reviewer" && ar.DetailId != null)
-                .GroupBy(ar => ar.DetailId)
-                .Select(g => g.OrderByDescending(ar => ar.ReviewId).First())
-                .ToListAsync();
-
-            var decidedDetailIds = latestL2Reviews
-                .Where(ar => ar.ReviewStatus == "Approved" || ar.ReviewStatus == "Rejected")
-                .Select(ar => ar.DetailId)
-                .ToList();
-
-            var fullyDecidedAssessmentIds = new List<int>();
-            foreach (var assessmentId in scopeAssessmentIds)
+            if (string.Equals(decision, AssessmentConstants.REVIEW_STATUS_APPROVED, StringComparison.OrdinalIgnoreCase))
             {
-                var totalDetails = await _ctx.Assessmentdetails
-                    .CountAsync(ad => ad.AssessmentId == assessmentId);
-                var decidedCount = await _ctx.Assessmentdetails
-                    .CountAsync(ad => ad.AssessmentId == assessmentId && decidedDetailIds.Contains(ad.DetailId));
-                if (totalDetails == decidedCount && totalDetails > 0)
-                    fullyDecidedAssessmentIds.Add(assessmentId);
+                finalDecision = AssessmentConstants.REVIEW_STATUS_APPROVED;
+                return true;
             }
 
-            var visibleAssessmentIds = scopeAssessmentIds
-                .Where(id => !fullyDecidedAssessmentIds.Contains(id) && !assessmentsWithL1.Contains(id))
-                .ToList();
-
-            var paginatedAssessmentIds = await _ctx.Selfassessments
-                .Where(sa => visibleAssessmentIds.Contains(sa.AssessmentId))
-                .OrderByDescending(sa => sa.SubmittedAt)
-                .Skip(offset)
-                .Take(pageSize)
-                .Select(sa => sa.AssessmentId)
-                .ToListAsync();
-
-            var result = new List<ReviewerAssessmentViewDto>();
-
-            foreach (var assessmentId in paginatedAssessmentIds)
+            if (string.Equals(decision, AssessmentConstants.REVIEW_STATUS_REJECTED, StringComparison.OrdinalIgnoreCase))
             {
-                var dto = await GetAssessmentForApproverAsync(approverUserId, assessmentId);
-                if (dto != null)
-                    result.Add(dto);
+                finalDecision = AssessmentConstants.REVIEW_STATUS_REJECTED;
+                return true;
             }
 
-            return result;
+            finalDecision = string.Empty;
+            return false;
         }
+private async Task<List<int>> GetRejectedAssessmentIdsFromLatestL2Async()
+{
+    var latestL2Reviews = await GetLatestReviewsByRoleAsync(AssessmentConstants.REVIEWER_ROLE_REVIEWER);
 
+    var rejectedDetailIds = latestL2Reviews
+        .Where(ar => ar.ReviewStatus == AssessmentConstants.REVIEW_STATUS_REJECTED)
+        .Select(ar => ar.DetailId)
+        .ToList();
+
+    return await GetAssessmentIdsByDetailIdsAsync(rejectedDetailIds);
+}
+
+        public async Task<IEnumerable<ApproverAssignmentRowDto>> GetSubmittedL1RatingsAsync(int approverUserId, int page, int pageSize)
+{
+    var (offset, size) = NormalizePaging(page, pageSize);
+
+    var l1EmployeeId = await GetL1EmployeeIdAsync(approverUserId);
+    if (l1EmployeeId == 0)
+        return Enumerable.Empty<ApproverAssignmentRowDto>();
+
+    var scopeAssessmentIds = await GetScopeAssessmentIdsAsync(l1EmployeeId, AssessmentConstants.STATUS_SUBMITTED);
+    if (!scopeAssessmentIds.Any())
+        return Enumerable.Empty<ApproverAssignmentRowDto>();
+
+    var fullyL1CompleteAssessmentIds = await GetFullyL1CompleteAssessmentIdsAsync(scopeAssessmentIds);
+    if (!fullyL1CompleteAssessmentIds.Any())
+        return Enumerable.Empty<ApproverAssignmentRowDto>();
+
+    var latestL2Reviews = await GetLatestReviewsByRoleAsync(AssessmentConstants.REVIEWER_ROLE_REVIEWER);
+
+    var rejectedDetailIds = latestL2Reviews
+        .Where(ar => ar.ReviewStatus == AssessmentConstants.REVIEW_STATUS_REJECTED)
+        .Select(ar => ar.DetailId)
+        .ToList();
+
+    var rejectedAssessmentIds = await GetAssessmentIdsByDetailIdsAsync(rejectedDetailIds);
+
+    var finalAssessmentIds = fullyL1CompleteAssessmentIds
+        .Where(id => !rejectedAssessmentIds.Contains(id))
+        .ToList();
+
+    if (!finalAssessmentIds.Any())
+        return Enumerable.Empty<ApproverAssignmentRowDto>();
+
+    var paginatedIds = await GetPaginatedAssessmentIdsBySubmittedAtAsync(finalAssessmentIds, offset, size);
+    if (!paginatedIds.Any())
+        return Enumerable.Empty<ApproverAssignmentRowDto>();
+
+    return await GetApproverAssignmentRowsAsync(paginatedIds, offset: 0, pageSize: int.MaxValue, overrideStatus: null);
+}
+        public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetApproverAssessmentsWithDetailsAsync(
+    int approverUserId, int page, int pageSize)
+{
+    var (offset, size) = NormalizePaging(page, pageSize);
+
+    var l1EmployeeId = await GetL1EmployeeIdAsync(approverUserId);
+    if (l1EmployeeId == 0)
+        return Enumerable.Empty<ReviewerAssessmentViewDto>();
+
+    var scopeAssessmentIds = await GetScopeAssessmentIdsAsync(l1EmployeeId, AssessmentConstants.STATUS_SUBMITTED);
+    if (!scopeAssessmentIds.Any())
+        return Enumerable.Empty<ReviewerAssessmentViewDto>();
+
+    var assessmentsWithL1 = await GetAssessmentsWithL1DetailsAsync();
+
+    var latestL2Reviews = await GetLatestReviewsByRoleAsync(AssessmentConstants.REVIEWER_ROLE_REVIEWER);
+    var fullyDecidedAssessmentIds = await GetFullyDecidedAssessmentIdsAsync(latestL2Reviews);
+
+    var visibleAssessmentIds = scopeAssessmentIds
+        .Where(id => !fullyDecidedAssessmentIds.Contains(id) && !assessmentsWithL1.Contains(id))
+        .ToList();
+
+    if (!visibleAssessmentIds.Any())
+        return Enumerable.Empty<ReviewerAssessmentViewDto>();
+
+    var paginatedAssessmentIds = await GetPaginatedAssessmentIdsBySubmittedAtAsync(visibleAssessmentIds, offset, size);
+    if (!paginatedAssessmentIds.Any())
+        return Enumerable.Empty<ReviewerAssessmentViewDto>();
+
+    var result = new List<ReviewerAssessmentViewDto>();
+    foreach (var assessmentId in paginatedAssessmentIds)
+    {
+        var dto = await GetAssessmentForApproverAsync(approverUserId, assessmentId);
+        if (dto != null)
+            result.Add(dto);
+    }
+
+    return result;
+}
         public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(int approverUserId, int assessmentId)
         {
             var l1EmployeeId = await _ctx.Userauthentications
@@ -477,7 +425,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 return null;
 
             var isInScope = await _ctx.Selfassessments
-                .Where(sa => sa.AssessmentId == assessmentId && sa.Status == "Submitted")
+                .Where(sa => sa.AssessmentId == assessmentId && sa.Status == AssessmentConstants.STATUS_SUBMITTED)
                 .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
                 .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, e })
                 .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, (x, edm) => new { x.sa, edm })
@@ -523,16 +471,18 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 .Select(p => p.ProjectName)
                 .ToListAsync();
 
-            var employeeName = userProfile != null ? $"{userProfile.FirstName} {userProfile.LastName}".Trim() : (string.IsNullOrWhiteSpace(userAuth?.Email) ? employee.EmployeeCompanyId : userAuth.Email);
+            var employeeName = userProfile != null
+                ? $"{userProfile.FirstName} {userProfile.LastName}".Trim()
+                : (string.IsNullOrWhiteSpace(userAuth?.Email) ? employee.EmployeeCompanyId : userAuth.Email);
 
             var latestL1Reviews = await _ctx.Assessmentreviews
-                .Where(ar => ar.ReviewerRole == "Approver")
+                .Where(ar => ar.ReviewerRole == AssessmentConstants.REVIEWER_ROLE_APPROVER)
                 .GroupBy(ar => ar.DetailId)
                 .Select(g => g.OrderByDescending(ar => ar.ReviewId).First())
                 .ToListAsync();
 
             var latestL2Reviews = await _ctx.Assessmentreviews
-                .Where(ar => ar.ReviewerRole == "Reviewer" && ar.Rating != 0)
+                .Where(ar => ar.ReviewerRole == AssessmentConstants.REVIEWER_ROLE_REVIEWER && ar.Rating != 0)
                 .GroupBy(ar => ar.DetailId)
                 .Select(g => g.OrderByDescending(ar => ar.ReviewId).First())
                 .ToListAsync();
@@ -582,7 +532,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 return 0;
 
             var isInScope = await _ctx.Selfassessments
-                .Where(sa => sa.AssessmentId == dto.AssessmentId && sa.Status == "Submitted")
+                .Where(sa => sa.AssessmentId == dto.AssessmentId && sa.Status == AssessmentConstants.STATUS_SUBMITTED)
                 .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
                 .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, e })
                 .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, (x, edm) => new { x.sa, edm })
@@ -604,7 +554,10 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             try
             {
                 var oldReviews = await _ctx.Assessmentreviews
-                    .Where(ar => ar.ReviewerId == approverUserId && ar.ReviewerRole == "Approver" && postedIds.Contains(ar.DetailId) && ar.Rating != 0)
+                    .Where(ar => ar.ReviewerId == approverUserId
+                              && ar.ReviewerRole == AssessmentConstants.REVIEWER_ROLE_APPROVER
+                              && postedIds.Contains(ar.DetailId)
+                              && ar.Rating != 0)
                     .ToListAsync();
 
                 _ctx.Assessmentreviews.RemoveRange(oldReviews);
@@ -617,11 +570,11 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     {
                         DetailId = item.DetailId,
                         ReviewerId = approverUserId,
-                        ReviewerRole = "Approver",
+                        ReviewerRole = AssessmentConstants.REVIEWER_ROLE_APPROVER,
                         Rating = item.Rating,
                         Comments = item.Comments,
                         ReviewedAt = DateTime.Now,
-                        ReviewStatus = "Approved"
+                        ReviewStatus = AssessmentConstants.REVIEW_STATUS_APPROVED
                     };
                     _ctx.Assessmentreviews.Add(newReview);
                     affected++;
@@ -630,12 +583,14 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 await _ctx.SaveChangesAsync();
 
                 var rejectedL2Reviews = await _ctx.Assessmentreviews
-                    .Where(ar => ar.ReviewerRole == "Reviewer" && ar.ReviewStatus == "Rejected" && postedIds.Contains(ar.DetailId))
+                    .Where(ar => ar.ReviewerRole == AssessmentConstants.REVIEWER_ROLE_REVIEWER
+                              && ar.ReviewStatus == AssessmentConstants.REVIEW_STATUS_REJECTED
+                              && postedIds.Contains(ar.DetailId))
                     .ToListAsync();
 
                 foreach (var review in rejectedL2Reviews)
                 {
-                    review.ReviewStatus = "Pending";
+                    review.ReviewStatus = AssessmentConstants.REVIEW_STATUS_PENDING;
                 }
 
                 await _ctx.SaveChangesAsync();
@@ -653,8 +608,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         public async Task<bool> SetApproverDecisionAsync(int approverUserId, int assessmentId, string decision, string? approverComment)
         {
             decision = (decision ?? string.Empty).Trim();
-            var approved = string.Equals(decision, "Approved", StringComparison.OrdinalIgnoreCase);
-            var rejected = string.Equals(decision, "Rejected", StringComparison.OrdinalIgnoreCase);
+
+            var approved = string.Equals(decision, AssessmentConstants.REVIEW_STATUS_APPROVED, StringComparison.OrdinalIgnoreCase);
+            var rejected = string.Equals(decision, AssessmentConstants.REVIEW_STATUS_REJECTED, StringComparison.OrdinalIgnoreCase);
 
             if (!approved && !rejected)
                 return false;
@@ -668,7 +624,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 return false;
 
             var inScope = await _ctx.Selfassessments
-                .Where(sa => sa.AssessmentId == assessmentId && sa.Status == "Submitted")
+                .Where(sa => sa.AssessmentId == assessmentId && sa.Status == AssessmentConstants.STATUS_SUBMITTED)
                 .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
                 .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, e })
                 .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, (x, edm) => new { x.sa, edm })
@@ -693,10 +649,15 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     return false;
                 }
 
-                var finalDecision = approved ? "Approved" : "Rejected";
+                var finalDecision = approved
+                    ? AssessmentConstants.REVIEW_STATUS_APPROVED
+                    : AssessmentConstants.REVIEW_STATUS_REJECTED;
 
                 var reviewsToUpdate = await _ctx.Assessmentreviews
-                    .Where(ar => ar.ReviewerRole == "Approver" && ar.ReviewerId == approverUserId && detailIds.Contains(ar.DetailId) && ar.Rating != 0)
+                    .Where(ar => ar.ReviewerRole == AssessmentConstants.REVIEWER_ROLE_APPROVER
+                              && ar.ReviewerId == approverUserId
+                              && detailIds.Contains(ar.DetailId)
+                              && ar.Rating != 0)
                     .ToListAsync();
 
                 foreach (var review in reviewsToUpdate)
@@ -710,10 +671,14 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 if (rejected)
                 {
-                    var note = approverComment ?? "Approver Rejected";
+                    var note = approverComment ?? "Approver Rejected"; 
                     var firstDetailId = detailIds.First();
+
                     var existingNote = await _ctx.Assessmentreviews
-                        .FirstOrDefaultAsync(ar => ar.DetailId == firstDetailId && ar.ReviewerId == approverUserId && ar.ReviewerRole == "Approver" && ar.Rating == 0);
+                        .FirstOrDefaultAsync(ar => ar.DetailId == firstDetailId
+                                                && ar.ReviewerId == approverUserId
+                                                && ar.ReviewerRole == AssessmentConstants.REVIEWER_ROLE_APPROVER
+                                                && ar.Rating == 0);
 
                     if (existingNote != null)
                     {
@@ -728,7 +693,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                         {
                             DetailId = firstDetailId,
                             ReviewerId = approverUserId,
-                            ReviewerRole = "Approver",
+                            ReviewerRole = AssessmentConstants.REVIEWER_ROLE_APPROVER,
                             Rating = 0,
                             Comments = note,
                             ReviewedAt = DateTime.Now,
@@ -740,7 +705,10 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 else
                 {
                     var notesToDelete = await _ctx.Assessmentreviews
-                        .Where(ar => ar.ReviewerRole == "Approver" && ar.ReviewerId == approverUserId && detailIds.Contains(ar.DetailId) && ar.Rating == 0)
+                        .Where(ar => ar.ReviewerRole == AssessmentConstants.REVIEWER_ROLE_APPROVER
+                                  && ar.ReviewerId == approverUserId
+                                  && detailIds.Contains(ar.DetailId)
+                                  && ar.Rating == 0)
                         .ToListAsync();
 
                     _ctx.Assessmentreviews.RemoveRange(notesToDelete);
@@ -758,7 +726,8 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     {
                         var tracker = await _ctx.Formprogresstrackers
                             .Include(t => t.Assignment)
-                            .FirstOrDefaultAsync(t => t.Assignment.EmployeeId == assessment.EmployeeId && t.Assignment.FormId == assessment.FormId);
+                            .FirstOrDefaultAsync(t => t.Assignment.EmployeeId == assessment.EmployeeId
+                                                   && t.Assignment.FormId == assessment.FormId);
 
                         if (tracker != null)
                         {
@@ -770,7 +739,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 }
                 catch
                 {
-
                 }
 
                 return true;
@@ -790,20 +758,17 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 {
                     DetailId = item.DetailId,
                     ReviewerId = approverId,
-                    ReviewerRole = "Approver",
+                    ReviewerRole = AssessmentConstants.REVIEWER_ROLE_APPROVER,
                     Rating = item.Rating,
                     Comments = item.Comments,
                     ReviewedAt = DateTime.Now,
-                    ReviewStatus = "Pending"
+                    ReviewStatus = AssessmentConstants.REVIEW_STATUS_PENDING
                 };
                 _ctx.Assessmentreviews.Add(entry);
             }
 
             await _ctx.SaveChangesAsync();
         }
-
-
-
 
         public async Task<List<AttachmentInfoDto>> GetAssessmentAttachmentsAsync(int assessmentId)
         {
@@ -825,34 +790,29 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             )).ToList();
         }
 
-
-
-
         public async Task<Selfassessmentattachment?> GetAttachmentByIdAsync(int attachmentId)
         {
             return await _ctx.Selfassessmentattachments
                 .FirstOrDefaultAsync(a => a.AttachmentId == attachmentId);
         }
 
-
         public async Task<ReviewerDecisionDto?> GetLatestReviewerDecisionAsync(int assessmentId)
-{
-    var decision = await _ctx.Assessmentreviews
-        .Where(ar => ar.ReviewerRole == "Reviewer"
-                  && _ctx.Assessmentdetails.Any(ad => ad.DetailId == ar.DetailId && ad.AssessmentId == assessmentId))
-        .OrderByDescending(ar => ar.ReviewedAt)
-        .FirstOrDefaultAsync();
+        {
+            var decision = await _ctx.Assessmentreviews
+                .Where(ar => ar.ReviewerRole == AssessmentConstants.REVIEWER_ROLE_REVIEWER
+                          && _ctx.Assessmentdetails.Any(ad => ad.DetailId == ar.DetailId && ad.AssessmentId == assessmentId))
+                .OrderByDescending(ar => ar.ReviewedAt)
+                .FirstOrDefaultAsync();
 
-    if (decision == null)
-        return null;
+            if (decision == null)
+                return null;
 
-    return new ReviewerDecisionDto(
-        assessmentId,
-        decision.ReviewStatus ?? "",  // Returns "Approved", "Rejected", or empty
-        decision.Comments ?? "",
-        decision.ReviewedAt ?? DateTime.Now
-    );
-}
-
+            return new ReviewerDecisionDto(
+                assessmentId,
+                decision.ReviewStatus ?? "",
+                decision.Comments ?? "",
+                decision.ReviewedAt ?? DateTime.Now
+            );
+        }
     }
 }
