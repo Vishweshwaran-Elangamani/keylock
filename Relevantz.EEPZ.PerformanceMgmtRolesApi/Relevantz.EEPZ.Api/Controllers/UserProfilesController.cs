@@ -23,28 +23,21 @@ namespace eepzbackend.Controllers
             _logger = logger;
         }
 
-        [HttpGet("all")]
+        // RESTful route: GET api/userprofiles
+        [HttpGet]
         public async Task<IActionResult> GetAllUserProfiles()
         {
-            try
-            {
-                var result = await _userProfilesService.GetAllUserProfilesAsync();
+            var result = await _userProfilesService.GetAllUserProfilesAsync();
 
-                if (result.Success)
-                {
-                    return Ok(new { success = true, data = result.Data });
-                }
-
-                return StatusCode(
-                    500,
-                    new { success = false, message = string.Join(", ", result.Errors) }
-                );
-            }
-            catch (System.Exception ex)
+            if (result.Success)
             {
-                _logger.LogError($"Error in GetAllUserProfiles: {ex.Message}");
-                return StatusCode(500, new { success = false, message = ex.Message });
+                return Ok(new { success = true, data = result.Data });
             }
+
+            return StatusCode(
+                500,
+                new { success = false, message = string.Join(", ", result.Errors) }
+            );
         }
     }
 }
