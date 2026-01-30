@@ -5,6 +5,7 @@ using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repositories.Interface;
 using Serilog;
+using MapsterMapper;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -17,13 +18,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private readonly ILnDApprovalRepository _approvalRepository;
         private readonly IFileStorageService _fileStorage;
         private readonly ILnDBaseRepository _baseRepository;
+        private readonly IMapper _mapper;
 
         public LnDSmeService(
             ILnDSmeRepository smeRepository,
             ILnDEmployeeSkillRepository skillRepository,
             ILnDApprovalRepository approvalRepository,
             IFileStorageService fileStorage,
-            ILnDBaseRepository baseRepository
+            ILnDBaseRepository baseRepository,
+            IMapper mapper
         )
         {
             _smeRepository = smeRepository;
@@ -31,6 +34,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _approvalRepository = approvalRepository;
             _fileStorage = fileStorage;
             _baseRepository = baseRepository;
+            _mapper = mapper;
         }
 
         #endregion
@@ -218,27 +222,16 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 totalCount
             );
 
-            var smeModels = new List<SmeResponseModel>();
-            foreach (var sme in items)
+            // Use Mapster to map Lndsme entities to SmeResponseModel
+            var smeModels = _mapper.Map<List<SmeResponseModel>>(items);
+
+            // Post-process: Add InProgressAssignments count (requires async call, can't be in mapping)
+            foreach (var smeModel in smeModels)
             {
                 var inProgressCount = await _smeRepository.GetSmeInProgressAssignmentCount(
-                    sme.SmeId
+                    smeModel.SmeId
                 );
-
-                smeModels.Add(
-                    new SmeResponseModel
-                    {
-                        SmeId = sme.SmeId,
-                        EmployeeId = sme.EmployeeId,
-                        EmployeeName =
-                            $"{sme.Employee.Userprofile.FirstName} {sme.Employee.Userprofile.LastName}",
-                        SkillId = sme.SkillId,
-                        SkillName = sme.Skill.SkillName,
-                        InProgressAssignments = inProgressCount,
-                        IsActive = sme.IsActive ?? true,
-                        ApprovedOn = sme.ApprovedOn,
-                    }
-                );
+                smeModel.InProgressAssignments = inProgressCount;
             }
   
             Log.Information(
@@ -275,6 +268,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 request.PageSize
             );
 
+            // Repository already returns SmeResponseModel, no mapping needed
             var (items, totalCount) = await _smeRepository.GetAllActiveSmes(request);
 
             return new ApiResponse<PaginatedResponse<SmeResponseModel>>

@@ -230,7 +230,7 @@ namespace Relevantz.EEPZ.Common.Models
     }
 
     /// <summary>
-    /// Request model for fetching subordinate employees.
+    /// Request model for fetching subordinate employees.00
     /// </summary>
     public class SubordinateEmployeesRequestModel
     {

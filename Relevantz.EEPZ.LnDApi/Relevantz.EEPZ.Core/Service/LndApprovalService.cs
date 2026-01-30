@@ -5,6 +5,7 @@ using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repositories.Interface;
 using Serilog;
+using MapsterMapper;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -15,6 +16,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private readonly ILnDAssignmentRepository _assignmentRepository;
         private readonly IFileStorageService _fileStorage;
         private readonly ILnDBaseRepository _baseRepository;
+        private readonly IMapper _mapper;
 
         #region Constructor
 
@@ -23,7 +25,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             ILnDSmeRepository smeRepository,
             ILnDAssignmentRepository assignmentRepository,
             IFileStorageService fileStorage,
-            ILnDBaseRepository baseRepository
+            ILnDBaseRepository baseRepository,
+            IMapper mapper
         )
         {
             _approvalRepository = approvalRepository;
@@ -31,6 +34,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _assignmentRepository = assignmentRepository;
             _fileStorage = fileStorage;
             _baseRepository = baseRepository;
+            _mapper = mapper;
         }
 
         #endregion
@@ -154,6 +158,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         approval.SkillId
                     );
 
+                    // KEEP ORIGINAL - No mapper needed here since we're setting all properties manually
                     var sme = new Lndsme
                     {
                         EmployeeId = approval.RequesterEmployeeId,
@@ -264,6 +269,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                     await _assignmentRepository.UpdateAssignment(assignment);
 
+                    // KEEP ORIGINAL - No mapper needed here since we're setting all properties manually
                     var managerApproval = new Lndapproval
                     {
                         ApprovalType = LnDConstants.APPROVAL_TYPE.ASSIGNMENT_COMPLETION,
@@ -432,61 +438,20 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
 
-            var details = new ApprovalDetailsResponseModel
-            {
-                ApprovalId = approval.ApprovalId,
-                ApprovalType = approval.ApprovalType,
-                AssignmentId = approval.AssignmentId,
-                SkillId = approval.SkillId,
-                SkillName = approval.Skill?.SkillName,
-
-                RequesterEmployeeId = approval.RequesterEmployeeId,
-                RequesterName =
-                    $"{approval.RequesterEmployee.Userprofile.FirstName} {approval.RequesterEmployee.Userprofile.LastName}",
-                RequesterEmail = approval.RequesterEmployee.Userprofile.PersonalEmail,
-
-                ApproverEmployeeId = approval.ApproverEmployeeId,
-                ApproverName =
-                    approval.ApproverEmployee != null
-                        ? $"{approval.ApproverEmployee.Userprofile.FirstName} {approval.ApproverEmployee.Userprofile.LastName}"
-                        : null,
-                ApproverEmail = approval.ApproverEmployee?.Userprofile?.PersonalEmail,
-
-                Status = approval.Status,
-                Notes = approval.Notes,
-                RequestedOn = approval.RequestedOn,
-                UpdatedOn = approval.UpdatedOn,
-
-                AttachmentId = approval.AttachmentId,
-                AttachmentFileName = approval.Attachment?.FileName,
-                AttachmentFilePath = approval.Attachment?.FilePath,
-                AttachmentFileSize = approval.Attachment?.FileSize,
-                AttachmentType = approval.Attachment?.AttachmentType,
-
-                UserRole =
-                    approval.RequesterEmployeeId == employeeId
-                        ? LnDConstants.ROLE_FILTERS.REQUESTER
-                        : LnDConstants.ROLE_FILTERS.APPROVER,
-                CanDownloadAttachment = approval.Attachment != null,
-            };
-
+            var details = _mapper.Map<ApprovalDetailsResponseModel>(approval);
+            
+         
+            details.UserRole =
+                approval.RequesterEmployeeId == employeeId
+                    ? LnDConstants.ROLE_FILTERS.REQUESTER
+                    : LnDConstants.ROLE_FILTERS.APPROVER;
+            details.CanDownloadAttachment = approval.Attachment != null;
             if (approval.AssignmentId.HasValue && approval.Assignment != null)
             {
-                details.Assignment = new AssignmentDetailsResponseModel
+                if (details.Assignment == null)
                 {
-                    AssignmentId = approval.Assignment.AssignmentId,
-                    MenteeName =
-                        $"{approval.Assignment.MenteeEmployee.Userprofile.FirstName} {approval.Assignment.MenteeEmployee.Userprofile.LastName}",
-                    SmeName =
-                        $"{approval.Assignment.Sme.Employee.Userprofile.FirstName} {approval.Assignment.Sme.Employee.Userprofile.LastName}",
-                    SkillName = approval.Assignment.Skill.SkillName,
-                    Deadline = approval.Assignment.Deadline,
-                    Status = approval.Assignment.Status,
-                    ProofFilePath = approval.Assignment.ProofFilePath,
-                    CompletionNotes = approval.Assignment?.CompletionNotes,
-
-                    CompletionRating = approval.Assignment.CompletionRating,
-                };
+                    details.Assignment = _mapper.Map<AssignmentDetailsResponseModel>(approval.Assignment);
+                }
             }
 
             Log.Debug(
@@ -838,10 +803,3 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
     }
 }
- 
-
-
-
-
-
- 

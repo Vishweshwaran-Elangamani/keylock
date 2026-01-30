@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 namespace Relevantz.EEPZ.Common.Models
 {
     /// <summary>
@@ -96,6 +97,8 @@ namespace Relevantz.EEPZ.Common.Models
     /// <summary>
     /// Represents assignment information with metadata such as deadlines, status, and overdue tracking.
     /// </summary>
+
+
     public class AssignmentResponseModel
     {
         public int AssignmentId { get; set; }
@@ -112,10 +115,15 @@ namespace Relevantz.EEPZ.Common.Models
         public string CompletionNotes { get; set; }
         public int? CompletionRating { get; set; }
         public DateOnly? CreatedOn { get; set; }
+
+        // Hide UpdatedOn from JSON serialization
+        [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
         public DateOnly? UpdatedOn { get; set; }
+
         public bool IsOverdue { get; set; }
         public int? DaysOverdue { get; set; }
     }
+
 
     /// <summary>
     /// Represents an employee’s skill mapping, rating, and SME eligibility.

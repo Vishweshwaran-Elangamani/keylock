@@ -15,10 +15,38 @@ using Relevantz.EEPZ.Data;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repositories.Implementations;
 using Relevantz.EEPZ.Data.Repositories.Interface;
+using Mapster;
+using MapsterMapper;
+using System.Reflection;
 using Serilog;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 
 var builder = WebApplication.CreateBuilder(args);
 Console.WriteLine("Building EEPZ Backend........");
+
+
+// Simple Mapster registration 
+builder.Services.AddMapster();
+
+
+var config = TypeAdapterConfig.GlobalSettings;
+config.Scan(Assembly.GetExecutingAssembly()); // Scans for IRegister implementations
+
+builder.Services.AddSingleton(config);
+builder.Services.AddScoped<IMapper, ServiceMapper>();
+
+var coreAssembly = typeof(Relevantz.EEPZ.Core.Mappings.LnDHRMapsterConfig).Assembly;
+
+var mapsterConfig = TypeAdapterConfig.GlobalSettings;
+mapsterConfig.Scan(coreAssembly); 
+
+builder.Services.AddSingleton(mapsterConfig);
+builder.Services.AddScoped<IMapper, ServiceMapper>();
+
+Log.Information("Mapster configuration completed");
+
 
 // Configure Serilog for Logging
 
@@ -62,7 +90,13 @@ builder
     })
     .AddFluentValidation(fv =>
         fv.RegisterValidatorsFromAssemblyContaining<Relevantz.EEPZ.Common.Validators.ApprovalDecisionRequestModelValidator>()
-    );
+    ).AddJsonOptions(options =>
+    {
+        // This will hide all null properties from JSON output
+        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.WriteIndented = false;
+    });
 
 builder.Services.AddEndpointsApiExplorer();
 

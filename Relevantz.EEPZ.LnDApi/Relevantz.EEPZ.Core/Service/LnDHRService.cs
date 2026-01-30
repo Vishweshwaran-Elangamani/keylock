@@ -1,4 +1,5 @@
 using ClosedXML.Excel;
+using Mapster;
 using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Models;
@@ -44,7 +45,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 "GetAllOrganizationEmployees: Retrieved {ItemCount} employees from database. TotalCount={TotalCount}",
                 items.Count,
                 totalCount
-            ); 
+            );
 
             var paginatedResponse = new PaginatedResponse<SubordinateEmployeeResponseModel>
             {
@@ -52,7 +53,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize,
-            };      
+            };
 
             Log.Information(
                 "GetAllOrganizationEmployees succeeded. ReturnedCount={Count}, TotalCount={TotalCount}",
@@ -91,24 +92,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
             var sortedItems = ApplySkillSorting(items.AsQueryable(), request.SortBy).ToList();
 
-            var responseItems = sortedItems
-                .Select(m => new EmployeeSkillResponseModel
-                {
-                    MapperId = m.MapperId,
-                    EmployeeId = m.EmployeeId,
-                    EmployeeName =
-                        $"{m.Employee.Userprofile.FirstName} {m.Employee.Userprofile.LastName}",
-                    SkillId = m.SkillId,
-                    SkillName = m.Skill.SkillName,
-                    Rating = m.Rating,
-                    CreatedOn = m.CreatedOn,
-                    UpdatedOn = m.UpdatedOn,
-                    CanBecomeSme = m.Rating >= LnDConstants.MIN_SME_RATING,
-                    IsSme = m.Skill.Lndsmes.Any(s =>
-                        s.EmployeeId == m.EmployeeId && s.IsActive == true
-                    ),
-                })
-                .ToList();
+            // Using Mapster for mapping
+            var responseItems = sortedItems.Adapt<List<EmployeeSkillResponseModel>>();
 
             return new ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>
             {
@@ -131,8 +116,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         /// Gets paginated organization-wide assignments with filtering and search
         /// </summary>
         public async Task<
-            ApiResponse<PaginatedResponse<AssignmentResponseModel>>
-        > GetAllOrganizationAssignments(OrganizationAssignmentsRequestModel request)
+              ApiResponse<PaginatedResponse<AssignmentResponseModel>>
+          > GetAllOrganizationAssignments(OrganizationAssignmentsRequestModel request)
         {
             Log.Information(
                 "GetAllOrganizationAssignments started. StatusFilter={StatusFilter}, SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
@@ -151,41 +136,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 )
                 .ToList();
 
-            var today = DateTime.Now.Date;
-
-            var assignmentResponseModels = sortedItems
-                .Select(a =>
-                {
-                    var deadlineDate = a.Deadline?.Date;
-                    var isCompleted = a.Status == LnDConstants.ASSIGNMENT_STATUS.COMPLETED;
-
-                    var isOverdue =
-                        deadlineDate.HasValue && deadlineDate.Value < today && !isCompleted;
-
-                    var daysOverdue =
-                        isOverdue && deadlineDate.HasValue
-                            ? (int)(today - deadlineDate.Value).TotalDays
-                            : (int?)null; 
-
-                    return new AssignmentResponseModel
-                    {
-                        AssignmentId = a.AssignmentId,
-                        SkillName = a.Skill?.SkillName,
-                        MenteeName =
-                            $"{a.MenteeEmployee?.Userprofile?.FirstName} {a.MenteeEmployee?.Userprofile?.LastName}",
-                        SmeName =
-                            $"{a.Sme?.Employee?.Userprofile?.FirstName} {a.Sme?.Employee?.Userprofile?.LastName}",
-                        Status = a.Status,
-                        CreatedOn = a.CreatedOn,
-                        Deadline = a.Deadline,
-                        CompletionRating = a.CompletionRating,
-                        CompletionNotes = a.CompletionNotes,
-                        ProofFilePath = a.ProofFilePath,
-                        IsOverdue = isOverdue,
-                        DaysOverdue = daysOverdue,
-                    };
-                })
-                .ToList();
+            // Using Mapster for mapping
+            var assignmentResponseModels = sortedItems.Adapt<List<AssignmentResponseModel>>();
 
             var paginatedResponse = new PaginatedResponse<AssignmentResponseModel>
             {
@@ -251,7 +203,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             worksheet.Cell(1, 8).Value = LnDConstants.ORG_EXPORT.SCORE;
             worksheet.Cell(1, 9).Value = LnDConstants.ORG_EXPORT.COMMENTS;
 
-            int row = 2; 
+            int row = 2;
 
             foreach (var assignment in sortedAssignments)
             {
@@ -287,6 +239,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
         #endregion
 
+        #region Private Helpers
 
         private IQueryable<Lndassignment> ApplySorting(
             IQueryable<Lndassignment> query,
@@ -335,7 +288,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
-        #region privatehelper
         private IQueryable<Lndemployeeskillmapper> ApplySkillSorting(
             IQueryable<Lndemployeeskillmapper> query,
             string? sortBy
