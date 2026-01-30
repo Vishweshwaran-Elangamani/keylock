@@ -46,7 +46,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (dto.ParticipantEmployeeIds == null || !dto.ParticipantEmployeeIds.Any())
                 throw new ArgumentException(AppConstants.ExceptionMessages.ValidationFailed);
 
-            // 🔥 BULK PARTICIPANT VALIDATION
+
             var distinctIds = dto.ParticipantEmployeeIds.Distinct().ToList();
             var employees = await _meetingRepository.GetEmployeesByIdsAsync(distinctIds, ct);
             if (employees.Count != distinctIds.Count)
@@ -91,10 +91,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
-        public async Task<MeetingResponseDto?> GetMeetingByIdAsync(int meetingId, CancellationToken ct = default)
+        public async Task<MeetingResponseDto> GetMeetingByIdAsync(int meetingId, CancellationToken ct = default)
         {
-            var meeting = await _meetingRepository.GetMeetingByIdAsync(meetingId, ct);
-            return meeting?.Adapt<MeetingResponseDto>();
+            var meeting = await _meetingRepository.GetMeetingByIdAsync(meetingId, ct)
+                          ?? throw new InvalidOperationException(AppConstants.ExceptionMessages.MeetingNotFound);
+
+            return meeting.Adapt<MeetingResponseDto>();
         }
 
         public async Task<OneOnOneReportDto> GetOneOnOneReportsAsync(int managerId, string role, int? empId, DateTime? start, DateTime? end, CancellationToken ct = default)
@@ -113,13 +115,21 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
-        public async Task<OneOnOneSummaryDto> GetOneOnOneSummaryAsync(int managerId, string role, CancellationToken ct = default)
+        public async Task<OneOnOneSummaryDto> GetOneOnOneSummaryAsync(
+     int managerId,
+     UserRole role,
+     CancellationToken ct = default)
         {
-            if (!string.Equals(role, AppConstants.Roles.Manager, StringComparison.OrdinalIgnoreCase))
+            if (role != UserRole.Manager)
                 throw new UnauthorizedAccessException(AppConstants.ExceptionMessages.UnauthorizedAccess);
 
-            var meetings = await _meetingRepository.GetOneOnOneMeetingsByManagerAsync(managerId, null, null, null, ct) ?? new List<Meeting>();
-            var team = await _meetingRepository.GetTeamMembersByManagerIdAsync(managerId, 1, 1000, ct) ?? new List<Employee>();
+            var meetings = await _meetingRepository
+                .GetOneOnOneMeetingsByManagerAsync(managerId, null, null, null, ct)
+                ?? new List<Meeting>();
+
+            var team = await _meetingRepository
+                .GetTeamMembersByManagerIdAsync(managerId, 1, 1000, ct)
+                ?? new List<Employee>();
 
             return new OneOnOneSummaryDto
             {
@@ -129,6 +139,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 LastMonthOneOnOnes = meetings.Count(m => m.MeetingDate.Month == _dateTimeProvider.Now.AddMonths(-1).Month)
             };
         }
+
 
         public async Task<MeetingInvitationDto> SubmitRsvpAsync(RsvpResponseDto dto, int empId, CancellationToken ct = default)
         {

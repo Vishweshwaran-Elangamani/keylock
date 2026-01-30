@@ -1,4 +1,5 @@
 using Relevantz.EEPZ.Common.DTOs;
+using Relevantz.EEPZ.Common.Enums;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,11 +33,7 @@ namespace Relevantz.EEPZ.Core.Services.Interfaces
             DateTime? endDate = null,
             CancellationToken cancellationToken = default);
 
-        Task<OneOnOneSummaryDto> GetOneOnOneSummaryAsync(
-            int managerId,
-            string role,
-            CancellationToken cancellationToken = default);
-
+        Task<OneOnOneSummaryDto> GetOneOnOneSummaryAsync( int managerId, UserRole role, CancellationToken ct = default);
         Task<MeetingInvitationDto> SubmitRsvpAsync(
             RsvpResponseDto rsvpDto,
             int employeeId,
