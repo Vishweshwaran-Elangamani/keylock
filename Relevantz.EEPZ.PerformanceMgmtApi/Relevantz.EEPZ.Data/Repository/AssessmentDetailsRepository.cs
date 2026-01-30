@@ -7,11 +7,12 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
     public class AssessmentDetailsRepository : IAssessmentDetailsRepository
     {
-        private readonly EEPZDbContext _dbContext;
+        private readonly EEPZDbContext _assessmentDetailsDbContext;
 
-        public AssessmentDetailsRepository(EEPZDbContext dbContext)
+        public AssessmentDetailsRepository(EEPZDbContext assessmentDetailsDbContext)
         {
-            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            _assessmentDetailsDbContext = assessmentDetailsDbContext 
+                ?? throw new ArgumentNullException(nameof(assessmentDetailsDbContext));
         }
 
         /// <summary>
@@ -19,7 +20,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         /// </summary>
         public async Task<List<Userprofile>> GetAllUserProfilesAsync()
         {
-            return await _dbContext.Userprofiles.AsNoTracking().ToListAsync();
+            return await _assessmentDetailsDbContext.Userprofiles.AsNoTracking().ToListAsync();
         }
 
         /// <summary>
@@ -27,7 +28,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         /// </summary>
         public async Task<List<Userauthentication>> GetAllUserAuthenticationsAsync()
         {
-            return await _dbContext.Userauthentications.AsNoTracking().ToListAsync();
+            return await _assessmentDetailsDbContext.Userauthentications.AsNoTracking().ToListAsync();
         }
 
         /// <summary>
@@ -35,7 +36,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         /// </summary>
         public async Task<List<Project>> GetAllProjectsAsync()
         {
-            return await _dbContext.Projects.AsNoTracking().ToListAsync();
+            return await _assessmentDetailsDbContext.Projects.AsNoTracking().ToListAsync();
         }
 
         /// <summary>
@@ -43,7 +44,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         /// </summary>
         public async Task<List<Projectemployee>> GetAllProjectEmployeesAsync()
         {
-            return await _dbContext.Projectemployees.AsNoTracking().ToListAsync();
+            return await _assessmentDetailsDbContext.Projectemployees.AsNoTracking().ToListAsync();
         }
 
         /// <summary>
@@ -51,7 +52,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         /// </summary>
         public async Task<List<Selfassessment>> GetAllSelfAssessmentsWithDetailsAsync()
         {
-            return await _dbContext.Selfassessments
+            return await _assessmentDetailsDbContext.Selfassessments
                 .Include(sa => sa.Assessmentdetails)
                     .ThenInclude(ad => ad.Competency)
                 .AsNoTracking()
@@ -63,7 +64,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         /// </summary>
         public async Task<List<Assessmentreview>> GetAllAssessmentReviewsAsync()
         {
-            return await _dbContext.Assessmentreviews.AsNoTracking().ToListAsync();
+            return await _assessmentDetailsDbContext.Assessmentreviews.AsNoTracking().ToListAsync();
         }
 
         /// <summary>
@@ -71,7 +72,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         /// </summary>
         public async Task<List<Assignment>> GetAssignmentsWithFormCompetenciesAsync()
         {
-            return await _dbContext.Assignments
+            return await _assessmentDetailsDbContext.Assignments
                 .Where(a => a.Action == "Send")
                 .Include(a => a.Form)
                     .ThenInclude(f => f.Competencies)
@@ -84,7 +85,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         /// </summary>
         public async Task<List<Selfassessmentattachment>> GetAllSelfAssessmentAttachmentsAsync()
         {
-            return await _dbContext.Selfassessmentattachments.AsNoTracking().ToListAsync();
+            return await _assessmentDetailsDbContext.Selfassessmentattachments.AsNoTracking().ToListAsync();
         }
 
         /// <summary>
@@ -92,10 +93,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         /// </summary>
         public async Task<Selfassessmentattachment?> GetAttachmentByIdAsync(int attachmentId)
         {
-            return await _dbContext.Selfassessmentattachments
+            return await _assessmentDetailsDbContext.Selfassessmentattachments
                 .AsNoTracking()
                 .FirstOrDefaultAsync(a => a.AttachmentId == attachmentId);
         }
     }
 }
-
