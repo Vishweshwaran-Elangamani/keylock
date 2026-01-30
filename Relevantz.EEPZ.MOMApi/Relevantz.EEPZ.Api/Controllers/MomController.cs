@@ -21,25 +21,33 @@ namespace eepzbackend.Controllers
         }
 
         /// <summary>
-        /// Create a new MOM
-        /// </summary>
-        [HttpPost("create")]
-        public async Task<ActionResult<ApiResponse<MomResponseDto>>> CreateMom([FromBody] CreateMomDto createMomDto)
-        {
-            var correlationId = HttpContext.TraceIdentifier;
+/// Create a new MOM
+/// </summary>
+[HttpPost("create")]
+[ProducesResponseType(typeof(ApiResponse<MomResponseDto>), StatusCodes.Status201Created)]
+[ProducesResponseType(typeof(ApiResponse<MomResponseDto>), StatusCodes.Status400BadRequest)]
+[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+public async Task<ActionResult<ApiResponse<MomResponseDto>>> CreateMom([FromBody] CreateMomDto createMomDto)
+{
+    var correlationId = HttpContext.TraceIdentifier;
 
-            var employeeId = GetEmployeeIdFromClaims();
-            var role = GetRoleFromClaims();
+    var employeeId = GetEmployeeIdFromClaims();
+    var role = GetRoleFromClaims();
 
-            var result = await _momService.CreateMomAsync(createMomDto, employeeId, role);
+    var result = await _momService.CreateMomAsync(createMomDto, employeeId, role);
 
-            Response.Headers.Add("X-Correlation-Id", correlationId);
+    Response.Headers.Add("X-Correlation-Id", correlationId);
 
-            return Ok(ApiResponse<MomResponseDto>.SuccessResponse(
-                result,
-                AppConstants.ResponseMessages.MomCreatedSuccessfully,
-                correlationId));
-        }
+    // Return 201 Created with Location header pointing to the created resource
+    return CreatedAtAction(
+        nameof(GetMomById),
+        new { momId = result.MomId },
+        ApiResponse<MomResponseDto>.SuccessResponse(
+            result,
+            AppConstants.ResponseMessages.MomCreatedSuccessfully,
+            correlationId));
+}
+
 
         /// <summary>
         /// Update an existing MOM

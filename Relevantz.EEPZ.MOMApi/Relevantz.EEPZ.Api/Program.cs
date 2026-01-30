@@ -10,9 +10,15 @@ using Relevantz.EEPZ.Data.Repository.Implementations;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Core.Services.Implementations;
 using System.Text;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Prometheus;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Relevantz.EEPZ.Common.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
-Console.WriteLine("Building........");
+Log.Information("Building");
 
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
@@ -24,6 +30,12 @@ builder.Host.UseSerilog();
 Log.Information("Starting EEPZ MoM Backend Application");
 
 builder.Services.AddControllers();
+
+// Add FluentValidation
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateMomDtoValidator>();
+
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(options =>
@@ -100,16 +112,27 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.Zero
     };
 });
+
 builder.Services.AddScoped<IMomRepository, MomRepository>();
 builder.Services.AddScoped<IMomService, MomService>();
 
+// Health Checks Configuration
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<EEPZDbContext>(
+        name: "database",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: new[] { "ready" })
+    .AddCheck("self", () => HealthCheckResult.Healthy(), tags: new[] { "live" });
+
+// CORS Configuration
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowSpecificOrigin", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins("http://localhost:3007")
               .AllowAnyMethod()
-              .AllowAnyHeader();
+              .AllowAnyHeader()
+              .AllowCredentials();
     });
 });
 
@@ -133,9 +156,29 @@ app.UseSerilogRequestLogging(options =>
 });
 
 app.UseHttpsRedirection();
-app.UseCors("AllowAll");
+app.UseCors("AllowSpecificOrigin");
+
+// Prometheus Metrics Middleware
+app.UseHttpMetrics();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Health Check Endpoints
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = (check) => check.Tags.Contains("live"),
+    AllowCachingResponses = false
+});
+
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = (check) => check.Tags.Contains("ready"),
+    AllowCachingResponses = false
+});
+
+// Prometheus Metrics Endpoint
+app.MapMetrics();
 
 app.MapControllers();
 
@@ -162,6 +205,9 @@ Log.Information(
     "   Database: {Database}",
     connectionString?.Split(';').FirstOrDefault(x => x.Contains("Database"))
 );
+Log.Information("   Health Checks: /health/live, /health/ready");
+Log.Information("   Metrics: /metrics");
+Log.Information("   FluentValidation: Registered");
 
 try
 {
