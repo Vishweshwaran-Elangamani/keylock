@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Relevantz.EEPZ.Common.DTOs.Response;
+using Relevantz.EEPZ.Common.Constants;
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
@@ -34,24 +36,83 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 .FirstOrDefaultAsync(a => a.AssessmentId == assessmentId && a.EmployeeId == employeeId);
         }
 
-        public async Task<int> CreateApprovalAsync(ApprovalRequestDto request, int deptHeadUserId)
+        public async Task<int> CreateApprovalAsync(Departmentheadapproval approval)
         {
-            var approval = new Departmentheadapproval
-            {
-                EmployeeId = request.EmployeeId,
-                ProjectId = request.ProjectId,
-                AssessmentId = request.AssessmentId,
-                ApprovedBy = deptHeadUserId,
-                ApprovedAt = DateTime.UtcNow,
-                Status = "Approved",
-                AcknowledgedByEmployee = false,
-                AcknowledgedAt = null,
-                EmployeeComments = null
-            };
-
             _context.Departmentheadapprovals.Add(approval);
             await _context.SaveChangesAsync();
             return approval.ApprovalId;
+        }
+
+       
+
+public async Task<PagedResult<Userprofile>> GetUserProfilesPagedAsync(int page, int pageSize)
+{
+    page = page <= 0 ? 1 : page;
+    pageSize = pageSize <= 0 ? 25 : pageSize;
+
+    var query = _context.Userprofiles.AsNoTracking();
+
+    var total = await query.CountAsync();
+
+    var items = await query
+        .OrderBy(x => x.EmployeeId) // stable ordering required for paging
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync();
+
+    return new PagedResult<Userprofile>
+    {
+        Items = items,
+        TotalRecords = total,
+        Page = page,
+        PageSize = pageSize
+    };
+}
+
+        public async Task<List<Userprofile>> GetUserProfilesByEmployeeIdsAsync(List<int> employeeIds)
+        {
+            if (employeeIds == null || employeeIds.Count == 0)
+                return new List<Userprofile>();
+
+            return await _context.Userprofiles
+                .AsNoTracking()
+                .Where(up => employeeIds.Contains(up.EmployeeId))
+                .ToListAsync();
+        }
+
+        public async Task<PagedResult<Userauthentication>> GetUserAuthenticationsPagedAsync(int page, int pageSize)
+        {
+            page = page <= 0 ? 1 : page;
+            pageSize = pageSize <= 0 ? 25 : pageSize;
+
+            var query = _context.Userauthentications.AsNoTracking();
+
+            var total = await query.CountAsync();
+
+            var items = await query
+                .OrderBy(x => x.EmployeeId) // stable ordering
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PagedResult<Userauthentication>
+            {
+                Items = items,
+                TotalRecords = total,
+                Page = page,
+                PageSize = pageSize
+            };
+        }
+
+        public async Task<List<Userauthentication>> GetUserAuthenticationsByEmployeeIdsAsync(List<int> employeeIds)
+        {
+            if (employeeIds == null || employeeIds.Count == 0)
+                return new List<Userauthentication>();
+
+            return await _context.Userauthentications
+                .AsNoTracking()
+                .Where(ua => employeeIds.Contains(ua.EmployeeId))
+                .ToListAsync();
         }
 
         public async Task<List<Userprofile>> GetAllUserProfilesAsync()
@@ -95,7 +156,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return await _context.Selfassessments
                 .Include(sa => sa.Assessmentdetails)
                 .ThenInclude(ad => ad.Competency)
-                .Where(sa => sa.Status == "Submitted")
+                .Where(sa => sa.Status == AssessmentStatuses.Submitted)
                 .AsNoTracking()
                 .ToListAsync();
         }
@@ -134,7 +195,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     a.EmployeeId == employeeId &&
                     a.ProjectId == projectId &&
                     a.AssessmentId == assessmentId &&
-                    a.Status == "Approved");
+                    a.Status == ApprovalStatuses.Approved);
         }
 
         public async Task<List<int>> GetGoalIdsByEmployeeIdAsync(int employeeId)
@@ -156,7 +217,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         public async Task<(List<Departmentheadapproval> approvals, int totalRecords)> GetApprovedEmployeesAsync(int page, int pageSize, int? deptHeadEmployeeId)
         {
             IQueryable<Departmentheadapproval> approvalQuery = _context.Departmentheadapprovals
-                .Where(a => a.Status == "Approved" || a.Status == null);
+                .Where(a => a.Status == ApprovalStatuses.Approved || a.Status == null);
 
             if (deptHeadEmployeeId.HasValue)
             {
@@ -212,14 +273,14 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         }
 
         public async Task<List<Departmentheadapproval>> GetPendingApprovalsForEmployeeAsync(int employeeId, int userId)
-        {
-            return await _context.Departmentheadapprovals
-                .Where(a => (a.EmployeeId == employeeId || a.EmployeeId == userId) &&
-                           (a.Status == "Approved" || a.Status == null) &&
-                           a.AcknowledgedByEmployee == false)
-                .OrderByDescending(a => a.ApprovedAt)
-                .ToListAsync();
-        }
+{
+    return await _context.Departmentheadapprovals
+        .Where(a => (a.EmployeeId == employeeId || a.EmployeeId == userId) &&
+                    (a.Status == ApprovalStatuses.Approved || a.Status == null) &&
+                    a.AcknowledgedByEmployee == false)
+        .OrderByDescending(a => a.ApprovedAt)
+        .ToListAsync();
+}
 
         public async Task<Selfassessment> GetAssessmentWithDetailsAsync(int assessmentId)
         {
@@ -317,3 +378,5 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
     }
 }
+
+

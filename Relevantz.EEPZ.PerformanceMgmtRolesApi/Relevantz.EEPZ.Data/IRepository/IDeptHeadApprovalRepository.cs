@@ -3,6 +3,7 @@ using Relevantz.EEPZ.Common.Entities;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Relevantz.EEPZ.Common.DTOs.Response;
 
 namespace Relevantz.EEPZ.Data.Repository.Interfaces
 {
@@ -10,9 +11,14 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
     {
         Task<Selfassessment> GetAssessmentByIdAsync(int assessmentId);
         Task<Departmentheadapproval> GetExistingApprovalAsync(int assessmentId, int employeeId);
-        Task<int> CreateApprovalAsync(ApprovalRequestDto request, int deptHeadUserId);
-        Task<List<Userprofile>> GetAllUserProfilesAsync();
-        Task<List<Userauthentication>> GetAllUserAuthenticationsAsync();
+        Task<int> CreateApprovalAsync(Departmentheadapproval approval);
+        
+
+Task<PagedResult<Userprofile>> GetUserProfilesPagedAsync(int page, int pageSize);
+Task<List<Userprofile>> GetUserProfilesByEmployeeIdsAsync(List<int> employeeIds);
+
+Task<PagedResult<Userauthentication>> GetUserAuthenticationsPagedAsync(int page, int pageSize);
+Task<List<Userauthentication>> GetUserAuthenticationsByEmployeeIdsAsync(List<int> employeeIds);
         Task<List<Project>> GetAllProjectsAsync();
         Task<List<Projectemployee>> GetAllProjectEmployeesAsync();
         Task<int> GetDepartmentIdByEmployeeIdAsync(int employeeId);

@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using MongoDB.Bson;
+using Relevantz.EEPZ.Common.Constants;
+using Relevantz.EEPZ.Common.Entities;
 
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
@@ -83,8 +85,20 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
 
 
-                var approvalId = await _repository.CreateApprovalAsync(request, deptHeadUserId);
-                return ApiResponse<int>.SuccessResponse(approvalId);
+var approval = new Departmentheadapproval
+{
+    EmployeeId = request.EmployeeId,
+    ProjectId = request.ProjectId,
+    AssessmentId = request.AssessmentId,
+    ApprovedBy = deptHeadUserId,
+    ApprovedAt = DateTime.UtcNow,
+    Status = ApprovalStatuses.Approved,  
+    AcknowledgedByEmployee = false,
+    AcknowledgedAt = null,
+    EmployeeComments = null
+};
+
+var approvalId = await _repository.CreateApprovalAsync(approval);                return ApiResponse<int>.SuccessResponse(approvalId);
             }
             catch (Exception ex)
             {
@@ -94,256 +108,261 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
 
-        public async Task<ApiResponse<List<object>>> GetDeptHeadSubmittedRatingsAsync(int? deptHeadEmployeeId)
+       public async Task<ApiResponse<List<object>>> GetDeptHeadSubmittedRatingsAsync(int? deptHeadEmployeeId)
+{
+    try
+    {
+        _logger.LogInformation($"GetDeptHeadSubmittedRatings called with departmentHeadId: {deptHeadEmployeeId}");
+
+        var projects = await _repository.GetAllProjectsAsync();
+        var projectEmployees = await _repository.GetAllProjectEmployeesAsync();
+
+        if (deptHeadEmployeeId.HasValue)
         {
-            try
+            var deptHeadDeptId = await _repository.GetDepartmentIdByEmployeeIdAsync(deptHeadEmployeeId.Value);
+
+            if (deptHeadDeptId > 0)
             {
-                _logger.LogInformation($"GetDeptHeadSubmittedRatings called with departmentHeadId: {deptHeadEmployeeId}");
+                _logger.LogInformation($"Filtering by Department ID: {deptHeadDeptId}");
+                var departmentEmployeeIds = await _repository.GetEmployeeIdsByDepartmentAsync(deptHeadDeptId);
 
-
-                var profiles = await _repository.GetAllUserProfilesAsync();
-                var userAuths = await _repository.GetAllUserAuthenticationsAsync();
-                var projects = await _repository.GetAllProjectsAsync();
-                var projectEmployees = await _repository.GetAllProjectEmployeesAsync();
-
-
-                if (deptHeadEmployeeId.HasValue)
-                {
-                    var deptHeadDeptId = await _repository.GetDepartmentIdByEmployeeIdAsync(deptHeadEmployeeId.Value);
-
-
-                    if (deptHeadDeptId > 0)
-                    {
-                        _logger.LogInformation($"Filtering by Department ID: {deptHeadDeptId}");
-                        var departmentEmployeeIds = await _repository.GetEmployeeIdsByDepartmentAsync(deptHeadDeptId);
-                        projectEmployees = projectEmployees.Where(pe => departmentEmployeeIds.Contains(pe.EmployeeId)).ToList();
-                    }
-                }
-
-
-                var selfAssessments = await _repository.GetSubmittedSelfAssessmentsAsync();
-                var reviews = await _repository.GetAllAssessmentReviewsAsync();
-                var allEmployeeIds = projectEmployees.Select(pe => pe.EmployeeId).Distinct().ToList();
-                var allGoals = await _repository.GetGoalsByEmployeeIdsAsync(allEmployeeIds);
-
-
-                var results = new List<object>();
-
-
-                foreach (var pe in projectEmployees)
-                {
-                    try
-                    {
-                        var profile = profiles.FirstOrDefault(up => up.EmployeeId == pe.EmployeeId);
-                        if (profile == null) continue;
-                        var userAuth = userAuths.FirstOrDefault(ua => ua.EmployeeId == pe.EmployeeId);
-                        if (userAuth == null) continue;
-                        var project = projects.FirstOrDefault(p => p.ProjectId == pe.ProjectId);
-                        if (project == null) continue;
-                        var employeeAssessments = selfAssessments
-                            .Where(sa => sa.EmployeeId == userAuth.UserId && sa.Assessmentdetails != null && sa.Assessmentdetails.Any())
-                            .OrderByDescending(sa => sa.SubmittedAt)
-                            .ToList();
-                        if (!employeeAssessments.Any()) continue;
-                        foreach (var selfAssessment in employeeAssessments)
-                        {
-                            var approval = await _repository.GetDeptHeadApprovalAsync(pe.EmployeeId, pe.ProjectId, selfAssessment.AssessmentId);
-                            if (approval != null)
-                            {
-                                _logger.LogDebug($"Skipping AssessmentId {selfAssessment.AssessmentId} - Already department head approved");
-                                continue;
-                            }
-
-
-                            var l1Auth = project.L1approverEmployeeId.HasValue
-                                ? userAuths.FirstOrDefault(ua => ua.EmployeeId == project.L1approverEmployeeId)
-                                : null;
-
-
-                            var l2Auth = project.L2approverEmployeeId.HasValue
-                                ? userAuths.FirstOrDefault(ua => ua.EmployeeId == project.L2approverEmployeeId)
-                                : null;
-
-
-                            bool hasL2 = l2Auth != null;
-                            bool allL2Approved = false;
-
-
-                            if (hasL2)
-                            {
-                                allL2Approved = selfAssessment.Assessmentdetails.All(detail =>
-                                    reviews.Any(r =>
-                                        r.DetailId == detail.DetailId &&
-                                        r.ReviewerId == l2Auth.UserId &&
-                                        r.ReviewerRole == "Reviewer" &&
-                                        r.ReviewStatus == "Approved"));
-                            }
-
-
-                            if (!hasL2)
-                            {
-                                _logger.LogDebug($"Skipping AssessmentId {selfAssessment.AssessmentId} - No L2 reviewer configured");
-                                continue;
-                            }
-
-
-                            if (!allL2Approved)
-                            {
-                                _logger.LogDebug($"Skipping AssessmentId {selfAssessment.AssessmentId} - L2 has not approved all details");
-                                continue;
-                            }
-
-
-                            _logger.LogInformation($"Including AssessmentId {selfAssessment.AssessmentId} - L2 approved");
-
-
-                            string l1ReviewerName = "No L1";
-                            if (l1Auth != null && project.L1approverEmployeeId.HasValue)
-                            {
-                                var l1Profile = profiles.FirstOrDefault(p => p.EmployeeId == project.L1approverEmployeeId);
-                                if (l1Profile != null)
-                                {
-                                    l1ReviewerName = $"{l1Profile.FirstName ?? ""} {l1Profile.LastName ?? ""}".Trim();
-                                    if (string.IsNullOrEmpty(l1ReviewerName))
-                                        l1ReviewerName = "L1 Reviewer";
-                                }
-                            }
-
-
-                            string l2ReviewerName = "No L2";
-                            if (l2Auth != null && project.L2approverEmployeeId.HasValue)
-                            {
-                                var l2Profile = profiles.FirstOrDefault(p => p.EmployeeId == project.L2approverEmployeeId);
-                                if (l2Profile != null)
-                                {
-                                    l2ReviewerName = $"{l2Profile.FirstName ?? ""} {l2Profile.LastName ?? ""}".Trim();
-                                    if (string.IsNullOrEmpty(l2ReviewerName))
-                                        l2ReviewerName = "L2 Reviewer";
-                                }
-                            }
-
-
-                            var competencies = selfAssessment.Assessmentdetails.Select(detail =>
-                            {
-                                var l1Review = l1Auth != null ? reviews.FirstOrDefault(r =>
-                                    r.DetailId == detail.DetailId &&
-                                    r.ReviewerId == l1Auth.UserId &&
-                                    r.ReviewerRole == "Approver") : null;
-
-
-                                var l2Review = l2Auth != null ? reviews.FirstOrDefault(r =>
-                                    r.DetailId == detail.DetailId &&
-                                    r.ReviewerId == l2Auth.UserId &&
-                                    r.ReviewerRole == "Reviewer") : null;
-
-
-                                return new
-                                {
-                                    CompetencyName = detail.Competency?.Name ?? "Unknown",
-                                    EmployeeRating = detail.EmployeeRating,
-                                    EmployeeComments = detail.EmployeeComments,
-                                    L1ReviewerName = l1ReviewerName,
-                                    L1Rating = l1Review?.Rating,
-                                    L1Comments = l1Review?.Comments,
-                                    L1ReviewStatus = l1Review?.ReviewStatus,
-                                    L2ReviewerName = l2ReviewerName,
-                                    L2Rating = l2Review?.Rating,
-                                    L2Comments = l2Review?.Comments,
-                                    L2ReviewStatus = l2Review?.ReviewStatus,
-                                    Status = "Completed"
-                                };
-                            }).ToList();
-
-
-                            var employeeGoalIds = await _repository.GetGoalIdsByEmployeeIdAsync(pe.EmployeeId);
-                            var employeeGoals = allGoals.Where(g => employeeGoalIds.Contains(g.GoalId)).ToList();
-
-
-                            var formattedGoals = employeeGoals.Select(g => new
-                            {
-                                g.GoalId,
-                                g.GoalTitle,
-                                g.GoalDescription,
-                                g.Goalstatus,
-                                GoalComments = g.GoalComments.Select(c => new
-                                {
-                                    c.Goalcommentid,
-                                    Comment = c.GoalComment1,
-                                    c.CommentedOn
-                                }),
-                                GoalProgressLogs = g.Goalprogresslogs.Select(p => new
-                                {
-                                    p.ProgressId,
-                                    p.ProgressPercent,
-                                    p.UpdatedOn
-                                }),
-                                GoalAssignments = g.GoalAssignments.Select(a => new
-                                {
-                                    a.AssignmentId,
-                                    a.AssignedBy,
-                                    a.AssignedOn
-                                }),
-                                GoalChecklists = g.GoalChecklists.Select(cl => new
-                                {
-                                    cl.ChecklistId,
-                                    cl.ItemTitle,
-                                    cl.ItemDescription,
-                                    Progresses = cl.Goalchecklistprogresses.Select(p => new
-                                    {
-                                        p.ChecklistProgressId,
-                                        p.IsCompleted,
-                                        p.CompletedOn
-                                    })
-                                }),
-                                GoalAttachments = g.GoalAttachments.Select(att => new
-                                {
-                                    att.Goalattachmentsid,
-                                    att.AttachmentTitle,
-                                    att.Attachments,
-                                    att.AttachedOn
-                                })
-                            }).ToList();
-
-
-                            string employeeName = $"{profile.FirstName ?? ""} {profile.LastName ?? ""}".Trim();
-                            if (string.IsNullOrEmpty(employeeName))
-                                employeeName = $"Employee {pe.EmployeeId}";
-
-
-                            var employeeDetails = await _repository.GetEmployeeDetailsByEmployeeIdAsync(pe.EmployeeId);
-
-
-                            results.Add(new
-                            {
-                                EmployeeId = pe.EmployeeId,
-                                EmployeeName = employeeName,
-                                EmployeeCompanyId = employeeDetails?.EmployeeMasterId.ToString() ?? "",
-                                ProjectId = project.ProjectId,
-                                ProjectName = project.ProjectName ?? "Unknown",
-                                AssessmentId = selfAssessment.AssessmentId,
-                                Competencies = competencies,
-                                Goals = formattedGoals
-                            });
-                        }
-                    }
-                    catch (Exception innerEx)
-                    {
-                        _logger.LogError($"Error processing employee {pe.EmployeeId}: {innerEx.Message}");
-                        continue;
-                    }
-                }
-
-
-                _logger.LogInformation($"Returning {results.Count} assessments for department head review");
-                return ApiResponse<List<object>>.SuccessResponse(results);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error in GetDeptHeadSubmittedRatingsAsync: {ex.Message}");
-                return ApiResponse<List<object>>.ErrorResponse($"Failed to fetch submitted ratings: {ex.Message}");
+                projectEmployees = projectEmployees
+                    .Where(pe => departmentEmployeeIds.Contains(pe.EmployeeId))
+                    .ToList();
             }
         }
 
+        var employeeIds = projectEmployees
+            .Select(pe => pe.EmployeeId)
+            .Distinct()
+            .ToList();
+
+        var profiles = await _repository.GetUserProfilesByEmployeeIdsAsync(employeeIds);
+        var userAuths = await _repository.GetUserAuthenticationsByEmployeeIdsAsync(employeeIds);
+
+   
+        var profileMap = profiles
+            .GroupBy(p => p.EmployeeId)
+            .ToDictionary(g => g.Key, g => g.First());
+
+        var authMap = userAuths
+            .GroupBy(a => a.EmployeeId)
+            .ToDictionary(g => g.Key, g => g.First());
+
+        var projectMap = projects
+            .GroupBy(p => p.ProjectId)
+            .ToDictionary(g => g.Key, g => g.First());
+
+        var selfAssessments = await _repository.GetSubmittedSelfAssessmentsAsync();
+        var reviews = await _repository.GetAllAssessmentReviewsAsync();
+
+        var allGoals = await _repository.GetGoalsByEmployeeIdsAsync(employeeIds);
+
+        var results = new List<object>();
+
+        foreach (var pe in projectEmployees)
+        {
+            try
+            {
+                if (!profileMap.TryGetValue(pe.EmployeeId, out var profile))
+                    continue;
+
+                if (!authMap.TryGetValue(pe.EmployeeId, out var userAuth))
+                    continue;
+
+                if (!projectMap.TryGetValue(pe.ProjectId, out var project))
+                    continue;
+
+                var employeeAssessments = selfAssessments
+                    .Where(sa =>
+                        sa.EmployeeId == userAuth.UserId &&
+                        sa.Assessmentdetails != null &&
+                        sa.Assessmentdetails.Any())
+                    .OrderByDescending(sa => sa.SubmittedAt)
+                    .ToList();
+
+                if (!employeeAssessments.Any())
+                    continue;
+
+                foreach (var selfAssessment in employeeAssessments)
+                {
+                    var approval = await _repository.GetDeptHeadApprovalAsync(
+                        pe.EmployeeId,
+                        pe.ProjectId,
+                        selfAssessment.AssessmentId);
+
+                    if (approval != null)
+                    {
+                        _logger.LogDebug($"Skipping AssessmentId {selfAssessment.AssessmentId} - Already department head approved");
+                        continue;
+                    }
+
+                    
+                    Userauthentication l1Auth = null;
+                    if (project.L1approverEmployeeId.HasValue)
+                        authMap.TryGetValue(project.L1approverEmployeeId.Value, out l1Auth);
+
+                    Userauthentication l2Auth = null;
+                    if (project.L2approverEmployeeId.HasValue)
+                        authMap.TryGetValue(project.L2approverEmployeeId.Value, out l2Auth);
+
+                    bool hasL2 = l2Auth != null;
+                    bool allL2Approved = false;
+
+                    if (hasL2)
+                    {
+                        allL2Approved = selfAssessment.Assessmentdetails.All(detail =>
+    reviews.Any(r =>
+        r.DetailId == detail.DetailId &&
+        r.ReviewerId == l2Auth.UserId &&
+        r.ReviewerRole == ReviewerRoles.Reviewer &&
+        r.ReviewStatus == ReviewStatuses.Approved));
+                    }
+
+                    if (!hasL2)
+                    {
+                        _logger.LogDebug($"Skipping AssessmentId {selfAssessment.AssessmentId} - No L2 reviewer configured");
+                        continue;
+                    }
+
+                    if (!allL2Approved)
+                    {
+                        _logger.LogDebug($"Skipping AssessmentId {selfAssessment.AssessmentId} - L2 has not approved all details");
+                        continue;
+                    }
+
+                    _logger.LogInformation($"Including AssessmentId {selfAssessment.AssessmentId} - L2 approved");
+
+                    string l1ReviewerName = "No L1";
+                    if (project.L1approverEmployeeId.HasValue &&
+                        profileMap.TryGetValue(project.L1approverEmployeeId.Value, out var l1Profile))
+                    {
+                        l1ReviewerName = $"{l1Profile.FirstName ?? ""} {l1Profile.LastName ?? ""}".Trim();
+                        if (string.IsNullOrEmpty(l1ReviewerName))
+                            l1ReviewerName = "L1 Reviewer";
+                    }
+
+                    string l2ReviewerName = "No L2";
+                    if (project.L2approverEmployeeId.HasValue &&
+                        profileMap.TryGetValue(project.L2approverEmployeeId.Value, out var l2Profile))
+                    {
+                        l2ReviewerName = $"{l2Profile.FirstName ?? ""} {l2Profile.LastName ?? ""}".Trim();
+                        if (string.IsNullOrEmpty(l2ReviewerName))
+                            l2ReviewerName = "L2 Reviewer";
+                    }
+
+                    var competencies = selfAssessment.Assessmentdetails.Select(detail =>
+                    {
+                        var l1Review = l1Auth != null ? reviews.FirstOrDefault(r =>
+    r.DetailId == detail.DetailId &&
+    r.ReviewerId == l1Auth.UserId &&
+    r.ReviewerRole == ReviewerRoles.Approver) : null;
+
+var l2Review = l2Auth != null ? reviews.FirstOrDefault(r =>
+    r.DetailId == detail.DetailId &&
+    r.ReviewerId == l2Auth.UserId &&
+    r.ReviewerRole == ReviewerRoles.Reviewer) : null;
+
+                        return new
+                        {
+                            CompetencyName = detail.Competency?.Name ?? "Unknown",
+                            EmployeeRating = detail.EmployeeRating,
+                            EmployeeComments = detail.EmployeeComments,
+                            L1ReviewerName = l1ReviewerName,
+                            L1Rating = l1Review?.Rating,
+                            L1Comments = l1Review?.Comments,
+                            L1ReviewStatus = l1Review?.ReviewStatus,
+                            L2ReviewerName = l2ReviewerName,
+                            L2Rating = l2Review?.Rating,
+                            L2Comments = l2Review?.Comments,
+                            L2ReviewStatus = l2Review?.ReviewStatus,
+                            Status = ResponseStatuses.Completed
+                        };
+                    }).ToList();
+
+                    var employeeGoalIds = await _repository.GetGoalIdsByEmployeeIdAsync(pe.EmployeeId);
+                    var employeeGoals = allGoals.Where(g => employeeGoalIds.Contains(g.GoalId)).ToList();
+
+                    var formattedGoals = employeeGoals.Select(g => new
+                    {
+                        g.GoalId,
+                        g.GoalTitle,
+                        g.GoalDescription,
+                        g.Goalstatus,
+                        GoalComments = g.GoalComments.Select(c => new
+                        {
+                            c.Goalcommentid,
+                            Comment = c.GoalComment1,
+                            c.CommentedOn
+                        }),
+                        GoalProgressLogs = g.Goalprogresslogs.Select(p => new
+                        {
+                            p.ProgressId,
+                            p.ProgressPercent,
+                            p.UpdatedOn
+                        }),
+                        GoalAssignments = g.GoalAssignments.Select(a => new
+                        {
+                            a.AssignmentId,
+                            a.AssignedBy,
+                            a.AssignedOn
+                        }),
+                        GoalChecklists = g.GoalChecklists.Select(cl => new
+                        {
+                            cl.ChecklistId,
+                            cl.ItemTitle,
+                            cl.ItemDescription,
+                            Progresses = cl.Goalchecklistprogresses.Select(p => new
+                            {
+                                p.ChecklistProgressId,
+                                p.IsCompleted,
+                                p.CompletedOn
+                            })
+                        }),
+                        GoalAttachments = g.GoalAttachments.Select(att => new
+                        {
+                            att.Goalattachmentsid,
+                            att.AttachmentTitle,
+                            att.Attachments,
+                            att.AttachedOn
+                        })
+                    }).ToList();
+
+                    string employeeName = $"{profile.FirstName ?? ""} {profile.LastName ?? ""}".Trim();
+                    if (string.IsNullOrEmpty(employeeName))
+                        employeeName = $"Employee {pe.EmployeeId}";
+
+                    var employeeDetails = await _repository.GetEmployeeDetailsByEmployeeIdAsync(pe.EmployeeId);
+
+                    results.Add(new
+                    {
+                        EmployeeId = pe.EmployeeId,
+                        EmployeeName = employeeName,
+                        EmployeeCompanyId = employeeDetails?.EmployeeMasterId.ToString() ?? "",
+                        ProjectId = project.ProjectId,
+                        ProjectName = project.ProjectName ?? "Unknown",
+                        AssessmentId = selfAssessment.AssessmentId,
+                        Competencies = competencies,
+                        Goals = formattedGoals
+                    });
+                }
+            }
+            catch (Exception innerEx)
+            {
+                _logger.LogError($"Error processing employee {pe.EmployeeId}: {innerEx.Message}");
+                continue;
+            }
+        }
+
+        _logger.LogInformation($"Returning {results.Count} assessments for department head review");
+        return ApiResponse<List<object>>.SuccessResponse(results);
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError($"Error in GetDeptHeadSubmittedRatingsAsync: {ex.Message}");
+        return ApiResponse<List<object>>.ErrorResponse($"Failed to fetch submitted ratings: {ex.Message}");
+    }
+}
 
         public async Task<(bool success, List<object> data, int totalRecords, int totalPages, List<string> errors)> GetManagerApprovedEmployeesAsync(int page, int pageSize, int? deptHeadEmployeeId)
         {
@@ -417,7 +436,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             employeeName = $"Employee {approval.EmployeeId}";
 
 
-                        // ← NEW: Fetch assessment and calculate average ratings
                         var selfAssessment = await _repository.GetAssessmentWithDetailsAsync(approval.AssessmentId);
 
                         double avgEmployeeRating = 0;
@@ -429,14 +447,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             var detailIds = selfAssessment.Assessmentdetails.Select(d => d.DetailId).ToList();
                             var reviews = await _repository.GetReviewsByDetailIdsAsync(detailIds);
 
-                            // Calculate Employee Average Rating
                             var employeeRatings = selfAssessment.Assessmentdetails
                                 .Where(ad => ad.EmployeeRating.HasValue && ad.EmployeeRating > 0)
                                 .Select(ad => (double)ad.EmployeeRating)
                                 .ToList();
                             avgEmployeeRating = employeeRatings.Any() ? Math.Round(employeeRatings.Average(), 2) : 0;
 
-                            // Get L1 and L2 user IDs
                             var l1Auth = project.L1approverEmployeeId.HasValue
                                 ? await _repository.GetUserAuthByEmployeeIdAsync(project.L1approverEmployeeId.Value)
                                 : null;
@@ -444,21 +460,19 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                                 ? await _repository.GetUserAuthByEmployeeIdAsync(project.L2approverEmployeeId.Value)
                                 : null;
 
-                            // Calculate L1 Average Rating
                             if (l1Auth != null)
                             {
                                 var l1Ratings = reviews
-                                    .Where(r => r.ReviewerId == l1Auth.UserId && r.ReviewerRole == "Approver" && r.Rating.HasValue && r.Rating > 0)
+                                    .Where(r => r.ReviewerId == l1Auth.UserId && r.ReviewerRole == ReviewerRoles.Approver && r.Rating.HasValue && r.Rating > 0)
                                     .Select(r => (double)r.Rating)
                                     .ToList();
                                 avgL1Rating = l1Ratings.Any() ? Math.Round(l1Ratings.Average(), 2) : 0;
                             }
 
-                            // Calculate L2 Average Rating
                             if (l2Auth != null)
                             {
                                 var l2Ratings = reviews
-                                    .Where(r => r.ReviewerId == l2Auth.UserId && r.ReviewerRole == "Reviewer" && r.Rating.HasValue && r.Rating > 0)
+                                    .Where(r => r.ReviewerId == l2Auth.UserId && r.ReviewerRole == ReviewerRoles.Reviewer && r.Rating.HasValue && r.Rating > 0)
                                     .Select(r => (double)r.Rating)
                                     .ToList();
                                 avgL2Rating = l2Ratings.Any() ? Math.Round(l2Ratings.Average(), 2) : 0;
@@ -473,9 +487,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             EmployeeName = employeeName,
                             ProjectName = project.ProjectName ?? "Unknown",
                             ApprovedAt = approval.ApprovedAt,
-                            EmployeeAvgRating = avgEmployeeRating > 0 ? avgEmployeeRating : (double?)null,  // ← NEW
-                            L1AvgRating = avgL1Rating > 0 ? avgL1Rating : (double?)null,                     // ← NEW
-                            L2AvgRating = avgL2Rating > 0 ? avgL2Rating : (double?)null                      // ← NEW
+                            EmployeeAvgRating = avgEmployeeRating > 0 ? avgEmployeeRating : (double?)null,  
+                            L1AvgRating = avgL1Rating > 0 ? avgL1Rating : (double?)null,                   
+                            L2AvgRating = avgL2Rating > 0 ? avgL2Rating : (double?)null                      
                         });
 
 
@@ -710,7 +724,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 _logger.LogInformation($"File Type: {attachment.FileType}");
 
 
-                // Parse GridFS ObjectId from FilePath
                 ObjectId fileId;
                 try
                 {
@@ -724,7 +737,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
 
 
-                // Download file from GridFS
                 byte[] fileBytes;
                 try
                 {
@@ -779,7 +791,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var reviews = await _repository.GetReviewsByDetailIdsAsync(detailIds);
 
 
-                // resolve L1/L2 userIds & names (similar to GetPendingAcknowledgmentsAsync)
                 var l1Auth = project.L1approverEmployeeId.HasValue
                     ? await _repository.GetUserAuthByEmployeeIdAsync(project.L1approverEmployeeId.Value)
                     : null;
