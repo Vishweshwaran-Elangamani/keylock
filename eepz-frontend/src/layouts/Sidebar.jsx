@@ -49,11 +49,6 @@ const Sidebar = ({ allowedRoles = [], currentRole, isOpen, onToggle, onClose }) 
         path: "/internal/opportunities",
       },
       {
-        icon: "bi-hand-thumbs-up",
-        label: "Nominations",
-        path: "/internal/nominations",
-      },
-      {
         icon: "bi-book",
         label: "Learning & Development",
         path: "/hr/lnd/dashboard",
@@ -124,6 +119,11 @@ const Sidebar = ({ allowedRoles = [], currentRole, isOpen, onToggle, onClose }) 
         path: "/department-head/dashboard",
       },
       {
+        icon: "bi-hand-thumbs-up",
+        label: "Nominations",
+        path: "/internal/nominations",
+      },
+      {
         icon: "bi-pie-chart",
         label: "Budget Utilization",
         path: "/department-head/budget",
@@ -142,11 +142,6 @@ const Sidebar = ({ allowedRoles = [], currentRole, isOpen, onToggle, onClose }) 
         icon: "bi bi-file-earmark-text",
         label: "Feedback Management",
         path: "/department-head/dashboard/feedback/allreviews",
-      },
-      {
-        icon: "bi-hand-thumbs-up",
-        label: "Nominations",
-        path: "/internal/nominations",
       },
       {
         icon: "bi-graph-up",
@@ -189,11 +184,6 @@ const Sidebar = ({ allowedRoles = [], currentRole, isOpen, onToggle, onClose }) 
         icon: "bi-briefcase",
         label: "Internal Opportiunities",
         path: "/internal/opportunities",
-      },
-      {
-        icon: "bi-clipboard-check",
-        label: "Nominations",
-        path: "/internal/nominations",
       },
       {
         icon: "bi-shield-check",
@@ -242,11 +232,6 @@ const Sidebar = ({ allowedRoles = [], currentRole, isOpen, onToggle, onClose }) 
         icon: "bi-briefcase",
         label: "Internal Opportiunities",
         path: "/internal/opportunities",
-      },
-      {
-        icon: "bi-clipboard-check",
-        label: "My Nominations",
-        path: "/internal/nominations",
       },
       {
         icon: "bi-shield-check",

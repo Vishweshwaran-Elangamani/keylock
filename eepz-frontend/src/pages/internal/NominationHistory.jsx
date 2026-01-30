@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useAuth } from "../../contexts/auth/AuthContext";
 import nominationService from "../../services/internal/nominationService";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import { FaSearch } from "react-icons/fa";
 import { Form } from "react-bootstrap";
 import "../../styles/internal/NominationHistory.css";
+
 const StatusDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
   const allOptions = [{ label: "All Status", value: "" }, ...options];
@@ -45,6 +47,7 @@ const StatusDropdown = ({ value, onChange, options }) => {
     </div>
   );
 };
+
 const SelfNominations = ({
   nominations,
   searchTerm,
@@ -64,9 +67,11 @@ const SelfNominations = ({
 }) => {
   const [filteredNominations, setFilteredNominations] = useState([]);
   const searchInputRef = useRef(null);
+
   useEffect(() => {
     applyFilters();
   }, [nominations, activeSearchTerm, filterStatus]);
+
   const applyFilters = () => {
     let filtered = [...nominations];
     if (activeSearchTerm.trim()) {
@@ -76,7 +81,7 @@ const SelfNominations = ({
           nom.opportunityTitle?.toLowerCase().includes(search) ||
           nom.employeeName?.toLowerCase().includes(search) ||
           nom.employeeCompanyId?.toLowerCase().includes(search) ||
-          nom.opportunityType?.toLowerCase().includes(search)
+          nom.opportunityType?.toLowerCase().includes(search),
       );
     }
     if (filterStatus) {
@@ -85,12 +90,15 @@ const SelfNominations = ({
     setFilteredNominations(filtered);
     setCurrentPage(1);
   };
+
   const totalPages = Math.ceil(filteredNominations.length / rowsPerPage) || 1;
+
   const getPaginatedNominations = () => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     return filteredNominations.slice(startIndex, endIndex);
   };
+
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
@@ -111,23 +119,26 @@ const SelfNominations = ({
           currentPage,
           currentPage + 1,
           "...",
-          totalPages
+          totalPages,
         );
       }
     }
     return pages;
   };
+
   const handleSearchKeyDown = (e) => {
     if (e.key === "Enter") {
       handleSearch();
       if (searchInputRef.current) searchInputRef.current.blur();
     }
   };
+
   const statusOptions = [
     { label: "Approved", value: "Approved" },
     { label: "Rejected", value: "Rejected" },
     { label: "Withdrawn", value: "Withdrawn" },
   ];
+
   return (
     <>
       <div className="nhad-filters-card">
@@ -140,7 +151,7 @@ const SelfNominations = ({
               <Form.Control
                 ref={searchInputRef}
                 type="text"
-                placeholder="Search oppourtunities..."
+                placeholder="Search opportunities..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={handleSearchKeyDown}
@@ -240,7 +251,9 @@ const SelfNominations = ({
                         {nom.currentStatus}
                       </span>
                     </td>
-                    <td className="text-muted">{formatDate(nom.nominatedDate)}</td>
+                    <td className="text-muted">
+                      {formatDate(nom.nominatedDate)}
+                    </td>
                     <td>
                       {nom.currentStatus === "Approved" && (
                         <div className="nhad-action-cell nhad-action-approved">
@@ -359,9 +372,7 @@ const SelfNominations = ({
                 >
                   <button
                     onClick={() =>
-                      setCurrentPage((prev) =>
-                        Math.min(prev + 1, totalPages)
-                      )
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                     }
                     disabled={currentPage === totalPages}
                   >
@@ -376,6 +387,7 @@ const SelfNominations = ({
     </>
   );
 };
+
 const TeamNominations = ({
   nominations,
   searchTerm,
@@ -395,9 +407,11 @@ const TeamNominations = ({
 }) => {
   const [filteredNominations, setFilteredNominations] = useState([]);
   const searchInputRef = useRef(null);
+
   useEffect(() => {
     applyFilters();
   }, [nominations, activeSearchTerm, filterStatus]);
+
   const applyFilters = () => {
     let filtered = [...nominations];
     if (activeSearchTerm.trim()) {
@@ -407,7 +421,7 @@ const TeamNominations = ({
           nom.opportunityTitle?.toLowerCase().includes(search) ||
           nom.employeeName?.toLowerCase().includes(search) ||
           nom.employeeCompanyId?.toLowerCase().includes(search) ||
-          nom.opportunityType?.toLowerCase().includes(search)
+          nom.opportunityType?.toLowerCase().includes(search),
       );
     }
     if (filterStatus) {
@@ -416,12 +430,15 @@ const TeamNominations = ({
     setFilteredNominations(filtered);
     setCurrentPage(1);
   };
+
   const totalPages = Math.ceil(filteredNominations.length / rowsPerPage) || 1;
+
   const getPaginatedNominations = () => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     return filteredNominations.slice(startIndex, endIndex);
   };
+
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
@@ -442,23 +459,26 @@ const TeamNominations = ({
           currentPage,
           currentPage + 1,
           "...",
-          totalPages
+          totalPages,
         );
       }
     }
     return pages;
   };
+
   const handleSearchKeyDown = (e) => {
     if (e.key === "Enter") {
       handleSearch();
       if (searchInputRef.current) searchInputRef.current.blur();
     }
   };
+
   const statusOptions = [
     { label: "Approved", value: "Approved" },
     { label: "Rejected", value: "Rejected" },
     { label: "Withdrawn", value: "Withdrawn" },
   ];
+
   return (
     <>
       <div className="nhad-filters-card">
@@ -471,7 +491,7 @@ const TeamNominations = ({
               <Form.Control
                 ref={searchInputRef}
                 type="text"
-                placeholder="Search oppourtunities..."
+                placeholder="Search opportunities..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={handleSearchKeyDown}
@@ -571,7 +591,9 @@ const TeamNominations = ({
                         {nom.currentStatus}
                       </span>
                     </td>
-                    <td className="text-muted">{formatDate(nom.nominatedDate)}</td>
+                    <td className="text-muted">
+                      {formatDate(nom.nominatedDate)}
+                    </td>
                     <td>
                       {nom.currentStatus === "Approved" && (
                         <div className="nhad-action-cell nhad-action-approved">
@@ -690,9 +712,7 @@ const TeamNominations = ({
                 >
                   <button
                     onClick={() =>
-                      setCurrentPage((prev) =>
-                        Math.min(prev + 1, totalPages)
-                      )
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                     }
                     disabled={currentPage === totalPages}
                   >
@@ -707,7 +727,9 @@ const TeamNominations = ({
     </>
   );
 };
+
 const NominationHistory = () => {
+  const { user } = useAuth();
   const [historyData, setHistoryData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("self");
@@ -716,9 +738,18 @@ const NominationHistory = () => {
   const [filterStatus, setFilterStatus] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
+
+  const getRolePrefix = () => {
+    const role = user?.role?.toLowerCase();
+    return `/${role}`;
+  };
+
+  const rolePrefix = getRolePrefix();
+
   useEffect(() => {
     fetchHistory();
   }, []);
+
   const fetchHistory = async () => {
     try {
       setLoading(true);
@@ -735,19 +766,23 @@ const NominationHistory = () => {
       setLoading(false);
     }
   };
+
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
   };
+
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
     setFilterStatus("");
   };
+
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     clearFilters();
     setCurrentPage(1);
   };
+
   const getStatusBadge = (status) => {
     const statusClasses = {
       Approved: "nhad-status-approved",
@@ -756,6 +791,7 @@ const NominationHistory = () => {
     };
     return `nhad-status-badge ${statusClasses[status] || "nhad-status-pending"}`;
   };
+
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -764,6 +800,7 @@ const NominationHistory = () => {
       year: "numeric",
     });
   };
+
   const getInitials = (name) => {
     if (!name) return "NA";
     const parts = name.split(" ");
@@ -774,6 +811,7 @@ const NominationHistory = () => {
     }
     return name.substring(0, 2).toUpperCase();
   };
+
   if (loading) {
     return (
       <div className="nhad-loading-container">
@@ -783,19 +821,25 @@ const NominationHistory = () => {
       </div>
     );
   }
+
   return (
     <div className="nhad-page">
       <Breadcrumb
         items={[
           {
-            label: "Nominations",
-            path: "/internal/nominations",
+            label: "Internal Opportunities",
+            path: `/internal/opportunities`,
+          },
+          {
+            label: "Manage Nominations",
+            path: `/internal/nominations`,
           },
           {
             label: "History",
           },
         ]}
       />
+
       <div className="stats-cards-nhad">
         <div className="stat-card-nhad stat-total-nhad">
           <div className="stat-icon-nhad">
@@ -842,6 +886,7 @@ const NominationHistory = () => {
           </div>
         </div>
       </div>
+
       <div className="nhad-nomination-tabs">
         <button
           className={`nhad-tab-btn ${activeTab === "self" ? "active" : ""}`}
@@ -868,6 +913,7 @@ const NominationHistory = () => {
           )}
         </button>
       </div>
+
       <div className="tab-content-nhad">
         {activeTab === "self" ? (
           <SelfNominations
@@ -910,4 +956,5 @@ const NominationHistory = () => {
     </div>
   );
 };
+
 export default NominationHistory;

@@ -90,7 +90,8 @@ const InternalOpportunityManagement = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showSelfNominateModal, setShowSelfNominateModal] = useState(false);
-  const [showManagerNominateModal, setShowManagerNominateModal] = useState(false);
+  const [showManagerNominateModal, setShowManagerNominateModal] =
+    useState(false);
   const [selectedOpportunity, setSelectedOpportunity] = useState(null);
 
   toast.options = {
@@ -103,7 +104,7 @@ const InternalOpportunityManagement = () => {
   // Get role prefix for routing
   const getRolePrefix = () => {
     const role = user?.role?.toLowerCase();
-    return `/${role}`;
+    return role;
   };
 
   const rolePrefix = getRolePrefix();
@@ -175,13 +176,13 @@ const InternalOpportunityManagement = () => {
         (opp) =>
           opp.opportunityName?.toLowerCase().includes(term) ||
           opp.description?.toLowerCase().includes(term) ||
-          opp.requirements?.toLowerCase().includes(term)
+          opp.requirements?.toLowerCase().includes(term),
       );
     }
 
     if (selectedDepartment) {
       filtered = filtered.filter(
-        (opp) => opp.departmentId === parseInt(selectedDepartment)
+        (opp) => opp.departmentId === parseInt(selectedDepartment),
       );
     }
 
@@ -204,6 +205,10 @@ const InternalOpportunityManagement = () => {
     setSelectedDepartment("");
     setSelectedStatus("");
     setCurrentPage(1);
+  };
+
+  const handleGoToMyNominations = () => {
+    navigate(`/internal/nominations`);
   };
 
   const handleCreateOpportunity = () => {
@@ -261,9 +266,10 @@ const InternalOpportunityManagement = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredOpportunities.slice(
     indexOfFirstItem,
-    indexOfLastItem
+    indexOfLastItem,
   );
-  const totalPages = Math.ceil(filteredOpportunities.length / itemsPerPage) || 1;
+  const totalPages =
+    Math.ceil(filteredOpportunities.length / itemsPerPage) || 1;
 
   const getPageNumbers = () => {
     const pages = [];
@@ -286,7 +292,7 @@ const InternalOpportunityManagement = () => {
           currentPage,
           currentPage + 1,
           "...",
-          totalPages
+          totalPages,
         );
       }
     }
@@ -322,7 +328,9 @@ const InternalOpportunityManagement = () => {
     const total = opportunities.length;
     const active = opportunities.filter((o) => o.status === "Active").length;
     const closed = opportunities.filter((o) => o.status === "Closed").length;
-    const departmentCount = [...new Set(opportunities.map(o => o.departmentId))].length;
+    const departmentCount = [
+      ...new Set(opportunities.map((o) => o.departmentId)),
+    ].length;
 
     return {
       totalOpportunities: total,
@@ -438,22 +446,41 @@ const InternalOpportunityManagement = () => {
           />
         </div>
 
-        <button className="ioma-btn-clear" onClick={clearFilters}>
+        <button className="ioma-btn-clear" onClick={clearFilters} type="button">
           Clear Filters
         </button>
 
-        <div className="ioma-results-count">
-          Showing {filteredOpportunities.length}{" "}
-          {filteredOpportunities.length === 1 ? "opportunity" : "opportunities"}
-        </div>
+        <div className="ioma-right-actions">
+  <div className="ioma-results-count">
+    Showing {filteredOpportunities.length}{" "}
+    {filteredOpportunities.length === 1 ? "opportunity" : "opportunities"}
+  </div>
 
-        {/* ONLY HR CAN CREATE */}
-        {isHR && (
-          <button className="ioma-btn-create" onClick={handleCreateOpportunity}>
-            <i className="bi bi-plus-circle"></i>
-            Create Opportunity
-          </button>
-        )}
+  {(isEmployee || isManager || isHR) && (
+    <button
+      type="button"
+      className={`ioma-btn-nominations ${isHR ? "hr-style" : ""}`}
+      onClick={handleGoToMyNominations}
+    >
+      <i className="bi bi-hand-thumbs-up"></i>
+      <span>
+        {isEmployee ? "My Nominations" : "Nominations"}
+      </span>
+    </button>
+  )}
+
+  {isHR && (
+    <button
+      type="button"
+      className="ioma-btn-create"
+      onClick={handleCreateOpportunity}
+    >
+      <i className="bi bi-plus-circle"></i>
+      <span>Create Opportunity</span>
+    </button>
+  )}
+</div>
+
       </div>
 
       {/* TABLE */}
@@ -484,8 +511,9 @@ const InternalOpportunityManagement = () => {
                 </tr>
               ) : (
                 currentItems.map((opportunity) => {
-                  const isClosed = opportunity.status?.toLowerCase() === "closed";
-                  
+                  const isClosed =
+                    opportunity.status?.toLowerCase() === "closed";
+
                   return (
                     <tr key={opportunity.opportunityId}>
                       <td>
@@ -506,7 +534,9 @@ const InternalOpportunityManagement = () => {
                       </td>
                       <td>{formatDate(opportunity.deadline)}</td>
                       <td>
-                        <span className={getStatusBadgeClass(opportunity.status)}>
+                        <span
+                          className={getStatusBadgeClass(opportunity.status)}
+                        >
                           {opportunity.status}
                         </span>
                       </td>
@@ -517,14 +547,18 @@ const InternalOpportunityManagement = () => {
                             <>
                               <button
                                 className="ioma-action-edit"
-                                onClick={() => handleEditOpportunity(opportunity)}
+                                onClick={() =>
+                                  handleEditOpportunity(opportunity)
+                                }
                                 title="Edit Opportunity"
                               >
                                 <i className="bi bi-pencil-square"></i>
                               </button>
                               <button
                                 className="ioma-action-delete"
-                                onClick={() => handleDeleteOpportunity(opportunity)}
+                                onClick={() =>
+                                  handleDeleteOpportunity(opportunity)
+                                }
                                 title="Delete Opportunity"
                               >
                                 <i className="bi bi-trash3"></i>
@@ -536,10 +570,19 @@ const InternalOpportunityManagement = () => {
                           {isEmployee && (
                             <button
                               className="ioma-action-nominate"
-                              onClick={() => !isClosed && handleSelfNominate(opportunity)}
-                              title={isClosed ? "Opportunity Closed" : "Self Nominate"}
+                              onClick={() =>
+                                !isClosed && handleSelfNominate(opportunity)
+                              }
+                              title={
+                                isClosed
+                                  ? "Opportunity Closed"
+                                  : "Self Nominate"
+                              }
                               disabled={isClosed}
-                              style={{ opacity: isClosed ? 0.5 : 1, cursor: isClosed ? 'not-allowed' : 'pointer' }}
+                              style={{
+                                opacity: isClosed ? 0.5 : 1,
+                                cursor: isClosed ? "not-allowed" : "pointer",
+                              }}
                             >
                               <i className="bi bi-hand-thumbs-up"></i>
                             </button>
@@ -550,19 +593,38 @@ const InternalOpportunityManagement = () => {
                             <>
                               <button
                                 className="ioma-action-nominate"
-                                onClick={() => !isClosed && handleSelfNominate(opportunity)}
-                                title={isClosed ? "Opportunity Closed" : "Self Nominate"}
+                                onClick={() =>
+                                  !isClosed && handleSelfNominate(opportunity)
+                                }
+                                title={
+                                  isClosed
+                                    ? "Opportunity Closed"
+                                    : "Self Nominate"
+                                }
                                 disabled={isClosed}
-                                style={{ opacity: isClosed ? 0.5 : 1, cursor: isClosed ? 'not-allowed' : 'pointer' }}
+                                style={{
+                                  opacity: isClosed ? 0.5 : 1,
+                                  cursor: isClosed ? "not-allowed" : "pointer",
+                                }}
                               >
                                 <i className="bi bi-hand-thumbs-up"></i>
                               </button>
                               <button
                                 className="ioma-action-nominate-team"
-                                onClick={() => !isClosed && handleManagerNominate(opportunity)}
-                                title={isClosed ? "Opportunity Closed" : "Nominate Team Member"}
+                                onClick={() =>
+                                  !isClosed &&
+                                  handleManagerNominate(opportunity)
+                                }
+                                title={
+                                  isClosed
+                                    ? "Opportunity Closed"
+                                    : "Nominate Team Member"
+                                }
                                 disabled={isClosed}
-                                style={{ opacity: isClosed ? 0.5 : 1, cursor: isClosed ? 'not-allowed' : 'pointer' }}
+                                style={{
+                                  opacity: isClosed ? 0.5 : 1,
+                                  cursor: isClosed ? "not-allowed" : "pointer",
+                                }}
                               >
                                 <i className="bi bi-person-plus"></i>
                               </button>
@@ -592,7 +654,10 @@ const InternalOpportunityManagement = () => {
           <div className="ioma-pagination-container">
             <div className="ioma-pagination-info">
               <span className="ioma-pagination-label">Show</span>
-              <div ref={itemsDropdownRef} className="ioma-items-dropdown-wrapper">
+              <div
+                ref={itemsDropdownRef}
+                className="ioma-items-dropdown-wrapper"
+              >
                 <button
                   type="button"
                   onClick={() => setShowItemsDropdown(!showItemsDropdown)}

@@ -13,6 +13,7 @@ import Breadcrumb from "../../components/common/Breadcrumb";
 import { FaSearch } from "react-icons/fa";
 import { toast } from "sonner";
 import "../../styles/internal/NominationManagement.css";
+
 const NominationStatusDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
   const options = [
@@ -59,6 +60,7 @@ const NominationStatusDropdown = ({ value, onChange }) => {
     </div>
   );
 };
+
 const NominationManagement = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -80,17 +82,22 @@ const NominationManagement = () => {
   const [showGraphModal, setShowGraphModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedNomination, setSelectedNomination] = useState(null);
+
   const getRolePrefix = () => {
     const role = user?.role?.toLowerCase();
     return `/${role}`;
   };
+
   const rolePrefix = getRolePrefix();
+
   useEffect(() => {
     fetchData();
   }, []);
+
   useEffect(() => {
     applyFilters();
   }, [nominations, selectedStatus, activeSearchTerm]);
+
   // Click outside handler for rows dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -106,22 +113,26 @@ const NominationManagement = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
     setCurrentPage(1);
     if (searchInputRef.current) searchInputRef.current.blur();
   };
+
   const handleSearchKeyDown = (e) => {
     if (e.key === "Enter") {
       handleSearch();
     }
   };
+
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
     setSelectedStatus("");
     setCurrentPage(1);
   };
+
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -136,6 +147,7 @@ const NominationManagement = () => {
         nominationsResponse = await nominationService.getMyNominations();
       }
       const opportunitiesResponse = await internalOpportunityService.getAllOpportunities();
+
       if (nominationsResponse.success) {
         const data = Array.isArray(nominationsResponse.data)
           ? nominationsResponse.data
@@ -145,6 +157,7 @@ const NominationManagement = () => {
         toast.error(nominationsResponse.message || "Failed to load nominations");
         setNominations([]);
       }
+
       if (opportunitiesResponse.success) {
         setOpportunities(
           Array.isArray(opportunitiesResponse.data) ? opportunitiesResponse.data : []
@@ -158,8 +171,10 @@ const NominationManagement = () => {
       setLoading(false);
     }
   };
+
   const applyFilters = () => {
     let filtered = Array.isArray(nominations) ? [...nominations] : [];
+
     if (activeSearchTerm) {
       const term = activeSearchTerm.toLowerCase();
       filtered = filtered.filter(
@@ -168,6 +183,7 @@ const NominationManagement = () => {
           nom.nomineeName?.toLowerCase().includes(term)
       );
     }
+
     if (selectedStatus) {
       filtered = filtered.filter((nom) => {
         const status = nom.status?.toLowerCase() || "";
@@ -182,9 +198,11 @@ const NominationManagement = () => {
         return status === filterStatus;
       });
     }
+
     setFilteredNominations(filtered);
     setCurrentPage(1);
   };
+
   const handleSelfNominate = () => {
     if (!opportunities || opportunities.length === 0) {
       toast.error("No opportunities available");
@@ -192,31 +210,39 @@ const NominationManagement = () => {
     }
     setShowSelfNominateModal(true);
   };
+
   const handleManagerNominate = () => setShowManagerNominateModal(true);
+
   const handleReviewNomination = (nomination) => {
     setSelectedNomination(nomination);
     setShowReviewModal(true);
   };
+
   const handleViewDetails = (nomination) => {
     setSelectedNomination(nomination);
     setShowDetailsModal(true);
   };
+
   const handleNominationSubmitted = () => {
     setShowSelfNominateModal(false);
     setShowManagerNominateModal(false);
     fetchData();
   };
+
   const handleReviewSubmitted = () => {
     setShowReviewModal(false);
     fetchData();
   };
+
   const handleViewHistory = () => {
     navigate("/internal/nomination-history");
   };
+
   const indexOfLastItem = currentPage * rowsPerPage;
   const indexOfFirstItem = indexOfLastItem - rowsPerPage;
   const currentItems = filteredNominations.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredNominations.length / rowsPerPage) || 1;
+
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
@@ -235,6 +261,7 @@ const NominationManagement = () => {
     }
     return pages;
   };
+
   const getStatusBadgeClass = (status) => {
     if (!status) return "nm-badge-inactive";
     const statusLower = status.toLowerCase();
@@ -249,6 +276,7 @@ const NominationManagement = () => {
     }
     return "nm-badge-inactive";
   };
+
   const formatStatus = (status) => {
     if (!status) return "N/A";
     return status
@@ -257,6 +285,7 @@ const NominationManagement = () => {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(" ");
   };
+
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -265,6 +294,7 @@ const NominationManagement = () => {
       day: "numeric",
     });
   };
+
   const getStatistics = () => {
     const total = nominations.length;
     const approved = nominations.filter((n) =>
@@ -278,7 +308,9 @@ const NominationManagement = () => {
     ).length;
     return { total, approved, pending, rejected };
   };
+
   const stats = getStatistics();
+
   if (loading) {
     return (
       <div className="nm-loading-container">
@@ -288,15 +320,37 @@ const NominationManagement = () => {
       </div>
     );
   }
+
   return (
     <div className="nm-page">
       <Breadcrumb
-        items={[
-          {
-            label: "Nominations",
-          },
-        ]}
+        items={
+          user?.role === "Department Head"
+            ? [
+                {
+                  label: "Nominations",
+                },
+              ]
+            : [
+                {
+                  label: user?.role === "HR" 
+                    ? "Manage Internal Opportunities" 
+                    : "Internal Opportunities",
+                  path: `/internal/opportunities`,
+                },
+                {
+                  label: user?.role === "HR" 
+                    ? "Nominations" 
+                    : user?.role === "Manager"
+                    ? "Manage Nominations"
+                    : user?.role === "Employee"
+                    ? "My Nominations"
+                    : "Nominations",
+                },
+              ]
+        }
       />
+
       {/* Statistics Cards */}
       <div className="stats-cards-nm">
         <div className="stat-card-nm stat-total-nm">
@@ -336,6 +390,7 @@ const NominationManagement = () => {
           </div>
         </div>
       </div>
+
       {/* Controls */}
       <div className="nm-controls">
         <div className="nm-search-input">
@@ -357,6 +412,7 @@ const NominationManagement = () => {
             </button>
           </div>
         </div>
+
         <div className="nm-status-filter">
           <NominationStatusDropdown
             value={selectedStatus}
@@ -366,34 +422,42 @@ const NominationManagement = () => {
             }}
           />
         </div>
-        <button className="nm-btn-clear" onClick={clearFilters}>
+
+        <button className="nm-btn-clear" onClick={clearFilters} type="button">
           Clear Filters
         </button>
-        {!["HR", "Department Head"].includes(user?.role) && (
-          <button
-            className="nm-btn-graph"
-            onClick={() => setShowGraphModal(true)}
-            title="View Analytics Graph"
-          >
-            <i className="bi bi-bar-chart-fill"></i>
-            View Graph
-          </button>
-        )}
-        {user?.role === "Manager" && (
-          <button
-            className="nm-btn-history"
-            onClick={handleViewHistory}
-            title="View Nomination History"
-          >
-            <i className="bi bi-clock-history"></i>
-            History
-          </button>
-        )}
-        <div className="nm-results-count">
-          Showing {filteredNominations.length}{" "}
-          {filteredNominations.length === 1 ? "nomination" : "nominations"}
+
+        <div className="nm-right-actions">
+          <div className="nm-results-count">
+            Showing {filteredNominations.length}{" "}
+            {filteredNominations.length === 1 ? "nomination" : "nominations"}
+          </div>
+          {user?.role === "Manager" && (
+            <button
+              type="button"
+              className="nm-btn-history"
+              onClick={handleViewHistory}
+              title="View Nomination History"
+            >
+              <i className="bi bi-clock-history"></i>
+              <span>History</span>
+            </button>
+          )}
+
+          {!["HR", "Department Head"].includes(user?.role) && (
+            <button
+              type="button"
+              className="nm-btn-graph"
+              onClick={() => setShowGraphModal(true)}
+              title="View Analytics Graph"
+            >
+              <i className="bi bi-bar-chart-fill"></i>
+              <span>View Graph</span>
+            </button>
+          )}
         </div>
       </div>
+
       {/* Table */}
       <div className="nm-table-card">
         <div className="nm-table-wrapper">
@@ -476,6 +540,7 @@ const NominationManagement = () => {
             </tbody>
           </table>
         </div>
+
         {/* Pagination */}
         {filteredNominations.length > 0 && (
           <div className="nm-pagination-container">
@@ -494,7 +559,7 @@ const NominationManagement = () => {
                 </button>
                 {showRowsDropdown && (
                   <div className="nm-rows-dropdown">
-                    {[5,10, 25, 50].map((size) => (
+                    {[5, 10, 25, 50].map((size) => (
                       <div
                         key={size}
                         onClick={() => {
@@ -566,6 +631,7 @@ const NominationManagement = () => {
           </div>
         )}
       </div>
+
       {showSelfNominateModal && (
         <SelfNominateModal
           show={showSelfNominateModal}
@@ -574,6 +640,7 @@ const NominationManagement = () => {
           onNominationSubmitted={handleNominationSubmitted}
         />
       )}
+
       {showManagerNominateModal && (
         <ManagerNominateModal
           show={showManagerNominateModal}
@@ -582,6 +649,7 @@ const NominationManagement = () => {
           onNominationSubmitted={handleNominationSubmitted}
         />
       )}
+
       {showReviewModal && selectedNomination && (
         <NominationReviewModal
           show={showReviewModal}
@@ -591,12 +659,14 @@ const NominationManagement = () => {
           onReviewSubmitted={handleReviewSubmitted}
         />
       )}
+
       {showGraphModal && (
         <NominationGraphModal
           show={showGraphModal}
           onHide={() => setShowGraphModal(false)}
         />
       )}
+
       {showDetailsModal && selectedNomination && (
         <NominationDetailsModal
           show={showDetailsModal}
@@ -607,4 +677,5 @@ const NominationManagement = () => {
     </div>
   );
 };
+
 export default NominationManagement;
