@@ -101,7 +101,9 @@ const MyMomsList = () => {
         selectedEmployees
       );
       if (response.success) {
-        toastr.success(`MOM shared with ${selectedEmployees.length} employee(s)`);
+        toastr.success(
+          `MOM shared with ${selectedEmployees.length} employee(s)`
+        );
         closeShareModal();
       }
     } catch (err) {
@@ -132,7 +134,9 @@ const MyMomsList = () => {
       Other: "secondary",
     };
     return (
-      <span className={`badge bg-${badgeMap[type] || "secondary"}`}>{type}</span>
+      <span className={`badge bg-${badgeMap[type] || "secondary"}`}>
+        {type}
+      </span>
     );
   };
 
@@ -277,7 +281,9 @@ const MyMomsList = () => {
 
                         <div className="col">
                           <div className="mml-mom-header-row">
-                            <h5 className="mml-mom-title">{mom.meetingTitle}</h5>
+                            <h5 className="mml-mom-title">
+                              {mom.meetingTitle}
+                            </h5>
                             {getMeetingTypeBadge(mom.meetingType)}
                           </div>
 
@@ -289,7 +295,9 @@ const MyMomsList = () => {
                                   className="mml-info-icon text-primary"
                                 />
                                 <div className="mml-info-text">
-                                  <div className="mml-info-label">Meeting Date</div>
+                                  <div className="mml-info-label">
+                                    Meeting Date
+                                  </div>
                                   <div className="mml-info-value">
                                     {formatDateTime(mom.meetingDate)}
                                   </div>
@@ -304,7 +312,9 @@ const MyMomsList = () => {
                                   className="mml-info-icon text-primary"
                                 />
                                 <div className="mml-info-text">
-                                  <div className="mml-info-label">Attendees</div>
+                                  <div className="mml-info-label">
+                                    Attendees
+                                  </div>
                                   <div className="mml-info-value">
                                     {mom.attendees || "N/A"}
                                   </div>
@@ -319,9 +329,12 @@ const MyMomsList = () => {
                                   className="mml-info-icon text-primary"
                                 />
                                 <div className="mml-info-text">
-                                  <div className="mml-info-label">Submitted by</div>
+                                  <div className="mml-info-label">
+                                    Submitted by
+                                  </div>
                                   <div className="mml-info-value">
-                                    {mom.submittedByEmployeeName} ({mom.submittedByRole})
+                                    {mom.submittedByEmployeeName} (
+                                    {mom.submittedByRole})
                                   </div>
                                 </div>
                               </div>
@@ -341,7 +354,8 @@ const MyMomsList = () => {
                             <button
                               className="btn btn-sm btn-info d-flex align-items-center gap-2"
                               onClick={() => openShareModal(mom)}
-                              type="button">
+                              type="button"
+                            >
                               <Share2 size={16} />
                               Share
                             </button>
@@ -350,7 +364,9 @@ const MyMomsList = () => {
                               <>
                                 <button
                                   className="btn btn-sm btn-warning d-flex align-items-center gap-2"
-                                  onClick={() => navigate(`/mom/edit/${mom.momId}`)}
+                                  onClick={() =>
+                                    navigate(`/mom/edit/${mom.momId}`)
+                                  }
                                   type="button"
                                 >
                                   <Edit size={16} />
@@ -433,7 +449,8 @@ const MyMomsList = () => {
                       <div className="alert alert-info d-flex align-items-center gap-2 mb-3">
                         <Users size={18} />
                         <span>
-                          <strong>{selectedEmployees.length}</strong> employee(s) selected
+                          <strong>{selectedEmployees.length}</strong>{" "}
+                          employee(s) selected
                         </span>
                       </div>
                     )}
@@ -453,15 +470,20 @@ const MyMomsList = () => {
                               <input
                                 type="checkbox"
                                 className="form-check-input mml-employee-checkbox"
-                                checked={selectedEmployees.includes(employee.employeeId)}
-                                onChange={() => toggleEmployeeSelection(employee.employeeId)}
+                                checked={selectedEmployees.includes(
+                                  employee.employeeId
+                                )}
+                                onChange={() =>
+                                  toggleEmployeeSelection(employee.employeeId)
+                                }
                               />
                               <div className="mml-employee-text">
                                 <div className="fw-semibold">
                                   {employee.firstName} {employee.lastName}
                                 </div>
                                 <div className="small text-muted">
-                                  {employee.email} • {employee.departmentName} • {employee.roleName}
+                                  {employee.email} • {employee.departmentName} •{" "}
+                                  {employee.roleName}
                                 </div>
                               </div>
                             </label>
@@ -483,7 +505,9 @@ const MyMomsList = () => {
                     <button
                       className="btn btn-primary d-flex align-items-center gap-2"
                       onClick={handleShareMom}
-                      disabled={selectedEmployees.length === 0 || sharingLoading}
+                      disabled={
+                        selectedEmployees.length === 0 || sharingLoading
+                      }
                       type="button"
                     >
                       <Share2 size={16} />
@@ -527,12 +551,16 @@ const MyMomsList = () => {
                   <div className="modal-body mml-modal-body">
                     <div className="card bg-light border-0 mb-4">
                       <div className="card-body">
-                        <h6 className="fw-semibold mb-3">Meeting Information</h6>
+                        <h6 className="fw-semibold mb-3">
+                          Meeting Information
+                        </h6>
                         <div className="row g-3">
                           <div className="col-md-6">
                             <div className="mml-detail-row">
                               <Calendar size={16} className="text-primary" />
-                              <small className="text-muted">Meeting Date:</small>
+                              <small className="text-muted">
+                                Meeting Date:
+                              </small>
                             </div>
                             <div className="fw-semibold">
                               {formatDateTime(selectedMom.meetingDate)}
@@ -543,7 +571,9 @@ const MyMomsList = () => {
                             <div className="col-md-6">
                               <div className="mml-detail-row">
                                 <LinkIcon size={16} className="text-primary" />
-                                <small className="text-muted">Meeting Link:</small>
+                                <small className="text-muted">
+                                  Meeting Link:
+                                </small>
                               </div>
                               <a
                                 href={selectedMom.meetingLink}
@@ -569,10 +599,13 @@ const MyMomsList = () => {
                           <div className="col-md-6">
                             <div className="mml-detail-row">
                               <Users size={16} className="text-primary" />
-                              <small className="text-muted">Submitted by:</small>
+                              <small className="text-muted">
+                                Submitted by:
+                              </small>
                             </div>
                             <div className="fw-semibold">
-                              {selectedMom.submittedByEmployeeName} ({selectedMom.submittedByRole})
+                              {selectedMom.submittedByEmployeeName} (
+                              {selectedMom.submittedByRole})
                             </div>
                           </div>
                         </div>

@@ -209,7 +209,9 @@ const ScheduleMeeting = () => {
 
   const filteredEmployees = useMemo(() => {
     return employeeOptions.filter((emp) => {
-      const fullName = `${emp.firstName || ""} ${emp.lastName || ""}`.toLowerCase();
+      const fullName = `${emp.firstName || ""} ${
+        emp.lastName || ""
+      }`.toLowerCase();
       return fullName.includes(searchTerm.toLowerCase());
     });
   }, [employeeOptions, searchTerm]);
@@ -301,10 +303,9 @@ const ScheduleMeeting = () => {
                 </button>
               </li>
 
-             <li className="breadcrumb-item">
+              <li className="breadcrumb-item">
                 <span className="sched-breadcrumb-home-separator">/</span>
-            </li>
-
+              </li>
 
               <li className="breadcrumb-item d-flex align-items-center">
                 <button
@@ -316,9 +317,9 @@ const ScheduleMeeting = () => {
                 </button>
               </li>
 
-             <li className="breadcrumb-item">
+              <li className="breadcrumb-item">
                 <span className="sched-breadcrumb-separator">/</span>
-            </li>
+              </li>
 
               <li className="breadcrumb-item active d-flex align-items-center">
                 <span className="sched-breadcrumb-current">
@@ -388,15 +389,24 @@ const ScheduleMeeting = () => {
                               <table className="table table-hover mb-0">
                                 <thead className="table-light sched-table-head">
                                   <tr>
-                                    <th className="text-start sched-th-select">Select</th>
-                                    <th className="text-start sched-th">Name</th>
-                                    <th className="text-start sched-th">Role</th>
+                                    <th className="text-start sched-th-select">
+                                      Select
+                                    </th>
+                                    <th className="text-start sched-th">
+                                      Name
+                                    </th>
+                                    <th className="text-start sched-th">
+                                      Role
+                                    </th>
                                   </tr>
                                 </thead>
                                 <tbody>
                                   {filteredEmployees.length === 0 ? (
                                     <tr>
-                                      <td colSpan={3} className="text-center py-2 text-muted sched-td">
+                                      <td
+                                        colSpan={3}
+                                        className="text-center py-2 text-muted sched-td"
+                                      >
                                         No employees found
                                       </td>
                                     </tr>
@@ -404,7 +414,9 @@ const ScheduleMeeting = () => {
                                     filteredEmployees.map((emp) => (
                                       <tr
                                         key={emp.employeeId}
-                                        onClick={() => handleCheckboxChange(emp.employeeId)}
+                                        onClick={() =>
+                                          handleCheckboxChange(emp.employeeId)
+                                        }
                                         className="sched-row-click"
                                       >
                                         <td className="text-start">
@@ -415,8 +427,14 @@ const ScheduleMeeting = () => {
                                               checked={formData.participantEmployeeIds.includes(
                                                 emp.employeeId
                                               )}
-                                              onChange={() => handleCheckboxChange(emp.employeeId)}
-                                              onClick={(e) => e.stopPropagation()}
+                                              onChange={() =>
+                                                handleCheckboxChange(
+                                                  emp.employeeId
+                                                )
+                                              }
+                                              onClick={(e) =>
+                                                e.stopPropagation()
+                                              }
                                             />
                                           </div>
                                         </td>
@@ -425,7 +443,9 @@ const ScheduleMeeting = () => {
                                         </td>
                                         <td className="text-start">
                                           <span className="badge bg-light text-dark border sched-role-badge">
-                                            {emp.roleName || emp.departmentName || "-"}
+                                            {emp.roleName ||
+                                              emp.departmentName ||
+                                              "-"}
                                           </span>
                                         </td>
                                       </tr>
@@ -438,9 +458,14 @@ const ScheduleMeeting = () => {
                             <div className="alert alert-info mt-3 mb-0 d-flex align-items-center gap-2 sched-selected-alert">
                               <Check size={20} />
                               <span>
-                                <strong>{formData.participantEmployeeIds.length}</strong>{" "}
+                                <strong>
+                                  {formData.participantEmployeeIds.length}
+                                </strong>{" "}
                                 participant
-                                {formData.participantEmployeeIds.length !== 1 ? "s" : ""} selected
+                                {formData.participantEmployeeIds.length !== 1
+                                  ? "s"
+                                  : ""}{" "}
+                                selected
                               </span>
                             </div>
                           </>
@@ -461,7 +486,9 @@ const ScheduleMeeting = () => {
                             onClick={() => setCalendarOpen((o) => !o)}
                             disabled={loading}
                             placeholder="Select date"
-                            className={`sched-date-input${loading ? " sched-date-input-disabled" : ""}`}
+                            className={`sched-date-input${
+                              loading ? " sched-date-input-disabled" : ""
+                            }`}
                           />
                           <button
                             type="button"
@@ -487,9 +514,32 @@ const ScheduleMeeting = () => {
                                 strokeWidth="1.8"
                                 fill="none"
                               />
-                              <line x1="4" y1="9" x2="20" y2="9" stroke="currentColor" strokeWidth="1.8" />
-                              <line x1="9" y1="3" x2="9" y2="7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                              <line x1="15" y1="3" x2="15" y2="7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                              <line
+                                x1="4"
+                                y1="9"
+                                x2="20"
+                                y2="9"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
+                              />
+                              <line
+                                x1="9"
+                                y1="3"
+                                x2="9"
+                                y2="7"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
+                                strokeLinecap="round"
+                              />
+                              <line
+                                x1="15"
+                                y1="3"
+                                x2="15"
+                                y2="7"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
+                                strokeLinecap="round"
+                              />
                             </svg>
                           </button>
                         </div>
@@ -508,7 +558,8 @@ const ScheduleMeeting = () => {
 
                       <div className="col-md-3">
                         <label className="form-label fw-semibold d-flex align-items-center gap-2 sched-label-top">
-                          <Clock size={20} /> Meeting Time <span className="text-danger">*</span>
+                          <Clock size={20} /> Meeting Time{" "}
+                          <span className="text-danger">*</span>
                         </label>
 
                         <div className="sched-time-picker">
@@ -542,7 +593,9 @@ const ScheduleMeeting = () => {
                         </div>
 
                         {!formData.meetingTime ? (
-                          <div className="sched-time-error">Please select time</div>
+                          <div className="sched-time-error">
+                            Please select time
+                          </div>
                         ) : null}
                       </div>
                     </div>
@@ -625,7 +678,11 @@ const ScheduleMeeting = () => {
               >
                 {loading ? (
                   <>
-                    <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span
+                      className="spinner-border spinner-border-sm"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
                     Scheduling...
                   </>
                 ) : (

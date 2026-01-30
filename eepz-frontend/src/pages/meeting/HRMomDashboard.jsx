@@ -119,7 +119,9 @@ const HRMomDashboard = () => {
   const getTotalActionItems = () => {
     if (!Array.isArray(moms)) return 0;
     return moms.reduce((sum, mom) => {
-      return sum + (Array.isArray(mom.actionItems) ? mom.actionItems.length : 0);
+      return (
+        sum + (Array.isArray(mom.actionItems) ? mom.actionItems.length : 0)
+      );
     }, 0);
   };
 
@@ -143,7 +145,9 @@ const HRMomDashboard = () => {
     <div className="hrmom-dashboard-container">
       <div className="hrmom-dashboard-wrapper">
         <div className="hrmom-header">
-          <Breadcrumb items={[{ label: "Meetings and MoM", href: "/hr/dashboard/mom" }]} />
+          <Breadcrumb
+            items={[{ label: "Meetings and MoM", href: "/hr/dashboard/mom" }]}
+          />
         </div>
 
         <div className="row g-3 mb-3">
@@ -196,7 +200,9 @@ const HRMomDashboard = () => {
                   <AlertCircle className="hrmom-top-icon-svg hrmom-top-icon-alert" />
                 </div>
                 <div className="hrmom-top-center">
-                  <div className="hrmom-top-count">{getOverdueActionItems()}</div>
+                  <div className="hrmom-top-count">
+                    {getOverdueActionItems()}
+                  </div>
                   <div className="hrmom-top-label">OVERDUE</div>
                 </div>
               </div>
@@ -223,10 +229,15 @@ const HRMomDashboard = () => {
                 {loading ? (
                   <tr>
                     <td colSpan="7" className="text-center py-4">
-                      <div className="spinner-border spinner-border-sm text-primary" role="status">
+                      <div
+                        className="spinner-border spinner-border-sm text-primary"
+                        role="status"
+                      >
                         <span className="visually-hidden">Loading...</span>
                       </div>
-                      <p className="text-muted mt-2 mb-0 small">Loading MOMs...</p>
+                      <p className="text-muted mt-2 mb-0 small">
+                        Loading MOMs...
+                      </p>
                     </td>
                   </tr>
                 ) : !Array.isArray(moms) || moms.length === 0 ? (
@@ -246,8 +257,12 @@ const HRMomDashboard = () => {
                             <FileText className="hrmom-table-icon-svg" />
                           </div>
                           <div>
-                            <div className="hrmom-meeting-title">{mom.meetingTitle}</div>
-                            <div className="mt-1">{getMeetingTypeBadge(mom.meetingType)}</div>
+                            <div className="hrmom-meeting-title">
+                              {mom.meetingTitle}
+                            </div>
+                            <div className="mt-1">
+                              {getMeetingTypeBadge(mom.meetingType)}
+                            </div>
                           </div>
                         </div>
                       </td>
@@ -267,15 +282,24 @@ const HRMomDashboard = () => {
 
                       <td>
                         <div className="d-flex align-items-center gap-2">
-                          <Calendar size={14} className="hrmom-date-icon text-muted" />
-                          <span className="hrmom-meeting-date">{formatDateTime(mom.meetingDate)}</span>
+                          <Calendar
+                            size={14}
+                            className="hrmom-date-icon text-muted"
+                          />
+                          <span className="hrmom-meeting-date">
+                            {formatDateTime(mom.meetingDate)}
+                          </span>
                         </div>
                       </td>
 
                       <td>
                         <div className="hrmom-count-badge">
                           <Users className="hrmom-count-icon hrmom-count-icon-participants" />
-                          <span>{Array.isArray(mom.attendees) ? mom.attendees.length : 0}</span>
+                          <span>
+                            {Array.isArray(mom.attendees)
+                              ? mom.attendees.length
+                              : 0}
+                          </span>
                         </div>
                       </td>
 
@@ -283,7 +307,9 @@ const HRMomDashboard = () => {
                         <div className="hrmom-count-badge">
                           <MessageSquare className="hrmom-count-icon hrmom-count-icon-topics" />
                           <span>
-                            {Array.isArray(mom.discussionPoints) ? mom.discussionPoints.length : 0}
+                            {Array.isArray(mom.discussionPoints)
+                              ? mom.discussionPoints.length
+                              : 0}
                           </span>
                         </div>
                       </td>
@@ -291,14 +317,20 @@ const HRMomDashboard = () => {
                       <td>
                         <div className="hrmom-count-badge">
                           <CheckCircle className="hrmom-count-icon hrmom-count-icon-actions" />
-                          <span>{Array.isArray(mom.actionItems) ? mom.actionItems.length : 0}</span>
+                          <span>
+                            {Array.isArray(mom.actionItems)
+                              ? mom.actionItems.length
+                              : 0}
+                          </span>
                         </div>
                       </td>
 
                       <td>
                         <button
                           className="btn btn-sm hrmom-view-btn"
-                          onClick={() => navigate(`/hr/dasboard/meetmom/${mom.momId}`)}
+                          onClick={() =>
+                            navigate(`/hr/dasboard/meetmom/${mom.momId}`)
+                          }
                         >
                           <Eye size={14} />
                         </button>
@@ -310,19 +342,22 @@ const HRMomDashboard = () => {
             </table>
           </div>
 
-          {!loading && Array.isArray(moms) && moms.length > 0 && totalPages > 0 && (
-            <PaginationFooter
-              currentPage={filters.pageNumber}
-              totalItems={totalMoms}
-              itemsPerPage={filters.pageSize}
-              onPageChange={handlePageChange}
-              onItemsPerPageChange={handlePageSizeChange}
-              pageSizeOptions={[5, 10, 25, 50]}
-              showPageSizeDropdown={true}
-              showStatusText={true}
-              pageNumberMode="compact"
-            />
-          )}
+          {!loading &&
+            Array.isArray(moms) &&
+            moms.length > 0 &&
+            totalPages > 0 && (
+              <PaginationFooter
+                currentPage={filters.pageNumber}
+                totalItems={totalMoms}
+                itemsPerPage={filters.pageSize}
+                onPageChange={handlePageChange}
+                onItemsPerPageChange={handlePageSizeChange}
+                pageSizeOptions={[5, 10, 25, 50]}
+                showPageSizeDropdown={true}
+                showStatusText={true}
+                pageNumberMode="compact"
+              />
+            )}
         </div>
       </div>
     </div>

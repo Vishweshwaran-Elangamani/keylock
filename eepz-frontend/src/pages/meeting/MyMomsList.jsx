@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import momService from "../../services/meeting/momService";
-import employeeService from "../../services/meeting/employeeservice"
+import employeeService from "../../services/meeting/employeeservice";
 import toastr from "toastr";
 import { useNavigate } from "react-router-dom";
 import {
@@ -109,7 +109,9 @@ const MyMomsList = () => {
         selectedEmployees
       );
       if (response.success) {
-        toastr.success(`MOM shared with ${selectedEmployees.length} employee(s)`);
+        toastr.success(
+          `MOM shared with ${selectedEmployees.length} employee(s)`
+        );
         closeShareModal();
       }
     } catch (err) {
@@ -190,7 +192,8 @@ const MyMomsList = () => {
 
   const filteredEmployees = employees.filter((emp) => {
     if (!searchTerm.trim()) return true;
-    const haystack = `${emp.firstName} ${emp.lastName} ${emp.email} ${emp.departmentName}`.toLowerCase();
+    const haystack =
+      `${emp.firstName} ${emp.lastName} ${emp.email} ${emp.departmentName}`.toLowerCase();
     return haystack.includes(searchTerm.toLowerCase());
   });
 
@@ -292,7 +295,9 @@ const MyMomsList = () => {
 
                         <div className="col">
                           <div className="mm2-mom-header">
-                            <h5 className="mm2-mom-title">{mom.meetingTitle}</h5>
+                            <h5 className="mm2-mom-title">
+                              {mom.meetingTitle}
+                            </h5>
                             {getMeetingTypeBadge(mom.meetingType)}
                           </div>
 
@@ -321,7 +326,9 @@ const MyMomsList = () => {
                                   className="mm2-info-icon text-primary"
                                 />
                                 <div className="mm2-info-text">
-                                  <div className="mm2-info-label">Attendees</div>
+                                  <div className="mm2-info-label">
+                                    Attendees
+                                  </div>
                                   <div className="mm2-info-value">
                                     {mom.attendees || "N/A"}
                                   </div>
@@ -473,8 +480,8 @@ const MyMomsList = () => {
                       <div className="alert alert-info d-flex align-items-center gap-2 mb-3">
                         <Users size={18} />
                         <span>
-                          <strong>{selectedEmployees.length}</strong> employee(s)
-                          selected
+                          <strong>{selectedEmployees.length}</strong>{" "}
+                          employee(s) selected
                         </span>
                       </div>
                     )}
@@ -530,7 +537,9 @@ const MyMomsList = () => {
                     <button
                       className="btn px-4 d-flex align-items-center gap-2 mm2-share-btn"
                       onClick={handleShareMom}
-                      disabled={selectedEmployees.length === 0 || sharingLoading}
+                      disabled={
+                        selectedEmployees.length === 0 || sharingLoading
+                      }
                       type="button"
                     >
                       <Share2 size={16} />
@@ -582,7 +591,9 @@ const MyMomsList = () => {
                           <div className="col-md-6">
                             <div className="mm2-detail-row">
                               <Calendar size={16} className="text-primary" />
-                              <small className="text-muted">Meeting Date:</small>
+                              <small className="text-muted">
+                                Meeting Date:
+                              </small>
                             </div>
                             <div className="fw-semibold">
                               {formatDateTime(selectedMom.meetingDate)}
@@ -593,7 +604,9 @@ const MyMomsList = () => {
                             <div className="col-md-6">
                               <div className="mm2-detail-row">
                                 <LinkIcon size={16} className="text-primary" />
-                                <small className="text-muted">Meeting Link:</small>
+                                <small className="text-muted">
+                                  Meeting Link:
+                                </small>
                               </div>
                               <a
                                 href={selectedMom.meetingLink}
@@ -619,7 +632,9 @@ const MyMomsList = () => {
                           <div className="col-md-6">
                             <div className="mm2-detail-row">
                               <Users size={16} className="text-primary" />
-                              <small className="text-muted">Submitted by:</small>
+                              <small className="text-muted">
+                                Submitted by:
+                              </small>
                             </div>
                             <div className="fw-semibold">
                               {selectedMom.submittedByEmployeeName} (
@@ -653,7 +668,9 @@ const MyMomsList = () => {
                               className="list-group-item border-0 bg-light mb-2 rounded"
                             >
                               <div className="d-flex gap-2">
-                                <span className="flex-grow-1">{dp.pointText}</span>
+                                <span className="flex-grow-1">
+                                  {dp.pointText}
+                                </span>
                               </div>
                             </div>
                           ))}
@@ -684,13 +701,17 @@ const MyMomsList = () => {
                               </div>
                               <div className="row g-2 mt-2">
                                 <div className="col-md-6">
-                                  <small className="text-muted">Assigned to:</small>
+                                  <small className="text-muted">
+                                    Assigned to:
+                                  </small>
                                   <div className="fw-semibold">
                                     {ai.assignedToEmployeeName}
                                   </div>
                                 </div>
                                 <div className="col-md-6">
-                                  <small className="text-muted">Due Date:</small>
+                                  <small className="text-muted">
+                                    Due Date:
+                                  </small>
                                   <div className="fw-semibold">
                                     {ai.dueDate || "N/A"}
                                   </div>

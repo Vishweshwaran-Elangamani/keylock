@@ -37,7 +37,9 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
             <i className="bi bi-calendar3"></i>
             {formatDateTime(meeting.meetingDate)}
           </p>
-          <button className="mmdm-close-icon" onClick={onClose}>×</button>
+          <button className="mmdm-close-icon" onClick={onClose}>
+            ×
+          </button>
         </div>
 
         <div className="mmdm-body">

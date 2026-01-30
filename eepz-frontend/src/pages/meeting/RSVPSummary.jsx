@@ -351,12 +351,16 @@ const RSVPSummary = () => {
             <div className="card-body">
               <h5 className="card-title fw-semibold mb-4 d-flex align-items-center gap-2">
                 <Users size={22} />
-                Participants {participants.length > 0 && `(${participants.length})`}
+                Participants{" "}
+                {participants.length > 0 && `(${participants.length})`}
               </h5>
 
               {participants.length === 0 ? (
                 <div className="text-center py-5 text-muted">
-                  <Users size={48} className="mb-3 rsvp-sum-participants-icon" />
+                  <Users
+                    size={48}
+                    className="mb-3 rsvp-sum-participants-icon"
+                  />
                   <p className="mb-0">No participants data available</p>
                 </div>
               ) : (
@@ -364,9 +368,13 @@ const RSVPSummary = () => {
                   <table className="table table-hover align-middle mb-0">
                     <thead className="table-light">
                       <tr>
-                        <th className="fw-semibold rsvp-sum-th">Employee Name</th>
+                        <th className="fw-semibold rsvp-sum-th">
+                          Employee Name
+                        </th>
                         <th className="fw-semibold rsvp-sum-th">Status</th>
-                        <th className="fw-semibold rsvp-sum-th">Response Date</th>
+                        <th className="fw-semibold rsvp-sum-th">
+                          Response Date
+                        </th>
                         <th className="fw-semibold rsvp-sum-th">Comments</th>
                       </tr>
                     </thead>
@@ -376,7 +384,10 @@ const RSVPSummary = () => {
                           <td>
                             <div className="d-flex align-items-center gap-2">
                               <div className="rsvp-sum-avatar">
-                                <Users size={18} className="rsvp-sum-avatar-icon" />
+                                <Users
+                                  size={18}
+                                  className="rsvp-sum-avatar-icon"
+                                />
                               </div>
                               <span className="fw-semibold">
                                 {participant.employeeName || "Unknown"}
@@ -412,7 +423,6 @@ const RSVPSummary = () => {
               )}
             </div>
           </div>
-
         </div>
       </div>
     </div>
