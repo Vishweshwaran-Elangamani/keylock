@@ -52,11 +52,10 @@ const LnDDashboard = () => {
       const [skillsRes, assignmentsRes, approvalsRes, smeRes] =
         await Promise.all([
           lndService
-            .getMySkills(1) //  Keep as-is (single parameter)
+            .getMySkills(1) 
             .catch(() => ({ data: { data: { totalCount: 0 } } })),
           lndService
             .getMyAssignments({
-              //  Object parameter with PascalCase
               PageNumber: 1,
               StatusFilter: "IN_PROGRESS",
               SearchTerm: "",
@@ -67,7 +66,6 @@ const LnDDashboard = () => {
             .catch(() => ({ data: { data: { totalCount: 0 } } })),
           lndService
             .getMyApprovals({
-              //  Object parameter with PascalCase
               PageNumber: 1,
               ApprovalType: "",
               Status: "PENDING",
@@ -230,7 +228,7 @@ const LnDDashboard = () => {
               >
                 {/* Card Content */}
                 <div className={styles.cardContent}>
-                  {/* Left Section: Icon + Text */}
+                  {/* Left Section:Text */}
                   <div className={styles.leftSection}>
                     {/* Icon */}
                     <div

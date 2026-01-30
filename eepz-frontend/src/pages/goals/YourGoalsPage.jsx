@@ -34,7 +34,7 @@ const YourGoalsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [projects, setProjects] = useState([]);
 
-  // Server-side pagination - itemsPerPage is now state
+  // Server-side pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(12);
   const [totalCount, setTotalCount] = useState(0);
@@ -54,7 +54,6 @@ const YourGoalsPage = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showFiltersModal, setShowFiltersModal] = useState(false);
 
-  // Counts for type toggle
   const [typeCounts, setTypeCounts] = useState({
     self: 0,
     team: 0,
@@ -66,7 +65,6 @@ const YourGoalsPage = () => {
     loadProjects();
   }, []);
 
-  // Changed to only depend on searchTerm (not searchInput for debouncing)
   useEffect(() => {
     loadGoals();
   }, [selectedType, currentPage, itemsPerPage, filters, searchTerm]);
@@ -219,7 +217,6 @@ const YourGoalsPage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Updated search handlers
   const handleSearchInputChange = (e) => {
     setSearchInput(e.target.value);
   };
@@ -406,7 +403,7 @@ const YourGoalsPage = () => {
                   <div
                     key={goal.goalId}
                     className={`col-12 col-md-6 col-lg-4 col-xl-3 ${styles.goalCardColumn}`}
-                  >  
+                  >
                     <GoalCard
                       goal={goal}
                       onComment={handleCommentClick}

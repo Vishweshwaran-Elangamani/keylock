@@ -24,12 +24,13 @@ const ViewGoalPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const getRolePrefix = (role) => ({
-    Manager: "/manager",
-    "Department Head": "/department-head",
-    Leadership: "/leadership",
-    Employee: "/employee",
-  }[role] || "/employee");
+  const getRolePrefix = (role) =>
+    ({
+      Manager: "/manager",
+      "Department Head": "/department-head",
+      Leadership: "/leadership",
+      Employee: "/employee",
+    }[role] || "/employee");
 
   const rolePrefix = getRolePrefix(user.role);
 
@@ -45,7 +46,7 @@ const ViewGoalPage = () => {
     canAssign: false,
     canComplete: false,
     canComment: false,
-  });  
+  });
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(false);
@@ -98,7 +99,7 @@ const ViewGoalPage = () => {
       setLoading(false);
       setRefreshing(false);
     }
-  };  
+  };
 
   const handleEdit = () => {
     setShowEditModal(true);
@@ -108,7 +109,6 @@ const ViewGoalPage = () => {
     setShowAssignModal(true);
   };
 
-  // FIXED: Unified callback that handles all approval types
   const handleRequestApproval = (approvalTypeParam) => {
     const isCreator = goal.createdByEmployeeMasterId === user.empMasterId;
     const isAssignee = goal.assignees?.some(
@@ -117,7 +117,6 @@ const ViewGoalPage = () => {
 
     let selectedApprovalType = approvalTypeParam;
 
-    // If no type passed, determine based on context (default behavior)
     if (!selectedApprovalType) {
       if (goal.goalType === "self" || isCreator) {
         selectedApprovalType = APPROVAL_TYPES.COMPLETION;
@@ -138,7 +137,6 @@ const ViewGoalPage = () => {
     loadGoal(true);
   };
 
-  // Helper function to get tab button classes
   const getTabClass = (tabName) => {
     return `nav-link ${styles.navTab} ${activeTab === tabName ? "active" : ""}`;
   };
@@ -159,7 +157,6 @@ const ViewGoalPage = () => {
     );
   }
 
-  // Check if Leadership is monitoring team goals
   const isCreator = goal.createdByEmployeeMasterId === user.empMasterId;
   const isAssignee = goal.assignees?.some(
     (a) => a.employeeMasterId === user.empMasterId
@@ -168,8 +165,6 @@ const ViewGoalPage = () => {
   const isTeamGoal = goal.goalType === "team";
   const isLeadershipMonitoring =
     isLeadership && isTeamGoal && !isCreator && !isAssignee;
-
-  // Check if should show comments/timeline
   const shouldShowCommentsAndTimeline =
     !(goal.goalType === "org" && user.role !== "Leadership") &&
     !isLeadershipMonitoring;
@@ -180,7 +175,6 @@ const ViewGoalPage = () => {
       {goal && (
         <Breadcrumb
           items={[
-            
             { label: "Goals Dashboard", path: `${rolePrefix}/dashboard/goals` },
             { label: goal.title || "Goal Details", path: null, icon: "" },
           ]}

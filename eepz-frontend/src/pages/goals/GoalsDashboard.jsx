@@ -13,18 +13,17 @@ import Breadcrumb from "../../components/common/Breadcrumb";
 import { GOAL_TYPES } from "../../constants/goals/goalConstants";
 import styles from "../../styles/goals/pages/GoalsDashboard.module.css";
 
-
 const GoalsDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Role prefix mapping for breadcrumb
-  const getRolePrefix = (role) => ({
-    Manager: "/manager",
-    "Department Head": "/department-head",
-    Leadership: "/leadership",
-    Employee: "/employee",
-  }[role] || "/employee");
+  const getRolePrefix = (role) =>
+    ({
+      Manager: "/manager",
+      "Department Head": "/department-head",
+      Leadership: "/leadership",
+      Employee: "/employee",
+    }[role] || "/employee");
 
   const rolePrefix = getRolePrefix(user.role);
 
@@ -35,7 +34,7 @@ const GoalsDashboard = () => {
   const [allOngoingGoals, setAllOngoingGoals] = useState([]);
   const [selectedType, setSelectedType] = useState(GOAL_TYPES.SELF);
 
-  // Pagination - now with state for itemsPerPage
+  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(12);
 
@@ -49,7 +48,7 @@ const GoalsDashboard = () => {
   const isManager = ["Manager", "Department Head"].includes(user.role);
   const isLeader = user.role === "Leadership";
 
-  // Calculate paginated goals from all goals (memoized)
+  // Calculate paginated goals
   const paginatedData = useMemo(() => {
     const totalCount = allOngoingGoals.length;
     const totalPages = Math.ceil(totalCount / itemsPerPage);
@@ -64,12 +63,10 @@ const GoalsDashboard = () => {
     };
   }, [allOngoingGoals, currentPage, itemsPerPage]);
 
-  // Load dashboard summary on mount
   useEffect(() => {
     loadDashboardData();
   }, []);
 
-  // Load ongoing goals only when selectedType changes
   useEffect(() => {
     loadOngoingGoals();
   }, [selectedType]);
@@ -96,8 +93,6 @@ const GoalsDashboard = () => {
 
     try {
       const statuses = ["open", "inprogress", "reopened"];
-
-      // Fetch ALL goals for each status
       const requests = statuses.map((status) =>
         goalService.queryGoals({
           type: selectedType,
@@ -108,22 +103,15 @@ const GoalsDashboard = () => {
       );
 
       const responses = await Promise.all(requests);
-
-      // Combine all results
       const allGoals = responses.flatMap((response) => response.data || []);
-
-      // Remove duplicates based on goalId
       const uniqueGoals = Array.from(
         new Map(allGoals.map((goal) => [goal.goalId, goal])).values()
       );
-
-      // Sort by most recent
       const sortedGoals = uniqueGoals.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );
-
       setAllOngoingGoals(sortedGoals);
-      setCurrentPage(1); // Reset to page 1 when data changes
+      setCurrentPage(1);
     } catch (error) {
       console.error("Error loading ongoing goals:", error);
       setAlert({
@@ -229,7 +217,9 @@ const GoalsDashboard = () => {
           <div className="mb-4">
             <div className="d-flex justify-content-between align-items-center mb-3">
               <h5 className={styles.sectionTitle}>
-                <i className={`bi bi-arrow-repeat me-2 ${styles.sectionIcon}`}></i>
+                <i
+                  className={`bi bi-arrow-repeat me-2 ${styles.sectionIcon}`}
+                ></i>
                 Ongoing Goals
                 {paginatedData.totalCount > 0 && (
                   <span className={`text-muted ms-2 ${styles.goalCount}`}>

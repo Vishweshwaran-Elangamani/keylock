@@ -1,7 +1,7 @@
 import axios from "axios";
 // GOAL MODULE BASE URL 
 const GOAL_API_BASE_URL = import.meta.env.VITE_GOAL_API_URL + "/api";
-// CREATE AXIOS INSTANCE 
+
 const goalApi = axios.create({
   baseURL: GOAL_API_BASE_URL,
   timeout: 30000,
@@ -9,7 +9,7 @@ const goalApi = axios.create({
     "Content-Type": "application/json",
   },
 });   
-// Add request interceptor for authentication
+
 goalApi.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -22,7 +22,7 @@ goalApi.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-// Add response interceptor for error handling
+
 goalApi.interceptors.response.use(
   (response) => response,
   (error) => {

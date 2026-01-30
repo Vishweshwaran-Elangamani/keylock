@@ -114,29 +114,26 @@ const TeamSkills = () => {
     setSelectedEmployee(null);
   };
 
-  // Get employee initials for avatar with null safety
   const getEmployeeInitials = (name) => {
-    // Check for null, undefined, or empty string
-    if (!name || typeof name !== 'string' || name.trim() === '') {
+    if (!name || typeof name !== "string" || name.trim() === "") {
       return "??";
     }
-    
+
     const trimmedName = name.trim();
-    const parts = trimmedName.split(/\s+/); // Split by any whitespace
-    
-    if (parts.length === 0 || parts[0] === '') {
+    const parts = trimmedName.split(/\s+/);
+
+    if (parts.length === 0 || parts[0] === "") {
       return "??";
     }
-    
+
     return parts
-      .filter(n => n.length > 0) // Filter out empty strings
+      .filter((n) => n.length > 0)
       .map((n) => n[0])
       .join("")
       .substring(0, 2)
       .toUpperCase();
   };
 
-  // Show initial loading spinner only when no data
   if (loading && employees.length === 0) {
     return (
       <div className={styles.loadingContainer}>

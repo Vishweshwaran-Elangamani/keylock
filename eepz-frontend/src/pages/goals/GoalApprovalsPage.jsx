@@ -12,12 +12,13 @@ import styles from "../../styles/goals/pages/GoalApprovalsPage.module.css";
 
 const GoalApprovalsPage = () => {
   const { user } = useAuth();
-  const getRolePrefix = (role) => ({
-    Manager: "/manager",
-    "Department Head": "/department-head",
-    Leadership: "/leadership",
-    Employee: "/employee",
-  }[role] || "/employee");   
+  const getRolePrefix = (role) =>
+    ({
+      Manager: "/manager",
+      "Department Head": "/department-head",
+      Leadership: "/leadership",
+      Employee: "/employee",
+    }[role] || "/employee");
 
   const rolePrefix = getRolePrefix(user.role);
   const [loading, setLoading] = useState(true);
@@ -42,7 +43,7 @@ const GoalApprovalsPage = () => {
   const [selectedApproval, setSelectedApproval] = useState(null);
   const [pendingDecision, setPendingDecision] = useState(null);
 
-  // Pagination - itemsPerPage is now state
+  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
@@ -51,7 +52,6 @@ const GoalApprovalsPage = () => {
   );
   const isEmployee = user.role === "Employee";
 
-  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -267,7 +267,6 @@ const GoalApprovalsPage = () => {
     return true;
   });
 
-  // Calculate pagination
   const totalItems = filteredApprovals.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const indexOfLastApproval = currentPage * itemsPerPage;
@@ -321,11 +320,10 @@ const GoalApprovalsPage = () => {
       <div className={`container-fluid ${styles.container}`}>
         <Breadcrumb
           items={[
-           
             { label: "Goals Dashboard", path: `${rolePrefix}/dashboard/goals` },
             { label: "Approvals", path: null, icon: "" },
           ]}
-        />  
+        />
 
         {alert && (
           <Alert
