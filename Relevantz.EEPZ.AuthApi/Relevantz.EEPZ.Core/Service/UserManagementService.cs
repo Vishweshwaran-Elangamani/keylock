@@ -291,24 +291,25 @@ namespace Relevantz.EEPZ.Core.Service
         }
 
         public async Task<List<UserResponseDto>> GetEmployeesByManagerAsync(int managerId)
+{
+    var employees = await _employeeRepository.GetByReportingManagerAsync(managerId);
+
+    var userIds = employees.Select(e => e.EmployeeId).ToList();
+    var users = new List<Userauthentication>();
+
+    foreach (var employeeId in userIds)
+    {
+        var user = await _userAuthRepository.GetByEmployeeIdWithDetailsAsync(employeeId);
+        if (user != null)
         {
-            var employees = await _employeeRepository.GetByReportingManagerAsync(managerId);
-
-            var userIds = employees.Select(e => e.EmployeeId).ToList();
-            var users = new List<Userauthentication>();
-
-            foreach (var employeeId in userIds)
-            {
-                var user = await _userAuthRepository.GetByEmployeeIdAsync(employeeId);
-                if (user != null)
-                {
-                    users.Add(user);
-                }
-            }
-
-            // Use Mapster for mapping list
-            return _mapper.Map<List<UserResponseDto>>(users);
+            users.Add(user);
         }
+    }
+
+    // Use Mapster for mapping list
+    return _mapper.Map<List<UserResponseDto>>(users);
+}
+
 
         public async Task<string> GetNextEmployeeCompanyIdAsync()
         {

@@ -13,5 +13,6 @@ namespace Relevantz.EEPZ.Data.IRepository
         Task<bool> EmailExistsAsync(string email);
         Task<List<Userauthentication>> GetLockedAccountsAsync();
         Task UpdateLastLoginAsync(int userId);
+        Task<Userauthentication?> GetByEmployeeIdWithDetailsAsync(int employeeId);
     }
 }
