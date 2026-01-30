@@ -1,9 +1,11 @@
 import internalApi from "./internalApi";
+
 const API_BASE = "Nomination";
+
 const nominationService = {
   getAllNominations: async (status = null) => {
     try {
-      let url = `/${API_BASE}/all-nominations`;
+      let url = `/${API_BASE}/all-nomination`; // Changed from all-nominations to all-nomination
       if (status) {
         url += `?status=${encodeURIComponent(status)}`;
       }
@@ -27,6 +29,7 @@ const nominationService = {
       };
     }
   },
+
   selfNominate: async (nominationData) => {
     try {
       const response = await internalApi.post(
@@ -42,6 +45,7 @@ const nominationService = {
       };
     }
   },
+
   managerNominate: async (nominationData) => {
     try {
       const response = await internalApi.post(
@@ -57,6 +61,7 @@ const nominationService = {
       };
     }
   },
+
   getPendingManagerReview: async () => {
     try {
       const response = await internalApi.get(
@@ -78,6 +83,7 @@ const nominationService = {
       };
     }
   },
+
   getPendingDeptHeadReview: async () => {
     try {
       const response = await internalApi.get(
@@ -99,6 +105,7 @@ const nominationService = {
       };
     }
   },
+
   reviewNomination: async (nominationId, reviewData, userRole) => {
     try {
       const endpoint =
@@ -114,6 +121,7 @@ const nominationService = {
       };
     }
   },
+
   getNominationById: async (id) => {
     try {
       const response = await internalApi.get(`/${API_BASE}/${id}`);
@@ -126,9 +134,10 @@ const nominationService = {
       };
     }
   },
+
   getMyNominations: async () => {
     try {
-      const response = await internalApi.get(`/${API_BASE}/my-nominations`);
+      const response = await internalApi.get(`/${API_BASE}/my-nomination`); // Changed from my-nominations to my-nomination
       let nominations = [];
       if (Array.isArray(response.data)) nominations = response.data;
       else nominations = response.data.nominations || response.data || [];
@@ -144,6 +153,7 @@ const nominationService = {
       };
     }
   },
+
   checkEligibility: async (opportunityId) => {
     try {
       const response = await internalApi.post(
@@ -159,6 +169,7 @@ const nominationService = {
       };
     }
   },
+
   getMyNominationHistory: async (status = null) => {
     try {
       let url = `/${API_BASE}/my-history`;
@@ -180,6 +191,7 @@ const nominationService = {
       };
     }
   },
+
   getMyNominationAnalytics: async () => {
     try {
       const response = await nominationService.getAllNominations();
@@ -223,4 +235,5 @@ const nominationService = {
     }
   },
 };
+
 export default nominationService;
