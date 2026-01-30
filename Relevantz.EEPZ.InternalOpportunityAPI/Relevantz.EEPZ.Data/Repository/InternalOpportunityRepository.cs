@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.IRepository;
+using Relevantz.EEPZ.Data.Constants;
 
 namespace Relevantz.EEPZ.Data.Repository
 {
@@ -38,7 +39,7 @@ namespace Relevantz.EEPZ.Data.Repository
         public async Task<List<Internalopportunity>> GetActiveAsync()
         {
             return await _context.Internalopportunities
-                .Where(x => x.Status == "Active")
+                .Where(x => x.Status == RepositoryConstants.StatusActive)
                 .Include(x => x.Department)
                 .Include(x => x.PostedByUser)
                 .OrderByDescending(x => x.CreatedAt)

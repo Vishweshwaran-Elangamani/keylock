@@ -8,6 +8,7 @@ using Relevantz.EEPZ.Common.ViewModels.InternalOpportunity.Request;
 using Relevantz.EEPZ.Common.ViewModels.InternalOpportunity.Response;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Data.IRepository;
+using Relevantz.EEPZ.Core.Constants;
 
 namespace Relevantz.EEPZ.Core.Service
 {
@@ -58,7 +59,7 @@ namespace Relevantz.EEPZ.Core.Service
         {
             var opportunity = await _opportunityRepository.GetByIdAsync(id);
             if (opportunity == null)
-                throw new Exception($"Opportunity with ID {id} not found");
+                throw new KeyNotFoundException(string.Format(ServiceMessageConstants.OpportunityNotFoundById, id));
 
             if (!string.IsNullOrEmpty(request.OpportunityName))
                 opportunity.OpportunityName = request.OpportunityName;
@@ -90,7 +91,7 @@ namespace Relevantz.EEPZ.Core.Service
         {
             var opportunity = await _opportunityRepository.GetByIdAsync(id);
             if (opportunity == null)
-                throw new Exception($"Opportunity with ID {id} not found");
+                throw new KeyNotFoundException(string.Format(ServiceMessageConstants.OpportunityNotFoundById, id));
 
             var dto = _mapper.Map<InternalOpportunityDetailResponseDto>(opportunity);
             return dto;
@@ -158,11 +159,11 @@ namespace Relevantz.EEPZ.Core.Service
         public async Task<InternalOpportunityStatisticsResponseDto> GetStatisticsAsync()
         {
             var allOpportunities = await _opportunityRepository.GetAllAsync();
-            var activeCount = await _opportunityRepository.CountByStatusAsync("Active");
-            var closedCount = await _opportunityRepository.CountByStatusAsync("Closed");
+            var activeCount = await _opportunityRepository.CountByStatusAsync(ServiceMessageConstants.StatusActive);
+            var closedCount = await _opportunityRepository.CountByStatusAsync(ServiceMessageConstants.StatusClosed);
 
             var byDepartment = allOpportunities
-                .GroupBy(x => x.Department?.DepartmentName ?? "Unknown")
+                .GroupBy(x => x.Department?.DepartmentName ?? ServiceMessageConstants.UnknownDepartment)
                 .ToDictionary(g => g.Key, g => g.Count());
 
             return new InternalOpportunityStatisticsResponseDto

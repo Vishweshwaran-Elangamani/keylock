@@ -1,9 +1,8 @@
-
-using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Core.IService;
+using Relevantz.EEPZ.Api.Constants;
 
 namespace Relevantz.EEPZ.Api.Controllers
 {
@@ -13,12 +12,12 @@ namespace Relevantz.EEPZ.Api.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
-    public class OpportunityAnalyticsController : ControllerBase
+    [Authorize(Roles = "Employee,Manager,HR")]
+    public class OpportunityAnalyticController : ControllerBase
     {
         private readonly IInternalOpportunityService _opportunityService;
 
-        public OpportunityAnalyticsController(IInternalOpportunityService opportunityService)
+        public OpportunityAnalyticController(IInternalOpportunityService opportunityService)
         {
             _opportunityService = opportunityService;
         }
@@ -27,19 +26,11 @@ namespace Relevantz.EEPZ.Api.Controllers
         /// Retrieves system-wide statistics related to internal opportunities.
         /// Accessible by Employees, Managers, and HR.
         /// </summary>
-        [HttpGet("statistics")]
-        [Authorize(Roles = "Employee,Manager,HR")]
+        [HttpGet("statistic")]
         public async Task<IActionResult> GetOpportunityStatistics()
         {
-            try
-            {
-                var result = await _opportunityService.GetStatisticsAsync();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            var result = await _opportunityService.GetStatisticsAsync();
+            return Ok(result);
         }
 
         /// <summary>
@@ -47,22 +38,14 @@ namespace Relevantz.EEPZ.Api.Controllers
         /// Commonly used for dashboards and analytics visualizations.
         /// </summary>
         [HttpGet("graph-data")]
-        [Authorize(Roles = "Employee,Manager,HR")]
         public async Task<IActionResult> GetGraphData()
         {
-            try
+            var statistics = await _opportunityService.GetStatisticsAsync();
+            return Ok(new
             {
-                var statistics = await _opportunityService.GetStatisticsAsync();
-                return Ok(new
-                {
-                    message = "Opportunity graph data",
-                    data = statistics
-                });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+                message = MessageConstants.OpportunityGraphData,
+                data = statistics
+            });
         }
     }
 }

@@ -16,6 +16,7 @@ using AutoMapper;
 using Serilog;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Relevantz.EEPZ.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,7 +61,7 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "EEPZ Internal Opportunities API",
         Version = "v1.0",
-        Description = "Internal Opportunities, Nominations, Promotions & Manager Tracking API",
+        Description = "Internal Opportunities, Nominations & Manager Tracking API",
         Contact = new OpenApiContact
         {
             Name = "EEPZ Support",
@@ -195,9 +196,6 @@ builder.Services.AddScoped<IInternalOpportunityRepository, InternalOpportunityRe
 builder.Services.AddScoped<INominationRepository, NominationRepository>();
 builder.Services.AddScoped<IManagerNominationTrackingRepository, ManagerNominationTrackingRepository>();
 builder.Services.AddScoped<INominationReviewMetricRepository, NominationReviewMetricRepository>();
-builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
-builder.Services.AddScoped<IPromotionHistoryRepository, PromotionHistoryRepository>();
-
 
 Log.Information("Repositories registered successfully");
 
@@ -205,7 +203,6 @@ Log.Information("Repositories registered successfully");
 // Register Services (Internal Opportunities Module)
 builder.Services.AddScoped<IInternalOpportunityService, InternalOpportunityService>();
 builder.Services.AddScoped<INominationService, NominationService>();
-builder.Services.AddScoped<IPromotionService, PromotionService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 
@@ -312,9 +309,7 @@ builder.Services.AddHealthChecks()
         }
     }, new[] { "db", "mysql" });
 
-
 var app = builder.Build();
-
 
 // Database Connection Verification
 using (var scope = app.Services.CreateScope())
@@ -324,9 +319,7 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<EEPZDbContext>();
 
-
         Log.Information("Verifying MySQL database connection");
-
 
         if (await context.Database.CanConnectAsync())
         {
@@ -349,13 +342,10 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-
 // Configure middleware pipeline
-
 
 // 1. Response Compression
 app.UseResponseCompression();
-
 
 // 2. Correlation ID Middleware
 app.Use(async (context, next) =>
@@ -368,7 +358,6 @@ app.Use(async (context, next) =>
         await next();
     }
 });
-
 
 // 3. Security Headers Middleware (Environment-Aware CSP)
 app.Use(async (context, next) =>
@@ -396,46 +385,7 @@ app.Use(async (context, next) =>
     await next();
 });
 
-
-// 4. Exception Handler
-app.UseExceptionHandler(errorApp =>
-{
-    errorApp.Run(async context =>
-    {
-        var error = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>();
-        var correlationId = context.TraceIdentifier;
-
-
-        if (error != null)
-        {
-            Log.Error(error.Error, 
-                "Unhandled exception - CorrelationId: {CorrelationId}, Path: {Path}",
-                correlationId, context.Request.Path);
-
-
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            context.Response.ContentType = "application/json";
-
-
-            var errorResponse = new
-            {
-                success = false,
-                message = "An internal server error occurred",
-                correlationId = correlationId,
-                timestamp = DateTime.UtcNow,
-                error = app.Environment.IsDevelopment() 
-                    ? error.Error.Message 
-                    : "Internal Server Error"
-            };
-
-
-            await context.Response.WriteAsJsonAsync(errorResponse);
-        }
-    });
-});
-
-
-// 5. Swagger 
+// 4. Swagger 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -449,8 +399,7 @@ if (app.Environment.IsDevelopment())
     Log.Information("Swagger UI enabled at root /");
 }
 
-
-// 6. Serilog Request Logging
+// 5. Serilog Request Logging
 app.UseSerilogRequestLogging(options =>
 {
     options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
@@ -468,30 +417,31 @@ app.UseSerilogRequestLogging(options =>
     };
 });
 
-
-// 7. HTTPS Redirection
+// 6. HTTPS Redirection
 if (!builder.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
 
-
-// 8. CORS
+// 7. CORS
 var corsPolicy = app.Environment.IsDevelopment() ? "DevelopmentPolicy" : "ProductionPolicy";
 app.UseCors(corsPolicy);
 Log.Information("CORS policy '{Policy}' applied", corsPolicy);
 
+// 8. Routing
+app.UseRouting();
 
-// 9. Authentication & Authorization
+// 9. Global Exception Middleware (MUST be after UseRouting, before UseAuthentication)
+app.UseMiddleware<GlobalExceptionMiddleware>();
+
+// 10. Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
-
-// 10. Map Controllers
+// 11. Map Controllers
 app.MapControllers();
 
-
-// 11. Health Check Endpoints
+// 12. Health Check Endpoints
 app.MapHealthChecks("/health/live", new HealthCheckOptions
 {
     Predicate = _ => false,
@@ -507,7 +457,6 @@ app.MapHealthChecks("/health/live", new HealthCheckOptions
         });
     }
 }).AllowAnonymous();
-
 
 app.MapHealthChecks("/health/ready", new HealthCheckOptions
 {
@@ -532,12 +481,10 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions
     }
 }).AllowAnonymous();
 
-
-// 12. Health Endpoint (backward compatible)
+// 13. Health Endpoint (backward compatible)
 app.MapGet("/health", async (EEPZDbContext dbContext, IConfiguration config) =>
 {
     bool dbConnected = false;
-
 
     try
     {
@@ -548,7 +495,6 @@ app.MapGet("/health", async (EEPZDbContext dbContext, IConfiguration config) =>
         Log.Warning("Health check database connection failed: {Message}", ex.Message);
     }
 
-
     return Results.Ok(new
     {
         status = "Healthy",
@@ -557,14 +503,12 @@ app.MapGet("/health", async (EEPZDbContext dbContext, IConfiguration config) =>
         version = "v1.0",
         environment = builder.Environment.EnvironmentName,
 
-
         database = new
         {
             connected = dbConnected,
             provider = "MySQL (Pomelo EF Core 8.0)",
             connectionStringName = "DefaultConnection"
         },
-
 
         endpoints = new
         {
@@ -574,10 +518,8 @@ app.MapGet("/health", async (EEPZDbContext dbContext, IConfiguration config) =>
                 "Internal Opportunities (7)",
                 "Nominations (12)",
                 "Opportunity Analytics (2)",
-                "Promotions (11)"
             }
         },
-
 
         authentication = new
         {
@@ -585,7 +527,6 @@ app.MapGet("/health", async (EEPZDbContext dbContext, IConfiguration config) =>
             type = "JWT Bearer",
             issuerConfigured = !string.IsNullOrEmpty(config["Jwt:Issuer"])
         },
-
 
         features = new
         {
@@ -596,8 +537,7 @@ app.MapGet("/health", async (EEPZDbContext dbContext, IConfiguration config) =>
     });
 }).AllowAnonymous();
 
-
-// 13. API Info Endpoint 
+// 14. API Info Endpoint 
 if (app.Environment.IsDevelopment())
 {
     app.MapGet("/api/info", () =>
@@ -619,7 +559,6 @@ if (app.Environment.IsDevelopment())
         });
     }).AllowAnonymous();
 }
-
 
 try
 {

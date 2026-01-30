@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -7,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.ViewModels.InternalOpportunity.Request;
 using Relevantz.EEPZ.Common.Validators;
 using Relevantz.EEPZ.Core.IService;
+using Relevantz.EEPZ.Api.Constants;
 
 namespace Relevantz.EEPZ.Api.Controllers
 {
@@ -31,15 +31,8 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllOpportunities()
         {
-            try
-            {
-                var result = await _opportunityService.GetAllOpportunitiesSimpleAsync();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            var result = await _opportunityService.GetAllOpportunitiesSimpleAsync();
+            return Ok(result);
         }
 
         /// <summary>
@@ -53,28 +46,16 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "HR")]
         public async Task<IActionResult> CreateOpportunity([FromBody] CreateInternalOpportunityRequestDto request)
         {
-            try
-            {
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ??
+                             User.FindFirst("sub");
 
-                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ??
-                                 User.FindFirst("sub");
-
-                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId) || userId <= 0)
-                {
-                    return Unauthorized(new { message = "User ID not found in token" });
-                }
-
-                var result = await _opportunityService.CreateOpportunityAsync(request, userId);
-                return CreatedAtAction(nameof(GetOpportunityById), new { id = result.OpportunityId }, result);
-            }
-            catch (ArgumentException ex)
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId) || userId <= 0)
             {
-                return BadRequest(new { message = ex.Message });
+                return Unauthorized(new { message = MessageConstants.UserIdNotFoundInToken });
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = ex.InnerException?.Message ?? ex.Message });
-            }
+
+            var result = await _opportunityService.CreateOpportunityAsync(request, userId);
+            return CreatedAtAction(nameof(GetOpportunityById), new { id = result.OpportunityId }, result);
         }
 
         /// <summary>
@@ -85,15 +66,8 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "HR")]
         public async Task<IActionResult> UpdateOpportunity(int id, [FromBody] UpdateInternalOpportunityRequestDto request)
         {
-            try
-            {
-                var result = await _opportunityService.UpdateOpportunityAsync(id, request);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            var result = await _opportunityService.UpdateOpportunityAsync(id, request);
+            return Ok(result);
         }
 
         /// <summary>
@@ -103,15 +77,8 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetOpportunityById(int id)
         {
-            try
-            {
-                var result = await _opportunityService.GetOpportunityByIdAsync(id);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
+            var result = await _opportunityService.GetOpportunityByIdAsync(id);
+            return Ok(result);
         }
 
         /// <summary>
@@ -120,33 +87,19 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("active")]
         public async Task<IActionResult> GetActiveOpportunities()
         {
-            try
-            {
-                var result = await _opportunityService.GetActiveOpportunitiesSimpleAsync();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            var result = await _opportunityService.GetActiveOpportunitiesSimpleAsync();
+            return Ok(result);
         }
 
         /// <summary>
         /// Returns HR-facing statistics for internal opportunities. (HR only)
         /// </summary>
-        [HttpGet("statistics")]
+        [HttpGet("statistic")]
         [Authorize(Roles = "HR")]
         public async Task<IActionResult> GetStatistics()
         {
-            try
-            {
-                var result = await _opportunityService.GetStatisticsAsync();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            var result = await _opportunityService.GetStatisticsAsync();
+            return Ok(result);
         }
 
         /// <summary>
@@ -157,15 +110,8 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "HR")]
         public async Task<IActionResult> DeleteOpportunity(int id)
         {
-            try
-            {
-                var result = await _opportunityService.DeleteOpportunityAsync(id);
-                return Ok(new { message = "Opportunity deleted successfully" });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            var result = await _opportunityService.DeleteOpportunityAsync(id);
+            return Ok(new { message = MessageConstants.OpportunityDeletedSuccessfully });
         }
     }
 }
