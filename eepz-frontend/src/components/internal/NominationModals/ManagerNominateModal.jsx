@@ -120,11 +120,28 @@ const ManagerNominateModal = ({
     }
   };
   const employeeOptions = useMemo(() => {
-    return employees.map((emp) => ({
-      label: `${emp.firstName} ${emp.lastName}`,
+  return employees.map((emp) => {
+    // Build display name with fallback to email
+    let displayName = '';
+    
+    if (emp.firstName && emp.lastName) {
+      displayName = `${emp.firstName} ${emp.lastName} (${emp.email})`;
+    } else if (emp.firstName) {
+      displayName = `${emp.firstName} (${emp.email})`;
+    } else if (emp.lastName) {
+      displayName = `${emp.lastName} (${emp.email})`;
+    } else {
+      // Fallback to email or employee ID
+      displayName = emp.email || emp.employeeCompanyId || `User ${emp.userId}`;
+    }
+
+    return {
+      label: displayName,
       value: emp.userId.toString(),
-    }));
-  }, [employees]);
+    };
+  });
+}, [employees]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
