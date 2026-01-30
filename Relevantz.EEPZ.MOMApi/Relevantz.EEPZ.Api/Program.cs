@@ -9,6 +9,7 @@ using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Data.Repository.Implementations;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Core.Services.Implementations;
+using Relevantz.EEPZ.Core.Mappings;
 using System.Text;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -16,6 +17,9 @@ using Prometheus;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Relevantz.EEPZ.Common.Validators;
+using Mapster;
+using MapsterMapper;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 Log.Information("Building");
@@ -36,6 +40,13 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateMomDtoValidator>();
 
+// Configure Mapster - High-performance object mapping
+MappingConfig.RegisterMappings();
+var mapsterConfig = TypeAdapterConfig.GlobalSettings;
+mapsterConfig.Scan(Assembly.GetExecutingAssembly());
+builder.Services.AddSingleton(mapsterConfig);
+builder.Services.AddScoped<IMapper, ServiceMapper>();
+
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(options =>
@@ -44,7 +55,7 @@ builder.Services.AddSwaggerGen(options =>
     {
         Title = "EEPZ API",
         Version = "v1",
-        Description = "MoM API"
+        Description = "MoM API with Mapster Integration"
     });
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -208,6 +219,7 @@ Log.Information(
 Log.Information("   Health Checks: /health/live, /health/ready");
 Log.Information("   Metrics: /metrics");
 Log.Information("   FluentValidation: Registered");
+Log.Information("   Mapster: Configured (2-6x faster than AutoMapper)");
 
 try
 {
