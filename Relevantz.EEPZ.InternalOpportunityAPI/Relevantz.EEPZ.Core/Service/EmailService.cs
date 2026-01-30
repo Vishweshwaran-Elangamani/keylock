@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Relevantz.EEPZ.Core.IService;
+using Relevantz.EEPZ.Common.Constants;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Configuration;
@@ -23,9 +24,9 @@ namespace Relevantz.EEPZ.Core.Service
             {
                 var message = new MimeMessage();
                 message.From.Add(new MailboxAddress(
-                    _configuration["SmtpSettings:FromName"],
-                    _configuration["SmtpSettings:FromEmail"]));
-                message.To.Add(new MailboxAddress("", toEmail));
+                    _configuration[EmailConstants.ConfigKeys.FromName],
+                    _configuration[EmailConstants.ConfigKeys.FromEmail]));
+                message.To.Add(new MailboxAddress(EmailConstants.Defaults.EmptyRecipientName, toEmail));
                 message.Subject = subject;
 
                 var bodyBuilder = new BodyBuilder
@@ -36,16 +37,15 @@ namespace Relevantz.EEPZ.Core.Service
 
                 using var client = new SmtpClient();
                 await client.ConnectAsync(
-    _configuration["SmtpSettings:Host"],
-    int.Parse(_configuration["SmtpSettings:Port"] ?? "587"),
-    _configuration["SmtpSettings:EnableSsl"] == "true"
-        ? SecureSocketOptions.StartTls
-        : SecureSocketOptions.None);
-
+                    _configuration[EmailConstants.ConfigKeys.Host],
+                    _configuration.GetValue<int>(EmailConstants.ConfigKeys.Port),
+                    _configuration.GetValue<bool>(EmailConstants.ConfigKeys.EnableSsl)
+                        ? SecureSocketOptions.StartTls
+                        : SecureSocketOptions.None);
 
                 await client.AuthenticateAsync(
-                    _configuration["SmtpSettings:Username"],
-                    _configuration["SmtpSettings:Password"]);
+                    _configuration[EmailConstants.ConfigKeys.Username],
+                    _configuration[EmailConstants.ConfigKeys.Password]);
 
                 await client.SendAsync(message);
                 await client.DisconnectAsync(true);
