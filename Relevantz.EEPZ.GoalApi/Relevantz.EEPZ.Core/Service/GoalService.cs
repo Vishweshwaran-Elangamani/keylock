@@ -57,31 +57,31 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         public async Task<ApiResponseModel<int>> CreateGoalAsync(
-            CreateGoalModel dto,
+            CreateGoalModel goal,
             int currentUserEmployeeMasterId,
             string currentUserRole
         )
         {
-            var validationResult = await _createGoalValidator.ValidateAsync(dto);
+            var validationResult = await _createGoalValidator.ValidateAsync(goal);
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
                 throw new BadRequestException("VALIDATION_FAILED", string.Join("; ", errors));
             }
 
-            if (!_baseService.CanCreate(currentUserRole, dto.GoalType))
+            if (!_baseService.CanCreate(currentUserRole, goal.GoalType))
             {
                 throw new ForbiddenException(
                     ResponseMessages.Codes.ROLE_INSUFFICIENT,
-                    $"Role '{currentUserRole}' not permitted to create '{dto.GoalType}' goals."
+                    $"Role '{currentUserRole}' not permitted to create '{goal.GoalType}' goals."
                 );
             }
 
-            var validChecklistItems = dto
+            var validChecklistItems = goal
                 .Checklist.Where(c => !string.IsNullOrWhiteSpace(c.Title))
                 .ToList();
 
-            if (dto.GoalType == GOAL_TYPE.SELF)
+            if (goal.GoalType == GOAL_TYPE.SELF)
             {
                 foreach (var item in validChecklistItems)
                 {
@@ -89,11 +89,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
             }
 
-            if (dto.ProjectId.HasValue && dto.ProjectId.Value > 0)
+            if (goal.ProjectId.HasValue && goal.ProjectId.Value > 0)
             {
                 var isInProject = await _repo.IsEmployeeInProjectAsync(
                     currentUserEmployeeMasterId,
-                    dto.ProjectId.Value
+                    goal.ProjectId.Value
                 );
 
                 if (!isInProject)
@@ -105,23 +105,26 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
             }
 
-            if (dto.GoalType == GOAL_TYPE.SELF)
+            if (goal.GoalType == GOAL_TYPE.SELF)
             {
                 if (
-                    dto.AssignedToEmployeeMasterIds.Count != 1
-                    || dto.AssignedToEmployeeMasterIds[0] != currentUserEmployeeMasterId
+                    goal.AssignedToEmployeeMasterIds.Count != 1
+                    || goal.AssignedToEmployeeMasterIds[0] != currentUserEmployeeMasterId
                 )
                 {
-                    dto.AssignedToEmployeeMasterIds = new List<int> { currentUserEmployeeMasterId };
+                    goal.AssignedToEmployeeMasterIds = new List<int>
+                    {
+                        currentUserEmployeeMasterId,
+                    };
                 }
             }
 
-            if (dto.GoalType == GOAL_TYPE.TEAM && dto.AssignedToEmployeeMasterIds.Count > 0)
+            if (goal.GoalType == GOAL_TYPE.TEAM && goal.AssignedToEmployeeMasterIds.Count > 0)
             {
                 var subordinates = await _baseRepo.GetSubordinateEmployeeMasterIdsAsync(
                     currentUserEmployeeMasterId
                 );
-                var invalidAssignments = dto
+                var invalidAssignments = goal
                     .AssignedToEmployeeMasterIds.Except(subordinates)
                     .ToList();
 
@@ -135,7 +138,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
 
             var goalId = await CreateGoalInternalAsync(
-                dto,
+                goal,
                 currentUserEmployeeMasterId,
                 currentUserRole,
                 validChecklistItems
@@ -144,9 +147,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var metadata = new
             {
                 GoalId = goalId,
-                GoalType = dto.GoalType,
+                GoalType = goal.GoalType,
                 RequiresApproval = currentUserRole != USER_ROLE.LEADERSHIP,
-                AssigneeCount = dto.AssignedToEmployeeMasterIds?.Count ?? 0,
+                AssigneeCount = goal.AssignedToEmployeeMasterIds?.Count ?? 0,
                 ChecklistItemCount = validChecklistItems.Count,
             };
 
@@ -158,7 +161,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         private async Task<int> CreateGoalInternalAsync(
-            CreateGoalModel dto,
+            CreateGoalModel goalDetails,
             int currentUserEmployeeMasterId,
             string currentUserRole,
             List<ChecklistItemModel> validChecklistItems
@@ -169,7 +172,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 initialStatus = GOAL_STATUS.OPEN;
             }
-            else if (dto.GoalType == GOAL_TYPE.ORG)
+            else if (goalDetails.GoalType == GOAL_TYPE.ORG)
             {
                 initialStatus = GOAL_STATUS.OPEN;
             }
@@ -180,12 +183,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             var goal = new Goal
             {
-                GoalType = dto.GoalType,
-                ProjectId = dto.ProjectId > 0 ? dto.ProjectId : null,
-                GoalTitle = dto.Title,
-                GoalDescription = dto.Description,
+                GoalType = goalDetails.GoalType,
+                ProjectId = goalDetails.ProjectId > 0 ? goalDetails.ProjectId : null,
+                GoalTitle = goalDetails.Title,
+                GoalDescription = goalDetails.Description,
                 Goalcreatedat = DateTime.UtcNow,
-                Goalendat = dto.Deadline,
+                Goalendat = goalDetails.Deadline,
                 CreatedBy = currentUserEmployeeMasterId,
                 Goalstatus = initialStatus,
             };
@@ -207,9 +210,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             await _repo.AddChecklistRangeAsync(checklistItems);
 
-            if (dto.AssignedToEmployeeMasterIds?.Count > 0)
+            if (goalDetails.AssignedToEmployeeMasterIds?.Count > 0)
             {
-                var assignments = dto
+                var assignments = goalDetails
                     .AssignedToEmployeeMasterIds.Select(to => new GoalAssignment
                     {
                         GoalId = goal.GoalId,
@@ -223,7 +226,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             if (currentUserRole != USER_ROLE.LEADERSHIP && initialStatus == GOAL_STATUS.PENDING)
             {
-                var approvalType = _baseService.GetCreationApprovalType(dto.GoalType);
+                var approvalType = _baseService.GetCreationApprovalType(goalDetails.GoalType);
                 if (approvalType != null)
                 {
                     var approverId = await _baseRepo.GetReportingManagerEmployeeMasterIdAsync(
@@ -294,7 +297,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             foreach (var goal in goals)
             {
-
                 var summary = _mapper.Map<GoalSummaryModel>(goal);
                 summary.DescriptionShort = GetShortDescription(goal.GoalDescription);
                 summary.ProgressPercent = await CalculateGoalProgressAsync(
@@ -332,7 +334,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 summary.IsAcknowledged = goal
                     .GoalAssignments.Where(a => a.AssignedTo == currentUserEmployeeMasterId)
                     .Any(a => a.IsAcknowledged == true);
-
 
                 if (goal.GoalType == GOAL_TYPE.TEAM)
                 {
@@ -375,12 +376,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         public async Task<ApiResponseModel> UpdateGoalAsync(
             int goalId,
-            UpdateGoalModel dto,
+            UpdateGoalModel goalDetails,
             int currentUserEmployeeMasterId,
             string currentUserRole
         )
         {
-            var validationResult = await _updateGoalValidator.ValidateAsync(dto);
+            var validationResult = await _updateGoalValidator.ValidateAsync(goalDetails);
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
@@ -403,7 +404,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw new GoalAccessDeniedException();
             }
 
-            if (dto.Checklist != null && dto.Checklist.Any())
+            if (goalDetails.Checklist != null && goalDetails.Checklist.Any())
             {
                 var existingChecklists = await _baseRepo.GetChecklistItemsByGoalIdAsync(goalId);
 
@@ -430,7 +431,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     await _repo.DeleteChecklistItemAsync(existingItem.ChecklistId);
                 }
 
-                foreach (var dtoItem in dto.Checklist)
+                foreach (var dtoItem in goalDetails.Checklist)
                 {
                     var newItem = new GoalChecklist
                     {
@@ -447,12 +448,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 await RecalculateProgressAsync(goalId, currentUserEmployeeMasterId);
             }
 
-            if (!string.IsNullOrWhiteSpace(dto.Title))
-                goal.GoalTitle = dto.Title;
-            if (dto.Description != null)
-                goal.GoalDescription = dto.Description;
-            if (dto.Deadline.HasValue)
-                goal.Goalendat = dto.Deadline;
+            if (!string.IsNullOrWhiteSpace(goalDetails.Title))
+                goal.GoalTitle = goalDetails.Title;
+            if (goalDetails.Description != null)
+                goal.GoalDescription = goalDetails.Description;
+            if (goalDetails.Deadline.HasValue)
+                goal.Goalendat = goalDetails.Deadline;
 
             await _repo.UpdateGoalAsync(goal);
             await _baseRepo.SaveChangesAsync();
@@ -539,12 +540,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         public async Task<ApiResponseModel> AssignAsync(
             int goalId,
-            AssignGoalModel dto,
+            AssignGoalModel assignmentDetails,
             int currentUserEmployeeMasterId,
             string currentUserRole
         )
         {
-            var validationResult = await _assignGoalValidator.ValidateAsync(dto);
+            var validationResult = await _assignGoalValidator.ValidateAsync(assignmentDetails);
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
@@ -594,7 +595,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var subordinates = await _baseRepo.GetSubordinateEmployeeMasterIdsAsync(
                 currentUserEmployeeMasterId
             );
-            var invalidAssignments = dto.AssignedToEmployeeMasterIds.Except(subordinates).ToList();
+            var invalidAssignments = assignmentDetails
+                .AssignedToEmployeeMasterIds.Except(subordinates)
+                .ToList();
             if (invalidAssignments.Any())
             {
                 throw new BusinessRuleException(
@@ -603,7 +606,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
             }
 
-            var duplicateAssignees = dto
+            var duplicateAssignees = assignmentDetails
                 .AssignedToEmployeeMasterIds.Intersect(existingAssigneeIds)
                 .ToList();
 
@@ -615,7 +618,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
             }
 
-            var assignments = dto
+            var assignments = assignmentDetails
                 .AssignedToEmployeeMasterIds.Select(to => new GoalAssignment
                 {
                     GoalId = goal.GoalId,
@@ -626,7 +629,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 .ToList();
             await _repo.AddAssignmentsAsync(assignments);
 
-            var items = dto
+            var items = assignmentDetails
                 .AdditionalChecklist.Select(c => new GoalChecklist
                 {
                     GoalId = goal.GoalId,
@@ -659,7 +662,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 GoalId = goalId,
                 AssignedBy = currentUserEmployeeMasterId,
-                NewAssignees = dto.AssignedToEmployeeMasterIds,
+                NewAssignees = assignmentDetails.AssignedToEmployeeMasterIds,
                 ChecklistItemsAdded = items.Count,
             };
 
@@ -698,12 +701,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var allProjects = await _repo.GetAllProjectsAsync();
             return _mapper.Map<List<ProjectModel>>(allProjects);
         }
+
         public async Task<ProjectModel> GetProjectAsync(int projectId)
         {
             var project = await _repo.GetProjectAsync(projectId);
             if (project == null)
                 throw new ProjectNotFoundException(projectId);
-
 
             var projectModel = _mapper.Map<ProjectModel>(project);
             projectModel.Employees = await _interactionRepo.GetProjectEmployeesAsync(projectId);
@@ -711,7 +714,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return projectModel;
         }
 
-        // HELPER METHODS 
+        // HELPER METHODS
 
         private string? GetShortDescription(string? description)
         {

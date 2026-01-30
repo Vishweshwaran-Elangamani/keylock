@@ -85,7 +85,6 @@ namespace Relevantz.EEPZ.Core.Service
             };
         }
 
-
         public async Task<FileUploadResponseModel> UploadFileAsync(
             int goalId,
             IFormFile file,
@@ -105,12 +104,9 @@ namespace Relevantz.EEPZ.Core.Service
                 throw new FileAccessDeniedException();
             }
 
-
             ValidateFile(file);
 
-
             var fileId = await _fileStorage.SaveFileAsync(file, "goals/attachments");
-
 
             var attachment = new GoalAttachment
             {
@@ -123,7 +119,6 @@ namespace Relevantz.EEPZ.Core.Service
 
             await _repo.AddAttachmentAsync(attachment);
             await _baseRepo.SaveChangesAsync();
-
 
             var response = _mapper.Map<FileUploadResponseModel>(attachment);
             response.FileName = file.FileName;
@@ -217,7 +212,6 @@ namespace Relevantz.EEPZ.Core.Service
             return attachment;
         }
 
-
         private void ValidateFile(IFormFile file)
         {
             if (file == null || file.Length == 0)
@@ -261,7 +255,6 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
 
-
         private string GetDisplayFileName(string? attachmentTitle, string originalFileName)
         {
             var displayFileName = !string.IsNullOrEmpty(attachmentTitle)
@@ -273,7 +266,6 @@ namespace Relevantz.EEPZ.Core.Service
                 var extension = Path.GetExtension(originalFileName);
                 displayFileName += extension;
             }
-
 
             displayFileName = Path.GetFileName(displayFileName);
 

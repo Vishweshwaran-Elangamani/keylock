@@ -7,7 +7,7 @@ namespace Relevantz.EEPZ.Core.Services.Interface
     public interface IGoalService
     {
         Task<ApiResponseModel<int>> CreateGoalAsync(
-            CreateGoalModel dto,
+            CreateGoalModel goal,
             int currentUserEmployeeMasterId,
             string currentUserRole
         );
@@ -18,14 +18,14 @@ namespace Relevantz.EEPZ.Core.Services.Interface
         );
         Task<ApiResponseModel> UpdateGoalAsync(
             int goalId,
-            UpdateGoalModel dto,
+            UpdateGoalModel goalDetails,
             int currentUserEmployeeMasterId,
             string currentUserRole
         );
         Task<List<AssigneeModel>> GetAssigneesAsync(int goalId);
         Task<ApiResponseModel> AssignAsync(
             int goalId,
-            AssignGoalModel dto,
+            AssignGoalModel assignmentDetails,
             int currentUserEmployeeMasterId,
             string currentUserRole
         );

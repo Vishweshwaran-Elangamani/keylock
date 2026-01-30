@@ -4,7 +4,6 @@ using MapsterMapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Exceptions;
 using Relevantz.EEPZ.Common.Models;
@@ -47,11 +46,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         public async Task<ApiResponseModel> UpdateChecklistStatusAsync(
             int goalId,
-            UpdateChecklistStatusModel dto,
+            UpdateChecklistStatusModel updateDetails,
             int currentUserEmployeeMasterId
         )
         {
-            var validationResult = await _updateChecklistStatusValidator.ValidateAsync(dto);
+            var validationResult = await _updateChecklistStatusValidator.ValidateAsync(
+                updateDetails
+            );
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
@@ -76,21 +77,21 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
             }
 
-            var checklistItem = await _repo.GetChecklistItemAsync(dto.ChecklistId);
+            var checklistItem = await _repo.GetChecklistItemAsync(updateDetails.ChecklistId);
             if (checklistItem == null || checklistItem.GoalId != goalId)
             {
-                throw new ChecklistNotFoundException(dto.ChecklistId);
+                throw new ChecklistNotFoundException(updateDetails.ChecklistId);
             }
 
             await _repo.SetChecklistProgressAsync(
-                dto.ChecklistId,
+                updateDetails.ChecklistId,
                 currentUserEmployeeMasterId,
-                dto.IsCompleted
+                updateDetails.IsCompleted
             );
 
             await _baseRepo.SaveChangesAsync();
 
-            if (dto.IsCompleted && goal.Goalstatus == GOAL_STATUS.OPEN)
+            if (updateDetails.IsCompleted && goal.Goalstatus == GOAL_STATUS.OPEN)
             {
                 goal.Goalstatus = GOAL_STATUS.IN_PROGRESS;
                 await _goalRepo.UpdateGoalAsync(goal);
@@ -155,11 +156,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var metadata = new
             {
                 GoalId = goalId,
-                ChecklistId = dto.ChecklistId,
-                IsCompleted = dto.IsCompleted,
+                ChecklistId = updateDetails.ChecklistId,
+                IsCompleted = updateDetails.IsCompleted,
                 NewProgress = percent,
                 UpdatedBy = currentUserEmployeeMasterId,
-                StatusChanged = goal.Goalstatus == GOAL_STATUS.IN_PROGRESS && dto.IsCompleted,
+                StatusChanged = goal.Goalstatus == GOAL_STATUS.IN_PROGRESS
+                    && updateDetails.IsCompleted,
             };
 
             return ApiResponseModel.SuccessResponse(
@@ -170,11 +172,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         public async Task<ApiResponseModel> UpdateProgressPercentageAsync(
             int goalId,
-            UpdateProgressPercentageModel dto,
+            UpdateProgressPercentageModel updateDetails,
             int currentUserEmployeeMasterId
         )
         {
-            var validationResult = await _updateProgressPercentageModelValidator.ValidateAsync(dto);
+            var validationResult = await _updateProgressPercentageModelValidator.ValidateAsync(
+                updateDetails
+            );
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
@@ -196,10 +200,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 )
             )
             {
-                throw new ForbiddenException(
-                    ResponseMessages.Codes.PROGRESS_UPDATE_DENIED,
-                    "Only managers and above can manually update progress."
-                );
+                throw new ForbiddenException(ResponseMessages.Codes.PROGRESS_UPDATE_DENIED);
             }
 
             await _repo.AddProgressLogAsync(
@@ -208,8 +209,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     GoalId = goalId,
                     UpdatedBy = currentUserEmployeeMasterId,
                     UpdatedOn = DateTime.UtcNow,
-                    ProgressPercent = dto.ProgressPercent,
-                    Source = dto.Source,
+                    ProgressPercent = updateDetails.ProgressPercent,
+                    Source = updateDetails.Source,
                 }
             );
 
@@ -218,8 +219,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var metadata = new
             {
                 GoalId = goalId,
-                ProgressPercent = dto.ProgressPercent,
-                Source = dto.Source,
+                ProgressPercent = updateDetails.ProgressPercent,
+                Source = updateDetails.Source,
                 UpdatedBy = currentUserEmployeeMasterId,
             };
 

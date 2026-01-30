@@ -50,16 +50,16 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _mapper = mapper;
         }
 
-
         public async Task<ApiResponseModel<int>> CreateApprovalRequestAsync(
             int goalId,
-            CreateApprovalRequestModel dto,
+            CreateApprovalRequestModel approvalRequestDetails,
             int requesterEmployeeMasterId,
             string requesterRole
         )
         {
-
-            var validationResult = await _createApprovalValidator.ValidateAsync(dto);
+            var validationResult = await _createApprovalValidator.ValidateAsync(
+                approvalRequestDetails
+            );
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
@@ -72,7 +72,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw new GoalNotFoundException(goalId);
             }
 
-            if (dto.ApprovalType == APPROVAL_TYPE.COMPLETION)
+            if (approvalRequestDetails.ApprovalType == APPROVAL_TYPE.COMPLETION)
             {
                 if (
                     requesterRole == USER_ROLE.LEADERSHIP
@@ -156,7 +156,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
             }
 
-            if (dto.ApprovalType == APPROVAL_TYPE.CLOSURE)
+            if (approvalRequestDetails.ApprovalType == APPROVAL_TYPE.CLOSURE)
             {
                 if (goal.CreatedBy != requesterEmployeeMasterId)
                 {
@@ -235,7 +235,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
             }
 
-            if (dto.ApprovalType == APPROVAL_TYPE.REOPENING)
+            if (approvalRequestDetails.ApprovalType == APPROVAL_TYPE.REOPENING)
             {
                 if (!goal.Goalendat.HasValue || goal.Goalendat.Value >= DateTime.UtcNow)
                 {
@@ -283,7 +283,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
             }
 
-            if (dto.ApprovalType == APPROVAL_TYPE.REACTIVATION)
+            if (approvalRequestDetails.ApprovalType == APPROVAL_TYPE.REACTIVATION)
             {
                 if (goal.CreatedBy != requesterEmployeeMasterId)
                 {
@@ -358,7 +358,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
             }
 
-            var approverId = dto.ApprovalType switch
+            var approverId = approvalRequestDetails.ApprovalType switch
             {
                 "creation" or "selfgoalactivation" or "delegation" or "task_acknowledgment" =>
                     await _baseRepo.GetReportingManagerEmployeeMasterIdAsync(
@@ -366,7 +366,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     ),
                 _ => throw new BadRequestException(
                     ResponseMessages.Codes.INVALID_REQUEST,
-                    $"Unknown approval type: {dto.ApprovalType}"
+                    $"Unknown approval type: {approvalRequestDetails.ApprovalType}"
                 ),
             };
 
@@ -381,7 +381,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var standardApproval = new GoalApproval
             {
                 GoalId = goalId,
-                ApprovalType = dto.ApprovalType,
+                ApprovalType = approvalRequestDetails.ApprovalType,
                 RequestedBy = requesterEmployeeMasterId,
                 RequestedOn = DateTime.UtcNow,
                 ApprovedBy = approverId.Value,
@@ -397,16 +397,16 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
         }
 
-
         public async Task<ApiResponseModel> ClosePendingApprovalAsync(
             int approvalId,
-            ApprovalDesicionModel dto,
+            ApprovalDesicionModel approvalDesicionDetails,
             int approverEmployeeMasterId,
             string approverRole
         )
         {
-
-            var validationResult = await _approvalDecisionValidator.ValidateAsync(dto);
+            var validationResult = await _approvalDecisionValidator.ValidateAsync(
+                approvalDesicionDetails
+            );
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
@@ -442,7 +442,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
             }
 
-            approval.ApprovalStatus = dto.Decision;
+            approval.ApprovalStatus = approvalDesicionDetails.Decision;
             approval.ApprovedOn = DateTime.UtcNow;
             await _repo.UpdateApprovalAsync(approval);
 
@@ -451,13 +451,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 || approval.ApprovalType == APPROVAL_TYPE.TASK_ACKNOWLEDGMENT
             )
             {
-                if (dto.Decision == APPROVAL_STATUS.REJECTED)
+                if (approvalDesicionDetails.Decision == APPROVAL_STATUS.REJECTED)
                 {
                     await _attachmentRepo.UnmarkProofAttachmentsAsync(approvalId);
                 }
             }
 
-            if (dto.Decision == APPROVAL_STATUS.APPROVED)
+            if (approvalDesicionDetails.Decision == APPROVAL_STATUS.APPROVED)
             {
                 switch (approval.ApprovalType)
                 {
@@ -535,7 +535,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         break;
 
                     case APPROVAL_TYPE.REOPENING:
-                        if (!dto.NewDeadline.HasValue)
+                        if (!approvalDesicionDetails.NewDeadline.HasValue)
                         {
                             throw new BadRequestException(
                                 ResponseMessages.Codes.INVALID_REQUEST,
@@ -543,7 +543,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             );
                         }
 
-                        if (dto.NewDeadline.Value <= DateTime.UtcNow)
+                        if (approvalDesicionDetails.NewDeadline.Value <= DateTime.UtcNow)
                         {
                             throw new BadRequestException(
                                 ResponseMessages.Codes.INVALID_REQUEST,
@@ -551,7 +551,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             );
                         }
 
-                        goal.Goalendat = dto.NewDeadline.Value;
+                        goal.Goalendat = approvalDesicionDetails.NewDeadline.Value;
                         goal.Goalstatus = GOAL_STATUS.REOPENED;
                         goal.ReopenedBy = approval.RequestedBy;
                         goal.ReopenedOn = DateTime.UtcNow;
@@ -623,7 +623,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 ApprovalId = approvalId,
                 GoalId = goal.GoalId,
-                Decision = dto.Decision,
+                Decision = approvalDesicionDetails.Decision,
                 ApprovalType = approval.ApprovalType,
                 ApprovedBy = approverEmployeeMasterId,
                 ApprovedOn = approval.ApprovedOn,
@@ -646,12 +646,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             foreach (var approval in approvals)
             {
-
                 var approvalModel = _mapper.Map<GoalApprovalModel>(approval);
                 approvalModel.RequestedByName = await _baseService.GetEmployeeNameAsync(
                     approval.RequestedBy
                 );
-
 
                 var (allAttachments, proofAttachments) = await MapAttachmentsForApprovalAsync(
                     approval
@@ -665,7 +663,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return result;
         }
 
-
         private async Task<(
             List<GoalAttachmentModel>,
             List<GoalAttachmentModel>?
@@ -678,11 +675,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 foreach (var att in approval.Goal.GoalAttachments)
                 {
-
                     var attachmentModel = _mapper.Map<GoalAttachmentModel>(att);
                     allAttachments.Add(attachmentModel);
                 }
-
 
                 if (
                     approval.ApprovalType == APPROVAL_TYPE.COMPLETION
@@ -699,7 +694,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             return (allAttachments, proofAttachments);
         }
-
 
         public async Task<PagedApprovalsModel> GetUserApprovalsAsync(
             ApprovalQueryModel query,
@@ -782,8 +776,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var approvalModels = new List<UserGoalApprovalModel>();
             foreach (var ga in approvals)
             {
-                var dto = await MapToUserGoalApprovalModelAsync(ga, userId, userRole);
-                approvalModels.Add(dto);
+                var approvalDesicionDetails = await MapToUserGoalApprovalModelAsync(
+                    ga,
+                    userId,
+                    userRole
+                );
+                approvalModels.Add(approvalDesicionDetails);
             }
 
             var summary = await CalculateApprovalSummaryOptimized(userId, userRole);
@@ -908,14 +906,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 && approval.RequestedBy != userId;
         }
 
-
         private async Task<UserGoalApprovalModel> MapToUserGoalApprovalModelAsync(
             GoalApproval approval,
             int userId,
             string userRole
         )
         {
-
             var model = _mapper.Map<UserGoalApprovalModel>(approval);
             model.RequestedByName = await _baseService.GetEmployeeNameAsync(approval.RequestedBy);
             model.ApproverName = await _baseService.GetEmployeeNameAsync(approval.ApprovedBy);
@@ -923,20 +919,16 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 approval.Goal?.CreatedBy
             );
 
-
             if (approval.ApprovedBy.HasValue)
             {
                 model.ApproverRole = await _baseRepo.GetUserRoleAsync(approval.ApprovedBy.Value);
             }
 
-
             model.GoalAssignees = await MapGoalAssigneesAsync(approval.Goal?.GoalAssignments);
-
 
             var (allAttachments, proofAttachments) = await MapAllAttachmentsAsync(approval);
             model.AllAttachments = allAttachments;
             model.ProofAttachments = proofAttachments;
-
 
             model.UserRole = DetermineUserRoleInApproval(approval, userId, userRole);
             model.CanMakeDecision = CanUserMakeDecision(approval, userId, userRole);
@@ -957,9 +949,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 {
                     if (assignment.AssignedTo.HasValue)
                     {
-
                         var assignee = _mapper.Map<AssigneeModel>(assignment);
-
 
                         assignee.Name = await _baseService.GetEmployeeNameAsync(
                             assignment.AssignedTo
@@ -988,9 +978,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 foreach (var att in approval.Goal.GoalAttachments)
                 {
-
                     var attachmentModel = _mapper.Map<GoalAttachmentModel>(att);
-
 
                     attachmentModel.AttachedByName = await _baseService.GetEmployeeNameAsync(
                         att.AttachedBy

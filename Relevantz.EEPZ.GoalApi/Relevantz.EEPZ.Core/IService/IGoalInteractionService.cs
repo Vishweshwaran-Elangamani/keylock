@@ -8,7 +8,7 @@ namespace Relevantz.EEPZ.Core.Services.Interface
     {
         Task<ApiResponseModel> AddCommentAsync(
             int goalId,
-            CreateCommentModel dto,
+            CreateCommentModel commentDetails,
             int currentUserEmployeeMasterId,
             string currentUserRole
         );

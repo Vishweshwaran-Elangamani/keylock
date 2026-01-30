@@ -4,7 +4,6 @@ using MapsterMapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Exceptions;
 using Relevantz.EEPZ.Common.Models;
@@ -47,12 +46,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         public async Task<ApiResponseModel> AddCommentAsync(
             int goalId,
-            CreateCommentModel dto,
+            CreateCommentModel commentDetails,
             int currentUserEmployeeMasterId,
             string currentUserRole
         )
         {
-            var validationResult = await _createCommentValidator.ValidateAsync(dto);
+            var validationResult = await _createCommentValidator.ValidateAsync(commentDetails);
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
@@ -90,7 +89,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var comment = new GoalComment
             {
                 GoalId = goalId,
-                GoalComment1 = dto.Comment,
+                GoalComment1 = commentDetails.Comment,
                 CommentedBy = currentUserEmployeeMasterId,
                 CommentedOn = DateTime.UtcNow,
             };

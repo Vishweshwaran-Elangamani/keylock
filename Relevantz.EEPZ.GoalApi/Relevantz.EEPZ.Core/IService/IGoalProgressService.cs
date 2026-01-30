@@ -8,12 +8,12 @@ namespace Relevantz.EEPZ.Core.Services.Interface
     {
         Task<ApiResponseModel> UpdateChecklistStatusAsync(
             int goalId,
-            UpdateChecklistStatusModel dto,
+            UpdateChecklistStatusModel updateDetails,
             int currentUserEmployeeMasterId
         );
         Task<ApiResponseModel> UpdateProgressPercentageAsync(
             int goalId,
-            UpdateProgressPercentageModel dto,
+            UpdateProgressPercentageModel updateDetails,
             int currentUserEmployeeMasterId
         );
         Task<int> GetGoalProgressPercentAsync(int goalId, int forEmployeeMasterId);

@@ -8,13 +8,13 @@ namespace Relevantz.EEPZ.Core.Services.Interface
     {
         Task<ApiResponseModel<int>> CreateApprovalRequestAsync(
             int goalId,
-            CreateApprovalRequestModel dto,
+            CreateApprovalRequestModel approvalRequestDetails,
             int requesterEmployeeMasterId,
             string requesterRole
         );
         Task<ApiResponseModel> ClosePendingApprovalAsync(
             int approvalId,
-            ApprovalDesicionModel dto,
+            ApprovalDesicionModel approvalDesicionDetails,
             int approverEmployeeMasterId,
             string approverRole
         );
