@@ -74,14 +74,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var assessment = await _repository.GetAssessmentByIdAsync(request.AssessmentId);
                 if (assessment == null)
                 {
-                    return ApiResponse<int>.ErrorResponse("Assessment not found");
+                    return ApiResponse<int>.ErrorResponse(ServiceMessages.AssessmentNotFound);
                 }
 
 
                 var existingApproval = await _repository.GetExistingApprovalAsync(request.AssessmentId, request.EmployeeId);
                 if (existingApproval != null)
                 {
-                    return ApiResponse<int>.ErrorResponse("Employee already approved");
+                    return ApiResponse<int>.ErrorResponse(ServiceMessages.EmployeeAlreadyApproved);
                 }
 
 
@@ -233,22 +233,22 @@ var approvalId = await _repository.CreateApprovalAsync(approval);               
 
                     _logger.LogInformation($"Including AssessmentId {selfAssessment.AssessmentId} - L2 approved");
 
-                    string l1ReviewerName = "No L1";
+                    string l1ReviewerName = DefaultLabels.NoL1;
                     if (project.L1approverEmployeeId.HasValue &&
                         profileMap.TryGetValue(project.L1approverEmployeeId.Value, out var l1Profile))
                     {
                         l1ReviewerName = $"{l1Profile.FirstName ?? ""} {l1Profile.LastName ?? ""}".Trim();
                         if (string.IsNullOrEmpty(l1ReviewerName))
-                            l1ReviewerName = "L1 Reviewer";
+                            l1ReviewerName = DefaultLabels.L1Reviewer;
                     }
 
-                    string l2ReviewerName = "No L2";
+                    string l2ReviewerName = DefaultLabels.NoL2;
                     if (project.L2approverEmployeeId.HasValue &&
                         profileMap.TryGetValue(project.L2approverEmployeeId.Value, out var l2Profile))
                     {
                         l2ReviewerName = $"{l2Profile.FirstName ?? ""} {l2Profile.LastName ?? ""}".Trim();
                         if (string.IsNullOrEmpty(l2ReviewerName))
-                            l2ReviewerName = "L2 Reviewer";
+                            l2ReviewerName = DefaultLabels.L2Reviewer;
                     }
 
                     var competencies = selfAssessment.Assessmentdetails.Select(detail =>
@@ -265,7 +265,7 @@ var l2Review = l2Auth != null ? reviews.FirstOrDefault(r =>
 
                         return new
                         {
-                            CompetencyName = detail.Competency?.Name ?? "Unknown",
+                            CompetencyName = detail.Competency?.Name ?? DefaultLabels.Unknown,
                             EmployeeRating = detail.EmployeeRating,
                             EmployeeComments = detail.EmployeeComments,
                             L1ReviewerName = l1ReviewerName,
@@ -330,7 +330,7 @@ var l2Review = l2Auth != null ? reviews.FirstOrDefault(r =>
 
                     string employeeName = $"{profile.FirstName ?? ""} {profile.LastName ?? ""}".Trim();
                     if (string.IsNullOrEmpty(employeeName))
-                        employeeName = $"Employee {pe.EmployeeId}";
+                        employeeName = $"{DefaultLabels.Employee} {pe.EmployeeId}";
 
                     var employeeDetails = await _repository.GetEmployeeDetailsByEmployeeIdAsync(pe.EmployeeId);
 
@@ -340,7 +340,7 @@ var l2Review = l2Auth != null ? reviews.FirstOrDefault(r =>
                         EmployeeName = employeeName,
                         EmployeeCompanyId = employeeDetails?.EmployeeMasterId.ToString() ?? "",
                         ProjectId = project.ProjectId,
-                        ProjectName = project.ProjectName ?? "Unknown",
+                        ProjectName = project.ProjectName ?? DefaultLabels.Unknown,
                         AssessmentId = selfAssessment.AssessmentId,
                         Competencies = competencies,
                         Goals = formattedGoals
@@ -360,7 +360,7 @@ var l2Review = l2Auth != null ? reviews.FirstOrDefault(r =>
     catch (Exception ex)
     {
         _logger.LogError($"Error in GetDeptHeadSubmittedRatingsAsync: {ex.Message}");
-        return ApiResponse<List<object>>.ErrorResponse($"Failed to fetch submitted ratings: {ex.Message}");
+        return ApiResponse<List<object>>.ErrorResponse($"{ServiceMessages.FailedToFetchSubmittedRatings}: {ex.Message}");
     }
 }
 
@@ -433,7 +433,7 @@ var l2Review = l2Auth != null ? reviews.FirstOrDefault(r =>
 
                         string employeeName = $"{profile.FirstName ?? ""} {profile.LastName ?? ""}".Trim();
                         if (string.IsNullOrEmpty(employeeName))
-                            employeeName = $"Employee {approval.EmployeeId}";
+                            employeeName = $"{DefaultLabels.Employee} {approval.EmployeeId}";
 
 
                         var selfAssessment = await _repository.GetAssessmentWithDetailsAsync(approval.AssessmentId);
@@ -485,7 +485,7 @@ var l2Review = l2Auth != null ? reviews.FirstOrDefault(r =>
                             ApprovalId = approval.ApprovalId,
                             EmployeeId = approval.EmployeeId,
                             EmployeeName = employeeName,
-                            ProjectName = project.ProjectName ?? "Unknown",
+                            ProjectName = project.ProjectName ?? DefaultLabels.Unknown,
                             ApprovedAt = approval.ApprovedAt,
                             EmployeeAvgRating = avgEmployeeRating > 0 ? avgEmployeeRating : (double?)null,  
                             L1AvgRating = avgL1Rating > 0 ? avgL1Rating : (double?)null,                   
@@ -551,8 +551,8 @@ var l2Review = l2Auth != null ? reviews.FirstOrDefault(r =>
                         var reviews = await _repository.GetReviewsByDetailIdsAsync(detailIds);
 
 
-                        var l1Name = "No L1";
-                        var l2Name = "No L2";
+                        var l1Name = DefaultLabels.NoL1;
+                        var l2Name = DefaultLabels.NoL2;
                         int? l1UserId = null, l2UserId = null;
 
 
@@ -588,7 +588,7 @@ var l2Review = l2Auth != null ? reviews.FirstOrDefault(r =>
 
                             return new
                             {
-                                CompetencyName = detail.Competency?.Name ?? "Unknown",
+                                CompetencyName = detail.Competency?.Name ?? DefaultLabels.Unknown,
                                 EmployeeRating = detail.EmployeeRating,
                                 EmployeeComments = detail.EmployeeComments,
                                 L1ReviewerName = l1Name,
@@ -604,7 +604,7 @@ var l2Review = l2Auth != null ? reviews.FirstOrDefault(r =>
                         results.Add(new
                         {
                             ApprovalId = approval.ApprovalId,
-                            ProjectName = project.ProjectName ?? "Unknown",
+                            ProjectName = project.ProjectName ?? DefaultLabels.Unknown,
                             ApprovedAt = approval.ApprovedAt,
                             Competencies = competencies
                         });
@@ -626,7 +626,6 @@ var l2Review = l2Auth != null ? reviews.FirstOrDefault(r =>
             }
         }
 
-
         public async Task<ApiResponse<DateTime?>> AcknowledgeRatingAsync(AcknowledgeRequestDto request, int employeeId, int userId)
         {
             try
@@ -640,13 +639,13 @@ var l2Review = l2Auth != null ? reviews.FirstOrDefault(r =>
                 if (approval == null)
                 {
                     _logger.LogWarning($"[ACK POST] NOT FOUND: approvalId={request.ApprovalId}, empId={employeeId}, userId={userId}");
-                    return ApiResponse<DateTime?>.ErrorResponse($"NOT_FOUND - Approval record not found for ApprovalId={request.ApprovalId}");
+                    return ApiResponse<DateTime?>.ErrorResponse($"{ServiceErrorCodes.NotFoundPrefix} - {ServiceMessages.ApprovalRecordNotFound} for ApprovalId={request.ApprovalId}");
                 }
 
 
                 if (approval.AcknowledgedByEmployee)
                 {
-                    return ApiResponse<DateTime?>.ErrorResponse("Already acknowledged");
+                   return ApiResponse<DateTime?>.ErrorResponse(ServiceMessages.AlreadyAcknowledged);
                 }
 
 
@@ -706,14 +705,14 @@ var l2Review = l2Auth != null ? reviews.FirstOrDefault(r =>
                 if (attachment == null)
                 {
                     _logger.LogWarning($"Attachment not found for attachmentId: {attachmentId}");
-                    return (false, null, null, null, new List<string> { "ATTACHMENT_NOT_FOUND - Attachment not found." });
+                    return (false, null, null, null, new List<string> { $"{ServiceErrorCodes.AttachmentNotFound} - Attachment not found." });
                 }
 
 
                 if (string.IsNullOrWhiteSpace(attachment.FilePath))
                 {
                     _logger.LogWarning($"File path missing for attachmentId: {attachmentId}");
-                    return (false, null, null, null, new List<string> { "FILE_NOT_FOUND - File path missing." });
+                    return (false, null, null, null, new List<string> { $"{ServiceErrorCodes.FileNotFound} - File path missing." });
                 }
 
 
@@ -733,7 +732,7 @@ var l2Review = l2Auth != null ? reviews.FirstOrDefault(r =>
                 catch (FormatException)
                 {
                     _logger.LogError($"Invalid ObjectId format: {attachment.FilePath}");
-                    return (false, null, null, null, new List<string> { "FILE_NOT_FOUND - Invalid file reference format." });
+                    return (false, null, null, null, new List<string> { $"{ServiceErrorCodes.FileNotFound} - Invalid file reference format." });
                 }
 
 
@@ -746,11 +745,11 @@ var l2Review = l2Auth != null ? reviews.FirstOrDefault(r =>
                 catch (GridFSFileNotFoundException)
                 {
                     _logger.LogError($"File not found in GridFS for ObjectId: {fileId}");
-                    return (false, null, null, null, new List<string> { "FILE_NOT_FOUND - File not found in GridFS storage." });
+                    return (false, null, null, null, new List<string> { $"{ServiceErrorCodes.FileNotFound} - File not found in GridFS storage." });
                 }
 
 
-                var contentType = attachment.FileType ?? "application/octet-stream";
+               var contentType = attachment.FileType ?? ContentTypes.OctetStream;
 
 
                 _logger.LogInformation($"File download completed successfully");
@@ -778,13 +777,13 @@ var l2Review = l2Auth != null ? reviews.FirstOrDefault(r =>
             {
                 var approval = await _repository.GetApprovalByIdAsync(approvalId);
                 if (approval == null)
-                    return ApiResponse<DeptHeadPerformanceDTO>.ErrorResponse("APPROVAL_NOT_FOUND");
+                   return ApiResponse<DeptHeadPerformanceDTO>.ErrorResponse(ServiceErrorCodes.ApprovalNotFound);
 
 
                 var project = await _repository.GetProjectByIdAsync(approval.ProjectId);
                 var assessment = await _repository.GetAssessmentWithDetailsAsync(approval.AssessmentId);
                 if (assessment == null || project == null)
-                    return ApiResponse<DeptHeadPerformanceDTO>.ErrorResponse("ASSESSMENT_OR_PROJECT_NOT_FOUND");
+                   return ApiResponse<DeptHeadPerformanceDTO>.ErrorResponse(ServiceErrorCodes.AssessmentOrProjectNotFound);
 
 
                 var detailIds = assessment.Assessmentdetails.Select(d => d.DetailId).ToList();
@@ -807,8 +806,8 @@ var l2Review = l2Auth != null ? reviews.FirstOrDefault(r =>
                     : null;
 
 
-                var l1Name = l1Profile != null ? $"{l1Profile.FirstName} {l1Profile.LastName}".Trim() : "No L1";
-                var l2Name = l2Profile != null ? $"{l2Profile.FirstName} {l2Profile.LastName}".Trim() : "No L2";
+                var l1Name = l1Profile != null ? $"{l1Profile.FirstName} {l1Profile.LastName}".Trim() : DefaultLabels.NoL1;
+                var l2Name = l2Profile != null ? $"{l2Profile.FirstName} {l2Profile.LastName}".Trim() : DefaultLabels.NoL2;
 
 
                 var competencies = assessment.Assessmentdetails.Select(detail =>
@@ -823,7 +822,9 @@ var l2Review = l2Auth != null ? reviews.FirstOrDefault(r =>
 
                     return new CompetencyRatingDTO
                     {
-                        CompetencyName = detail.Competency?.Name ?? "Unknown",
+                        
+                        CompetencyName = detail.Competency?.Name ?? DefaultLabels.Unknown,
+
                         EmployeeRating = detail.EmployeeRating,
                         EmployeeComments = detail.EmployeeComments,
                         L1ReviewerName = l1Name,
@@ -841,14 +842,14 @@ var l2Review = l2Auth != null ? reviews.FirstOrDefault(r =>
                 var empProfile = await _repository.GetUserProfileByEmployeeIdAsync(approval.EmployeeId);
                 var employeeName = empProfile != null
                     ? $"{empProfile.FirstName} {empProfile.LastName}".Trim()
-                    : $"Employee {approval.EmployeeId}";
+                    : $"{DefaultLabels.Employee} {approval.EmployeeId}";
 
 
                 var dto = new DeptHeadPerformanceDTO
                 {
                     EmployeeId = approval.EmployeeId,
                     EmployeeName = employeeName,
-                    ProjectName = project.ProjectName ?? "Unknown",
+                   ProjectName = project.ProjectName ?? DefaultLabels.Unknown,
                     AssessmentId = approval.AssessmentId,
                     Competencies = competencies
                 };
@@ -863,7 +864,5 @@ var l2Review = l2Auth != null ? reviews.FirstOrDefault(r =>
                 return ApiResponse<DeptHeadPerformanceDTO>.ErrorResponse($"Error: {ex.Message}");
             }
         }
-
-
     }
 }
