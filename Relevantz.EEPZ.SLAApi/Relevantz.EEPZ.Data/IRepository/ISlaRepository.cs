@@ -50,6 +50,8 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
 
         Task<List<Employee>> GetEmployeesByIdsAsync(List<int> employeeIds);
 
+         Task<List<Slahistory>> GetAllSlaHistoryAsync();
+
 
         string GetConnectionString();
 

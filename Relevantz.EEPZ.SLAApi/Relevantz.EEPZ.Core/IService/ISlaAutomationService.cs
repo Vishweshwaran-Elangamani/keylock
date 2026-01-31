@@ -1,5 +1,4 @@
 using Relevantz.EEPZ.Common.DTOs.Response;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Relevantz.EEPZ.Core.Services.Interfaces
@@ -7,28 +6,33 @@ namespace Relevantz.EEPZ.Core.Services.Interfaces
     public interface ISlaAutomationService
     {
         /// <summary>
-        /// Sends reminders for SLAs due within a specified day offset (e.g., -2, -1, 0).
+        /// Sends SLA reminders for a specific day offset (e.g., 2, 1, 0).
         /// </summary>
-        /// <param name="dayOffset">The number of days before the SLA deadline (e.g., -2 for two days before, 0 for the day of the deadline).</param>
-        /// <returns>A response with the list of SLA reminders sent.</returns>
-        Task<ApiResponse<List<SlaResponse>>> SendReminders(int dayOffset);
+        /// <param name="dayOffset">Number of days before deadline.</param>
+        /// <returns>Summary of reminder execution.</returns>
+        Task<ApiResponse<SlaReminderSummaryResponse>> SendReminders(int dayOffset);
 
         /// <summary>
-        /// Escalates overdue SLAs to the assigned manager.
+        /// Runs reminder process for Day-2, Day-1 and Day-0.
         /// </summary>
-        /// <returns>A response with the list of escalations processed.</returns>
-
-
-        /// <summary>
-        /// Automatically closes completed SLAs and sends completion emails.
-        /// </summary>
-        /// <returns>A response with the number of SLAs closed.</returns>
-        Task<ApiResponse<int>> AutoCloseSlas();
+        /// <returns>Combined reminder summary.</returns>
+        Task<ApiResponse<SlaReminderSummaryResponse>> RunReminderCycle();
 
         /// <summary>
-        /// Runs the full SLA automation cycle including reminders, escalations, and closures.
+        /// Automatically closes completed SLAs and sends confirmation emails.
         /// </summary>
-        /// <returns>A response with the total number of actions processed in the automation cycle.</returns>
+        /// <returns>Summary of auto-closure process.</returns>
+        Task<ApiResponse<SlaClosureSummaryResponse>> AutoCloseSlas();
+
+        /// <summary>
+        /// Executes the full automation workflow (reminders + closures).
+        /// </summary>
+        /// <returns>Total actions processed.</returns>
         Task<ApiResponse<int>> RunFullAutomationCycle();
+
+      Task<ApiResponse<AutomationStatusResponse>> GetAutomationStatus();
+     Task<ApiResponse<AutomationLogResponse>> GetAutomationLogs(int days);
+
+          
     }
 }
