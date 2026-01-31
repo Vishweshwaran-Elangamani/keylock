@@ -371,7 +371,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
 
             var savedMapper = await _repository.AddEmployeeSkill(mapper);
-            await _baseRepository.SaveChangesAsync();
+            await _baseRepository.SaveChanges();
 
             Log.Information(
                 "RecordEmployeeSkill succeeded. MapperId={MapperId}, EmployeeId={EmployeeId}, SkillId={SkillId}, Rating={Rating}",
@@ -479,7 +479,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (newMappings.Any())
             {
                 await _repository.AddEmployeeSkills(newMappings);
-                await _baseRepository.SaveChangesAsync();
+                await _baseRepository.SaveChanges();
 
                 results = newMappings
                     .Select(m => new EmployeeSkillResponseModel
@@ -572,7 +572,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
 
             await _repository.UpdateEmployeeSkill(mapper);
-            await _baseRepository.SaveChangesAsync();
+            await _baseRepository.SaveChanges();
 
             Log.Information(
                 "UpdateEmployeeSkillRating succeeded. MapperId={MapperId}, EmployeeId={EmployeeId}, SkillId={SkillId}, OldRating={OldRating}, NewRating={NewRating}",
@@ -699,7 +699,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             await _repository.DeleteEmployeeSkill(mapper);
 
-            await _baseRepository.SaveChangesAsync();
+            await _baseRepository.SaveChanges();
 
             Log.Information(
                 "DeleteEmployeeSkill succeeded. MapperId={MapperId}, EmployeeId={EmployeeId}, SkillId={SkillId}, DeletedAssignments={AssignmentCount}",

@@ -314,7 +314,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
 
             await _approvalRepository.UpdateApproval(approval);
-            await _baseRepository.SaveChangesAsync();
+            await _baseRepository.SaveChanges();
 
             Log.Information(
                 "ProcessApproval succeeded. ApprovalId={ApprovalId}, ApproverId={ApproverId}, IsApproved={IsApproved}",

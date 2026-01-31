@@ -38,7 +38,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             var userId = GetEmpMasterId();
             var role = GetUserRole();
 
-            var result = await _service.CreateGoalAsync(dto, userId, role);
+            var result = await _service.CreateGoal(dto, userId, role);
 
             return CreatedAtAction(nameof(GetGoalDetailsById), new { id = result.Data }, result);
         }
@@ -52,7 +52,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             var userId = GetEmpMasterId();
             var role = GetUserRole();
 
-            var goal = await _baseService.GetGoalAsync(id, userId, role);
+            var goal = await _baseService.GetGoal(id, userId, role);
 
             var response = ApiResponseModel<GoalDetailModel>.SuccessResponse(
                 ResponseMessages.Codes.GOAL_RETRIEVED_SUCCESS,
@@ -72,7 +72,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             var userId = GetEmpMasterId();
             var role = GetUserRole();
 
-            var goals = await _service.QueryGoalsAsync(query, userId, role);
+            var goals = await _service.QueryGoals(query, userId, role);
 
             var response = ApiResponseModel<List<GoalSummaryModel>>.SuccessResponse(
                 ResponseMessages.Codes.GOAL_RETRIEVED_SUCCESS,
@@ -98,7 +98,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             var userId = GetEmpMasterId();
             var role = GetUserRole();
 
-            var result = await _service.UpdateGoalAsync(id, dto, userId, role);
+            var result = await _service.UpdateGoal(id, dto, userId, role);
 
             return Ok(result);
         }
@@ -109,7 +109,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         [HttpGet("/api/goals/{id}/assignees")]
         public async Task<IActionResult> GetAssignees(int id)
         {
-            var assignees = await _service.GetAssigneesAsync(id);
+            var assignees = await _service.GetAssignees(id);
 
             var response = ApiResponseModel<List<AssigneeModel>>.SuccessResponse(
                 ResponseMessages.Codes.ASSIGNMENT_RETRIEVED_SUCCESS,
@@ -130,7 +130,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             var userId = GetEmpMasterId();
             var role = GetUserRole();
 
-            var result = await _service.AssignAsync(id, dto, userId, role);
+            var result = await _service.Assign(id, dto, userId, role);
 
             return Ok(result);
         }
@@ -143,7 +143,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             var userId = GetEmpMasterId();
 
-            var userProjects = await _service.GetUserProjectsAsync(userId);
+            var userProjects = await _service.GetUserProjects(userId);
 
             var response = ApiResponseModel<List<ProjectModel>>.SuccessResponse(
                 ResponseMessages.Codes.PROJECTS_RETRIEVED_SUCCESS,
@@ -163,7 +163,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         )]
         public async Task<IActionResult> GetAllProjects()
         {
-            var allProjects = await _service.GetAllProjectsAsync();
+            var allProjects = await _service.GetAllProjects();
 
             var response = ApiResponseModel<List<ProjectModel>>.SuccessResponse(
                 ResponseMessages.Codes.PROJECTS_RETRIEVED_SUCCESS,
@@ -180,7 +180,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         [HttpGet("/api/goals/projects/{projectId}")]
         public async Task<IActionResult> GetProject(int projectId)
         {
-            var project = await _service.GetProjectAsync(projectId);
+            var project = await _service.GetProject(projectId);
 
             var response = ApiResponseModel<ProjectModel>.SuccessResponse(
                 ResponseMessages.Codes.PROJECT_RETRIEVED_SUCCESS,

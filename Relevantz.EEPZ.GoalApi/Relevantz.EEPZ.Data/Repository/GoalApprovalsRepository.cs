@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Data.DBContexts;
@@ -20,12 +19,12 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             environment = _environment;
         }
 
-        public async Task AddApprovalAsync(GoalApproval approval)
+        public async Task AddApproval(GoalApproval approval)
         {
             await _db.GoalApprovals.AddAsync(approval);
         }
 
-        public async Task<GoalApproval?> GetApprovalByIdAsync(int approvalId)
+        public async Task<GoalApproval?> GetApprovalById(int approvalId)
         {
             var result = await _db
                 .GoalApprovals.Include(a => a.Goal)
@@ -35,7 +34,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task<GoalApproval?> GetPendingApprovalByGoalAndTypeAsync(
+        public async Task<GoalApproval?> GetPendingApprovalByGoalAndType(
             int goalId,
             string approvalType
         )
@@ -51,7 +50,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task<List<GoalApproval>> GetPendingApprovalsForApproverAsync(
+        public async Task<List<GoalApproval>> GetPendingApprovalsForApprover(
             int approverEmployeeMasterId
         )
         {
@@ -67,13 +66,13 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public Task UpdateApprovalAsync(GoalApproval approval)
+        public Task UpdateApproval(GoalApproval approval)
         {
             _db.GoalApprovals.Update(approval);
             return Task.CompletedTask;
         }
 
-        public async Task<int> CountPendingApprovalsForUserAsync(int employeeMasterId)
+        public async Task<int> CountPendingApprovalsForUser(int employeeMasterId)
         {
             var result = await _db.GoalApprovals.CountAsync(a =>
                 a.ApprovedBy == employeeMasterId && a.ApprovalStatus == APPROVAL_STATUS.PENDING
@@ -82,7 +81,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task<List<GoalApproval>> GetAllApprovalsForUserAsync(
+        public async Task<List<GoalApproval>> GetAllApprovalsForUser(
             int userId,
             string userRole
         )
@@ -120,14 +119,14 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 .AsQueryable();
         }
 
-        public async Task<int> CountAsync<T>(IQueryable<T> query)
+        public async Task<int> Count<T>(IQueryable<T> query)
         {
             var result = await query.CountAsync();
 
             return result;
         }
 
-        public async Task<List<T>> GetPagedAsync<T>(IQueryable<T> query, int page, int pageSize)
+        public async Task<List<T>> GetPaged<T>(IQueryable<T> query, int page, int pageSize)
         {
             var result = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
 

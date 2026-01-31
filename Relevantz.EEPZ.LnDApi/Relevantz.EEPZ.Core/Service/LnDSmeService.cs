@@ -159,7 +159,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
 
             await _approvalRepository.AddAttachment(attachment);
-            await _baseRepository.SaveChangesAsync();
+            await _baseRepository.SaveChanges();
 
             var approval = new Lndapproval
             {
@@ -173,7 +173,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
 
             await _approvalRepository.AddApproval(approval);
-            await _baseRepository.SaveChangesAsync();
+            await _baseRepository.SaveChanges();
 
             Log.Information(
                 "ApplyToBecomeSme succeeded. EmployeeId={EmployeeId}, SkillId={SkillId}, ApprovalId={ApprovalId}, ApproverId={ApproverId}",

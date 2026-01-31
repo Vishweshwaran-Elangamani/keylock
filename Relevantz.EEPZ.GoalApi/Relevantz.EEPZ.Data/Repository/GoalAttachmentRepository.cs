@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Data.DBContexts;
@@ -20,12 +19,12 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             environment = _environment;
         }
 
-        public async Task AddAttachmentAsync(GoalAttachment attachment)
+        public async Task AddAttachment(GoalAttachment attachment)
         {
             await _db.GoalAttachments.AddAsync(attachment);
         }
 
-        public async Task<List<GoalAttachment>> GetAttachmentsByGoalAsync(int goalId)
+        public async Task<List<GoalAttachment>> GetAttachmentsByGoal(int goalId)
         {
             var result = await _db
                 .GoalAttachments.Where(a => a.GoalId == goalId)
@@ -35,7 +34,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task<GoalAttachment?> GetAttachmentByIdAsync(int attachmentId)
+        public async Task<GoalAttachment?> GetAttachmentById(int attachmentId)
         {
             var result = await _db.GoalAttachments.FirstOrDefaultAsync(a =>
                 a.Goalattachmentsid == attachmentId
@@ -44,7 +43,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task MarkAttachmentsAsProofAsync(List<int> attachmentIds, int approvalId)
+        public async Task MarkAttachmentsAsProof(List<int> attachmentIds, int approvalId)
         {
             var attachments = await _db
                 .GoalAttachments.Where(a => attachmentIds.Contains(a.Goalattachmentsid))
@@ -58,7 +57,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
         }
 
-        public async Task DeleteAttachmentAsync(int attachmentId)
+        public async Task DeleteAttachment(int attachmentId)
         {
             var attachment = await _db.GoalAttachments.FirstOrDefaultAsync(a =>
                 a.Goalattachmentsid == attachmentId
@@ -70,7 +69,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
         }
 
-        public async Task<List<GoalAttachment>> GetProofAttachmentsForApprovalAsync(int approvalId)
+        public async Task<List<GoalAttachment>> GetProofAttachmentsForApproval(int approvalId)
         {
             var result = await _db
                 .GoalAttachments.Where(a =>
@@ -82,7 +81,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task UnmarkProofAttachmentsAsync(int approvalId)
+        public async Task UnmarkProofAttachments(int approvalId)
         {
             var attachments = await _db
                 .GoalAttachments.Where(a => a.LinkedApprovalId == approvalId)

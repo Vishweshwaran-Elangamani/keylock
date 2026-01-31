@@ -41,18 +41,18 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             : goalType == GOAL_TYPE.TEAM ? APPROVAL_TYPE.CREATION
             : null;
 
-        public async Task<int?> GetApproverForUserAsync(int employeeMasterId, string approvalType)
+        public async Task<int?> GetApproverForUser(int employeeMasterId, string approvalType)
         {
-            var managerId = await _repo.GetReportingManagerEmployeeMasterIdAsync(employeeMasterId);
+            var managerId = await _repo.GetReportingManagerEmployeeMasterId(employeeMasterId);
             return managerId;
         }
 
-        public async Task<string> GetEmployeeNameAsync(int? employeeMasterId)
+        public async Task<string> GetEmployeeName(int? employeeMasterId)
         {
             if (!employeeMasterId.HasValue)
                 return PROJECT_STATUS.UNKNOWN;
 
-            var edm = await _repo.GetEmployeeDetailsByMasterIdAsync(employeeMasterId.Value);
+            var edm = await _repo.GetEmployeeDetailsByMasterId(employeeMasterId.Value);
             if (edm?.Employee?.Userprofile == null)
                 return PROJECT_STATUS.UNKNOWN;
 
@@ -60,20 +60,20 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return $"{profile.FirstName} {profile.LastName}";
         }
 
-        public async Task<bool> CanMarkCompleteAsync(int goalId, int employeeMasterId)
+        public async Task<bool> CanMarkComplete(int goalId, int employeeMasterId)
         {
-            var goal = await _repo.GetGoalByIdAsync(goalId);
+            var goal = await _repo.GetGoalById(goalId);
             if (goal == null)
                 return false;
 
-            bool isParticipant = await _repo.IsGoalParticipantAsync(goalId, employeeMasterId);
+            bool isParticipant = await _repo.IsGoalParticipant(goalId, employeeMasterId);
             if (!isParticipant)
                 return false;
 
             if (goal.Goalstatus != GOAL_STATUS.OPEN && goal.Goalstatus != GOAL_STATUS.IN_PROGRESS)
                 return false;
 
-            var progress = await GetGoalProgressPercentAsync(goalId, employeeMasterId);
+            var progress = await GetGoalProgressPercent(goalId, employeeMasterId);
             if (progress < 100)
                 return false;
 
@@ -89,9 +89,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return true;
         }
 
-        public async Task<int> GetGoalProgressPercentAsync(int goalId, int forEmployeeMasterId)
+        public async Task<int> GetGoalProgressPercent(int goalId, int forEmployeeMasterId)
         {
-            var latestLog = await _repo.GetLatestProgressLogAsync(goalId);
+            var latestLog = await _repo.GetLatestProgressLog(goalId);
 
             if (latestLog != null && latestLog.Source == PROGRESS_SOURCE.MANUAL)
             {
@@ -99,19 +99,19 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
             else
             {
-                var completed = await _repo.CountCompletedForUserAsync(goalId, forEmployeeMasterId);
-                var total = await _repo.CountTotalForUserAsync(goalId, forEmployeeMasterId);
+                var completed = await _repo.CountCompletedForUser(goalId, forEmployeeMasterId);
+                var total = await _repo.CountTotalForUser(goalId, forEmployeeMasterId);
                 return total == 0 ? 0 : (int)Math.Round((double)completed / total * 100);
             }
         }
 
-        public async Task<bool> CanViewGoalAsync(int goalId, int employeeMasterId)
+        public async Task<bool> CanViewGoal(int goalId, int employeeMasterId)
         {
-            var goal = await _repo.GetGoalByIdAsync(goalId);
+            var goal = await _repo.GetGoalById(goalId);
             if (goal == null)
                 return false;
 
-            var userRole = await _repo.GetUserRoleAsync(employeeMasterId);
+            var userRole = await _repo.GetUserRole(employeeMasterId);
 
             if (userRole == USER_ROLE.LEADERSHIP)
                 return true;
@@ -122,12 +122,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (goal.CreatedBy == employeeMasterId)
                 return true;
 
-            if (await _repo.IsUserAssignedToGoalAsync(goalId, employeeMasterId))
+            if (await _repo.IsUserAssignedToGoal(goalId, employeeMasterId))
                 return true;
 
             if (goal.GoalType == GOAL_TYPE.SELF && goal.CreatedBy.HasValue)
             {
-                var creatorManagerId = await _repo.GetReportingManagerEmployeeMasterIdAsync(
+                var creatorManagerId = await _repo.GetReportingManagerEmployeeMasterId(
                     goal.CreatedBy.Value
                 );
                 if (creatorManagerId.HasValue && creatorManagerId.Value == employeeMasterId)
@@ -138,10 +138,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             if (userRole == USER_ROLE.DEPARTMENT_HEAD && goal.GoalType == GOAL_TYPE.TEAM)
             {
-                var deptHead = await _repo.GetEmployeeDetailsByMasterIdAsync(employeeMasterId);
+                var deptHead = await _repo.GetEmployeeDetailsByMasterId(employeeMasterId);
                 if (deptHead != null)
                 {
-                    var isInDept = await _repo.IsEmployeeInDepartmentAsync(
+                    var isInDept = await _repo.IsEmployeeInDepartment(
                         goalId,
                         deptHead.DepartmentId
                     );
@@ -152,7 +152,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             if (goal.GoalType == GOAL_TYPE.TEAM && goal.CreatedBy.HasValue)
             {
-                var creatorManagerId = await _repo.GetReportingManagerEmployeeMasterIdAsync(
+                var creatorManagerId = await _repo.GetReportingManagerEmployeeMasterId(
                     goal.CreatedBy.Value
                 );
                 if (creatorManagerId.HasValue && creatorManagerId.Value == employeeMasterId)
@@ -163,18 +163,18 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return false;
         }
 
-        public async Task<bool> CanCommentOnGoalAsync(
+        public async Task<bool> CanCommentOnGoal(
             int goalId,
             int currentUserEmployeeMasterId,
             string currentUserRole
         )
         {
-            var goal = await _repo.GetGoalByIdAsync(goalId);
+            var goal = await _repo.GetGoalById(goalId);
             if (goal == null)
                 return false;
 
             var isCreator = goal.CreatedBy == currentUserEmployeeMasterId;
-            var isAssignee = await _repo.IsUserAssignedToGoalAsync(
+            var isAssignee = await _repo.IsUserAssignedToGoal(
                 goalId,
                 currentUserEmployeeMasterId
             );
@@ -186,7 +186,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     if (isCreator)
                         return true;
 
-                    var creatorManagerId = await _repo.GetReportingManagerEmployeeMasterIdAsync(
+                    var creatorManagerId = await _repo.GetReportingManagerEmployeeMasterId(
                         goal.CreatedBy ?? 0
                     );
                     return creatorManagerId == currentUserEmployeeMasterId;
@@ -197,13 +197,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                     if (USER_ROLE.MANAGERIAL_ROLES.Contains(currentUserRole))
                     {
-                        var assignees = await _repo.GetAssigneesAsync(goalId);
+                        var assignees = await _repo.GetAssignees(goalId);
                         foreach (var assignee in assignees)
                         {
                             if (assignee.AssignedTo.HasValue)
                             {
                                 var assigneeManagerId =
-                                    await _repo.GetReportingManagerEmployeeMasterIdAsync(
+                                    await _repo.GetReportingManagerEmployeeMasterId(
                                         assignee.AssignedTo.Value
                                     );
                                 if (assigneeManagerId == currentUserEmployeeMasterId)
@@ -221,33 +221,33 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-        public async Task<bool> CanUserCommentOnGoalAsync(
+        public async Task<bool> CanUserCommentOnGoal(
             int goalId,
             int employeeMasterId,
             string role
         )
         {
-            var canComment = await _repo.CanUserCommentOnGoalAsync(goalId, employeeMasterId, role);
+            var canComment = await _repo.CanUserCommentOnGoal(goalId, employeeMasterId, role);
             return canComment;
         }
 
-        public async Task<bool> IsGoalCommentableAsync(int goalId)
+        public async Task<bool> IsGoalCommentable(int goalId)
         {
-            var isCommentable = await _repo.IsGoalCommentableAsync(goalId);
+            var isCommentable = await _repo.IsGoalCommentable(goalId);
             return isCommentable;
         }
 
-        public async Task<GoalDetailModel> GetGoalAsync(
+        public async Task<GoalDetailModel> GetGoal(
             int goalId,
             int currentUserEmployeeMasterId,
             string currentUserRole
         )
         {
-            var goal = await _repo.GetGoalByIdAsync(goalId);
+            var goal = await _repo.GetGoalById(goalId);
             if (goal == null)
                 throw new GoalNotFoundException(goalId);
 
-            var canView = await CanViewGoalAsync(goalId, currentUserEmployeeMasterId);
+            var canView = await CanViewGoal(goalId, currentUserEmployeeMasterId);
             if (!canView)
                 throw new GoalAccessDeniedException();
 
@@ -255,24 +255,24 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var goalDetail = _mapper.Map<GoalDetailModel>(goal);
 
 
-            goalDetail.ProgressPercent = await CalculateGoalProgressAsync(
+            goalDetail.ProgressPercent = await CalculateGoalProgress(
                 goalId,
                 currentUserEmployeeMasterId
             );
 
 
-            goalDetail.ProjectName = await GetProjectNameAsync(goal.ProjectId);
+            goalDetail.ProjectName = await GetProjectName(goal.ProjectId);
 
-            goalDetail.CreatedByName = await GetEmployeeNameAsync(goal.CreatedBy);
+            goalDetail.CreatedByName = await GetEmployeeName(goal.CreatedBy);
 
 
-            goalDetail.Checklist = await MapChecklistItemsAsync(
+            goalDetail.Checklist = await MapChecklistItems(
                 goal.GoalChecklists.ToList(),
                 currentUserEmployeeMasterId
             );
 
 
-            goalDetail.Assignees = await GetAssigneesWithDetailsAsync(goalId);
+            goalDetail.Assignees = await GetAssigneesWithDetails(goalId);
 
             // Set permission flags
             goalDetail.CanEdit =
@@ -280,13 +280,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 && goal.Goalstatus != GOAL_STATUS.COMPLETED
                 && goal.Goalstatus != GOAL_STATUS.CLOSED;
 
-            goalDetail.CanComment = await CanCommentOnGoalAsync(
+            goalDetail.CanComment = await CanCommentOnGoal(
                 goalId,
                 currentUserEmployeeMasterId,
                 currentUserRole
             );
 
-            goalDetail.CanMarkComplete = await CanMarkCompleteAsync(
+            goalDetail.CanMarkComplete = await CanMarkComplete(
                 goalId,
                 currentUserEmployeeMasterId
             );
@@ -304,10 +304,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 isOverdue
                 && (
                     goal.CreatedBy == currentUserEmployeeMasterId
-                    || await _repo.IsUserAssignedToGoalAsync(goalId, currentUserEmployeeMasterId)
+                    || await _repo.IsUserAssignedToGoal(goalId, currentUserEmployeeMasterId)
                 );
 
-            goalDetail.HasPendingApproval = await _repo.HasPendingApprovalAsync(
+            goalDetail.HasPendingApproval = await _repo.HasPendingApproval(
                 goalId,
                 currentUserEmployeeMasterId
             );
@@ -315,19 +315,19 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return goalDetail;
         }
 
-        private async Task<int> CalculateGoalProgressAsync(
+        private async Task<int> CalculateGoalProgress(
             int goalId,
             int currentUserEmployeeMasterId
         )
         {
-            var latestLog = await _repo.GetLatestProgressLogAsync(goalId);
+            var latestLog = await _repo.GetLatestProgressLog(goalId);
 
             if (latestLog != null && latestLog.Source == PROGRESS_SOURCE.MANUAL)
             {
                 return latestLog.ProgressPercent ?? 0;
             }
 
-            var allChecklistItems = await _repo.GetChecklistItemsByGoalIdAsync(goalId);
+            var allChecklistItems = await _repo.GetChecklistItemsByGoalId(goalId);
             if (allChecklistItems == null || !allChecklistItems.Any())
             {
                 return 0;
@@ -336,7 +336,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             int completedCount = 0;
             foreach (var item in allChecklistItems)
             {
-                var isCompleted = await _repo.ChecklistHasProgressAsync(
+                var isCompleted = await _repo.ChecklistHasProgress(
                     item.ChecklistId,
                     item.AddedFor ?? currentUserEmployeeMasterId
                 );
@@ -347,16 +347,16 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return (int)Math.Round((double)completedCount / allChecklistItems.Count * 100);
         }
 
-        private async Task<string?> GetProjectNameAsync(int? projectId)
+        private async Task<string?> GetProjectName(int? projectId)
         {
             if (!projectId.HasValue)
                 return null;
 
-            var project = await _repo.GetProjectByIdAsync(projectId.Value);
+            var project = await _repo.GetProjectById(projectId.Value);
             return project?.ProjectName;
         }
 
-        private async Task<List<GoalChecklistItemModel>> MapChecklistItemsAsync(
+        private async Task<List<GoalChecklistItemModel>> MapChecklistItems(
             List<GoalChecklist> checklists,
             int currentUserEmployeeMasterId
         )
@@ -380,9 +380,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return checklistModels;
         }
 
-        private async Task<List<AssigneeModel>> GetAssigneesWithDetailsAsync(int goalId)
+        private async Task<List<AssigneeModel>> GetAssigneesWithDetails(int goalId)
         {
-            var assignments = await _repo.GetAssigneesAsync(goalId);
+            var assignments = await _repo.GetAssignees(goalId);
             var result = new List<AssigneeModel>();
 
             foreach (var assignment in assignments)
@@ -390,7 +390,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 if (!assignment.AssignedTo.HasValue)
                     continue;
 
-                var edm = await _repo.GetEmployeeDetailsByMasterIdAsync(
+                var edm = await _repo.GetEmployeeDetailsByMasterId(
                     assignment.AssignedTo.Value
                 );
                 if (edm?.Employee?.Userprofile == null)
@@ -410,13 +410,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return result;
         }
 
-        public async Task<CanMarkCompleteModel> GetMarkCompleteEligibilityAsync(
+        public async Task<CanMarkCompleteModel> GetMarkCompleteEligibility(
             int goalId,
             int employeeMasterId,
             string role
         )
         {
-            var goal = await _repo.GetGoalByIdAsync(goalId);
+            var goal = await _repo.GetGoalById(goalId);
             if (goal == null)
             {
                 return new CanMarkCompleteModel
@@ -427,8 +427,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
 
-            bool isParticipant = await _repo.IsGoalParticipantAsync(goalId, employeeMasterId);
-            var progress = await GetGoalProgressPercentAsync(goalId, employeeMasterId);
+            bool isParticipant = await _repo.IsGoalParticipant(goalId, employeeMasterId);
+            var progress = await GetGoalProgressPercent(goalId, employeeMasterId);
 
             var isOverdue = goal.Goalendat.HasValue && goal.Goalendat.Value < DateTime.UtcNow;
             var hasRequiredProgress = progress >= 100;

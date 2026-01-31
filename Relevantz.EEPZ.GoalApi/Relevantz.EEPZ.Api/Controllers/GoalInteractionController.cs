@@ -34,7 +34,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             var userId = GetEmpMasterId();
             var role = GetUserRole();
 
-            var result = await _service.AddCommentAsync(id, dto, userId, role);
+            var result = await _service.AddComment(id, dto, userId, role);
 
             return Ok(result);
         }
@@ -45,7 +45,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         [HttpGet("api/goals/{id}/comments")]
         public async Task<IActionResult> GetAllComments(int id)
         {
-            var items = await _service.GetAllCommentsAsync(id);
+            var items = await _service.GetAllComments(id);
 
             var response = ApiResponseModel<List<GoalCommentModel>>.SuccessResponse(
                 ResponseMessages.Codes.COMMENTS_RETRIEVED_SUCCESS,
@@ -64,7 +64,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             var userId = GetEmpMasterId();
 
-            var timeline = await _service.GetGoalTimelineAsync(id, userId);
+            var timeline = await _service.GetGoalTimeline(id, userId);
 
             var response = ApiResponseModel<List<TimelineEventModel>>.SuccessResponse(
                 ResponseMessages.Codes.TIMELINE_RETRIEVED_SUCCESS,
@@ -83,7 +83,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             var userId = GetEmpMasterId();
 
-            var summary = await _service.GetDashboardDetailsAsync(userId);
+            var summary = await _service.GetDashboardDetails(userId);
 
             var response = ApiResponseModel<GoalDashboardSummaryModel>.SuccessResponse(
                 ResponseMessages.Codes.DASHBOARD_RETRIEVED_SUCCESS,
@@ -103,7 +103,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             var userId = GetEmpMasterId();
             var role = GetUserRole();
 
-            var result = await _baseService.GetMarkCompleteEligibilityAsync(id, userId, role);
+            var result = await _baseService.GetMarkCompleteEligibility(id, userId, role);
 
             var response = ApiResponseModel<CanMarkCompleteModel>.SuccessResponse(
                 ResponseMessages.Codes.GOAL_RETRIEVED_SUCCESS,
@@ -122,7 +122,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             var currentUserId = GetEmpMasterId();
 
-            var subordinates = await _service.FetchProjectTeamAsync(projectId, currentUserId);
+            var subordinates = await _service.FetchProjectTeam(projectId, currentUserId);
 
             var response = ApiResponseModel<List<ProjectEmployeeModel>>.SuccessResponse(
                 ResponseMessages.Codes.SUBORDINATES_RETRIEVED_SUCCESS,

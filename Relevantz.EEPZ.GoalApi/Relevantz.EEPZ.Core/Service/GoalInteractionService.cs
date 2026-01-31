@@ -44,7 +44,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task<ApiResponseModel> AddCommentAsync(
+        public async Task<ApiResponseModel> AddComment(
             int goalId,
             CreateCommentModel commentDetails,
             int currentUserEmployeeMasterId,
@@ -58,13 +58,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw new BadRequestException("VALIDATION_FAILED", string.Join("; ", errors));
             }
 
-            var goal = await _baseRepo.GetGoalByIdAsync(goalId);
+            var goal = await _baseRepo.GetGoalById(goalId);
             if (goal == null)
             {
                 throw new GoalNotFoundException(goalId);
             }
 
-            var canComment = await _baseService.CanUserCommentOnGoalAsync(
+            var canComment = await _baseService.CanUserCommentOnGoal(
                 goalId,
                 currentUserEmployeeMasterId,
                 currentUserRole
@@ -77,7 +77,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
             }
 
-            var isCommentable = await _baseService.IsGoalCommentableAsync(goalId);
+            var isCommentable = await _baseService.IsGoalCommentable(goalId);
             if (!isCommentable)
             {
                 throw new BusinessRuleException(
@@ -93,8 +93,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 CommentedBy = currentUserEmployeeMasterId,
                 CommentedOn = DateTime.UtcNow,
             };
-            await _repo.AddCommentAsync(comment);
-            await _baseRepo.SaveChangesAsync();
+            await _repo.AddComment(comment);
+            await _baseRepo.SaveChanges();
 
             var metadata = new
             {
@@ -109,22 +109,22 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
         }
 
-        public async Task<List<GoalCommentModel>> GetAllCommentsAsync(int goalId)
+        public async Task<List<GoalCommentModel>> GetAllComments(int goalId)
         {
-            var comments = await _repo.GetCommentsByGoalAsync(goalId);
+            var comments = await _repo.GetCommentsByGoal(goalId);
             var result = new List<GoalCommentModel>();
 
             foreach (var comment in comments)
             {
 
                 var commentModel = _mapper.Map<GoalCommentModel>(comment);
-                commentModel.CommentedByName = await _baseService.GetEmployeeNameAsync(
+                commentModel.CommentedByName = await _baseService.GetEmployeeName(
                     comment.CommentedBy
                 );
 
                 if (comment.CommentedBy.HasValue)
                 {
-                    commentModel.CommentedByRole = await _baseRepo.GetUserRoleAsync(
+                    commentModel.CommentedByRole = await _baseRepo.GetUserRole(
                         comment.CommentedBy.Value
                     );
                 }
@@ -135,13 +135,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return result;
         }
 
-        public async Task<GoalDashboardSummaryModel> GetDashboardDetailsAsync(
+        public async Task<GoalDashboardSummaryModel> GetDashboardDetails(
             int currentUserEmployeeMasterId
         )
         {
-            var userRole = await _baseRepo.GetUserRoleAsync(currentUserEmployeeMasterId);
+            var userRole = await _baseRepo.GetUserRole(currentUserEmployeeMasterId);
 
-            var allGoals = await _goalRepo.QueryGoalsAsync(
+            var allGoals = await _goalRepo.QueryGoals(
                 new GoalQueryModel
                 {
                     CurrentUserEmpMasterID = currentUserEmployeeMasterId,
@@ -176,7 +176,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 )
                 .ToList();
 
-            var pendingApprovals = await _approvalsRepo.CountPendingApprovalsForUserAsync(
+            var pendingApprovals = await _approvalsRepo.CountPendingApprovalsForUser(
                 currentUserEmployeeMasterId
             );
 
@@ -190,12 +190,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
-        public async Task<List<GoalSummaryModel>> GetOngoingAsync(
+        public async Task<List<GoalSummaryModel>> GetOngoing(
             string type,
             int currentUserEmployeeMasterId
         )
         {
-            var goals = await _goalRepo.QueryGoalsAsync(
+            var goals = await _goalRepo.QueryGoals(
                 new GoalQueryModel { Page = 1, PageSize = 1_000_000 }
             );
 
@@ -219,8 +219,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     .Goalprogresslogs.OrderByDescending(p => p.UpdatedOn)
                     .FirstOrDefault();
                 summary.ProgressPercent = latestProgress?.ProgressPercent ?? 0;
-                summary.ProjectName = await GetProjectNameAsync(goal.ProjectId);
-                summary.CreatedByName = await _baseService.GetEmployeeNameAsync(goal.CreatedBy);
+                summary.ProjectName = await GetProjectName(goal.ProjectId);
+                summary.CreatedByName = await _baseService.GetEmployeeName(goal.CreatedBy);
                 summary.IsOverdue =
                     goal.Goalendat.HasValue
                     && goal.Goalendat.Value < DateTime.UtcNow
@@ -232,64 +232,64 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return result;
         }
 
-        public async Task<List<TimelineEventModel>> GetGoalTimelineAsync(
+        public async Task<List<TimelineEventModel>> GetGoalTimeline(
             int goalId,
             int currentUserEmployeeMasterId
         )
         {
-            var goal = await _baseRepo.GetGoalByIdAsync(goalId);
+            var goal = await _baseRepo.GetGoalById(goalId);
             if (goal == null)
                 throw new GoalNotFoundException(goalId);
 
-            var canView = await _baseService.CanViewGoalAsync(goalId, currentUserEmployeeMasterId);
+            var canView = await _baseService.CanViewGoal(goalId, currentUserEmployeeMasterId);
             if (!canView)
                 throw new GoalAccessDeniedException();
 
             var events = new List<TimelineEventModel>();
 
 
-            events.Add(await CreateGoalCreatedEventAsync(goal));
+            events.Add(await CreateGoalCreatedEvent(goal));
 
 
-            var progressLogs = await _repo.GetProgressLogsByGoalAsync(goalId);
+            var progressLogs = await _repo.GetProgressLogsByGoal(goalId);
             foreach (var progressLog in progressLogs)
             {
-                events.Add(await MapProgressLogToTimelineEventAsync(progressLog));
+                events.Add(await MapProgressLogToTimelineEvent(progressLog));
             }
 
 
             foreach (var approval in goal.GoalApprovals)
             {
-                events.AddRange(await MapApprovalToTimelineEventsAsync(approval));
+                events.AddRange(await MapApprovalToTimelineEvents(approval));
             }
 
 
             foreach (var comment in goal.GoalComments)
             {
-                events.Add(await MapCommentToTimelineEventAsync(comment));
+                events.Add(await MapCommentToTimelineEvent(comment));
             }
 
 
             foreach (var assignment in goal.GoalAssignments)
             {
-                events.Add(await MapAssignmentToTimelineEventAsync(assignment));
+                events.Add(await MapAssignmentToTimelineEvent(assignment));
             }
 
 
             foreach (var attachment in goal.GoalAttachments)
             {
-                events.Add(await MapAttachmentToTimelineEventAsync(attachment));
+                events.Add(await MapAttachmentToTimelineEvent(attachment));
             }
 
             return events.OrderByDescending(e => e.Timestamp).ToList();
         }
 
-        public async Task<List<ProjectEmployeeModel>> FetchProjectTeamAsync(
+        public async Task<List<ProjectEmployeeModel>> FetchProjectTeam(
             int projectId,
             int managerEmployeeMasterId
         )
         {
-            return await _repo.FetchProjectTeamAsync(projectId, managerEmployeeMasterId);
+            return await _repo.FetchProjectTeam(projectId, managerEmployeeMasterId);
         }
 
         // HELPER METHODS
@@ -302,16 +302,16 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return description.Length > 80 ? description.Substring(0, 80) + "..." : description;
         }
 
-        private async Task<string?> GetProjectNameAsync(int? projectId)
+        private async Task<string?> GetProjectName(int? projectId)
         {
             if (!projectId.HasValue)
                 return null;
 
-            var project = await _baseRepo.GetProjectByIdAsync(projectId.Value);
+            var project = await _baseRepo.GetProjectById(projectId.Value);
             return project?.ProjectName;
         }
 
-        private async Task<TimelineEventModel> CreateGoalCreatedEventAsync(Goal goal)
+        private async Task<TimelineEventModel> CreateGoalCreatedEvent(Goal goal)
         {
             return new TimelineEventModel
             {
@@ -319,14 +319,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 Timestamp = goal.Goalcreatedat ?? DateTime.UtcNow,
                 Description = "Goal created",
                 UserId = goal.CreatedBy,
-                UserName = await _baseService.GetEmployeeNameAsync(goal.CreatedBy),
+                UserName = await _baseService.GetEmployeeName(goal.CreatedBy),
                 UserRole = goal.CreatedBy.HasValue
-                    ? await _baseRepo.GetUserRoleAsync(goal.CreatedBy.Value)
+                    ? await _baseRepo.GetUserRole(goal.CreatedBy.Value)
                     : null,
             };
         }
 
-        private async Task<TimelineEventModel> MapProgressLogToTimelineEventAsync(
+        private async Task<TimelineEventModel> MapProgressLogToTimelineEvent(
             Goalprogresslog progressLog
         )
         {
@@ -334,11 +334,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var timelineEvent = _mapper.Map<TimelineEventModel>(progressLog);
 
 
-            timelineEvent.UserName = await _baseService.GetEmployeeNameAsync(progressLog.UpdatedBy);
+            timelineEvent.UserName = await _baseService.GetEmployeeName(progressLog.UpdatedBy);
 
             if (progressLog.UpdatedBy.HasValue)
             {
-                timelineEvent.UserRole = await _baseRepo.GetUserRoleAsync(
+                timelineEvent.UserRole = await _baseRepo.GetUserRole(
                     progressLog.UpdatedBy.Value
                 );
             }
@@ -353,7 +353,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return timelineEvent;
         }
 
-        private async Task<List<TimelineEventModel>> MapApprovalToTimelineEventsAsync(
+        private async Task<List<TimelineEventModel>> MapApprovalToTimelineEvents(
             GoalApproval approval
         )
         {
@@ -369,9 +369,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     Timestamp = approval.RequestedOn ?? DateTime.UtcNow,
                     Description = requestDescription,
                     UserId = approval.RequestedBy,
-                    UserName = await _baseService.GetEmployeeNameAsync(approval.RequestedBy),
+                    UserName = await _baseService.GetEmployeeName(approval.RequestedBy),
                     UserRole = approval.RequestedBy.HasValue
-                        ? await _baseRepo.GetUserRoleAsync(approval.RequestedBy.Value)
+                        ? await _baseRepo.GetUserRole(approval.RequestedBy.Value)
                         : null,
                     Metadata = new
                     {
@@ -396,9 +396,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         Timestamp = approval.ApprovedOn.Value,
                         Description = decisionDescription,
                         UserId = approval.ApprovedBy,
-                        UserName = await _baseService.GetEmployeeNameAsync(approval.ApprovedBy),
+                        UserName = await _baseService.GetEmployeeName(approval.ApprovedBy),
                         UserRole = approval.ApprovedBy.HasValue
-                            ? await _baseRepo.GetUserRoleAsync(approval.ApprovedBy.Value)
+                            ? await _baseRepo.GetUserRole(approval.ApprovedBy.Value)
                             : null,
                         Metadata = new
                         {
@@ -412,17 +412,17 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return events;
         }
 
-        private async Task<TimelineEventModel> MapCommentToTimelineEventAsync(GoalComment comment)
+        private async Task<TimelineEventModel> MapCommentToTimelineEvent(GoalComment comment)
         {
 
             var timelineEvent = _mapper.Map<TimelineEventModel>(comment);
 
 
-            timelineEvent.UserName = await _baseService.GetEmployeeNameAsync(comment.CommentedBy);
+            timelineEvent.UserName = await _baseService.GetEmployeeName(comment.CommentedBy);
 
             if (comment.CommentedBy.HasValue)
             {
-                timelineEvent.UserRole = await _baseRepo.GetUserRoleAsync(
+                timelineEvent.UserRole = await _baseRepo.GetUserRole(
                     comment.CommentedBy.Value
                 );
             }
@@ -433,7 +433,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return timelineEvent;
         }
 
-        private async Task<TimelineEventModel> MapAssignmentToTimelineEventAsync(
+        private async Task<TimelineEventModel> MapAssignmentToTimelineEvent(
             GoalAssignment assignment
         )
         {
@@ -441,14 +441,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var timelineEvent = _mapper.Map<TimelineEventModel>(assignment);
 
 
-            var assigneeName = await _baseService.GetEmployeeNameAsync(assignment.AssignedTo);
+            var assigneeName = await _baseService.GetEmployeeName(assignment.AssignedTo);
             timelineEvent.Description = $"Assigned to {assigneeName}";
 
-            timelineEvent.UserName = await _baseService.GetEmployeeNameAsync(assignment.AssignedBy);
+            timelineEvent.UserName = await _baseService.GetEmployeeName(assignment.AssignedBy);
 
             if (assignment.AssignedBy.HasValue)
             {
-                timelineEvent.UserRole = await _baseRepo.GetUserRoleAsync(
+                timelineEvent.UserRole = await _baseRepo.GetUserRole(
                     assignment.AssignedBy.Value
                 );
             }
@@ -456,17 +456,17 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return timelineEvent;
         }
 
-        private async Task<TimelineEventModel> MapAttachmentToTimelineEventAsync(
+        private async Task<TimelineEventModel> MapAttachmentToTimelineEvent(
             GoalAttachment attachment
         )
         {
 
             var timelineEvent = _mapper.Map<TimelineEventModel>(attachment);
-            timelineEvent.UserName = await _baseService.GetEmployeeNameAsync(attachment.AttachedBy);
+            timelineEvent.UserName = await _baseService.GetEmployeeName(attachment.AttachedBy);
 
             if (attachment.AttachedBy.HasValue)
             {
-                timelineEvent.UserRole = await _baseRepo.GetUserRoleAsync(
+                timelineEvent.UserRole = await _baseRepo.GetUserRole(
                     attachment.AttachedBy.Value
                 );
             }

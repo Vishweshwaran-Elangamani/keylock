@@ -8,12 +8,12 @@ namespace Relevantz.EEPZ.Core.IService
     /// </summary>
     public interface IFileStorageService
     {
-        Task<string> SaveFileAsync(IFormFile file, string subFolder);
-        Task<byte[]> GetFileAsync(string fileId);
-        Task<bool> DeleteFileAsync(string fileId);
-        Task<(byte[] fileBytes, string contentType, string fileName)> GetFileForPreviewAsync(
+        Task<string> SaveFile(IFormFile file, string subFolder);
+        Task<byte[]> GetFile(string fileId);
+        Task<bool> DeleteFile(string fileId);
+        Task<(byte[] fileBytes, string contentType, string fileName)> GetFileForPreview(
             string fileId
         );
-        Task<FileMetadata?> GetFileMetadataAsync(string fileId);
+        Task<FileMetadata?> GetFileMetadata(string fileId);
     }
 }

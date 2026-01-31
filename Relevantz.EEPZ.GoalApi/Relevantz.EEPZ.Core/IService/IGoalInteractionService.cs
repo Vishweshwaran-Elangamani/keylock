@@ -6,20 +6,20 @@ namespace Relevantz.EEPZ.Core.Services.Interface
 {
     public interface IGoalInteractionService
     {
-        Task<ApiResponseModel> AddCommentAsync(
+        Task<ApiResponseModel> AddComment(
             int goalId,
             CreateCommentModel commentDetails,
             int currentUserEmployeeMasterId,
             string currentUserRole
         );
-        Task<List<GoalCommentModel>> GetAllCommentsAsync(int goalId);
-        Task<GoalDashboardSummaryModel> GetDashboardDetailsAsync(int currentUserEmployeeMasterId);
-        Task<List<GoalSummaryModel>> GetOngoingAsync(string type, int currentUserEmployeeMasterId);
-        Task<List<TimelineEventModel>> GetGoalTimelineAsync(
+        Task<List<GoalCommentModel>> GetAllComments(int goalId);
+        Task<GoalDashboardSummaryModel> GetDashboardDetails(int currentUserEmployeeMasterId);
+        Task<List<GoalSummaryModel>> GetOngoing(string type, int currentUserEmployeeMasterId);
+        Task<List<TimelineEventModel>> GetGoalTimeline(
             int goalId,
             int currentUserEmployeeMasterId
         );
-        Task<List<ProjectEmployeeModel>> FetchProjectTeamAsync(
+        Task<List<ProjectEmployeeModel>> FetchProjectTeam(
             int projectId,
             int managerEmployeeMasterId
         );

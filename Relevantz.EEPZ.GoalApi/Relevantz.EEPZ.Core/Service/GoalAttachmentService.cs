@@ -34,25 +34,25 @@ namespace Relevantz.EEPZ.Core.Service
             _mapper = mapper;
         }
 
-        public async Task<FilePreviewResult> GetAttachmentFilePreviewAsync(
+        public async Task<FilePreviewResult> GetAttachmentFilePreview(
             int attachmentId,
             int currentUserEmployeeMasterId
         )
         {
-            var attachment = await _repo.GetAttachmentByIdAsync(attachmentId);
+            var attachment = await _repo.GetAttachmentById(attachmentId);
 
             if (attachment == null)
             {
                 throw new FileNotFoundCustomException(attachmentId);
             }
 
-            var goal = await _baseRepo.GetGoalByIdAsync(attachment.GoalId);
+            var goal = await _baseRepo.GetGoalById(attachment.GoalId);
             if (goal == null)
             {
                 throw new GoalNotFoundException(attachment.GoalId);
             }
 
-            var canView = await _baseService.CanViewGoalAsync(
+            var canView = await _baseService.CanViewGoal(
                 attachment.GoalId,
                 currentUserEmployeeMasterId
             );
@@ -62,7 +62,7 @@ namespace Relevantz.EEPZ.Core.Service
                 throw new FileAccessDeniedException();
             }
 
-            var (fileBytes, contentType, fileName) = await _fileStorage.GetFileForPreviewAsync(
+            var (fileBytes, contentType, fileName) = await _fileStorage.GetFileForPreview(
                 attachment.Attachments ?? string.Empty
             );
 
@@ -85,20 +85,20 @@ namespace Relevantz.EEPZ.Core.Service
             };
         }
 
-        public async Task<FileUploadResponseModel> UploadFileAsync(
+        public async Task<FileUploadResponseModel> UploadFile(
             int goalId,
             IFormFile file,
             string title,
             int currentUserEmployeeMasterId
         )
         {
-            var goal = await _baseRepo.GetGoalByIdAsync(goalId);
+            var goal = await _baseRepo.GetGoalById(goalId);
             if (goal == null)
             {
                 throw new GoalNotFoundException(goalId);
             }
 
-            var canView = await _baseService.CanViewGoalAsync(goalId, currentUserEmployeeMasterId);
+            var canView = await _baseService.CanViewGoal(goalId, currentUserEmployeeMasterId);
             if (!canView)
             {
                 throw new FileAccessDeniedException();
@@ -106,7 +106,7 @@ namespace Relevantz.EEPZ.Core.Service
 
             ValidateFile(file);
 
-            var fileId = await _fileStorage.SaveFileAsync(file, "goals/attachments");
+            var fileId = await _fileStorage.SaveFile(file, "goals/attachments");
 
             var attachment = new GoalAttachment
             {
@@ -117,8 +117,8 @@ namespace Relevantz.EEPZ.Core.Service
                 AttachedOn = DateTime.UtcNow,
             };
 
-            await _repo.AddAttachmentAsync(attachment);
-            await _baseRepo.SaveChangesAsync();
+            await _repo.AddAttachment(attachment);
+            await _baseRepo.SaveChanges();
 
             var response = _mapper.Map<FileUploadResponseModel>(attachment);
             response.FileName = file.FileName;
@@ -132,15 +132,15 @@ namespace Relevantz.EEPZ.Core.Service
             byte[] fileBytes,
             string contentType,
             string fileName
-        )> GetAttachmentFileAsync(int attachmentId, int currentUserEmployeeMasterId)
+        )> GetAttachmentFile(int attachmentId, int currentUserEmployeeMasterId)
         {
-            var attachment = await _repo.GetAttachmentByIdAsync(attachmentId);
+            var attachment = await _repo.GetAttachmentById(attachmentId);
             if (attachment == null)
             {
                 throw new FileNotFoundCustomException(attachmentId);
             }
 
-            var canView = await _baseService.CanViewGoalAsync(
+            var canView = await _baseService.CanViewGoal(
                 attachment.GoalId,
                 currentUserEmployeeMasterId
             );
@@ -150,7 +150,7 @@ namespace Relevantz.EEPZ.Core.Service
                 throw new FileAccessDeniedException();
             }
 
-            var (fileBytes, contentType, fileName) = await _fileStorage.GetFileForPreviewAsync(
+            var (fileBytes, contentType, fileName) = await _fileStorage.GetFileForPreview(
                 attachment.Attachments ?? ""
             );
 
@@ -159,18 +159,18 @@ namespace Relevantz.EEPZ.Core.Service
             return (fileBytes, contentType, downloadFileName);
         }
 
-        public async Task<bool> DeleteAttachmentAsync(
+        public async Task<bool> DeleteAttachment(
             int attachmentId,
             int currentUserEmployeeMasterId
         )
         {
-            var attachment = await _repo.GetAttachmentByIdAsync(attachmentId);
+            var attachment = await _repo.GetAttachmentById(attachmentId);
             if (attachment == null)
             {
                 throw new FileNotFoundCustomException(attachmentId);
             }
 
-            var goal = await _baseRepo.GetGoalByIdAsync(attachment.GoalId);
+            var goal = await _baseRepo.GetGoalById(attachment.GoalId);
             if (goal == null)
             {
                 throw new GoalNotFoundException(attachment.GoalId);
@@ -186,24 +186,24 @@ namespace Relevantz.EEPZ.Core.Service
 
             if (!string.IsNullOrEmpty(attachment.Attachments))
             {
-                await _fileStorage.DeleteFileAsync(attachment.Attachments);
+                await _fileStorage.DeleteFile(attachment.Attachments);
             }
 
-            await _repo.DeleteAttachmentAsync(attachmentId);
-            await _baseRepo.SaveChangesAsync();
+            await _repo.DeleteAttachment(attachmentId);
+            await _baseRepo.SaveChanges();
 
             return true;
         }
 
-        public async Task<List<GoalAttachment>> ListAttachmentsAsync(int goalId)
+        public async Task<List<GoalAttachment>> ListAttachments(int goalId)
         {
-            var attachments = await _repo.GetAttachmentsByGoalAsync(goalId);
+            var attachments = await _repo.GetAttachmentsByGoal(goalId);
             return attachments;
         }
 
-        public async Task<GoalAttachment> GetAttachmentAsync(int attachmentId)
+        public async Task<GoalAttachment> GetAttachment(int attachmentId)
         {
-            var attachment = await _repo.GetAttachmentByIdAsync(attachmentId);
+            var attachment = await _repo.GetAttachmentById(attachmentId);
             if (attachment == null)
             {
                 throw new FileNotFoundCustomException(attachmentId);

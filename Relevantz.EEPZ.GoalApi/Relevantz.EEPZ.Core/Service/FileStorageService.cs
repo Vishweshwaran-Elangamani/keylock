@@ -34,7 +34,7 @@ namespace Relevantz.EEPZ.Core.Service
             _gridFSBucket = new GridFSBucket(database, bucketOptions);
         }
 
-        public async Task<string> SaveFileAsync(IFormFile file, string subFolder)
+        public async Task<string> SaveFile(IFormFile file, string subFolder)
         {
             if (file == null || file.Length == 0)
                 throw new BadRequestException(ResponseMessages.Codes.BadRequest, "File is empty");
@@ -61,7 +61,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
 
-        public async Task<byte[]> GetFileAsync(string fileId)
+        public async Task<byte[]> GetFile(string fileId)
         {
             if (string.IsNullOrEmpty(fileId))
                 throw new BadRequestException(
@@ -89,7 +89,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
 
-        public async Task<bool> DeleteFileAsync(string fileId)
+        public async Task<bool> DeleteFile(string fileId)
         {
             if (string.IsNullOrEmpty(fileId))
                 throw new BadRequestException(
@@ -121,7 +121,7 @@ namespace Relevantz.EEPZ.Core.Service
             byte[] fileBytes,
             string contentType,
             string fileName
-        )> GetFileForPreviewAsync(string fileId)
+        )> GetFileForPreview(string fileId)
         {
             if (string.IsNullOrEmpty(fileId))
                 throw new BadRequestException(
@@ -167,7 +167,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
 
-        public async Task<FileMetadata?> GetFileMetadataAsync(string fileId)
+        public async Task<FileMetadata?> GetFileMetadata(string fileId)
         {
             if (string.IsNullOrEmpty(fileId))
                 throw new BadRequestException(

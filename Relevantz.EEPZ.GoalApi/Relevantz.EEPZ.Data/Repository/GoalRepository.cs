@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Constants;
+
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Data.DBContexts;
@@ -26,7 +26,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             environment = _environment;
         }
 
-        public async Task<List<Goal>> QueryGoalsAsync(GoalQueryModel request)
+        public async Task<List<Goal>> QueryGoals(GoalQueryModel request)
         {
             var q = _db
                 .Goals.Include(g => g.GoalAssignments)
@@ -179,18 +179,18 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task AddGoalAsync(Goal goal)
+        public async Task AddGoal(Goal goal)
         {
             await _db.Goals.AddAsync(goal);
         }
 
-        public Task UpdateGoalAsync(Goal goal)
+        public Task UpdateGoal(Goal goal)
         {
             _db.Goals.Update(goal);
             return Task.CompletedTask;
         }
 
-        public async Task<List<Project>> GetUserProjectsAsync(int employeeMasterId)
+        public async Task<List<Project>> GetUserProjects(int employeeMasterId)
         {
             var employeeDetails = await _db.Employeedetailsmasters.FirstOrDefaultAsync(edm =>
                 edm.EmployeeMasterId == employeeMasterId
@@ -213,7 +213,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return projects;
         }
 
-        public async Task<List<Project>> GetAllProjectsAsync()
+        public async Task<List<Project>> GetAllProjects()
         {
             var result = await _db
                 .Projects.Where(p => p.Status == PROJECT_STATUS.ACTIVE)
@@ -222,14 +222,14 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task<Project?> GetProjectAsync(int projectId)
+        public async Task<Project?> GetProject(int projectId)
         {
             var result = await _db.Projects.FirstOrDefaultAsync(p => p.ProjectId == projectId);
 
             return result;
         }
 
-        public async Task<List<AssigneeModel>> GetAssigneesWithDetailsAsync(int goalId)
+        public async Task<List<AssigneeModel>> GetAssigneesWithDetails(int goalId)
         {
             var assignments = await _db
                 .GoalAssignments.Where(a => a.GoalId == goalId)
@@ -242,7 +242,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 if (!assignment.AssignedTo.HasValue)
                     continue;
 
-                var edm = await _baseRepo.GetEmployeeDetailsByMasterIdAsync(
+                var edm = await _baseRepo.GetEmployeeDetailsByMasterId(
                     assignment.AssignedTo.Value
                 );
                 if (edm?.Employee?.Userprofile == null)
@@ -268,7 +268,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task<List<GoalChecklist>> GetChecklistByGoalAsync(int goalId)
+        public async Task<List<GoalChecklist>> GetChecklistByGoal(int goalId)
         {
             var result = await _db
                 .GoalChecklists.Include(c => c.Goalchecklistprogresses)
@@ -278,12 +278,12 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task AddChecklistRangeAsync(List<GoalChecklist> items)
+        public async Task AddChecklistRange(List<GoalChecklist> items)
         {
             await _db.GoalChecklists.AddRangeAsync(items);
         }
 
-        public async Task<int> CountTotalForUserAsync(int goalId, int userEmployeeMasterId)
+        public async Task<int> CountTotalForUser(int goalId, int userEmployeeMasterId)
         {
             var result = await _db
                 .GoalChecklists.Where(c => c.GoalId == goalId && c.AddedFor == userEmployeeMasterId)
@@ -292,12 +292,12 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task AddAssignmentsAsync(List<GoalAssignment> assignments)
+        public async Task AddAssignments(List<GoalAssignment> assignments)
         {
             await _db.GoalAssignments.AddRangeAsync(assignments);
         }
 
-        public async Task UpdateGoalAssignmentAsync(GoalAssignment assignment)
+        public async Task UpdateGoalAssignment(GoalAssignment assignment)
         {
             _db.GoalAssignments.Update(assignment);
         }
@@ -306,7 +306,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             byte[] fileBytes,
             string contentType,
             string fileName
-        )?> GetAttachmentForPreviewAsync(int attachmentId, int currentUserEmployeeMasterId)
+        )?> GetAttachmentForPreview(int attachmentId, int currentUserEmployeeMasterId)
         {
             var attachment = await _db
                 .GoalAttachments.Include(a => a.Goal)
@@ -317,7 +317,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 return null;
             }
 
-            var canView = await CanViewGoalAsync(attachment.GoalId, currentUserEmployeeMasterId);
+            var canView = await CanViewGoal(attachment.GoalId, currentUserEmployeeMasterId);
 
             if (!canView)
             {
@@ -353,7 +353,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return (fileBytes, contentType, fileName);
         }
 
-        private async Task<bool> CanViewGoalAsync(int goalId, int employeeMasterId)
+        private async Task<bool> CanViewGoal(int goalId, int employeeMasterId)
         {
             var goal = await _db
                 .Goals.Include(g => g.GoalAssignments)
@@ -368,7 +368,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             if (goal.GoalAssignments.Any(a => a.AssignedTo == employeeMasterId))
                 return true;
 
-            var userRole = await _baseRepo.GetUserRoleAsync(employeeMasterId);
+            var userRole = await _baseRepo.GetUserRole(employeeMasterId);
             if (userRole == USER_ROLE.LEADERSHIP)
                 return true;
 
@@ -394,12 +394,12 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             };
         }
 
-        public async Task<bool> IsManagerOfAsync(
+        public async Task<bool> IsManagerOf(
             int managerEmployeeMasterId,
             int employeeEmployeeMasterId
         )
         {
-            var employeeManagerId = await _baseRepo.GetReportingManagerEmployeeMasterIdAsync(
+            var employeeManagerId = await _baseRepo.GetReportingManagerEmployeeMasterId(
                 employeeEmployeeMasterId
             );
             var result = employeeManagerId == managerEmployeeMasterId;
@@ -407,7 +407,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task<bool> IsManagerOfGoalAssigneesAsync(int goalId, int managerId)
+        public async Task<bool> IsManagerOfGoalAssignees(int goalId, int managerId)
         {
             var assigneeIds = await _db
                 .GoalAssignments.Where(a => a.GoalId == goalId && a.AssignedTo.HasValue)
@@ -416,7 +416,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
             foreach (var assigneeId in assigneeIds)
             {
-                var assigneeManagerId = await _baseRepo.GetReportingManagerEmployeeMasterIdAsync(
+                var assigneeManagerId = await _baseRepo.GetReportingManagerEmployeeMasterId(
                     assigneeId
                 );
                 if (assigneeManagerId == managerId)
@@ -426,7 +426,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return false;
         }
 
-        public async Task<bool> IsEmployeeInProjectAsync(int employeeMasterId, int projectId)
+        public async Task<bool> IsEmployeeInProject(int employeeMasterId, int projectId)
         {
             var employeeDetails = await _db.Employeedetailsmasters.FirstOrDefaultAsync(edm =>
                 edm.EmployeeMasterId == employeeMasterId
@@ -444,7 +444,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task<List<Project>> GetUserProjectsByEmployeeIdAsync(int employeeId)
+        public async Task<List<Project>> GetUserProjectsByEmployeeId(int employeeId)
         {
             var result = await _db
                 .Projectemployees.Where(pe => pe.EmployeeId == employeeId)
@@ -455,7 +455,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task<bool> IsGoalCreatorAsync(int goalId, int employeeMasterId)
+        public async Task<bool> IsGoalCreator(int goalId, int employeeMasterId)
         {
             var goal = await _db.Goals.FirstOrDefaultAsync(g => g.GoalId == goalId);
             var result = goal?.CreatedBy == employeeMasterId;
@@ -463,7 +463,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task<List<int>> GetGoalParticipantIdsAsync(int goalId)
+        public async Task<List<int>> GetGoalParticipantIds(int goalId)
         {
             var goal = await _db
                 .Goals.Include(g => g.GoalAssignments)
@@ -489,13 +489,13 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return distinctParticipants;
         }
 
-        public async Task AddChecklistItemAsync(GoalChecklist item)
+        public async Task AddChecklistItem(GoalChecklist item)
         {
             await _db.GoalChecklists.AddAsync(item);
             await _db.SaveChangesAsync();
         }
 
-        public async Task DeleteChecklistItemAsync(int checklistId)
+        public async Task DeleteChecklistItem(int checklistId)
         {
             var progressRecords = await _db
                 .Goalchecklistprogresses.Where(x => x.ChecklistId == checklistId)
@@ -512,7 +512,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             await _db.SaveChangesAsync();
         }
 
-        public async Task<bool> ChecklistHasProgressAsync(int checklistId, int userId)
+        public async Task<bool> ChecklistHasProgress(int checklistId, int userId)
         {
             var result = await _db.Goalchecklistprogresses.AnyAsync(x =>
                 x.ChecklistId == checklistId && x.UserId == userId && x.IsCompleted == true
@@ -521,7 +521,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task UpdateGoalProgressAsync(int goalId, decimal progress, int userId)
+        public async Task UpdateGoalProgress(int goalId, decimal progress, int userId)
         {
             var newLog = new Goalprogresslog
             {

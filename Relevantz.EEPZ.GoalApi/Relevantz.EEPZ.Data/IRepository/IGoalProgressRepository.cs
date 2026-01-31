@@ -5,16 +5,16 @@ namespace Relevantz.EEPZ.Data.Repository.Interface
 {
     public interface IGoalProgressRepository
     {
-        Task<GoalChecklist?> GetChecklistItemAsync(int checklistId);
-        Task SetChecklistProgressAsync(int checklistId, int userEmployeeMasterId, bool completed);
-        Task<List<GoalApproval>> GetPendingApprovalsForGoalAndUserAsync(
+        Task<GoalChecklist?> GetChecklistItem(int checklistId);
+        Task SetChecklistProgress(int checklistId, int userEmployeeMasterId, bool completed);
+        Task<List<GoalApproval>> GetPendingApprovalsForGoalAndUser(
             int goalId,
             int employeeMasterId,
             string[] approvalTypes
         );
-        Task AddProgressLogAsync(Goalprogresslog log);
-        Task<List<int>> GetSubordinatesAssignedToGoalAsync(int goalId, int managerEmployeeMasterId);
-        Task<List<GoalChecklist>> GetUserOwnChecklistItemsAsync(int goalId, int userId);
-        Task<int> CountUserOwnCompletedItemsAsync(int goalId, int userId);
+        Task AddProgressLog(Goalprogresslog log);
+        Task<List<int>> GetSubordinatesAssignedToGoal(int goalId, int managerEmployeeMasterId);
+        Task<List<GoalChecklist>> GetUserOwnChecklistItems(int goalId, int userId);
+        Task<int> CountUserOwnCompletedItems(int goalId, int userId);
     }
 }

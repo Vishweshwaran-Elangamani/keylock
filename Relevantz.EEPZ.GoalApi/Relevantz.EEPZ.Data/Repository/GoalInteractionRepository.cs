@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Data.DBContexts;
@@ -26,12 +25,12 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             environment = _environment;
         }
 
-        public async Task AddCommentAsync(GoalComment comment)
+        public async Task AddComment(GoalComment comment)
         {
             await _db.GoalComments.AddAsync(comment);
         }
 
-        public async Task<List<GoalComment>> GetCommentsByGoalAsync(int goalId)
+        public async Task<List<GoalComment>> GetCommentsByGoal(int goalId)
         {
             var result = await _db
                 .GoalComments.Where(c => c.GoalId == goalId)
@@ -41,7 +40,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task<List<Goalprogresslog>> GetProgressLogsByGoalAsync(int goalId)
+        public async Task<List<Goalprogresslog>> GetProgressLogsByGoal(int goalId)
         {
             var result = await _db
                 .Goalprogresslogs.Where(p => p.GoalId == goalId)
@@ -51,12 +50,12 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task<List<ProjectEmployeeModel>> FetchProjectTeamAsync(
+        public async Task<List<ProjectEmployeeModel>> FetchProjectTeam(
             int projectId,
             int managerEmployeeMasterId
         )
         {
-            var subordinateMasterIds = await _baseRepo.GetSubordinateEmployeeMasterIdsAsync(
+            var subordinateMasterIds = await _baseRepo.GetSubordinateEmployeeMasterIds(
                 managerEmployeeMasterId
             );
 
@@ -65,7 +64,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 return new List<ProjectEmployeeModel>();
             }
 
-            var projectEmployees = await GetProjectEmployeesAsync(projectId);
+            var projectEmployees = await GetProjectEmployees(projectId);
             var projectSubordinates = projectEmployees
                 .Where(emp => subordinateMasterIds.Contains(emp.EmpMasterId))
                 .ToList();
@@ -73,7 +72,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return projectSubordinates;
         }
 
-        public async Task<List<ProjectEmployeeModel>> GetProjectEmployeesAsync(int projectId)
+        public async Task<List<ProjectEmployeeModel>> GetProjectEmployees(int projectId)
         {
             var employees = await _db
                 .Employeedetailsmasters.Where(edm =>

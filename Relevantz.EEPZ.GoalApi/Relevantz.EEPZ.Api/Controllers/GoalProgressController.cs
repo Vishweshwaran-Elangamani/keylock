@@ -38,7 +38,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             var userId = GetEmpMasterId();
 
-            var result = await _service.UpdateChecklistStatusAsync(goalId, dto, userId);
+            var result = await _service.UpdateChecklistStatus(goalId, dto, userId);
 
             return Ok(result);
         }
@@ -57,7 +57,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             var userId = GetEmpMasterId();
 
-            var result = await _service.UpdateProgressPercentageAsync(goalId, dto, userId);
+            var result = await _service.UpdateProgressPercentage(goalId, dto, userId);
 
             return Ok(result);
         }
@@ -92,7 +92,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             var userId = GetEmpMasterId();
 
-            var percent = await _service.GetTeamGoalProgressForManagerAsync(goalId, userId);
+            var percent = await _service.GetTeamGoalProgressForManager(goalId, userId);
 
             var response = ApiResponseModel<object>.SuccessResponse(
                 ResponseMessages.Codes.PROGRESS_CALCULATED_SUCCESS,
@@ -111,7 +111,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             var userId = GetEmpMasterId();
 
-            var progress = await _service.GetDependentProgressAsync(goalId, userId);
+            var progress = await _service.GetDependentProgress(goalId, userId);
 
             var response = ApiResponseModel<object>.SuccessResponse(
                 ResponseMessages.Codes.PROGRESS_CALCULATED_SUCCESS,
@@ -130,7 +130,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             var userId = GetEmpMasterId();
 
-            var hierarchy = await _service.FetchGoalProgressTreeAsync(goalId, userId);
+            var hierarchy = await _service.FetchGoalProgressTree(goalId, userId);
 
             var response = ApiResponseModel<GoalProgressHierarchyModel>.SuccessResponse(
                 ResponseMessages.Codes.PROGRESS_CALCULATED_SUCCESS,

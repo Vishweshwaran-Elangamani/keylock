@@ -6,31 +6,31 @@ namespace Relevantz.EEPZ.Core.Services.Interface
 {
     public interface IGoalService
     {
-        Task<ApiResponseModel<int>> CreateGoalAsync(
+        Task<ApiResponseModel<int>> CreateGoal(
             CreateGoalModel goal,
             int currentUserEmployeeMasterId,
             string currentUserRole
         );
-        Task<List<GoalSummaryModel>> QueryGoalsAsync(
+        Task<List<GoalSummaryModel>> QueryGoals(
             GoalQueryModel query,
             int currentUserEmployeeMasterId,
             string currentUserRole
         );
-        Task<ApiResponseModel> UpdateGoalAsync(
+        Task<ApiResponseModel> UpdateGoal(
             int goalId,
             UpdateGoalModel goalDetails,
             int currentUserEmployeeMasterId,
             string currentUserRole
         );
-        Task<List<AssigneeModel>> GetAssigneesAsync(int goalId);
-        Task<ApiResponseModel> AssignAsync(
+        Task<List<AssigneeModel>> GetAssignees(int goalId);
+        Task<ApiResponseModel> Assign(
             int goalId,
             AssignGoalModel assignmentDetails,
             int currentUserEmployeeMasterId,
             string currentUserRole
         );
-        Task<List<ProjectModel>> GetUserProjectsAsync(int employeeMasterId);
-        Task<List<ProjectModel>> GetAllProjectsAsync();
-        Task<ProjectModel> GetProjectAsync(int projectId);
+        Task<List<ProjectModel>> GetUserProjects(int employeeMasterId);
+        Task<List<ProjectModel>> GetAllProjects();
+        Task<ProjectModel> GetProject(int projectId);
     }
 }

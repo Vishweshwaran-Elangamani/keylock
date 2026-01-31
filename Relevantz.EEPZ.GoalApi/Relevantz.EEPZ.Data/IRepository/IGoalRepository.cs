@@ -5,25 +5,25 @@ namespace Relevantz.EEPZ.Data.Repository.Interface
 {
     public interface IGoalRepository
     {
-        Task<List<Goal>> QueryGoalsAsync(GoalQueryModel request);
-        Task AddGoalAsync(Goal goal);
-        Task UpdateGoalAsync(Goal goal);
-        Task<List<Project>> GetUserProjectsAsync(int employeeMasterId);
-        Task<List<Project>> GetAllProjectsAsync();
-        Task<Project> GetProjectAsync(int projectId);
-        Task<List<GoalChecklist>> GetChecklistByGoalAsync(int goalId);
-        Task AddChecklistRangeAsync(List<GoalChecklist> items);
-        Task AddAssignmentsAsync(List<GoalAssignment> assignments);
-        Task UpdateGoalAssignmentAsync(GoalAssignment assignment);
-        Task<bool> IsManagerOfAsync(int managerEmployeeMasterId, int employeeEmployeeMasterId);
-        Task<bool> IsManagerOfGoalAssigneesAsync(int goalId, int managerId);
-        Task<bool> IsEmployeeInProjectAsync(int employeeMasterId, int projectId);
-        Task<List<Project>> GetUserProjectsByEmployeeIdAsync(int employeeId);
-        Task<List<AssigneeModel>> GetAssigneesWithDetailsAsync(int goalId);
-        Task<bool> IsGoalCreatorAsync(int goalId, int employeeMasterId);
-        Task<List<int>> GetGoalParticipantIdsAsync(int goalId);
-        Task AddChecklistItemAsync(GoalChecklist item);
-        Task DeleteChecklistItemAsync(int checklistId);
-        Task UpdateGoalProgressAsync(int goalId, decimal progress, int userId);
+        Task<List<Goal>> QueryGoals(GoalQueryModel request);
+        Task AddGoal(Goal goal);
+        Task UpdateGoal(Goal goal);
+        Task<List<Project>> GetUserProjects(int employeeMasterId);
+        Task<List<Project>> GetAllProjects();
+        Task<Project> GetProject(int projectId);
+        Task<List<GoalChecklist>> GetChecklistByGoal(int goalId);
+        Task AddChecklistRange(List<GoalChecklist> items);
+        Task AddAssignments(List<GoalAssignment> assignments);
+        Task UpdateGoalAssignment(GoalAssignment assignment);
+        Task<bool> IsManagerOf(int managerEmployeeMasterId, int employeeEmployeeMasterId);
+        Task<bool> IsManagerOfGoalAssignees(int goalId, int managerId);
+        Task<bool> IsEmployeeInProject(int employeeMasterId, int projectId);
+        Task<List<Project>> GetUserProjectsByEmployeeId(int employeeId);
+        Task<List<AssigneeModel>> GetAssigneesWithDetails(int goalId);
+        Task<bool> IsGoalCreator(int goalId, int employeeMasterId);
+        Task<List<int>> GetGoalParticipantIds(int goalId);
+        Task AddChecklistItem(GoalChecklist item);
+        Task DeleteChecklistItem(int checklistId);
+        Task UpdateGoalProgress(int goalId, decimal progress, int userId);
     }
 }

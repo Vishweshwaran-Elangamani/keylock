@@ -50,7 +50,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task<ApiResponseModel<int>> CreateApprovalRequestAsync(
+        public async Task<ApiResponseModel<int>> CreateApprovalRequest(
             int goalId,
             CreateApprovalRequestModel approvalRequestDetails,
             int requesterEmployeeMasterId,
@@ -66,7 +66,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw new BadRequestException("VALIDATION_FAILED", string.Join("; ", errors));
             }
 
-            var goal = await _baseRepo.GetGoalByIdAsync(goalId);
+            var goal = await _baseRepo.GetGoalById(goalId);
             if (goal == null)
             {
                 throw new GoalNotFoundException(goalId);
@@ -90,9 +90,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         ApprovedOn = DateTime.UtcNow,
                     };
 
-                    await _repo.AddApprovalAsync(autoApproval);
+                    await _repo.AddApproval(autoApproval);
                     goal.Goalstatus = GOAL_STATUS.COMPLETED;
-                    await _baseRepo.SaveChangesAsync();
+                    await _baseRepo.SaveChanges();
 
                     return ApiResponseModel<int>.SuccessResponse(
                         ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
@@ -116,9 +116,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         ApprovedOn = DateTime.UtcNow,
                     };
 
-                    await _repo.AddApprovalAsync(autoApproval);
+                    await _repo.AddApproval(autoApproval);
                     goal.Goalstatus = GOAL_STATUS.COMPLETED;
-                    await _baseRepo.SaveChangesAsync();
+                    await _baseRepo.SaveChanges();
 
                     return ApiResponseModel<int>.SuccessResponse(
                         ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
@@ -126,7 +126,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     );
                 }
 
-                var managerId = await _baseRepo.GetReportingManagerEmployeeMasterIdAsync(
+                var managerId = await _baseRepo.GetReportingManagerEmployeeMasterId(
                     requesterEmployeeMasterId
                 );
                 if (!managerId.HasValue)
@@ -147,8 +147,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     ApprovalStatus = APPROVAL_STATUS.PENDING,
                 };
 
-                await _repo.AddApprovalAsync(approval);
-                await _baseRepo.SaveChangesAsync();
+                await _repo.AddApproval(approval);
+                await _baseRepo.SaveChanges();
 
                 return ApiResponseModel<int>.SuccessResponse(
                     ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
@@ -194,10 +194,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         ApprovedOn = DateTime.UtcNow,
                     };
 
-                    await _repo.AddApprovalAsync(autoApproval);
+                    await _repo.AddApproval(autoApproval);
                     goal.Goalstatus = GOAL_STATUS.CLOSED;
 
-                    await _baseRepo.SaveChangesAsync();
+                    await _baseRepo.SaveChanges();
 
                     return ApiResponseModel<int>.SuccessResponse(
                         ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
@@ -205,7 +205,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     );
                 }
 
-                var managerId = await _baseRepo.GetReportingManagerEmployeeMasterIdAsync(
+                var managerId = await _baseRepo.GetReportingManagerEmployeeMasterId(
                     requesterEmployeeMasterId
                 );
                 if (!managerId.HasValue)
@@ -226,8 +226,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     ApprovalStatus = APPROVAL_STATUS.PENDING,
                 };
 
-                await _repo.AddApprovalAsync(approval);
-                await _baseRepo.SaveChangesAsync();
+                await _repo.AddApproval(approval);
+                await _baseRepo.SaveChanges();
 
                 return ApiResponseModel<int>.SuccessResponse(
                     ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
@@ -247,13 +247,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 if (
                     goal.CreatedBy != requesterEmployeeMasterId
-                    && !await _baseRepo.IsUserAssignedToGoalAsync(goalId, requesterEmployeeMasterId)
+                    && !await _baseRepo.IsUserAssignedToGoal(goalId, requesterEmployeeMasterId)
                 )
                 {
                     throw new GoalAccessDeniedException();
                 }
 
-                var managerId = await _baseRepo.GetReportingManagerEmployeeMasterIdAsync(
+                var managerId = await _baseRepo.GetReportingManagerEmployeeMasterId(
                     requesterEmployeeMasterId
                 );
                 if (!managerId.HasValue)
@@ -274,8 +274,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     ApprovalStatus = APPROVAL_STATUS.PENDING,
                 };
 
-                await _repo.AddApprovalAsync(approval);
-                await _baseRepo.SaveChangesAsync();
+                await _repo.AddApproval(approval);
+                await _baseRepo.SaveChanges();
 
                 return ApiResponseModel<int>.SuccessResponse(
                     ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
@@ -318,9 +318,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         ApprovedOn = DateTime.UtcNow,
                     };
 
-                    await _repo.AddApprovalAsync(autoApproval);
+                    await _repo.AddApproval(autoApproval);
                     goal.Goalstatus = GOAL_STATUS.REOPENED;
-                    await _baseRepo.SaveChangesAsync();
+                    await _baseRepo.SaveChanges();
 
                     return ApiResponseModel<int>.SuccessResponse(
                         ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
@@ -328,7 +328,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     );
                 }
 
-                var managerId = await _baseRepo.GetReportingManagerEmployeeMasterIdAsync(
+                var managerId = await _baseRepo.GetReportingManagerEmployeeMasterId(
                     requesterEmployeeMasterId
                 );
                 if (!managerId.HasValue)
@@ -349,8 +349,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     ApprovalStatus = APPROVAL_STATUS.PENDING,
                 };
 
-                await _repo.AddApprovalAsync(approval);
-                await _baseRepo.SaveChangesAsync();
+                await _repo.AddApproval(approval);
+                await _baseRepo.SaveChanges();
 
                 return ApiResponseModel<int>.SuccessResponse(
                     ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
@@ -361,7 +361,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var approverId = approvalRequestDetails.ApprovalType switch
             {
                 "creation" or "selfgoalactivation" or "delegation" or "task_acknowledgment" =>
-                    await _baseRepo.GetReportingManagerEmployeeMasterIdAsync(
+                    await _baseRepo.GetReportingManagerEmployeeMasterId(
                         requesterEmployeeMasterId
                     ),
                 _ => throw new BadRequestException(
@@ -388,8 +388,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 ApprovalStatus = APPROVAL_STATUS.PENDING,
             };
 
-            await _repo.AddApprovalAsync(standardApproval);
-            await _baseRepo.SaveChangesAsync();
+            await _repo.AddApproval(standardApproval);
+            await _baseRepo.SaveChanges();
 
             return ApiResponseModel<int>.SuccessResponse(
                 ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
@@ -397,7 +397,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
         }
 
-        public async Task<ApiResponseModel> ClosePendingApprovalAsync(
+        public async Task<ApiResponseModel> ClosePendingApproval(
             int approvalId,
             ApprovalDesicionModel approvalDesicionDetails,
             int approverEmployeeMasterId,
@@ -413,7 +413,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw new BadRequestException("VALIDATION_FAILED", string.Join("; ", errors));
             }
 
-            var approval = await _repo.GetApprovalByIdAsync(approvalId);
+            var approval = await _repo.GetApprovalById(approvalId);
             if (approval == null)
             {
                 throw new ApprovalNotFoundException(approvalId);
@@ -444,7 +444,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             approval.ApprovalStatus = approvalDesicionDetails.Decision;
             approval.ApprovedOn = DateTime.UtcNow;
-            await _repo.UpdateApprovalAsync(approval);
+            await _repo.UpdateApproval(approval);
 
             if (
                 approval.ApprovalType == APPROVAL_TYPE.COMPLETION
@@ -453,7 +453,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 if (approvalDesicionDetails.Decision == APPROVAL_STATUS.REJECTED)
                 {
-                    await _attachmentRepo.UnmarkProofAttachmentsAsync(approvalId);
+                    await _attachmentRepo.UnmarkProofAttachments(approvalId);
                 }
             }
 
@@ -464,17 +464,17 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     case APPROVAL_TYPE.CREATION:
                     case APPROVAL_TYPE.SELF_GOAL_ACTIVATION:
                         goal.Goalstatus = GOAL_STATUS.OPEN;
-                        await _goalRepo.UpdateGoalAsync(goal);
+                        await _goalRepo.UpdateGoal(goal);
                         break;
 
                     case APPROVAL_TYPE.DELEGATION:
                         goal.Goalstatus = GOAL_STATUS.OPEN;
-                        await _goalRepo.UpdateGoalAsync(goal);
+                        await _goalRepo.UpdateGoal(goal);
                         break;
 
                     case APPROVAL_TYPE.COMPLETION:
                         var requesterRole = approval.RequestedBy.HasValue
-                            ? await _baseRepo.GetUserRoleAsync(approval.RequestedBy.Value)
+                            ? await _baseRepo.GetUserRole(approval.RequestedBy.Value)
                             : null;
 
                         bool shouldCompleteGoal = false;
@@ -493,7 +493,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             if (shouldCompleteGoal)
                             {
                                 bool isCreator = goal.CreatedBy == approval.RequestedBy;
-                                bool isAssignedManager = await _baseRepo.IsUserAssignedToGoalAsync(
+                                bool isAssignedManager = await _baseRepo.IsUserAssignedToGoal(
                                     goal.GoalId,
                                     approval.RequestedBy.Value
                                 );
@@ -512,14 +512,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         if (shouldCompleteGoal)
                         {
                             goal.Goalstatus = GOAL_STATUS.COMPLETED;
-                            await _goalRepo.UpdateGoalAsync(goal);
+                            await _goalRepo.UpdateGoal(goal);
                         }
                         break;
 
                     case APPROVAL_TYPE.TASK_ACKNOWLEDGMENT:
                         if (approval.RequestedBy.HasValue)
                         {
-                            var assignment = await _baseRepo.GetGoalAssignmentAsync(
+                            var assignment = await _baseRepo.GetGoalAssignment(
                                 goal.GoalId,
                                 approval.RequestedBy.Value
                             );
@@ -529,7 +529,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                                 assignment.IsAcknowledged = true;
                                 assignment.AcknowledgedOn = DateTime.UtcNow;
                                 assignment.AcknowledgedBy = approverEmployeeMasterId;
-                                await _goalRepo.UpdateGoalAssignmentAsync(assignment);
+                                await _goalRepo.UpdateGoalAssignment(assignment);
                             }
                         }
                         break;
@@ -555,19 +555,19 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         goal.Goalstatus = GOAL_STATUS.REOPENED;
                         goal.ReopenedBy = approval.RequestedBy;
                         goal.ReopenedOn = DateTime.UtcNow;
-                        await _goalRepo.UpdateGoalAsync(goal);
+                        await _goalRepo.UpdateGoal(goal);
                         break;
 
                     case APPROVAL_TYPE.CLOSURE:
                         goal.Goalstatus = GOAL_STATUS.CLOSED;
                         goal.ClosedBy = approverEmployeeMasterId;
                         goal.ClosedOn = DateTime.UtcNow;
-                        await _goalRepo.UpdateGoalAsync(goal);
+                        await _goalRepo.UpdateGoal(goal);
                         break;
 
                     case APPROVAL_TYPE.REACTIVATION:
                         goal.Goalstatus = GOAL_STATUS.OPEN;
-                        await _goalRepo.UpdateGoalAsync(goal);
+                        await _goalRepo.UpdateGoal(goal);
                         break;
 
                     default:
@@ -584,7 +584,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     case APPROVAL_TYPE.CREATION:
                     case APPROVAL_TYPE.SELF_GOAL_ACTIVATION:
                         goal.Goalstatus = GOAL_STATUS.CLOSED;
-                        await _goalRepo.UpdateGoalAsync(goal);
+                        await _goalRepo.UpdateGoal(goal);
                         break;
 
                     case APPROVAL_TYPE.DELEGATION:
@@ -600,13 +600,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         )
                         {
                             goal.Goalstatus = GOAL_STATUS.IN_PROGRESS;
-                            await _goalRepo.UpdateGoalAsync(goal);
+                            await _goalRepo.UpdateGoal(goal);
                         }
                         break;
 
                     case APPROVAL_TYPE.REOPENING:
                         goal.ReopenUntil = null;
-                        await _goalRepo.UpdateGoalAsync(goal);
+                        await _goalRepo.UpdateGoal(goal);
                         break;
 
                     case APPROVAL_TYPE.CLOSURE:
@@ -617,7 +617,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
             }
 
-            await _baseRepo.SaveChangesAsync();
+            await _baseRepo.SaveChanges();
 
             var metadata = new
             {
@@ -635,11 +635,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
         }
 
-        public async Task<List<GoalApprovalModel>> GetPendingApprovalsAsync(
+        public async Task<List<GoalApprovalModel>> GetPendingApprovals(
             int approverEmployeeMasterId
         )
         {
-            var approvals = await _repo.GetPendingApprovalsForApproverAsync(
+            var approvals = await _repo.GetPendingApprovalsForApprover(
                 approverEmployeeMasterId
             );
             var result = new List<GoalApprovalModel>();
@@ -647,11 +647,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             foreach (var approval in approvals)
             {
                 var approvalModel = _mapper.Map<GoalApprovalModel>(approval);
-                approvalModel.RequestedByName = await _baseService.GetEmployeeNameAsync(
+                approvalModel.RequestedByName = await _baseService.GetEmployeeName(
                     approval.RequestedBy
                 );
 
-                var (allAttachments, proofAttachments) = await MapAttachmentsForApprovalAsync(
+                var (allAttachments, proofAttachments) = await MapAttachmentsForApproval(
                     approval
                 );
                 approvalModel.AllAttachments = allAttachments;
@@ -666,7 +666,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private async Task<(
             List<GoalAttachmentModel>,
             List<GoalAttachmentModel>?
-        )> MapAttachmentsForApprovalAsync(GoalApproval approval)
+        )> MapAttachmentsForApproval(GoalApproval approval)
         {
             var allAttachments = new List<GoalAttachmentModel>();
             List<GoalAttachmentModel>? proofAttachments = null;
@@ -695,7 +695,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return (allAttachments, proofAttachments);
         }
 
-        public async Task<PagedApprovalsModel> GetUserApprovalsAsync(
+        public async Task<PagedApprovalsModel> GetUserApprovals(
             ApprovalQueryModel query,
             int userId,
             string userRole
@@ -765,9 +765,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 baseQuery = baseQuery.Where(ga => ga.Goal.GoalTitle.ToLower().Contains(searchTerm));
             }
 
-            var totalCount = await _repo.CountAsync(baseQuery);
+            var totalCount = await _repo.Count(baseQuery);
 
-            var approvals = await _repo.GetPagedAsync(
+            var approvals = await _repo.GetPaged(
                 baseQuery.OrderByDescending(ga => ga.RequestedOn),
                 query.Page,
                 query.PageSize
@@ -776,7 +776,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var approvalModels = new List<UserGoalApprovalModel>();
             foreach (var ga in approvals)
             {
-                var approvalDesicionDetails = await MapToUserGoalApprovalModelAsync(
+                var approvalDesicionDetails = await MapToUserGoalApprovalModel(
                     ga,
                     userId,
                     userRole
@@ -815,13 +815,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     || ga.Goal.GoalAssignments.Any(assignment => assignment.AssignedTo == userId)
                 );
 
-            var myPending = await _repo.CountAsync(
+            var myPending = await _repo.Count(
                 baseQuery.Where(ga =>
                     ga.ApprovalStatus == APPROVAL_STATUS.PENDING && ga.RequestedBy == userId
                 )
             );
 
-            var toReview = await _repo.CountAsync(
+            var toReview = await _repo.Count(
                 baseQuery.Where(ga =>
                     ga.ApprovalStatus == APPROVAL_STATUS.PENDING
                     && ga.ApprovedBy == userId
@@ -829,15 +829,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 )
             );
 
-            var myRequests = await _repo.CountAsync(
+            var myRequests = await _repo.Count(
                 baseQuery.Where(ga => ga.RequestedBy == userId)
             );
 
-            var history = await _repo.CountAsync(
+            var history = await _repo.Count(
                 baseQuery.Where(ga => ga.ApprovalStatus != APPROVAL_STATUS.PENDING)
             );
 
-            var total = await _repo.CountAsync(baseQuery);
+            var total = await _repo.Count(baseQuery);
 
             return new ApprovalSummaryModel
             {
@@ -906,27 +906,27 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 && approval.RequestedBy != userId;
         }
 
-        private async Task<UserGoalApprovalModel> MapToUserGoalApprovalModelAsync(
+        private async Task<UserGoalApprovalModel> MapToUserGoalApprovalModel(
             GoalApproval approval,
             int userId,
             string userRole
         )
         {
             var model = _mapper.Map<UserGoalApprovalModel>(approval);
-            model.RequestedByName = await _baseService.GetEmployeeNameAsync(approval.RequestedBy);
-            model.ApproverName = await _baseService.GetEmployeeNameAsync(approval.ApprovedBy);
-            model.GoalCreatedByName = await _baseService.GetEmployeeNameAsync(
+            model.RequestedByName = await _baseService.GetEmployeeName(approval.RequestedBy);
+            model.ApproverName = await _baseService.GetEmployeeName(approval.ApprovedBy);
+            model.GoalCreatedByName = await _baseService.GetEmployeeName(
                 approval.Goal?.CreatedBy
             );
 
             if (approval.ApprovedBy.HasValue)
             {
-                model.ApproverRole = await _baseRepo.GetUserRoleAsync(approval.ApprovedBy.Value);
+                model.ApproverRole = await _baseRepo.GetUserRole(approval.ApprovedBy.Value);
             }
 
-            model.GoalAssignees = await MapGoalAssigneesAsync(approval.Goal?.GoalAssignments);
+            model.GoalAssignees = await MapGoalAssignees(approval.Goal?.GoalAssignments);
 
-            var (allAttachments, proofAttachments) = await MapAllAttachmentsAsync(approval);
+            var (allAttachments, proofAttachments) = await MapAllAttachments(approval);
             model.AllAttachments = allAttachments;
             model.ProofAttachments = proofAttachments;
 
@@ -937,7 +937,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return model;
         }
 
-        private async Task<List<AssigneeModel>> MapGoalAssigneesAsync(
+        private async Task<List<AssigneeModel>> MapGoalAssignees(
             ICollection<GoalAssignment>? assignments
         )
         {
@@ -951,10 +951,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     {
                         var assignee = _mapper.Map<AssigneeModel>(assignment);
 
-                        assignee.Name = await _baseService.GetEmployeeNameAsync(
+                        assignee.Name = await _baseService.GetEmployeeName(
                             assignment.AssignedTo
                         );
-                        assignee.Role = await _baseRepo.GetUserRoleAsync(
+                        assignee.Role = await _baseRepo.GetUserRole(
                             assignment.AssignedTo.Value
                         );
 
@@ -969,7 +969,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private async Task<(
             List<GoalAttachmentModel>,
             List<GoalAttachmentModel>
-        )> MapAllAttachmentsAsync(GoalApproval approval)
+        )> MapAllAttachments(GoalApproval approval)
         {
             var allAttachments = new List<GoalAttachmentModel>();
             var proofAttachments = new List<GoalAttachmentModel>();
@@ -980,7 +980,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 {
                     var attachmentModel = _mapper.Map<GoalAttachmentModel>(att);
 
-                    attachmentModel.AttachedByName = await _baseService.GetEmployeeNameAsync(
+                    attachmentModel.AttachedByName = await _baseService.GetEmployeeName(
                         att.AttachedBy
                     );
 

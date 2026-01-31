@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Data.DBContexts;
@@ -26,7 +25,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             environment = _environment;
         }
 
-        public async Task<GoalChecklist?> GetChecklistItemAsync(int checklistId)
+        public async Task<GoalChecklist?> GetChecklistItem(int checklistId)
         {
             var result = await _db
                 .GoalChecklists.Include(c => c.Goalchecklistprogresses)
@@ -35,7 +34,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task<List<GoalApproval>> GetPendingApprovalsForGoalAndUserAsync(
+        public async Task<List<GoalApproval>> GetPendingApprovalsForGoalAndUser(
             int goalId,
             int employeeMasterId,
             string[] approvalTypes
@@ -53,13 +52,13 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task SetChecklistProgressAsync(
+        public async Task SetChecklistProgress(
             int checklistId,
             int userEmployeeMasterId,
             bool completed
         )
         {
-            var existing = await GetChecklistProgressAsync(checklistId, userEmployeeMasterId);
+            var existing = await GetChecklistProgress(checklistId, userEmployeeMasterId);
 
             if (existing == null)
             {
@@ -80,7 +79,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
         }
 
-        public async Task<Goalchecklistprogress?> GetChecklistProgressAsync(
+        public async Task<Goalchecklistprogress?> GetChecklistProgress(
             int checklistId,
             int userEmployeeMasterId
         )
@@ -92,17 +91,17 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task AddProgressLogAsync(Goalprogresslog log)
+        public async Task AddProgressLog(Goalprogresslog log)
         {
             await _db.Goalprogresslogs.AddAsync(log);
         }
 
-        public async Task<List<int>> GetSubordinatesAssignedToGoalAsync(
+        public async Task<List<int>> GetSubordinatesAssignedToGoal(
             int goalId,
             int managerEmployeeMasterId
         )
         {
-            var subordinateMasterIds = await _baseRepo.GetSubordinateEmployeeMasterIdsAsync(
+            var subordinateMasterIds = await _baseRepo.GetSubordinateEmployeeMasterIds(
                 managerEmployeeMasterId
             );
 
@@ -123,7 +122,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return assignedSubordinates;
         }
 
-        public async Task<List<GoalChecklist>> GetUserOwnChecklistItemsAsync(int goalId, int userId)
+        public async Task<List<GoalChecklist>> GetUserOwnChecklistItems(int goalId, int userId)
         {
             var result = await _db
                 .GoalChecklists.Include(c => c.Goalchecklistprogresses)
@@ -133,9 +132,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task<int> CountUserOwnCompletedItemsAsync(int goalId, int userId)
+        public async Task<int> CountUserOwnCompletedItems(int goalId, int userId)
         {
-            var userItems = await GetUserOwnChecklistItemsAsync(goalId, userId);
+            var userItems = await GetUserOwnChecklistItems(goalId, userId);
 
             if (!userItems.Any())
             {

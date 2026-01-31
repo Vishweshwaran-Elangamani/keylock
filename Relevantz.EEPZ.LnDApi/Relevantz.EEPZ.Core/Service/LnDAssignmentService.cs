@@ -65,7 +65,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 assignment.UpdatedOn = DateOnly.FromDateTime(DateTime.Now);
             }
 
-            await _baseRepository.SaveChangesAsync();
+            await _baseRepository.SaveChanges();
 
             Log.Information(
                 "CheckAndMarkOverdueAssignments completed. OverdueCount={Count}",
@@ -156,7 +156,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
 
             await _approvalRepository.AddApproval(approval);
-            await _baseRepository.SaveChangesAsync();
+            await _baseRepository.SaveChanges();
 
             Log.Information(
                 "RequestSmeAssignment succeeded. ApprovalId={ApprovalId}, MenteeId={MenteeId}, MentorId={MentorId}",
@@ -239,7 +239,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
 
             await _approvalRepository.AddAttachment(attachment);
-            await _baseRepository.SaveChangesAsync();
+            await _baseRepository.SaveChanges();
 
             assignment.ProofFilePath = filePath;
             assignment.CompletionNotes = request.CompletionNotes;
@@ -261,7 +261,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             await _approvalRepository.AddApproval(approval);
             await _assignmentRepository.UpdateAssignment(assignment);
-            await _baseRepository.SaveChangesAsync();
+            await _baseRepository.SaveChanges();
 
             Log.Information(
                 "UploadCompletionProof succeeded. AssignmentId={AssignmentId}, ApprovalId={ApprovalId}, SmeId={SmeId}",
@@ -376,7 +376,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
             }
 
-            await _baseRepository.SaveChangesAsync();
+            await _baseRepository.SaveChanges();
 
             Log.Information(
                 "CompleteAssignment succeeded. AssignmentId={AssignmentId}, MenteeId={MenteeId}, NewRating={NewRating}",

@@ -6,22 +6,22 @@ namespace Relevantz.EEPZ.Core.IService
 {
     public interface IGoalAttachmentService
     {
-        Task<FileUploadResponseModel> UploadFileAsync(
+        Task<FileUploadResponseModel> UploadFile(
             int goalId,
             IFormFile file,
             string title,
             int currentUserEmployeeMasterId
         );
-        Task<(byte[] fileBytes, string contentType, string fileName)> GetAttachmentFileAsync(
+        Task<(byte[] fileBytes, string contentType, string fileName)> GetAttachmentFile(
             int attachmentId,
             int currentUserEmployeeMasterId
         );
-        Task<FilePreviewResult?> GetAttachmentFilePreviewAsync(
+        Task<FilePreviewResult?> GetAttachmentFilePreview(
             int attachmentId,
             int currentUserEmployeeMasterId
         );
-        Task<bool> DeleteAttachmentAsync(int attachmentId, int currentUserEmployeeMasterId);
-        Task<List<GoalAttachment>> ListAttachmentsAsync(int goalId);
-        Task<GoalAttachment> GetAttachmentAsync(int attachmentId);
+        Task<bool> DeleteAttachment(int attachmentId, int currentUserEmployeeMasterId);
+        Task<List<GoalAttachment>> ListAttachments(int goalId);
+        Task<GoalAttachment> GetAttachment(int attachmentId);
     }
 }

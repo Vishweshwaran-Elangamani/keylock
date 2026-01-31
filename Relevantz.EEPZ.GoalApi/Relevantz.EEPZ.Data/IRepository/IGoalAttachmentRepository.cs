@@ -5,12 +5,12 @@ namespace Relevantz.EEPZ.Data.Repository.Interface
 {
     public interface IGoalAttachmentRepository
     {
-        Task AddAttachmentAsync(GoalAttachment attachment);
-        Task<List<GoalAttachment>> GetAttachmentsByGoalAsync(int goalId);
-        Task<GoalAttachment?> GetAttachmentByIdAsync(int attachmentId);
-        Task MarkAttachmentsAsProofAsync(List<int> attachmentIds, int approvalId);
-        Task DeleteAttachmentAsync(int attachmentId);
-        Task<List<GoalAttachment>> GetProofAttachmentsForApprovalAsync(int approvalId);
-        Task UnmarkProofAttachmentsAsync(int approvalId);
+        Task AddAttachment(GoalAttachment attachment);
+        Task<List<GoalAttachment>> GetAttachmentsByGoal(int goalId);
+        Task<GoalAttachment?> GetAttachmentById(int attachmentId);
+        Task MarkAttachmentsAsProof(List<int> attachmentIds, int approvalId);
+        Task DeleteAttachment(int attachmentId);
+        Task<List<GoalAttachment>> GetProofAttachmentsForApproval(int approvalId);
+        Task UnmarkProofAttachments(int approvalId);
     }
 }

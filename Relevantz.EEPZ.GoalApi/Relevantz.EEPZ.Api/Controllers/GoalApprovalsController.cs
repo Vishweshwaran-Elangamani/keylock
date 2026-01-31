@@ -40,7 +40,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             var userId = GetEmpMasterId();
             var role = GetUserRole();
 
-            var result = await _service.CreateApprovalRequestAsync(goalId, request, userId, role);
+            var result = await _service.CreateApprovalRequest(goalId, request, userId, role);
 
             return Ok(result);
         }
@@ -60,7 +60,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             var userId = GetEmpMasterId();
             var role = GetUserRole();
 
-            var result = await _service.ClosePendingApprovalAsync(
+            var result = await _service.ClosePendingApproval(
                 approvalId,
                 desicion,
                 userId,
@@ -81,7 +81,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             var userId = GetEmpMasterId();
 
-            var approvals = await _service.GetPendingApprovalsAsync(userId);
+            var approvals = await _service.GetPendingApprovals(userId);
 
             var response = ApiResponseModel<List<GoalApprovalModel>>.SuccessResponse(
                 ResponseMessages.Codes.APPROVAL_RETRIEVED_SUCCESS,
@@ -101,7 +101,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             var userId = GetEmpMasterId();
             var role = GetUserRole();
 
-            var approvals = await _service.GetUserApprovalsAsync(query, userId, role);
+            var approvals = await _service.GetUserApprovals(query, userId, role);
 
             var response = ApiResponseModel<PagedApprovalsModel>.SuccessResponse(
                 ResponseMessages.Codes.APPROVAL_RETRIEVED_SUCCESS,

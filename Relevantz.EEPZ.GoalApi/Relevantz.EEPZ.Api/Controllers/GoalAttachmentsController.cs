@@ -39,7 +39,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             var userId = GetEmpMasterId();
 
-            var result = await _service.UploadFileAsync(goalId, file, title, userId);
+            var result = await _service.UploadFile(goalId, file, title, userId);
 
             var response = ApiResponseModel<FileUploadResponseModel>.SuccessResponse(
                 ResponseMessages.Codes.FILE_UPLOADED_SUCCESS,
@@ -75,7 +75,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             var userId = GetEmpMasterId();
 
-            var (fileBytes, contentType, fileName) = await _service.GetAttachmentFileAsync(
+            var (fileBytes, contentType, fileName) = await _service.GetAttachmentFile(
                 attachmentId,
                 userId
             );
@@ -94,7 +94,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             var userId = GetEmpMasterId();
 
-            var result = await _service.GetAttachmentFilePreviewAsync(attachmentId, userId);
+            var result = await _service.GetAttachmentFilePreview(attachmentId, userId);
 
             return File(
                 result.FileBytes,
@@ -112,7 +112,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             var userId = GetEmpMasterId();
 
-            await _service.DeleteAttachmentAsync(attachmentId, userId);
+            await _service.DeleteAttachment(attachmentId, userId);
 
             var response = ApiResponseModel.SuccessResponse(
                 ResponseMessages.Codes.FILE_DELETED_SUCCESS,

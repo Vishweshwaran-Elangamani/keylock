@@ -20,7 +20,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             environment = _environment;
         }
 
-        public async Task<Employeedetailsmaster?> GetEmployeeDetailsByMasterIdAsync(
+        public async Task<Employeedetailsmaster?> GetEmployeeDetailsByMasterId(
             int employeeMasterId
         )
         {
@@ -34,7 +34,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task<Goal?> GetGoalByIdAsync(int goalId)
+        public async Task<Goal?> GetGoalById(int goalId)
         {
             var result = await _db
                 .Goals.Include(g => g.GoalChecklists)
@@ -49,7 +49,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task<int?> GetReportingManagerEmployeeMasterIdAsync(int employeeMasterId)
+        public async Task<int?> GetReportingManagerEmployeeMasterId(int employeeMasterId)
         {
             var employee = await _db
                 .Employeedetailsmasters.Include(edm => edm.Employee)
@@ -67,7 +67,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return managerEdm?.EmployeeMasterId;
         }
 
-        public async Task<bool> IsGoalParticipantAsync(int goalId, int employeeMasterId)
+        public async Task<bool> IsGoalParticipant(int goalId, int employeeMasterId)
         {
             var goal = await _db
                 .Goals.Include(g => g.GoalAssignments)
@@ -85,7 +85,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task<Goalprogresslog?> GetLatestProgressLogAsync(int goalId)
+        public async Task<Goalprogresslog?> GetLatestProgressLog(int goalId)
         {
             var result = await _db
                 .Goalprogresslogs.Where(p => p.GoalId == goalId)
@@ -95,7 +95,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task<int> CountCompletedForUserAsync(int goalId, int userEmployeeMasterId)
+        public async Task<int> CountCompletedForUser(int goalId, int userEmployeeMasterId)
         {
             var result = await _db
                 .Goalchecklistprogresses.Where(p =>
@@ -110,7 +110,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task<int> CountTotalForUserAsync(int goalId, int userEmployeeMasterId)
+        public async Task<int> CountTotalForUser(int goalId, int userEmployeeMasterId)
         {
             var result = await _db
                 .GoalChecklists.Where(c => c.GoalId == goalId && c.AddedFor == userEmployeeMasterId)
@@ -119,7 +119,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task<string?> GetUserRoleAsync(int employeeMasterId)
+        public async Task<string?> GetUserRole(int employeeMasterId)
         {
             var edm = await _db
                 .Employeedetailsmasters.Include(edm => edm.Role)
@@ -130,7 +130,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return roleName;
         }
 
-        public async Task<bool> IsUserAssignedToGoalAsync(int goalId, int employeeMasterId)
+        public async Task<bool> IsUserAssignedToGoal(int goalId, int employeeMasterId)
         {
             var result = await _db.GoalAssignments.AnyAsync(a =>
                 a.GoalId == goalId && a.AssignedTo == employeeMasterId
@@ -139,7 +139,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task<bool> IsEmployeeInDepartmentAsync(int goalId, int departmentId)
+        public async Task<bool> IsEmployeeInDepartment(int goalId, int departmentId)
         {
             var goal = await _db
                 .Goals.Include(g => g.GoalAssignments)
@@ -160,14 +160,14 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return isInDept;
         }
 
-        public async Task<List<GoalAssignment>> GetAssigneesAsync(int goalId)
+        public async Task<List<GoalAssignment>> GetAssignees(int goalId)
         {
             var result = await _db.GoalAssignments.Where(a => a.GoalId == goalId).ToListAsync();
 
             return result;
         }
 
-        public async Task<bool> CanUserCommentOnGoalAsync(
+        public async Task<bool> CanUserCommentOnGoal(
             int goalId,
             int employeeMasterId,
             string role
@@ -200,7 +200,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return false;
         }
 
-        public async Task<bool> IsGoalCommentableAsync(int goalId)
+        public async Task<bool> IsGoalCommentable(int goalId)
         {
             var goal = await _db.Goals.AsNoTracking().FirstOrDefaultAsync(g => g.GoalId == goalId);
 
@@ -213,7 +213,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return isCommentable;
         }
 
-        public async Task<List<GoalChecklist>> GetChecklistItemsByGoalIdAsync(int goalId)
+        public async Task<List<GoalChecklist>> GetChecklistItemsByGoalId(int goalId)
         {
             var result = await _db
                 .GoalChecklists.Where(x => x.GoalId == goalId)
@@ -223,7 +223,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task<bool> ChecklistHasProgressAsync(int checklistId, int userId)
+        public async Task<bool> ChecklistHasProgress(int checklistId, int userId)
         {
             var result = await _db.Goalchecklistprogresses.AnyAsync(x =>
                 x.ChecklistId == checklistId && x.UserId == userId && x.IsCompleted == true
@@ -232,14 +232,14 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task<Project?> GetProjectByIdAsync(int projectId)
+        public async Task<Project?> GetProjectById(int projectId)
         {
             var result = await _db.Projects.FirstOrDefaultAsync(p => p.ProjectId == projectId);
 
             return result;
         }
 
-        public async Task<bool> HasPendingApprovalAsync(int goalId, int userId)
+        public async Task<bool> HasPendingApproval(int goalId, int userId)
         {
             var result = await _db.GoalApprovals.AnyAsync(a =>
                 a.GoalId == goalId
@@ -254,7 +254,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task<GoalAssignment> GetGoalAssignmentAsync(int goalId, int assignedTo)
+        public async Task<GoalAssignment> GetGoalAssignment(int goalId, int assignedTo)
         {
             var result = await _db.GoalAssignments.FirstOrDefaultAsync(ga =>
                 ga.GoalId == goalId && ga.AssignedTo == assignedTo
@@ -263,7 +263,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
-        public async Task<List<int>> GetSubordinateEmployeeMasterIdsAsync(
+        public async Task<List<int>> GetSubordinateEmployeeMasterIds(
             int managerEmployeeMasterId
         )
         {
@@ -289,7 +289,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return subordinateMasterIds;
         }
 
-        public async Task SaveChangesAsync()
+        public async Task SaveChanges()
         {
             await _db.SaveChangesAsync();
         }
