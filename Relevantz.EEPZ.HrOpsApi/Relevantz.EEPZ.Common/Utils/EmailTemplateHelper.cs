@@ -4,7 +4,7 @@ namespace Relevantz.EEPZ.Common.Utils
     {
         private const string BaseStyle = @"
             <style>
-                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
                 
                 :root {
                     color-scheme: light dark;
@@ -14,108 +14,15 @@ namespace Relevantz.EEPZ.Common.Utils
                 * {
                     margin: 0;
                     padding: 0;
+                    box-sizing: border-box;
                 }
                 
                 body {
                     margin: 0;
                     padding: 0;
-                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-                    background-color: #FAFAFA;
-                    -webkit-font-smoothing: antialiased;
-                    -moz-osx-font-smoothing: grayscale;
-                }
-                
-                @media (prefers-color-scheme: dark) {
-                    body {
-                        background-color: #0A0A0A;
-                    }
-                    
-                    .email-container {
-                        background-color: #1A1A1A;
-                        border: 1px solid #2A2A2A;
-                    }
-                    
-                    .brand-bar {
-                        background-color: #2563EB;
-                    }
-                    
-                    .header-section {
-                        background-color: #1A1A1A;
-                        border-bottom: 1px solid #2A2A2A;
-                    }
-                    
-                    .brand-name {
-                        color: #FFFFFF;
-                    }
-                    
-                    .brand-subtitle {
-                        color: #9CA3AF;
-                    }
-                    
-                    .section-title {
-                        background-color: #2A2A2A;
-                        color: #E5E7EB;
-                    }
-                    
-                    .content-area {
-                        background-color: #1A1A1A;
-                    }
-                    
-                    .text-primary {
-                        color: #E5E7EB;
-                    }
-                    
-                    .text-secondary {
-                        color: #9CA3AF;
-                    }
-                    
-                    .goal-table {
-                        background-color: #111111;
-                        border: 1px solid #2A2A2A;
-                    }
-                    
-                    .goal-item {
-                        background-color: #2A2A2A;
-                        border: 1px solid #333333;
-                    }
-                    
-                    .notice-bar {
-                        background-color: #2A2A2A;
-                        border-left: 3px solid #F59E0B;
-                    }
-                    
-                    .notice-bar.success {
-                        border-left-color: #10B981;
-                    }
-                    
-                    .notice-bar.error {
-                        border-left-color: #EF4444;
-                    }
-                    
-                    .notice-bar.info {
-                        border-left-color: #3B82F6;
-                    }
-                    
-                    .notice-text {
-                        color: #D1D5DB;
-                    }
-                    
-                    .footer-section {
-                        background-color: #111111;
-                        border-top: 1px solid #2A2A2A;
-                    }
-                    
-                    .footer-text {
-                        color: #6B7280;
-                    }
-                    
-                    .footer-link {
-                        color: #60A5FA;
-                    }
-                    
-                    .divider-line {
-                        background-color: #2A2A2A;
-                    }
+                    font-family: 'Inter', Arial, sans-serif;
+                    background-color: #f5f5f5;
+                    color: #333333;
                 }
                 
                 table {
@@ -123,284 +30,319 @@ namespace Relevantz.EEPZ.Common.Utils
                     border-collapse: collapse;
                 }
                 
-                td {
-                    padding: 0;
-                }
-                
                 .email-wrapper {
                     width: 100%;
-                    background-color: #FAFAFA;
-                    padding: 40px 0;
+                    background-color: #f5f5f5;
+                    padding: 20px 10px;
                 }
                 
                 .email-container {
-                    max-width: 600px;
+                    max-width: 580px;
                     margin: 0 auto;
-                    background-color: #FFFFFF;
-                    border: 1px solid #E5E7EB;
+                    background-color: #ffffff;
+                    border-radius: 8px;
                     overflow: hidden;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
                 }
                 
-                .brand-bar {
-                    width: 4px;
-                    background-color: #2563EB;
-                    height: 100%;
+                .header {
+                    background-color: #2563eb;
+                    padding: 20px 24px;
+                    text-align: center;
                 }
                 
-                .header-section {
-                    background-color: #FFFFFF;
-                    padding: 40px 48px;
-                    border-bottom: 1px solid #E5E7EB;
-                }
-                
-                .brand-name {
-                    font-size: 32px;
+                .header-logo {
+                    font-size: 24px;
                     font-weight: 700;
-                    color: #111827;
-                    letter-spacing: 4px;
+                    color: #ffffff;
+                    letter-spacing: 3px;
+                    margin: 0;
+                }
+                
+                .header-tag {
+                    font-size: 11px;
+                    color: rgba(255,255,255,0.9);
+                    margin: 4px 0 0 0;
+                    font-weight: 500;
+                }
+                
+                .content {
+                    padding: 24px;
+                }
+                
+                .title {
+                    font-size: 20px;
+                    font-weight: 600;
+                    color: #1a1a1a;
                     margin: 0 0 8px 0;
                 }
                 
-                .brand-subtitle {
-                    font-size: 12px;
-                    font-weight: 500;
-                    color: #6B7280;
-                    letter-spacing: 1.5px;
-                    text-transform: uppercase;
-                    margin: 0;
-                }
-                
-                .section-title {
-                    background-color: #F9FAFB;
-                    padding: 16px 48px;
-                    font-size: 11px;
-                    font-weight: 700;
-                    color: #374151;
-                    letter-spacing: 2px;
-                    text-transform: uppercase;
-                    border-top: 1px solid #E5E7EB;
-                    border-bottom: 1px solid #E5E7EB;
-                }
-                
-                .content-area {
-                    padding: 40px 48px;
-                    background-color: #FFFFFF;
-                }
-                
-                .greeting-text {
-                    font-size: 16px;
-                    font-weight: 600;
-                    color: #111827;
-                    margin: 0 0 24px 0;
+                .subtitle {
+                    font-size: 14px;
+                    color: #666666;
+                    margin: 0 0 20px 0;
                     line-height: 1.5;
                 }
                 
-                .text-primary {
-                    font-size: 15px;
-                    line-height: 1.7;
-                    color: #374151;
-                    margin: 0 0 16px 0;
+                .goal-list {
+                    margin: 16px 0;
                 }
                 
-                .text-secondary {
-                    font-size: 14px;
-                    line-height: 1.6;
-                    color: #6B7280;
-                    margin: 0;
-                }
-                
-                .goal-table {
-                    width: 100%;
-                    background-color: #F9FAFB;
-                    border: 1px solid #E5E7EB;
-                    margin: 32px 0;
-                }
-                
-                .goal-item {
-                    background-color: #FFFFFF;
-                    border: 1px solid #E5E7EB;
-                    padding: 20px 24px;
-                    margin: 12px 0;
+                .goal-card {
+                    background-color: #f8f9fa;
+                    border-left: 3px solid #2563eb;
+                    padding: 14px 16px;
+                    margin: 10px 0;
+                    border-radius: 4px;
                 }
                 
                 .goal-number {
                     font-size: 11px;
-                    font-weight: 700;
-                    color: #6B7280;
+                    font-weight: 600;
+                    color: #2563eb;
+                    margin: 0 0 6px 0;
                     text-transform: uppercase;
-                    letter-spacing: 1.5px;
-                    margin: 0 0 8px 0;
+                    letter-spacing: 0.5px;
                 }
                 
                 .goal-text {
                     font-size: 14px;
-                    font-weight: 500;
-                    color: #111827;
-                    line-height: 1.6;
+                    color: #1a1a1a;
                     margin: 0;
+                    line-height: 1.5;
                 }
                 
-                .notice-bar {
-                    background-color: #F9FAFB;
-                    border-left: 3px solid #F59E0B;
-                    padding: 20px 24px;
-                    margin: 28px 0;
-                }
-                
-                .notice-bar.success {
-                    border-left-color: #10B981;
-                }
-                
-                .notice-bar.error {
-                    border-left-color: #EF4444;
-                }
-                
-                .notice-bar.info {
-                    border-left-color: #3B82F6;
-                }
-                
-                .notice-title {
-                    font-size: 12px;
-                    font-weight: 700;
-                    color: #111827;
-                    text-transform: uppercase;
-                    letter-spacing: 1px;
-                    margin: 0 0 8px 0;
-                }
-                
-                .notice-text {
-                    font-size: 14px;
-                    color: #4B5563;
-                    margin: 0;
-                    line-height: 1.6;
-                }
-                
-                .list-section {
-                    margin: 28px 0;
-                }
-                
-                .list-heading {
+                .alert {
+                    padding: 12px 16px;
+                    border-radius: 6px;
+                    margin: 16px 0;
                     font-size: 13px;
-                    font-weight: 700;
-                    color: #111827;
-                    text-transform: uppercase;
-                    letter-spacing: 1px;
-                    margin: 0 0 16px 0;
+                    line-height: 1.5;
+                    border-left: 3px solid;
                 }
                 
-                .list-item {
+                .alert-info {
+                    background-color: #e0f2fe;
+                    border-left-color: #0ea5e9;
+                    color: #0c4a6e;
+                }
+                
+                .alert-success {
+                    background-color: #d1fae5;
+                    border-left-color: #10b981;
+                    color: #065f46;
+                }
+                
+                .alert-warning {
+                    background-color: #fef3c7;
+                    border-left-color: #f59e0b;
+                    color: #78350f;
+                }
+                
+                .alert-error {
+                    background-color: #fee2e2;
+                    border-left-color: #ef4444;
+                    color: #7f1d1d;
+                }
+                
+                .steps {
+                    margin: 16px 0;
+                }
+                
+                .step {
+                    padding: 8px 0;
                     font-size: 14px;
-                    color: #4B5563;
-                    line-height: 1.7;
-                    margin: 0 0 12px 0;
+                    color: #4b5563;
                     padding-left: 24px;
                     position: relative;
                 }
                 
-                .list-item:before {
-                    content: '•';
+                .step:before {
+                    content: '→';
                     position: absolute;
-                    left: 8px;
-                    color: #3B82F6;
-                    font-weight: bold;
-                }
-                
-                .divider-line {
-                    height: 1px;
-                    background-color: #E5E7EB;
-                    margin: 32px 0;
+                    left: 0;
+                    color: #2563eb;
+                    font-weight: 700;
                 }
                 
                 .button-container {
                     text-align: center;
-                    margin: 32px 0;
+                    margin: 20px 0;
                 }
                 
                 .primary-button {
                     display: inline-block;
-                    padding: 14px 32px;
-                    background-color: #2563EB;
-                    color: #FFFFFF;
+                    padding: 12px 28px;
+                    background-color: #2563eb;
+                    color: #ffffff;
                     text-decoration: none;
                     font-size: 14px;
                     font-weight: 600;
-                    letter-spacing: 0.5px;
-                    text-transform: uppercase;
-                    border-radius: 0;
+                    border-radius: 6px;
+                    letter-spacing: 0.3px;
                 }
                 
                 .primary-button:hover {
-                    background-color: #1D4ED8;
+                    background-color: #1d4ed8;
                 }
                 
-                .footer-section {
-                    background-color: #F9FAFB;
-                    padding: 40px 48px;
-                    border-top: 1px solid #E5E7EB;
+                .divider {
+                    height: 1px;
+                    background-color: #e5e7eb;
+                    margin: 20px 0;
+                }
+                
+                .section-heading {
+                    font-size: 15px;
+                    font-weight: 600;
+                    color: #1a1a1a;
+                    margin: 0 0 12px 0;
+                }
+                
+                .footer {
+                    background-color: #f8f9fa;
+                    padding: 20px 24px;
+                    text-align: center;
+                    border-top: 1px solid #e5e7eb;
                 }
                 
                 .footer-brand {
-                    text-align: center;
-                    margin: 0 0 24px 0;
-                }
-                
-                .footer-brand-name {
-                    font-size: 18px;
+                    font-size: 14px;
                     font-weight: 700;
-                    color: #111827;
-                    letter-spacing: 3px;
-                    margin: 0 0 4px 0;
-                }
-                
-                .footer-brand-desc {
-                    font-size: 11px;
-                    color: #6B7280;
-                    letter-spacing: 1px;
-                    margin: 0;
+                    color: #1a1a1a;
+                    margin: 0 0 8px 0;
                 }
                 
                 .footer-text {
-                    font-size: 13px;
-                    color: #6B7280;
-                    text-align: center;
-                    line-height: 1.6;
-                    margin: 12px 0;
+                    font-size: 12px;
+                    color: #6b7280;
+                    margin: 4px 0;
+                    line-height: 1.5;
                 }
                 
                 .footer-link {
-                    color: #2563EB;
+                    color: #2563eb;
                     text-decoration: none;
-                    font-weight: 500;
                 }
                 
-                .footer-link:hover {
-                    color: #1D4ED8;
-                }
-                
-                .footer-copyright {
-                    font-size: 11px;
-                    color: #9CA3AF;
-                    text-align: center;
-                    line-height: 1.7;
-                    margin: 24px 0 0 0;
+                @media (prefers-color-scheme: dark) {
+                    body {
+                        background-color: #0a0a0a;
+                        color: #e5e5e5;
+                    }
+                    
+                    .email-wrapper {
+                        background-color: #0a0a0a;
+                    }
+                    
+                    .email-container {
+                        background-color: #1a1a1a;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                    }
+                    
+                    .header {
+                        background-color: #1e40af;
+                    }
+                    
+                    .content {
+                        background-color: #1a1a1a;
+                    }
+                    
+                    .title {
+                        color: #f5f5f5;
+                    }
+                    
+                    .subtitle {
+                        color: #a3a3a3;
+                    }
+                    
+                    .goal-card {
+                        background-color: #262626;
+                        border-left-color: #3b82f6;
+                    }
+                    
+                    .goal-number {
+                        color: #60a5fa;
+                    }
+                    
+                    .goal-text {
+                        color: #e5e5e5;
+                    }
+                    
+                    .section-heading {
+                        color: #f5f5f5;
+                    }
+                    
+                    .alert-info {
+                        background-color: #0c2340;
+                        border-left-color: #3b82f6;
+                        color: #bfdbfe;
+                    }
+                    
+                    .alert-success {
+                        background-color: #052e16;
+                        border-left-color: #22c55e;
+                        color: #bbf7d0;
+                    }
+                    
+                    .alert-warning {
+                        background-color: #422006;
+                        border-left-color: #f59e0b;
+                        color: #fde68a;
+                    }
+                    
+                    .alert-error {
+                        background-color: #450a0a;
+                        border-left-color: #ef4444;
+                        color: #fecaca;
+                    }
+                    
+                    .step {
+                        color: #a3a3a3;
+                    }
+                    
+                    .step:before {
+                        color: #3b82f6;
+                    }
+                    
+                    .divider {
+                        background-color: #404040;
+                    }
+                    
+                    .footer {
+                        background-color: #0d0d0d;
+                        border-top-color: #404040;
+                    }
+                    
+                    .footer-brand {
+                        color: #f5f5f5;
+                    }
+                    
+                    .footer-text {
+                        color: #737373;
+                    }
+                    
+                    .footer-link {
+                        color: #60a5fa;
+                    }
                 }
                 
                 @media only screen and (max-width: 600px) {
-                    .header-section,
-                    .section-title,
-                    .content-area,
-                    .footer-section {
-                        padding-left: 24px;
-                        padding-right: 24px;
+                    .email-wrapper {
+                        padding: 10px 5px;
                     }
                     
-                    .brand-name {
-                        font-size: 26px;
-                        letter-spacing: 3px;
+                    .content,
+                    .footer {
+                        padding: 20px 16px;
                     }
                     
-                    .goal-item {
-                        padding: 16px 20px;
+                    .header {
+                        padding: 16px;
+                    }
+                    
+                    .goal-card {
+                        padding: 12px 14px;
                     }
                 }
             </style>
@@ -412,7 +354,7 @@ namespace Relevantz.EEPZ.Common.Utils
             if (goalSuggestions != null && goalSuggestions.Any())
             {
                 suggestionsHtml = string.Join("", goalSuggestions.Select((s, i) =>
-                    $@"<div class=""goal-item"">
+                    $@"<div class=""goal-card"">
                         <p class=""goal-number"">Goal {i + 1}</p>
                         <p class=""goal-text"">{s}</p>
                     </div>"
@@ -432,85 +374,61 @@ namespace Relevantz.EEPZ.Common.Utils
     {BaseStyle}
 </head>
 <body>
-    <table class=""email-wrapper"" width=""100%"" cellpadding=""0"" cellspacing=""0"" role=""presentation"">
+    <table class=""email-wrapper"" width=""100%"" cellpadding=""0"" cellspacing=""0"">
         <tr>
             <td align=""center"">
-                <table class=""email-container"" width=""600"" cellpadding=""0"" cellspacing=""0"" role=""presentation"">
+                <table class=""email-container"" cellpadding=""0"" cellspacing=""0"">
                     <tr>
-                        <td width=""4"" class=""brand-bar""></td>
-                        <td>
-                            <table width=""100%"" cellpadding=""0"" cellspacing=""0"" role=""presentation"">
-                                <tr>
-                                    <td class=""header-section"">
-                                        <h1 class=""brand-name"">EEPZ</h1>
-                                        <p class=""brand-subtitle"">Employee Engagement Platform</p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class=""section-title"">Career Development Goals Required</td>
-                                </tr>
-                                <tr>
-                                    <td class=""content-area"">
-                                        <p class=""greeting-text"">Dear {userName},</p>
-                                        
-                                        <p class=""text-primary"">
-                                            We noticed you have not yet set your professional development goals. Setting clear goals is an essential part of your career progression and personal growth within the organization.
-                                        </p>
-                                        
-                                        <div class=""divider-line""></div>
-                                        
-                                        <div class=""list-section"">
-                                            <p class=""list-heading"">Why Set Goals</p>
-                                            <p class=""list-item"">Focus on skills you want to develop</p>
-                                            <p class=""list-item"">Track your career progress</p>
-                                            <p class=""list-item"">Get support from your manager</p>
-                                            <p class=""list-item"">Align your work with your career path</p>
-                                        </div>
-                                        
-                                        {(goalSuggestions != null && goalSuggestions.Any() ? $@"
-                                        <div class=""divider-line""></div>
-                                        
-                                        <div class=""list-section"">
-                                            <p class=""list-heading"">Goal Suggestions For You</p>
-                                            {suggestionsHtml}
-                                        </div>" : "")}
-                                        
-                                        <div class=""divider-line""></div>
-                                        
-                                        <div class=""button-container"">
-                                            <a href=""https://portal.company.com/goals"" class=""primary-button"">Set Your Goals Now</a>
-                                        </div>
-                                        
-                                        <div class=""divider-line""></div>
-                                        
-                                        <div class=""notice-bar info"">
-                                            <p class=""notice-title"">Action Needed</p>
-                                            <p class=""notice-text"">
-                                                Please set 2-3 goals by <strong>{DateTime.UtcNow.AddDays(14):MMMM dd, yyyy}</strong>. This will help ensure your development plan is aligned with organizational objectives.
-                                            </p>
-                                        </div>
-                                        
-                                        <p class=""text-secondary"">
-                                            If you require assistance choosing goals or have questions, please contact HR at <a href=""mailto:eepzmailservice@gmail.com"" class=""footer-link"">eepzmailservice@gmail.com</a>
-                                        </p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class=""footer-section"">
-                                        <div class=""footer-brand"">
-                                            <p class=""footer-brand-name"">EEPZ</p>
-                                            <p class=""footer-brand-desc"">Employee Engagement Platform</p>
-                                        </div>
-                                        <p class=""footer-text"">
-                                            Support: <a href=""mailto:eepzmailservice@gmail.com"" class=""footer-link"">eepzmailservice@gmail.com</a>
-                                        </p>
-                                        <p class=""footer-copyright"">
-                                            &copy; {DateTime.UtcNow.Year} EEPZ. All rights reserved.<br>
-                                            This is an automated message.
-                                        </p>
-                                    </td>
-                                </tr>
-                            </table>
+                        <td class=""header"">
+                            <h1 class=""header-logo"">EEPZ</h1>
+                            <p class=""header-tag"">Career Development Goals</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class=""content"">
+                            <h2 class=""title"">Action Required</h2>
+                            <p class=""subtitle"">Dear {userName}, we noticed you haven't set your professional development goals yet. Setting clear goals is essential for your career progression.</p>
+                            
+                            <p class=""section-heading"">Why Set Goals</p>
+                            
+                            <div class=""steps"">
+                                <div class=""step"">Focus on skills you want to develop</div>
+                                <div class=""step"">Track your career progress</div>
+                                <div class=""step"">Get support from your manager</div>
+                                <div class=""step"">Align work with your career path</div>
+                            </div>
+                            
+                            {(goalSuggestions != null && goalSuggestions.Any() ? $@"
+                            <div class=""divider""></div>
+                            
+                            <p class=""section-heading"">Goal Suggestions For You</p>
+                            
+                            <div class=""goal-list"">
+                                {suggestionsHtml}
+                            </div>" : "")}
+                            
+                            <div class=""divider""></div>
+                            
+                            <div class=""button-container"">
+                                <a href=""https://portal.company.com/goals"" class=""primary-button"">Set Your Goals Now</a>
+                            </div>
+                            
+                            <div class=""divider""></div>
+                            
+                            <div class=""alert alert-info"">
+                                <strong>Action Needed:</strong> Please set 2-3 goals by <strong>{DateTime.UtcNow.AddDays(14):MMMM dd, yyyy}</strong> to align your development plan with organizational objectives.
+                            </div>
+                            
+                            <p class=""subtitle"">Need help choosing goals? Contact HR at <a href=""mailto:emailserviceeepz@gmail.com"" class=""footer-link"">emailserviceeepz@gmail.com</a></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class=""footer"">
+                            <p class=""footer-brand"">EEPZ</p>
+                            <p class=""footer-text"">
+                                Support: <a href=""mailto:emailserviceeepz@gmail.com"" class=""footer-link"">emailserviceeepz@gmail.com</a>
+                            </p>
+                            <p class=""footer-text"">© {DateTime.UtcNow.Year} EEPZ. All rights reserved.</p>
                         </td>
                     </tr>
                 </table>

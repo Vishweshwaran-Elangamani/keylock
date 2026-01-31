@@ -4,7 +4,7 @@ namespace Relevantz.EEPZ.Common.Utils
     {
         private const string BaseStyle = @"
             <style>
-                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
                 
                 :root {
                     color-scheme: light dark;
@@ -14,122 +14,15 @@ namespace Relevantz.EEPZ.Common.Utils
                 * {
                     margin: 0;
                     padding: 0;
+                    box-sizing: border-box;
                 }
                 
                 body {
                     margin: 0;
                     padding: 0;
-                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-                    background-color: #FAFAFA;
-                    -webkit-font-smoothing: antialiased;
-                    -moz-osx-font-smoothing: grayscale;
-                }
-                
-                @media (prefers-color-scheme: dark) {
-                    body {
-                        background-color: #0A0A0A;
-                    }
-                    
-                    .email-container {
-                        background-color: #1A1A1A;
-                        border: 1px solid #2A2A2A;
-                    }
-                    
-                    .brand-bar {
-                        background-color: #2563EB;
-                    }
-                    
-                    .header-section {
-                        background-color: #1A1A1A;
-                        border-bottom: 1px solid #2A2A2A;
-                    }
-                    
-                    .brand-name {
-                        color: #FFFFFF;
-                    }
-                    
-                    .brand-subtitle {
-                        color: #9CA3AF;
-                    }
-                    
-                    .section-title {
-                        background-color: #2A2A2A;
-                        color: #E5E7EB;
-                    }
-                    
-                    .content-area {
-                        background-color: #1A1A1A;
-                    }
-                    
-                    .text-primary {
-                        color: #E5E7EB;
-                    }
-                    
-                    .text-secondary {
-                        color: #9CA3AF;
-                    }
-                    
-                    .credential-table {
-                        background-color: #111111;
-                        border: 1px solid #2A2A2A;
-                    }
-                    
-                    .credential-label {
-                        color: #9CA3AF;
-                        background-color: #1A1A1A;
-                    }
-                    
-                    .credential-value {
-                        color: #FFFFFF;
-                        background-color: #2A2A2A;
-                    }
-                    
-                    .notice-bar {
-                        background-color: #2A2A2A;
-                        border-left: 3px solid #F59E0B;
-                    }
-                    
-                    .notice-bar.success {
-                        border-left-color: #10B981;
-                    }
-                    
-                    .notice-bar.error {
-                        border-left-color: #EF4444;
-                    }
-                    
-                    .notice-bar.info {
-                        border-left-color: #3B82F6;
-                    }
-                    
-                    .notice-text {
-                        color: #D1D5DB;
-                    }
-                    
-                    .highlight-container {
-                        background-color: #1E293B;
-                        border: 2px solid #3B82F6;
-                    }
-                    
-                    .highlight-code {
-                        color: #FFFFFF;
-                    }
-                    
-                    .footer-section {
-                        background-color: #111111;
-                        border-top: 1px solid #2A2A2A;
-                    }
-                    
-                    .footer-text {
-                        color: #6B7280;
-                    }
-                    
-                    .footer-link {
-                        color: #60A5FA;
-                    }
-                    
-                    .divider-line {
-                        background-color: #2A2A2A;
-                    }
+                    font-family: 'Inter', Arial, sans-serif;
+                    background-color: #f5f5f5;
+                    color: #333333;
                 }
                 
                 table {
@@ -137,315 +30,363 @@ namespace Relevantz.EEPZ.Common.Utils
                     border-collapse: collapse;
                 }
                 
-                td {
-                    padding: 0;
-                }
-                
                 .email-wrapper {
                     width: 100%;
-                    background-color: #FAFAFA;
-                    padding: 40px 0;
+                    background-color: #f5f5f5;
+                    padding: 20px 10px;
                 }
                 
                 .email-container {
-                    max-width: 600px;
+                    max-width: 580px;
                     margin: 0 auto;
-                    background-color: #FFFFFF;
-                    border: 1px solid #E5E7EB;
+                    background-color: #ffffff;
+                    border-radius: 8px;
                     overflow: hidden;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
                 }
                 
-                .brand-bar {
-                    width: 4px;
-                    background-color: #2563EB;
-                    height: 100%;
+                .header {
+                    background-color: #2563eb;
+                    padding: 20px 24px;
+                    text-align: center;
                 }
                 
-                .header-section {
-                    background-color: #FFFFFF;
-                    padding: 40px 48px;
-                    border-bottom: 1px solid #E5E7EB;
-                }
-                
-                .brand-name {
-                    font-size: 32px;
+                .header-logo {
+                    font-size: 24px;
                     font-weight: 700;
-                    color: #111827;
-                    letter-spacing: 4px;
-                    margin: 0 0 8px 0;
-                }
-                
-                .brand-subtitle {
-                    font-size: 12px;
-                    font-weight: 500;
-                    color: #6B7280;
-                    letter-spacing: 1.5px;
-                    text-transform: uppercase;
+                    color: #ffffff;
+                    letter-spacing: 3px;
                     margin: 0;
                 }
                 
-                .section-title {
-                    background-color: #F9FAFB;
-                    padding: 16px 48px;
+                .header-tag {
                     font-size: 11px;
-                    font-weight: 700;
-                    color: #374151;
-                    letter-spacing: 2px;
-                    text-transform: uppercase;
-                    border-top: 1px solid #E5E7EB;
-                    border-bottom: 1px solid #E5E7EB;
+                    color: rgba(255,255,255,0.9);
+                    margin: 4px 0 0 0;
+                    font-weight: 500;
                 }
                 
-                .content-area {
-                    padding: 40px 48px;
-                    background-color: #FFFFFF;
+                .content {
+                    padding: 24px;
                 }
                 
-                .greeting-text {
-                    font-size: 16px;
+                .title {
+                    font-size: 20px;
                     font-weight: 600;
-                    color: #111827;
-                    margin: 0 0 24px 0;
+                    color: #1a1a1a;
+                    margin: 0 0 8px 0;
+                }
+                
+                .subtitle {
+                    font-size: 14px;
+                    color: #666666;
+                    margin: 0 0 20px 0;
                     line-height: 1.5;
                 }
                 
-                .text-primary {
-                    font-size: 15px;
-                    line-height: 1.7;
-                    color: #374151;
-                    margin: 0 0 16px 0;
-                }
-                
-                .text-secondary {
-                    font-size: 14px;
-                    line-height: 1.6;
-                    color: #6B7280;
-                    margin: 0;
-                }
-                
-                .credential-table {
+                .info-table {
                     width: 100%;
-                    background-color: #F9FAFB;
-                    border: 1px solid #E5E7EB;
-                    margin: 32px 0;
+                    background-color: #f8f9fa;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 6px;
+                    margin: 16px 0;
                 }
                 
-                .credential-row {
-                    border-bottom: 1px solid #E5E7EB;
+                .info-row {
+                    border-bottom: 1px solid #e5e7eb;
                 }
                 
-                .credential-row:last-child {
+                .info-row:last-child {
                     border-bottom: none;
                 }
                 
-                .credential-label {
-                    padding: 20px 24px;
-                    font-size: 11px;
-                    font-weight: 700;
-                    color: #6B7280;
-                    text-transform: uppercase;
-                    letter-spacing: 1.5px;
-                    background-color: #FAFAFA;
-                    width: 35%;
-                }
-                
-                .credential-value {
-                    padding: 20px 24px;
-                    font-size: 14px;
+                .info-label {
+                    padding: 12px 16px;
+                    font-size: 12px;
                     font-weight: 600;
-                    color: #111827;
-                    font-family: 'Courier New', monospace;
-                    background-color: #FFFFFF;
+                    color: #6b7280;
+                    width: 35%;
+                    vertical-align: top;
                 }
                 
-                .highlight-container {
-                    background-color: #EFF6FF;
-                    border: 2px solid #3B82F6;
-                    padding: 32px;
-                    text-align: center;
-                    margin: 32px 0;
-                }
-                
-                .highlight-label {
-                    font-size: 10px;
-                    font-weight: 700;
-                    color: #1E40AF;
-                    text-transform: uppercase;
-                    letter-spacing: 2px;
-                    margin: 0 0 16px 0;
-                }
-                
-                .highlight-code {
-                    font-size: 42px;
-                    font-weight: 700;
-                    color: #1E3A8A;
-                    letter-spacing: 16px;
-                    font-family: 'Courier New', monospace;
-                    margin: 0;
-                }
-                
-                .highlight-expiry {
-                    font-size: 12px;
+                .info-value {
+                    padding: 12px 16px;
+                    font-size: 14px;
                     font-weight: 500;
-                    color: #1E40AF;
-                    margin: 16px 0 0 0;
+                    color: #1a1a1a;
+                    word-break: break-word;
                 }
                 
-                .notice-bar {
-                    background-color: #F9FAFB;
-                    border-left: 3px solid #F59E0B;
-                    padding: 20px 24px;
-                    margin: 28px 0;
+                .code-container {
+                    background-color: #eff6ff;
+                    border: 2px solid #2563eb;
+                    border-radius: 6px;
+                    padding: 20px;
+                    text-align: center;
+                    margin: 16px 0;
                 }
                 
-                .notice-bar.success {
-                    border-left-color: #10B981;
+                .code-label {
+                    font-size: 11px;
+                    font-weight: 600;
+                    color: #2563eb;
+                    margin: 0 0 10px 0;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
                 }
                 
-                .notice-bar.error {
-                    border-left-color: #EF4444;
+                .code-number {
+                    font-size: 36px;
+                    font-weight: 700;
+                    color: #1e40af;
+                    letter-spacing: 8px;
+                    margin: 8px 0;
+                    font-family: 'Courier New', monospace;
                 }
                 
-                .notice-bar.info {
-                    border-left-color: #3B82F6;
-                }
-                
-                .notice-title {
+                .code-expiry {
                     font-size: 12px;
-                    font-weight: 700;
-                    color: #111827;
-                    text-transform: uppercase;
-                    letter-spacing: 1px;
-                    margin: 0 0 8px 0;
+                    color: #4b5563;
+                    margin: 10px 0 0 0;
                 }
                 
-                .notice-text {
-                    font-size: 14px;
-                    color: #4B5563;
-                    margin: 0;
-                    line-height: 1.6;
-                }
-                
-                .list-section {
-                    margin: 28px 0;
-                }
-                
-                .list-heading {
+                .alert {
+                    padding: 12px 16px;
+                    border-radius: 6px;
+                    margin: 16px 0;
                     font-size: 13px;
-                    font-weight: 700;
-                    color: #111827;
-                    text-transform: uppercase;
-                    letter-spacing: 1px;
-                    margin: 0 0 16px 0;
+                    line-height: 1.5;
+                    border-left: 3px solid;
                 }
                 
-                .list-item {
+                .alert-info {
+                    background-color: #e0f2fe;
+                    border-left-color: #0ea5e9;
+                    color: #0c4a6e;
+                }
+                
+                .alert-success {
+                    background-color: #d1fae5;
+                    border-left-color: #10b981;
+                    color: #065f46;
+                }
+                
+                .alert-warning {
+                    background-color: #fef3c7;
+                    border-left-color: #f59e0b;
+                    color: #78350f;
+                }
+                
+                .alert-error {
+                    background-color: #fee2e2;
+                    border-left-color: #ef4444;
+                    color: #7f1d1d;
+                }
+                
+                .steps {
+                    margin: 16px 0;
+                }
+                
+                .step {
+                    padding: 8px 0;
                     font-size: 14px;
-                    color: #4B5563;
-                    line-height: 1.7;
-                    margin: 0 0 12px 0;
+                    color: #4b5563;
                     padding-left: 24px;
                     position: relative;
                 }
                 
-                .list-item:before {
-                    content: '•';
+                .step:before {
+                    content: '→';
                     position: absolute;
-                    left: 8px;
-                    color: #3B82F6;
-                    font-weight: bold;
+                    left: 0;
+                    color: #2563eb;
+                    font-weight: 700;
                 }
                 
-                .divider-line {
+                .divider {
                     height: 1px;
-                    background-color: #E5E7EB;
-                    margin: 32px 0;
+                    background-color: #e5e7eb;
+                    margin: 20px 0;
                 }
                 
-                .footer-section {
-                    background-color: #F9FAFB;
-                    padding: 40px 48px;
-                    border-top: 1px solid #E5E7EB;
+                .footer {
+                    background-color: #f8f9fa;
+                    padding: 20px 24px;
+                    text-align: center;
+                    border-top: 1px solid #e5e7eb;
                 }
                 
                 .footer-brand {
-                    text-align: center;
-                    margin: 0 0 24px 0;
-                }
-                
-                .footer-brand-name {
-                    font-size: 18px;
+                    font-size: 14px;
                     font-weight: 700;
-                    color: #111827;
-                    letter-spacing: 3px;
-                    margin: 0 0 4px 0;
-                }
-                
-                .footer-brand-desc {
-                    font-size: 11px;
-                    color: #6B7280;
-                    letter-spacing: 1px;
-                    margin: 0;
+                    color: #1a1a1a;
+                    margin: 0 0 8px 0;
                 }
                 
                 .footer-text {
-                    font-size: 13px;
-                    color: #6B7280;
-                    text-align: center;
-                    line-height: 1.6;
-                    margin: 12px 0;
+                    font-size: 12px;
+                    color: #6b7280;
+                    margin: 4px 0;
+                    line-height: 1.5;
                 }
                 
                 .footer-link {
-                    color: #2563EB;
+                    color: #2563eb;
                     text-decoration: none;
-                    font-weight: 500;
                 }
                 
-                .footer-link:hover {
-                    color: #1D4ED8;
-                }
-                
-                .footer-copyright {
-                    font-size: 11px;
-                    color: #9CA3AF;
-                    text-align: center;
-                    line-height: 1.7;
-                    margin: 24px 0 0 0;
+                @media (prefers-color-scheme: dark) {
+                    body {
+                        background-color: #0a0a0a;
+                        color: #e5e5e5;
+                    }
+                    
+                    .email-wrapper {
+                        background-color: #0a0a0a;
+                    }
+                    
+                    .email-container {
+                        background-color: #1a1a1a;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                    }
+                    
+                    .header {
+                        background-color: #1e40af;
+                    }
+                    
+                    .content {
+                        background-color: #1a1a1a;
+                    }
+                    
+                    .title {
+                        color: #f5f5f5;
+                    }
+                    
+                    .subtitle {
+                        color: #a3a3a3;
+                    }
+                    
+                    .info-table {
+                        background-color: #262626;
+                        border-color: #404040;
+                    }
+                    
+                    .info-row {
+                        border-color: #404040;
+                    }
+                    
+                    .info-label {
+                        color: #a3a3a3;
+                    }
+                    
+                    .info-value {
+                        color: #e5e5e5;
+                    }
+                    
+                    .code-container {
+                        background-color: #1e293b;
+                        border-color: #3b82f6;
+                    }
+                    
+                    .code-label {
+                        color: #60a5fa;
+                    }
+                    
+                    .code-number {
+                        color: #93c5fd;
+                    }
+                    
+                    .code-expiry {
+                        color: #cbd5e1;
+                    }
+                    
+                    .alert-info {
+                        background-color: #0c2340;
+                        border-left-color: #3b82f6;
+                        color: #bfdbfe;
+                    }
+                    
+                    .alert-success {
+                        background-color: #052e16;
+                        border-left-color: #22c55e;
+                        color: #bbf7d0;
+                    }
+                    
+                    .alert-warning {
+                        background-color: #422006;
+                        border-left-color: #f59e0b;
+                        color: #fde68a;
+                    }
+                    
+                    .alert-error {
+                        background-color: #450a0a;
+                        border-left-color: #ef4444;
+                        color: #fecaca;
+                    }
+                    
+                    .step {
+                        color: #a3a3a3;
+                    }
+                    
+                    .step:before {
+                        color: #3b82f6;
+                    }
+                    
+                    .divider {
+                        background-color: #404040;
+                    }
+                    
+                    .footer {
+                        background-color: #0d0d0d;
+                        border-top-color: #404040;
+                    }
+                    
+                    .footer-brand {
+                        color: #f5f5f5;
+                    }
+                    
+                    .footer-text {
+                        color: #737373;
+                    }
+                    
+                    .footer-link {
+                        color: #60a5fa;
+                    }
                 }
                 
                 @media only screen and (max-width: 600px) {
-                    .header-section,
-                    .section-title,
-                    .content-area,
-                    .footer-section {
-                        padding-left: 24px;
-                        padding-right: 24px;
+                    .email-wrapper {
+                        padding: 10px 5px;
                     }
                     
-                    .brand-name {
-                        font-size: 26px;
-                        letter-spacing: 3px;
+                    .content,
+                    .footer {
+                        padding: 20px 16px;
                     }
                     
-                    .highlight-code {
-                        font-size: 32px;
-                        letter-spacing: 10px;
+                    .header {
+                        padding: 16px;
                     }
                     
-                    .credential-label,
-                    .credential-value {
+                    .code-number {
+                        font-size: 28px;
+                        letter-spacing: 6px;
+                    }
+                    
+                    .info-label,
+                    .info-value {
                         display: block;
                         width: 100%;
+                        padding: 10px 12px;
                     }
                     
-                    .credential-label {
-                        padding-bottom: 8px;
+                    .info-label {
+                        padding-bottom: 4px;
+                        border-bottom: none;
                     }
                     
-                    .credential-value {
+                    .info-value {
                         padding-top: 0;
-                        word-break: break-all;
                     }
                 }
             </style>
@@ -466,80 +407,52 @@ namespace Relevantz.EEPZ.Common.Utils
     {BaseStyle}
 </head>
 <body>
-    <table class=""email-wrapper"" width=""100%"" cellpadding=""0"" cellspacing=""0"" role=""presentation"">
+    <table class=""email-wrapper"" width=""100%"" cellpadding=""0"" cellspacing=""0"">
         <tr>
             <td align=""center"">
-                <table class=""email-container"" width=""600"" cellpadding=""0"" cellspacing=""0"" role=""presentation"">
+                <table class=""email-container"" cellpadding=""0"" cellspacing=""0"">
                     <tr>
-                        <td width=""4"" class=""brand-bar""></td>
-                        <td>
-                            <table width=""100%"" cellpadding=""0"" cellspacing=""0"" role=""presentation"">
-                                <tr>
-                                    <td class=""header-section"">
-                                        <h1 class=""brand-name"">EEPZ</h1>
-                                        <p class=""brand-subtitle"">Employee Engagement Platform</p>
-                                    </td>
+                        <td class=""header"">
+                            <h1 class=""header-logo"">EEPZ</h1>
+                            <p class=""header-tag"">Employee Engagement Platform Zone</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class=""content"">
+                            <h2 class=""title"">Welcome, {firstName}!</h2>
+                            <p class=""subtitle"">Your account has been created successfully. Use the credentials below to access your account.</p>
+                            
+                            <table class=""info-table"" cellpadding=""0"" cellspacing=""0"">
+                                <tr class=""info-row"">
+                                    <td class=""info-label"">Email</td>
+                                    <td class=""info-value"">{email}</td>
                                 </tr>
-                                <tr>
-                                    <td class=""section-title"">Account Created</td>
-                                </tr>
-                                <tr>
-                                    <td class=""content-area"">
-                                        <p class=""greeting-text"">Welcome, {firstName}</p>
-                                        
-                                        <p class=""text-primary"">
-                                            Your EEPZ account has been successfully created. You now have access to our employee engagement platform.
-                                        </p>
-                                        
-                                        <p class=""text-secondary"">
-                                            Below are your login credentials. Store them securely.
-                                        </p>
-                                        
-                                        <table class=""credential-table"" width=""100%"" cellpadding=""0"" cellspacing=""0"" role=""presentation"">
-                                            <tr class=""credential-row"">
-                                                <td class=""credential-label"">Email</td>
-                                                <td class=""credential-value"">{email}</td>
-                                            </tr>
-                                            <tr class=""credential-row"">
-                                                <td class=""credential-label"">Password</td>
-                                                <td class=""credential-value"">{temporaryPassword}</td>
-                                            </tr>
-                                        </table>
-                                        
-                                        <div class=""notice-bar info"">
-                                            <p class=""notice-title"">Required Action</p>
-                                            <p class=""notice-text"">
-                                                You must change your password upon first login. This is a mandatory security requirement.
-                                            </p>
-                                        </div>
-                                        
-                                        <div class=""divider-line""></div>
-                                        
-                                        <div class=""list-section"">
-                                            <p class=""list-heading"">Next Steps</p>
-                                            <p class=""list-item"">Log in with your credentials</p>
-                                            <p class=""list-item"">Complete password reset</p>
-                                            <p class=""list-item"">Explore your dashboard</p>
-                                            <p class=""list-item"">Update profile settings</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class=""footer-section"">
-                                        <div class=""footer-brand"">
-                                            <p class=""footer-brand-name"">EEPZ</p>
-                                            <p class=""footer-brand-desc"">Employee Engagement Platform</p>
-                                        </div>
-                                        <p class=""footer-text"">
-                                            Support: <a href=""mailto:eepzmailservice@gmail.com"" class=""footer-link"">eepzmailservice@gmail.com</a>
-                                        </p>
-                                        <p class=""footer-copyright"">
-                                            © {DateTime.UtcNow.Year} EEPZ. All rights reserved.<br>
-                                            This is an automated message.
-                                        </p>
-                                    </td>
+                                <tr class=""info-row"">
+                                    <td class=""info-label"">Password</td>
+                                    <td class=""info-value"">{temporaryPassword}</td>
                                 </tr>
                             </table>
+                            
+                            <div class=""alert alert-info"">
+                                You must change your password on first login for security.
+                            </div>
+                            
+                            <div class=""divider""></div>
+                            
+                            <div class=""steps"">
+                                <div class=""step"">Login with your credentials</div>
+                                <div class=""step"">Complete password reset</div>
+                                <div class=""step"">Update your profile</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class=""footer"">
+                            <p class=""footer-brand"">EEPZ</p>
+                            <p class=""footer-text"">
+                                Support: <a href=""mailto:emailserviceeepz@gmail.com"" class=""footer-link"">emailserviceeepz@gmail.com</a>
+                            </p>
+                            <p class=""footer-text"">© {DateTime.UtcNow.Year} EEPZ. All rights reserved.</p>
                         </td>
                     </tr>
                 </table>
@@ -554,10 +467,10 @@ namespace Relevantz.EEPZ.Common.Utils
         {
             string purpose = otpType switch
             {
-                "Login2FA" => "complete secure authentication",
-                "ForgotPassword" => "reset your password",
-                "EmailVerification" => "verify your email address",
-                _ => "complete verification"
+                "Login2FA" => "two-factor authentication",
+                "ForgotPassword" => "password reset",
+                "EmailVerification" => "email verification",
+                _ => "verification"
             };
 
             return $@"
@@ -573,76 +486,43 @@ namespace Relevantz.EEPZ.Common.Utils
     {BaseStyle}
 </head>
 <body>
-    <table class=""email-wrapper"" width=""100%"" cellpadding=""0"" cellspacing=""0"" role=""presentation"">
+    <table class=""email-wrapper"" width=""100%"" cellpadding=""0"" cellspacing=""0"">
         <tr>
             <td align=""center"">
-                <table class=""email-container"" width=""600"" cellpadding=""0"" cellspacing=""0"" role=""presentation"">
+                <table class=""email-container"" cellpadding=""0"" cellspacing=""0"">
                     <tr>
-                        <td width=""4"" class=""brand-bar""></td>
-                        <td>
-                            <table width=""100%"" cellpadding=""0"" cellspacing=""0"" role=""presentation"">
-                                <tr>
-                                    <td class=""header-section"">
-                                        <h1 class=""brand-name"">EEPZ</h1>
-                                        <p class=""brand-subtitle"">Employee Engagement Platform</p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class=""section-title"">Verification Required</td>
-                                </tr>
-                                <tr>
-                                    <td class=""content-area"">
-                                        <p class=""greeting-text"">Hello, {firstName}</p>
-                                        
-                                        <p class=""text-primary"">
-                                            You have requested to {purpose}. Use the verification code below to proceed.
-                                        </p>
-                                        
-                                        <div class=""highlight-container"">
-                                            <p class=""highlight-label"">Verification Code</p>
-                                            <h2 class=""highlight-code"">{otpCode}</h2>
-                                            <p class=""highlight-expiry"">Valid for {expirationMinutes} minutes</p>
-                                        </div>
-                                        
-                                        <div class=""notice-bar"">
-                                            <p class=""notice-title"">Important</p>
-                                            <p class=""notice-text"">
-                                                This code expires in {expirationMinutes} minutes. Never share this code with anyone.
-                                            </p>
-                                        </div>
-                                        
-                                        <div class=""divider-line""></div>
-                                        
-                                        <div class=""list-section"">
-                                            <p class=""list-heading"">Security Guidelines</p>
-                                            <p class=""list-item"">Never share this code</p>
-                                            <p class=""list-item"">EEPZ will never request codes</p>
-                                            <p class=""list-item"">Request new code if expired</p>
-                                        </div>
-                                        
-                                        <div class=""divider-line""></div>
-                                        
-                                        <p class=""text-secondary"">
-                                            If you did not request this code, please ignore this email.
-                                        </p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class=""footer-section"">
-                                        <div class=""footer-brand"">
-                                            <p class=""footer-brand-name"">EEPZ</p>
-                                            <p class=""footer-brand-desc"">Employee Engagement Platform</p>
-                                        </div>
-                                        <p class=""footer-text"">
-                                            Support: <a href=""mailto:eepzmailservice@gmail.com"" class=""footer-link"">eepzmailservice@gmail.com</a>
-                                        </p>
-                                        <p class=""footer-copyright"">
-                                            © {DateTime.UtcNow.Year} EEPZ. All rights reserved.<br>
-                                            This is an automated message.
-                                        </p>
-                                    </td>
-                                </tr>
-                            </table>
+                        <td class=""header"">
+                            <h1 class=""header-logo"">EEPZ</h1>
+                            <p class=""header-tag"">Verification Required</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class=""content"">
+                            <h2 class=""title"">Hello, {firstName}</h2>
+                            <p class=""subtitle"">Your verification code for {purpose}.</p>
+                            
+                            <div class=""code-container"">
+                                <p class=""code-label"">Verification Code</p>
+                                <div class=""code-number"">{otpCode}</div>
+                                <p class=""code-expiry"">Expires in {expirationMinutes} minutes</p>
+                            </div>
+                            
+                            <div class=""alert alert-warning"">
+                                Never share this code. EEPZ will never ask for it via email or phone.
+                            </div>
+                            
+                            <div class=""divider""></div>
+                            
+                            <p class=""subtitle"">If you didn't request this code, please ignore this email.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class=""footer"">
+                            <p class=""footer-brand"">EEPZ</p>
+                            <p class=""footer-text"">
+                                Support: <a href=""mailto:emailserviceeepz@gmail.com"" class=""footer-link"">emailserviceeepz@gmail.com</a>
+                            </p>
+                            <p class=""footer-text"">© {DateTime.UtcNow.Year} EEPZ. All rights reserved.</p>
                         </td>
                     </tr>
                 </table>
@@ -668,74 +548,47 @@ namespace Relevantz.EEPZ.Common.Utils
     {BaseStyle}
 </head>
 <body>
-    <table class=""email-wrapper"" width=""100%"" cellpadding=""0"" cellspacing=""0"" role=""presentation"">
+    <table class=""email-wrapper"" width=""100%"" cellpadding=""0"" cellspacing=""0"">
         <tr>
             <td align=""center"">
-                <table class=""email-container"" width=""600"" cellpadding=""0"" cellspacing=""0"" role=""presentation"">
+                <table class=""email-container"" cellpadding=""0"" cellspacing=""0"">
                     <tr>
-                        <td width=""4"" class=""brand-bar""></td>
-                        <td>
-                            <table width=""100%"" cellpadding=""0"" cellspacing=""0"" role=""presentation"">
-                                <tr>
-                                    <td class=""header-section"">
-                                        <h1 class=""brand-name"">EEPZ</h1>
-                                        <p class=""brand-subtitle"">Employee Engagement Platform</p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class=""section-title"">Password Reset Complete</td>
-                                </tr>
-                                <tr>
-                                    <td class=""content-area"">
-                                        <p class=""greeting-text"">Hello, {firstName}</p>
-                                        
-                                        <p class=""text-primary"">
-                                            Your password has been successfully reset. You can now log in to your EEPZ account with your new credentials.
-                                        </p>
-                                        
-                                        <div class=""notice-bar success"">
-                                            <p class=""notice-title"">Confirmed</p>
-                                            <p class=""notice-text"">
-                                                Your account security has been updated successfully.
-                                            </p>
-                                        </div>
-                                        
-                                        <div class=""divider-line""></div>
-                                        
-                                        <div class=""list-section"">
-                                            <p class=""list-heading"">Security Recommendations</p>
-                                            <p class=""list-item"">Use unique passwords</p>
-                                            <p class=""list-item"">Enable two-factor authentication</p>
-                                            <p class=""list-item"">Update passwords regularly</p>
-                                            <p class=""list-item"">Use password managers</p>
-                                        </div>
-                                        
-                                        <div class=""divider-line""></div>
-                                        
-                                        <div class=""notice-bar error"">
-                                            <p class=""notice-title"">Did Not Make This Change?</p>
-                                            <p class=""notice-text"">
-                                                If you did not reset your password, contact support immediately at eepzmailservice@gmail.com
-                                            </p>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class=""footer-section"">
-                                        <div class=""footer-brand"">
-                                            <p class=""footer-brand-name"">EEPZ</p>
-                                            <p class=""footer-brand-desc"">Employee Engagement Platform</p>
-                                        </div>
-                                        <p class=""footer-text"">
-                                            Support: <a href=""mailto:eepzmailservice@gmail.com"" class=""footer-link"">eepzmailservice@gmail.com</a>
-                                        </p>
-                                        <p class=""footer-copyright"">
-                                            © {DateTime.UtcNow.Year} EEPZ. All rights reserved.<br>
-                                            This is an automated message.
-                                        </p>
-                                    </td>
-                                </tr>
-                            </table>
+                        <td class=""header"">
+                            <h1 class=""header-logo"">EEPZ</h1>
+                            <p class=""header-tag"">Password Updated</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class=""content"">
+                            <h2 class=""title"">Password Reset Complete</h2>
+                            <p class=""subtitle"">Hello {firstName}, your password has been successfully reset. You can now login with your new password.</p>
+                            
+                            <div class=""alert alert-success"">
+                                Your account security has been updated successfully.
+                            </div>
+                            
+                            <div class=""divider""></div>
+                            
+                            <div class=""steps"">
+                                <div class=""step"">Use unique passwords for each account</div>
+                                <div class=""step"">Enable two-factor authentication</div>
+                                <div class=""step"">Update passwords regularly</div>
+                            </div>
+                            
+                            <div class=""divider""></div>
+                            
+                            <div class=""alert alert-error"">
+                                Didn't make this change? Contact support immediately at emailserviceeepz@gmail.com
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class=""footer"">
+                            <p class=""footer-brand"">EEPZ</p>
+                            <p class=""footer-text"">
+                                Support: <a href=""mailto:emailserviceeepz@gmail.com"" class=""footer-link"">emailserviceeepz@gmail.com</a>
+                            </p>
+                            <p class=""footer-text"">© {DateTime.UtcNow.Year} EEPZ. All rights reserved.</p>
                         </td>
                     </tr>
                 </table>
@@ -770,86 +623,60 @@ namespace Relevantz.EEPZ.Common.Utils
     {BaseStyle}
 </head>
 <body>
-    <table class=""email-wrapper"" width=""100%"" cellpadding=""0"" cellspacing=""0"" role=""presentation"">
+    <table class=""email-wrapper"" width=""100%"" cellpadding=""0"" cellspacing=""0"">
         <tr>
             <td align=""center"">
-                <table class=""email-container"" width=""600"" cellpadding=""0"" cellspacing=""0"" role=""presentation"">
+                <table class=""email-container"" cellpadding=""0"" cellspacing=""0"">
                     <tr>
-                        <td width=""4"" class=""brand-bar""></td>
-                        <td>
-                            <table width=""100%"" cellpadding=""0"" cellspacing=""0"" role=""presentation"">
-                                <tr>
-                                    <td class=""header-section"">
-                                        <h1 class=""brand-name"">EEPZ</h1>
-                                        <p class=""brand-subtitle"">Employee Engagement Platform</p>
-                                    </td>
+                        <td class=""header"">
+                            <h1 class=""header-logo"">EEPZ</h1>
+                            <p class=""header-tag"">Change Request Pending</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class=""content"">
+                            <h2 class=""title"">Request Submitted</h2>
+                            <p class=""subtitle"">Hello {firstName}, your change request has been submitted and is under review.</p>
+                            
+                            <table class=""info-table"" cellpadding=""0"" cellspacing=""0"">
+                                <tr class=""info-row"">
+                                    <td class=""info-label"">Change Type</td>
+                                    <td class=""info-value"">{changeTypeDisplay}</td>
                                 </tr>
-                                <tr>
-                                    <td class=""section-title"">Change Request Submitted</td>
+                                <tr class=""info-row"">
+                                    <td class=""info-label"">New Value</td>
+                                    <td class=""info-value"">{newValue}</td>
                                 </tr>
-                                <tr>
-                                    <td class=""content-area"">
-                                        <p class=""greeting-text"">Hello, {firstName}</p>
-                                        
-                                        <p class=""text-primary"">
-                                            Your account information change request has been submitted and is pending administrative review.
-                                        </p>
-                                        
-                                        <table class=""credential-table"" width=""100%"" cellpadding=""0"" cellspacing=""0"" role=""presentation"">
-                                            <tr class=""credential-row"">
-                                                <td class=""credential-label"">Change Type</td>
-                                                <td class=""credential-value"">{changeTypeDisplay}</td>
-                                            </tr>
-                                            <tr class=""credential-row"">
-                                                <td class=""credential-label"">New Value</td>
-                                                <td class=""credential-value"">{newValue}</td>
-                                            </tr>
-                                            <tr class=""credential-row"">
-                                                <td class=""credential-label"">Status</td>
-                                                <td class=""credential-value"">Pending</td>
-                                            </tr>
-                                            <tr class=""credential-row"">
-                                                <td class=""credential-label"">Submitted</td>
-                                                <td class=""credential-value"">{DateTime.UtcNow:MMM dd, yyyy HH:mm} UTC</td>
-                                            </tr>
-                                        </table>
-                                        
-                                        <div class=""divider-line""></div>
-                                        
-                                        <div class=""list-section"">
-                                            <p class=""list-heading"">Next Steps</p>
-                                            <p class=""list-item"">Administrator reviews within 1-2 business days</p>
-                                            <p class=""list-item"">Email notification upon decision</p>
-                                            <p class=""list-item"">Automatic update if approved</p>
-                                            <p class=""list-item"">Contact if more information needed</p>
-                                        </div>
-                                        
-                                        <div class=""divider-line""></div>
-                                        
-                                        <div class=""notice-bar info"">
-                                            <p class=""notice-title"">Track Request</p>
-                                            <p class=""notice-text"">
-                                                Monitor your request status in your EEPZ dashboard under My Requests.
-                                            </p>
-                                        </div>
-                                    </td>
+                                <tr class=""info-row"">
+                                    <td class=""info-label"">Status</td>
+                                    <td class=""info-value"">Pending Review</td>
                                 </tr>
-                                <tr>
-                                    <td class=""footer-section"">
-                                        <div class=""footer-brand"">
-                                            <p class=""footer-brand-name"">EEPZ</p>
-                                            <p class=""footer-brand-desc"">Employee Engagement Platform</p>
-                                        </div>
-                                        <p class=""footer-text"">
-                                            Support: <a href=""mailto:eepzmailservice@gmail.com"" class=""footer-link"">eepzmailservice@gmail.com</a>
-                                        </p>
-                                        <p class=""footer-copyright"">
-                                            © {DateTime.UtcNow.Year} EEPZ. All rights reserved.<br>
-                                            This is an automated message.
-                                        </p>
-                                    </td>
+                                <tr class=""info-row"">
+                                    <td class=""info-label"">Submitted</td>
+                                    <td class=""info-value"">{DateTime.UtcNow:MMM dd, yyyy HH:mm} UTC</td>
                                 </tr>
                             </table>
+                            
+                            <div class=""alert alert-info"">
+                                Track your request status in Dashboard → My Requests
+                            </div>
+                            
+                            <div class=""divider""></div>
+                            
+                            <div class=""steps"">
+                                <div class=""step"">Admin reviews within 1-2 business days</div>
+                                <div class=""step"">Email notification on decision</div>
+                                <div class=""step"">Automatic update if approved</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class=""footer"">
+                            <p class=""footer-brand"">EEPZ</p>
+                            <p class=""footer-text"">
+                                Support: <a href=""mailto:emailserviceeepz@gmail.com"" class=""footer-link"">emailserviceeepz@gmail.com</a>
+                            </p>
+                            <p class=""footer-text"">© {DateTime.UtcNow.Year} EEPZ. All rights reserved.</p>
                         </td>
                     </tr>
                 </table>
