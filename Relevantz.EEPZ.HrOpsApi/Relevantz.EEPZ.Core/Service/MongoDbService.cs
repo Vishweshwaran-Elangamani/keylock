@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using Relevantz.EEPZ.Common.Models;
+using Relevantz.EEPZ.Common.Utils;
 using Relevantz.EEPZ.Core.IService;
 
 namespace Relevantz.EEPZ.Core.Service
@@ -15,8 +16,7 @@ namespace Relevantz.EEPZ.Core.Service
         {
             _logger = logger;
 
-            var connectionString = configuration.GetConnectionString("MongoDb") 
-                ?? "mongodb://localhost:27017";
+            var connectionString = configuration.GetConnectionString("MongoDb") ?? "mongodb://localhost:27017";
             var databaseName = configuration["MongoDB:DatabaseName"] ?? "EEPZFileStorage";
             var collectionName = configuration["MongoDB:CollectionName"] ?? "PolicyUploads";
 
@@ -24,13 +24,16 @@ namespace Relevantz.EEPZ.Core.Service
             var database = client.GetDatabase(databaseName);
             _filesCollection = database.GetCollection<PolicyFileDocument>(collectionName);
 
-            _logger.LogInformation($"MongoDB connected: {databaseName}.{collectionName}");
+            EEPZBusinessLog.LogServiceInformation("MongoDB connected: {Database}.{Collection}", databaseName, collectionName);
         }
 
         public async Task<string> UploadFileAsync(byte[] fileData, string fileName, string contentType, long fileSize, int userId)
         {
             try
             {
+                EEPZBusinessLog.LogServiceInformation("Uploading file to MongoDB: {FileName}, Size: {FileSize} bytes, User: {UserId}",
+                    fileName, fileSize, userId);
+
                 var document = new PolicyFileDocument
                 {
                     FileName = fileName,
@@ -44,12 +47,14 @@ namespace Relevantz.EEPZ.Core.Service
 
                 await _filesCollection.InsertOneAsync(document);
 
-                _logger.LogInformation($"File uploaded to MongoDB: {fileName} (ID: {document.Id})");
+                EEPZBusinessLog.LogServiceInformation("File uploaded to MongoDB successfully: {FileName} (ID: {FileId})",
+                    fileName, document.Id);
+
                 return document.Id;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error uploading file to MongoDB: {ex.Message}");
+                EEPZBusinessLog.LogServiceError("Error uploading file {FileName} to MongoDB", ex, fileName);
                 throw;
             }
         }
@@ -58,19 +63,26 @@ namespace Relevantz.EEPZ.Core.Service
         {
             try
             {
+                EEPZBusinessLog.LogServiceInformation("Retrieving file from MongoDB: {FileId}", fileId);
+
                 var filter = Builders<PolicyFileDocument>.Filter.Eq(doc => doc.Id, fileId);
                 var document = await _filesCollection.Find(filter).FirstOrDefaultAsync();
 
                 if (document == null)
                 {
-                    _logger.LogWarning($"File not found in MongoDB: {fileId}");
+                    EEPZBusinessLog.LogServiceWarning("File not found in MongoDB: {FileId}", fileId);
+                }
+                else
+                {
+                    EEPZBusinessLog.LogServiceInformation("File retrieved from MongoDB: {FileId}, Name: {FileName}",
+                        fileId, document.OriginalFileName);
                 }
 
                 return document;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error retrieving file from MongoDB: {ex.Message}");
+                EEPZBusinessLog.LogServiceError("Error retrieving file {FileId} from MongoDB", ex, fileId);
                 throw;
             }
         }
@@ -79,21 +91,23 @@ namespace Relevantz.EEPZ.Core.Service
         {
             try
             {
+                EEPZBusinessLog.LogServiceInformation("Deleting file from MongoDB: {FileId}", fileId);
+
                 var filter = Builders<PolicyFileDocument>.Filter.Eq(doc => doc.Id, fileId);
                 var result = await _filesCollection.DeleteOneAsync(filter);
 
                 if (result.DeletedCount > 0)
                 {
-                    _logger.LogInformation($"File deleted from MongoDB: {fileId}");
+                    EEPZBusinessLog.LogServiceInformation("File deleted from MongoDB: {FileId}", fileId);
                     return true;
                 }
 
-                _logger.LogWarning($"File not found for deletion: {fileId}");
+                EEPZBusinessLog.LogServiceWarning("File not found for deletion: {FileId}", fileId);
                 return false;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error deleting file from MongoDB: {ex.Message}");
+                EEPZBusinessLog.LogServiceError("Error deleting file {FileId} from MongoDB", ex, fileId);
                 throw;
             }
         }

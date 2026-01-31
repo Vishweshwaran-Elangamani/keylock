@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Constants;
+using Relevantz.EEPZ.Common.Utils;
+using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.IRepository;
 
 namespace Relevantz.EEPZ.Data.Repository
@@ -24,158 +21,274 @@ namespace Relevantz.EEPZ.Data.Repository
 
         public async Task<Policyviolation> CreateViolationAsync(Policyviolation violation)
         {
-            await _context.Policyviolations.AddAsync(violation);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Policyviolations.Add(violation);
+                await _context.SaveChangesAsync();
 
-            _logger.LogInformation(RepositoryMessages.ViolationCreated, violation.ViolationId);
+                EEPZBusinessLog.LogRepositoryInformation(RepositoryMessages.ViolationCreated, violation.ViolationId);
 
-            return violation;
-        }
-
-        public async Task<List<Policyviolation>> GetAllViolationsAsync()
-        {
-            return await BaseQuery()
-                .OrderByDescending(v => v.ReportedDate)
-                .ToListAsync();
+                return violation;
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogRepositoryError("Error creating violation", ex);
+                throw;
+            }
         }
 
         public async Task<Policyviolation?> GetViolationByIdAsync(int violationId)
         {
-            if (violationId <= 0)
-                return null;
+            try
+            {
+                if (violationId <= 0)
+                    return null;
 
-            return await BaseQuery()
-                .FirstOrDefaultAsync(v => v.ViolationId == violationId);
+                return await BaseQuery()
+                    .FirstOrDefaultAsync(v => v.ViolationId == violationId);
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogRepositoryError("Error fetching violation {ViolationId}", ex, violationId);
+                throw;
+            }
         }
 
-        public async Task<List<Policyviolation>> GetViolationsByEmployeeAsync(int EmployeeUserId)
+        public async Task<List<Policyviolation>> GetAllViolationsAsync()
         {
-            if (EmployeeUserId <= 0)
-                return new List<Policyviolation>();
+            try
+            {
+                return await BaseQuery()
+                    .OrderByDescending(v => v.ReportedDate)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogRepositoryError("Error fetching all violations", ex);
+                throw;
+            }
+        }
 
-            return await BaseQuery()
-                .Where(v => v.EmployeeUserId == EmployeeUserId)
-                .OrderByDescending(v => v.ReportedDate)
-                .ToListAsync();
+        public async Task<List<Policyviolation>> GetViolationsByEmployeeAsync(int employeeUserId)
+        {
+            try
+            {
+                if (employeeUserId <= 0)
+                    return new List<Policyviolation>();
+
+                return await BaseQuery()
+                    .Where(v => v.EmployeeUserId == employeeUserId)
+                    .OrderByDescending(v => v.ReportedDate)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogRepositoryError("Error fetching violations for employee {EmployeeUserId}", ex, employeeUserId);
+                throw;
+            }
         }
 
         public async Task<List<Policyviolation>> GetViolationsByPolicyAsync(int policyId)
         {
-            if (policyId <= 0)
-                return new List<Policyviolation>();
+            try
+            {
+                if (policyId <= 0)
+                    return new List<Policyviolation>();
 
-            return await BasePolicyQuery()
-                .Where(v => v.PolicyId == policyId)
-                .OrderByDescending(v => v.ReportedDate)
-                .ToListAsync();
+                return await BaseQuery()
+                    .Where(v => v.PolicyId == policyId)
+                    .OrderByDescending(v => v.ReportedDate)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogRepositoryError("Error fetching violations for policy {PolicyId}", ex, policyId);
+                throw;
+            }
         }
 
         public async Task<List<Policyviolation>> GetViolationsBySeverityAsync(string severity)
         {
-            if (string.IsNullOrWhiteSpace(severity))
-                return new List<Policyviolation>();
+            try
+            {
+                if (string.IsNullOrWhiteSpace(severity))
+                    return new List<Policyviolation>();
 
-            return await BaseQuery()
-                .Where(v => v.Severity == severity)
-                .OrderByDescending(v => v.ReportedDate)
-                .ToListAsync();
+                return await BaseQuery()
+                    .Where(v => v.Severity == severity)
+                    .OrderByDescending(v => v.ReportedDate)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogRepositoryError("Error fetching violations by severity {Severity}", ex, severity);
+                throw;
+            }
         }
 
         public async Task<List<Policyviolation>> GetViolationsByStatusAsync(string status)
         {
-            if (string.IsNullOrWhiteSpace(status))
-                return new List<Policyviolation>();
+            try
+            {
+                if (string.IsNullOrWhiteSpace(status))
+                    return new List<Policyviolation>();
 
-            return await BaseQuery()
-                .Where(v => v.Status == status)
-                .OrderByDescending(v => v.ReportedDate)
-                .ToListAsync();
+                return await BaseQuery()
+                    .Where(v => v.Status == status)
+                    .OrderByDescending(v => v.ReportedDate)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogRepositoryError("Error fetching violations by status {Status}", ex, status);
+                throw;
+            }
         }
 
         public async Task<Policyviolation> UpdateViolationAsync(Policyviolation violation)
         {
-            var existingViolation = await _context.Policyviolations.FindAsync(violation.ViolationId);
-            if (existingViolation == null)
+            try
             {
-                _logger.LogWarning(RepositoryMessages.ViolationNotFound, violation.ViolationId);
-                throw new InvalidOperationException($"Violation with ID {violation.ViolationId} not found");
+                var existingViolation = await _context.Policyviolations.FindAsync(violation.ViolationId);
+                if (existingViolation == null)
+                {
+                    EEPZBusinessLog.LogRepositoryWarning(RepositoryMessages.ViolationNotFound, violation.ViolationId);
+                    throw new InvalidOperationException($"Violation with ID {violation.ViolationId} not found");
+                }
+
+                _context.Policyviolations.Update(violation);
+                await _context.SaveChangesAsync();
+
+                EEPZBusinessLog.LogRepositoryInformation(RepositoryMessages.ViolationUpdated, violation.ViolationId);
+
+                return violation;
             }
-
-            _context.Policyviolations.Update(violation);
-            await _context.SaveChangesAsync();
-
-            _logger.LogInformation(RepositoryMessages.ViolationUpdated, violation.ViolationId);
-
-            return violation;
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogRepositoryError("Error updating violation {ViolationId}", ex, violation.ViolationId);
+                throw;
+            }
         }
 
         public async Task<bool> ResolveViolationAsync(int violationId, string resolutionNotes)
         {
-            if (violationId <= 0)
-                return false;
+            try
+            {
+                if (violationId <= 0)
+                    return false;
 
-            var violation = await _context.Policyviolations.FindAsync(violationId);
-            if (violation == null)
-                return false;
+                var violation = await _context.Policyviolations.FindAsync(violationId);
+                if (violation == null)
+                    return false;
 
-            violation.Status = "Resolved";
-            violation.ResolutionNotes = resolutionNotes;
-            violation.ResolvedAt = DateTime.Now;
+                violation.Status = "Resolved";
+                violation.ResolutionNotes = resolutionNotes;
 
-            await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
 
-            _logger.LogInformation(RepositoryMessages.ViolationResolved, violationId);
+                EEPZBusinessLog.LogRepositoryInformation(RepositoryMessages.ViolationResolved, violationId);
 
-            return true;
-        }
-
-        public async Task<int> GetTotalViolationsCountAsync()
-        {
-            return await _context.Policyviolations.CountAsync();
-        }
-
-        public async Task<int> GetActiveViolationsCountAsync()
-        {
-            return await _context.Policyviolations
-                .CountAsync(v =>
-                    v.Status == "Reported" ||
-                    v.Status == "UnderReview" ||
-                    v.Status == "Escalated");
-        }
-
-        public async Task<int> GetResolvedViolationsCountAsync()
-        {
-            return await _context.Policyviolations
-                .CountAsync(v => v.Status == "Resolved");
-        }
-
-        public async Task<Dictionary<string, int>> GetViolationCountBySeverityAsync()
-        {
-            return await _context.Policyviolations
-                .GroupBy(v => v.Severity)
-                .Select(g => new { Severity = g.Key, Count = g.Count() })
-                .ToDictionaryAsync(x => x.Severity, x => x.Count);
-        }
-
-        public async Task<Dictionary<string, int>> GetViolationCountByStatusAsync()
-        {
-            return await _context.Policyviolations
-                .GroupBy(v => v.Status)
-                .Select(g => new { Status = g.Key, Count = g.Count() })
-                .ToDictionaryAsync(x => x.Status, x => x.Count);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogRepositoryError("Error resolving violation {ViolationId}", ex, violationId);
+                throw;
+            }
         }
 
         public async Task<List<Policyviolation>> GetViolationsTrendsAsync(int months)
         {
-            if (months <= 0)
-                return new List<Policyviolation>();
+            try
+            {
+                if (months <= 0)
+                    months = 6;
 
-            var startDate = DateOnly.FromDateTime(DateTime.Now.AddMonths(-months));
+                var startDate = DateOnly.FromDateTime(DateTime.Now.AddMonths(-months));
 
-            return await _context.Policyviolations
-                .Where(v => v.ReportedDate >= startDate)
-                .OrderBy(v => v.ReportedDate)
-                .ToListAsync();
+                return await BaseQuery()
+                    .Where(v => v.ReportedDate >= startDate)
+                    .OrderBy(v => v.ReportedDate)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogRepositoryError("Error fetching violations trends for {Months} months", ex, months);
+                throw;
+            }
+        }
+
+        public async Task<Dictionary<string, int>> GetViolationCountBySeverityAsync()
+        {
+            try
+            {
+                return await _context.Policyviolations
+                    .GroupBy(v => v.Severity ?? "Unknown")
+                    .Select(g => new { Severity = g.Key, Count = g.Count() })
+                    .ToDictionaryAsync(x => x.Severity, x => x.Count);
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogRepositoryError("Error fetching violation count by severity", ex);
+                throw;
+            }
+        }
+
+        public async Task<Dictionary<string, int>> GetViolationCountByStatusAsync()
+        {
+            try
+            {
+                return await _context.Policyviolations
+                    .GroupBy(v => v.Status ?? "Unknown")
+                    .Select(g => new { Status = g.Key, Count = g.Count() })
+                    .ToDictionaryAsync(x => x.Status, x => x.Count);
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogRepositoryError("Error fetching violation count by status", ex);
+                throw;
+            }
+        }
+
+        public async Task<int> GetTotalViolationsCountAsync()
+        {
+            try
+            {
+                return await _context.Policyviolations.CountAsync();
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogRepositoryError("Error fetching total violations count", ex);
+                throw;
+            }
+        }
+
+        public async Task<int> GetActiveViolationsCountAsync()
+        {
+            try
+            {
+                return await _context.Policyviolations
+                    .CountAsync(v => v.Status == "Reported" || v.Status == "Under Investigation");
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogRepositoryError("Error fetching active violations count", ex);
+                throw;
+            }
+        }
+
+        public async Task<int> GetResolvedViolationsCountAsync()
+        {
+            try
+            {
+                return await _context.Policyviolations
+                    .CountAsync(v => v.Status == "Resolved");
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogRepositoryError("Error fetching resolved violations count", ex);
+                throw;
+            }
         }
 
         private IQueryable<Policyviolation> BaseQuery()
@@ -186,16 +299,8 @@ namespace Relevantz.EEPZ.Data.Repository
                         .ThenInclude(e => e.Userprofile)
                 .Include(v => v.Policy)
                 .Include(v => v.ReportedByUser)
-                .Include(v => v.EscalatedToUser);
-        }
-
-        private IQueryable<Policyviolation> BasePolicyQuery()
-        {
-            return _context.Policyviolations
-                .Include(v => v.EmployeeUser)
                     .ThenInclude(u => u.Employee)
-                        .ThenInclude(e => e.Userprofile)
-                .Include(v => v.ReportedByUser);
+                        .ThenInclude(e => e.Userprofile);
         }
     }
 }

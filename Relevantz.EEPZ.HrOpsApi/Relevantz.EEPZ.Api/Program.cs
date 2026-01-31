@@ -3,6 +3,7 @@ using Relevantz.EEPZ.Data.Repository;
 using Relevantz.EEPZ.Data.IRepository;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Core.Service;
+using Relevantz.EEPZ.Common.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -14,21 +15,53 @@ using System.Text;
 using System.IO.Compression;
 using Relevantz.EEPZ.Api.Middleware;
 using Serilog;
+using Serilog.Events;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Relevantz.EEPZ.Core.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure Serilog with structured logging
+// ===========================
+// SERILOG CONFIGURATION
+// ===========================
 Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+    .MinimumLevel.Override("System", LogEventLevel.Warning)
     .Enrich.FromLogContext()
+    .Enrich.WithProperty("Application", "EEPZ-HR-Operations")
     .Enrich.WithProperty("Service", "EEPZ-HR-Operations")
     .Enrich.WithProperty("Environment", builder.Environment.EnvironmentName)
+    .WriteTo.Console(
+        outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}] [{Level:u3}] [{SourceContext}] {Message:lj}{NewLine}{Exception}",
+        restrictedToMinimumLevel: LogEventLevel.Information
+    )
+    .WriteTo.File(
+        path: "logs/eepz-.log",
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 30,
+        outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}] [{Level:u3}] [{SourceContext}] {Message:lj}{NewLine}{Exception}",
+        restrictedToMinimumLevel: LogEventLevel.Information
+    )
+    .WriteTo.File(
+        path: "logs/eepz-errors-.log",
+        restrictedToMinimumLevel: LogEventLevel.Error,
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 30,
+        outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}] [{Level:u3}] [{SourceContext}] {Message:lj}{NewLine}{Exception}"
+    )
     .CreateLogger();
 
 builder.Host.UseSerilog();
+
+// Initialize EEPZBusinessLog with ILogger factory
+EEPZBusinessLog.Initialize(LoggerFactory.Create(loggingBuilder =>
+{
+    loggingBuilder.AddSerilog(Log.Logger);
+}));
 
 Log.Information("Starting EEPZ HR Operations Microservice in {Environment} mode", builder.Environment.EnvironmentName);
 
@@ -41,7 +74,9 @@ builder.Services.AddControllers()
 
 builder.Services.AddEndpointsApiExplorer();
 
-// Configure Swagger
+// ===========================
+// SWAGGER CONFIGURATION
+// ===========================
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
@@ -78,7 +113,9 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Configure MySQL Database Context with proper connection handling
+// ===========================
+// DATABASE CONFIGURATION
+// ===========================
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Database connection string is not configured");
 
@@ -103,13 +140,15 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
         .EnableDetailedErrors(builder.Environment.IsDevelopment());
 }, ServiceLifetime.Scoped);
 
-// Configure JWT Authentication with enhanced security
+// ===========================
+// JWT AUTHENTICATION
+// ===========================
 var jwtSettings = builder.Configuration.GetSection("Jwt");
-var secretKey = jwtSettings["SecretKey"] 
+var secretKey = jwtSettings["SecretKey"]
     ?? throw new InvalidOperationException("JWT Secret Key not configured");
-var issuer = jwtSettings["Issuer"] 
+var issuer = jwtSettings["Issuer"]
     ?? throw new InvalidOperationException("JWT Issuer not configured");
-var audience = jwtSettings["Audience"] 
+var audience = jwtSettings["Audience"]
     ?? throw new InvalidOperationException("JWT Audience not configured");
 
 builder.Services.AddAuthentication(options =>
@@ -137,7 +176,7 @@ builder.Services.AddAuthentication(options =>
     {
         OnAuthenticationFailed = context =>
         {
-            Log.Warning("JWT Authentication Failed: {ExceptionType}", 
+            EEPZBusinessLog.LogWarning("JWT Authentication Failed: {ExceptionType}",
                 context.Exception.GetType().Name);
             return Task.CompletedTask;
         },
@@ -145,13 +184,13 @@ builder.Services.AddAuthentication(options =>
         {
             var userId = context.Principal?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             var correlationId = context.HttpContext.TraceIdentifier;
-            Log.Information("JWT Token Validated - UserId: {UserId}, CorrelationId: {CorrelationId}", 
+            EEPZBusinessLog.LogInformation("JWT Token Validated - UserId: {UserId}, CorrelationId: {CorrelationId}",
                 userId, correlationId);
             return Task.CompletedTask;
         },
         OnChallenge = context =>
         {
-            Log.Warning("JWT Challenge - Path: {Path}, CorrelationId: {CorrelationId}",
+            EEPZBusinessLog.LogWarning("JWT Challenge - Path: {Path}, CorrelationId: {CorrelationId}",
                 context.Request.Path, context.HttpContext.TraceIdentifier);
             return Task.CompletedTask;
         }
@@ -160,26 +199,32 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AdminOnly", policy => 
+    options.AddPolicy("AdminOnly", policy =>
         policy.RequireRole("Admin"));
-    options.AddPolicy("HROnly", policy => 
+    options.AddPolicy("HROnly", policy =>
         policy.RequireRole("HR"));
-    options.AddPolicy("EmployeeAccess", policy => 
+    options.AddPolicy("EmployeeAccess", policy =>
         policy.RequireRole("Employee", "HR", "Admin"));
 });
 
-// ✅ Register Mapster Configuration
+// ===========================
+// MAPSTER CONFIGURATION
+// ===========================
 builder.Services.RegisterMapsterConfiguration();
 Log.Information("Mapster configuration registered successfully");
 
-// Add FluentValidation
+// ===========================
+// FLUENT VALIDATION
+// ===========================
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<Relevantz.EEPZ.Common.Validators.CreatePolicyRequestDtoValidator>();
 
 Log.Information("FluentValidation registered successfully");
 
-// Register Repositories
+// ===========================
+// DEPENDENCY INJECTION - REPOSITORIES
+// ===========================
 builder.Services.AddScoped<IPolicyRepository, PolicyRepository>();
 builder.Services.AddScoped<IViolationRepository, ViolationRepository>();
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
@@ -192,7 +237,9 @@ builder.Services.AddScoped<IDepartmentBudgetRepository, DepartmentBudgetReposito
 
 Log.Information("Repositories registered successfully");
 
-// Register Services
+// ===========================
+// DEPENDENCY INJECTION - SERVICES
+// ===========================
 builder.Services.AddScoped<IPolicyService, PolicyService>();
 builder.Services.AddScoped<IViolationService, ViolationService>();
 builder.Services.AddScoped<IComplianceService, ComplianceService>();
@@ -207,7 +254,9 @@ builder.Services.AddScoped<IMongoDbService, MongoDbService>();
 
 Log.Information("Services registered successfully");
 
-// Configure CORS with environment-specific policies
+// ===========================
+// CORS CONFIGURATION
+// ===========================
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins")
     .Get<string[]>() ?? Array.Empty<string>();
 
@@ -240,7 +289,9 @@ else
     Log.Information("CORS configured with restricted origins for Production");
 }
 
-// Add Response Compression
+// ===========================
+// RESPONSE COMPRESSION
+// ===========================
 builder.Services.AddResponseCompression(options =>
 {
     options.EnableForHttps = true;
@@ -258,10 +309,11 @@ builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
     options.Level = CompressionLevel.Fastest;
 });
 
-// Add Memory Cache
+// ===========================
+// MEMORY CACHE & HTTP CLIENT
+// ===========================
 builder.Services.AddMemoryCache();
 
-// Add HTTP Client with timeout
 var httpTimeout = builder.Configuration.GetValue<int>("HttpClient:TimeoutSeconds", 30);
 builder.Services.AddHttpClient("DefaultClient")
     .SetHandlerLifetime(TimeSpan.FromMinutes(5))
@@ -270,7 +322,9 @@ builder.Services.AddHttpClient("DefaultClient")
         client.Timeout = TimeSpan.FromSeconds(httpTimeout);
     });
 
-// Configure Health Checks
+// ===========================
+// HEALTH CHECKS
+// ===========================
 builder.Services.AddHealthChecks()
     .AddCheck("mysql-db", () =>
     {
@@ -279,7 +333,7 @@ builder.Services.AddHealthChecks()
             using var scope = builder.Services.BuildServiceProvider().CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<EEPZDbContext>();
             var canConnect = context.Database.CanConnect();
-            return canConnect 
+            return canConnect
                 ? HealthCheckResult.Healthy("MySQL database is healthy")
                 : HealthCheckResult.Unhealthy("MySQL database connection failed");
         }
@@ -291,49 +345,54 @@ builder.Services.AddHealthChecks()
 
 var app = builder.Build();
 
-// Database Initialization with proper error handling
+// ===========================
+// DATABASE INITIALIZATION
+// ===========================
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<EEPZDbContext>();
-        Log.Information("Initializing MySQL database connection");
+        EEPZBusinessLog.LogInformation("Initializing MySQL database connection");
 
         if (builder.Environment.IsDevelopment())
         {
             await context.Database.EnsureCreatedAsync();
-            Log.Information("Database schema validated in Development mode");
+            EEPZBusinessLog.LogInformation("Database schema validated in Development mode");
         }
         else
         {
             var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
             if (pendingMigrations.Any())
             {
-                Log.Information("Applying {Count} pending migrations", pendingMigrations.Count());
+                EEPZBusinessLog.LogInformation("Applying {Count} pending migrations", pendingMigrations.Count());
                 await context.Database.MigrateAsync();
             }
         }
 
-        Log.Information("Seeding database with initial data");
+        EEPZBusinessLog.LogInformation("Seeding database with initial data");
         var initializerType = typeof(Program).Assembly.GetType("eepzbackend.Data.DbInitializer");
         var method = initializerType?.GetMethod("InitializeAsync");
         if (method != null)
         {
             await (Task)method.Invoke(null, new object[] { context })!;
-            Log.Information("Database seeding completed successfully");
+            EEPZBusinessLog.LogInformation("Database seeding completed successfully");
         }
 
-        Log.Information("MySQL database initialized successfully");
+        EEPZBusinessLog.LogInformation("MySQL database initialized successfully");
     }
     catch (Exception ex)
     {
-        Log.Fatal(ex, "Critical error during database initialization");
+        EEPZBusinessLog.LogError("Critical error during database initialization", ex);
         throw;
     }
 }
 
-// Configure middleware pipeline
+// ===========================
+// MIDDLEWARE PIPELINE
+// ===========================
+
 // 1. Response Compression
 app.UseResponseCompression();
 
@@ -348,7 +407,7 @@ app.Use(async (context, next) =>
     }
 });
 
-// 3. Security Headers Middleware (Environment-Aware CSP)
+// 3. Security Headers Middleware
 app.Use(async (context, next) =>
 {
     context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
@@ -358,16 +417,14 @@ app.Use(async (context, next) =>
 
     if (builder.Environment.IsDevelopment())
     {
-        // Relaxed CSP for Development (allows Swagger)
-        context.Response.Headers.Add("Content-Security-Policy", 
+        context.Response.Headers.Add("Content-Security-Policy",
             "default-src 'self' 'unsafe-inline' 'unsafe-eval' data:; img-src 'self' data:; style-src 'self' 'unsafe-inline'");
     }
     else
     {
-        // Strict CSP for Production
-        context.Response.Headers.Add("Content-Security-Policy", 
+        context.Response.Headers.Add("Content-Security-Policy",
             "default-src 'self'; frame-ancestors 'none'");
-        context.Response.Headers.Add("Strict-Transport-Security", 
+        context.Response.Headers.Add("Strict-Transport-Security",
             "max-age=31536000; includeSubDomains");
     }
 
@@ -384,9 +441,11 @@ app.UseExceptionHandler(errorApp =>
 
         if (error != null)
         {
-            Log.Error(error.Error, 
+            EEPZBusinessLog.LogError(
                 "Unhandled exception - CorrelationId: {CorrelationId}, Path: {Path}",
-                correlationId, context.Request.Path);
+                error.Error,
+                correlationId,
+                context.Request.Path);
 
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             context.Response.ContentType = "application/json";
@@ -397,8 +456,8 @@ app.UseExceptionHandler(errorApp =>
                 message = "An internal server error occurred",
                 correlationId = correlationId,
                 timestamp = DateTime.UtcNow,
-                error = app.Environment.IsDevelopment() 
-                    ? error.Error.Message 
+                error = app.Environment.IsDevelopment()
+                    ? error.Error.Message
                     : "Internal Server Error"
             };
 
@@ -456,12 +515,15 @@ Log.Information("CORS policy '{Policy}' applied", corsPolicy);
 app.UseAuthentication();
 app.UseAuthorization();
 
+// 11. Global Exception Middleware
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
-// 11. Map Controllers
+// 12. Map Controllers
 app.MapControllers();
 
-// 12. Health Check Endpoints
+// ===========================
+// HEALTH CHECK ENDPOINTS
+// ===========================
 app.MapHealthChecks("/health/live", new HealthCheckOptions
 {
     Predicate = _ => false,
@@ -501,7 +563,6 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions
     }
 }).AllowAnonymous();
 
-// 13. Health Endpoint
 app.MapGet("/health", async (EEPZDbContext dbContext, IConfiguration config) =>
 {
     bool dbConnected = false;
@@ -511,7 +572,7 @@ app.MapGet("/health", async (EEPZDbContext dbContext, IConfiguration config) =>
     }
     catch (Exception ex)
     {
-        Log.Warning("Health check database connection failed: {Message}", ex.Message);
+        EEPZBusinessLog.LogWarning("Health check database connection failed: {Message}", ex.Message);
     }
 
     return Results.Ok(new
@@ -550,7 +611,7 @@ app.MapGet("/health", async (EEPZDbContext dbContext, IConfiguration config) =>
     });
 }).AllowAnonymous();
 
-// 14. API Info Endpoint
+// API Info Endpoint (Development only)
 if (app.Environment.IsDevelopment())
 {
     app.MapGet("/api/info", () =>
@@ -573,23 +634,28 @@ if (app.Environment.IsDevelopment())
     }).AllowAnonymous();
 }
 
+// ===========================
+// APPLICATION STARTUP
+// ===========================
 try
 {
-    Log.Information("EEPZ HR Operations Microservice started successfully on {Environment}", 
+    EEPZBusinessLog.LogInformation("EEPZ HR Operations Microservice started successfully on {Environment}",
         builder.Environment.EnvironmentName);
-    Log.Information("Authentication: JWT Bearer Token Enabled");
-    Log.Information("Mapster: Registered and Ready");
-    Log.Information("Endpoints: 57 Total");
-    Log.Information("Environment: {Environment}", app.Environment.EnvironmentName);
+    EEPZBusinessLog.LogInformation("Authentication: JWT Bearer Token Enabled");
+    EEPZBusinessLog.LogInformation("Mapster: Registered and Ready");
+    EEPZBusinessLog.LogInformation("Endpoints: 57 Total");
+    EEPZBusinessLog.LogInformation("Logging: Serilog with EEPZBusinessLog wrapper");
+    EEPZBusinessLog.LogInformation("Environment: {Environment}", app.Environment.EnvironmentName);
+
     app.Run();
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "HR Operations Microservice terminated unexpectedly");
+    EEPZBusinessLog.LogError("HR Operations Microservice terminated unexpectedly", ex);
     throw;
 }
 finally
 {
-    Log.Information("EEPZ HR Operations Microservice shutting down");
+    EEPZBusinessLog.LogInformation("EEPZ HR Operations Microservice shutting down");
     await Log.CloseAndFlushAsync();
 }

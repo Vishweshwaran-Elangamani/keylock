@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Relevantz.EEPZ.Common.DTOs.Request;
+using Relevantz.EEPZ.Common.Utils;
 using Relevantz.EEPZ.Core.IService;
 
 namespace Relevantz.EEPZ.Api.Controllers
@@ -41,8 +42,20 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("goal-tracking/overview")]
         public async Task<IActionResult> GetComplianceOverview()
         {
-            var result = await _employeeDataService.GetComplianceOverviewAsync();
-            return Ok(result);
+            try
+            {
+                EEPZBusinessLog.LogBusinessInformation("Retrieving goal tracking compliance overview");
+                
+                var result = await _employeeDataService.GetComplianceOverviewAsync();
+                
+                EEPZBusinessLog.LogBusinessInformation("Goal tracking compliance overview retrieved successfully");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogBusinessError("Failed to retrieve goal tracking compliance overview", ex);
+                throw;
+            }
         }
 
         /// <summary>
@@ -55,37 +68,47 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("goal-tracking/employees-without-goals")]
         public async Task<IActionResult> GetEmployeesWithoutGoals()
         {
-            var userIdClaim =
-                User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
-                User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value ??
-                User.FindFirst("sub")?.Value;
-
-            int? currentUserId = null;
-
-            if (!string.IsNullOrEmpty(userIdClaim) &&
-                int.TryParse(userIdClaim, out int parsedUserId))
+            try
             {
-                currentUserId = parsedUserId;
-                _logger.LogInformation("Current logged-in user ID: {UserId}", currentUserId);
-            }
-            else
-            {
-                _logger.LogWarning("Unable to extract user ID from JWT token");
-            }
+                var userIdClaim =
+                    User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
+                    User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value ??
+                    User.FindFirst("sub")?.Value;
 
-            var (employees, message) =
-                await _employeeDataService.GetEmployeesWithoutGoalsAsync(currentUserId);
+                int? currentUserId = null;
 
-            return Ok(new
-            {
-                success = true,
-                message,
-                data = new
+                if (!string.IsNullOrEmpty(userIdClaim) &&
+                    int.TryParse(userIdClaim, out int parsedUserId))
                 {
-                    totalEmployeesWithoutGoals = employees.Count,
-                    employees
+                    currentUserId = parsedUserId;
+                    EEPZBusinessLog.LogBusinessInformation("User {UserId} requesting employees without goals", currentUserId);
                 }
-            });
+                else
+                {
+                    EEPZBusinessLog.LogBusinessWarning("Unable to extract user ID from JWT token for employees without goals request");
+                }
+
+                var (employees, message) =
+                    await _employeeDataService.GetEmployeesWithoutGoalsAsync(currentUserId);
+
+                EEPZBusinessLog.LogBusinessInformation("Retrieved {Count} employees without goals", employees.Count);
+
+                return Ok(new
+                {
+                    success = true,
+                    message,
+                    data = new
+                    {
+                        totalEmployeesWithoutGoals = employees.Count,
+                        employees
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogBusinessError("Failed to retrieve employees without goals", ex);
+                throw;
+            }
         }
 
         /// <summary>
@@ -100,14 +123,26 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("goal-tracking/suggest-goals/{userId}")]
         public async Task<IActionResult> SuggestGoals(int userId)
         {
-            var result = await _employeeDataService.SuggestGoalsAsync(userId);
-
-            return Ok(new
+            try
             {
-                success = true,
-                message = "Goal suggestions generated",
-                data = result
-            });
+                EEPZBusinessLog.LogBusinessInformation("Generating goal suggestions for user {UserId}", userId);
+                
+                var result = await _employeeDataService.SuggestGoalsAsync(userId);
+
+                EEPZBusinessLog.LogBusinessInformation("Goal suggestions generated successfully for user {UserId}", userId);
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Goal suggestions generated",
+                    data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogBusinessError("Failed to generate goal suggestions for user {UserId}", ex, userId);
+                throw;
+            }
         }
 
         /// <summary>
@@ -123,21 +158,34 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> SendGoalReminders(
             [FromBody] SendGoalReminderRequestDto request)
         {
-            var result = await _employeeDataService.SendGoalRemindersAsync(request);
-
-            return Ok(new
+            try
             {
-                success = true,
-                message = result.Message,
-                data = new
+                EEPZBusinessLog.LogBusinessInformation("Sending goal reminders to employees");
+                
+                var result = await _employeeDataService.SendGoalRemindersAsync(request);
+
+                EEPZBusinessLog.LogBusinessInformation("Goal reminders sent: {TotalSent} total, {Successful} successful, {Failed} failed", 
+                    result.TotalSent, result.Successful, result.Failed);
+
+                return Ok(new
                 {
-                    totalSent = result.TotalSent,
-                    successful = result.Successful,
-                    failed = result.Failed,
-                    sentTo = result.SentTo,
-                    failedSends = result.FailedSends
-                }
-            });
+                    success = true,
+                    message = result.Message,
+                    data = new
+                    {
+                        totalSent = result.TotalSent,
+                        successful = result.Successful,
+                        failed = result.Failed,
+                        sentTo = result.SentTo,
+                        failedSends = result.FailedSends
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogBusinessError("Failed to send goal reminders", ex);
+                throw;
+            }
         }
 
         /// <summary>
@@ -150,8 +198,20 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("goal-tracking/goal-adoption-rate")]
         public async Task<IActionResult> GetGoalAdoptionRate()
         {
-            var result = await _employeeDataService.GetGoalAdoptionRateAsync();
-            return Ok(new { success = true, message = "Success", data = result });
+            try
+            {
+                EEPZBusinessLog.LogBusinessInformation("Retrieving goal adoption rate");
+                
+                var result = await _employeeDataService.GetGoalAdoptionRateAsync();
+                
+                EEPZBusinessLog.LogBusinessInformation("Goal adoption rate retrieved successfully");
+                return Ok(new { success = true, message = "Success", data = result });
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogBusinessError("Failed to retrieve goal adoption rate", ex);
+                throw;
+            }
         }
 
         /// <summary>
@@ -164,8 +224,20 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("goal-tracking/goal-statistics")]
         public async Task<IActionResult> GetGoalStatistics()
         {
-            var result = await _employeeDataService.GetGoalStatisticsAsync();
-            return Ok(new { success = true, message = "Success", data = result });
+            try
+            {
+                EEPZBusinessLog.LogBusinessInformation("Retrieving goal statistics");
+                
+                var result = await _employeeDataService.GetGoalStatisticsAsync();
+                
+                EEPZBusinessLog.LogBusinessInformation("Goal statistics retrieved successfully");
+                return Ok(new { success = true, message = "Success", data = result });
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogBusinessError("Failed to retrieve goal statistics", ex);
+                throw;
+            }
         }
 
         /// <summary>
@@ -178,15 +250,27 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("department/all")]
         public async Task<IActionResult> GetAllDepartments()
         {
-            var (departments, message) =
-                await _employeeDataService.GetAllDepartmentsAsync();
-
-            return Ok(new
+            try
             {
-                success = true,
-                message,
-                data = departments
-            });
+                EEPZBusinessLog.LogBusinessInformation("Retrieving all departments");
+                
+                var (departments, message) =
+                    await _employeeDataService.GetAllDepartmentsAsync();
+
+                EEPZBusinessLog.LogBusinessInformation("Retrieved {Count} departments", departments.Count);
+
+                return Ok(new
+                {
+                    success = true,
+                    message,
+                    data = departments
+                });
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogBusinessError("Failed to retrieve all departments", ex);
+                throw;
+            }
         }
 
         /// <summary>
@@ -201,23 +285,36 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("department/{id}")]
         public async Task<IActionResult> GetDepartmentById(int id)
         {
-            var department =
-                await _employeeDataService.GetDepartmentByIdAsync(id);
-
-            if (department == null)
+            try
             {
-                return NotFound(new
+                EEPZBusinessLog.LogBusinessInformation("Retrieving department with ID {DepartmentId}", id);
+                
+                var department =
+                    await _employeeDataService.GetDepartmentByIdAsync(id);
+
+                if (department == null)
                 {
-                    success = false,
-                    message = "Department not found"
+                    EEPZBusinessLog.LogBusinessWarning("Department with ID {DepartmentId} not found", id);
+                    return NotFound(new
+                    {
+                        success = false,
+                        message = "Department not found"
+                    });
+                }
+
+                EEPZBusinessLog.LogBusinessInformation("Department with ID {DepartmentId} retrieved successfully", id);
+
+                return Ok(new
+                {
+                    success = true,
+                    data = department
                 });
             }
-
-            return Ok(new
+            catch (Exception ex)
             {
-                success = true,
-                data = department
-            });
+                EEPZBusinessLog.LogBusinessError("Failed to retrieve department with ID {DepartmentId}", ex, id);
+                throw;
+            }
         }
 
         /// <summary>
@@ -231,16 +328,28 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize]
         public async Task<IActionResult> GetPublishedPolicies()
         {
-            var userId =
-                int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            try
+            {
+                var userId =
+                    int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
 
-            var userRole =
-                User.FindFirst(ClaimTypes.Role)?.Value ?? "Unknown";
+                var userRole =
+                    User.FindFirst(ClaimTypes.Role)?.Value ?? "Unknown";
 
-            var policies =
-                await _employeeDataService.GetPublishedPoliciesAsync(userId, userRole);
+                EEPZBusinessLog.LogBusinessInformation("User {UserId} with role {UserRole} retrieving published policies", userId, userRole);
 
-            return Ok(new { success = true, data = policies });
+                var policies =
+                    await _employeeDataService.GetPublishedPoliciesAsync(userId, userRole);
+
+                EEPZBusinessLog.LogBusinessInformation("Retrieved {Count} published policies for user {UserId}", policies.Count, userId);
+
+                return Ok(new { success = true, data = policies });
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogBusinessError("Failed to retrieve published policies", ex);
+                throw;
+            }
         }
 
         /// <summary>
@@ -256,16 +365,28 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize]
         public async Task<IActionResult> GetPolicyById(int policyId)
         {
-            var userId =
-                int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            try
+            {
+                var userId =
+                    int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
 
-            var userRole =
-                User.FindFirst(ClaimTypes.Role)?.Value ?? "Unknown";
+                var userRole =
+                    User.FindFirst(ClaimTypes.Role)?.Value ?? "Unknown";
 
-            var policy =
-                await _employeeDataService.GetPolicyByIdAsync(policyId, userId, userRole);
+                EEPZBusinessLog.LogBusinessInformation("User {UserId} with role {UserRole} retrieving policy {PolicyId}", userId, userRole, policyId);
 
-            return Ok(new { success = true, data = policy });
+                var policy =
+                    await _employeeDataService.GetPolicyByIdAsync(policyId, userId, userRole);
+
+                EEPZBusinessLog.LogBusinessInformation("Policy {PolicyId} retrieved successfully for user {UserId}", policyId, userId);
+
+                return Ok(new { success = true, data = policy });
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogBusinessError("Failed to retrieve policy {PolicyId}", ex, policyId);
+                throw;
+            }
         }
     }
 }

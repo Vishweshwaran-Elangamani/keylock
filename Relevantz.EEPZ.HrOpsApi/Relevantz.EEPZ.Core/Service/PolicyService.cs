@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Utils;
 using Relevantz.EEPZ.Data.IRepository;
 using Relevantz.EEPZ.Core.IService;
 using Microsoft.Extensions.Logging;
@@ -31,250 +32,356 @@ namespace Relevantz.EEPZ.Core.Service
             _mapper = mapper;
         }
 
-       public async Task<ApiResponseDto<PolicyResponseDto>> CreatePolicyAsync(
-    CreatePolicyRequestDto request,
-    int createdByUserId)
-{
-    if (await _policyRepository.PolicyNameExistsAsync(request.PolicyName))
-    {
-        return ApiResponseDto<PolicyResponseDto>
-            .ErrorResponse(PolicyMessages.PolicyNameExists);
-    }
+        public async Task<ApiResponseDto<PolicyResponseDto>> CreatePolicyAsync(
+            CreatePolicyRequestDto request,
+            int createdByUserId)
+        {
+            try
+            {
+                EEPZBusinessLog.LogServiceInformation("Creating policy: {PolicyName}, CreatedBy: {UserId}",
+                    request.PolicyName, createdByUserId);
 
-    var policy = _mapper.Map<Organizationalpolicy>(request);
-    policy.CreatedByUserId = createdByUserId;
-    policy.CreatedAt = DateTime.Now;
-    policy.IsPublished = false;
-    policy.Status = request.Status ?? "Draft";
+                if (await _policyRepository.PolicyNameExistsAsync(request.PolicyName))
+                {
+                    EEPZBusinessLog.LogServiceWarning("Policy name already exists: {PolicyName}", request.PolicyName);
+                    return ApiResponseDto<PolicyResponseDto>
+                        .ErrorResponse(PolicyMessages.PolicyNameExists);
+                }
 
-    if (!string.IsNullOrEmpty(request.DocumentUrl))
-    {
-        policy.DocumentUploadedAt = DateTime.Now;
-    }
+                var policy = _mapper.Map<Organizationalpolicy>(request);
+                policy.CreatedByUserId = createdByUserId;
+                policy.CreatedAt = DateTime.Now;
+                policy.IsPublished = false;
+                policy.Status = request.Status ?? "Draft";
 
-    var createdPolicy = await _policyRepository.CreatePolicyAsync(policy);
+                if (!string.IsNullOrEmpty(request.DocumentUrl))
+                {
+                    policy.DocumentUploadedAt = DateTime.Now;
+                }
 
-    _logger.LogInformation(
-        PolicyMessages.LogPolicyCreated,
-        createdPolicy.PolicyName,
-        createdPolicy.PolicyId,
-        createdByUserId);
+                var createdPolicy = await _policyRepository.CreatePolicyAsync(policy);
 
-    // Fetch complete entity with navigation properties
-    var fullPolicy = await _policyRepository.GetPolicyByIdAsync(createdPolicy.PolicyId);
-    
-    // Map to response DTO using Mapster
-    var response = _mapper.Map<PolicyResponseDto>(fullPolicy);
+                var fullPolicy = await _policyRepository.GetPolicyByIdAsync(createdPolicy.PolicyId);
+                var response = _mapper.Map<PolicyResponseDto>(fullPolicy);
 
-    return ApiResponseDto<PolicyResponseDto>.SuccessResponse(
-        response,
-        PolicyMessages.PolicyCreatedSuccess);
-}
+                EEPZBusinessLog.LogServiceInformation("Policy created successfully: PolicyId={PolicyId}, Name={PolicyName}, CreatedBy={UserId}",
+                    createdPolicy.PolicyId, createdPolicy.PolicyName, createdByUserId);
 
-
+                return ApiResponseDto<PolicyResponseDto>.SuccessResponse(
+                    response,
+                    PolicyMessages.PolicyCreatedSuccess);
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogServiceError("Error creating policy {PolicyName}", ex, request.PolicyName);
+                throw;
+            }
+        }
 
         public async Task<ApiResponseDto<List<PolicyResponseDto>>> GetAllPoliciesAsync()
         {
-            var policies = await _policyRepository.GetAllPoliciesAsync();
-            
-            // Map list using Mapster
-            var response = _mapper.Map<List<PolicyResponseDto>>(policies);
+            try
+            {
+                EEPZBusinessLog.LogServiceInformation("Fetching all policies");
 
-            return ApiResponseDto<List<PolicyResponseDto>>
-                .SuccessResponse(response);
+                var policies = await _policyRepository.GetAllPoliciesAsync();
+                var response = _mapper.Map<List<PolicyResponseDto>>(policies);
+
+                EEPZBusinessLog.LogServiceInformation("Retrieved {Count} policies", response.Count);
+
+                return ApiResponseDto<List<PolicyResponseDto>>.SuccessResponse(response);
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogServiceError("Error fetching all policies", ex);
+                throw;
+            }
         }
 
         public async Task<ApiResponseDto<List<PolicyResponseDto>>> GetActivePoliciesAsync()
         {
-            var policies = await _policyRepository.GetActivePoliciesAsync();
-            
-            // Map using Mapster
-            var response = _mapper.Map<List<PolicyResponseDto>>(policies);
+            try
+            {
+                EEPZBusinessLog.LogServiceInformation("Fetching active policies");
 
-            return ApiResponseDto<List<PolicyResponseDto>>
-                .SuccessResponse(response);
+                var policies = await _policyRepository.GetActivePoliciesAsync();
+                var response = _mapper.Map<List<PolicyResponseDto>>(policies);
+
+                EEPZBusinessLog.LogServiceInformation("Retrieved {Count} active policies", response.Count);
+
+                return ApiResponseDto<List<PolicyResponseDto>>.SuccessResponse(response);
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogServiceError("Error fetching active policies", ex);
+                throw;
+            }
         }
 
         public async Task<ApiResponseDto<List<PolicyResponseDto>>> GetInactivePoliciesAsync()
         {
-            var policies = await _policyRepository.GetInactivePoliciesAsync();
-            
-            // Map using Mapster
-            var response = _mapper.Map<List<PolicyResponseDto>>(policies);
+            try
+            {
+                EEPZBusinessLog.LogServiceInformation("Fetching inactive policies");
 
-            return ApiResponseDto<List<PolicyResponseDto>>
-                .SuccessResponse(response);
+                var policies = await _policyRepository.GetInactivePoliciesAsync();
+                var response = _mapper.Map<List<PolicyResponseDto>>(policies);
+
+                EEPZBusinessLog.LogServiceInformation("Retrieved {Count} inactive policies", response.Count);
+
+                return ApiResponseDto<List<PolicyResponseDto>>.SuccessResponse(response);
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogServiceError("Error fetching inactive policies", ex);
+                throw;
+            }
         }
 
         public async Task<ApiResponseDto<List<PolicyResponseDto>>> GetPublishedPoliciesAsync()
         {
-            var policies = await _policyRepository.GetPublishedPoliciesAsync();
-            
-            // Map using Mapster
-            var response = _mapper.Map<List<PolicyResponseDto>>(policies);
+            try
+            {
+                EEPZBusinessLog.LogServiceInformation("Fetching published policies");
 
-            return ApiResponseDto<List<PolicyResponseDto>>
-                .SuccessResponse(response);
+                var policies = await _policyRepository.GetPublishedPoliciesAsync();
+                var response = _mapper.Map<List<PolicyResponseDto>>(policies);
+
+                EEPZBusinessLog.LogServiceInformation("Retrieved {Count} published policies", response.Count);
+
+                return ApiResponseDto<List<PolicyResponseDto>>.SuccessResponse(response);
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogServiceError("Error fetching published policies", ex);
+                throw;
+            }
         }
 
         public async Task<ApiResponseDto<List<PolicyResponseDto>>> GetDraftPoliciesAsync()
         {
-            var policies = await _policyRepository.GetDraftPoliciesAsync();
-            
-            // Map using Mapster
-            var response = _mapper.Map<List<PolicyResponseDto>>(policies);
+            try
+            {
+                EEPZBusinessLog.LogServiceInformation("Fetching draft policies");
 
-            return ApiResponseDto<List<PolicyResponseDto>>
-                .SuccessResponse(response);
+                var policies = await _policyRepository.GetDraftPoliciesAsync();
+                var response = _mapper.Map<List<PolicyResponseDto>>(policies);
+
+                EEPZBusinessLog.LogServiceInformation("Retrieved {Count} draft policies", response.Count);
+
+                return ApiResponseDto<List<PolicyResponseDto>>.SuccessResponse(response);
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogServiceError("Error fetching draft policies", ex);
+                throw;
+            }
         }
 
         public async Task<ApiResponseDto<PolicyResponseDto>> GetPolicyByIdAsync(int policyId)
         {
-            var policy = await _policyRepository.GetPolicyByIdAsync(policyId);
-
-            if (policy == null)
+            try
             {
-                return ApiResponseDto<PolicyResponseDto>
-                    .ErrorResponse(PolicyMessages.PolicyNotFound);
+                EEPZBusinessLog.LogServiceInformation("Fetching policy {PolicyId}", policyId);
+
+                var policy = await _policyRepository.GetPolicyByIdAsync(policyId);
+
+                if (policy == null)
+                {
+                    EEPZBusinessLog.LogServiceWarning("Policy {PolicyId} not found", policyId);
+                    return ApiResponseDto<PolicyResponseDto>
+                        .ErrorResponse(PolicyMessages.PolicyNotFound);
+                }
+
+                var response = _mapper.Map<PolicyResponseDto>(policy);
+
+                EEPZBusinessLog.LogServiceInformation("Policy {PolicyId} retrieved successfully", policyId);
+
+                return ApiResponseDto<PolicyResponseDto>.SuccessResponse(response);
             }
-
-            // Map using Mapster
-            var response = _mapper.Map<PolicyResponseDto>(policy);
-
-            return ApiResponseDto<PolicyResponseDto>
-                .SuccessResponse(response);
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogServiceError("Error fetching policy {PolicyId}", ex, policyId);
+                throw;
+            }
         }
 
         public async Task<ApiResponseDto<PolicyResponseDto>> UpdatePolicyAsync(
             int policyId,
             UpdatePolicyRequestDto request)
         {
-            var policy = await _policyRepository.GetPolicyByIdAsync(policyId);
-
-            if (policy == null)
+            try
             {
-                return ApiResponseDto<PolicyResponseDto>
-                    .ErrorResponse(PolicyMessages.PolicyNotFound);
-            }
+                EEPZBusinessLog.LogServiceInformation("Updating policy {PolicyId}", policyId);
 
-            if (!string.IsNullOrEmpty(request.PolicyName) &&
-                request.PolicyName != policy.PolicyName &&
-                await _policyRepository.PolicyNameExistsAsync(request.PolicyName, policyId))
+                var policy = await _policyRepository.GetPolicyByIdAsync(policyId);
+
+                if (policy == null)
+                {
+                    EEPZBusinessLog.LogServiceWarning("Policy {PolicyId} not found for update", policyId);
+                    return ApiResponseDto<PolicyResponseDto>
+                        .ErrorResponse(PolicyMessages.PolicyNotFound);
+                }
+
+                if (!string.IsNullOrEmpty(request.PolicyName) &&
+                    request.PolicyName != policy.PolicyName &&
+                    await _policyRepository.PolicyNameExistsAsync(request.PolicyName, policyId))
+                {
+                    EEPZBusinessLog.LogServiceWarning("Policy name {PolicyName} already exists", request.PolicyName);
+                    return ApiResponseDto<PolicyResponseDto>
+                        .ErrorResponse(PolicyMessages.PolicyNameExists);
+                }
+
+                if (!string.IsNullOrEmpty(request.PolicyName))
+                    policy.PolicyName = request.PolicyName;
+
+                if (!string.IsNullOrEmpty(request.Category))
+                    policy.Category = request.Category;
+
+                if (request.Description != null)
+                    policy.Description = request.Description;
+
+                if (request.ComplianceGuidance != null)
+                    policy.ComplianceGuidance = request.ComplianceGuidance;
+
+                if (!string.IsNullOrEmpty(request.Status))
+                    policy.Status = request.Status;
+
+                if (!string.IsNullOrEmpty(request.DocumentUrl))
+                {
+                    policy.DocumentUrl = request.DocumentUrl;
+                    policy.DocumentName = request.DocumentName;
+                    policy.DocumentType = request.DocumentType;
+                    policy.DocumentSize = request.DocumentSize;
+                    policy.DocumentUploadedAt = DateTime.Now;
+                }
+
+                policy.UpdatedAt = DateTime.Now;
+
+                var updatedPolicy = await _policyRepository.UpdatePolicyAsync(policy);
+
+                var response = _mapper.Map<PolicyResponseDto>(updatedPolicy);
+
+                EEPZBusinessLog.LogServiceInformation("Policy {PolicyId} updated successfully: {PolicyName}",
+                    policyId, updatedPolicy.PolicyName);
+
+                return ApiResponseDto<PolicyResponseDto>.SuccessResponse(
+                    response,
+                    PolicyMessages.PolicyUpdatedSuccess);
+            }
+            catch (Exception ex)
             {
-                return ApiResponseDto<PolicyResponseDto>
-                    .ErrorResponse(PolicyMessages.PolicyNameExists);
+                EEPZBusinessLog.LogServiceError("Error updating policy {PolicyId}", ex, policyId);
+                throw;
             }
-
-            if (!string.IsNullOrEmpty(request.PolicyName))
-                policy.PolicyName = request.PolicyName;
-
-            if (!string.IsNullOrEmpty(request.Category))
-                policy.Category = request.Category;
-
-            if (request.Description != null)
-                policy.Description = request.Description;
-
-            if (request.ComplianceGuidance != null)
-                policy.ComplianceGuidance = request.ComplianceGuidance;
-
-            if (!string.IsNullOrEmpty(request.Status))
-                policy.Status = request.Status;
-
-            if (!string.IsNullOrEmpty(request.DocumentUrl))
-            {
-                policy.DocumentUrl = request.DocumentUrl;
-                policy.DocumentName = request.DocumentName;
-                policy.DocumentType = request.DocumentType;
-                policy.DocumentSize = request.DocumentSize;
-                policy.DocumentUploadedAt = DateTime.Now;
-            }
-
-            policy.UpdatedAt = DateTime.Now;
-
-            var updatedPolicy = await _policyRepository.UpdatePolicyAsync(policy);
-
-            _logger.LogInformation(
-                PolicyMessages.LogPolicyUpdated,
-                updatedPolicy.PolicyName,
-                updatedPolicy.PolicyId);
-
-            // Map to response using Mapster
-            var response = _mapper.Map<PolicyResponseDto>(updatedPolicy);
-
-            return ApiResponseDto<PolicyResponseDto>.SuccessResponse(
-                response,
-                PolicyMessages.PolicyUpdatedSuccess);
         }
 
         public async Task<ApiResponseDto<string>> PublishPolicyAsync(int policyId, int publishedBy)
         {
-            var policy = await _policyRepository.GetPolicyByIdAsync(policyId);
+            try
+            {
+                EEPZBusinessLog.LogServiceInformation("Publishing policy {PolicyId} by user {UserId}", policyId, publishedBy);
 
-            if (policy == null)
-                return ApiResponseDto<string>.ErrorResponse(PolicyMessages.PolicyNotFound);
+                var policy = await _policyRepository.GetPolicyByIdAsync(policyId);
 
-            if (policy.IsPublished)
-                return ApiResponseDto<string>.ErrorResponse(PolicyMessages.PolicyAlreadyPublished);
+                if (policy == null)
+                {
+                    EEPZBusinessLog.LogServiceWarning("Policy {PolicyId} not found for publishing", policyId);
+                    return ApiResponseDto<string>.ErrorResponse(PolicyMessages.PolicyNotFound);
+                }
 
-            policy.IsPublished = true;
-            policy.PublishedAt = DateTime.Now;
-            policy.PublishedBy = publishedBy;
-            policy.UpdatedAt = DateTime.Now;
+                if (policy.IsPublished)
+                {
+                    EEPZBusinessLog.LogServiceWarning("Policy {PolicyId} is already published", policyId);
+                    return ApiResponseDto<string>.ErrorResponse(PolicyMessages.PolicyAlreadyPublished);
+                }
 
-            await _policyRepository.UpdatePolicyAsync(policy);
+                policy.IsPublished = true;
+                policy.PublishedAt = DateTime.Now;
+                policy.PublishedBy = publishedBy;
+                policy.UpdatedAt = DateTime.Now;
 
-            _logger.LogInformation(
-                PolicyMessages.LogPolicyPublished,
-                policy.PolicyName,
-                policy.PolicyId,
-                publishedBy);
+                await _policyRepository.UpdatePolicyAsync(policy);
 
-            return ApiResponseDto<string>.SuccessResponse(
-                PolicyMessages.PolicyCreatedSuccess,
-                PolicyMessages.PolicyPublishedSuccess);
+                EEPZBusinessLog.LogServiceInformation("Policy {PolicyId} published successfully: {PolicyName}, PublishedBy: {UserId}",
+                    policyId, policy.PolicyName, publishedBy);
+
+                return ApiResponseDto<string>.SuccessResponse(
+                    PolicyMessages.PolicyCreatedSuccess,
+                    PolicyMessages.PolicyPublishedSuccess);
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogServiceError("Error publishing policy {PolicyId}", ex, policyId);
+                throw;
+            }
         }
 
         public async Task<ApiResponseDto<bool>> DeletePolicyAsync(int policyId)
         {
-            var result = await _policyRepository.DeletePolicyAsync(policyId);
+            try
+            {
+                EEPZBusinessLog.LogServiceInformation("Deleting policy {PolicyId}", policyId);
 
-            if (!result)
-                return ApiResponseDto<bool>.ErrorResponse(PolicyMessages.PolicyNotFound);
+                var result = await _policyRepository.DeletePolicyAsync(policyId);
 
-            _logger.LogInformation(PolicyMessages.LogPolicyDeleted, policyId);
+                if (!result)
+                {
+                    EEPZBusinessLog.LogServiceWarning("Policy {PolicyId} not found for deletion", policyId);
+                    return ApiResponseDto<bool>.ErrorResponse(PolicyMessages.PolicyNotFound);
+                }
 
-            return ApiResponseDto<bool>.SuccessResponse(
-                true,
-                PolicyMessages.PolicyDeletedSuccess);
+                EEPZBusinessLog.LogServiceInformation("Policy {PolicyId} deleted successfully", policyId);
+
+                return ApiResponseDto<bool>.SuccessResponse(
+                    true,
+                    PolicyMessages.PolicyDeletedSuccess);
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogServiceError("Error deleting policy {PolicyId}", ex, policyId);
+                throw;
+            }
         }
 
         public async Task<ApiResponseDto<PolicyResponseDto>> UnpublishPolicyAsync(
             int policyId,
             int userId)
         {
-            var policy = await _policyRepository.GetPolicyByIdAsync(policyId);
+            try
+            {
+                EEPZBusinessLog.LogServiceInformation("Unpublishing policy {PolicyId} by user {UserId}", policyId, userId);
 
-            if (policy == null)
-                return ApiResponseDto<PolicyResponseDto>
-                    .ErrorResponse(PolicyMessages.PolicyNotFound);
+                var policy = await _policyRepository.GetPolicyByIdAsync(policyId);
 
-            policy.IsPublished = false;
-            policy.PublishedAt = null;
-            policy.PublishedBy = null;
-            policy.UpdatedAt = DateTime.Now;
+                if (policy == null)
+                {
+                    EEPZBusinessLog.LogServiceWarning("Policy {PolicyId} not found for unpublishing", policyId);
+                    return ApiResponseDto<PolicyResponseDto>
+                        .ErrorResponse(PolicyMessages.PolicyNotFound);
+                }
 
-            await _policyRepository.UpdatePolicyAsync(policy);
+                policy.IsPublished = false;
+                policy.PublishedAt = null;
+                policy.PublishedBy = null;
+                policy.UpdatedAt = DateTime.Now;
 
-            _logger.LogInformation(
-                PolicyMessages.LogPolicyUnpublished,
-                policyId);
+                await _policyRepository.UpdatePolicyAsync(policy);
 
-            // Map using Mapster
-            var response = _mapper.Map<PolicyResponseDto>(policy);
+                var response = _mapper.Map<PolicyResponseDto>(policy);
 
-            return ApiResponseDto<PolicyResponseDto>.SuccessResponse(
-                response,
-                PolicyMessages.PolicyUnpublishedSuccess);
+                EEPZBusinessLog.LogServiceInformation("Policy {PolicyId} unpublished successfully: {PolicyName}",
+                    policyId, policy.PolicyName);
+
+                return ApiResponseDto<PolicyResponseDto>.SuccessResponse(
+                    response,
+                    PolicyMessages.PolicyUnpublishedSuccess);
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogServiceError("Error unpublishing policy {PolicyId}", ex, policyId);
+                throw;
+            }
         }
     }
 }

@@ -29,133 +29,242 @@ namespace Relevantz.EEPZ.Core.Service
 
         public async Task<ApiResponseDto<HeadcountResponseDto>> GetDepartmentHeadcountAsync(int departmentId)
         {
-            if (departmentId <= 0)
-                throw new ArgumentException("Invalid department ID");
-
-            var headcount = await _costMappingRepository.GetCurrentHeadcountAsync(departmentId);
-
-            var response = new HeadcountResponseDto
+            try
             {
-                DepartmentId = departmentId,
-                DepartmentName = "Department",
-                CurrentHeadcount = headcount,
-                Timestamp = DateTime.Now
-            };
+                if (departmentId <= 0)
+                {
+                    EEPZBusinessLog.LogServiceWarning("Invalid department ID provided: {DepartmentId}", departmentId);
+                    throw new ArgumentException("Invalid department ID");
+                }
 
-            return ApiResponseDto<HeadcountResponseDto>
-                .SuccessResponse(response, "Headcount retrieved successfully");
+                EEPZBusinessLog.LogServiceInformation("Fetching headcount for department {DepartmentId}", departmentId);
+
+                var headcount = await _costMappingRepository.GetCurrentHeadcountAsync(departmentId);
+
+                var response = new HeadcountResponseDto
+                {
+                    DepartmentId = departmentId,
+                    DepartmentName = "Department",
+                    CurrentHeadcount = headcount,
+                    Timestamp = DateTime.Now
+                };
+
+                EEPZBusinessLog.LogServiceInformation("Headcount retrieved for department {DepartmentId}: {Headcount}", 
+                    departmentId, headcount);
+
+                return ApiResponseDto<HeadcountResponseDto>
+                    .SuccessResponse(response, "Headcount retrieved successfully");
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogServiceError("Error retrieving headcount for department {DepartmentId}", ex, departmentId);
+                throw;
+            }
         }
 
         public async Task<ApiResponseDto<CostMappingResponseDto>> CreateCostMappingAsync(CreateCostMappingRequestDto request)
         {
-            _logger.LogInformation("Creating cost mapping for department {DepartmentId}", request.DepartmentId);
+            try
+            {
+                EEPZBusinessLog.LogServiceInformation("Creating cost mapping for department {DepartmentId}, fiscal year {FiscalYear}", 
+                    request.DepartmentId, request.FiscalYear);
 
-            // Map DTO to Entity using Mapster
-            var budget = _mapper.Map<Departmentbudget>(request);
+                var budget = _mapper.Map<Departmentbudget>(request);
 
-            var createdBudget = await _costMappingRepository.CreateAsync(budget);
+                var createdBudget = await _costMappingRepository.CreateAsync(budget);
 
-            // Map Entity back to Response DTO
-            var response = _mapper.Map<CostMappingResponseDto>(createdBudget);
+                var response = _mapper.Map<CostMappingResponseDto>(createdBudget);
 
-            _logger.LogInformation(RepositoryMessages.CostMappingCreated, createdBudget.BudgetId);
+                EEPZBusinessLog.LogServiceInformation("Cost mapping created successfully: BudgetId={BudgetId}, Department={DepartmentId}", 
+                    createdBudget.BudgetId, request.DepartmentId);
 
-            return ApiResponseDto<CostMappingResponseDto>
-                .SuccessResponse(response, "Cost mapping created successfully");
+                return ApiResponseDto<CostMappingResponseDto>
+                    .SuccessResponse(response, "Cost mapping created successfully");
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogServiceError("Error creating cost mapping for department {DepartmentId}", ex, request.DepartmentId);
+                throw;
+            }
         }
 
         public async Task<ApiResponseDto<CostMappingResponseDto>> UpdateCostMappingAsync(UpdateCostMappingRequestDto request)
         {
-            var budget = await _costMappingRepository.GetByIdAsync(request.BudgetId)
-                ?? throw new ArgumentException("Cost mapping not found");
+            try
+            {
+                EEPZBusinessLog.LogServiceInformation("Updating cost mapping {BudgetId}", request.BudgetId);
 
-            // Update only provided fields
-            if (request.TotalBudget.HasValue)
-                budget.TotalBudget = request.TotalBudget.Value;
+                var budget = await _costMappingRepository.GetByIdAsync(request.BudgetId);
+                
+                if (budget == null)
+                {
+                    EEPZBusinessLog.LogServiceWarning("Cost mapping not found: {BudgetId}", request.BudgetId);
+                    throw new ArgumentException("Cost mapping not found");
+                }
 
-            if (request.AllocatedAmount.HasValue)
-                budget.AllocatedAmount = request.AllocatedAmount.Value;
+                if (request.TotalBudget.HasValue)
+                    budget.TotalBudget = request.TotalBudget.Value;
 
-            if (request.UtilizedAmount.HasValue)
-                budget.UtilizedAmount = request.UtilizedAmount.Value;
+                if (request.AllocatedAmount.HasValue)
+                    budget.AllocatedAmount = request.AllocatedAmount.Value;
 
-            if (request.Headcount.HasValue)
-                budget.Headcount = request.Headcount.Value;
+                if (request.UtilizedAmount.HasValue)
+                    budget.UtilizedAmount = request.UtilizedAmount.Value;
 
-            // Recalculate metrics
-            if (budget.Headcount.HasValue && budget.Headcount.Value > 0)
-                budget.AvgCostPerEmployee = budget.TotalBudget / budget.Headcount.Value;
+                if (request.Headcount.HasValue)
+                    budget.Headcount = request.Headcount.Value;
 
-            if (budget.AllocatedAmount.HasValue && budget.AllocatedAmount.Value > 0)
-                budget.UtilizationPercentage = (budget.UtilizedAmount ?? 0) / budget.AllocatedAmount.Value * 100;
+                if (budget.Headcount.HasValue && budget.Headcount.Value > 0)
+                    budget.AvgCostPerEmployee = budget.TotalBudget / budget.Headcount.Value;
 
-            budget.UpdatedAt = DateTime.Now;
+                if (budget.AllocatedAmount.HasValue && budget.AllocatedAmount.Value > 0)
+                    budget.UtilizationPercentage = (budget.UtilizedAmount ?? 0) / budget.AllocatedAmount.Value * 100;
 
-            var updatedBudget = await _costMappingRepository.UpdateAsync(budget);
+                budget.UpdatedAt = DateTime.Now;
 
-            // Map to response DTO using Mapster
-            var response = _mapper.Map<CostMappingResponseDto>(updatedBudget);
+                var updatedBudget = await _costMappingRepository.UpdateAsync(budget);
 
-            return ApiResponseDto<CostMappingResponseDto>
-                .SuccessResponse(response, "Cost mapping updated successfully");
+                var response = _mapper.Map<CostMappingResponseDto>(updatedBudget);
+
+                EEPZBusinessLog.LogServiceInformation("Cost mapping {BudgetId} updated successfully", request.BudgetId);
+
+                return ApiResponseDto<CostMappingResponseDto>
+                    .SuccessResponse(response, "Cost mapping updated successfully");
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogServiceError("Error updating cost mapping {BudgetId}", ex, request.BudgetId);
+                throw;
+            }
         }
 
         public async Task<ApiResponseDto<CostMappingResponseDto>> GetCostMappingByIdAsync(int budgetId)
         {
-            var budget = await _costMappingRepository.GetByIdAsync(budgetId)
-                ?? throw new ArgumentException("Cost mapping not found");
+            try
+            {
+                EEPZBusinessLog.LogServiceInformation("Fetching cost mapping {BudgetId}", budgetId);
 
-            // Map using Mapster
-            var response = _mapper.Map<CostMappingResponseDto>(budget);
+                var budget = await _costMappingRepository.GetByIdAsync(budgetId);
+                
+                if (budget == null)
+                {
+                    EEPZBusinessLog.LogServiceWarning("Cost mapping {BudgetId} not found", budgetId);
+                    throw new ArgumentException("Cost mapping not found");
+                }
 
-            return ApiResponseDto<CostMappingResponseDto>
-                .SuccessResponse(response, "Cost mapping retrieved successfully");
+                var response = _mapper.Map<CostMappingResponseDto>(budget);
+
+                EEPZBusinessLog.LogServiceInformation("Cost mapping {BudgetId} retrieved successfully", budgetId);
+
+                return ApiResponseDto<CostMappingResponseDto>
+                    .SuccessResponse(response, "Cost mapping retrieved successfully");
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogServiceError("Error retrieving cost mapping {BudgetId}", ex, budgetId);
+                throw;
+            }
         }
 
         public async Task<ApiResponseDto<List<CostMappingResponseDto>>> GetAllCostMappingsAsync()
         {
-            var budgets = await _costMappingRepository.GetAllAsync();
-            
-            // Map list using Mapster
-            var response = _mapper.Map<List<CostMappingResponseDto>>(budgets);
+            try
+            {
+                EEPZBusinessLog.LogServiceInformation("Fetching all cost mappings");
 
-            return ApiResponseDto<List<CostMappingResponseDto>>
-                .SuccessResponse(response, $"Retrieved {response.Count} cost mappings");
+                var budgets = await _costMappingRepository.GetAllAsync();
+                
+                var response = _mapper.Map<List<CostMappingResponseDto>>(budgets);
+
+                EEPZBusinessLog.LogServiceInformation("Retrieved {Count} cost mappings", response.Count);
+
+                return ApiResponseDto<List<CostMappingResponseDto>>
+                    .SuccessResponse(response, $"Retrieved {response.Count} cost mappings");
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogServiceError("Error retrieving all cost mappings", ex);
+                throw;
+            }
         }
 
         public async Task<ApiResponseDto<List<CostMappingResponseDto>>> GetCostMappingsByDepartmentAsync(int departmentId)
         {
-            var budgets = await _costMappingRepository.GetByDepartmentIdAsync(departmentId);
-            
-            // Map using Mapster
-            var response = _mapper.Map<List<CostMappingResponseDto>>(budgets);
+            try
+            {
+                EEPZBusinessLog.LogServiceInformation("Fetching cost mappings for department {DepartmentId}", departmentId);
 
-            return ApiResponseDto<List<CostMappingResponseDto>>
-                .SuccessResponse(response, "Cost mappings retrieved");
+                var budgets = await _costMappingRepository.GetByDepartmentIdAsync(departmentId);
+                
+                var response = _mapper.Map<List<CostMappingResponseDto>>(budgets);
+
+                EEPZBusinessLog.LogServiceInformation("Retrieved {Count} cost mappings for department {DepartmentId}", 
+                    response.Count, departmentId);
+
+                return ApiResponseDto<List<CostMappingResponseDto>>
+                    .SuccessResponse(response, "Cost mappings retrieved");
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogServiceError("Error retrieving cost mappings for department {DepartmentId}", ex, departmentId);
+                throw;
+            }
         }
 
         public async Task<ApiResponseDto<List<CostMappingResponseDto>>> GetCostMappingsByFiscalYearAsync(int fiscalYear)
         {
-            var budgets = await _costMappingRepository.GetByFiscalYearAsync(fiscalYear);
-            
-            // Map using Mapster
-            var response = _mapper.Map<List<CostMappingResponseDto>>(budgets);
+            try
+            {
+                EEPZBusinessLog.LogServiceInformation("Fetching cost mappings for fiscal year {FiscalYear}", fiscalYear);
 
-            return ApiResponseDto<List<CostMappingResponseDto>>
-                .SuccessResponse(response, "Cost mappings retrieved");
+                var budgets = await _costMappingRepository.GetByFiscalYearAsync(fiscalYear);
+                
+                var response = _mapper.Map<List<CostMappingResponseDto>>(budgets);
+
+                EEPZBusinessLog.LogServiceInformation("Retrieved {Count} cost mappings for fiscal year {FiscalYear}", 
+                    response.Count, fiscalYear);
+
+                return ApiResponseDto<List<CostMappingResponseDto>>
+                    .SuccessResponse(response, "Cost mappings retrieved");
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogServiceError("Error retrieving cost mappings for fiscal year {FiscalYear}", ex, fiscalYear);
+                throw;
+            }
         }
 
         public async Task<ApiResponseDto<bool>> DeleteCostMappingAsync(int budgetId)
         {
-            var budget = await _costMappingRepository.GetByIdAsync(budgetId)
-                ?? throw new ArgumentException("Cost mapping not found");
+            try
+            {
+                EEPZBusinessLog.LogServiceInformation("Deleting cost mapping {BudgetId}", budgetId);
 
-            var deleted = await _costMappingRepository.DeleteAsync(budgetId);
+                var budget = await _costMappingRepository.GetByIdAsync(budgetId);
+                
+                if (budget == null)
+                {
+                    EEPZBusinessLog.LogServiceWarning("Cost mapping {BudgetId} not found for deletion", budgetId);
+                    throw new ArgumentException("Cost mapping not found");
+                }
 
-            if (!deleted)
-                throw new InvalidOperationException("Failed to delete cost mapping");
+                var deleted = await _costMappingRepository.DeleteAsync(budgetId);
 
-            return ApiResponseDto<bool>.SuccessResponse(true, "Cost mapping deleted successfully");
+                if (!deleted)
+                {
+                    EEPZBusinessLog.LogServiceError("Failed to delete cost mapping {BudgetId}", null, budgetId);
+                    throw new InvalidOperationException("Failed to delete cost mapping");
+                }
+
+                EEPZBusinessLog.LogServiceInformation("Cost mapping {BudgetId} deleted successfully", budgetId);
+
+                return ApiResponseDto<bool>.SuccessResponse(true, "Cost mapping deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogServiceError("Error deleting cost mapping {BudgetId}", ex, budgetId);
+                throw;
+            }
         }
     }
 }

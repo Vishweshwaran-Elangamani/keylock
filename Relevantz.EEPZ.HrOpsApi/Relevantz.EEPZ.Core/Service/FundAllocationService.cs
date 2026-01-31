@@ -4,6 +4,7 @@ using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Utils;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Data.IRepository;
 using MapsterMapper;
@@ -33,174 +34,263 @@ namespace Relevantz.EEPZ.Core.Service
         public async Task<ApiResponseDto<FundAllocationResponseDto>> CreateFundAllocationAsync(
             CreateFundAllocationRequestDto request)
         {
-            var validationError = ValidateCreateRequest(request);
-            if (validationError != null)
-                return validationError;
-
-            _logger.LogInformation(
-                "Creating fund allocation. BudgetId: {BudgetId}, DepartmentId: {DepartmentId}, Type: {Type}, Amount: {Amount}",
-                request.BudgetId, request.DepartmentId, request.AllocationType, request.Amount);
-
-            var budgetExists = await _fundAllocationRepository.BudgetExistsAsync(request.BudgetId);
-            if (!budgetExists)
+            try
             {
-                return ApiResponseDto<FundAllocationResponseDto>.FailureResponse(
-                    string.Format(ServiceMessages.BudgetNotFoundForAllocation, request.BudgetId));
-            }
+                var validationError = ValidateCreateRequest(request);
+                if (validationError != null)
+                {
+                    EEPZBusinessLog.LogServiceWarning("Fund allocation creation validation failed: {Message}", validationError.Message);
+                    return validationError;
+                }
 
-            if (!string.IsNullOrEmpty(request.Period) && request.PeriodYear.HasValue)
+                EEPZBusinessLog.LogServiceInformation(
+                    "Creating fund allocation. BudgetId: {BudgetId}, DepartmentId: {DepartmentId}, Type: {Type}, Amount: {Amount}",
+                    request.BudgetId, request.DepartmentId, request.AllocationType, request.Amount);
+
+                var budgetExists = await _fundAllocationRepository.BudgetExistsAsync(request.BudgetId);
+                if (!budgetExists)
+                {
+                    EEPZBusinessLog.LogServiceWarning("Budget {BudgetId} not found for allocation", request.BudgetId);
+                    return ApiResponseDto<FundAllocationResponseDto>.FailureResponse(
+                        string.Format(ServiceMessages.BudgetNotFoundForAllocation, request.BudgetId));
+                }
+
+                if (!string.IsNullOrEmpty(request.Period) && request.PeriodYear.HasValue)
+                {
+                    var periodValidationError = await ValidatePeriodAllocation(request);
+                    if (periodValidationError != null)
+                    {
+                        EEPZBusinessLog.LogServiceWarning("Period validation failed for allocation: {Message}", periodValidationError.Message);
+                        return periodValidationError;
+                    }
+                }
+
+                var allocation = _mapper.Map<Budgetallocation>(request);
+                allocation.UtilizedAmount = 0;
+                allocation.UtilizationPercentage = 0;
+                allocation.AllocatedAt = DateTime.UtcNow;
+                allocation.UpdatedAt = DateTime.UtcNow;
+                allocation.GoalStatus = request.GoalStatus ?? "Pending";
+
+                var createdAllocation = await _fundAllocationRepository.CreateAsync(allocation);
+
+                var response = await _fundAllocationRepository
+                    .GetFundAllocationDetailsAsync(createdAllocation.AllocationId);
+
+                EEPZBusinessLog.LogServiceInformation(
+                    "Fund allocation created successfully. AllocationId: {Id}, BudgetId: {BudgetId}, Amount: {Amount}",
+                    createdAllocation.AllocationId, request.BudgetId, request.Amount);
+
+                return ApiResponseDto<FundAllocationResponseDto>.SuccessResponse(
+                    response!, ServiceMessages.FundAllocationCreatedSuccess);
+            }
+            catch (Exception ex)
             {
-                var periodValidationError = await ValidatePeriodAllocation(request);
-                if (periodValidationError != null)
-                    return periodValidationError;
+                EEPZBusinessLog.LogServiceError("Error creating fund allocation", ex);
+                throw;
             }
-
-            // Map using Mapster
-            var allocation = _mapper.Map<Budgetallocation>(request);
-            allocation.UtilizedAmount = 0;
-            allocation.UtilizationPercentage = 0;
-            allocation.AllocatedAt = DateTime.UtcNow;
-            allocation.UpdatedAt = DateTime.UtcNow;
-            allocation.GoalStatus = request.GoalStatus ?? "Pending";
-
-            var createdAllocation = await _fundAllocationRepository.CreateAsync(allocation);
-
-            var response = await _fundAllocationRepository
-                .GetFundAllocationDetailsAsync(createdAllocation.AllocationId);
-
-            _logger.LogInformation(
-                "Fund allocation created successfully. AllocationId: {Id}",
-                createdAllocation.AllocationId);
-
-            return ApiResponseDto<FundAllocationResponseDto>.SuccessResponse(
-                response!,
-                ServiceMessages.FundAllocationCreatedSuccess);
         }
 
         public async Task<ApiResponseDto<FundAllocationResponseDto>> UpdateFundAllocationAsync(
             UpdateFundAllocationRequestDto request)
         {
-            var validationError = ValidateUpdateRequest(request);
-            if (validationError != null)
-                return validationError;
-
-            _logger.LogInformation(
-                "Updating fund allocation. AllocationId: {Id}",
-                request.AllocationId);
-
-            var allocation = await _fundAllocationRepository.GetByIdAsync(request.AllocationId);
-            if (allocation == null)
+            try
             {
-                return ApiResponseDto<FundAllocationResponseDto>.FailureResponse(
-                    ServiceMessages.FundAllocationNotFound);
+                var validationError = ValidateUpdateRequest(request);
+                if (validationError != null)
+                {
+                    EEPZBusinessLog.LogServiceWarning("Fund allocation update validation failed: {Message}", validationError.Message);
+                    return validationError;
+                }
+
+                EEPZBusinessLog.LogServiceInformation("Updating fund allocation. AllocationId: {Id}", request.AllocationId);
+
+                var allocation = await _fundAllocationRepository.GetByIdAsync(request.AllocationId);
+                if (allocation == null)
+                {
+                    EEPZBusinessLog.LogServiceWarning("Fund allocation {AllocationId} not found", request.AllocationId);
+                    return ApiResponseDto<FundAllocationResponseDto>.FailureResponse(
+                        ServiceMessages.FundAllocationNotFound);
+                }
+
+                if (request.Amount.HasValue)
+                    allocation.Amount = request.Amount.Value;
+
+                if (!string.IsNullOrEmpty(request.GoalStatus))
+                    allocation.GoalStatus = request.GoalStatus;
+
+                if (!string.IsNullOrEmpty(request.Notes))
+                    allocation.Notes = request.Notes;
+
+                allocation.UpdatedAt = DateTime.UtcNow;
+
+                var updatedAllocation = await _fundAllocationRepository.UpdateAsync(allocation);
+
+                var response = await _fundAllocationRepository
+                    .GetFundAllocationDetailsAsync(updatedAllocation.AllocationId);
+
+                EEPZBusinessLog.LogServiceInformation("Fund allocation {AllocationId} updated successfully", request.AllocationId);
+
+                return ApiResponseDto<FundAllocationResponseDto>.SuccessResponse(
+                    response!, ServiceMessages.FundAllocationUpdatedSuccess);
             }
-
-            if (request.Amount.HasValue)
-                allocation.Amount = request.Amount.Value;
-
-            if (!string.IsNullOrEmpty(request.GoalStatus))
-                allocation.GoalStatus = request.GoalStatus;
-
-            if (!string.IsNullOrEmpty(request.Notes))
-                allocation.Notes = request.Notes;
-
-            allocation.UpdatedAt = DateTime.UtcNow;
-
-            var updatedAllocation = await _fundAllocationRepository.UpdateAsync(allocation);
-
-            var response = await _fundAllocationRepository
-                .GetFundAllocationDetailsAsync(updatedAllocation.AllocationId);
-
-            return ApiResponseDto<FundAllocationResponseDto>.SuccessResponse(
-                response!,
-                ServiceMessages.FundAllocationUpdatedSuccess);
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogServiceError("Error updating fund allocation {AllocationId}", ex, request.AllocationId);
+                throw;
+            }
         }
 
         public async Task<ApiResponseDto<bool>> DeleteFundAllocationAsync(int allocationId)
         {
-            if (allocationId <= 0)
-                return ApiResponseDto<bool>.FailureResponse(ServiceMessages.InvalidAllocationId);
-
-            _logger.LogInformation("Deleting fund allocation {Id}", allocationId);
-
-            var allocation = await _fundAllocationRepository.GetByIdAsync(allocationId);
-            if (allocation == null)
+            try
             {
-                return ApiResponseDto<bool>.FailureResponse(
-                    ServiceMessages.FundAllocationNotFound);
+                if (allocationId <= 0)
+                {
+                    EEPZBusinessLog.LogServiceWarning("Invalid allocation ID for deletion: {AllocationId}", allocationId);
+                    return ApiResponseDto<bool>.FailureResponse(ServiceMessages.InvalidAllocationId);
+                }
+
+                EEPZBusinessLog.LogServiceInformation("Deleting fund allocation {Id}", allocationId);
+
+                var allocation = await _fundAllocationRepository.GetByIdAsync(allocationId);
+                if (allocation == null)
+                {
+                    EEPZBusinessLog.LogServiceWarning("Fund allocation {AllocationId} not found for deletion", allocationId);
+                    return ApiResponseDto<bool>.FailureResponse(ServiceMessages.FundAllocationNotFound);
+                }
+
+                var result = await _fundAllocationRepository.DeleteAsync(allocationId);
+
+                if (result)
+                {
+                    EEPZBusinessLog.LogServiceInformation("Fund allocation {AllocationId} deleted successfully", allocationId);
+                    return ApiResponseDto<bool>.SuccessResponse(true, ServiceMessages.FundAllocationDeletedSuccess);
+                }
+                else
+                {
+                    EEPZBusinessLog.LogServiceError("Failed to delete fund allocation {AllocationId}", null, allocationId);
+                    return ApiResponseDto<bool>.FailureResponse(ServiceMessages.FailedToDeleteFundAllocation);
+                }
             }
-
-            var result = await _fundAllocationRepository.DeleteAsync(allocationId);
-
-            return result
-                ? ApiResponseDto<bool>.SuccessResponse(true, ServiceMessages.FundAllocationDeletedSuccess)
-                : ApiResponseDto<bool>.FailureResponse(ServiceMessages.FailedToDeleteFundAllocation);
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogServiceError("Error deleting fund allocation {AllocationId}", ex, allocationId);
+                throw;
+            }
         }
 
         public async Task<ApiResponseDto<FundAllocationResponseDto>> GetFundAllocationByIdAsync(int allocationId)
         {
-            if (allocationId <= 0)
-                return ApiResponseDto<FundAllocationResponseDto>.FailureResponse(
-                    ServiceMessages.InvalidAllocationId);
-
-            var response = await _fundAllocationRepository
-                .GetFundAllocationDetailsAsync(allocationId);
-
-            if (response == null)
+            try
             {
-                return ApiResponseDto<FundAllocationResponseDto>.FailureResponse(
-                    ServiceMessages.FundAllocationNotFound);
-            }
+                if (allocationId <= 0)
+                {
+                    EEPZBusinessLog.LogServiceWarning("Invalid allocation ID: {AllocationId}", allocationId);
+                    return ApiResponseDto<FundAllocationResponseDto>.FailureResponse(ServiceMessages.InvalidAllocationId);
+                }
 
-            return ApiResponseDto<FundAllocationResponseDto>.SuccessResponse(
-                response,
-                ServiceMessages.FundAllocationRetrievedSuccess);
+                EEPZBusinessLog.LogServiceInformation("Fetching fund allocation {AllocationId}", allocationId);
+
+                var response = await _fundAllocationRepository.GetFundAllocationDetailsAsync(allocationId);
+
+                if (response == null)
+                {
+                    EEPZBusinessLog.LogServiceWarning("Fund allocation {AllocationId} not found", allocationId);
+                    return ApiResponseDto<FundAllocationResponseDto>.FailureResponse(ServiceMessages.FundAllocationNotFound);
+                }
+
+                EEPZBusinessLog.LogServiceInformation("Fund allocation {AllocationId} retrieved successfully", allocationId);
+
+                return ApiResponseDto<FundAllocationResponseDto>.SuccessResponse(
+                    response, ServiceMessages.FundAllocationRetrievedSuccess);
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogServiceError("Error fetching fund allocation {AllocationId}", ex, allocationId);
+                throw;
+            }
         }
 
         public async Task<ApiResponseDto<List<FundAllocationResponseDto>>> GetAllFundAllocationsAsync()
         {
-            _logger.LogInformation("Fetching all fund allocations");
+            try
+            {
+                EEPZBusinessLog.LogServiceInformation("Fetching all fund allocations");
 
-            var allocations = await _fundAllocationRepository.GetAllAsync();
-            var response = await BuildFundAllocationResponses(allocations);
+                var allocations = await _fundAllocationRepository.GetAllAsync();
+                var response = await BuildFundAllocationResponses(allocations);
 
-            return ApiResponseDto<List<FundAllocationResponseDto>>.SuccessResponse(
-                response,
-                string.Format(ServiceMessages.FundAllocationsRetrievedSuccess, response.Count));
+                EEPZBusinessLog.LogServiceInformation("Retrieved {Count} fund allocations", response.Count);
+
+                return ApiResponseDto<List<FundAllocationResponseDto>>.SuccessResponse(
+                    response, string.Format(ServiceMessages.FundAllocationsRetrievedSuccess, response.Count));
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogServiceError("Error fetching all fund allocations", ex);
+                throw;
+            }
         }
 
         public async Task<ApiResponseDto<List<FundAllocationResponseDto>>> GetFundAllocationsByDepartmentAsync(
             int departmentId)
         {
-            if (departmentId <= 0)
-                return ApiResponseDto<List<FundAllocationResponseDto>>.FailureResponse(
-                    ServiceMessages.InvalidDepartmentIdForAllocation);
+            try
+            {
+                if (departmentId <= 0)
+                {
+                    EEPZBusinessLog.LogServiceWarning("Invalid department ID: {DepartmentId}", departmentId);
+                    return ApiResponseDto<List<FundAllocationResponseDto>>.FailureResponse(
+                        ServiceMessages.InvalidDepartmentIdForAllocation);
+                }
 
-            var allocations = await _fundAllocationRepository.GetByDepartmentIdAsync(departmentId);
-            var response = await BuildFundAllocationResponses(allocations);
+                EEPZBusinessLog.LogServiceInformation("Fetching fund allocations for department {DepartmentId}", departmentId);
 
-            return ApiResponseDto<List<FundAllocationResponseDto>>.SuccessResponse(
-                response,
-                string.Format(ServiceMessages.FundAllocationsByDepartmentRetrievedSuccess, response.Count));
+                var allocations = await _fundAllocationRepository.GetByDepartmentIdAsync(departmentId);
+                var response = await BuildFundAllocationResponses(allocations);
+
+                EEPZBusinessLog.LogServiceInformation("Retrieved {Count} fund allocations for department {DepartmentId}", 
+                    response.Count, departmentId);
+
+                return ApiResponseDto<List<FundAllocationResponseDto>>.SuccessResponse(
+                    response, string.Format(ServiceMessages.FundAllocationsByDepartmentRetrievedSuccess, response.Count));
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogServiceError("Error fetching fund allocations for department {DepartmentId}", ex, departmentId);
+                throw;
+            }
         }
 
         public async Task<ApiResponseDto<List<FundAllocationResponseDto>>> GetFundAllocationsByTypeAsync(
             string allocationType)
         {
-            if (string.IsNullOrWhiteSpace(allocationType))
-                return ApiResponseDto<List<FundAllocationResponseDto>>.FailureResponse(
-                    "Allocation type cannot be empty");
+            try
+            {
+                if (string.IsNullOrWhiteSpace(allocationType))
+                {
+                    EEPZBusinessLog.LogServiceWarning("Empty allocation type provided");
+                    return ApiResponseDto<List<FundAllocationResponseDto>>.FailureResponse("Allocation type cannot be empty");
+                }
 
-            var allocations = await _fundAllocationRepository
-                .GetByAllocationTypeAsync(allocationType);
-            var response = await BuildFundAllocationResponses(allocations);
+                EEPZBusinessLog.LogServiceInformation("Fetching fund allocations by type: {AllocationType}", allocationType);
 
-            return ApiResponseDto<List<FundAllocationResponseDto>>.SuccessResponse(
-                response,
-                string.Format(
-                    ServiceMessages.FundAllocationsByTypeRetrievedSuccess,
-                    response.Count,
-                    allocationType));
+                var allocations = await _fundAllocationRepository.GetByAllocationTypeAsync(allocationType);
+                var response = await BuildFundAllocationResponses(allocations);
+
+                EEPZBusinessLog.LogServiceInformation("Retrieved {Count} fund allocations for type {AllocationType}", 
+                    response.Count, allocationType);
+
+                return ApiResponseDto<List<FundAllocationResponseDto>>.SuccessResponse(
+                    response,
+                    string.Format(ServiceMessages.FundAllocationsByTypeRetrievedSuccess, response.Count, allocationType));
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogServiceError("Error fetching fund allocations by type {AllocationType}", ex, allocationType);
+                throw;
+            }
         }
 
         #region Private Helper Methods
@@ -209,7 +299,6 @@ namespace Relevantz.EEPZ.Core.Service
             IEnumerable<Budgetallocation> allocations)
         {
             var response = new List<FundAllocationResponseDto>();
-
             foreach (var allocation in allocations)
             {
                 var dto = await _fundAllocationRepository
@@ -217,7 +306,6 @@ namespace Relevantz.EEPZ.Core.Service
                 if (dto != null)
                     response.Add(dto);
             }
-
             return response;
         }
 
@@ -231,20 +319,20 @@ namespace Relevantz.EEPZ.Core.Service
 
             if (!exists)
             {
+                EEPZBusinessLog.LogServiceWarning("Period allocation not found: Budget={BudgetId}, Period={Period}, Year={Year}",
+                    request.BudgetId, request.Period, request.PeriodYear);
+
                 return ApiResponseDto<FundAllocationResponseDto>.FailureResponse(
-                    string.Format(
-                        ServiceMessages.PeriodAllocationNotFoundForFund,
-                        request.Period,
-                        request.PeriodYear));
+                    string.Format(ServiceMessages.PeriodAllocationNotFoundForFund, request.Period, request.PeriodYear));
             }
 
             if (request.Amount > availableInPeriod)
             {
+                EEPZBusinessLog.LogServiceWarning("Amount {Amount} exceeds available period allocation {Available}",
+                    request.Amount, availableInPeriod);
+
                 return ApiResponseDto<FundAllocationResponseDto>.FailureResponse(
-                    string.Format(
-                        ServiceMessages.AmountExceedsPeriodAllocation,
-                        request.Amount,
-                        availableInPeriod));
+                    string.Format(ServiceMessages.AmountExceedsPeriodAllocation, request.Amount, availableInPeriod));
             }
 
             return null;

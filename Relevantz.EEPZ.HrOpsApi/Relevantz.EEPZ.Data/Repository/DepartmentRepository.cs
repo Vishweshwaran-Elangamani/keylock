@@ -1,6 +1,7 @@
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.IRepository;
+using Relevantz.EEPZ.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Relevantz.EEPZ.Common.Constants;
@@ -20,78 +21,134 @@ namespace Relevantz.EEPZ.Data.Repository
 
         public async Task<Department?> GetByIdAsync(int departmentId)
         {
-            if (departmentId <= 0)
-                return null;
+            try
+            {
+                if (departmentId <= 0)
+                    return null;
 
-            return await _context.Departments.FindAsync(departmentId);
+                return await _context.Departments.FindAsync(departmentId);
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogRepositoryError("Error fetching department {DepartmentId}", ex, departmentId);
+                throw;
+            }
         }
 
         public async Task<Department?> GetByNameAsync(string departmentName)
         {
-            if (string.IsNullOrWhiteSpace(departmentName))
-                return null;
+            try
+            {
+                if (string.IsNullOrWhiteSpace(departmentName))
+                    return null;
 
-            return await _context.Departments
-                .FirstOrDefaultAsync(d => d.DepartmentName == departmentName);
+                return await _context.Departments
+                    .FirstOrDefaultAsync(d => d.DepartmentName == departmentName);
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogRepositoryError("Error fetching department by name {DepartmentName}", ex, departmentName);
+                throw;
+            }
         }
 
         public async Task<List<Department>> GetAllAsync()
         {
-            return await _context.Departments.ToListAsync();
+            try
+            {
+                return await _context.Departments.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogRepositoryError("Error fetching all departments", ex);
+                throw;
+            }
         }
 
         public async Task<Department> CreateAsync(Department department)
         {
-            _context.Departments.Add(department);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Departments.Add(department);
+                await _context.SaveChangesAsync();
 
-            _logger.LogInformation(RepositoryMessages.DepartmentCreated, department.DepartmentId);
+                EEPZBusinessLog.LogRepositoryInformation(RepositoryMessages.DepartmentCreated, department.DepartmentId);
 
-            return department;
+                return department;
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogRepositoryError("Error creating department", ex);
+                throw;
+            }
         }
 
         public async Task<Department> UpdateAsync(Department department)
         {
-            var existingDepartment = await _context.Departments.FindAsync(department.DepartmentId);
-            if (existingDepartment == null)
+            try
             {
-                _logger.LogWarning(RepositoryMessages.DepartmentNotFound, department.DepartmentId);
-                throw new InvalidOperationException($"Department with ID {department.DepartmentId} not found");
+                var existingDepartment = await _context.Departments.FindAsync(department.DepartmentId);
+                if (existingDepartment == null)
+                {
+                    EEPZBusinessLog.LogRepositoryWarning(RepositoryMessages.DepartmentNotFound, department.DepartmentId);
+                    throw new InvalidOperationException($"Department with ID {department.DepartmentId} not found");
+                }
+
+                department.UpdatedAt = DateTime.UtcNow;
+                _context.Departments.Update(department);
+                await _context.SaveChangesAsync();
+
+                EEPZBusinessLog.LogRepositoryInformation(RepositoryMessages.DepartmentUpdated, department.DepartmentId);
+
+                return department;
             }
-
-            department.UpdatedAt = DateTime.UtcNow;
-            _context.Departments.Update(department);
-            await _context.SaveChangesAsync();
-
-            _logger.LogInformation(RepositoryMessages.DepartmentUpdated, department.DepartmentId);
-
-            return department;
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogRepositoryError("Error updating department {DepartmentId}", ex, department.DepartmentId);
+                throw;
+            }
         }
 
         public async Task<bool> DeleteAsync(int departmentId)
         {
-            if (departmentId <= 0)
-                return false;
+            try
+            {
+                if (departmentId <= 0)
+                    return false;
 
-            var department = await _context.Departments.FindAsync(departmentId);
-            if (department == null)
-                return false;
+                var department = await _context.Departments.FindAsync(departmentId);
+                if (department == null)
+                    return false;
 
-            _context.Departments.Remove(department);
-            await _context.SaveChangesAsync();
+                _context.Departments.Remove(department);
+                await _context.SaveChangesAsync();
 
-            _logger.LogInformation(RepositoryMessages.DepartmentDeleted, departmentId);
+                EEPZBusinessLog.LogRepositoryInformation(RepositoryMessages.DepartmentDeleted, departmentId);
 
-            return true;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogRepositoryError("Error deleting department {DepartmentId}", ex, departmentId);
+                throw;
+            }
         }
 
         public async Task<bool> DepartmentNameExistsAsync(string departmentName)
         {
-            if (string.IsNullOrWhiteSpace(departmentName))
-                return false;
+            try
+            {
+                if (string.IsNullOrWhiteSpace(departmentName))
+                    return false;
 
-            return await _context.Departments
-                .AnyAsync(d => d.DepartmentName == departmentName);
+                return await _context.Departments
+                    .AnyAsync(d => d.DepartmentName == departmentName);
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.LogRepositoryError("Error checking department name existence {DepartmentName}", ex, departmentName);
+                throw;
+            }
         }
     }
 }
