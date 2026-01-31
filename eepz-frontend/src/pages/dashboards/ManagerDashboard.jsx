@@ -14,23 +14,27 @@ import {
   YAxis
 } from "recharts";
 import CountUp from "react-countup";
-import { Users, Target, Shield, TrendingUp, Calendar, AlertTriangle } from "lucide-react";
+import { Users, Target, Shield, TrendingUp, Calendar, AlertTriangle, Briefcase, Award } from "lucide-react";
 import goalService from "../../services/goals/goalService";
 import lndService from "../../services/lnd/lndService";
 import { getTeamMembers, getMyNominations } from "../../services/performancemanagement/manager/managernominationapi";
 import meetingService from "../../services/meeting/meetingService";
 import rsvpService from "../../services/meeting/rsvpService";
 import slaService from "../../services/sla/slaService";
+import internalOpportunityService from "../../services/internal/internalOpportunityService";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
 
+
 import "../../styles/auth/ManagerDashboard.css";
+
 
 const formatStatusLabel = (raw) => {
   if (!raw) return "";
   const lower = String(raw).toLowerCase().replace(/_/g, " ");
   return lower.replace(/\b\w/g, (c) => c.toUpperCase());
 };
+
 
 const ManagerDashboard = () => {
   const navigate = useNavigate();
@@ -47,17 +51,22 @@ const ManagerDashboard = () => {
     subordinateEmployees: [],
     myMeetings: [],
     oneOnOneReports: [],
-    managerEscalations: []
+    managerEscalations: [],
+    opportunities: []
   });
+
 
   const BLUE_COLORS = ["#1E40AF", "#3B82F6", "#60A5FA", "#93C5FD", "#DBEAFE", "#2563EB"];
 
+
   useEffect(() => { fetchAllData(); }, []);
+
 
   const getUserData = () => {
     try { return JSON.parse(localStorage.getItem("user")); }
     catch { return null; }
   };
+
 
   const extractData = (response) => {
     if (!response) return [];
@@ -66,6 +75,7 @@ const ManagerDashboard = () => {
     const paths = [data?.data?.items, data?.data?.$values, data?.data, data?.items, data?.$values, data];
     return paths.find(p => Array.isArray(p)) || [];
   };
+
 
   const fetchAllData = async () => {
     try {
@@ -77,7 +87,9 @@ const ManagerDashboard = () => {
         return;
       }
 
+
       const managerId = user.empMasterId || user.employeeMasterId || user.id;
+
 
       const [
         dashboardSummaryRes, 
@@ -89,7 +101,8 @@ const ManagerDashboard = () => {
         teamAssignmentsRes,
         subordinateEmployeesRes, 
         myMeetingsRes, 
-        managerEscalationsRes
+        managerEscalationsRes,
+        opportunitiesRes
       ] = await Promise.all([
         goalService.getDashboardSummary().catch(() => ({ data: null })),
         goalService.queryGoals({ pageSize: 1000, status: "" }).catch(() => ({ data: [] })),
@@ -99,11 +112,14 @@ const ManagerDashboard = () => {
         getTeamMembers(managerId).catch(() => ({ data: [] })),
         lndService.getTeamAssignments(1).catch(() => ({ data: { data: { items: [] } } })),
         lndService.getSubordinateEmployees(1).catch(() => ({ data: { data: { items: [] } } })),
-       meetingService.getMyMeetings().catch(() => ({ data: { meetings: [] } })),
-        slaService.getManagerEscalations(managerId).catch(() => ({ data: [] }))
+        meetingService.getMyMeetings().catch(() => ({ data: { meetings: [] } })),
+        slaService.getManagerEscalations(managerId).catch(() => ({ data: [] })),
+        internalOpportunityService.getActiveOpportunities().catch(() => ({ data: [] }))
       ]);
 
+
       const allGoalsExtracted = extractData(allGoalsRes);
+
 
       const extractedSelfGoals = allGoalsExtracted.filter((g) => {
         const title = (g.title || "").toLowerCase();
@@ -111,11 +127,13 @@ const ManagerDashboard = () => {
         return title.includes("self") || title.includes("personal") || type === "self";
       });
 
+
       const extractedTeamGoals = allGoalsExtracted.filter((g) => {
         const title = (g.title || "").toLowerCase();
         const type = (g.goalType || g.type || "").toLowerCase();
         return (title.includes("team") || type === "team") && !title.includes("self") && !title.includes("personal");
       });
+
 
       const extractedOrgGoals = allGoalsExtracted.filter((g) => {
         const title = (g.title || "").toLowerCase();
@@ -123,23 +141,24 @@ const ManagerDashboard = () => {
         return title.includes("org") || type === "org" || type === "organization";
       });
 
+
       const allGoalsCombined = [
         ...extractedSelfGoals.map((g) => ({ ...g, goalType: "self" })),
         ...extractedTeamGoals.map((g) => ({ ...g, goalType: "team" })),
         ...extractedOrgGoals.map((g) => ({ ...g, goalType: "org" }))
       ];
 
-          const allMeetings = myMeetingsRes?.data?.meetings || [];
-    
-    console.log('Total Meetings Retrieved:', allMeetings.length);
-    console.log('First Meeting:', allMeetings[0]);
-      
-      // Filter one-on-one meetings from all meetings
+
+      const allMeetings = myMeetingsRes?.data?.meetings || [];
+
+      console.log('Total Meetings Retrieved:', allMeetings.length);
+      console.log('First Meeting:', allMeetings[0]);
+
       const oneOnOneReports = allMeetings.filter(m => {
         const title = (m.title || m.meetingTitle || m.subject || '').toLowerCase();
         const type = (m.meetingType || m.type || '').toLowerCase();
         const description = (m.description || '').toLowerCase();
-        
+
         return title.includes('one-on-one') || 
                title.includes('1-on-1') || 
                title.includes('1:1') ||
@@ -151,8 +170,13 @@ const ManagerDashboard = () => {
                description.includes('1:1');
       });
 
+
       console.log('Total Meetings:', allMeetings.length);
       console.log('One-on-one Meetings:', oneOnOneReports.length);
+
+      const opportunities = extractData(opportunitiesRes);
+      console.log('Opportunities data:', opportunities);
+
 
       setDashboardData({
         dashboardSummary: dashboardSummaryRes?.data || null,
@@ -165,7 +189,8 @@ const ManagerDashboard = () => {
         subordinateEmployees: subordinateEmployeesRes?.data?.data?.items?.$values || subordinateEmployeesRes?.data?.data?.items || extractData(subordinateEmployeesRes),
         myMeetings: allMeetings,
         oneOnOneReports: oneOnOneReports,
-        managerEscalations: extractData(managerEscalationsRes)
+        managerEscalations: extractData(managerEscalationsRes),
+        opportunities
       });
     } catch (err) {
       console.error("Error in fetchAllData:", err);
@@ -175,6 +200,7 @@ const ManagerDashboard = () => {
     }
   };
 
+
   const getKPIStats = () => {
     const totalTeamMembers = dashboardData.subordinateEmployees.length || dashboardData.teamMembers.length;
     const totalNominations = dashboardData.managerNominations.length;
@@ -183,12 +209,15 @@ const ManagerDashboard = () => {
       return status === "inprogress" || status === "pending" || status === "approved" || status === "open";
     }).length;
 
+
     const pendingEscalations = dashboardData.managerEscalations.filter((e) => e.escalationStatus?.toLowerCase() === "pending").length;
+
 
     const upcomingMeetings = dashboardData.myMeetings.filter((m) => {
       const meetingDate = new Date(m.meetingDate || m.date);
       return meetingDate > new Date();
     }).length;
+
 
     return {
       totalTeamMembers,
@@ -198,9 +227,11 @@ const ManagerDashboard = () => {
       pendingEscalations,
       upcomingMeetings,
       totalEscalations: dashboardData.managerEscalations.length,
-      totalMeetings: dashboardData.myMeetings.length
+      totalMeetings: dashboardData.myMeetings.length,
+      totalOpportunities: dashboardData.opportunities.length
     };
   };
+
 
   const getGoalsByType = () => {
     const goals = dashboardData.allGoals.filter((g) => {
@@ -211,9 +242,11 @@ const ManagerDashboard = () => {
       return false;
     });
 
+
     if (!goals || goals.length === 0) {
       return { total: 0, completed: 0, inProgress: 0, pending: 0, chartData: [] };
     }
+
 
     const completed = goals.filter((g) => (g.status || g.goalStatus || "").toLowerCase() === "completed").length;
     const inProgress = goals.filter((g) => (g.status || g.goalStatus || "").toLowerCase() === "inprogress").length;
@@ -222,14 +255,50 @@ const ManagerDashboard = () => {
       return status === "pending" || status === "open" || status === "approved";
     }).length;
 
+
     const chartData = [
       completed > 0 && { name: "Completed", value: completed, fill: BLUE_COLORS[0] },
       inProgress > 0 && { name: "In Progress", value: inProgress, fill: BLUE_COLORS[1] },
       pending > 0 && { name: "Pending", value: pending, fill: BLUE_COLORS[2] }
     ].filter(Boolean);
 
+
     return { total: goals.length, completed, inProgress, pending, chartData };
   };
+
+
+  const getOpportunitiesOverview = () => {
+    const opportunities = dashboardData.opportunities;
+    if (!opportunities?.length) return { total: 0, opportunityList: [], chartData: [] };
+
+    const byOpportunity = {};
+    opportunities.forEach(opp => {
+      const name = opp.title || opp.opportunityName || opp.name || "Unnamed Opportunity";
+      if (!byOpportunity[name]) {
+        byOpportunity[name] = {
+          name: name,
+          count: 0,
+          id: opp.id || opp.opportunityId
+        };
+      }
+      byOpportunity[name].count += 1;
+    });
+
+    const opportunityList = Object.values(byOpportunity);
+
+    const chartData = opportunityList.map((item, i) => ({
+      name: item.name,
+      value: item.count,
+      fill: BLUE_COLORS[i % BLUE_COLORS.length]
+    }));
+
+    return { 
+      total: opportunities.length, 
+      opportunityList,
+      chartData 
+    };
+  };
+
 
   const getTeamAssignmentStatus = () => {
     const statusCount = {};
@@ -243,6 +312,7 @@ const ManagerDashboard = () => {
       .filter((item) => item.value > 0);
   };
 
+
   const getEscalationHistory = () => {
     const ESCALATION_COLORS = {
       Pending: BLUE_COLORS[2],
@@ -253,6 +323,7 @@ const ManagerDashboard = () => {
       InProgress: BLUE_COLORS[1]
     };
 
+
     const escalations = dashboardData.managerEscalations;
     const statusCount = {};
     escalations.forEach((esc) => {
@@ -261,11 +332,13 @@ const ManagerDashboard = () => {
       statusCount[key] = (statusCount[key] || 0) + 1;
     });
 
+
     const chartData = Object.entries(statusCount).map(([name, value]) => ({
       name,
       value,
       fill: ESCALATION_COLORS[name] || BLUE_COLORS[2]
     }));
+
 
     return {
       total: escalations.length,
@@ -276,12 +349,14 @@ const ManagerDashboard = () => {
     };
   };
 
+
   const getNominationOverview = () => {
     const nominations = dashboardData.managerNominations;
     const now = new Date();
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth();
     const total = nominations.length;
+
 
     const thisMonth = nominations.filter((nom) => {
       const dateFields = [nom.createdDate, nom.submittedDate, nom.nominationDate, nom.createdAt, nom.submittedAt];
@@ -296,10 +371,28 @@ const ManagerDashboard = () => {
       return false;
     }).length;
 
+
     const pending = nominations.filter((nom) => {
       const status = (nom.status || nom.nominationStatus || nom.currentStatus || "").toLowerCase();
       return status.includes("pending") || status === "submitted" || status === "open";
     }).length;
+
+
+    // Group by reward type
+    const byRewardType = {};
+    nominations.forEach((nom) => {
+      const rewardType = nom.rewardType || nom.rewardTypeName || nom.awardType || nom.opportunity?.rewardType || "Other";
+      if (!byRewardType[rewardType]) {
+        byRewardType[rewardType] = {
+          name: rewardType,
+          count: 0
+        };
+      }
+      byRewardType[rewardType].count += 1;
+    });
+
+    const rewardTypeList = Object.values(byRewardType);
+
 
     const statusCount = {};
     nominations.forEach((nom) => {
@@ -307,6 +400,7 @@ const ManagerDashboard = () => {
       const key = formatStatusLabel(rawStatus);
       statusCount[key] = (statusCount[key] || 0) + 1;
     });
+
 
     const chartData = Object.entries(statusCount).map(([name, value]) => ({
       name,
@@ -318,8 +412,16 @@ const ManagerDashboard = () => {
               BLUE_COLORS[1]
     }));
 
-    return { total, thisMonth, pending, chartData: chartData.filter((item) => item.value > 0) };
+
+    return { 
+      total, 
+      thisMonth, 
+      pending, 
+      chartData: chartData.filter((item) => item.value > 0),
+      rewardTypeList
+    };
   };
+
 
   const getMeetingScheduleData = () => {
     const meetings = dashboardData.myMeetings;
@@ -332,14 +434,17 @@ const ManagerDashboard = () => {
       }
     });
 
+
     const chartData = Object.entries(monthlyData).sort((a, b) => a[0].localeCompare(b[0])).slice(-6)
       .map(([month, count]) => ({
         month: new Date(month + "-01").toLocaleDateString("en-US", { month: "short", year: "numeric" }),
         count
       }));
 
+
     return { total: meetings.length, chartData };
   };
+
 
   const getMeetingOverview = () => {
     const now = new Date();
@@ -349,6 +454,7 @@ const ManagerDashboard = () => {
     return { total, upcoming, completed };
   };
 
+
   if (loading) return (
     <div className="ada-loading-container">
       <div className="spinner-border text-primary" role="status">
@@ -357,25 +463,30 @@ const ManagerDashboard = () => {
     </div>
   );
 
+
   const kpiStats = getKPIStats();
   const goalsData = getGoalsByType();
+  const opportunitiesData = getOpportunitiesOverview();
   const teamAssignmentStatus = getTeamAssignmentStatus();
   const escalationHistory = getEscalationHistory();
   const nominationOverview = getNominationOverview();
   const meetingScheduleData = getMeetingScheduleData();
   const meetingOverview = getMeetingOverview();
 
+
   const kpiCards = [
     { icon: Users, value: kpiStats.totalTeamMembers, label: "Team Members", trend: `${kpiStats.totalTeamMembers} total`, iconClass: "ada-stat-icon-primary" },
     { icon: Target, value: kpiStats.ongoingGoalsCount, label: "Ongoing Goals", trend: `${kpiStats.myProjectsCount} projects`, iconClass: "ada-stat-icon-info", up: true },
     { icon: Shield, value: kpiStats.totalNominations, label: "Nominations", trend: `${nominationOverview.thisMonth} this month`, iconClass: "ada-stat-icon-warning" },
-    { icon: Calendar, value: kpiStats.totalMeetings, label: "Meetings", trend: `${kpiStats.upcomingMeetings} upcoming`, iconClass: "ada-stat-icon-success" },
+    { icon: Briefcase, value: kpiStats.totalOpportunities, label: "Opportunities", trend: "Internal opportunities", iconClass: "ada-stat-icon-pink" },
     { icon: AlertTriangle, value: kpiStats.totalEscalations, label: "Escalations", trend: `${kpiStats.pendingEscalations} pending`, iconClass: "ada-stat-icon-purple" }
   ];
+
 
   return (
     <div className="ada-dashboard">
       <Breadcrumb items={[{ label: "Manager Dashboard" }]} />
+
 
       <div className="ada-stats-grid">
         {kpiCards.map(({ icon: Icon, value, label, trend, iconClass, up }, i) => (
@@ -395,7 +506,9 @@ const ManagerDashboard = () => {
         ))}
       </div>
 
+
       <div className="manager-cards-container">
+        {/* ROW 1: Goals, Nominations, Opportunities */}
         <div className="manager-row">
           <div className="ada-chart-card">
             <div className="ada-card-header">
@@ -426,6 +539,7 @@ const ManagerDashboard = () => {
                     </div>
                   </div>
 
+
                   {goalsData.chartData.length > 0 && (
                     <ResponsiveContainer width="100%" height={220}>
                       <PieChart>
@@ -444,6 +558,8 @@ const ManagerDashboard = () => {
             </div>
           </div>
 
+
+          {/* UPDATED: Nominations Card with Reward Types */}
           <div className="ada-chart-card">
             <div className="ada-card-header">
               <div className="ada-card-title">
@@ -468,11 +584,184 @@ const ManagerDashboard = () => {
                     </div>
                   </div>
 
+
                   {nominationOverview.chartData.length > 0 && (
+                    <ResponsiveContainer width="100%" height={180}>
+                      <PieChart>
+                        <Pie data={nominationOverview.chartData} cx="50%" cy="45%" outerRadius={60} dataKey="value" label={false}>
+                          {nominationOverview.chartData.map((entry, i) => <Cell key={`cell-${i}`} fill={entry.fill} />)}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  )}
+
+                  {/* List of reward types */}
+                  {nominationOverview.rewardTypeList.length > 0 && (
+                    <div className="ada-nomination-list">
+                      {nominationOverview.rewardTypeList.map((item, i) => (
+                        <div key={i} className="ada-nomination-item">
+                          <Award size={18} style={{ color: BLUE_COLORS[i % BLUE_COLORS.length], flexShrink: 0 }} />
+                          <div className="ada-nomination-info">
+                            <div className="ada-nomination-name">{item.name}</div>
+                            <div className="ada-nomination-bar">
+                              <div
+                                className="ada-nomination-fill"
+                                style={{
+                                  width: `${(item.count / nominationOverview.total) * 100}%`,
+                                  backgroundColor: BLUE_COLORS[i % BLUE_COLORS.length]
+                                }}
+                              />
+                            </div>
+                          </div>
+                          <span 
+                            className="ada-nomination-count" 
+                            style={{ color: BLUE_COLORS[i % BLUE_COLORS.length] }}
+                          >
+                            {item.count}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="ada-no-data">No nominations data</div>
+              )}
+            </div>
+          </div>
+
+
+          {/* Internal Opportunities Card */}
+          <div className="ada-chart-card">
+            <div className="ada-card-header">
+              <div className="ada-card-title">
+                <i className="bi bi-briefcase" /> Internal Opportunities
+              </div>
+            </div>
+            <div className="ada-card-body">
+              {opportunitiesData.total > 0 ? (
+                <>
+                  <div className="ada-perf-stats-grid ada-perf-stats-1col">
+                    <div className="ada-perf-stat-card">
+                      <div className="ada-perf-stat-value">{opportunitiesData.total}</div>
+                      <div className="ada-perf-stat-label">Opportunities Awaiting</div>
+                    </div>
+                  </div>
+
+                  {opportunitiesData.chartData.length > 0 && (
+                    <ResponsiveContainer width="100%" height={180}>
+                      <PieChart>
+                        <Pie 
+                          data={opportunitiesData.chartData} 
+                          cx="50%" 
+                          cy="50%" 
+                          outerRadius={60} 
+                          dataKey="value" 
+                          label={false}
+                        >
+                          {opportunitiesData.chartData.map((entry, i) => (
+                            <Cell key={`cell-${i}`} fill={entry.fill} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  )}
+
+                  {opportunitiesData.opportunityList.length > 0 && (
+                    <div className="ada-opportunity-list">
+                      {opportunitiesData.opportunityList.map((item, i) => (
+                        <div key={i} className="ada-opportunity-item">
+                          <Briefcase size={18} style={{ color: BLUE_COLORS[i % BLUE_COLORS.length], flexShrink: 0 }} />
+                          <div className="ada-opportunity-info">
+                            <div className="ada-opportunity-name">{item.name}</div>
+                            <div className="ada-opportunity-bar">
+                              <div
+                                className="ada-opportunity-fill"
+                                style={{
+                                  width: `${(item.count / opportunitiesData.total) * 100}%`,
+                                  backgroundColor: BLUE_COLORS[i % BLUE_COLORS.length]
+                                }}
+                              />
+                            </div>
+                          </div>
+                          <span 
+                            className="ada-opportunity-count" 
+                            style={{ color: BLUE_COLORS[i % BLUE_COLORS.length] }}
+                          >
+                            {item.count}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="ada-no-data">No opportunities available</div>
+              )}
+            </div>
+          </div>
+        </div>
+
+
+        {/* ROW 2: Team L&D, Escalations, Meetings */}
+        <div className="manager-row">
+          <div className="ada-chart-card">
+            <div className="ada-card-header">
+              <div className="ada-card-title">
+                <i className="bi bi-people-fill" /> Team L&D
+              </div>
+              <span className="ada-card-badge">Assignments</span>
+            </div>
+            <div className="ada-card-body">
+              {teamAssignmentStatus.length > 0 ? (
+                <ResponsiveContainer width="100%" height={280}>
+                  <PieChart>
+                    <Pie data={teamAssignmentStatus} cx="50%" cy="45%" innerRadius={60} outerRadius={90} paddingAngle={3} dataKey="value" label={false}>
+                      {teamAssignmentStatus.map((entry, i) => <Cell key={`cell-${i}`} fill={entry.fill} />)}
+                    </Pie>
+                    <Tooltip />
+                    <Legend layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="ada-no-data">No L&D assignments</div>
+              )}
+            </div>
+          </div>
+
+
+          <div className="ada-chart-card">
+            <div className="ada-card-header">
+              <div className="ada-card-title">
+                <i className="bi bi-exclamation-triangle-fill" /> Escalations
+              </div>
+            </div>
+            <div className="ada-card-body">
+              {escalationHistory.total > 0 ? (
+                <>
+                  <div className="ada-perf-stats-grid">
+                    <div className="ada-perf-stat-card">
+                      <div className="ada-perf-stat-value">{escalationHistory.total}</div>
+                      <div className="ada-perf-stat-label">Total</div>
+                    </div>
+                    <div className="ada-perf-stat-card ada-warning">
+                      <div className="ada-perf-stat-value">{escalationHistory.pending}</div>
+                      <div className="ada-perf-stat-label">Pending</div>
+                    </div>
+                    <div className="ada-perf-stat-card ada-success">
+                      <div className="ada-perf-stat-value">{escalationHistory.resolved}</div>
+                      <div className="ada-perf-stat-label">Resolved</div>
+                    </div>
+                  </div>
+
+
+                  {escalationHistory.chartData.length > 0 && (
                     <ResponsiveContainer width="100%" height={220}>
                       <PieChart>
-                        <Pie data={nominationOverview.chartData} cx="50%" cy="45%" outerRadius={75} dataKey="value" label={false}>
-                          {nominationOverview.chartData.map((entry, i) => <Cell key={`cell-${i}`} fill={entry.fill} />)}
+                        <Pie data={escalationHistory.chartData} cx="50%" cy="45%" innerRadius={50} outerRadius={70} dataKey="value" label={false}>
+                          {escalationHistory.chartData.map((entry, i) => <Cell key={`cell-${i}`} fill={entry.fill} />)}
                         </Pie>
                         <Tooltip />
                         <Legend layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ fontSize: "11px" }} />
@@ -481,10 +770,11 @@ const ManagerDashboard = () => {
                   )}
                 </>
               ) : (
-                <div className="ada-no-data">No nominations data</div>
+                <div className="ada-no-data">No escalations</div>
               )}
             </div>
           </div>
+
 
           <div className="ada-chart-card">
             <div className="ada-card-header">
@@ -511,6 +801,7 @@ const ManagerDashboard = () => {
                     </div>
                   </div>
 
+
                   {meetingScheduleData.chartData.length > 0 && (
                     <ResponsiveContainer width="100%" height={220}>
                       <LineChart data={meetingScheduleData.chartData}>
@@ -529,77 +820,10 @@ const ManagerDashboard = () => {
             </div>
           </div>
         </div>
-
-        <div className="manager-row manager-row-2">
-          <div className="ada-chart-card">
-            <div className="ada-card-header">
-              <div className="ada-card-title">
-                <i className="bi bi-people-fill" /> Team L&D
-              </div>
-              <span className="ada-card-badge">Assignments</span>
-            </div>
-            <div className="ada-card-body">
-              {teamAssignmentStatus.length > 0 ? (
-                <ResponsiveContainer width="100%" height={280}>
-                  <PieChart>
-                    <Pie data={teamAssignmentStatus} cx="50%" cy="45%" innerRadius={60} outerRadius={90} paddingAngle={3} dataKey="value" label={false}>
-                      {teamAssignmentStatus.map((entry, i) => <Cell key={`cell-${i}`} fill={entry.fill} />)}
-                    </Pie>
-                    <Tooltip />
-                    <Legend layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }} />
-                  </PieChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="ada-no-data">No L&D assignments</div>
-              )}
-            </div>
-          </div>
-
-          <div className="ada-chart-card">
-            <div className="ada-card-header">
-              <div className="ada-card-title">
-                <i className="bi bi-exclamation-triangle-fill" /> Escalations
-              </div>
-            </div>
-            <div className="ada-card-body">
-              {escalationHistory.total > 0 ? (
-                <>
-                  <div className="ada-perf-stats-grid">
-                    <div className="ada-perf-stat-card">
-                      <div className="ada-perf-stat-value">{escalationHistory.total}</div>
-                      <div className="ada-perf-stat-label">Total</div>
-                    </div>
-                    <div className="ada-perf-stat-card ada-warning">
-                      <div className="ada-perf-stat-value">{escalationHistory.pending}</div>
-                      <div className="ada-perf-stat-label">Pending</div>
-                    </div>
-                    <div className="ada-perf-stat-card ada-success">
-                      <div className="ada-perf-stat-value">{escalationHistory.resolved}</div>
-                      <div className="ada-perf-stat-label">Resolved</div>
-                    </div>
-                  </div>
-
-                  {escalationHistory.chartData.length > 0 && (
-                    <ResponsiveContainer width="100%" height={220}>
-                      <PieChart>
-                        <Pie data={escalationHistory.chartData} cx="50%" cy="45%" innerRadius={50} outerRadius={70} dataKey="value" label={false}>
-                          {escalationHistory.chartData.map((entry, i) => <Cell key={`cell-${i}`} fill={entry.fill} />)}
-                        </Pie>
-                        <Tooltip />
-                        <Legend layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ fontSize: "11px" }} />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  )}
-                </>
-              ) : (
-                <div className="ada-no-data">No escalations</div>
-              )}
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
 };
+
 
 export default ManagerDashboard;

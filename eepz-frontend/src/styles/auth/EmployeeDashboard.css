@@ -1,6 +1,7 @@
 /* EMPLOYEE DASHBOARD  */
 
 
+
 /* LOADING STATE */
 .ada-loading-container {
   display: flex;
@@ -8,6 +9,7 @@
   justify-content: center;
   min-height: 50vh;
 }
+
 
 
 /* MAIN DASHBOARD CONTAINER */
@@ -18,6 +20,7 @@
 }
 
 
+
 /* KPI CARDS GRID - FIXED 5 COLUMNS */
 .admin-kpi-grid {
   display: grid;
@@ -25,6 +28,7 @@
   gap: 1rem;
   margin-bottom: 1rem;
 }
+
 
 
 .admin-kpi-card {
@@ -40,11 +44,13 @@
 }
 
 
+
 .admin-kpi-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(39, 35, 92, 0.12); /* admin hover */
   border-color: #1E40AF;
 }
+
 
 
 .admin-kpi-icon {
@@ -59,31 +65,37 @@
 }
 
 
+
 /* BLUE NAVY GRADIENT COLORS FOR KPI ICONS  */
 .admin-kpi-icon.admin-purple {
   background: linear-gradient(135deg, rgba(30, 64, 175, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%);
   color: #1E40AF;
 }
 
+
 .admin-kpi-icon.admin-blue {
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.1) 100%);
   color: #2563EB;
 }
+
 
 .admin-kpi-icon.admin-pink {
   background: linear-gradient(135deg, rgba(96, 165, 250, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%);
   color: #3B82F6;
 }
 
+
 .admin-kpi-icon.admin-green {
   background: linear-gradient(135deg, rgba(129, 140, 248, 0.18) 0%, rgba(59, 130, 246, 0.1) 100%);
   color: #4F46E5;
 }
 
+
 .admin-kpi-icon.admin-cyan {
   background: linear-gradient(135deg, rgba(191, 219, 254, 0.4) 0%, rgba(147, 197, 253, 0.2) 100%);
   color: #60A5FA;
 }
+
 
 
 .admin-kpi-content {
@@ -96,6 +108,7 @@
 }
 
 
+
 .admin-kpi-content h2 {
   font-size: 1.625rem;
   font-weight: 700;
@@ -105,12 +118,14 @@
 }
 
 
+
 .admin-kpi-content p {
   font-size: 0.8125rem;
   color: #6c757d;
   margin: 0;
   font-weight: 500;
 }
+
 
 
 .admin-kpi-subtitle {
@@ -123,12 +138,14 @@
 }
 
 
+
 /* DASHBOARD CARDS CONTAINER */
 .dashboard-cards-container {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
 }
+
 
 
 .dashboard-row {
@@ -138,9 +155,11 @@
 }
 
 
+
 .dashboard-row-2 {
   grid-template-columns: repeat(2, 1fr);
 }
+
 
 
 .dashboard-card {
@@ -153,15 +172,18 @@
 }
 
 
+
 .dashboard-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(39, 35, 92, 0.12);
 }
 
 
+
 .dashboard-card.card-medium {
   grid-column: span 1;
 }
+
 
 
 /* CARD HEADER - SAME DARK NAVY BLUE GRADIENT AS ADMIN */
@@ -175,6 +197,7 @@
 }
 
 
+
 .card-header-content {
   display: flex;
   align-items: center;
@@ -182,10 +205,12 @@
 }
 
 
+
 .card-header-content i {
   font-size: 1.125rem;
   color: #ffffff;
 }
+
 
 
 .card-header-content h3 {
@@ -196,10 +221,12 @@
 }
 
 
+
 /* CARD BODY */
 .card-body {
   padding: 1.25rem;
 }
+
 
 
 .no-data-message {
@@ -214,6 +241,7 @@
 }
 
 
+
 /* STAT CARDS GRID */
 .emp-stats-grid {
   display: grid;
@@ -223,14 +251,22 @@
 }
 
 
+
+.emp-stats-grid.emp-stats-1col {
+  grid-template-columns: 1fr;
+}
+
+
 .emp-stats-grid.emp-stats-2col {
   grid-template-columns: repeat(2, 1fr);
 }
 
 
+
 .emp-stats-grid.emp-stats-4col {
   grid-template-columns: repeat(4, 1fr);
 }
+
 
 
 .emp-stat-card {
@@ -241,10 +277,12 @@
 }
 
 
+
 .emp-stat-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2); /* blue shadow */
 }
+
 
 
 .emp-stat-value {
@@ -254,10 +292,12 @@
 }
 
 
+
 .emp-stat-label {
   font-size: 0.7rem;
   font-weight: 500;
 }
+
 
 
 /* STAT CARDS - BLUE THEME VARIANTS  */
@@ -270,6 +310,7 @@
   color: #1E40AF !important;
 }
 
+
 .emp-stat-org-noms {
   background: #e5e7ff !important;
   border: 1px solid #4F46E5 !important;
@@ -278,6 +319,7 @@
 .emp-stat-org-noms .emp-stat-label {
   color: #312E81 !important;
 }
+
 
 .emp-stat-total-purple {
   background: #e5e7ff !important;
@@ -288,6 +330,7 @@
   color: #312E81 !important;
 }
 
+
 .emp-stat-completed-purple {
   background: #27235c !important;
   border: 1px solid #4F46E5 !important;
@@ -296,6 +339,7 @@
 .emp-stat-completed-purple .emp-stat-label {
   color: #ffffff !important;
 }
+
 
 .emp-stat-inprogress-coral {
   background: #DBEAFE !important;
@@ -306,6 +350,7 @@
   color: #2563EB !important;
 }
 
+
 .emp-stat-low-rating {
   background: #eff6ff !important;
   border: 1px solid #2563EB !important;
@@ -314,6 +359,7 @@
 .emp-stat-low-rating .emp-stat-label {
   color: #1D4ED8 !important;
 }
+
 
 .emp-stat-medium-rating {
   background: #DBEAFE !important;
@@ -324,6 +370,7 @@
   color: #1E40AF !important;
 }
 
+
 .emp-stat-high-rating {
   background: #1E40AF !important;
   border: 1px solid #2563EB !important;
@@ -333,6 +380,7 @@
   color: #ffffff !important;
 }
 
+
 .emp-stat-open {
   background: #DBEAFE !important;
   border: 1px solid #60A5FA !important;
@@ -341,6 +389,7 @@
 .emp-stat-open .emp-stat-label {
   color: #2563EB !important;
 }
+
 
 .emp-stat-overdue {
   background: #e0ecff !important;
@@ -352,6 +401,7 @@
 }
 
 
+
 /* TROPHY SECTION - BLUE ADAPTATION */
 .emp-trophy-section {
   display: flex;
@@ -360,15 +410,18 @@
   padding: 1rem 0;
 }
 
+
 .emp-trophy-container {
   position: relative;
   margin-bottom: 1.5rem;
 }
 
+
 .emp-trophy-icon {
   color: #1E40AF;
   filter: drop-shadow(0 4px 6px rgba(30, 64, 175, 0.4));
 }
+
 
 .emp-trophy-badge {
   position: absolute;
@@ -389,12 +442,14 @@
   color: #1E3A8A;
 }
 
+
 .emp-trophy-title {
   font-size: 1.1rem;
   font-weight: 600;
   color: #1E40AF;
   margin-bottom: 1rem;
 }
+
 
 
 /* RECOGNITION LIST - BLUE THEMED */
@@ -404,6 +459,7 @@
   flex-direction: column;
   gap: 0.75rem;
 }
+
 
 .emp-recognition-item {
   display: flex;
@@ -416,15 +472,18 @@
   transition: all 0.2s ease;
 }
 
+
 .emp-recognition-item:hover {
   background: linear-gradient(135deg, rgba(147, 197, 253, 0.2) 0%, rgba(191, 219, 254, 0.14) 100%);
   border-color: #60A5FA;
   transform: translateX(4px);
 }
 
+
 .emp-recognition-info {
   flex: 1;
 }
+
 
 .emp-recognition-name {
   font-size: 0.875rem;
@@ -432,6 +491,7 @@
   color: #1E40AF;
   margin-bottom: 0.25rem;
 }
+
 
 .emp-recognition-bar {
   width: 100%;
@@ -441,10 +501,12 @@
   overflow: hidden;
 }
 
+
 .emp-recognition-fill {
   height: 100%;
   transition: width 0.3s ease;
 }
+
 
 .emp-recognition-count {
   font-size: 1rem;
@@ -454,24 +516,95 @@
 }
 
 
+
+/* OPPORTUNITIES LIST - SIMILAR TO RECOGNITION LIST */
+.emp-opportunity-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+
+.emp-opportunity-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, rgba(147, 197, 253, 0.12) 0%, rgba(191, 219, 254, 0.08) 100%);
+  border-radius: 8px;
+  border: 1px solid #DBEAFE;
+  transition: all 0.2s ease;
+}
+
+
+.emp-opportunity-item:hover {
+  background: linear-gradient(135deg, rgba(147, 197, 253, 0.2) 0%, rgba(191, 219, 254, 0.14) 100%);
+  border-color: #60A5FA;
+  transform: translateX(4px);
+}
+
+
+.emp-opportunity-info {
+  flex: 1;
+}
+
+
+.emp-opportunity-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1E40AF;
+  margin-bottom: 0.25rem;
+}
+
+
+.emp-opportunity-bar {
+  width: 100%;
+  height: 6px;
+  background: #EFF6FF;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+
+.emp-opportunity-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+
+.emp-opportunity-count {
+  font-size: 1rem;
+  font-weight: 600;
+  min-width: 30px;
+  text-align: right;
+}
+
+
+
 /* RESPONSIVE DESIGN */
 @media (max-width: 1400px) {
   .admin-kpi-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 
+
   .dashboard-row {
     grid-template-columns: repeat(2, 1fr);
   }
+
 
   .dashboard-row-2 {
     grid-template-columns: repeat(2, 1fr);
   }
 
+
   .emp-stats-grid.emp-stats-4col {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
 
 @media (max-width: 992px) {
   .dashboard-row,
@@ -479,33 +612,40 @@
     grid-template-columns: 1fr;
   }
 
+
   .admin-kpi-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
 
   .emp-stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
+
   .emp-stats-grid.emp-stats-2col {
     grid-template-columns: 1fr;
   }
+
 
   .emp-stats-grid.emp-stats-4col {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
 
 @media (max-width: 768px) {
   .admin-kpi-grid {
     grid-template-columns: 1fr;
   }
 
+
   .emp-stats-grid,
   .emp-stats-grid.emp-stats-4col {
     grid-template-columns: 1fr;
   }
 }
+
 
 @media (max-width: 480px) {
   .card-header-dark {
@@ -514,10 +654,12 @@
     align-items: stretch;
   }
 
+
   .admin-kpi-card {
     flex-direction: column;
     text-align: center;
   }
+
 
   .admin-kpi-icon {
     margin: 0 auto;
