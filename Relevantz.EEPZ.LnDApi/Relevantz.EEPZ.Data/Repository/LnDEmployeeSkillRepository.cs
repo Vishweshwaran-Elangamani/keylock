@@ -355,7 +355,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             );
 
             _context.Lndemployeeskillmappers.Add(mapper);
-            await _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             Log.Information(
                 "AddEmployeeSkillAsync completed. MapperId={MapperId}, EmployeeId={EmployeeId}, SkillId={SkillId}",
@@ -377,7 +377,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             Log.Information("AddEmployeeSkillsAsync called. MappingsCount={Count}", mappers.Count);
 
             _context.Lndemployeeskillmappers.AddRange(mappers);
-            await _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             Log.Information("AddEmployeeSkillsAsync completed. SavedCount={Count}", mappers.Count);
 

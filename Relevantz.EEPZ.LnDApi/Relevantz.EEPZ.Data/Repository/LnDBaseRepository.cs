@@ -20,7 +20,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         public async Task<int> SaveChanges()
         {
-            return await _context.SaveChanges();
+            return await _context.SaveChangesAsync();
         }
     }
 }
