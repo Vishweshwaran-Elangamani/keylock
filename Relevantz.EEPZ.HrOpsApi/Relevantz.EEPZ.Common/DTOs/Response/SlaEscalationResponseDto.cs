@@ -27,5 +27,8 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public string? SlaStatus { get; set; }
         public int DaysOverdue { get; set; }
         public string Severity { get; set; } = null!;
+        public string? AssignedToName { get; set; }
+        public string ComplianceStatus { get; set; } = "OnTime";
+
     }
 }

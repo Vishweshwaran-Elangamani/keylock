@@ -182,6 +182,7 @@ builder.Services.AddAuthorization();
 
 Log.Information("JWT Authentication configured");
 
+builder.Services.AddScoped<IEmailClient, EmailClient>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<ISlaService, SlaService>();

@@ -1,11 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Common.DTOs.Request;
+using Relevantz.EEPZ.Common.DTOs.Response;
+using Relevantz.EEPZ.Common;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace eepzbackend.Controllers
 {
+    [Authorize]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/slas")]
     [Produces("application/json")]
     public partial class SlaController : ControllerBase
     {
@@ -18,120 +23,257 @@ namespace eepzbackend.Controllers
             _logger = logger;
         }
 
-        [HttpGet("all")]
-        public async Task<IActionResult> GetAllSlas()
+        private string CorrelationId => HttpContext.TraceIdentifier;
+
+        private int UserId
         {
-            _logger.LogInformation("Getting all SLAs");
-            var result = await _slaService.GetAllSlas();
-            return result.Success ? Ok(result) : BadRequest(result);
-        }
-
-        [HttpPost("create")]
-        public IActionResult CreateSla([FromBody] CreateSlaRequest request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            _logger.LogInformation("Queueing SLA creation process");
-
-            _ = Task.Run(async () =>
+            get
             {
-                var result = await _slaService.CreateSla(request);
-                if (!result.Success)
-                {
-                    _logger.LogWarning("SLA creation failed: {Message}", result.Message);
-                }
-                else
-                {
-                    _logger.LogInformation("SLA created successfully");
-                }
+                var claim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (string.IsNullOrEmpty(claim))
+                    throw new UnauthorizedAccessException(ApiMessages.Unauthorized);
+                return int.Parse(claim);
+            }
+        }
+
+        /// <summary>
+        /// Retrieves all SLAs available in the system.
+        /// </summary>
+        /// <returns>List of SLA records</returns>
+        [HttpGet]
+        public async Task<IActionResult> GetSlas()
+        {
+            _logger.LogInformation("Fetching all SLAs. UserId: {UserId}, CorrelationId: {CorrelationId}", UserId, CorrelationId);
+
+            var data = await _slaService.GetAllSlas();
+
+            _logger.LogInformation("Fetched {Count} SLAs successfully. CorrelationId: {CorrelationId}", data.Count, CorrelationId);
+
+            return Ok(new ApiResponse<object>
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Success = true,
+                Message = ApiMessages.Success,
+                Data = data,
+                CorrelationId = CorrelationId
             });
-
-            return Accepted(new { success = true, message = "SLA creation started in background" });
         }
 
-        [HttpPost("bulk-create")]
-        public async Task<IActionResult> BulkCreateSla([FromBody] List<CreateSlaRequest> requests)
+        /// <summary>
+        /// Creates a new SLA for an employee.
+        /// </summary>
+        /// <param name="slaRequest">SLA creation request payload</param>
+        /// <returns>Created SLA information</returns>
+        [HttpPost]
+        public async Task<IActionResult> CreateSla([FromBody] CreateSlaRequest slaRequest)
         {
+            _logger.LogInformation("Creating SLA. UserId: {UserId}, CorrelationId: {CorrelationId}", UserId, CorrelationId);
+
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                _logger.LogWarning("Validation failed for CreateSla. CorrelationId: {CorrelationId}", CorrelationId);
 
-            if (requests == null || !requests.Any())
-                return BadRequest(new { success = false, message = "No SLA records provided" });
+                return BadRequest(new ApiResponse<object>
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Success = false,
+                    Message = ApiMessages.ValidationFailed,
+                    Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList(),
+                    CorrelationId = CorrelationId
+                });
+            }
 
-            if (requests.Count > 10000)
-                return BadRequest(new { success = false, message = "Maximum 10,000 records allowed per bulk operation" });
+            var data = await _slaService.CreateSla(slaRequest, UserId);
 
-            _logger.LogInformation("Starting bulk SLA creation for {Count} records", requests.Count);
+            _logger.LogInformation("SLA created successfully. SLA ID: {Slaid}, CorrelationId: {CorrelationId}", data.Slaid, CorrelationId);
 
-            var result = await _slaService.BulkCreateSla(requests);
-
-            return result.Success ? Ok(result) : BadRequest(result);
+            return Ok(new ApiResponse<object>
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Success = true,
+                Message = ApiMessages.Created,
+                Data = data,
+                CorrelationId = CorrelationId
+            });
         }
 
-        [HttpGet("{slaid}")]
-        public async Task<IActionResult> GetSlaById(int slaid)
+        /// <summary>
+        /// Creates multiple SLAs in bulk.
+        /// </summary>
+        /// <param name="slaRequests">List of SLA creation request payloads</param>
+        /// <returns>Bulk creation result</returns>
+        [HttpPost("bulk")]
+        public async Task<IActionResult> BulkCreateSla([FromBody] List<CreateSlaRequest> slaRequests)
         {
-            _logger.LogInformation("Getting SLA {Slaid}", slaid);
-            var result = await _slaService.GetSlaById(slaid);
-            return result.Success ? Ok(result) : NotFound(result);
+            _logger.LogInformation("Bulk SLA creation started. UserId: {UserId}, Count: {Count}, CorrelationId: {CorrelationId}",
+                UserId, slaRequests?.Count ?? 0, CorrelationId);
+
+            if (slaRequests == null || !slaRequests.Any())
+                return BadRequest(new ApiResponse<object> { StatusCode = 400, Success = false, Message = ApiMessages.NoRecords, CorrelationId = CorrelationId });
+
+            if (slaRequests.Count > 10000)
+                return BadRequest(new ApiResponse<object> { StatusCode = 400, Success = false, Message = ApiMessages.BulkLimitExceeded, CorrelationId = CorrelationId });
+
+            foreach (var slaRequest in slaRequests)
+                if (!TryValidateModel(slaRequest))
+                    return BadRequest(new ApiResponse<object> { StatusCode = 400, Success = false, Message = ApiMessages.ValidationFailed, CorrelationId = CorrelationId });
+
+            var data = await _slaService.BulkCreateSla(slaRequests, UserId);
+
+            _logger.LogInformation("Bulk SLA creation completed. Success: {Count}, CorrelationId: {CorrelationId}", data.SuccessfulInserts, CorrelationId);
+
+            return Ok(new ApiResponse<object>
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Success = true,
+                Message = ApiMessages.Created,
+                Data = data,
+                CorrelationId = CorrelationId
+            });
         }
 
-        [HttpGet("employee/{employeeId}")]
-        public async Task<IActionResult> GetEmployeeSlas(int employeeId)
+        /// <summary>
+        /// Retrieves SLA details by identifier.
+        /// </summary>
+        /// <param name="slaId">SLA identifier</param>
+        /// <returns>SLA details</returns>
+        [HttpGet("{slaId}")]
+        public async Task<IActionResult> GetSlaById(int slaId)
         {
-            _logger.LogInformation("Getting SLAs for employee {EmployeeId}", employeeId);
-            var result = await _slaService.GetEmployeeSlas(employeeId);
-            return result.Success ? Ok(result) : NotFound(result);
+            _logger.LogInformation("Fetching SLA by ID {SlaId}. CorrelationId: {CorrelationId}", slaId, CorrelationId);
+
+            var data = await _slaService.GetSlaById(slaId);
+
+            if (data == null)
+                return NotFound(new ApiResponse<object> { StatusCode = 404, Success = false, Message = ApiMessages.NotFound, CorrelationId = CorrelationId });
+
+            return Ok(new ApiResponse<object>
+            {
+                StatusCode = 200,
+                Success = true,
+                Message = ApiMessages.Success,
+                Data = data,
+                CorrelationId = CorrelationId
+            });
         }
 
-        [HttpGet("manager/{managerId}/team-reviews")]
-        public async Task<IActionResult> GetTeamReviewTracking(int managerId)
+        /// <summary>
+        /// Updates an existing SLA record.
+        /// </summary>
+        /// <param name="slaId">SLA identifier</param>
+        /// <param name="slaRequest">SLA update request payload</param>
+        /// <returns>Update confirmation</returns>
+        [HttpPut("{slaId}")]
+        public async Task<IActionResult> UpdateSla(int slaId, [FromBody] UpdateSlaRequest slaRequest)
         {
-            _logger.LogInformation("Getting team review tracking for manager {ManagerId}", managerId);
-            var result = await _slaService.GetTeamReviewTracking(managerId);
-            return result.Success ? Ok(result) : NotFound(result);
+            _logger.LogInformation("Updating SLA {SlaId}. CorrelationId: {CorrelationId}", slaId, CorrelationId);
+
+            await _slaService.UpdateSla(slaId, slaRequest, UserId);
+
+            _logger.LogInformation("SLA {SlaId} updated successfully. CorrelationId: {CorrelationId}", slaId, CorrelationId);
+
+            return Ok(new ApiResponse<object> { StatusCode = 200, Success = true, Message = ApiMessages.Updated, CorrelationId = CorrelationId });
         }
 
-        [HttpGet("{slaid}/history")]
-        public async Task<IActionResult> GetSlaHistory(int slaid)
+        /// <summary>
+        /// Closes an SLA.
+        /// </summary>
+        /// <param name="slaId">SLA identifier</param>
+        /// <returns>Closure confirmation</returns>
+        [HttpPut("{slaId}/close")]
+        public async Task<IActionResult> CloseSla(int slaId)
         {
-            _logger.LogInformation("Getting SLA history for {Slaid}", slaid);
-            var result = await _slaService.GetSlaHistory(slaid);
-            return result.Success ? Ok(result) : NotFound(result);
+            _logger.LogInformation("Closing SLA {SlaId}. CorrelationId: {CorrelationId}", slaId, CorrelationId);
+
+            await _slaService.CloseSla(slaId, UserId);
+
+            _logger.LogInformation("SLA {SlaId} closed successfully. CorrelationId: {CorrelationId}", slaId, CorrelationId);
+
+            return Ok(new ApiResponse<object> { StatusCode = 200, Success = true, Message = ApiMessages.Closed, CorrelationId = CorrelationId });
         }
 
-        [HttpPut("{slaid}")]
-        public async Task<IActionResult> UpdateSla(int slaid, [FromBody] UpdateSlaRequest request)
+        /// <summary>
+        /// Reopens a closed SLA.
+        /// </summary>
+        /// <param name="slaId">SLA identifier</param>
+        /// <param name="slaRequest">Reopen SLA request payload</param>
+        /// <returns>Reopen result</returns>
+        [HttpPut("{slaId}/reopen")]
+        public async Task<IActionResult> ReopenSla(int slaId, [FromBody] ReopenSlaRequest slaRequest)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            _logger.LogInformation("Reopening SLA {SlaId}. CorrelationId: {CorrelationId}", slaId, CorrelationId);
 
-            _logger.LogInformation("Updating SLA {Slaid}", slaid);
-            var result = await _slaService.UpdateSla(slaid, request);
-            return result.Success ? Ok(result) : NotFound(result);
+            var data = await _slaService.ReopenSla(slaId, slaRequest.ExtensionDays, slaRequest.ReopenReason, UserId);
+
+            _logger.LogInformation("SLA {SlaId} reopened successfully. CorrelationId: {CorrelationId}", slaId, CorrelationId);
+
+            return Ok(new ApiResponse<ReopenSlaResponse>
+            {
+                StatusCode = 200,
+                Success = true,
+                Message = ApiMessages.Reopened,
+                Data = data,
+                CorrelationId = CorrelationId
+            });
         }
 
-        [HttpPut("close")]
-        public async Task<IActionResult> CloseSla([FromBody] CloseSlaRequest request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+    /// <summary>
+/// Retrieves SLA history records for a given SLA.
+/// </summary>
+/// <param name="slaid">SLA identifier</param>
+/// <returns>List of SLA history changes</returns>
+[HttpGet("{slaid}/history")]
+public async Task<IActionResult> GetSlaHistory(int slaid)
+{
+    _logger.LogInformation("START GetSlaHistory. SLA: {Slaid}, CorrelationId: {CorrelationId}", slaid, CorrelationId);
 
-            _logger.LogInformation("Closing SLA {Slaid}", request.Slaid);
-            var result = await _slaService.CloseSla(request);
-            return result.Success ? Ok(result) : BadRequest(result);
-        }
+    var data = await _slaService.GetSlaHistory(slaid);
 
-        [HttpPut("reopen")]
-        public async Task<IActionResult> ReopenSla([FromBody] ReopenSlaRequest request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+    _logger.LogInformation("SUCCESS GetSlaHistory. Count: {Count}, CorrelationId: {CorrelationId}", data.Count, CorrelationId);
 
-            _logger.LogInformation("Reopening SLA {Slaid}", request.Slaid);
-            var result = await _slaService.ReopenSla(request);
-            return result.Success ? Ok(result) : BadRequest(result);
-        }
+    return Ok(new ApiResponse<List<SlaHistoryResponse>>
+    {
+        StatusCode = StatusCodes.Status200OK,
+        Success = true,
+        Message = ApiMessages.Success,
+        Data = data,
+        CorrelationId = CorrelationId
+    });
+}
+
+
+      /// <summary>
+/// Retrieves all SLAs assigned to a specific employee.
+/// </summary>
+/// <param name="employeeId">Unique identifier of the employee.</param>
+/// <returns>ApiResponse containing list of SLAs for the employee.</returns>
+/// <summary>
+/// Retrieves all SLAs assigned to a specific employee.
+/// </summary>
+/// <param name="employeeId">Unique identifier of the employee.</param>
+/// <returns>ApiResponse containing list of SLAs for the employee.</returns>
+[HttpGet("employee/{employeeId}")]
+public async Task<IActionResult> GetEmployeeSlas(int employeeId)
+{
+    _logger.LogInformation("START GetEmployeeSlas. EmployeeId: {EmployeeId}, CorrelationId: {CorrelationId}",
+        employeeId, CorrelationId);
+
+    var data = await _slaService.GetEmployeeSlas(employeeId);
+
+    _logger.LogInformation("SUCCESS GetEmployeeSlas. Count: {Count}, CorrelationId: {CorrelationId}",
+        data?.Count ?? 0, CorrelationId);
+
+    _logger.LogInformation("END GetEmployeeSlas. CorrelationId: {CorrelationId}", CorrelationId);
+
+    return Ok(new ApiResponse<List<SlaResponse>>
+    {
+        StatusCode = StatusCodes.Status200OK,
+        Success = true,
+        Message = ApiMessages.Success,
+        Data = data,
+        CorrelationId = CorrelationId
+    });
+}
+
     }
 }

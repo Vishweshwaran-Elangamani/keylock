@@ -36,20 +36,15 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 .ToListAsync();
         }
 
-        public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
-        {
-            try
-            {
-                return await _context.Employees
-                    .Include(e => e.Userprofile)
-                    .FirstOrDefaultAsync(e => e.EmployeeId == employeeId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error retrieving employee: {employeeId}");
-                throw;
-            }
-        }
+public async Task<Employee?> GetEmployeeByIdAsync(int employeeId)
+{
+    return await _context.Employees
+        .Include(e => e.Userprofile)
+        .Include(e => e.Userauthentication)
+        .AsNoTracking()
+        .FirstOrDefaultAsync(e => e.EmployeeId == employeeId);
+}
+
 
         public async Task<Sla?> GetSlaByIdAsync(int slaid)
         {
@@ -112,67 +107,16 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
         }
 
-        public async Task<Sla> CreateSlaAsync(Sla sla)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(sla.Slatype))
-                    throw new ArgumentException("Slatype is required");
+     public async Task<Sla> CreateSlaAsync(Sla sla)
+{
+    sla.CreatedAt = DateTime.Now;
+    sla.UpdatedAt = DateTime.Now;
 
-                if (sla.EmployeeId <= 0)
-                    throw new ArgumentException("EmployeeId must be a positive integer");
+    _context.Slas.Add(sla);
+    await _context.SaveChangesAsync();
 
-                if (sla.AssignedToEmployeeId <= 0)
-                    throw new ArgumentException("AssignedToEmployeeId must be a positive integer");
-
-                if (sla.Deadline == default(DateTime))
-                    throw new ArgumentException("Valid Deadline is required");
-
-                sla.CreatedAt = DateTime.Now;
-                sla.UpdatedAt = DateTime.Now;
-
-                sla.Status = sla.Status ?? "Open";
-                sla.ComplianceStatus = sla.ComplianceStatus ?? "OnTime";
-
-                sla.Employee = null;
-                sla.AssignedToEmployee = null;
-
-                if (string.IsNullOrWhiteSpace(sla.RelatedEntityType))
-                    sla.RelatedEntityType = null;
-
-                if (sla.RelatedEntityId.HasValue && sla.RelatedEntityId.Value <= 0)
-                    sla.RelatedEntityId = null;
-
-                _context.Slas.Add(sla);
-                await _context.SaveChangesAsync();
-
-                _logger.LogInformation($"SLA created successfully. SLA ID: {sla.Slaid}");
-
-                return sla;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error creating SLA");
-                throw;
-            }
-        }
-
-        public async Task<Slahistory> CreateHistoryAsync(Slahistory history)
-        {
-            try
-            {
-                _context.Slahistories.Add(history);
-                await _context.SaveChangesAsync();
-
-                _logger.LogInformation($"History created successfully. SLA ID: {history.Slaid}");
-                return history;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error creating history");
-                throw;
-            }
-        }
+    return sla;
+}
 
         public async Task<Sla> UpdateSlaAsync(Sla sla)
         {
@@ -290,28 +234,24 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
+public async Task<List<Slaescalation>> GetEscalationsBySlaIdAsync(int slaId)
+{
+    return await _context.Slaescalations
+        .Where(e => e.Slaid == slaId)
 
-        public async Task<List<Slaescalation>> GetEscalationsBySlaIdAsync(int slaid)
-        {
-            try
-            {
-                return await _context.Slaescalations
-                    .Where(e => e.Slaid == slaid)
-                    .Include(e => e.EscalatedToEmployee)
-                        .ThenInclude(emp => emp.Userprofile)
-                    .Include(e => e.SubmittedByEmployee)
-                        .ThenInclude(emp => emp.Userprofile)
-                    .Include(e => e.ResolvedByEmployee)
-                        .ThenInclude(emp => emp.Userprofile)
-                    .OrderByDescending(e => e.SubmittedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error retrieving escalations for SLA: {slaid}");
-                throw;
-            }
-        }
+        .Include(e => e.SubmittedByEmployee)
+            .ThenInclude(e => e.Userprofile)
+
+        .Include(e => e.EscalatedToEmployee)
+            .ThenInclude(e => e.Userprofile)
+
+        .Include(e => e.Sla)
+            .ThenInclude(s => s.Employee)
+                .ThenInclude(e => e.Userprofile)
+
+        .OrderByDescending(e => e.SubmittedAt)
+        .ToListAsync();
+}
 
         public async Task<Slaescalation> CreateEscalationAsync(Slaescalation escalation)
         {
@@ -351,44 +291,45 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         #endregion
 
         #region History Operations
-        public async Task<List<Slahistory>> GetSlaHistoryAsync(int slaid)
-        {
-            try
-            {
-                return await _context.Slahistories
-                    .Where(h => h.Slaid == slaid)
-                    .Include(h => h.Sla)
-                        .ThenInclude(s => s.Employee)
-                            .ThenInclude(e => e.Userprofile)
-                    .Include(h => h.ChangedByEmployee)
-                        .ThenInclude(e => e.Userprofile)
-                    .OrderByDescending(h => h.CreatedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error retrieving SLA history for SLA: {slaid}");
-                throw;
-            }
-        }
+      public async Task<List<Slahistory>> GetSlaHistoryAsync(int slaid)
+{
+    return await _context.Slahistories
+        .Where(h => h.Slaid == slaid)
 
-        public async Task<Slahistory> AddHistoryAsync(Slahistory history)
-        {
-            try
-            {
-                history.CreatedAt = DateTime.Now;
-                _context.Slahistories.Add(history);
-                await _context.SaveChangesAsync();
+        .Include(h => h.ChangedByEmployee)
+            .ThenInclude(e => e.Userprofile)
 
-                _logger.LogInformation($"History entry added. SLA ID: {history.Slaid}");
-                return history;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error adding history");
-                throw;
-            }
-        }
+        .Include(h => h.Sla)
+            .ThenInclude(s => s.Employee)
+                .ThenInclude(e => e.Userprofile)
+
+        .OrderByDescending(h => h.CreatedAt)
+        .ToListAsync();
+}
+
+
+   public async Task<Slahistory> AddHistoryAsync(Slahistory history)
+{
+    history.CreatedAt = DateTime.Now;
+
+    if (history.ChangedByEmployeeId == 0)
+        history.ChangedByEmployeeId = null;
+
+    _context.Slahistories.Add(history);
+    await _context.SaveChangesAsync();
+
+    if (history.ChangedByEmployeeId.HasValue)
+    {
+        await _context.Entry(history)
+            .Reference(h => h.ChangedByEmployee)
+            .Query()
+            .Include(e => e.Userprofile)
+            .LoadAsync();
+    }
+
+    return history;
+}
+
 
         #endregion
 
@@ -709,6 +650,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return _context.Database.GetDbConnection().ConnectionString;
         }
 
+
         public async Task<int> BulkInsertSlasAsync(List<Sla> slas)
         {
             try
@@ -818,40 +760,21 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
         }
 
-        public async Task<List<Slaescalation>> GetEscalationsByEscalatedToAsync(int employeeId)
-        {
-            try
-            {
-                return await _context.Slaescalations
-                    .AsNoTracking()
-                    .Where(e => e.EscalatedToEmployeeId == employeeId)
-                    .Include(e => e.Sla)
-                        .ThenInclude(s => s.Employee!)
-                        .ThenInclude(emp => emp.Userprofile)
-                    .Include(e => e.Sla)
-                        .ThenInclude(s => s.Employee!)
-                        .ThenInclude(emp => emp.Userauthentication)
-                    .Include(e => e.EscalatedToEmployee!)
-                        .ThenInclude(emp => emp.Userprofile)
-                    .Include(e => e.EscalatedToEmployee!)
-                        .ThenInclude(emp => emp.Userauthentication)
-                    .Include(e => e.SubmittedByEmployee!)
-                        .ThenInclude(emp => emp.Userprofile)
-                    .Include(e => e.SubmittedByEmployee!)
-                        .ThenInclude(emp => emp.Userauthentication)
-                    .Include(e => e.ResolvedByEmployee!)
-                        .ThenInclude(emp => emp.Userprofile)
-                    .Include(e => e.ResolvedByEmployee!)
-                        .ThenInclude(emp => emp.Userauthentication)
-                    .OrderByDescending(e => e.SubmittedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error retrieving escalations for employee: {employeeId}");
-                throw;
-            }
-        }
+    public async Task<List<Slaescalation>> GetEscalationsByEscalatedToAsync(int managerId)
+{
+    return await _context.Slaescalations
+        .Include(e => e.Sla)
+            .ThenInclude(s => s.Employee)
+                .ThenInclude(emp => emp.Userprofile)
+        .Include(e => e.SubmittedByEmployee)
+            .ThenInclude(emp => emp.Userprofile)
+        .Include(e => e.EscalatedToEmployee)
+            .ThenInclude(emp => emp.Userprofile)
+        .Where(e => e.EscalatedToEmployeeId == managerId)
+        .OrderByDescending(e => e.SubmittedAt)
+        .ToListAsync();
+}
+
 
         /// <summary>
         /// Get SLAs due in specific number of days (for reminders)

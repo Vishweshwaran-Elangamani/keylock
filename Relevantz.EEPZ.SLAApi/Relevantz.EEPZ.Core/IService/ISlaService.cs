@@ -1,28 +1,30 @@
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
-
 namespace Relevantz.EEPZ.Core.Services.Interfaces
 {
     public interface ISlaService
     {
-        Task<ApiResponse<List<SlaResponse>>> GetEmployeeSlas(int employeeId);
-        Task<ApiResponse<EscalationResponse>> SubmitEscalation(SubmitSlaEscalationRequest request);
-        Task<ApiResponse<List<TeamReviewTrackingResponse>>> GetTeamReviewTracking(int managerId);
-        Task<ApiResponse<DepartmentComplianceResponse>> GetDepartmentCompliance(int departmentId, string? period = null);
-        Task<ApiResponse<ReopenSlaResponse>> ReopenSla(ReopenSlaRequest request);
-        Task<ApiResponse<EscalationResponse>> EscalateToDeptHead(SubmitSlaEscalationRequest request);
-        Task<ApiResponse<List<SlaHistoryResponse>>> GetSlaHistory(int slaid);
-        Task<ApiResponse<List<DepartmentComplianceResponse>>> GetAllDepartmentCompliance(string? period = null);
-        Task<ApiResponse<DepartmentComplianceResponse>> CalculateCompliance(CalculateComplianceRequest request);
-        Task<ApiResponse<List<SlaResponse>>> GetAllSlas();
-        Task<ApiResponse<CreateSlaResponse>> CreateSla(CreateSlaRequest request);
-        Task<ApiResponse<SlaResponse>> GetSlaById(int slaid);
-        Task<ApiResponse<List<EscalationResponse>>> GetSlaEscalations(int slaid);
-        Task<ApiResponse<string>> CloseSla(CloseSlaRequest request);
-        Task<ApiResponse<string>> ResolveEscalation(ResolveEscalationRequest request);
-        Task<ApiResponse<List<EscalationResponse>>> GetManagerEscalations(int managerId);
-        Task<ApiResponse<SlaResponse>> UpdateSla(int slaid, UpdateSlaRequest request);
-        Task<ApiResponse<string>> DeleteSla(int slaid);
-        Task<ApiResponse<BulkCreateSlaResponse>> BulkCreateSla(List<CreateSlaRequest> requests);
+        Task<List<SlaResponse>> GetEmployeeSlas(int employeeId);
+        Task<List<TeamReviewTrackingResponse>> GetTeamReviewTracking(int managerId);
+        Task<DepartmentComplianceResponse> GetDepartmentCompliance(int departmentId, string? period);
+        Task<ReopenSlaResponse> ReopenSla(int slaId, int extensionDays, string reason, int userId);
+
+        Task<EscalationResponse> SubmitEscalation(SubmitSlaEscalationRequest request,int userId,string? level);
+
+        Task<List<SlaHistoryResponse>> GetSlaHistory(int slaid);
+        Task<List<DepartmentComplianceResponse>> GetAllDepartmentCompliance(string? period);
+        Task<DepartmentComplianceResponse> CalculateCompliance(CalculateComplianceRequest request);
+        Task<List<SlaResponse>> GetAllSlas();
+        Task<CreateSlaResponse> CreateSla(CreateSlaRequest request, int userId);
+        Task<SlaResponse?> GetSlaById(int slaid);
+        Task CloseSla(int slaId, int userId);
+        Task UpdateSla(int slaid, UpdateSlaRequest request, int userId);
+        Task<BulkCreateSlaResponse> BulkCreateSla(List<CreateSlaRequest> requests, int userId);
+        Task DeleteSla(int slaId);
+        Task<EscalationResponse> EscalateToDeptHead(SubmitSlaEscalationRequest request, int userId);  
+        Task<List<EscalationResponse>> GetSlaEscalations(int slaId);
+        Task<string> ResolveEscalation(ResolveEscalationRequest request, int userId);
+        Task<List<EscalationResponse>> GetManagerEscalations(int managerId);
+
     }
 }

@@ -9,8 +9,8 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         Task<Sla?> GetSlaByIdAsync(int slaid);
         Task<List<Sla>> GetSlasByEmployeeIdAsync(int employeeId);
         Task<List<Sla>> GetSlasByDepartmentIdAsync(int departmentId);
-        Task<Employee> GetEmployeeByIdAsync(int employeeId);
-
+        Task<Employee?> GetEmployeeByIdAsync(int employeeId);
+ 
         Task<Sla> CreateSlaAsync(Sla sla);
 
         Task<Sla> UpdateSlaAsync(Sla sla);
@@ -49,6 +49,7 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         Task<List<Sla>> GetCompletedSlasAsync();
 
         Task<List<Employee>> GetEmployeesByIdsAsync(List<int> employeeIds);
+
 
         string GetConnectionString();
 

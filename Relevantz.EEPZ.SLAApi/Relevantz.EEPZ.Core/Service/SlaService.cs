@@ -1,9 +1,11 @@
+
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Common.Entities;
 using Microsoft.Extensions.Logging;
+
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -25,89 +27,82 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         #region Employee Methods
 
-        public async Task<ApiResponse<List<SlaResponse>>> GetEmployeeSlas(int employeeId)
-        {
-            try
-            {
-                _logger.LogInformation("Retrieving SLAs for employee {EmployeeId}", employeeId);
-                var slas = await _slaRepository.GetSlasByEmployeeIdAsync(employeeId);
+    public async Task<List<SlaResponse>> GetEmployeeSlas(int employeeId)
+{
+    _logger.LogInformation("Retrieving SLAs for employee {EmployeeId}", employeeId);
 
-                var responses = slas.Select(s => new SlaResponse
-                {
-                    Slaid = s.Slaid,
-                    Slatype = s.Slatype ?? string.Empty,
-                    Status = s.Status ?? string.Empty,
-                    EmployeeId = s.EmployeeId,
-                    EmployeeName = GetEmployeeName(s.Employee),
-                    DepartmentId = s.DepartmentId,
-                    DepartmentName = s.Department?.DepartmentName ?? string.Empty,
-                    AssignedToEmployeeId = s.AssignedToEmployeeId,
-                    AssignedToName = GetEmployeeName(s.AssignedToEmployee),
-                    Deadline = s.Deadline,
-                    ClosedAt = s.ClosedAt,
-                    ComplianceStatus = s.ComplianceStatus ?? string.Empty,
-                    RelatedEntityType = s.RelatedEntityType,
-                    RelatedEntityId = s.RelatedEntityId,
-                    ReopenedAt = s.ReopenedAt,
-                    ReopenExtensionDays = s.ReopenExtensionDays,
-                    ReopenReason = s.ReopenReason,
-                    DaysUntilDeadline = (s.Deadline - DateTime.Now).Days,
-                    CreatedAt = s.CreatedAt ?? DateTime.MinValue,
-                    UpdatedAt = s.UpdatedAt ?? DateTime.MinValue
-                }).ToList();
+    var slas = await _slaRepository.GetSlasByEmployeeIdAsync(employeeId);
 
-                return new ApiResponse<List<SlaResponse>> { Success = true, Message = "Success", Data = responses };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in GetEmployeeSlas");
-                return new ApiResponse<List<SlaResponse>> { Success = false, Message = ex.Message };
-            }
-        }
-        public async Task<ApiResponse<EscalationResponse>> SubmitEscalation(SubmitSlaEscalationRequest request)
-        {
-            try
-            {
-                _logger.LogInformation("Submitting escalation for SLA {Slaid}", request.Slaid);
-                var sla = await _slaRepository.GetSlaByIdAsync(request.Slaid);
-                if (sla == null)
-                    return new ApiResponse<EscalationResponse> { Success = false, Message = "SLA not found" };
+    return slas.Select(s => new SlaResponse
+    {
+        Slaid = s.Slaid,
+        Slatype = s.Slatype ?? string.Empty,
+        Status = s.Status ?? string.Empty,
+        EmployeeId = s.EmployeeId,
+        EmployeeName = GetEmployeeName(s.Employee),
+        DepartmentId = s.DepartmentId,
+        DepartmentName = s.Department?.DepartmentName ?? string.Empty,
+       AssignedToEmployeeId = s.AssignedToEmployeeId,
+       AssignedToName = GetEmployeeName(s.AssignedToEmployee),
+        Deadline = s.Deadline,
+        ClosedAt = s.ClosedAt,
+        ComplianceStatus = s.ComplianceStatus ?? string.Empty,
+        CreatedAt = s.CreatedAt ?? DateTime.MinValue,
+        UpdatedAt = s.UpdatedAt ?? DateTime.MinValue
+    }).ToList();
+}
+public async Task<EscalationResponse> SubmitEscalation(
+    SubmitSlaEscalationRequest request,
+    int userId,
+    string? level)
+{
+    _logger.LogInformation(
+        "Processing escalation for SLA {Slaid} by User {UserId} with Level {Level}",
+        request.Slaid, userId, level);
 
-                int escalatedId = request.EscalatedToEmployeeId ?? 0;
-                int submittedId = request.SubmittedByEmployeeId ?? 0;
+    var sla = await _slaRepository.GetSlaByIdAsync(request.Slaid)
+        ?? throw new KeyNotFoundException("SLA not found");
 
+    // Determine escalation level
+    var escalationLevel = level?.ToLower() == "dept-head" ? "L2" : "L1";
 
-                var escalation = new Slaescalation
-                {
-                    Slaid = request.Slaid,
-                    Reason = request.Reason,
-                    Description = request.Description ?? string.Empty,
-                    EscalationLevel = request.EscalationLevel ?? "L1",
-                    EscalatedToEmployeeId = escalatedId,
-                    SubmittedByEmployeeId = submittedId,
-                    SubmittedAt = DateTime.Now,
-                    EscalationStatus = "InProgress"
-                };
+    var escalation = new Slaescalation
+    {
+        Slaid = request.Slaid,
+        Reason = request.Reason,
+        Description = request.Description ?? string.Empty,
+        EscalationLevel = escalationLevel,
+        EscalatedToEmployeeId =
+            request.EscalatedToEmployeeId
+            ?? sla.AssignedToEmployeeId
+            ?? throw new Exception("Escalation target not found"),
+        SubmittedByEmployeeId = userId,
+        EscalationStatus = "Pending",
+        SubmittedAt = DateTime.Now
+    };
 
-                await _slaRepository.CreateEscalationAsync(escalation);
+    var created = await _slaRepository.CreateEscalationAsync(escalation);
 
-                sla.Status = "InProgress";
-                await _slaRepository.UpdateSlaAsync(sla);
+   
+    await _slaRepository.AddHistoryAsync(new Slahistory
+    {
+        Slaid = request.Slaid,
+        ChangeType = "Escalated",
+        ChangedTo = escalationLevel,
+        ChangedByEmployeeId = userId,
+        Reason = request.Reason,
+        CreatedAt = DateTime.Now
+    });
 
+    // Update SLA status
+    sla.Status = "InProgress";
+    await _slaRepository.UpdateSlaAsync(sla);
 
-                var history = new Slahistory
-                {
-                    Slaid = escalation.Slaid,
-                    ChangeType = "Escalated",
-                    ChangedTo = escalation.EscalationLevel,
-                    ChangedByEmployeeId = escalation.SubmittedByEmployeeId,
-                    Reason = escalation.Reason,
-                    CreatedAt = DateTime.Now
-                };
+    _logger.LogInformation(
+        "Escalation {EscalationId} created for SLA {Slaid}",
+        created.EscalationId, request.Slaid);
 
-                await _slaRepository.AddHistoryAsync(history);
-
-                var employeeEmail = sla.Employee?.Userprofile?.PersonalEmail;
+     var employeeEmail = sla.Employee?.Userprofile?.PersonalEmail;
                 var employeeName = GetEmployeeName(sla.Employee);
 
                 if (!string.IsNullOrEmpty(employeeEmail))
@@ -138,185 +133,142 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     _logger.LogInformation("Manager escalation email sent to {Email}", managerEmail);
                 }
 
-                return new ApiResponse<EscalationResponse>
-                {
-                    Success = true,
-                    Message = "Escalation submitted successfully",
-                    Data = new EscalationResponse
-                    {
-                        EscalationId = escalation.EscalationId,
-                        Slaid = request.Slaid,
-                        Reason = request.Reason,
-                        Description = request.Description,
-                        EscalationLevel = request.EscalationLevel ?? "L1",
-                        Message = "Escalation submitted successfully"
-                    }
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in SubmitEscalation");
-                return new ApiResponse<EscalationResponse> { Success = false, Message = ex.Message };
-            }
-        }
 
-        #endregion
 
-        #region Manager Methods
+    return new EscalationResponse
+    {
+        EscalationId = created.EscalationId,
+        Slaid = request.Slaid,
+        EscalationLevel = escalationLevel,
+        EscalationStatus = "Pending",
+        Reason = request.Reason,
+        Description = request.Description,
+        SubmittedAt = created.SubmittedAt
+    };
+}
 
-        public async Task<ApiResponse<List<TeamReviewTrackingResponse>>> GetTeamReviewTracking(int managerId)
+ public async Task<List<TeamReviewTrackingResponse>> GetTeamReviewTracking(int managerId)
+{
+    var reviews = await _slaRepository.GetReviewTrackingByReviewerIdAsync(managerId);
+
+    return reviews
+        .Where(r => r.Status != "Closed")
+        .Select(r => new TeamReviewTrackingResponse
         {
-            try
-            {
-                var reviews = await _slaRepository.GetReviewTrackingByReviewerIdAsync(managerId);
+            ReviewTrackingId = r.ReviewTrackingId,
+            Slaid = r.Slaid,
+            EmployeeId = r.EmployeeId,
+            EmployeeName = GetEmployeeName(r.Employee),
+            ReviewCycle = r.ReviewCycle ?? string.Empty,
+            Deadline = r.Deadline,
+            Status = r.Status ?? string.Empty,
+            ComplianceStatus = r.ComplianceStatus ?? string.Empty
+        }).ToList();
+}
 
-                var filtered = reviews.Where(r => r.Status != "Closed").ToList();
 
-                var responses = filtered.Select(r => new TeamReviewTrackingResponse
-                {
-                    ReviewTrackingId = r.ReviewTrackingId,
-                    Slaid = r.Slaid,
-                    EmployeeId = r.EmployeeId,
-                    EmployeeName = GetEmployeeName(r.Employee),
-                    ReviewCycle = r.ReviewCycle ?? string.Empty,
-                    Deadline = r.Deadline,
-                    Status = r.Status ?? string.Empty,
-                    DaysUntilDeadline = (r.Deadline - DateTime.Now).Days,
-                    ComplianceStatus = r.ComplianceStatus ?? string.Empty
-                }).ToList();
+public async Task<DepartmentComplianceResponse> GetDepartmentCompliance(int departmentId, string? period)
+{
+    var compliance = await _slaRepository.GetComplianceByDepartmentAndPeriodAsync(departmentId, period ?? "Current");
 
-                return new ApiResponse<List<TeamReviewTrackingResponse>> { Success = true, Data = responses };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in GetTeamReviewTracking");
-                return new ApiResponse<List<TeamReviewTrackingResponse>> { Success = false, Message = ex.Message };
-            }
-        }
-
-        public async Task<ApiResponse<DepartmentComplianceResponse>> GetDepartmentCompliance(int departmentId, string? period = null)
+    if (compliance == null)
+    {
+        return new DepartmentComplianceResponse
         {
-            try
-            {
-                string p = period ?? "Current";
-                var compliance = await _slaRepository.GetComplianceByDepartmentAndPeriodAsync(departmentId, p);
+            DepartmentId = departmentId,
+            Period = period ?? "Current",
+            TotalSlas = 0,
+            OnTimeSlas = 0,
+            BreachedSlas = 0,
+            CompliancePercentage = 0
+        };
+    }
 
-                if (compliance == null)
-                    return new ApiResponse<DepartmentComplianceResponse>
-                    {
-                        Success = true,
-                        Data = new DepartmentComplianceResponse
-                        {
-                            DepartmentId = departmentId,
-                            Period = p,
-                            TotalSlas = 0,
-                            OnTimeSlas = 0,
-                            BreachedSlas = 0,
-                            CompliancePercentage = 0
-                        }
-                    };
+    return new DepartmentComplianceResponse
+    {
+        ComplianceId = compliance.ComplianceId,
+        DepartmentId = compliance.DepartmentId,
+        DepartmentName = compliance.Department?.DepartmentName ?? string.Empty,
+        Period = compliance.Period ?? string.Empty,
+        TotalSlas = compliance.TotalSlas,
+        OnTimeSlas = compliance.OnTimeSlas,
+        BreachedSlas = compliance.BreachedSlas,
+        CompliancePercentage = compliance.CompliancePercentage ?? 0
+    };
+}
+public async Task<ReopenSlaResponse> ReopenSla(int slaId, int extensionDays, string reason, int userId)
+{
+    var sla = await _slaRepository.GetSlaByIdAsync(slaId)
+        ?? throw new Exception("SLA not found");
 
-                var data = new DepartmentComplianceResponse
-                {
-                    ComplianceId = compliance.ComplianceId,
-                    DepartmentId = compliance.DepartmentId,
-                    DepartmentName = compliance.Department?.DepartmentName ?? string.Empty,
-                    Period = compliance.Period ?? string.Empty,
-                    TotalSlas = compliance.TotalSlas,
-                    OnTimeSlas = compliance.OnTimeSlas,
-                    BreachedSlas = compliance.BreachedSlas,
-                    CompliancePercentage = compliance.CompliancePercentage ?? 0
-                };
+    var oldDeadline = sla.Deadline;
 
-                return new ApiResponse<DepartmentComplianceResponse> { Success = true, Data = data };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in GetDepartmentCompliance");
-                return new ApiResponse<DepartmentComplianceResponse> { Success = false, Message = ex.Message };
-            }
-        }
+    var success = await _slaRepository.ReopenSlaAsync(slaId, extensionDays, reason, userId);
+    if (!success) throw new Exception("Failed to reopen SLA");
 
-        public async Task<ApiResponse<ReopenSlaResponse>> ReopenSla(ReopenSlaRequest request)
-        {
-            try
-            {
-                var sla = await _slaRepository.GetSlaByIdAsync(request.Slaid);
-                if (sla == null)
-                    return new ApiResponse<ReopenSlaResponse> { Success = false, Message = "SLA not found" };
+    DateTime newDeadline = DateTime.Now.AddDays(extensionDays);
 
-                DateTime oldDeadline = sla.Deadline;
+    var employeeEmail = sla.Employee?.Userprofile?.PersonalEmail;
+    var employeeName = GetEmployeeName(sla.Employee);
 
-                var result = await _slaRepository.ReopenSlaAsync(
-                    request.Slaid,
-                    request.ExtensionDays,
-                    request.ReopenReason,
-                    request.ReopenedByEmployeeId
-                );
+    if (!string.IsNullOrEmpty(employeeEmail))
+    {
+        await _emailService.SendSlaReopenEmailAsync(
+            employeeEmail,
+            employeeName,
+            sla.Slatype,
+            newDeadline
+        );
+        _logger.LogInformation("SLA reopen email sent to {Email}", employeeEmail);
+    }
 
-                if (!result)
-                    return new ApiResponse<ReopenSlaResponse> { Success = false, Message = "Failed to reopen SLA" };
+    return new ReopenSlaResponse
+    {
+        OldDeadline = oldDeadline,
+        NewDeadline = newDeadline, 
+        ExtensionDays = extensionDays
+    };
+}
 
-                DateTime newDeadline = DateTime.Now.AddDays(request.ExtensionDays);
+public async Task<EscalationResponse> EscalateToDeptHead(SubmitSlaEscalationRequest request, int userId)
+{
+    _logger.LogInformation("Escalating SLA {Slaid} to department head by User {UserId}", request.Slaid, userId);
 
-                var employeeEmail = sla.Employee?.Userprofile?.PersonalEmail;
-                var employeeName = GetEmployeeName(sla.Employee);
+    var sla = await _slaRepository.GetSlaByIdAsync(request.Slaid)
+        ?? throw new Exception("SLA not found");
 
-                if (!string.IsNullOrEmpty(employeeEmail))
-                {
-                    await _emailService.SendSlaReopenEmailAsync(
-                        employeeEmail,
-                        employeeName,
-                        sla.Slatype,
-                        newDeadline
-                    );
-                    _logger.LogInformation("SLA reopen email sent to {Email}", employeeEmail);
-                }
+    var escalation = new Slaescalation
+    {
+        Slaid = request.Slaid,
+        Reason = request.Reason,
+        Description = request.Description ?? string.Empty,
+        EscalationLevel = "L2",
+        EscalatedToEmployeeId = request.EscalatedToEmployeeId ?? sla.AssignedToEmployeeId ?? 0,
+        SubmittedByEmployeeId = userId,
+        EscalationStatus = "Pending",
+        SubmittedAt = DateTime.Now
+    };
 
-                return new ApiResponse<ReopenSlaResponse>
-                {
-                    Success = true,
-                    Data = new ReopenSlaResponse
-                    {
-                        Message = "SLA reopened successfully",
-                        OldDeadline = oldDeadline,
-                        NewDeadline = newDeadline,
-                        ExtensionDays = request.ExtensionDays
-                    }
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in ReopenSla");
-                return new ApiResponse<ReopenSlaResponse> { Success = false, Message = ex.Message };
-            }
-        }
+    var created = await _slaRepository.CreateEscalationAsync(escalation);
 
-        public async Task<ApiResponse<EscalationResponse>> EscalateToDeptHead(SubmitSlaEscalationRequest request)
-        {
-            try
-            {
-                _logger.LogInformation("Escalating to dept head for SLA {Slaid}", request.Slaid);
+   
+    await _slaRepository.AddHistoryAsync(new Slahistory
+    {
+        Slaid = request.Slaid,
+        ChangeType = "Escalated",
+        ChangedTo = "L2",
+        ChangedByEmployeeId = userId,
+        Reason = request.Reason,
+        CreatedAt = DateTime.Now
+    });
 
-                var sla = await _slaRepository.GetSlaByIdAsync(request.Slaid);
-                if (sla == null)
-                    return new ApiResponse<EscalationResponse> { Success = false, Message = "SLA not found" };
+    sla.Status = "InProgress";
+    await _slaRepository.UpdateSlaAsync(sla);
 
-                var escalation = new Slaescalation
-                {
-                    Slaid = request.Slaid,
-                    Reason = request.Reason,
-                    Description = request.Description ?? string.Empty,
-                    EscalationLevel = "L2",
-                    EscalatedToEmployeeId = request.EscalatedToEmployeeId ?? 0,
-                    SubmittedByEmployeeId = request.SubmittedByEmployeeId ?? 0,
-                    EscalationStatus = "Pending",
-                    SubmittedAt = DateTime.Now
-                };
+    _logger.LogInformation("Escalation {EscalationId} created for SLA {Slaid}", created.EscalationId, request.Slaid);
 
-                var created = await _slaRepository.CreateEscalationAsync(escalation);
 
-                var deptHead = await _slaRepository.GetEmployeeByIdAsync(request.EscalatedToEmployeeId ?? 0);
+     var deptHead = await _slaRepository.GetEmployeeByIdAsync(request.EscalatedToEmployeeId ?? 0);
                 var deptHeadEmail = deptHead?.Userprofile?.PersonalEmail;
                 var manager = sla.AssignedToEmployee;
 
@@ -335,248 +287,224 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     _logger.LogInformation("Dept head escalation email sent to {Email}", deptHeadEmail);
                 }
 
-                return new ApiResponse<EscalationResponse>
-                {
-                    Success = true,
-                    Message = "SLA escalated to department head successfully",
-                    Data = new EscalationResponse
-                    {
-                        EscalationId = created.EscalationId,
-                        Slaid = request.Slaid,
-                        EscalationLevel = "L2",
-                        Reason = request.Reason,
-                        Message = "Escalation submitted successfully"
-                    }
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in EscalateToDeptHead");
-                return new ApiResponse<EscalationResponse> { Success = false, Message = ex.Message };
-            }
-        }
 
-        public async Task<ApiResponse<List<SlaHistoryResponse>>> GetSlaHistory(int slaid)
-        {
-            try
-            {
-                var history = await _slaRepository.GetSlaHistoryAsync(slaid);
-                var responses = history.Select(h => new SlaHistoryResponse
-                {
-                    SlahistoryId = h.SlahistoryId,
-                    Slaid = h.Slaid,
-                    ChangeType = h.ChangeType ?? string.Empty,
-                    ChangedFrom = h.ChangedFrom,
-                    ChangedTo = h.ChangedTo,
-                    ChangedByEmployeeId = h.ChangedByEmployeeId,
-                    Reason = h.Reason,
-                    CreatedAt = h.CreatedAt
-                }).ToList();
+    
 
-                return new ApiResponse<List<SlaHistoryResponse>> { Success = true, Data = responses };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in GetSlaHistory");
-                return new ApiResponse<List<SlaHistoryResponse>> { Success = false, Message = ex.Message };
-            }
-        }
+    return new EscalationResponse
+    {
+        EscalationId = created.EscalationId,
+        Slaid = request.Slaid,
+        EscalationLevel = "L2",
+        EscalationStatus = "Pending",
+        Reason = request.Reason,
+        Description = request.Description,
+        SubmittedAt = created.SubmittedAt,
+        SubmittedByEmployeeId = userId,
+        EscalatedToEmployeeId = escalation.EscalatedToEmployeeId
+    };
+}
+
+
+
+public async Task<List<SlaHistoryResponse>> GetSlaHistory(int slaid)
+{
+    var history = await _slaRepository.GetSlaHistoryAsync(slaid);
+
+    return history.Select(h => new SlaHistoryResponse
+    {
+        SlahistoryId = h.SlahistoryId,
+        Slaid = h.Slaid,
+        ChangeType = h.ChangeType ?? string.Empty,
+        ChangedFrom = h.ChangedFrom,
+        ChangedTo = h.ChangedTo,
+        ChangedByEmployeeId = h.ChangedByEmployeeId,
+        ChangedByName = GetEmployeeName(h.ChangedByEmployee),
+        Reason = h.Reason,
+        CreatedAt = h.CreatedAt
+    }).ToList();
+}
+
+
 
         #endregion
 
         #region Department/HR Methods
+public async Task<List<EscalationResponse>> GetSlaEscalations(int slaId)
+{
+    var escalations = await _slaRepository.GetEscalationsBySlaIdAsync(slaId);
 
-        public async Task<ApiResponse<List<DepartmentComplianceResponse>>> GetAllDepartmentCompliance(string? period = null)
+    return escalations.Select(e => new EscalationResponse
+    {
+        EscalationId = e.EscalationId,
+        Slaid = e.Slaid,
+        EscalationLevel = e.EscalationLevel,
+        EscalationStatus = e.EscalationStatus,
+        Reason = e.Reason,
+        Description = e.Description,
+        SubmittedAt = e.SubmittedAt,
+
+        SubmittedByEmployeeId = e.SubmittedByEmployeeId,
+        SubmittedByName = GetEmployeeName(e.SubmittedByEmployee),
+
+        EscalatedToEmployeeId = e.EscalatedToEmployeeId,
+        EscalatedToName = GetEmployeeName(e.EscalatedToEmployee)
+    }).ToList();
+}
+
+
+
+
+public async Task<string> ResolveEscalation(ResolveEscalationRequest request, int userId)
+{
+    var escalation = await _slaRepository.GetEscalationByIdAsync(request.EscalationId)
+        ?? throw new Exception("Escalation not found");
+
+    escalation.EscalationStatus = request.EscalationStatus;
+    escalation.ResolutionComments = request.ResolutionComments;
+    escalation.ResolvedAt = DateTime.Now;
+    escalation.ResolvedByEmployeeId = userId;
+
+    await _slaRepository.UpdateEscalationAsync(escalation);
+
+    return "Escalation resolved successfully";
+}
+public async Task<List<EscalationResponse>> GetManagerEscalations(int managerId)
+{
+    var escalations = await _slaRepository.GetEscalationsByEscalatedToAsync(managerId);
+
+    return escalations.Select(e => new EscalationResponse
+    {
+        EscalationId = e.EscalationId,
+        Slaid = e.Slaid,
+        EscalationLevel = e.EscalationLevel ?? string.Empty,
+        EscalationStatus = e.EscalationStatus ?? string.Empty,
+        Reason = e.Reason,
+        Description = e.Description,
+        SubmittedAt = e.SubmittedAt,
+
+        EmployeeId = e.Sla?.EmployeeId ?? 0,
+        EmployeeName = GetEmployeeName(e.Sla?.Employee),
+
+        SubmittedByEmployeeId = e.SubmittedByEmployeeId,
+        SubmittedByName = GetEmployeeName(e.SubmittedByEmployee),
+
+        EscalatedToEmployeeId = e.EscalatedToEmployeeId,
+        EscalatedToName = GetEmployeeName(e.EscalatedToEmployee)
+    }).ToList();
+}
+
+
+
+       public async Task<List<DepartmentComplianceResponse>> GetAllDepartmentCompliance(string? period)
+{
+    var compliances = await _slaRepository.GetAllComplianceAsync(period);
+
+    return compliances.Select(c => new DepartmentComplianceResponse
+    {
+        ComplianceId = c.ComplianceId,
+        DepartmentId = c.DepartmentId,
+        DepartmentName = c.Department?.DepartmentName ?? string.Empty,
+        Period = c.Period ?? string.Empty,
+        TotalSlas = c.TotalSlas,
+        OnTimeSlas = c.OnTimeSlas,
+        BreachedSlas = c.BreachedSlas,
+        CompliancePercentage = c.CompliancePercentage ?? 0
+    }).ToList();
+}
+
+
+      public async Task<DepartmentComplianceResponse> CalculateCompliance(CalculateComplianceRequest request)
+{
+    if (string.IsNullOrEmpty(request.Period))
+        request.Period = "Current";
+
+    await _slaRepository.CalculateComplianceAsync(
+        request.DepartmentId,
+        request.Period,
+        DateOnly.FromDateTime(request.PeriodStartDate),
+        DateOnly.FromDateTime(request.PeriodEndDate)
+    );
+
+    var compliance = await _slaRepository.GetComplianceByDepartmentAndPeriodAsync(
+        request.DepartmentId,
+        request.Period
+    );
+
+    if (compliance == null)
+    {
+        return new DepartmentComplianceResponse
         {
-            try
-            {
-                var compliances = await _slaRepository.GetAllComplianceAsync(period);
-                var responses = compliances.Select(c => new DepartmentComplianceResponse
-                {
-                    ComplianceId = c.ComplianceId,
-                    DepartmentId = c.DepartmentId,
-                    DepartmentName = c.Department?.DepartmentName ?? string.Empty,
-                    Period = c.Period ?? string.Empty,
-                    TotalSlas = c.TotalSlas,
-                    OnTimeSlas = c.OnTimeSlas,
-                    BreachedSlas = c.BreachedSlas,
-                    CompliancePercentage = c.CompliancePercentage ?? 0
-                }).ToList();
+            DepartmentId = request.DepartmentId,
+            Period = request.Period,
+            TotalSlas = 0,
+            OnTimeSlas = 0,
+            BreachedSlas = 0,
+            CompliancePercentage = 0
+        };
+    }
 
-                return new ApiResponse<List<DepartmentComplianceResponse>> { Success = true, Data = responses };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in GetAllDepartmentCompliance");
-                return new ApiResponse<List<DepartmentComplianceResponse>> { Success = false, Message = ex.Message };
-            }
-        }
+    return new DepartmentComplianceResponse
+    {
+        ComplianceId = compliance.ComplianceId,
+        DepartmentId = compliance.DepartmentId,
+        DepartmentName = compliance.Department?.DepartmentName ?? string.Empty,
+        Period = compliance.Period ?? string.Empty,
+        TotalSlas = compliance.TotalSlas,
+        OnTimeSlas = compliance.OnTimeSlas,
+        BreachedSlas = compliance.BreachedSlas,
+        CompliancePercentage = compliance.CompliancePercentage ?? 0
+    };
+}public async Task<List<SlaResponse>> GetAllSlas()
+{
+    var slas = await _slaRepository.GetAllSlasAsync();
 
-        public async Task<ApiResponse<DepartmentComplianceResponse>> CalculateCompliance(CalculateComplianceRequest request)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(request.Period))
-                    request.Period = "Current";
+    return slas.Select(s => new SlaResponse
+    {
+        Slaid = s.Slaid,
+        Slatype = s.Slatype ?? string.Empty,
+        Status = s.Status ?? string.Empty,
 
-                DateOnly startDate = DateOnly.FromDateTime(request.PeriodStartDate);
-                DateOnly endDate = DateOnly.FromDateTime(request.PeriodEndDate);
+        EmployeeId = s.EmployeeId,
+        EmployeeName = GetEmployeeName(s.Employee),
 
-                await _slaRepository.CalculateComplianceAsync(
-    request.DepartmentId,
-    request.Period,
-    DateOnly.FromDateTime(request.PeriodStartDate),
-    DateOnly.FromDateTime(request.PeriodEndDate)
-);
+        DepartmentId = s.DepartmentId,
+        DepartmentName = s.Department?.DepartmentName ?? string.Empty,
 
-                var compliance = await _slaRepository.GetComplianceByDepartmentAndPeriodAsync(
-                    request.DepartmentId,
-                    request.Period
-                );
+        AssignedToEmployeeId = s.AssignedToEmployeeId,
+        AssignedToName = GetEmployeeName(s.AssignedToEmployee),
 
-                if (compliance == null)
-                {
-                    return new ApiResponse<DepartmentComplianceResponse>
-                    {
-                        Success = true,
-                        Message = "Compliance calculated (no SLAs in period)",
-                        Data = new DepartmentComplianceResponse
-                        {
-                            ComplianceId = 0,
-                            DepartmentId = request.DepartmentId,
-                            DepartmentName = "Department",
-                            Period = request.Period,
-                            TotalSlas = 0,
-                            OnTimeSlas = 0,
-                            BreachedSlas = 0,
-                            CompliancePercentage = 0,
-                            CalculatedAt = DateTime.Now
-                        }
-                    };
-                }
+        Deadline = s.Deadline,
+        ClosedAt = s.ClosedAt,
 
-                return new ApiResponse<DepartmentComplianceResponse>
-                {
-                    Success = true,
-                    Message = "Compliance calculated successfully",
-                    Data = new DepartmentComplianceResponse
-                    {
-                        ComplianceId = compliance.ComplianceId,
-                        DepartmentId = compliance.DepartmentId,
-                        DepartmentName = compliance.Department?.DepartmentName ?? "Department",
-                        Period = compliance.Period,
-                        TotalSlas = compliance.TotalSlas,
-                        OnTimeSlas = compliance.OnTimeSlas,
-                        BreachedSlas = compliance.BreachedSlas,
-                        CompliancePercentage = compliance.CompliancePercentage ?? 0,
-                        CalculatedAt = DateTime.Now
-                    }
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in CalculateCompliance");
-                return new ApiResponse<DepartmentComplianceResponse>
-                {
-                    Success = false,
-                    Message = $"Failed to calculate compliance: {ex.Message}"
-                };
-            }
-        }
+        ComplianceStatus = s.ComplianceStatus ?? string.Empty,
 
-        public async Task<ApiResponse<List<SlaResponse>>> GetAllSlas()
-        {
-            try
-            {
-                var slas = await _slaRepository.GetAllSlasAsync();
-                var responses = slas.Select(s => new SlaResponse
-                {
-                    Slaid = s.Slaid,
-                    Slatype = s.Slatype ?? string.Empty,
-                    Status = s.Status ?? string.Empty,
+        CreatedAt = s.CreatedAt ?? DateTime.MinValue,
+        UpdatedAt = s.UpdatedAt ?? DateTime.MinValue
+    }).ToList();
+}public async Task<CreateSlaResponse> CreateSla(CreateSlaRequest request, int userId)
+{
+    var employee = await _slaRepository.GetEmployeeByIdAsync(request.EmployeeId)
+        ?? throw new Exception("Employee not found");
 
-                    EmployeeId = s.EmployeeId,
-                    EmployeeName = GetEmployeeName(s.Employee),
-                    EmployeeEmail = s.Employee?.Userauthentication?.Email ?? string.Empty,
+    if (!employee.ReportingManagerEmployeeId.HasValue)
+        throw new Exception("Employee has no reporting manager");
 
-                    DepartmentId = s.DepartmentId,
-                    DepartmentName = s.Department?.DepartmentName ?? string.Empty,
+    var sla = new Sla
+    {
+        Slatype = request.Slatype,
+        EmployeeId = request.EmployeeId,
+        AssignedToEmployeeId = employee.ReportingManagerEmployeeId.Value, // ONLY MANAGER
+        DepartmentId = request.DepartmentId,
+        Deadline = request.Deadline,
+        Status = "Open",
+        ComplianceStatus = "OnTime",
+        CreatedByEmployeeId = userId,
+        CreatedAt = DateTime.Now
+    };
 
-                    AssignedToEmployeeId = s.AssignedToEmployeeId,
-                    AssignedToName = GetEmployeeName(s.AssignedToEmployee),
+    var created = await _slaRepository.CreateSlaAsync(sla);
 
-                    Deadline = s.Deadline,
-                    ClosedAt = s.ClosedAt,
-                    ComplianceStatus = s.ComplianceStatus ?? string.Empty,
-                    RelatedEntityType = s.RelatedEntityType,
-                    RelatedEntityId = s.RelatedEntityId,
-                    ReopenedAt = s.ReopenedAt,
-                    ReopenExtensionDays = s.ReopenExtensionDays,
-                    ReopenReason = s.ReopenReason,
-
-                    CreatedAt = s.CreatedAt ?? DateTime.MinValue,
-                    UpdatedAt = s.UpdatedAt ?? DateTime.MinValue
-                }).ToList();
-
-                return new ApiResponse<List<SlaResponse>> { Success = true, Data = responses };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in GetAllSlas");
-                return new ApiResponse<List<SlaResponse>> { Success = false, Message = ex.Message };
-            }
-        }
-
-        public async Task<ApiResponse<CreateSlaResponse>> CreateSla(CreateSlaRequest request)
-        {
-            try
-            {
-                var employee = await _slaRepository.GetEmployeeByIdAsync(request.EmployeeId);
-                if (employee == null)
-                {
-                    return new ApiResponse<CreateSlaResponse>
-                    {
-                        Success = false,
-                        Message = $"Employee with ID {request.EmployeeId} not found"
-                    };
-                }
-
-                int? reportingManagerId = employee.ReportingManagerEmployeeId;
-
-                if (reportingManagerId == null || reportingManagerId == 0)
-                {
-                    return new ApiResponse<CreateSlaResponse>
-                    {
-                        Success = false,
-                        Message = $"Employee {employee.Userprofile?.FirstName} {employee.Userprofile?.LastName} does not have a reporting manager assigned"
-                    };
-                }
-
-                _logger.LogInformation(
-                    "Creating SLA for Employee {EmployeeId} ({EmployeeName}) - Assigned to Manager {ManagerId}",
-                    request.EmployeeId,
-                    GetEmployeeName(employee),
-                    reportingManagerId
-                );
-
-                var sla = new Sla
-                {
-                    Slatype = request.Slatype,
-                    EmployeeId = request.EmployeeId,
-                    AssignedToEmployeeId = reportingManagerId.Value,
-                    DepartmentId = request.DepartmentId,
-                    Deadline = request.Deadline,
-                    Status = "Open",
-                    ComplianceStatus = "OnTime",
-                    CreatedByEmployeeId = request.CreatedByEmployeeId,
-                    CreatedAt = DateTime.Now,
-                    RelatedEntityType = string.IsNullOrWhiteSpace(request.RelatedEntityType) ? null : request.RelatedEntityType,
-                    RelatedEntityId = request.RelatedEntityId.HasValue && request.RelatedEntityId.Value > 0 ? request.RelatedEntityId : null,
-                };
-
-                var created = await _slaRepository.CreateSlaAsync(sla);
-
-                var employeeEmail = employee.Userprofile?.PersonalEmail;
+     var employeeEmail = employee.Userprofile?.PersonalEmail;
                 var employeeName = GetEmployeeName(employee);
 
                 if (!string.IsNullOrEmpty(employeeEmail))
@@ -606,422 +534,133 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     _logger.LogInformation("SLA assignment email sent to {Email}", employeeEmail);
                 }
 
-                return new ApiResponse<CreateSlaResponse>
-                {
-                    Success = true,
-                    Data = new CreateSlaResponse
-                    {
-                        Slaid = created.Slaid,
-                        Message = $"SLA created successfully and assigned to {GetEmployeeName(await _slaRepository.GetEmployeeByIdAsync(reportingManagerId.Value))}",
-                        CreatedAt = created.CreatedAt ?? DateTime.Now
-                    }
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in CreateSla");
-                return new ApiResponse<CreateSlaResponse> { Success = false, Message = ex.Message };
-            }
-        }
 
-        #endregion
+    return new CreateSlaResponse
+    {
+        Slaid = created.Slaid,
+        CreatedAt = created.CreatedAt ?? DateTime.Now
+    };
+}
 
-        #region Common Methods
 
-        public async Task<ApiResponse<SlaResponse>> GetSlaById(int slaid)
+
+#endregion
+
+#region Common Methods
+
+public async Task DeleteSla(int slaId)
+{
+    await _slaRepository.DeleteSlaAsync(slaId);
+}
+
+
+public async Task<SlaResponse?> GetSlaById(int slaid)
+{
+    var sla = await _slaRepository.GetSlaByIdAsync(slaid);
+    if (sla == null) return null;
+
+    return new SlaResponse
+    {
+        Slaid = sla.Slaid,
+        Slatype = sla.Slatype ?? string.Empty,
+        Status = sla.Status ?? string.Empty,
+        EmployeeId = sla.EmployeeId,
+        EmployeeName = GetEmployeeName(sla.Employee),
+        DepartmentId = sla.DepartmentId,
+        DepartmentName = sla.Department?.DepartmentName ?? string.Empty,
+        AssignedToEmployeeId = sla.AssignedToEmployeeId,
+        AssignedToName = GetEmployeeName(sla.AssignedToEmployee),
+        Deadline = sla.Deadline,
+        ClosedAt = sla.ClosedAt,
+        ComplianceStatus = sla.ComplianceStatus ?? string.Empty,
+        CreatedAt = sla.CreatedAt ?? DateTime.MinValue,
+        UpdatedAt = sla.UpdatedAt ?? DateTime.MinValue
+    };
+}
+
+       
+     public async Task CloseSla(int slaId, int userId)
+{
+    var success = await _slaRepository.CloseSlaAsync(slaId, userId);
+    if (!success) throw new Exception("Failed to close SLA");
+}
+
+public async Task UpdateSla(int slaid, UpdateSlaRequest request, int userId)
+{
+    var sla = await _slaRepository.GetSlaByIdAsync(slaid)
+        ?? throw new Exception("SLA not found");
+
+    if (!string.IsNullOrEmpty(request.Slatype)) sla.Slatype = request.Slatype;
+    if (request.Deadline.HasValue) sla.Deadline = request.Deadline.Value;
+    if (!string.IsNullOrEmpty(request.Status)) sla.Status = request.Status;
+
+    if (request.AssignedToEmployeeId.HasValue)
+        sla.AssignedToEmployeeId = request.AssignedToEmployeeId.Value;
+
+    await _slaRepository.UpdateSlaAsync(sla);
+}
+
+
+public async Task<BulkCreateSlaResponse> BulkCreateSla(List<CreateSlaRequest> requests, int userId)
+{
+    var now = DateTime.Now;
+    var slas = new List<Sla>();
+
+    foreach (var r in requests)
+    {
+        var employee = await _slaRepository.GetEmployeeByIdAsync(r.EmployeeId)
+            ?? throw new Exception($"Employee {r.EmployeeId} not found");
+
+        int assigneeId = employee.ReportingManagerEmployeeId ?? userId;
+
+        slas.Add(new Sla
         {
-            try
-            {
-                var sla = await _slaRepository.GetSlaByIdAsync(slaid);
-                if (sla == null)
-                    return new ApiResponse<SlaResponse> { Success = false, Message = "SLA not found" };
+            Slatype = r.Slatype,
+            EmployeeId = r.EmployeeId,
+            AssignedToEmployeeId = assigneeId,
+            DepartmentId = r.DepartmentId,
+            Deadline = r.Deadline,
+            Status = "Open",
+            ComplianceStatus = "OnTime",
+            CreatedByEmployeeId = userId,
+            CreatedAt = now
+        });
+    }
 
-                _logger.LogInformation($"SLA from repo - EmployeeId: {sla.EmployeeId}, Employee: {sla.Employee?.EmployeeId}, Userprofile: {sla.Employee?.Userprofile?.FirstName}");
+    var count = await _slaRepository.BulkInsertSlasAsync(slas);
 
-                var employeeName = GetEmployeeName(sla.Employee);
-                var departmentName = sla.Department?.DepartmentName ?? string.Empty;
+    return new BulkCreateSlaResponse
+    {
+        TotalRequested = requests.Count,
+        SuccessfulInserts = count,
+        FailedInserts = requests.Count - count,
+        CreatedAt = now
+    };
+}
 
-                _logger.LogInformation($"Mapped - EmployeeName: '{employeeName}', DepartmentName: '{departmentName}'");
 
-                return new ApiResponse<SlaResponse>
-                {
-                    Success = true,
-                    Data = new SlaResponse
-                    {
-                        Slaid = sla.Slaid,
-                        Slatype = sla.Slatype ?? string.Empty,
-                        Status = sla.Status ?? string.Empty,
-
-                        EmployeeId = sla.EmployeeId,
-                        EmployeeName = employeeName,
-                        EmployeeEmail = sla.Employee?.Userprofile?.PersonalEmail ?? string.Empty,
-
-                        DepartmentId = sla.DepartmentId,
-                        DepartmentName = departmentName,
-
-                        AssignedToEmployeeId = sla.AssignedToEmployeeId,
-                        AssignedToName = GetEmployeeName(sla.AssignedToEmployee),
-
-                        Deadline = sla.Deadline,
-                        ClosedAt = sla.ClosedAt,
-                        ComplianceStatus = sla.ComplianceStatus ?? string.Empty,
-
-                        ReopenedAt = sla.ReopenedAt,
-                        ReopenExtensionDays = sla.ReopenExtensionDays,
-                        ReopenReason = sla.ReopenReason,
-
-                        RelatedEntityType = sla.RelatedEntityType,
-                        RelatedEntityId = sla.RelatedEntityId,
-
-                        UrgencyStatus = sla.Status == "Closed" ? "Completed" :
-                                       (sla.Deadline < DateTime.Now) ? "Overdue" : "OnTrack",
-                        DaysUntilDeadline = (int)(sla.Deadline - DateTime.Now).TotalDays,
-
-                        CreatedAt = sla.CreatedAt ?? DateTime.MinValue,
-                        UpdatedAt = sla.UpdatedAt ?? DateTime.MinValue
-                    }
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in GetSlaById");
-                return new ApiResponse<SlaResponse> { Success = false, Message = ex.Message };
-            }
-        }
-
-        public async Task<ApiResponse<List<EscalationResponse>>> GetSlaEscalations(int slaid)
-        {
-            try
-            {
-                var escalations = await _slaRepository.GetEscalationsBySlaIdAsync(slaid);
-                var responses = escalations.Select(e => new EscalationResponse
-                {
-                    EscalationId = e.EscalationId,
-                    Slaid = e.Slaid,
-                    EscalationLevel = e.EscalationLevel ?? string.Empty,
-                    EscalationStatus = e.EscalationStatus ?? string.Empty,
-                    Description = e.Description,
-                    Reason = e.Reason,
-                    SubmittedAt = e.SubmittedAt,
-
-                    SubmittedByName = GetEmployeeName(e.SubmittedByEmployee),
-                    SubmittedByEmployeeId = e.SubmittedByEmployeeId,
-                    EmployeeEmail = e.SubmittedByEmployee?.Userprofile?.PersonalEmail ?? string.Empty,
-
-                    EscalatedToName = GetEmployeeName(e.EscalatedToEmployee),
-                    EscalatedToEmployeeId = e.EscalatedToEmployeeId,
-
-                    ResolvedByName = GetEmployeeName(e.ResolvedByEmployee),
-                    ResolvedByEmployeeId = e.ResolvedByEmployeeId,
-
-                    ResolutionComments = e.ResolutionComments,
-                    ResolvedAt = e.ResolvedAt,
-
-                    Message = e.Description ?? string.Empty
-                }).ToList();
-
-                return new ApiResponse<List<EscalationResponse>> { Success = true, Data = responses };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in GetSlaEscalations");
-                return new ApiResponse<List<EscalationResponse>> { Success = false, Message = ex.Message };
-            }
-        }
-        public async Task<ApiResponse<string>> CloseSla(CloseSlaRequest request)
-        {
-            try
-            {
-                var sla = await _slaRepository.GetSlaByIdAsync(request.Slaid);
-                if (sla == null)
-                    return new ApiResponse<string> { Success = false, Message = "SLA not found" };
-
-                var result = await _slaRepository.CloseSlaAsync(request.Slaid, request.ClosedByEmployeeId);
-                if (!result)
-                    return new ApiResponse<string> { Success = false, Message = "Failed to close SLA" };
-
-                var employeeEmail = sla.Employee?.Userprofile?.PersonalEmail;
-                var employeeName = GetEmployeeName(sla.Employee);
-
-                if (!string.IsNullOrEmpty(employeeEmail))
-                {
-                    await _emailService.SendSlaCompletionEmailAsync(
-                        employeeEmail,
-                        employeeName,
-                        sla.Slatype,
-                        DateTime.Now
-                    );
-                    _logger.LogInformation("SLA completion email sent to {Email}", employeeEmail);
-                }
-
-                return new ApiResponse<string> { Success = true, Data = "SLA closed successfully" };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in CloseSla");
-                return new ApiResponse<string> { Success = false, Message = ex.Message };
-            }
-        }
-
-        public async Task<ApiResponse<string>> ResolveEscalation(ResolveEscalationRequest request)
-        {
-            try
-            {
-                var escalation = await _slaRepository.GetEscalationByIdAsync(request.EscalationId);
-                if (escalation == null)
-                    return new ApiResponse<string> { Success = false, Message = "Escalation not found" };
-
-                escalation.EscalationStatus = request.EscalationStatus;
-                escalation.ResolutionComments = request.ResolutionComments;
-                escalation.ResolvedAt = DateTime.Now;
-                escalation.ResolvedByEmployeeId = request.ResolvedByEmployeeId;
-
-                await _slaRepository.UpdateEscalationAsync(escalation);
-
-                var submittedByEmployee = escalation.SubmittedByEmployee;
-                var submittedByEmail = submittedByEmployee?.Userprofile?.PersonalEmail;
-
-                if (!string.IsNullOrEmpty(submittedByEmail))
-                {
-                    _logger.LogInformation("Escalation resolution notification prepared for {Email}", submittedByEmail);
-                }
-
-                return new ApiResponse<string> { Success = true, Data = "Escalation resolved successfully" };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in ResolveEscalation");
-                return new ApiResponse<string> { Success = false, Message = ex.Message };
-            }
-        }
-
-        public async Task<ApiResponse<List<EscalationResponse>>> GetManagerEscalations(int managerId)
-        {
-            try
-            {
-                var escalations = await _slaRepository.GetEscalationsByEscalatedToAsync(managerId);
-                var responses = escalations.Select(e => new EscalationResponse
-                {
-                    EscalationId = e.EscalationId,
-                    Slaid = e.Slaid,
-                    Reason = e.Reason ?? string.Empty,
-                    Description = e.Description,
-                    EscalationLevel = e.EscalationLevel ?? string.Empty,
-                    EscalationStatus = e.EscalationStatus ?? string.Empty,
-                    SubmittedAt = e.SubmittedAt ?? DateTime.Now,
-
-                    EmployeeId = e.Sla?.EmployeeId,
-                    EmployeeName = GetEmployeeName(e.Sla?.Employee),
-                    EmployeeEmail = e.Sla?.Employee?.Userauthentication?.Email ?? string.Empty,
-
-                    SubmittedByName = GetEmployeeName(e.SubmittedByEmployee),
-                    SubmittedByEmployeeId = e.SubmittedByEmployeeId,
-
-                    EscalatedToName = GetEmployeeName(e.EscalatedToEmployee),
-                    EscalatedToEmployeeId = e.EscalatedToEmployeeId,
-
-                    ResolvedByName = GetEmployeeName(e.ResolvedByEmployee),
-                    ResolvedByEmployeeId = e.ResolvedByEmployeeId,
-                    ResolvedAt = e.ResolvedAt,
-                    ResolutionComments = e.ResolutionComments,
-
-                    Message = e.Description ?? string.Empty
-                }).ToList();
-
-                return new ApiResponse<List<EscalationResponse>> { Success = true, Data = responses };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in GetManagerEscalations");
-                return new ApiResponse<List<EscalationResponse>> { Success = false, Message = ex.Message };
-            }
-        }
-
-        public async Task<ApiResponse<SlaResponse>> UpdateSla(int slaid, UpdateSlaRequest request)
-        {
-            try
-            {
-                var sla = await _slaRepository.GetSlaByIdAsync(slaid);
-                if (sla == null)
-                    return new ApiResponse<SlaResponse> { Success = false, Message = "SLA not found" };
-
-                if (!string.IsNullOrEmpty(request.Slatype))
-                    sla.Slatype = request.Slatype;
-                if (request.AssignedToEmployeeId.HasValue)
-                    sla.AssignedToEmployeeId = request.AssignedToEmployeeId.Value;
-                if (request.Deadline.HasValue)
-                    sla.Deadline = request.Deadline.Value;
-                if (!string.IsNullOrEmpty(request.Status))
-                    sla.Status = request.Status;
-                if (!string.IsNullOrEmpty(request.ComplianceStatus))
-                    sla.ComplianceStatus = request.ComplianceStatus;
-
-                await _slaRepository.UpdateSlaAsync(sla);
-                return new ApiResponse<SlaResponse> { Success = true, Message = "SLA updated successfully" };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in UpdateSla");
-                return new ApiResponse<SlaResponse> { Success = false, Message = ex.Message };
-            }
-        }
-
-        public async Task<ApiResponse<string>> DeleteSla(int slaid)
-        {
-            try
-            {
-                await _slaRepository.DeleteSlaAsync(slaid);
-                return new ApiResponse<string> { Success = true, Data = "SLA deleted successfully" };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in DeleteSla");
-                return new ApiResponse<string> { Success = false, Message = ex.Message };
-            }
-        }
-        public async Task<ApiResponse<BulkCreateSlaResponse>> BulkCreateSla(List<CreateSlaRequest> requests)
-        {
-            try
-            {
-                _logger.LogInformation("Starting bulk SLA creation for {Count} records", requests.Count);
-
-                if (requests == null || !requests.Any())
-                {
-                    return new ApiResponse<BulkCreateSlaResponse>
-                    {
-                        Success = false,
-                        Message = "No SLA requests provided"
-                    };
-                }
-
-                if (requests.Count > 10000)
-                {
-                    return new ApiResponse<BulkCreateSlaResponse>
-                    {
-                        Success = false,
-                        Message = "Maximum 10,000 SLAs allowed per bulk operation"
-                    };
-                }
-
-                var employeeIds = requests.Select(r => r.EmployeeId).Distinct().ToList();
-                var employees = await _slaRepository.GetEmployeesByIdsAsync(employeeIds);
-                var employeeDict = employees.ToDictionary(e => e.EmployeeId, e => e);
-
-                var slasToInsert = new List<Sla>();
-                var failedRecords = new List<string>();
-                var now = DateTime.Now;
-
-                foreach (var request in requests)
-                {
-                    if (!employeeDict.TryGetValue(request.EmployeeId, out var employee))
-                    {
-                        failedRecords.Add($"Employee {request.EmployeeId} not found");
-                        continue;
-                    }
-
-                    var reportingManagerId = employee.ReportingManagerEmployeeId;
-                    if (reportingManagerId == null || reportingManagerId == 0)
-                    {
-                        failedRecords.Add($"Employee {request.EmployeeId} ({GetEmployeeName(employee)}) has no reporting manager");
-                        continue;
-                    }
-
-                    slasToInsert.Add(new Sla
-                    {
-                        Slatype = request.Slatype,
-                        EmployeeId = request.EmployeeId,
-                        AssignedToEmployeeId = reportingManagerId.Value,
-                        DepartmentId = request.DepartmentId,
-                        Deadline = request.Deadline,
-                        Status = "Open",
-                        ComplianceStatus = "OnTime",
-                        CreatedByEmployeeId = request.CreatedByEmployeeId,
-                        CreatedAt = now,
-                        UpdatedAt = now,
-                        RelatedEntityType = string.IsNullOrWhiteSpace(request.RelatedEntityType)
-                            ? null : request.RelatedEntityType,
-                        RelatedEntityId = request.RelatedEntityId.HasValue && request.RelatedEntityId.Value > 0
-                            ? request.RelatedEntityId : null
-                    });
-                }
-
-                var insertedCount = 0;
-                if (slasToInsert.Any())
-                {
-                    insertedCount = await _slaRepository.BulkInsertSlasAsync(slasToInsert);
-                    _logger.LogInformation("Bulk insert completed: {Count} records inserted", insertedCount);
-                }
-                _ = Task.Run(async () =>
-                {
-                    try
-                    {
-                        foreach (var request in requests)
-                        {
-                            if (employeeDict.TryGetValue(request.EmployeeId, out var emp))
-                            {
-                                var email = emp.Userprofile?.PersonalEmail;
-                                if (!string.IsNullOrEmpty(email))
-                                {
-                                    var daysUntilDeadline = (int)(request.Deadline - DateTime.Now).TotalDays;
-                                    await _emailService.SendSlaReminderEmailAsync(
-                                        email,
-                                        GetEmployeeName(emp),
-                                        request.Slatype,
-                                        request.Deadline,
-                                        daysUntilDeadline
-                                    );
-                                }
-                            }
-                        }
-                        _logger.LogInformation("Bulk SLA email notifications sent successfully");
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Error sending bulk SLA email notifications");
-                    }
-                });
-
-                return new ApiResponse<BulkCreateSlaResponse>
-                {
-                    Success = true,
-                    Message = $"Bulk insert completed: {insertedCount} successful, {failedRecords.Count} failed",
-                    Data = new BulkCreateSlaResponse
-                    {
-                        TotalRequested = requests.Count,
-                        SuccessfulInserts = insertedCount,
-                        FailedInserts = failedRecords.Count,
-                        FailedRecords = failedRecords,
-                        CreatedAt = now,
-                        Message = failedRecords.Any()
-                            ? "Bulk creation completed with some failures"
-                            : "All SLAs created successfully"
-                    }
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in BulkCreateSla");
-                return new ApiResponse<BulkCreateSlaResponse>
-                {
-                    Success = false,
-                    Message = $"Bulk insert failed: {ex.Message}"
-                };
-            }
-        }
 
         #endregion
 
         #region Helpers
-        private string GetEmployeeName(Employee employee)
-        {
-            if (employee?.Userprofile != null)
-            {
-                var firstName = employee.Userprofile.FirstName ?? string.Empty;
-                var lastName = employee.Userprofile.LastName ?? string.Empty;
-                return $"{firstName} {lastName}".Trim();
-            }
-            return "Employee";
-        }
+private string GetEmployeeName(Employee? employee)
+{
+    if (employee == null)
+        return "Unassigned";
+
+    if (employee.Userprofile != null)
+    {
+        var first = employee.Userprofile.FirstName ?? "";
+        var last = employee.Userprofile.LastName ?? "";
+        var full = $"{first} {last}".Trim();
+        if (!string.IsNullOrWhiteSpace(full))
+            return full;
+    }
+
+    return $"Employee #{employee.EmployeeId}";
+}
+
+
 
         #endregion
     }
