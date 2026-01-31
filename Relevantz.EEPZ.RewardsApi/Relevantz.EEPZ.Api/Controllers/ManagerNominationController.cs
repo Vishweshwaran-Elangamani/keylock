@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,11 +20,6 @@ namespace Relevantz.EEPZ.Api.Controllers
         private readonly IManagerNominationService _managerNominationService;
         private readonly ILogger<ManagerNominationController> _logger;
 
-        /// <summary>
-        /// Creates a new instance of <see cref="ManagerNominationController"/>.
-        /// </summary>
-        /// <param name="managerNominationService">Domain service for manager nomination flows.</param>
-        /// <param name="logger">Structured logger instance.</param>
         public ManagerNominationController(
             IManagerNominationService managerNominationService,
             ILogger<ManagerNominationController> logger)
@@ -34,14 +28,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             _logger = logger;
         }
 
-        /// <summary>
-        /// Gets the list of reward types visible to managers for creating nominations.
-        /// </summary>
-        /// <remarks>
-        /// Returns only reward types that are currently available/configured for manager nominations.
-        /// </remarks>
-        /// <response code="200">Reward types were fetched successfully.</response>
-        /// <response code="500">An unexpected error occurred while fetching reward types.</response>
         [HttpGet("reward-types")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -52,15 +38,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             return ToActionResult(res);
         }
 
-        /// <summary>
-        /// Gets all active nomination opportunities available to the current manager.
-        /// </summary>
-        /// <remarks>
-        /// The result may be filtered at the service/repository layer based on business rules
-        /// (e.g., deadlines, visibility, manager eligibility).
-        /// </remarks>
-        /// <response code="200">Opportunities were fetched successfully.</response>
-        /// <response code="500">An unexpected error occurred while fetching opportunities.</response>
         [HttpGet("opportunities")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -71,13 +48,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             return ToActionResult(res);
         }
 
-        /// <summary>
-        /// Gets all active nomination opportunities for a specific reward type.
-        /// </summary>
-        /// <param name="rewardTypeId">Unique identifier of the reward type.</param>
-        /// <response code="200">Opportunities for the specified reward type were fetched successfully.</response>
-        /// <response code="400">The provided rewardTypeId is invalid.</response>
-        /// <response code="500">An unexpected error occurred while fetching opportunities by reward type.</response>
         [HttpGet("opportunities/{rewardTypeId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -94,13 +64,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             return ToActionResult(res);
         }
 
-        /// <summary>
-        /// Gets nomination parameter definitions for the given reward type.
-        /// </summary>
-        /// <param name="rewardTypeId">Unique identifier of the reward type to fetch parameter schema for.</param>
-        /// <response code="200">Nomination parameters were fetched successfully.</response>
-        /// <response code="400">The provided rewardTypeId is invalid.</response>
-        /// <response code="500">An unexpected error occurred while fetching nomination parameters.</response>
         [HttpGet("parameters/{rewardTypeId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -117,13 +80,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             return ToActionResult(res);
         }
 
-        /// <summary>
-        /// Gets direct/indirect team members for a manager to nominate from.
-        /// </summary>
-        /// <param name="managerId">Manager's employee identifier.</param>
-        /// <response code="200">Team members were fetched successfully.</response>
-        /// <response code="400">The provided managerId is invalid.</response>
-        /// <response code="500">An unexpected error occurred while fetching team members.</response>
         [HttpGet("team/{managerId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -140,17 +96,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             return ToActionResult(res);
         }
 
-        /// <summary>
-        /// Submits a new nomination on behalf of a manager.
-        /// </summary>
-        /// <remarks>
-        /// Validations (eligibility, duplicates, window constraints) are performed in the service layer.
-        /// </remarks>
-        /// <param name="request">Nomination payload, including nominee and parameter values.</param>
-        /// <response code="200">Nomination was submitted successfully.</response>
-        /// <response code="400">The request payload is invalid.</response>
-        /// <response code="403">The caller is not authorized to submit this nomination.</response>
-        /// <response code="500">An unexpected error occurred while submitting the nomination.</response>
         [HttpPost("submit")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -168,13 +113,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             return ToActionResult(res);
         }
 
-        /// <summary>
-        /// Gets nominations submitted for an employee (regardless of who nominated).
-        /// </summary>
-        /// <param name="employeeId">Employee’s identifier.</param>
-        /// <response code="200">Employee nominations were fetched successfully.</response>
-        /// <response code="400">The provided employeeId is invalid.</response>
-        /// <response code="500">An unexpected error occurred while fetching employee nominations.</response>
         [HttpGet("employee-nominations/{employeeId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -191,13 +129,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             return ToActionResult(res);
         }
 
-        /// <summary>
-        /// Gets nominations submitted by a specific manager.
-        /// </summary>
-        /// <param name="managerId">Manager’s employee identifier.</param>
-        /// <response code="200">Manager nominations were fetched successfully.</response>
-        /// <response code="400">The provided managerId is invalid.</response>
-        /// <response code="500">An unexpected error occurred while fetching manager nominations.</response>
         [HttpGet("my-nominations/{managerId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -214,13 +145,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             return ToActionResult(res);
         }
 
-        /// <summary>
-        /// Gets full details for a specific nomination.
-        /// </summary>
-        /// <param name="nominationId">Nomination identifier.</param>
-        /// <response code="200">Nomination details were fetched successfully.</response>
-        /// <response code="400">The provided nominationId is invalid.</response>
-        /// <response code="500">An unexpected error occurred while fetching nomination details.</response>
         [HttpGet("nomination-details/{nominationId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -237,11 +161,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             return ToActionResult(res);
         }
 
-        /// <summary>
-        /// Maps anonymous service response to <see cref="IActionResult"/>. If a 'statusCode' field is present, that code is used.
-        /// </summary>
-        /// <param name="response">Anonymous/DTO response from service layer.</param>
-        /// <returns>Action result with the specified or default HTTP status code.</returns>
         private IActionResult ToActionResult(object response)
         {
             if (response == null)

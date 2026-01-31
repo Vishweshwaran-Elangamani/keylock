@@ -33,13 +33,13 @@ namespace Relevantz.EEPZ.Data.Repository
             return await _context.Rewardtypes
                 .FirstOrDefaultAsync(rt => rt.RewardTypeId == rewardTypeId);
         }
-        public async Task<Recognitiondetail?> GetOpportunityByIdAsync(int opportunityId)
-{
-    return await _context.Recognitiondetails
-        .Include(o => o.RewardType)
-        .FirstOrDefaultAsync(o => o.OpportunityId == opportunityId);
-}
 
+        public async Task<Recognitiondetail?> GetOpportunityByIdAsync(int opportunityId)
+        {
+            return await _context.Recognitiondetails
+                .Include(o => o.RewardType)
+                .FirstOrDefaultAsync(o => o.OpportunityId == opportunityId);
+        }
 
         public async Task<Rewardtype?> GetVisibleRewardTypeByIdAsync(int rewardTypeId)
         {
@@ -183,7 +183,7 @@ namespace Relevantz.EEPZ.Data.Repository
             };
 
             _context.Recognitiondetails.Add(opportunity);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(); // keep old behavior
             return opportunity;
         }
 

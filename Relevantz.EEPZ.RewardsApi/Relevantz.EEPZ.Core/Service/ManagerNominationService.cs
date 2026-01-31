@@ -22,9 +22,7 @@ namespace Relevantz.EEPZ.Core.Services
 
         public async Task<object> GetRewardTypesAsync()
         {
-            _logger.LogInformation(
-                "[GET_REWARD_TYPES] Fetching visible reward types for manager nominations"
-            );
+            _logger.LogInformation("[GET_REWARD_TYPES] Fetching visible reward types for manager nominations");
 
             var rewardTypes = await _repository.GetVisibleRewardTypesAsync();
 
@@ -61,33 +59,29 @@ namespace Relevantz.EEPZ.Core.Services
                 var rewardType = await _repository.GetRewardTypeByIdAsync(o.RewardTypeId);
                 var department = await _repository.GetDepartmentByIdAsync(o.DepartmentId);
 
-                result.Add(
-                    new
-                    {
-                        o.OpportunityId,
-                        o.OpportunityName,
-                        o.Description,
-                        o.Deadline,
-                        o.Requirements,
-                        o.EligibilityCriteria,
-                        RewardType = rewardType != null
-                            ? new
-                            {
-                                rewardType.RewardTypeId,
-                                rewardType.RewardCategory,
-                                rewardType.RewardName,
-                            }
-                            : null,
-                        Department = department != null
-                            ? new { department.DepartmentId, department.DepartmentName }
-                            : null,
-                    }
-                );
+                result.Add(new
+                {
+                    o.OpportunityId,
+                    o.OpportunityName,
+                    o.Description,
+                    o.Deadline,
+                    o.Requirements,
+                    o.EligibilityCriteria,
+                    RewardType = rewardType != null
+                        ? new
+                        {
+                            rewardType.RewardTypeId,
+                            rewardType.RewardCategory,
+                            rewardType.RewardName,
+                        }
+                        : null,
+                    Department = department != null
+                        ? new { department.DepartmentId, department.DepartmentName }
+                        : null,
+                });
             }
 
-            _logger.LogInformation(
-                $"[GET_OPPORTUNITIES] Found {result.Count} active opportunities"
-            );
+            _logger.LogInformation($"[GET_OPPORTUNITIES] Found {result.Count} active opportunities");
 
             return new
             {
@@ -99,13 +93,9 @@ namespace Relevantz.EEPZ.Core.Services
 
         public async Task<object> GetOpportunitiesByRewardTypeAsync(int rewardTypeId)
         {
-            _logger.LogInformation(
-                $"[GET_OPPORTUNITIES_BY_REWARD] Fetching opportunities for Reward Type: {rewardTypeId}"
-            );
+            _logger.LogInformation($"[GET_OPPORTUNITIES_BY_REWARD] Fetching opportunities for Reward Type: {rewardTypeId}");
 
-            var validationRewardType = await _repository.GetVisibleRewardTypeByIdAsync(
-                rewardTypeId
-            );
+            var validationRewardType = await _repository.GetVisibleRewardTypeByIdAsync(rewardTypeId);
 
             if (validationRewardType == null)
             {
@@ -116,30 +106,24 @@ namespace Relevantz.EEPZ.Core.Services
                 };
             }
 
-            var opportunities = await _repository.GetActiveOpportunitiesByRewardTypeAsync(
-                rewardTypeId
-            );
+            var opportunities = await _repository.GetActiveOpportunitiesByRewardTypeAsync(rewardTypeId);
 
             var result = new List<object>();
             foreach (var o in opportunities)
             {
                 var rewardType = await _repository.GetRewardTypeByIdAsync(o.RewardTypeId);
 
-                result.Add(
-                    new
-                    {
-                        o.OpportunityId,
-                        o.OpportunityName,
-                        o.Description,
-                        o.Deadline,
-                        RewardTypeName = rewardType?.RewardName ?? "Unknown",
-                    }
-                );
+                result.Add(new
+                {
+                    o.OpportunityId,
+                    o.OpportunityName,
+                    o.Description,
+                    o.Deadline,
+                    RewardTypeName = rewardType?.RewardName ?? "Unknown",
+                });
             }
 
-            _logger.LogInformation(
-                $"[GET_OPPORTUNITIES_BY_REWARD] Found {result.Count} opportunities for Reward Type {rewardTypeId}"
-            );
+            _logger.LogInformation($"[GET_OPPORTUNITIES_BY_REWARD] Found {result.Count} opportunities for Reward Type {rewardTypeId}");
 
             return new
             {
@@ -151,9 +135,7 @@ namespace Relevantz.EEPZ.Core.Services
 
         public async Task<object> GetNominationParametersAsync(int rewardTypeId)
         {
-            _logger.LogInformation(
-                $"[GET_PARAMETERS] Fetching parameters for Reward Type: {rewardTypeId}"
-            );
+            _logger.LogInformation($"[GET_PARAMETERS] Fetching parameters for Reward Type: {rewardTypeId}");
 
             var parameters = await _repository.GetParametersByRewardTypeAsync(rewardTypeId);
 
@@ -171,9 +153,7 @@ namespace Relevantz.EEPZ.Core.Services
                 })
                 .ToList();
 
-            _logger.LogInformation(
-                $"[GET_PARAMETERS] Found {result.Count} parameters for Reward Type {rewardTypeId}"
-            );
+            _logger.LogInformation($"[GET_PARAMETERS] Found {result.Count} parameters for Reward Type {rewardTypeId}");
 
             return new
             {
@@ -185,21 +165,15 @@ namespace Relevantz.EEPZ.Core.Services
 
         public async Task<object> GetTeamMembersAsync(int managerId)
         {
-            _logger.LogInformation(
-                $"[GET_TEAM_MEMBERS] Fetching team members for Manager ID: {managerId}"
-            );
+            _logger.LogInformation($"[GET_TEAM_MEMBERS] Fetching team members for Manager ID: {managerId}");
 
             var managerProjectsAsL1 = await _repository.GetManagerL1ProjectIdsAsync(managerId);
 
-            _logger.LogInformation(
-                $"[GET_TEAM_MEMBERS] Manager {managerId} is L1 on {managerProjectsAsL1.Count} projects"
-            );
+            _logger.LogInformation($"[GET_TEAM_MEMBERS] Manager {managerId} is L1 on {managerProjectsAsL1.Count} projects");
 
             if (!managerProjectsAsL1.Any())
             {
-                _logger.LogInformation(
-                    $"[GET_TEAM_MEMBERS] No L1 projects found for Manager {managerId}"
-                );
+                _logger.LogInformation($"[GET_TEAM_MEMBERS] No L1 projects found for Manager {managerId}");
                 return new
                 {
                     success = true,
@@ -210,18 +184,11 @@ namespace Relevantz.EEPZ.Core.Services
 
             var allManagerIds = await _repository.GetAllManagerEmployeeIdsAsync();
 
-            _logger.LogInformation(
-                $"[GET_TEAM_MEMBERS] Found {allManagerIds.Count} employees who are managers/approvers"
-            );
+            _logger.LogInformation($"[GET_TEAM_MEMBERS] Found {allManagerIds.Count} employees who are managers/approvers");
 
-            var teamMembers = await _repository.GetTeamMembersByProjectIdsAsync(
-                managerProjectsAsL1,
-                allManagerIds
-            );
+            var teamMembers = await _repository.GetTeamMembersByProjectIdsAsync(managerProjectsAsL1, allManagerIds);
 
-            _logger.LogInformation(
-                $"[GET_TEAM_MEMBERS] Found {teamMembers.Count} regular employees for Manager {managerId}"
-            );
+            _logger.LogInformation($"[GET_TEAM_MEMBERS] Found {teamMembers.Count} regular employees for Manager {managerId}");
 
             return new
             {
@@ -233,9 +200,7 @@ namespace Relevantz.EEPZ.Core.Services
 
         public async Task<object> SubmitNominationAsync(NominationSubmitDto dto)
         {
-            _logger.LogInformation(
-                $"[SUBMIT_NOMINATION] Submitting nomination for Employee {dto.NomineeEmployeeId}"
-            );
+            _logger.LogInformation($"[SUBMIT_NOMINATION] Submitting nomination for Employee {dto.NomineeEmployeeId}");
 
             if (dto.NomineeEmployeeId <= 0 || dto.NominatedByEmployeeId <= 0)
                 return new { success = false, message = "Invalid employee IDs" };
@@ -250,9 +215,7 @@ namespace Relevantz.EEPZ.Core.Services
 
             if (!isL1Manager)
             {
-                _logger.LogWarning(
-                    $"[SUBMIT_NOMINATION] Employee {dto.NominatedByEmployeeId} is not an L1 manager on any project"
-                );
+                _logger.LogWarning($"[SUBMIT_NOMINATION] Employee {dto.NominatedByEmployeeId} is not an L1 manager on any project");
                 return new
                 {
                     success = false,
@@ -261,20 +224,13 @@ namespace Relevantz.EEPZ.Core.Services
                 };
             }
 
-            var managerProjectsAsL1 = await _repository.GetManagerL1ProjectIdsAsync(
-                dto.NominatedByEmployeeId
-            );
+            var managerProjectsAsL1 = await _repository.GetManagerL1ProjectIdsAsync(dto.NominatedByEmployeeId);
 
-            var nomineeInManagerProjects = await _repository.IsNomineeInManagerProjectsAsync(
-                dto.NomineeEmployeeId,
-                managerProjectsAsL1
-            );
+            var nomineeInManagerProjects = await _repository.IsNomineeInManagerProjectsAsync(dto.NomineeEmployeeId, managerProjectsAsL1);
 
             if (!nomineeInManagerProjects)
             {
-                _logger.LogWarning(
-                    $"[SUBMIT_NOMINATION] Nominee {dto.NomineeEmployeeId} is not in manager's L1 projects"
-                );
+                _logger.LogWarning($"[SUBMIT_NOMINATION] Nominee {dto.NomineeEmployeeId} is not in manager's L1 projects");
                 return new
                 {
                     success = false,
@@ -283,9 +239,7 @@ namespace Relevantz.EEPZ.Core.Services
                 };
             }
 
-            var rewardType = await _repository.GetVisibleRewardTypeByIdAsync(
-                dto.RewardTypeId.Value
-            );
+            var rewardType = await _repository.GetVisibleRewardTypeByIdAsync(dto.RewardTypeId.Value);
 
             if (rewardType == null)
                 return new
@@ -294,49 +248,39 @@ namespace Relevantz.EEPZ.Core.Services
                     message = "Invalid reward type or not available for manager nominations",
                 };
 
-            _logger.LogInformation(
-                $"[SUBMIT_NOMINATION] Reward Type: {rewardType.RewardName} (Visible: {rewardType.IsVisibleForManagerNomination})"
-            );
+            _logger.LogInformation($"[SUBMIT_NOMINATION] Reward Type: {rewardType.RewardName} (Visible: {rewardType.IsVisibleForManagerNomination})");
 
-            var existingNomination = await _repository.GetExistingNominationAsync(
-                dto.NomineeEmployeeId,
-                dto.RewardTypeId.Value
-            );
+            var existingNomination = await _repository.GetExistingNominationAsync(dto.NomineeEmployeeId, dto.RewardTypeId.Value);
 
             if (existingNomination != null)
             {
-                _logger.LogWarning(
-                    $"[SUBMIT_NOMINATION] Employee {dto.NomineeEmployeeId} already nominated for RewardType {dto.RewardTypeId}"
-                );
+                _logger.LogWarning($"[SUBMIT_NOMINATION] Employee {dto.NomineeEmployeeId} already nominated for RewardType {dto.RewardTypeId}");
 
+                // ✅ CRITICAL CHANGE: return 200 OK with success=false (old UI contract)
                 return new
                 {
                     success = false,
                     message = $"This employee has already been nominated for {rewardType.RewardName}. Please select a different award.",
+                    data = new
+                    {
+                        existingNominationId = existingNomination.NominationId,
+                        rewardTypeName = rewardType.RewardName
+                    }
                 };
             }
 
-            var defaultOpportunity = await _repository.GetDefaultOpportunityAsync(
-                dto.RewardTypeId.Value
-            );
+            var defaultOpportunity = await _repository.GetDefaultOpportunityAsync(dto.RewardTypeId.Value);
 
             int opportunityId;
 
             if (defaultOpportunity == null)
             {
-                _logger.LogInformation(
-                    $"[SUBMIT_NOMINATION] Creating default opportunity for RewardType {dto.RewardTypeId}"
-                );
+                _logger.LogInformation($"[SUBMIT_NOMINATION] Creating default opportunity for RewardType {dto.RewardTypeId}");
 
-                defaultOpportunity = await _repository.CreateDefaultOpportunityAsync(
-                    dto.RewardTypeId.Value,
-                    rewardType.RewardName
-                );
+                defaultOpportunity = await _repository.CreateDefaultOpportunityAsync(dto.RewardTypeId.Value, rewardType.RewardName);
 
                 opportunityId = defaultOpportunity.OpportunityId;
-                _logger.LogInformation(
-                    $"[SUBMIT_NOMINATION] Default opportunity created: {opportunityId}"
-                );
+                _logger.LogInformation($"[SUBMIT_NOMINATION] Default opportunity created: {opportunityId}");
             }
             else
             {
@@ -352,41 +296,28 @@ namespace Relevantz.EEPZ.Core.Services
                 Justification = dto.Justification,
                 Status = "Pending",
                 SubmittedAt = DateTime.UtcNow,
-                ReviewRemarks =
-                    $"DirectManagerNomination|RewardType:{dto.RewardTypeId}|User-Submitted",
+                ReviewRemarks = $"DirectManagerNomination|RewardType:{dto.RewardTypeId}|User-Submitted",
             };
 
             await _repository.AddRecognitionStatusAsync(recognitionstatus);
             await _repository.SaveChangesAsync();
 
-            _logger.LogInformation(
-                $"[SUBMIT_NOMINATION] Nomination created: {recognitionstatus.NominationId}"
-            );
+            _logger.LogInformation($"[SUBMIT_NOMINATION] Nomination created: {recognitionstatus.NominationId}");
 
             if (dto.ParameterValues != null && dto.ParameterValues.Any())
             {
-                var uniqueParams = dto
-                    .ParameterValues.GroupBy(p => p.ParameterId)
-                    .Select(g => g.First())
-                    .ToList();
+                var uniqueParams = dto.ParameterValues.GroupBy(p => p.ParameterId).Select(g => g.First()).ToList();
 
                 foreach (var param in uniqueParams)
                 {
                     if (param.ParameterId <= 0)
                         continue;
 
-                    var parameterExists = await _repository.ParameterExistsAsync(
-                        param.ParameterId,
-                        dto.RewardTypeId.Value
-                    );
-
+                    var parameterExists = await _repository.ParameterExistsAsync(param.ParameterId, dto.RewardTypeId.Value);
                     if (!parameterExists)
                         continue;
 
-                    var existingParamValue = await _repository.GetExistingParameterValueAsync(
-                        recognitionstatus.NominationId,
-                        param.ParameterId
-                    );
+                    var existingParamValue = await _repository.GetExistingParameterValueAsync(recognitionstatus.NominationId, param.ParameterId);
 
                     if (existingParamValue != null)
                     {
@@ -432,9 +363,7 @@ namespace Relevantz.EEPZ.Core.Services
 
         public async Task<object> GetEmployeeNominationsAsync(int employeeId)
         {
-            _logger.LogInformation(
-                $"[GET_EMPLOYEE_NOMINATIONS] Fetching nominations for Employee {employeeId}"
-            );
+            _logger.LogInformation($"[GET_EMPLOYEE_NOMINATIONS] Fetching nominations for Employee {employeeId}");
 
             var nominations = await _repository.GetNominationsByEmployeeIdAsync(employeeId);
 
@@ -450,9 +379,7 @@ namespace Relevantz.EEPZ.Core.Services
                 })
                 .ToList();
 
-            _logger.LogInformation(
-                $"[GET_EMPLOYEE_NOMINATIONS] Found {result.Count} nominations for Employee {employeeId}"
-            );
+            _logger.LogInformation($"[GET_EMPLOYEE_NOMINATIONS] Found {result.Count} nominations for Employee {employeeId}");
 
             return new
             {
@@ -464,15 +391,11 @@ namespace Relevantz.EEPZ.Core.Services
 
         public async Task<object> GetMyNominationsAsync(int managerId)
         {
-            _logger.LogInformation(
-                $"[GET_MY_NOMINATIONS] Fetching nominations for Manager {managerId}"
-            );
+            _logger.LogInformation($"[GET_MY_NOMINATIONS] Fetching nominations for Manager {managerId}");
 
             var nominations = await _repository.GetNominationsByManagerIdAsync(managerId);
 
-            _logger.LogInformation(
-                $"[GET_MY_NOMINATIONS] Found {nominations.Count} nominations for Manager {managerId}"
-            );
+            _logger.LogInformation($"[GET_MY_NOMINATIONS] Found {nominations.Count} nominations for Manager {managerId}");
 
             var result = new List<object>();
             foreach (var n in nominations)
@@ -488,45 +411,41 @@ namespace Relevantz.EEPZ.Core.Services
 
                 var userProfile =
                     nomineeEmployee != null
-                        ? await _repository.GetUserProfileByEmployeeIdAsync(
-                            nomineeEmployee.EmployeeId
-                        )
+                        ? await _repository.GetUserProfileByEmployeeIdAsync(nomineeEmployee.EmployeeId)
                         : null;
 
                 var dept = await _repository.GetEmployeeDetailsAsync(n.NomineeEmployeeId);
 
-                result.Add(
-                    new
+                result.Add(new
+                {
+                    n.NominationId,
+                    n.Status,
+                    n.Justification,
+                    n.SubmittedAt,
+                    n.ReviewedAt,
+                    n.ReviewRemarks,
+                    RewardTypeId = opportunity?.RewardTypeId,
+                    Nominee = new
                     {
-                        n.NominationId,
-                        n.Status,
-                        n.Justification,
-                        n.SubmittedAt,
-                        n.ReviewedAt,
-                        n.ReviewRemarks,
-                        RewardTypeId = opportunity?.RewardTypeId,
-                        Nominee = new
-                        {
-                            EmployeeId = nomineeEmployee?.EmployeeId ?? 0,
-                            FirstName = userProfile?.FirstName ?? "Unknown",
-                            LastName = userProfile?.LastName ?? "",
-                            DepartmentName = dept?.Department?.DepartmentName ?? "Unknown",
-                            Department = dept?.Department != null
-                                ? new
-                                {
-                                    DepartmentId = dept.Department.DepartmentId,
-                                    DepartmentName = dept.Department.DepartmentName,
-                                }
-                                : null,
-                        },
-                        Opportunity = new
-                        {
-                            OpportunityName = opportunity?.OpportunityName ?? "Unknown",
-                            Deadline = opportunity?.Deadline,
-                            RewardType = rewardType?.RewardName ?? "Unknown",
-                        },
-                    }
-                );
+                        EmployeeId = nomineeEmployee?.EmployeeId ?? 0,
+                        FirstName = userProfile?.FirstName ?? "Unknown",
+                        LastName = userProfile?.LastName ?? "",
+                        DepartmentName = dept?.Department?.DepartmentName ?? "Unknown",
+                        Department = dept?.Department != null
+                            ? new
+                            {
+                                DepartmentId = dept.Department.DepartmentId,
+                                DepartmentName = dept.Department.DepartmentName,
+                            }
+                            : null,
+                    },
+                    Opportunity = new
+                    {
+                        OpportunityName = opportunity?.OpportunityName ?? "Unknown",
+                        Deadline = opportunity?.Deadline,
+                        RewardType = rewardType?.RewardName ?? "Unknown",
+                    },
+                });
             }
 
             return new
@@ -539,9 +458,7 @@ namespace Relevantz.EEPZ.Core.Services
 
         public async Task<object> GetNominationDetailsAsync(int nominationId)
         {
-            _logger.LogInformation(
-                $"[GET_NOMINATION_DETAILS] Fetching details for Nomination {nominationId}"
-            );
+            _logger.LogInformation($"[GET_NOMINATION_DETAILS] Fetching details for Nomination {nominationId}");
 
             var nomination = await _repository.GetNominationByIdAsync(nominationId);
 
@@ -558,29 +475,21 @@ namespace Relevantz.EEPZ.Core.Services
                     ? await _repository.GetRewardTypeByIdAsync(opportunity.RewardTypeId)
                     : null;
 
-            var nomineeEmployee = await _repository.GetEmployeeByIdAsync(
-                nomination.NomineeEmployeeId
-            );
+            var nomineeEmployee = await _repository.GetEmployeeByIdAsync(nomination.NomineeEmployeeId);
 
             var nomineeProfile =
                 nomineeEmployee != null
                     ? await _repository.GetUserProfileByEmployeeIdAsync(nomineeEmployee.EmployeeId)
                     : null;
 
-            var nominatorEmployee = await _repository.GetEmployeeByIdAsync(
-                nomination.NominatedByEmployeeId
-            );
+            var nominatorEmployee = await _repository.GetEmployeeByIdAsync(nomination.NominatedByEmployeeId);
 
             var nominatorProfile =
                 nominatorEmployee != null
-                    ? await _repository.GetUserProfileByEmployeeIdAsync(
-                        nominatorEmployee.EmployeeId
-                    )
+                    ? await _repository.GetUserProfileByEmployeeIdAsync(nominatorEmployee.EmployeeId)
                     : null;
 
-            var parameterValues = await _repository.GetParameterValuesByNominationIdAsync(
-                nominationId
-            );
+            var parameterValues = await _repository.GetParameterValuesByNominationIdAsync(nominationId);
 
             var parameterResults = new List<object>();
             foreach (var pv in parameterValues)
@@ -589,15 +498,13 @@ namespace Relevantz.EEPZ.Core.Services
 
                 if (parameter != null)
                 {
-                    parameterResults.Add(
-                        new
-                        {
-                            parameter.ParameterId,
-                            parameter.ParameterName,
-                            parameter.ParameterType,
-                            pv.ParameterValue,
-                        }
-                    );
+                    parameterResults.Add(new
+                    {
+                        parameter.ParameterId,
+                        parameter.ParameterName,
+                        parameter.ParameterType,
+                        pv.ParameterValue,
+                    });
                 }
             }
 
@@ -630,9 +537,7 @@ namespace Relevantz.EEPZ.Core.Services
                 ParameterValues = parameterResults,
             };
 
-            _logger.LogInformation(
-                $"[GET_NOMINATION_DETAILS] Nomination {nominationId} details retrieved with {parameterResults.Count} parameters"
-            );
+            _logger.LogInformation($"[GET_NOMINATION_DETAILS] Nomination {nominationId} details retrieved with {parameterResults.Count} parameters");
 
             return new { success = true, data = result };
         }
