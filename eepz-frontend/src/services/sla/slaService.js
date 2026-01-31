@@ -4,7 +4,7 @@ const API_BASE_URL = import.meta.env.VITE_SLA_API_URL;
 const API_EMP = import.meta.env.VITE_PROJECT_API_URL;
 
 const slaApi = axios.create({
-  baseURL: `${API_BASE_URL}/api/Sla`,
+baseURL: `${API_BASE_URL}/api/slas`,
   headers: { "Content-Type": "application/json" },
   timeout: 30000,
 });
@@ -27,13 +27,18 @@ const employeeApi = axios.create({
 });
 
 [slaApi, employeeApi].forEach((api) => {
-  api.interceptors.response.use(
-    (response) => ({
-      success: response.data.success !== false,
-      data: response.data.data || response.data,
-      message: response.data.message || "Success",
-      count: response.data.count || 0,
-    }),
+ api.interceptors.response.use(
+  (response) => {
+    const body = response.data;
+
+    return {
+      success: body.success ?? body.Success ?? true,
+      data: body.data ?? body.Data ?? body,
+      message: body.message ?? body.Message ?? "Success",
+      count: body.count ?? body.Count ?? 0,
+    };
+  },
+
     (error) => {
       if (error.response?.status === 401) {
         localStorage.removeItem("user");
@@ -162,86 +167,11 @@ export const dateHelpers = {
 };
 
 const slaService = {
-  getAllSLAs: async () => {
-    try {
-      const response = await slaApi.get("/all");
-      return response;
-    } catch (error) {
-      console.error("Error fetching all SLAs:", error);
-      throw error;
-    }
-  },
+getAllSLAs: async () => await slaApi.get(""),
+getSLAById: async (id) => await slaApi.get(`/${id}`),
 
-  getEmployeeSLAs: async (empId) => {
-    try {
-      const response = await slaApi.get(`/employee/${empId}`);
-      return response;
-    } catch (error) {
-      console.error("Error fetching employee SLAs:", error);
-      throw error;
-    }
-  },
-
-  getSLAById: async (id) => {
-    try {
-      return await slaApi.get(`/${id}`);
-    } catch (error) {
-      console.error("Error fetching SLA:", error);
-      throw error;
-    }
-  },
-
-  createSLA: async (data) => {
-    try {
-      const payload = {
-        slatype: data.slatype,
-        employeeId: data.employeeId,
-        assignedToEmployeeId: data.assignedToEmployeeId,
-        departmentId: data.departmentId,
-        deadline: data.deadline,
-        createdByEmployeeId: data.createdByEmployeeId,
-      };
-      return await slaApi.post("/create", payload);
-    } catch (error) {
-      console.error("Error creating SLA:", error);
-      throw error;
-    }
-  },
-
-  createBulkSLA: async (slaRequests) => {
-    try {
-      if (!Array.isArray(slaRequests) || slaRequests.length === 0) {
-        throw new Error("SLA requests array is required and cannot be empty");
-      }
-
-      if (slaRequests.length > 10000) {
-        throw new Error("Maximum 10,000 SLAs allowed per bulk operation");
-      }
-
-      const payload = slaRequests.map((sla) => ({
-        slatype: sla.slatype,
-        employeeId: sla.employeeId,
-        assignedToEmployeeId: sla.assignedToEmployeeId,
-        departmentId: sla.departmentId,
-        deadline: sla.deadline,
-        relatedEntityType: sla.relatedEntityType || null,
-        relatedEntityId: sla.relatedEntityId || null,
-        createdByEmployeeId: sla.createdByEmployeeId,
-        creationReason: sla.creationReason || null,
-      }));
-
-      const response = await slaApi.post("/bulk-create", payload);
-
-      if (response.data?.failedRecords?.length > 0) {
-        console.warn("Failed records:", response.data.failedRecords);
-      }
-
-      return response;
-    } catch (error) {
-      console.error("Error creating bulk SLAs:", error);
-      throw error;
-    }
-  },
+createSLA: async (data) => await slaApi.post("", data),
+  createBulkSLA: async (data) => await slaApi.post("/bulk", data),
 
   createBulkSLAForDepartment: async (departmentId, slaConfig) => {
     try {
@@ -255,16 +185,16 @@ const slaService = {
 
       const employees = employeesResponse.data;
 
-      const slaRequests = employees.map((emp) => ({
-        slatype: slaConfig.slatype,
-        employeeId: emp.employeeId || emp.employeeMasterId,
-        assignedToEmployeeId: 0,
-        departmentId: departmentId,
-        deadline: slaConfig.deadline,
-        createdByEmployeeId: slaConfig.createdByEmployeeId,
-        creationReason:
-          slaConfig.creationReason || `Bulk creation for ${slaConfig.slatype}`,
-      }));
+  const slaRequests = employees.map((emp) => ({
+  slatype: slaConfig.slatype,
+  employeeId: emp.employeeId || emp.employeeMasterId,
+  departmentId: departmentId,
+  deadline: slaConfig.deadline,
+  createdByEmployeeId: slaConfig.createdByEmployeeId,
+  creationReason:
+    slaConfig.creationReason || `Bulk creation for ${slaConfig.slatype}`,
+}));
+
 
       return await slaService.createBulkSLA(slaRequests);
     } catch (error) {
@@ -283,16 +213,16 @@ const slaService = {
 
       const employees = employeesResponse.data;
 
-      const slaRequests = employees.map((emp) => ({
-        slatype: slaConfig.slatype,
-        employeeId: emp.employeeId || emp.employeeMasterId,
-        assignedToEmployeeId: 0,
-        departmentId: emp.departmentId,
-        deadline: slaConfig.deadline,
-        createdByEmployeeId: slaConfig.createdByEmployeeId,
-        creationReason:
-          slaConfig.creationReason || `Organization-wide ${slaConfig.slatype}`,
-      }));
+     const slaRequests = employees.map((emp) => ({
+  slatype: slaConfig.slatype,
+  employeeId: emp.employeeId || emp.employeeMasterId,
+  departmentId: emp.departmentId,
+  deadline: slaConfig.deadline,
+  createdByEmployeeId: slaConfig.createdByEmployeeId,
+  creationReason:
+    slaConfig.creationReason || `Organization-wide ${slaConfig.slatype}`,
+}));
+
       return await slaService.createBulkSLA(slaRequests);
     } catch (error) {
       console.error("Error creating organization-wide bulk SLAs:", error);
@@ -300,120 +230,32 @@ const slaService = {
     }
   },
 
-  updateSLA: async (id, data) => {
-    try {
-      const payload = {
-        slatype: data.slatype,
-        assignedToEmployeeId: data.assignedToEmployeeId,
-        deadline: data.deadline,
-        status: data.status,
-        updatedByEmployeeId: data.updatedByEmployeeId,
-      };
-      return await slaApi.put(`/${id}`, payload);
-    } catch (error) {
-      console.error("Error updating SLA:", error);
-      throw error;
-    }
-  },
+  updateSLA: async (id, data) => await slaApi.put(`/${id}`, data),
+deleteSLA: async (id) => await slaApi.delete(`/${id}`),
 
-  deleteSLA: async (id) => {
-    try {
-      return await slaApi.delete(`/${id}`);
-    } catch (error) {
-      console.error("Error deleting SLA:", error);
-      throw error;
-    }
-  },
+submitEscalation: async (slaId, payload, level = "normal") =>
+  await slaApi.post(`/${slaId}/escalations`, payload, {
+    params: { level },
+  }),
 
-  closeSLA: async (data) => {
-    try {
-      const payload = {
-        slaid: data.slaid,
-        closedByEmployeeId: data.closedByEmployeeId,
-        closureComments: data.closureComments || "",
-      };
-      return await slaApi.put("/close", payload);
-    } catch (error) {
-      console.error("Error closing SLA:", error);
-      throw error;
-    }
-  },
+resolveEscalation: async (payload) =>
+  await slaApi.put(`/escalations/resolve`, payload),
 
-  reopenSLA: async (data) => {
-    try {
-      return await slaApi.put("/reopen", data);
-    } catch (error) {
-      console.error("Error reopening SLA:", error);
-      throw error;
-    }
-  },
+closeSLA: async (slaId) =>
+  await slaApi.put(`/${slaId}/close`),
 
-  submitEscalation: async (data) => {
-    try {
-      const payload = {
-        slaid: data.slaid,
-        reason: data.reason,
-        description: data.description || "",
-        escalationLevel: "L1",
-        escalatedToEmployeeId: data.escalatedToEmployeeId,
-        submittedByEmployeeId: data.submittedByEmployeeId,
-      };
-      return await slaApi.post("/escalate", payload);
-    } catch (error) {
-      console.error("L1 Escalation Error:", error);
-      throw error;
-    }
-  },
+reopenSLA: async (slaId, payload) =>
+  await slaApi.put(`/${slaId}/reopen`, payload),
 
-  escalateToDeptHead: async (data) => {
-    try {
-      const payload = {
-        slaid: data.slaid,
-        reason: data.reason,
-        description: data.description || "",
-        escalationLevel: "L2",
-        escalatedToEmployeeId: data.escalatedToEmployeeId,
-        submittedByEmployeeId: data.submittedByEmployeeId,
-      };
-      return await slaApi.post("/escalate-to-dept-head", payload);
-    } catch (error) {
-      console.error("L2 Escalation Error:", error);
-      throw error;
-    }
-  },
 
-  resolveEscalation: async (data) => {
-    try {
-      const payload = {
-        escalationId: data.escalationId,
-        resolvedByEmployeeId: data.resolvedByEmployeeId,
-        escalationStatus: "Resolved",
-        resolutionComments: data.resolutionComments || "",
-      };
-      return await slaApi.put("/escalation/resolve", payload);
-    } catch (error) {
-      console.error("Error resolving escalation:", error);
-      throw error;
-    }
-  },
+  getSLAEscalations: async (slaId) =>
+  await slaApi.get(`/${slaId}/escalations`),
 
-  getSLAEscalations: async (id) => {
-    try {
-      return await slaApi.get(`/${id}/escalations`);
-    } catch (error) {
-      console.error("Error fetching escalations:", error);
-      throw error;
-    }
-  },
+  escalateToDeptHead: async (data) => await slaApi.post("/escalate-to-dept-head", data),
 
-  getSLAHistory: async (id) => {
-    try {
-      return await slaApi.get(`/${id}/history`);
-    } catch (error) {
-      console.error("Error fetching history:", error);
-      throw error;
-    }
-  },
+
+getSLAHistory: async (slaId) =>
+  await slaApi.get(`/${slaId}/history`),
 
   getTeamReviews: async (managerId) => {
     try {
@@ -424,52 +266,23 @@ const slaService = {
     }
   },
 
-  getManagerEscalations: async (managerId) => {
-    try {
-      return await slaApi.get(`/manager/${managerId}/escalations`);
-    } catch (error) {
-      console.error("Error fetching escalations:", error);
-      throw error;
-    }
-  },
+  getEmployeeSLAs: async (employeeId) =>
+  await slaApi.get(`/employee/${employeeId}`),
 
-  getDepartmentCompliance: async (deptId, period = null) => {
-    try {
-      const params = period ? { period } : {};
-      return await slaApi.get(`/compliance/department/${deptId}`, { params });
-    } catch (error) {
-      console.error("Error fetching compliance:", error);
-      throw error;
-    }
-  },
 
-  getAllCompliance: async (period = null) => {
-    try {
-      const params = period ? { period } : {};
-      return await slaApi.get("/compliance/all", { params });
-    } catch (error) {
-      console.error("Error fetching compliance:", error);
-      throw error;
-    }
-  },
+getManagerEscalations: async () =>
+  await slaApi.get(`/manager/escalations`),
 
-  calculateCompliance: async (data) => {
-    try {
-      return await slaApi.post("/compliance/calculate", data);
-    } catch (error) {
-      console.error("Error calculating compliance:", error);
-      throw error;
-    }
-  },
+  getDepartmentCompliance: async (deptId, period) =>
+  await slaApi.get(`/department/${deptId}`, { params: { period } }),
 
-  getAllEmployees: async () => {
-    try {
-      return await employeeApi.get("/");
-    } catch (error) {
-      console.error("Error fetching employees:", error);
-      throw error;
-    }
-  },
+getAllCompliance: async (period)=>
+  await slaApi.get(`/departments`, { params: { period } }),
+
+calculateCompliance: async (data) => await slaApi.post(`/calculate`, data),
+
+
+  getAllEmployees: async () => await employeeApi.get("/"),
 
   getAllManagers: async () => {
     try {

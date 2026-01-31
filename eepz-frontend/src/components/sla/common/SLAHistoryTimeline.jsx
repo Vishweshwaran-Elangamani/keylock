@@ -21,21 +21,13 @@ const SLAHistoryTimeline = ({ history }) => {
         return { icon: TrendingUp, label: "Status Changed", variant: "status" };
       case "Escalated":
       case "EscalatedToDeptHead":
-        return {
-          icon: AlertTriangle,
-          label: "Escalated",
-          variant: "escalated",
-        };
+        return { icon: AlertTriangle, label: "Escalated", variant: "escalated" };
       case "Reopened":
         return { icon: RotateCcw, label: "Reopened", variant: "reopened" };
       case "Closed":
         return { icon: CheckCircle, label: "Closed", variant: "closed" };
       case "ComplianceChanged":
-        return {
-          icon: Clock,
-          label: "Compliance Changed",
-          variant: "compliance",
-        };
+        return { icon: Clock, label: "Compliance Changed", variant: "compliance" };
       case "AutoClosed":
         return { icon: XCircle, label: "Auto Closed", variant: "autoclosed" };
       default:
@@ -46,7 +38,7 @@ const SLAHistoryTimeline = ({ history }) => {
   const formatDateTime = (dateString) => {
     if (!dateString) return "N/A";
     const date = new Date(dateString);
-    return date.toLocaleString("en-US", {
+    return date.toLocaleString("en-IN", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -75,7 +67,7 @@ const SLAHistoryTimeline = ({ history }) => {
 
         return (
           <div
-            key={item.historyId || index}
+            key={item.slahistoryId || index}
             className={`sla-history-item sla-history-variant-${variant}`}
           >
             <div className="sla-history-content">
@@ -86,7 +78,6 @@ const SLAHistoryTimeline = ({ history }) => {
                       <div className="sla-history-title-iconwrap">
                         <Icon size={20} strokeWidth={2.5} />
                       </div>
-
                       <h3 className="sla-history-title">{label}</h3>
                     </div>
 
@@ -96,10 +87,10 @@ const SLAHistoryTimeline = ({ history }) => {
                         {formatDateTime(item.createdAt)}
                       </span>
 
-                      {item.changedByEmployeeName && (
+                      {item.changedByName && (
                         <span className="sla-history-meta-item">
                           <User size={14} />
-                          {item.changedByEmployeeName}
+                          {item.changedByName}
                         </span>
                       )}
                     </div>
@@ -129,14 +120,6 @@ const SLAHistoryTimeline = ({ history }) => {
                 {item.reason && (
                   <div className="sla-history-description">
                     <strong>Reason:</strong> {item.reason}
-                  </div>
-                )}
-
-                {item.referenceEscalationId && (
-                  <div className="sla-history-reference">
-                    <span className="sla-history-reference-badge">
-                      Escalation #{item.referenceEscalationId}
-                    </span>
                   </div>
                 )}
               </div>

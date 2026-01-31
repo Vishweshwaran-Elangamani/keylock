@@ -479,9 +479,7 @@ const DeptHeadSLADashboard = () => {
                           <div className="dh-sla-employee-name">
                             {esc.employeeName}
                           </div>
-                          <div className="dh-sla-employee-email">
-                            {esc.employeeEmail || "No email"}
-                          </div>
+                        
                         </div>
                       </div>
                     </td>

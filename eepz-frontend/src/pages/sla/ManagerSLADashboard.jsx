@@ -602,9 +602,7 @@ const ManagerSLADashboard = () => {
                             <div className="mgr-sla-employee-name">
                               {esc.employeeName || "—"}
                             </div>
-                            <div className="mgr-sla-employee-email">
-                              {esc.employeeEmail || "No email"}
-                            </div>
+                          
                           </div>
                         </div>
                       </td>

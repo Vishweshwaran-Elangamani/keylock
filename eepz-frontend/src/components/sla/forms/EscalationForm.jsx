@@ -9,7 +9,6 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
     reason: "",
     description: "",
-    escalationLevel: "L1",
   });
 
   const [loading, setLoading] = useState(false);
@@ -31,7 +30,7 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
   };
 
   const handleSubmit = async (e) => {
-    if (e) e.preventDefault();
+    e?.preventDefault();
     if (loading) return;
 
     if (!formData.reason) {
@@ -39,8 +38,13 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
       return;
     }
 
-    if (!formData.description.trim() || formData.description.trim().length < 10) {
+    if (formData.description.trim().length < 10) {
       toast.error("Description must be at least 10 characters");
+      return;
+    }
+
+    if (!sla?.slaid) {
+      toast.error("Invalid SLA data");
       return;
     }
 
@@ -48,30 +52,30 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
     setError(null);
 
     try {
-      const user = JSON.parse(localStorage.getItem("user"));
-
-      const escalationData = {
-        slaid: sla.slaid,
+      const escalationPayload = {
         reason: formData.reason,
         description: formData.description,
-        escalationLevel: "L1",
         escalatedToEmployeeId: sla.assignedToEmployeeId,
-        submittedByEmployeeId: user.empId,
       };
 
-      const response = await slaService.submitEscalation(escalationData);
+      const response = await slaService.submitEscalation(
+        sla.slaid,
+        escalationPayload,
+        "normal"
+      );
 
       if (response.success) {
         toast.success("Escalation submitted successfully!");
         onSuccess();
         onClose();
       } else {
-        toast.error("Escalation failed");
         setError(response.message);
+        toast.error(response.message || "Escalation failed");
       }
     } catch (err) {
-      toast.error("Error submitting escalation");
+      console.error("Escalation error:", err);
       setError(err.message || "Failed to submit escalation");
+      toast.error("Error submitting escalation");
     } finally {
       setLoading(false);
     }
@@ -91,10 +95,7 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
 
   return (
     <>
-      <div
-        className="esc-modal-backdrop"
-        onClick={() => !loading && onClose()}
-      />
+      <div className="esc-modal-backdrop" onClick={() => !loading && onClose()} />
       <div className="esc-modal-wrapper">
         <div className="esc-modal-container">
           <div className="esc-modal-header">
@@ -113,14 +114,8 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
             {error && (
               <div className="esc-error-alert">
                 <AlertCircle size={18} />
-                <div>
-                  <p>{error}</p>
-                </div>
-                <button
-                  onClick={() => setError(null)}
-                  className="esc-error-close"
-                  type="button"
-                >
+                <div><p>{error}</p></div>
+                <button onClick={() => setError(null)} className="esc-error-close" type="button">
                   <X size={16} />
                 </button>
               </div>
@@ -130,15 +125,11 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
               <div className="esc-sla-info">
                 <div className="esc-info-row">
                   <span className="esc-info-label">SLA Type:</span>
-                  <span className="esc-info-value">
-                    {sla?.slatype || "N/A"}
-                  </span>
+                  <span className="esc-info-value">{sla?.slatype || "N/A"}</span>
                 </div>
                 <div className="esc-info-row">
                   <span className="esc-info-label">Employee:</span>
-                  <span className="esc-info-value">
-                    {sla?.employeeName || "N/A"}
-                  </span>
+                  <span className="esc-info-value">{sla?.employeeName || "N/A"}</span>
                 </div>
                 <div className="esc-info-row">
                   <span className="esc-info-label">Deadline:</span>
@@ -150,11 +141,7 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
 
               <div className="esc-form-group">
                 <CustomDropdown
-                  label={
-                    <span className="esc-dd-label">
-                      Reason <span className="esc-required">*</span>
-                    </span>
-                  }
+                  label={<span className="esc-dd-label">Reason <span className="esc-required">*</span></span>}
                   required
                   name="reason"
                   value={formData.reason}
@@ -175,39 +162,24 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                   rows={3}
                   value={formData.description}
                   onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      description: e.target.value,
-                    }))
+                    setFormData((prev) => ({ ...prev, description: e.target.value }))
                   }
                   placeholder="Provide detailed context..."
                   disabled={loading}
                   maxLength={500}
                   required
                 />
-                <small className="esc-char-count">
-                  {formData.description.length}/500
-                </small>
+                <small className="esc-char-count">{formData.description.length}/500</small>
               </div>
             </form>
           </div>
 
           <div className="esc-modal-footer">
-            <button
-              type="button"
-              className="esc-btn esc-btn-secondary"
-              onClick={onClose}
-              disabled={loading}
-            >
+            <button type="button" className="esc-btn esc-btn-secondary" onClick={onClose} disabled={loading}>
               Cancel
             </button>
 
-            <button
-              onClick={handleSubmit}
-              className="esc-btn esc-btn-primary"
-              disabled={!isValid}
-              type="button"
-            >
+            <button onClick={handleSubmit} className="esc-btn esc-btn-primary" disabled={!isValid} type="button">
               {loading ? (
                 <>
                   <span className="esc-spinner" />
