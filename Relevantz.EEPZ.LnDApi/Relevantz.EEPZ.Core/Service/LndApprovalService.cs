@@ -158,7 +158,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         approval.SkillId
                     );
 
-                    // KEEP ORIGINAL - No mapper needed here since we're setting all properties manually
                     var sme = new Lndsme
                     {
                         EmployeeId = approval.RequesterEmployeeId,
@@ -439,8 +438,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
 
             var details = _mapper.Map<ApprovalDetailsResponseModel>(approval);
-            
-         
+
+
             details.UserRole =
                 approval.RequesterEmployeeId == employeeId
                     ? LnDConstants.ROLE_FILTERS.REQUESTER

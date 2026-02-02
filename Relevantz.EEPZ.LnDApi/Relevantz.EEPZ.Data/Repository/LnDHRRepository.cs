@@ -4,7 +4,7 @@ using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repositories.Interface;
-using Serilog;
+using Serilog;                      
 
 namespace Relevantz.EEPZ.Data.Repositories.Implementations
 {
@@ -53,7 +53,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                         edm.Department.DepartmentName == request.ExcludeDepartment
                     )
                 );
-            }
+            } 
 
             if (!string.IsNullOrEmpty(request.SearchTerm))
             {

@@ -225,7 +225,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             // Use Mapster to map Lndsme entities to SmeResponseModel
             var smeModels = _mapper.Map<List<SmeResponseModel>>(items);
 
-            // Post-process: Add InProgressAssignments count (requires async call, can't be in mapping)
             foreach (var smeModel in smeModels)
             {
                 var inProgressCount = await _smeRepository.GetSmeInProgressAssignmentCount(
@@ -233,7 +232,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
                 smeModel.InProgressAssignments = inProgressCount;
             }
-  
+
             Log.Information(
                 "GetAvailableSmes succeeded. SkillId={SkillId}, ReturnedCount={Count}, TotalCount={TotalCount}",
                 request.SkillId,
@@ -268,7 +267,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 request.PageSize
             );
 
-            // Repository already returns SmeResponseModel, no mapping needed
             var (items, totalCount) = await _smeRepository.GetAllActiveSmes(request);
 
             return new ApiResponse<PaginatedResponse<SmeResponseModel>>
