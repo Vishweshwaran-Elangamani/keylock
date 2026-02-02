@@ -547,12 +547,12 @@ function HRViewAppraisals() {
               <thead>
                 <tr>
                   <th>Employee Name</th>
-                  <th>Project</th>
-                  <th>Average</th>
-                  <th>Reviewer</th>
-                  <th>Average</th>
-                  <th>Approver</th>
-                  <th>Average</th>
+                  <th>Project Name</th>
+                  <th>Employee Average</th>
+                  <th>L1 Reviewer</th>
+                  <th>Reviewer Average</th>
+                  <th>L2 Approver</th>
+                  <th>Approver Average</th>
                   <th>Status</th>
                   <th className={styles.textCenter}>Details</th>
                 </tr>

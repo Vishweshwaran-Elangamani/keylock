@@ -162,12 +162,13 @@ export default function ManagerNomination() {
     return (
       <div className="mn-pagination-container">
         <div className="mn-pagination-info">
-          <span className="mn-pagination-label">Rows per page:</span>
+          <span className="mn-pagination-label">Show</span>
           <PaginationDropdown value={pageSize} onChange={setPageSize} />
+          <span className="mn-pagination-label">entries</span>
         </div>
 
         <div className="mn-pagination-status">
-          {startItem}-{endItem} of {totalItems}
+         Showing {startItem}-{endItem} of {totalItems}
         </div>
 
         <div className="mn-pagination-nav">

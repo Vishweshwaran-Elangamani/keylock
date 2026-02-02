@@ -536,3 +536,36 @@
     justify-self: center !important;
   }
 }
+
+
+.fld-table-formhrp td.fld-status-cell {
+  text-align: center !important;
+  vertical-align: middle !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.fld-status-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 22px;
+  height: 22px;
+
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1;
+
+  
+  transform: translateY(0.5px);
+}
+
+
+.fld-status-cell.is-yes .fld-status-mark {
+  color: #16a34a; 
+}
+
+.fld-status-cell.is-no .fld-status-mark {
+  color: #dc2626; 
+}

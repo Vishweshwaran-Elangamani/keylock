@@ -216,7 +216,7 @@ export default function FormProgressTrackerPage() {
                   <th>Employee</th>
                   <th>Reviewer</th>
                   <th>Approver</th>
-                  <th>Initiated</th>
+                  {/* <th>Initiated</th> */}
                   {/* <th>Sent Emp</th> */}
                   <th>Employee</th>
                   {/* <th>Sent Mgr</th> */}
@@ -233,49 +233,23 @@ export default function FormProgressTrackerPage() {
                     </td>
                     <td>{tracker.l1Name}</td>
                     <td>{tracker.l2Name}</td>
-                    <td style={{ color: tracker.initiated ? "green" : "red" }}>
-                      {tracker.initiated ? "✔" : "✖"}
-                    </td>
-                    {/* <td
-                      style={{
-                        color: tracker.sentToEmployee ? "green" : "red",
-                      }}
-                    >
-                      {tracker.sentToEmployee ? "✔" : "✖"}
-                    </td> */}
-                    <td
-                      style={{
-                        color: tracker.employeeCompleted ? "green" : "red",
-                      }}
-                    >
-                      {tracker.employeeCompleted ? "✔" : "✖"}
-                    </td>
-                    {/* <td
-                      style={{ color: tracker.sentToManager ? "green" : "red" }}
-                    >
-                      {tracker.sentToManager ? "✔" : "✖"}
-                    </td> */}
-                    <td
-                      style={{
-                        color: tracker.managerCompleted ? "green" : "red",
-                      }}
-                    >
-                      {tracker.managerCompleted ? "✔" : "✖"}
-                    </td>
-                    <td
-                      style={{
-                        color: tracker.deptHeadApproved ? "green" : "red",
-                      }}
-                    >
-                      {tracker.deptHeadApproved ? "✔" : "✖"}
-                    </td>
-                    <td
-                      style={{
-                        color: tracker.empAcknowledged ? "green" : "red",
-                      }}
-                    >
-                      {tracker.empAcknowledged ? "✔" : "✖"}
-                    </td>
+                   
+                    <td className={`fld-status-cell ${tracker.employeeCompleted ? "is-yes" : "is-no"}`}>
+  <span className="fld-status-mark">{tracker.employeeCompleted ? "✔" : "✖"}</span>
+</td>
+
+<td className={`fld-status-cell ${tracker.managerCompleted ? "is-yes" : "is-no"}`}>
+  <span className="fld-status-mark">{tracker.managerCompleted ? "✔" : "✖"}</span>
+</td>
+
+<td className={`fld-status-cell ${tracker.deptHeadApproved ? "is-yes" : "is-no"}`}>
+  <span className="fld-status-mark">{tracker.deptHeadApproved ? "✔" : "✖"}</span>
+</td>
+
+<td className={`fld-status-cell ${tracker.empAcknowledged ? "is-yes" : "is-no"}`}>
+  <span className="fld-status-mark">{tracker.empAcknowledged ? "✔" : "✖"}</span>
+</td>
+
                   </tr>
                 ))}
               </tbody>
