@@ -143,7 +143,7 @@ builder.Services.AddHealthChecks()
     .AddCheck("self", () => HealthCheckResult.Healthy("App is running"), tags: new[] { "live" })
     .AddCheck<MySqlDbHealthCheck>("mysql-db", tags: new[] { "ready", "db", "mysql" });
 
-// ✅ Register custom exception handling middleware (added)
+//  Register custom exception handling middleware (added)
 builder.Services.AddTransient<Relevantz.EEPZ.Api.Middleware.ExceptionHandlingMiddleware>();
 
 var app = builder.Build();
@@ -168,8 +168,8 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 }
 
-// ❌ Removed: Inline UseExceptionHandler block
-// ✅ Add custom exception handling middleware early in the pipeline (added)
+//  Removed: Inline UseExceptionHandler block
+//  Add custom exception handling middleware early in the pipeline (added)
 app.UseMiddleware<Relevantz.EEPZ.Api.Middleware.ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();

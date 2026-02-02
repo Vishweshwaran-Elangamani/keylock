@@ -1,89 +1,71 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Reflection;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.RateLimiting;
- 
+using Relevantz.EEPZ.Data.IRepository;
+using Relevantz.EEPZ.Data.Repository;
+using Relevantz.EEPZ.Core.Service;
+using Relevantz.EEPZ.Core.IService;
+using Relevantz.EEPZ.Common.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
- 
 using Serilog;
- 
-using Relevantz.EEPZ.Data.DBContexts; // DB context only
- 
-// Metrics
-using Prometheus;
- 
+using Relevantz.EEPZ.Data.DBContexts;
+using System.Text;
+using Microsoft.AspNetCore.ResponseCompression;
+using System.IO.Compression;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Relevantz.EEPZ.Api.Middleware;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Relevantz.EEPZ.Core.Mapping;
+using Mapster;
+using MapsterMapper;
+using System.Reflection;
+
 var builder = WebApplication.CreateBuilder(args);
- 
-// -------------------------------------------------
-// Serilog
-// -------------------------------------------------
+// Configure Serilog with structured logging
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
-    .Enrich.WithProperty("Service", "EEPZ-Performance")
+    .Enrich.WithProperty("Service", "EEPZ-Auth")
     .Enrich.WithProperty("Environment", builder.Environment.EnvironmentName)
     .CreateLogger();
- 
 builder.Host.UseSerilog();
-Log.Information("Starting EEPZ Performance Management API…");
- 
-// -------------------------------------------------
-// Shared uploads directory
-// -------------------------------------------------
-var sharedUploadsPath = Path.GetFullPath(Path.Combine(
-    Directory.GetCurrentDirectory(), "..", "..", "SharedUploads"
-));
-if (!Directory.Exists(sharedUploadsPath))
-{
-    Directory.CreateDirectory(sharedUploadsPath);
-    Log.Information("Created shared uploads directory at: {Path}", sharedUploadsPath);
-}
-else
-{
-    Log.Information("Shared uploads directory exists at: {Path}", sharedUploadsPath);
-}
-builder.Services.AddSingleton(new FileUploadSettings { UploadPath = sharedUploadsPath });
- 
-// -------------------------------------------------
-// Controllers
-// -------------------------------------------------
-builder.Services.AddControllers();
- 
-// -------------------------------------------------
-// Swagger (JWT security)
-// -------------------------------------------------
+Log.Information("Starting EEPZ Application in {Environment} mode", builder.Environment.EnvironmentName);
+// Add Controllers with validation
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
+        options.JsonSerializerOptions.Converters.Add(new NullableDateOnlyJsonConverter());
+        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+    });
+// Add FluentValidation
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<Relevantz.EEPZ.Common.Validators.LoginRequestDtoValidator>();
+Log.Information("FluentValidation registered successfully");
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
+// Add Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo
+    c.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "EEPZ API",
         Version = "v1",
-        Description = "Performance Management API"
+        Description = "EEPZ Authentication & User Management API"
     });
- 
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
         Type = SecuritySchemeType.Http,
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Enter 'Bearer {token}'"
+        Description = "Enter 'Bearer' followed by your JWT token"
     });
- 
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
             new OpenApiSecurityScheme
@@ -93,277 +75,371 @@ builder.Services.AddSwaggerGen(options =>
             Array.Empty<string>()
         }
     });
- 
-    options.CustomSchemaIds(t => t.FullName!.Replace("+", "."));
 });
- 
-// -------------------------------------------------
-// EF Core (MySQL) — ensure TLS via appsettings
-// -------------------------------------------------
+// Configure MySQL Database Context with proper connection handling
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException("DefaultConnection is not configured");
-// e.g. add in appsettings: ;SslMode=Required;TrustServerCertificate=True
+    ?? throw new InvalidOperationException("Database connection string is not configured");
+var dbRetryCount = builder.Configuration.GetValue<int>("Database:MaxRetryCount", 3);
+var dbRetryDelay = builder.Configuration.GetValue<int>("Database:MaxRetryDelaySeconds", 10);
+var dbCommandTimeout = builder.Configuration.GetValue<int>("Database:CommandTimeoutSeconds", 30);
 builder.Services.AddDbContext<EEPZDbContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
-builder.Services.AddScoped<DbContext>(sp => sp.GetRequiredService<EEPZDbContext>());
- 
-// -------------------------------------------------
-// JWT (sanitized events)
-// -------------------------------------------------
-var jwt = builder.Configuration.GetSection("Jwt");
-var secretKey = jwt["SecretKey"] ?? throw new InvalidOperationException("Jwt:SecretKey not configured");
- 
-builder.Services.AddAuthentication(o =>
 {
-    o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.UseMySql(
+        connectionString,
+        new MySqlServerVersion(new Version(8, 0, 36)),
+        mySqlOptions =>
+        {
+            mySqlOptions.EnableRetryOnFailure(
+                maxRetryCount: dbRetryCount,
+                maxRetryDelay: TimeSpan.FromSeconds(dbRetryDelay),
+                errorNumbersToAdd: null);
+            mySqlOptions.CommandTimeout(dbCommandTimeout);
+        })
+        .EnableSensitiveDataLogging(builder.Environment.IsDevelopment())
+        .EnableDetailedErrors(builder.Environment.IsDevelopment());
+}, ServiceLifetime.Scoped);
+// Configure MongoDB Settings
+builder.Services.Configure<MongoDbSettings>(
+    builder.Configuration.GetSection("MongoDbSettings"));
+Log.Information("MongoDB configuration loaded successfully");
+// Configure JWT Authentication with security
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var secretKey = jwtSettings["SecretKey"] 
+    ?? throw new InvalidOperationException("JWT Secret Key not configured");
+var issuer = jwtSettings["Issuer"] 
+    ?? throw new InvalidOperationException("JWT Issuer not configured");
+var audience = jwtSettings["Audience"] 
+    ?? throw new InvalidOperationException("JWT Audience not configured");
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-.AddJwtBearer(o =>
+.AddJwtBearer(options =>
 {
-    o.TokenValidationParameters = new TokenValidationParameters
+    options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = jwt["Issuer"],
-        ValidAudience = jwt["Audience"],
+        ValidIssuer = issuer,
+        ValidAudience = audience,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
         ClockSkew = TimeSpan.Zero,
-        RoleClaimType = ClaimTypes.Role,
-        NameClaimType = JwtRegisteredClaimNames.Sub,
-        ValidAlgorithms = new[] { SecurityAlgorithms.HmacSha256 }
+        RequireExpirationTime = true,
+        RequireSignedTokens = true
     };
- 
-    o.Events = new JwtBearerEvents
+    options.Events = new JwtBearerEvents
     {
-        OnMessageReceived = ctx =>
+        OnAuthenticationFailed = context =>
         {
-            // Do NOT log token/headers
-            Log.Debug("JWT OnMessageReceived Path={Path}", ctx.Request.Path);
+            Log.Warning("JWT Authentication Failed: {ExceptionType}", 
+                context.Exception.GetType().Name);
             return Task.CompletedTask;
         },
-        OnTokenValidated = ctx =>
+        OnTokenValidated = context =>
         {
-            Log.Information("JWT Validated Sub={Sub} CID={CID}",
-                ctx.Principal?.FindFirstValue(JwtRegisteredClaimNames.Sub),
-                ctx.HttpContext.TraceIdentifier);
+            var correlationId = context.HttpContext.TraceIdentifier;
+            Log.Information("JWT Token Validated - CorrelationId: {CorrelationId}", correlationId);
             return Task.CompletedTask;
         },
-        OnAuthenticationFailed = ctx =>
+        OnChallenge = context =>
         {
-            Log.Warning(ctx.Exception, "JWT Authentication Failed Path={Path}", ctx.Request.Path);
+            Log.Warning("JWT Challenge - Path: {Path}, CorrelationId: {CorrelationId}",
+                context.Request.Path, context.HttpContext.TraceIdentifier);
             return Task.CompletedTask;
         }
     };
 });
- 
-// -------------------------------------------------
-// Authorization — secure-by-default (+ optional MFA policy)
-// -------------------------------------------------
 builder.Services.AddAuthorization(options =>
 {
-    options.FallbackPolicy = new AuthorizationPolicyBuilder()
-        .RequireAuthenticatedUser()
-        .Build();
- 
-    options.AddPolicy("RequireMfa", p => p.RequireClaim("mfa", "true"));
+    options.AddPolicy("AdminOnly", policy => 
+        policy.RequireRole("Admin"));
+    options.AddPolicy("HROnly", policy => 
+        policy.RequireRole("HR"));
+    options.AddPolicy("EmployeeAccess", policy => 
+        policy.RequireRole("Employee", "HR", "Admin"));
 });
- 
-// -------------------------------------------------
-// DI: Register by convention (NO explicit type references)
-// This eliminates CS0246 from Program.cs
-// -------------------------------------------------
-DiRegistration.RegisterByConvention(builder.Services,
-    "Relevantz.EEPZ.Core",
-    "Relevantz.EEPZ.Data");
- 
-// -------------------------------------------------
-// CORS — Dev: AllowAny; Prod: Allowlist
-// -------------------------------------------------
-var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
-builder.Services.AddCors(options =>
+// Register MySQL Repositories
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IUserAuthenticationRepository, UserAuthenticationRepository>();
+builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+builder.Services.AddScoped<IEmployeeDetailsMasterRepository, EmployeeDetailsMasterRepository>();
+builder.Services.AddScoped<IOtpRepository, OtpRepository>();
+builder.Services.AddScoped<ILoginAttemptRepository, LoginAttemptRepository>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.AddScoped<IChangeRequestRepository, ChangeRequestRepository>();
+builder.Services.AddScoped<IBulkOperationLogRepository, BulkOperationLogRepository>();
+// Register MongoDB Repository
+builder.Services.AddScoped<IProfileImageRepository, ProfileImageRepository>();
+Log.Information("Repositories registered successfully");
+// Register Services
+builder.Services.AddScoped<IPasswordService, PasswordService>();
+builder.Services.AddScoped<IOtpService, OtpService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<IUserManagementService, UserManagementService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<IChangeRequestService, ChangeRequestService>();
+builder.Services.AddScoped<IBulkOperationService, BulkOperationService>();
+builder.Services.AddScoped<IExportService, ExportService>();
+builder.Services.AddScoped<IAddressRepository, AddressRepository>();
+
+
+MappingConfig.RegisterMappings(); // Call our configuration
+builder.Services.AddSingleton(TypeAdapterConfig.GlobalSettings);
+builder.Services.AddScoped<IMapper, ServiceMapper>();
+
+Log.Information("Services registered successfully");
+// Configure CORS with environment-specific policies
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins")
+    .Get<string[]>() ?? Array.Empty<string>();
+if (builder.Environment.IsDevelopment())
 {
-    options.AddPolicy("DevCors", p => p
-        .AllowAnyOrigin()
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-        .WithExposedHeaders("Content-Disposition", "Content-Type"));
- 
-    options.AddPolicy("ProdCors", p => p
-        .WithOrigins(allowedOrigins)
-        .WithMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-        .WithHeaders("Content-Type", "Authorization", "If-Match", "If-None-Match")
-        .WithExposedHeaders("Content-Disposition", "Content-Type"));
-});
- 
-// -------------------------------------------------
-// Rate limiting (per-IP, 100 req/min)
-// -------------------------------------------------
-builder.Services.AddRateLimiter(options =>
-{
-    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
- 
-    options.AddPolicy("PerIp", httpContext =>
-        RateLimitPartition.GetFixedWindowLimiter(
-            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
-            factory: _ => new FixedWindowRateLimiterOptions
-            {
-                PermitLimit = 100,
-                Window = TimeSpan.FromMinutes(1),
-                QueueLimit = 0,
-                AutoReplenishment = true
-            }));
-});
- 
-// -------------------------------------------------
-// File upload size limit
-// -------------------------------------------------
-builder.Services.Configure<FormOptions>(o =>
-{
-    o.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10 MB
-});
- 
-// -------------------------------------------------
-// Health checks
-// -------------------------------------------------
-builder.Services.AddHealthChecks()
-    .AddCheck("self", () => HealthCheckResult.Healthy("App is running"), tags: new[] { "live" })
-    .AddCheck<MySqlDbHealthCheck>("mysql-db", tags: new[] { "ready", "db", "mysql" });
- 
-// If you have custom exception middleware, register here
-// builder.Services.AddTransient<Relevantz.EEPZ.Api.Middleware.ExceptionHandlingMiddleware>();
- 
-var app = builder.Build();
- 
-// -------------------------------------------------
-// Dev error page / HSTS
-// -------------------------------------------------
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("DevelopmentPolicy", policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        });
+    });
+    Log.Warning("CORS configured with AllowAny policy for Development environment");
 }
 else
 {
-    app.UseHsts();
-}
- 
-// -------------------------------------------------
-// Security headers
-// -------------------------------------------------
-app.Use(async (ctx, next) =>
-{
-    ctx.Response.Headers.Remove("Server");
-    ctx.Response.Headers["X-Content-Type-Options"] = "nosniff";
-    ctx.Response.Headers["X-Frame-Options"] = "DENY";
-    ctx.Response.Headers["Referrer-Policy"] = "no-referrer";
-    ctx.Response.Headers["Permissions-Policy"] = "geolocation=(), camera=(), microphone=()";
- 
-    var isSwagger = ctx.Request.Path.StartsWithSegments("/swagger") || string.Equals(ctx.Request.Path, "/");
-    if (!isSwagger)
-        ctx.Response.Headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'; base-uri 'none'";
- 
-    await next();
-});
- 
-// -------------------------------------------------
-// (Optional) custom exception middleware
-// -------------------------------------------------
-// app.UseMiddleware<Relevantz.EEPZ.Api.Middleware.ExceptionHandlingMiddleware>();
- 
-// -------------------------------------------------
-// Rate Limiter
-// -------------------------------------------------
-app.UseRateLimiter();
- 
-// -------------------------------------------------
-// Metrics
-// -------------------------------------------------
-app.UseHttpMetrics();
-app.MapMetrics("/metrics");
- 
-// -------------------------------------------------
-// Serilog request logging
-// -------------------------------------------------
-app.UseSerilogRequestLogging(options =>
-{
-    options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
-    options.GetLevel = (httpContext, elapsed, ex) =>
-        ex != null || httpContext.Response.StatusCode >= 500
-            ? Serilog.Events.LogEventLevel.Error
-            : httpContext.Response.StatusCode >= 400
-                ? Serilog.Events.LogEventLevel.Warning
-                : Serilog.Events.LogEventLevel.Information;
- 
-    options.EnrichDiagnosticContext = (diag, ctx) =>
+    builder.Services.AddCors(options =>
     {
-        diag.Set("RequestHost", ctx.Request.Host.Value);
-        diag.Set("RequestScheme", ctx.Request.Scheme);
-        diag.Set("RemoteIP", ctx.Connection.RemoteIpAddress?.ToString());
-        diag.Set("CorrelationId", ctx.TraceIdentifier);
-    };
-});
- 
-// -------------------------------------------------
-// HTTPS redirect (keep if HTTPS endpoint is configured)
-// -------------------------------------------------
-app.UseHttpsRedirection();
- 
-// -------------------------------------------------
-// CORS (env-based)
-// -------------------------------------------------
-app.UseCors(app.Environment.IsDevelopment() ? "DevCors" : "ProdCors");
- 
-// -------------------------------------------------
-// AuthN/Z
-// -------------------------------------------------
-app.UseAuthentication();
-app.UseAuthorization();
- 
-// -------------------------------------------------
-// Basic upload safety (name/ext/size)
-// -------------------------------------------------
-app.Use(async (ctx, next) =>
-{
-    if (ctx.Request.HasFormContentType && ctx.Request.Form.Files.Count > 0)
-    {
-        foreach (var f in ctx.Request.Form.Files)
+        options.AddPolicy("ProductionPolicy", policy =>
         {
-            var safeName = Path.GetFileName(f.FileName);
-            if (!string.Equals(safeName, f.FileName, StringComparison.Ordinal))
+            policy.WithOrigins(allowedOrigins)
+                  .AllowAnyMethod()
+                  .AllowAnyHeader()
+                  .AllowCredentials()
+                  .SetIsOriginAllowedToAllowWildcardSubdomains();
+        });
+    });
+    Log.Information("CORS configured with restricted origins for Production");
+}
+// Add Response Compression
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+    options.Providers.Add<GzipCompressionProvider>();
+    options.Providers.Add<BrotliCompressionProvider>();
+});
+builder.Services.Configure<GzipCompressionProviderOptions>(options =>
+{
+    options.Level = CompressionLevel.Fastest;
+});
+builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
+{
+    options.Level = CompressionLevel.Fastest;
+});
+// Add Memory Cache
+builder.Services.AddMemoryCache();
+// Add HTTP Client with timeout
+var httpTimeout = builder.Configuration.GetValue<int>("HttpClient:TimeoutSeconds", 30);
+builder.Services.AddHttpClient("DefaultClient")
+    .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+    .ConfigureHttpClient(client =>
+    {
+        client.Timeout = TimeSpan.FromSeconds(httpTimeout);
+    });
+// Configure Health Checks
+builder.Services.AddHealthChecks()
+    .AddCheck("mysql-db", () =>
+    {
+        try
+        {
+            using var scope = builder.Services.BuildServiceProvider().CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<EEPZDbContext>();
+            var canConnect = context.Database.CanConnect();
+            return canConnect 
+                ? HealthCheckResult.Healthy("MySQL database is healthy")
+                : HealthCheckResult.Unhealthy("MySQL database connection failed");
+        }
+        catch (Exception ex)
+        {
+            return HealthCheckResult.Unhealthy("MySQL database connection failed", ex);
+        }
+    }, new[] { "db", "mysql" })
+    .AddCheck("mongodb", () =>
+    {
+        try
+        {
+            return HealthCheckResult.Healthy("MongoDB connection is healthy");
+        }
+        catch (Exception ex)
+        {
+            return HealthCheckResult.Unhealthy("MongoDB connection failed", ex);
+        }
+    }, new[] { "db", "mongodb" });
+var app = builder.Build();
+// Database Initialization with proper error handling
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<EEPZDbContext>();
+        var configuration = services.GetRequiredService<IConfiguration>();
+        Log.Information("Initializing MySQL database connection");
+        if (builder.Environment.IsDevelopment())
+        {
+            await context.Database.EnsureCreatedAsync();
+            Log.Information("Database schema validated in Development mode");
+        }
+        else
+        {
+            var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
+            if (pendingMigrations.Any())
             {
-                ctx.Response.StatusCode = StatusCodes.Status400BadRequest;
-                await ctx.Response.WriteAsync("Invalid file name.");
-                return;
+                Log.Information("Applying {Count} pending migrations", pendingMigrations.Count());
+                await context.Database.MigrateAsync();
             }
- 
-            var allowed = new[] { ".pdf", ".png", ".jpg", ".jpeg" };
-            if (!allowed.Contains(Path.GetExtension(safeName).ToLowerInvariant()))
-            {
-                ctx.Response.StatusCode = StatusCodes.Status415UnsupportedMediaType;
-                await ctx.Response.WriteAsync("Unsupported file type.");
-                return;
-            }
- 
-            if (f.Length == 0 || f.Length > 10 * 1024 * 1024)
-            {
-                ctx.Response.StatusCode = StatusCodes.Status413PayloadTooLarge;
-                await ctx.Response.WriteAsync("Invalid file size.");
-                return;
-            }
+        }
+        Log.Information("Seeding database with initial data");
+        await DbInitializer.InitializeAsync(context, configuration);
+        Log.Information("MySQL database initialized successfully");
+        // Test MongoDB Connection
+        try
+        {
+            var profileImageRepo = services.GetRequiredService<IProfileImageRepository>();
+            var mongoTestExists = await profileImageRepo.ImageExistsAsync(0);
+            Log.Information("MongoDB ProfileImageRepository initialized successfully");
+        }
+        catch (Exception mongoEx)
+        {
+            Log.Warning("MongoDB connection test failed - Service will continue: {ErrorType}",
+                mongoEx.GetType().Name);
+        }
+    }
+    catch (Exception ex)
+    {
+        Log.Fatal(ex, "Critical error during database initialization");
+        throw;
+    }
+}
+// Configure middleware pipeline
+// 1. Response Compression
+app.UseResponseCompression();
+// 2. Correlation ID Middleware
+app.Use(async (context, next) =>
+{
+    var correlationId = context.TraceIdentifier;
+    context.Response.Headers.Add("X-Correlation-ID", correlationId);
+    using (Serilog.Context.LogContext.PushProperty("CorrelationId", correlationId))
+    {
+        await next();
+    }
+});
+// 3. Security Headers Middleware
+app.Use(async (context, next) =>
+{
+    var path = context.Request.Path.Value?.ToLower() ?? "";
+    // Only apply security headers to NON-Swagger paths
+    if (!path.StartsWith("/swagger") && 
+        !path.Contains("index.html") && 
+        !path.EndsWith(".js") && 
+        !path.EndsWith(".css"))
+    {
+        context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+        context.Response.Headers.Add("X-Frame-Options", "DENY");
+        context.Response.Headers.Add("X-XSS-Protection", "1; mode=block");
+        context.Response.Headers.Add("Referrer-Policy", "strict-origin-when-cross-origin");
+        context.Response.Headers.Add("Content-Security-Policy", 
+            "default-src 'self'; frame-ancestors 'none'");
+        if (!builder.Environment.IsDevelopment())
+        {
+            context.Response.Headers.Add("Strict-Transport-Security", 
+                "max-age=31536000; includeSubDomains");
         }
     }
     await next();
 });
- 
-// -------------------------------------------------
-// Endpoints
-// -------------------------------------------------
+// 4. Exception Handler
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        var error = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>();
+        var correlationId = context.TraceIdentifier;
+        if (error != null)
+        {
+            Log.Error(error.Error, 
+                "Unhandled exception - CorrelationId: {CorrelationId}, Path: {Path}",
+                correlationId, context.Request.Path);
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            context.Response.ContentType = "application/json";
+            var errorResponse = new
+            {
+                success = false,
+                message = "An internal server error occurred",
+                correlationId = correlationId,
+                timestamp = DateTime.UtcNow,
+                error = app.Environment.IsDevelopment() 
+                    ? error.Error.Message 
+                    : "Internal Server Error"
+            };
+            await context.Response.WriteAsJsonAsync(errorResponse);
+        }
+    });
+});
+// 5. Swagger
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "EEPZ API V1");
+        c.RoutePrefix = string.Empty;
+        c.DocumentTitle = "EEPZ API Documentation";
+    });
+    Log.Information("Swagger UI enabled at http://localhost:5101/");
+}
+// 6. Serilog Request Logging
+app.UseSerilogRequestLogging(options =>
+{
+    options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+    options.GetLevel = (httpContext, elapsed, ex) => ex != null
+        ? Serilog.Events.LogEventLevel.Error
+        : httpContext.Response.StatusCode > 499
+            ? Serilog.Events.LogEventLevel.Error
+            : Serilog.Events.LogEventLevel.Information;
+    options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+    {
+        diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value);
+        diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
+        diagnosticContext.Set("RemoteIP", httpContext.Connection.RemoteIpAddress?.ToString());
+        diagnosticContext.Set("CorrelationId", httpContext.TraceIdentifier);
+    };
+});
+// 7. HTTPS Redirection
+app.UseHttpsRedirection();
+// 8. Static Files
+app.UseStaticFiles();
+// 9. CORS
+var corsPolicy = app.Environment.IsDevelopment() ? "DevelopmentPolicy" : "ProductionPolicy";
+app.UseCors(corsPolicy);
+Log.Information("CORS policy '{Policy}' applied", corsPolicy);
+// 10. Authentication & Authorization
+app.UseAuthentication();
+app.UseAuthorization();
+// 11. Map Controllers
 app.MapControllers();
- 
+app.UseMiddleware<GlobalExceptionMiddleware>();
+// 12. Health Check Endpoints
 app.MapHealthChecks("/health/live", new HealthCheckOptions
 {
-    Predicate = check => check.Tags.Contains("live"),
+    Predicate = _ => false,
     ResponseWriter = async (context, report) =>
     {
         context.Response.ContentType = "application/json";
@@ -371,15 +447,14 @@ app.MapHealthChecks("/health/live", new HealthCheckOptions
         {
             status = "Healthy",
             timestamp = DateTime.UtcNow,
-            service = "EEPZ-Performance",
+            service = "EEPZ-Auth",
             version = "v1.0"
         });
     }
 }).AllowAnonymous();
- 
 app.MapHealthChecks("/health/ready", new HealthCheckOptions
 {
-    Predicate = check => check.Tags.Contains("ready"),
+    Predicate = check => check.Tags.Contains("db"),
     ResponseWriter = async (context, report) =>
     {
         context.Response.ContentType = "application/json";
@@ -391,32 +466,39 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions
             {
                 name = e.Key,
                 status = e.Value.Status.ToString(),
-                durationMs = e.Value.Duration.TotalMilliseconds,
+                duration = e.Value.Duration.TotalMilliseconds,
                 tags = e.Value.Tags
             }),
-            totalDurationMs = report.TotalDuration.TotalMilliseconds
+            totalDuration = report.TotalDuration.TotalMilliseconds
         };
         await context.Response.WriteAsJsonAsync(result);
     }
 }).AllowAnonymous();
- 
-// -------------------------------------------------
-// Swagger UI
-// -------------------------------------------------
-app.UseSwagger();
-app.UseSwaggerUI(c =>
+// 13. API Info Endpoint
+if (app.Environment.IsDevelopment())
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "EEPZ API v1");
-    if (app.Environment.IsDevelopment())
-        c.RoutePrefix = string.Empty;
-});
- 
-// -------------------------------------------------
-// Run
-// -------------------------------------------------
+    app.MapGet("/api/info", () =>
+    {
+        return Results.Ok(new
+        {
+            service = "EEPZ Authentication & User Management API",
+            version = "v1.0",
+            environment = builder.Environment.EnvironmentName,
+            endpoints = new
+            {
+                swagger = "/",
+                healthLive = "/health/live",
+                healthReady = "/health/ready"
+            },
+            authentication = "JWT Bearer",
+            documentation = "See / for API documentation"
+        });
+    }).AllowAnonymous();
+}
 try
 {
-    Log.Information("EEPZ Performance Management API started successfully");
+    Log.Information("EEPZ Application started successfully on {Environment}", 
+        builder.Environment.EnvironmentName);
     app.Run();
 }
 catch (Exception ex)
@@ -426,85 +508,6 @@ catch (Exception ex)
 }
 finally
 {
-    Log.CloseAndFlush();
+    Log.Information("EEPZ Application shutting down");
+    await Log.CloseAndFlushAsync();
 }
- 
-// -------------------------------------------------
-// Supporting types
-// -------------------------------------------------
-public class FileUploadSettings
-{
-    public string UploadPath { get; set; } = string.Empty;
-}
- 
-internal sealed class MySqlDbHealthCheck : IHealthCheck
-{
-    private readonly EEPZDbContext _db;
- 
-    public MySqlDbHealthCheck(EEPZDbContext db) => _db = db;
- 
-    public async Task<HealthCheckResult> CheckHealthAsync(
-        HealthCheckContext context,
-        CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            cts.CancelAfter(TimeSpan.FromSeconds(3));
- 
-            var canConnect = await _db.Database.CanConnectAsync(cts.Token);
- 
-            return canConnect
-                ? HealthCheckResult.Healthy("MySQL database reachable")
-                : HealthCheckResult.Unhealthy("MySQL database unreachable");
-        }
-        catch (Exception ex)
-        {
-            return HealthCheckResult.Unhealthy("MySQL database exception", ex);
-        }
-    }
-}
- 
-// -------------------------------------------------
-// DI helper: register by convention (no explicit type refs)
-// -------------------------------------------------
-internal static class DiRegistration
-{
-    public static void RegisterByConvention(Microsoft.Extensions.DependencyInjection.IServiceCollection services, params string[] assemblyNames)
-    {
-        var assemblies = assemblyNames
-            .Where(n => !string.IsNullOrWhiteSpace(n))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .Select(Assembly.Load)
-            .ToArray();
- 
-        var allTypes = assemblies.SelectMany(a =>
-        {
-            try { return a.GetTypes(); }
-            catch (ReflectionTypeLoadException rtle) { return rtle.Types.Where(t => t != null)!; }
-        }).Where(t => t != null).Cast<Type>();
- 
-        var implementations = allTypes
-            .Where(t => t.IsClass && !t.IsAbstract);
- 
-        foreach (var impl in implementations)
-        {
-            bool isCandidate =
-                impl.Name.EndsWith("Service", StringComparison.Ordinal) ||
-                impl.Name.EndsWith("Repository", StringComparison.Ordinal);
- 
-            if (!isCandidate) continue;
- 
-            var serviceInterfaces = impl.GetInterfaces()
-                .Where(i =>
-                    i.Name.EndsWith("Service", StringComparison.Ordinal) ||
-                    i.Name.EndsWith("Repository", StringComparison.Ordinal));
- 
-            foreach (var itf in serviceInterfaces)
-            {
-                services.AddScoped(itf, impl);
-            }
-        }
-    }
-}
- 
