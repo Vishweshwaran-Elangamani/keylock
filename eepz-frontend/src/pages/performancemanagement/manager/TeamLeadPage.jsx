@@ -536,186 +536,326 @@ function TeamLeadPage() {
     );
   };
  
-  function renderL1Table() {
-    const categories = getL1Categories(allL1);
-    const tabs = [
-      { key: "Pending", label: "Pending L1 Review", subs: categories.pending, icon: "clock-history" },
-      { key: "Rejected", label: "Rejected (Rework)", subs: categories.rejected, icon: "arrow-counterclockwise" },
-      { key: "Submitted", label: "Submitted L1 Ratings", subs: submittedL1, icon: "check-circle" },
-    ];
-    const currentSubs = tabs.find((t) => t.key === activeL1Tab)?.subs || [];
-    const paginatedSubs = getPaginatedData(currentSubs, l1CurrentPage, l1ItemsPerPage);
-    return (
-      <>
-        <div className="tl-tabs-bar">
-          {tabs.map((tab) => (
-            <button key={tab.key} className={`tl-tab ${activeL1Tab === tab.key ? "active" : ""}`} onClick={() => { setActiveL1Tab(tab.key); setL1CurrentPage(1); }}>
-              <i className={`bi bi-${tab.icon}`}></i>
-              {tab.label}
-              <span className="tl-count">{tab.subs.length}</span>
-            </button>
-          ))}
-        </div>
-        {currentSubs.length === 0 ? (
-          <div className="tl-empty">
-            <div className="tl-empty-icon"><i className="bi bi-inbox"></i></div>
-            <h3 className="tl-empty-title">No Submissions Found</h3>
-            <p className="tl-empty-text">There are no assessments in this category at the moment.</p>
+function renderL1Table() {
+  const categories = getL1Categories(allL1);
+  const tabs = [
+    { key: "Pending", label: "Pending L1 Review", subs: categories.pending, icon: "clock-history" },
+    { key: "Rejected", label: "Rejected (Rework)", subs: categories.rejected, icon: "arrow-counterclockwise" },
+    { key: "Submitted", label: "Submitted L1 Ratings", subs: submittedL1, icon: "check-circle" },
+  ];
+  const currentSubs = tabs.find((t) => t.key === activeL1Tab)?.subs || [];
+  const paginatedSubs = getPaginatedData(currentSubs, l1CurrentPage, l1ItemsPerPage);
+
+  return (
+    <>
+      <div className="tl-tabs-bar">
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            className={`tl-tab ${activeL1Tab === tab.key ? "active" : ""}`}
+            onClick={() => {
+              setActiveL1Tab(tab.key);
+              setL1CurrentPage(1);
+            }}
+          >
+            <i className={`bi bi-${tab.icon}`}></i>
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {currentSubs.length === 0 ? (
+        <div className="tl-empty">
+          <div className="tl-empty-icon">
+            <i className="bi bi-inbox"></i>
           </div>
-        ) : (
-          <>
-            <div className="tl-table-wrapper">
-              <table className="cg-employee-table">
-                <thead>
-                  <tr>
-                    <th><i className="bi bi-person"></i> Employee</th>
-                    <th><i className="bi bi-file-text"></i> Form</th>
-                    <th><i className="bi bi-star"></i> Emp Avg</th>
-                    <th><i className="bi bi-flag"></i> Status</th>
-                    <th><i className="bi bi-calendar"></i> Date</th>
-                    <th><i className="bi bi-gear"></i> Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedSubs.map((assess) => {
-                    const avgRating = calculateAverageRating(assess.items);
-                    const l1Complete = isL1Complete(assess);
-                    const isSubmittedTab = activeL1Tab === "Submitted";
-                    const showReviewBtn = !isSubmittedTab && (!l1Complete || assess.l2Decision === "Rejected");
-                    return (
-                      <tr key={assess.assessmentId}>
-                        <td>
-                          <div className="tl-employee-cell">
-                            <div className="tl-employee-avatar">{assess.employeeName?.charAt(0) || "U"}</div>
-                            <span className="tl-employee-name">{assess.employeeName}</span>
+          <h3 className="tl-empty-title">No Submissions Found</h3>
+          <p className="tl-empty-text">
+            There are no assessments in this category at the moment.
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="tl-table-wrapper">
+            <table className="cg-employee-table">
+              <thead>
+                <tr>
+                  <th>
+                    <i className="bi bi-person"></i> Employee
+                  </th>
+                  <th>
+                    <i className="bi bi-file-text"></i> Form
+                  </th>
+                  <th>
+                    <i className="bi bi-star"></i> Emp Avg
+                  </th>
+                  <th>
+                    <i className="bi bi-flag"></i> Status
+                  </th>
+                  <th>
+                    <i className="bi bi-calendar"></i> Date
+                  </th>
+                  <th>
+                    <i className="bi bi-gear"></i> Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginatedSubs.map((assess) => {
+                  const avgRating = calculateAverageRating(assess.items);
+                  const l1Complete = isL1Complete(assess);
+                  const isSubmittedTab = activeL1Tab === "Submitted";
+                  const showReviewBtn =
+                    !isSubmittedTab &&
+                    (!l1Complete || assess.l2Decision === "Rejected");
+
+                  return (
+                    <tr key={assess.assessmentId}>
+                      <td>
+                        <div className="tl-employee-cell">
+                          <div className="tl-employee-avatar">
+                            {assess.employeeName?.charAt(0) || "U"}
                           </div>
-                        </td>
-                        <td>{assess.formName}</td>
-                        <td>
-                          <span className="cg-days-badge badge-info"><i className="bi bi-star-fill"></i>{avgRating}/5</span>
-                        </td>
-                        <td>
-                          <span className={`cg-days-badge ${isSubmittedTab ? "badge-success" : assess.l2Decision === "Rejected" ? "badge-danger" : l1Complete ? "badge-warning" : "badge-info"}`}>
-                            {isSubmittedTab ? "Submitted" : assess.l2Decision === "Rejected" ? "Rejected" : l1Complete ? "Submitted" : "Pending"}
+                          <span className="tl-employee-name">
+                            {assess.employeeName}
                           </span>
-                        </td>
-                        <td>{new Date(assess.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
-                        <td>
-                          {showReviewBtn && (
-                            <button className="cg-bulk-btn" onClick={() => openModal(assess, false)}>
-                              <i className="bi bi-pencil-square"></i> Review
-                            </button>
-                          )}
-                          {isSubmittedTab && (
-                            <button className="cg-bulk-btn cg-bulk-btn-view" onClick={() => openModal(assess, true)}>
-                              <i className="bi bi-eye"></i> View
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-            <PaginationControls currentPage={l1CurrentPage} totalItems={currentSubs.length} itemsPerPage={l1ItemsPerPage} onPageChange={handlePageChange} onItemsPerPageChange={handleItemsPerPageChange} isL1={true} />
-          </>
-        )}
-      </>
-    );
-  }
+                        </div>
+                      </td>
+                      <td>{assess.formName}</td>
+                      <td>
+                        <span className="cg-days-badge badge-info">
+                          <i className="bi bi-star-fill"></i>
+                          {avgRating}/5
+                        </span>
+                      </td>
+                      <td>
+                        <span
+                          className={`cg-days-badge ${
+                            isSubmittedTab
+                              ? "badge-success"
+                              : assess.l2Decision === "Rejected"
+                              ? "badge-danger"
+                              : l1Complete
+                              ? "badge-warning"
+                              : "badge-info"
+                          }`}
+                        >
+                          {isSubmittedTab
+                            ? "Submitted"
+                            : assess.l2Decision === "Rejected"
+                            ? "Rejected"
+                            : l1Complete
+                            ? "Submitted"
+                            : "Pending"}
+                        </span>
+                      </td>
+                      <td>
+                        {new Date(assess.submittedAt).toLocaleDateString(
+                          "en-US",
+                          { month: "short", day: "numeric", year: "numeric" }
+                        )}
+                      </td>
+                      <td>
+                        {showReviewBtn && (
+                          <button
+                            className="cg-bulk-btn"
+                            onClick={() => openModal(assess, false)}
+                          >
+                            <i className="bi bi-pencil-square"></i> Review
+                          </button>
+                        )}
+                        {isSubmittedTab && (
+                          <button
+                            className="cg-bulk-btn cg-bulk-btn-view"
+                            onClick={() => openModal(assess, true)}
+                          >
+                            <i className="bi bi-eye"></i> View
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          <PaginationControls
+            currentPage={l1CurrentPage}
+            totalItems={currentSubs.length}
+            itemsPerPage={l1ItemsPerPage}
+            onPageChange={handlePageChange}
+            onItemsPerPageChange={handleItemsPerPageChange}
+            isL1={true}
+          />
+        </>
+      )}
+    </>
+  );
+}
+
  
-  function renderL2Table() {
-    const tabs = [
-      { key: "Pending", label: "Pending L2 Review", subs: l2Subs, icon: "hourglass-split" },
-      { key: "Submitted", label: "Submitted L2 Ratings", subs: submittedL2, icon: "check-circle" },
-    ];
-    const currentSubs = tabs.find((t) => t.key === activeL2Tab)?.subs || [];
-    const isSubmittedTab = activeL2Tab === "Submitted";
-    const paginatedSubs = getPaginatedData(currentSubs, l2CurrentPage, l2ItemsPerPage);
-    return (
-      <>
-        <div className="tl-tabs-bar">
-          {tabs.map((tab) => (
-            <button key={tab.key} className={`tl-tab ${activeL2Tab === tab.key ? "active" : ""}`} onClick={() => { setActiveL2Tab(tab.key); setL2CurrentPage(1); }}>
-              <i className={`bi bi-${tab.icon}`}></i>
-              {tab.label}
-              <span className="tl-count">{tab.subs.length}</span>
-            </button>
-          ))}
-        </div>
-        {currentSubs.length === 0 ? (
-          <div className="tl-empty">
-            <div className="tl-empty-icon"><i className="bi bi-inbox"></i></div>
-            <h3 className="tl-empty-title">No Reviews Found</h3>
-            <p className="tl-empty-text">There are no reviews in this category at the moment.</p>
+function renderL2Table() {
+  const tabs = [
+    { key: "Pending", label: "Pending L2 Review", subs: l2Subs, icon: "hourglass-split" },
+    { key: "Submitted", label: "Submitted L2 Ratings", subs: submittedL2, icon: "check-circle" },
+  ];
+  const currentSubs = tabs.find((t) => t.key === activeL2Tab)?.subs || [];
+  const isSubmittedTab = activeL2Tab === "Submitted";
+  const paginatedSubs = getPaginatedData(currentSubs, l2CurrentPage, l2ItemsPerPage);
+
+  return (
+    <>
+      <div className="tl-tabs-bar">
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            className={`tl-tab ${activeL2Tab === tab.key ? "active" : ""}`}
+            onClick={() => {
+              setActiveL2Tab(tab.key);
+              setL2CurrentPage(1);
+            }}
+          >
+            <i className={`bi bi-${tab.icon}`}></i>
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {currentSubs.length === 0 ? (
+        <div className="tl-empty">
+          <div className="tl-empty-icon">
+            <i className="bi bi-inbox"></i>
           </div>
-        ) : (
-          <>
-            <div className="tl-table-wrapper">
-              <table className="cg-employee-table">
-                <thead>
-                  <tr>
-                    <th><i className="bi bi-person"></i> Employee</th>
-                    <th><i className="bi bi-file-text"></i> Form</th>
-                    <th><i className="bi bi-star"></i> Emp Avg</th>
-                    <th><i className="bi bi-star-fill"></i> L1 Avg</th>
-                    <th><i className="bi bi-flag"></i> Status</th>
-                    <th><i className="bi bi-calendar"></i> Date</th>
-                    <th><i className="bi bi-gear"></i> Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedSubs.map((assess) => {
-                    const empAvg = calculateAverageRating(assess.items);
-                    const l1Ratings = (assess.items || []).filter((i) => i.approverRating && i.approverRating > 0);
-                    const l1Avg = l1Ratings.length > 0 ? (l1Ratings.reduce((sum, i) => sum + i.approverRating, 0) / l1Ratings.length).toFixed(2) : 0;
-                    return (
-                      <tr key={assess.assessmentId}>
-                        <td>
-                          <div className="tl-employee-cell">
-                            <div className="tl-employee-avatar">{assess.employeeName?.charAt(0) || "U"}</div>
-                            <span className="tl-employee-name">{assess.employeeName}</span>
+          <h3 className="tl-empty-title">No Reviews Found</h3>
+          <p className="tl-empty-text">
+            There are no reviews in this category at the moment.
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="tl-table-wrapper">
+            <table className="cg-employee-table">
+              <thead>
+                <tr>
+                  <th>
+                    <i className="bi bi-person"></i> Employee
+                  </th>
+                  <th>
+                    <i className="bi bi-file-text"></i> Form
+                  </th>
+                  <th>
+                    <i className="bi bi-star"></i> Emp Avg
+                  </th>
+                  <th>
+                    <i className="bi bi-star-fill"></i> L1 Avg
+                  </th>
+                  <th>
+                    <i className="bi bi-flag"></i> Status
+                  </th>
+                  <th>
+                    <i className="bi bi-calendar"></i> Date
+                  </th>
+                  <th>
+                    <i className="bi bi-gear"></i> Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginatedSubs.map((assess) => {
+                  const empAvg = calculateAverageRating(assess.items);
+                  const l1Ratings = (assess.items || []).filter(
+                    (i) => i.approverRating && i.approverRating > 0
+                  );
+                  const l1Avg =
+                    l1Ratings.length > 0
+                      ? (
+                          l1Ratings.reduce(
+                            (sum, i) => sum + i.approverRating,
+                            0
+                          ) / l1Ratings.length
+                        ).toFixed(2)
+                      : 0;
+
+                  return (
+                    <tr key={assess.assessmentId}>
+                      <td>
+                        <div className="tl-employee-cell">
+                          <div className="tl-employee-avatar">
+                            {assess.employeeName?.charAt(0) || "U"}
                           </div>
-                        </td>
-                        <td>{assess.formName}</td>
-                        <td>
-                          <span className="cg-days-badge badge-info"><i className="bi bi-star-fill"></i>{empAvg}/5</span>
-                        </td>
-                        <td>
-                          <span className="cg-days-badge badge-warning"><i className="bi bi-star-fill"></i>{l1Avg}/5</span>
-                        </td>
-                        <td>
-                          <span className={`cg-days-badge ${isSubmittedTab ? "badge-success" : "badge-info"}`}>
-                            {isSubmittedTab ? "Submitted" : "Awaiting"}
+                          <span className="tl-employee-name">
+                            {assess.employeeName}
                           </span>
-                        </td>
-                        <td>{new Date(assess.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
-                        <td>
-                          {!isSubmittedTab && (
-                            <button className="cg-bulk-btn" onClick={() => openModal(assess, false)}>
-                              <i className="bi bi-pencil-square"></i> Review
-                            </button>
-                          )}
-                          {isSubmittedTab && (
-                            <button className="cg-bulk-btn cg-bulk-btn-view" onClick={() => openModal(assess, true)}>
-                              <i className="bi bi-eye"></i> View
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-            <PaginationControls currentPage={l2CurrentPage} totalItems={currentSubs.length} itemsPerPage={l2ItemsPerPage}
-            onPageChange={handlePageChange} onItemsPerPageChange={handleItemsPerPageChange} isL1={false} />
-          </>
-        )}
-      </>
-    );
-  }
+                        </div>
+                      </td>
+                      <td>{assess.formName}</td>
+                      <td>
+                        <span className="cg-days-badge badge-info">
+                          <i className="bi bi-star-fill"></i>
+                          {empAvg}/5
+                        </span>
+                      </td>
+                      <td>
+                        <span className="cg-days-badge badge-warning">
+                          <i className="bi bi-star-fill"></i>
+                          {l1Avg}/5
+                        </span>
+                      </td>
+                      <td>
+                        <span
+                          className={`cg-days-badge ${
+                            isSubmittedTab ? "badge-success" : "badge-info"
+                          }`}
+                        >
+                          {isSubmittedTab ? "Submitted" : "Awaiting"}
+                        </span>
+                      </td>
+                      <td>
+                        {new Date(assess.submittedAt).toLocaleDateString(
+                          "en-US",
+                          { month: "short", day: "numeric", year: "numeric" }
+                        )}
+                      </td>
+                      <td>
+                        {!isSubmittedTab && (
+                          <button
+                            className="cg-bulk-btn"
+                            onClick={() => openModal(assess, false)}
+                          >
+                            <i className="bi bi-pencil-square"></i> Review
+                          </button>
+                        )}
+                        {isSubmittedTab && (
+                          <button
+                            className="cg-bulk-btn cg-bulk-btn-view"
+                            onClick={() => openModal(assess, true)}
+                          >
+                            <i className="bi bi-eye"></i> View
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          <PaginationControls
+            currentPage={l2CurrentPage}
+            totalItems={currentSubs.length}
+            itemsPerPage={l2ItemsPerPage}
+            onPageChange={handlePageChange}
+            onItemsPerPageChange={handleItemsPerPageChange}
+            isL1={false}
+          />
+        </>
+      )}
+    </>
+  );
+}
+
  
   return (
     <div className="tl-page">
