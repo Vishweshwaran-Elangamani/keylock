@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "../../../../styles/performancemanagement/components/ParameterModall.css";
 
 const ParameterModal = ({
@@ -8,7 +8,41 @@ const ParameterModal = ({
   setParameterForm,
   onSubmit,
 }) => {
+  const [errors, setErrors] = useState({});
+
   if (!show) return null;
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!parameterForm.parameterName?.trim()) {
+      newErrors.parameterName = "Parameter name is required.";
+    }
+    if (!parameterForm.parameterType?.trim()) {
+      newErrors.parameterType = "Parameter type is required.";
+    }
+    if (!parameterForm.sortOrder || parameterForm.sortOrder < 1) {
+      newErrors.sortOrder = "Sort order must be at least 1.";
+    }
+    if (
+      (parameterForm.parameterType === "Number" ||
+        parameterForm.parameterType === "Rating") &&
+      (parameterForm.minimumValue === "" || parameterForm.maximumValue === "")
+    ) {
+      newErrors.range = "Min and Max values are required for Number/Rating.";
+    }
+    return newErrors;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+    setErrors({});
+    onSubmit(e);
+  };
 
   return (
     <div className="parameter-modal-overlay" onClick={onClose}>
@@ -17,7 +51,8 @@ const ParameterModal = ({
           <span className="parameter-modal-header-title">Add Parameter</span>
         </div>
         <div className="parameter-modal-body">
-          <form onSubmit={onSubmit} autoComplete="off">
+          <form onSubmit={handleSubmit} autoComplete="off">
+
             <label className="parameter-modal-label">
               Parameter Name <span className="parameter-modal-required">*</span>
             </label>
@@ -31,9 +66,11 @@ const ParameterModal = ({
                   parameterName: e.target.value,
                 })
               }
-              required
               className="parameter-modal-input"
             />
+            {errors.parameterName && (
+              <div className="parameter-modal-error">{errors.parameterName}</div>
+            )}
 
             <label className="parameter-modal-label">
               Type <span className="parameter-modal-required">*</span>
@@ -46,15 +83,18 @@ const ParameterModal = ({
                   parameterType: e.target.value,
                 })
               }
-              required
               className="parameter-modal-select"
             >
+              <option value="">Select type</option>
               <option value="Text">Text</option>
               <option value="TextArea">Text Area</option>
               <option value="Number">Number</option>
               <option value="Rating">Rating</option>
               <option value="Date">Date</option>
             </select>
+            {errors.parameterType && (
+              <div className="parameter-modal-error">{errors.parameterType}</div>
+            )}
 
             <label className="parameter-modal-checkbox-label">
               <input
@@ -112,6 +152,9 @@ const ParameterModal = ({
                   }
                   className="parameter-modal-input"
                 />
+                {errors.range && (
+                  <div className="parameter-modal-error">{errors.range}</div>
+                )}
               </>
             )}
 
@@ -128,9 +171,11 @@ const ParameterModal = ({
                   sortOrder: parseInt(e.target.value),
                 })
               }
-              required
               className="parameter-modal-input"
             />
+            {errors.sortOrder && (
+              <div className="parameter-modal-error">{errors.sortOrder}</div>
+            )}
 
             <div className="parameter-modal-action-row">
               <button
@@ -141,7 +186,7 @@ const ParameterModal = ({
                 Cancel
               </button>
               <button type="submit" className="parameter-modal-submit-btn">
-                Add Parameter 
+                Add Parameter
               </button>
             </div>
           </form>

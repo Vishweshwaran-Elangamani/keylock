@@ -161,3 +161,24 @@
 .parameter-modal-submit-btn:hover {
   filter: brightness(1.12);
 }
+
+.parameter-modal-error {
+  color: red;
+  font-size: 13px;
+  text-align: left;
+  margin-top: 4px;
+}
+
+.parameter-modal-error-summary {
+  color: red;
+  font-size: 14px;
+  text-align: left;
+  margin-bottom: 10px;
+}
+.parameter-modal-error-summary ul {
+  margin: 4px 0 0 16px;
+  padding: 0;
+}
+.parameter-modal-error-summary li {
+  list-style-type: disc;
+}
