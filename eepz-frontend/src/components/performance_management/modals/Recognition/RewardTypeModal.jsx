@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "../../../../styles/performancemanagement/components/RewardTypeModal.css";
 
 const RewardTypeModal = ({
@@ -9,7 +9,29 @@ const RewardTypeModal = ({
   onSubmit,
   isEditMode,
 }) => {
+  const [errors, setErrors] = useState({});
+
   if (!show) return null;
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!rewardTypeForm.rewardName?.trim()) {
+      newErrors.rewardName = "Recognition Name is required.";
+    }
+    return newErrors;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+    setErrors({});
+    onSubmit(e);
+  };
+
   return (
     <div className="reward-type-overlay" onClick={onClose}>
       <div className="reward-type-modal" onClick={(e) => e.stopPropagation()}>
@@ -19,7 +41,9 @@ const RewardTypeModal = ({
           </span>
         </div>
         <div className="reward-type-body">
-          <form onSubmit={onSubmit} autoComplete="off">
+          <form onSubmit={handleSubmit} autoComplete="off">
+
+
             <label className="reward-type-label">
               Recognition Name <span className="reward-type-required">*</span>
             </label>
@@ -33,9 +57,12 @@ const RewardTypeModal = ({
                 })
               }
               placeholder="Type recognition name"
-              required
               className="reward-type-input"
             />
+            {errors.rewardName && (
+              <div className="reward-type-error">{errors.rewardName}</div>
+            )}
+
             <label className="reward-type-label">Description</label>
             <textarea
               value={rewardTypeForm.description}
@@ -48,6 +75,7 @@ const RewardTypeModal = ({
               placeholder="Type description (optional)"
               className="reward-type-textarea"
             />
+
             <div className="reward-type-action-row">
               <button
                 type="button"

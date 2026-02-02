@@ -146,3 +146,26 @@
 .reward-type-modal div[style*="overflow-y: auto"]::-webkit-scrollbar {
   display: none;
 }
+
+.reward-type-error {
+  color: red;
+  font-size: 13px;
+  text-align: left;
+  margin-top: 4px;
+}
+
+.reward-type-error-summary {
+  color: red;
+  font-size: 14px;
+  text-align: left;
+  margin-bottom: 10px;
+}
+
+.reward-type-error-summary ul {
+  margin: 4px 0 0 16px;
+  padding: 0;
+}
+
+.reward-type-error-summary li {
+  list-style-type: disc;
+}
