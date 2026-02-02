@@ -243,7 +243,8 @@ getBudgetAllocationsByBudget: async (budgetId) => {
   },
   updateUtilization: async (data) => {
     try {
-      const response = await hrApi.put("/FundAllocation/update-utilization", {
+      const response = await hrApi.put("/FundAllocation/department-budgets/update-utilization", 
+ {
         allocationId: data.allocationId,
         utilizedAmount: data.utilizedAmount,
         utilizationPercentage: data.utilizationPercentage,
