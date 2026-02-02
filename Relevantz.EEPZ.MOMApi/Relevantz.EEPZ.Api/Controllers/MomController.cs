@@ -13,6 +13,7 @@ namespace eepzbackend.Controllers
     /// <summary>
     /// Controller for managing Minutes of Meeting (MOM) operations
     /// SECURED: Rate limiting via middleware, input sanitization, validation, caching, and audit logging
+    /// RESTful: Uses noun-based routes with proper HTTP methods
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
@@ -41,12 +42,13 @@ namespace eepzbackend.Controllers
         /// <summary>
         /// Create a new MOM
         /// SECURED: Rate limiting via middleware, date validation, input sanitization, audit logging
+        /// RESTful: POST /api/mom (noun-based route, HTTP method indicates action)
         /// </summary>
         /// <remarks>
         /// Rate Limited: 100 requests per minute per client (global middleware)
         /// Meeting date must be within past 7 days or future 30 days
         /// </remarks>
-        [HttpPost("create")]
+        [HttpPost] // CHANGED: Removed "/create" - POST method implies creation
         [ProducesResponseType(typeof(ApiResponse<MomResponseDto>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -144,18 +146,21 @@ namespace eepzbackend.Controllers
         /// <summary>
         /// Update an existing MOM
         /// SECURED: Null/empty validation, field-level validation, version control, audit logging
+        /// RESTful: PUT /api/mom/{momId} (noun-based route, HTTP method indicates action)
         /// </summary>
         /// <remarks>
         /// Only managers can update MOMs. Empty update payloads are rejected.
         /// All changes are logged for audit purposes.
+        /// PUT is idempotent - multiple identical requests have the same effect as a single request.
         /// </remarks>
-        [HttpPut("update")]
+        [HttpPut("{momId:int}")] // CHANGED: Removed "/update", added momId to route
         [ProducesResponseType(typeof(ApiResponse<MomResponseDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ApiResponse<MomResponseDto>>> UpdateMom(
+            int momId, // CHANGED: Added momId as route parameter
             [FromBody] UpdateMomDto updateMomDto)
         {
             var correlationId = HttpContext.TraceIdentifier;
@@ -173,6 +178,26 @@ namespace eepzbackend.Controllers
                         correlationId));
                 }
 
+                // CHANGED: Validate momId from route matches body (if provided)
+                if (momId <= 0)
+                {
+                    return BadRequest(ApiResponse<object>.ErrorResponse(
+                        "Invalid MOM ID in route",
+                        correlationId));
+                }
+
+                // Set momId from route if not in body
+                if (updateMomDto.MomId == 0)
+                {
+                    updateMomDto.MomId = momId;
+                }
+                else if (updateMomDto.MomId != momId)
+                {
+                    return BadRequest(ApiResponse<object>.ErrorResponse(
+                        "MOM ID in route does not match MOM ID in body",
+                        correlationId));
+                }
+
                 // VALIDATION 2: Reject empty update payloads
                 if (IsEmptyUpdatePayload(updateMomDto))
                 {
@@ -185,15 +210,7 @@ namespace eepzbackend.Controllers
                         correlationId));
                 }
 
-                // VALIDATION 3: MomId validation
-                if (updateMomDto.MomId <= 0)
-                {
-                    return BadRequest(ApiResponse<object>.ErrorResponse(
-                        "Invalid MOM ID",
-                        correlationId));
-                }
-
-                // VALIDATION 4: Date validation if provided
+                // VALIDATION 3: Date validation if provided
                 if (updateMomDto.MeetingDate.HasValue)
                 {
                     var minDate = DateTime.Now.AddDays(-7);
@@ -208,10 +225,10 @@ namespace eepzbackend.Controllers
                     }
                 }
 
-                // VALIDATION 5: Input sanitization
+                // VALIDATION 4: Input sanitization
                 updateMomDto = SanitizeUpdateMomDto(updateMomDto);
 
-                // VALIDATION 6: Field-level validation
+                // VALIDATION 5: Field-level validation
                 var validationErrors = ValidateUpdateMomDto(updateMomDto);
                 if (validationErrors.Any())
                 {
@@ -256,7 +273,7 @@ namespace eepzbackend.Controllers
                 _logger.LogWarning(
                     ex, 
                     "Unauthorized UpdateMom attempt for MOM {MomId} by employee {EmployeeId}",
-                    updateMomDto?.MomId, employeeId);
+                    momId, employeeId);
                 return Forbid();
             }
             catch (ArgumentException ex)
@@ -269,7 +286,7 @@ namespace eepzbackend.Controllers
                 _logger.LogError(
                     ex, 
                     "Error updating MOM {MomId} for employee {EmployeeId}",
-                    updateMomDto?.MomId, employeeId);
+                    momId, employeeId);
                 return StatusCode(500, ApiResponse<object>.ErrorResponse(
                     "An error occurred while updating the MOM",
                     correlationId));
@@ -279,10 +296,12 @@ namespace eepzbackend.Controllers
         /// <summary>
         /// Get MOMs submitted by the current user
         /// SECURED: Pagination, caching, claim validation
+        /// RESTful: GET /api/mom/my-moms (collection endpoint with filter)
         /// </summary>
         /// <remarks>
         /// Results are cached for 5 minutes to improve performance.
         /// Supports pagination to handle large datasets efficiently.
+        /// GET is safe and idempotent.
         /// </remarks>
         [HttpGet("my-moms")]
         [Authorize(Roles = AppConstants.Roles.Manager + "," + AppConstants.Roles.Employee)]
@@ -385,7 +404,7 @@ namespace eepzbackend.Controllers
                 var cacheOptions = new MemoryCacheEntryOptions()
                     .SetAbsoluteExpiration(TimeSpan.FromMinutes(CacheExpirationMinutes))
                     .SetSlidingExpiration(TimeSpan.FromMinutes(2))
-                    .SetSize(1); // For cache size management
+                    .SetSize(1);
                 
                 _cache.Set(cacheKey, result, cacheOptions);
 
@@ -416,6 +435,7 @@ namespace eepzbackend.Controllers
         /// <summary>
         /// Get a specific MOM by ID
         /// SECURED: Caching, validation
+        /// RESTful: GET /api/mom/{momId} (singular resource endpoint)
         /// </summary>
         [HttpGet("{momId:int}")]
         [ProducesResponseType(typeof(ApiResponse<MomResponseDto>), StatusCodes.Status200OK)]
@@ -483,11 +503,13 @@ namespace eepzbackend.Controllers
         /// <summary>
         /// Delete a MOM (Soft Delete)
         /// SECURED: Confirmation token, soft delete, audit logging
+        /// RESTful: DELETE /api/mom/{momId} (HTTP method indicates action)
         /// </summary>
         /// <remarks>
         /// Implements soft delete pattern. MOM is marked as deleted but retained in database.
         /// Requires confirmation token to prevent accidental deletions.
         /// All deletions are logged for audit and compliance purposes.
+        /// DELETE is idempotent - multiple identical requests have the same effect.
         /// </remarks>
         [HttpDelete("{momId:int}")]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
@@ -878,6 +900,4 @@ namespace eepzbackend.Controllers
 
         #endregion
     }
-
-    
 }
