@@ -10,7 +10,6 @@ import { FaSearch } from "react-icons/fa";
 import { Form } from "react-bootstrap";
 import "../../../../styles/hr_operations/hr/BudgetAllocation.css";
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
-
 const YearDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
   const allOptions = [{ label: "All Years", value: "all" }, ...options];
@@ -51,7 +50,6 @@ const YearDropdown = ({ value, onChange, options }) => {
     </div>
   );
 };
-
 const DepartmentDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
   const allOptions = [
@@ -97,7 +95,6 @@ const DepartmentDropdown = ({ value, onChange, options }) => {
     </div>
   );
 };
-
 const BudgetAllocation = () => {
   const [budgets, setBudgets] = useState([]);
   const [filteredBudgets, setFilteredBudgets] = useState([]);
@@ -124,23 +121,17 @@ const BudgetAllocation = () => {
     years: [],
     departments: [],
   });
-
   const currentUserId = parseInt(localStorage.getItem("userId"));
   const userRole = localStorage.getItem("userRole");
   const isLeadership = userRole === "Leadership";
-
   useEffect(() => {}, [userRole]);
-
   useEffect(() => {
     fetchBudgets();
   }, []);
-
   useEffect(() => {
     applyFilters();
     setCurrentPage(1);
   }, [budgets, activeSearchTerm, filters]);
-
-  // Click outside handler for rows dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -155,7 +146,6 @@ const BudgetAllocation = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
   const fetchBudgets = async () => {
     setLoading(true);
     setError(null);
@@ -173,7 +163,6 @@ const BudgetAllocation = () => {
       setLoading(false);
     }
   };
-
   const generateFilterOptions = (data) => {
     const years = [...new Set(data.map((b) => b.fiscalYear))].sort(
       (a, b) => b - a
@@ -183,7 +172,6 @@ const BudgetAllocation = () => {
     ].sort();
     setFilterOptions({ years, departments });
   };
-
   const applyFilters = () => {
     let filtered = budgets;
     if (activeSearchTerm.trim()) {
@@ -205,7 +193,6 @@ const BudgetAllocation = () => {
     }
     setFilteredBudgets(filtered);
   };
-
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({
@@ -213,18 +200,15 @@ const BudgetAllocation = () => {
       [name]: value,
     }));
   };
-
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
     if (searchInputRef.current) searchInputRef.current.blur();
   };
-
   const handleSearchKeyDown = (e) => {
     if (e.key === "Enter") {
       handleSearch();
     }
   };
-
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
@@ -233,62 +217,49 @@ const BudgetAllocation = () => {
       department: "",
     });
   };
-
   const handleItemsPerPageChange = (newSize) => {
     setItemsPerPage(newSize);
     setCurrentPage(1);
     setShowRowsDropdown(false);
   };
-
   const goToPage = (page) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
   };
-
   const totalPages = Math.ceil(filteredBudgets.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentPageData = filteredBudgets.slice(startIndex, endIndex);
-
   const handleCreateBudget = () => {
     setShowCreateModal(true);
   };
-
   const handleBudgetCreated = () => {
     setShowCreateModal(false);
     fetchBudgets();
-    showToast("Success", "Department budget created successfully", "success");
   };
-
   const handleEditClick = (budget) => {
     setSelectedBudget(budget);
     setShowEditModal(true);
   };
-
   const handleBudgetUpdated = () => {
     setShowEditModal(false);
     setSelectedBudget(null);
     fetchBudgets();
-    showToast("Success", "Department budget updated successfully", "success");
   };
-
   const handleDeleteClick = (budget) => {
     setSelectedBudget(budget);
     setShowDeleteModal(true);
   };
-
   const handleBudgetDeleted = () => {
     setShowDeleteModal(false);
     setSelectedBudget(null);
     fetchBudgets();
   };
-
   const handleViewDetails = (budget) => {
     setSelectedBudget(budget);
     setShowDetailsModal(true);
   };
-
   const showToast = (title, message, type) => {
     const fullMessage = `${title}: ${message}`;
     switch (type) {
@@ -309,7 +280,6 @@ const BudgetAllocation = () => {
         toast(fullMessage);
     }
   };
-
   const getUtilizationColor = (percentage) => {
     if (!percentage) return "#cbd5e1";
     if (percentage >= 90) return "#ef4444";
@@ -317,7 +287,6 @@ const BudgetAllocation = () => {
     if (percentage >= 50) return "#10b981";
     return "#3b82f6";
   };
-
   const summaryStats = {
     totalBudget: filteredBudgets.reduce(
       (sum, b) => sum + (b.totalBudget || 0),
@@ -332,7 +301,6 @@ const BudgetAllocation = () => {
       0
     ),
   };
-
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
@@ -359,7 +327,6 @@ const BudgetAllocation = () => {
     }
     return pages;
   };
-
   if (loading) {
     return (
       <div className="ba-loading-container">
@@ -370,7 +337,6 @@ const BudgetAllocation = () => {
       </div>
     );
   }
-
   return (
     <div className="ba-page">
       <Breadcrumb
@@ -844,5 +810,4 @@ const BudgetAllocation = () => {
     </div>
   );
 };
-
 export default BudgetAllocation;

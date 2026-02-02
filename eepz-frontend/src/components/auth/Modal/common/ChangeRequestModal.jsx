@@ -148,6 +148,14 @@ const ChangeRequestModal = ({
       setIsLoading(false);
     }
   };
+  const blockClipboardAction = (
+    e,
+    message = "Copy/Paste is disabled for password"
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (message) toast.info(message);
+  };
   if (!show) return null;
   if (hasPendingRequest) {
     return (
@@ -315,6 +323,30 @@ const ChangeRequestModal = ({
                     required
                     minLength={6}
                     className="crm-form-input crm-password-input"
+                    onPaste={(e) =>
+                      blockClipboardAction(
+                        e,
+                        "Pasting is disabled for password"
+                      )
+                    }
+                    onCopy={(e) =>
+                      blockClipboardAction(e, "Copy is disabled for password")
+                    }
+                    onCut={(e) =>
+                      blockClipboardAction(e, "Cut is disabled for password")
+                    }
+                    onDrop={(e) =>
+                      blockClipboardAction(
+                        e,
+                        "Drag & drop is disabled for password"
+                      )
+                    }
+                    onContextMenu={(e) => e.preventDefault()}
+                    autoComplete="new-password"
+                    inputMode="text"
+                    spellCheck={false}
+                    autoCapitalize="off"
+                    aria-autocomplete="none"
                   />
                   <button
                     type="button"
@@ -328,7 +360,7 @@ const ChangeRequestModal = ({
                       className={`bi ${
                         showPassword ? "bi-eye-slash" : "bi-eye"
                       }`}
-                    ></i>
+                    />
                   </button>
                 </div>
                 <small className="crm-form-help">

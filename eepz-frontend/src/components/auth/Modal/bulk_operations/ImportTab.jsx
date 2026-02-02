@@ -36,31 +36,6 @@ const ImportTab = ({
           Download the template, fill in user details, and upload it below
         </small>
       </div>
-      <div className="bom-info-alert">
-        <i className="bi bi-info-circle-fill bom-info-alert-icon"></i>
-        <div className="bom-info-alert-content">
-          <strong className="bom-info-alert-title">
-            Excel Format Requirements:
-          </strong>
-          <ul className="bom-info-alert-list">
-            <li>
-              <strong>Employee IDs are AUTO-GENERATED:</strong> Do NOT include
-              Employee ID column. IDs will be assigned automatically starting
-              from the last used ID (e.g., 1000, 1001, 1002...)
-            </li>
-            <li>
-              <strong>Required columns:</strong> Email, FirstName, LastName,
-              Role, Department
-            </li>
-            <li>
-              <strong>Role & Department:</strong> Use dropdown lists in the
-              Excel template (values loaded from database)
-            </li>
-            <li>File format: .xlsx or .xls (max 5MB)</li>
-            <li>First row must contain column headers</li>
-          </ul>
-        </div>
-      </div>
       <div className="bom-file-upload-section">
         <input
           ref={fileInputRef}
