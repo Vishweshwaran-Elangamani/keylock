@@ -254,7 +254,7 @@ const AppraisalDetailsModal = ({
                 <table className="appraisal-table">
                   <thead>
                     <tr>
-                      <th>#</th>
+                      <th>S.No</th>
                       <th>Competency</th>
                       <th>Employee Rating</th>
                       <th>Employee Comments</th>

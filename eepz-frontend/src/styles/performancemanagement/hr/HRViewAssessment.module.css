@@ -428,7 +428,7 @@
 
 .hrViewAssessmentBtnExport {
   padding: 10px 20px;
-  background: #27235c;
+  background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -443,7 +443,7 @@
 }
 
 .hrViewAssessmentBtnExport:hover {
-  background: #1e1b45;
+  background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(39, 35, 92, 0.3);
 }
@@ -748,3 +748,36 @@
     height: 6px;
   }
 }
+/* Center empty state content in the table cell */
+.hrViewAssessmentEmptyState {
+  text-align: center;
+  padding: 0 !important;              /* remove extra padding */
+  height: 320px;                      /* gives vertical space for centering */
+}
+
+/* Perfect center: vertical + horizontal */
+.hrViewAssessmentEmptyStateInner {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Optional: icon styling */
+.hrViewAssessmentEmptyStateInner i {
+  font-size: 42px;
+  color: #9ca3af;
+  opacity: 0.75;
+}
+
+/* Optional: message styling */
+.hrViewAssessmentEmptyStateInner p {
+  margin: 0;
+  font-size: 1rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+

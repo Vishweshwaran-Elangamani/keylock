@@ -381,13 +381,13 @@ function FormCreate() {
 
   // Dropdown options
   const formTypeOptions = [
-    { label: "Select form type", value: "" },
-    { label: "Self", value: "Self" },
-    { label: "Manager", value: "Manager" },
+    { label: "Select Form Type for Performance Cycle", value: "" },
+    { label: "Employee Self Assessment Form", value: "Self" },
+    { label: "Manager Form", value: "Manager" },
   ];
 
   const categoryOptions = [
-    { label: "Select category", value: "" },
+    { label: "Select Relevant Performance Category for Assessment", value: "" },
     { label: "Delivery", value: "Delivery" },
     { label: "Enablement", value: "Enablement" },
   ];

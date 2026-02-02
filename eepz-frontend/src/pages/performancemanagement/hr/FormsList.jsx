@@ -81,8 +81,8 @@ function FormsList() {
 
   const [formsPage, setFormsPage] = useState(1);
   const [usersPage, setUsersPage] = useState(1);
-  const [formsPerPage, setFormsPerPage] = useState(8);
-  const [usersPerPage, setUsersPerPage] = useState(9);
+  const [formsPerPage, setFormsPerPage] = useState(5);
+  const [usersPerPage, setUsersPerPage] = useState(5);
 
   const [formSearchQuery, setFormSearchQuery] = useState("");
   const [formTypeFilter, setFormTypeFilter] = useState("All");

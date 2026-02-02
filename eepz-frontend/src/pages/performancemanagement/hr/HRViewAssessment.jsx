@@ -179,7 +179,6 @@ function statusBadge(status) {
       <span
         className={`${styles.hrViewAssessmentBadge} ${styles.hrViewAssessmentBadgeCompleted}`}
       >
-        <i className="bi bi-check-circle-fill" style={{ marginRight: 6 }} />
         Completed
       </span>
     );
@@ -247,7 +246,6 @@ function HRViewAppraisals() {
           throw new Error("Unexpected response format");
         }
 
-        // Normalize to avoid runtime errors if fields are missing
         const safe = list.map((a) => ({
           employeeId: a?.employeeId,
           employeeName: a?.employeeName ?? "",
@@ -256,7 +254,6 @@ function HRViewAppraisals() {
           attachments: Array.isArray(a?.attachments) ? a.attachments : [],
         }));
 
-        // Consider “initiated” if there is at least one competency OR any competency with a meaningful status
         const initiatedAppraisals = safe.filter((appraisal) => {
           const comps = Array.isArray(appraisal.competencies) ? appraisal.competencies : [];
 
@@ -550,26 +547,25 @@ function HRViewAppraisals() {
               <thead>
                 <tr>
                   <th>Employee Name</th>
-                  <th>Project Name</th>
-                  <th>Emp Avg</th>
-                  <th>L1 Reviewer</th>
-                  <th>L1 Avg</th>
-                  <th>L2 Reviewer</th>
-                  <th>L2 Avg</th>
+                  <th>Project</th>
+                  <th>Average</th>
+                  <th>Reviewer</th>
+                  <th>Average</th>
+                  <th>Approver</th>
+                  <th>Average</th>
                   <th>Status</th>
-                  <th className={styles.textCenter}>Actions</th>
+                  <th className={styles.textCenter}>Details</th>
                 </tr>
               </thead>
               <tbody>
                 {currentItems.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan={9}
-                      className={styles.hrViewAssessmentEmptyState}
-                    >
-                      <i className="bi bi-inbox"></i>
-                      <p>No appraisals match your filters</p>
-                    </td>
+                   <td colSpan={9} className={styles.hrViewAssessmentEmptyState}>
+  <div className={styles.hrViewAssessmentEmptyStateInner}>
+    <i className="bi bi-inbox"></i>
+    <p>No appraisals match your filters</p>
+  </div>
+</td>
                   </tr>
                 ) : (
                   currentItems.map((row) => (

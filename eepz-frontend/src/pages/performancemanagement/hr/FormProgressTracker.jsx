@@ -11,7 +11,7 @@ export default function FormProgressTrackerPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(8);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
@@ -214,15 +214,15 @@ export default function FormProgressTrackerPage() {
               <thead>
                 <tr>
                   <th>Employee</th>
-                  <th>L1</th>
-                  <th>L2</th>
+                  <th>Reviewer</th>
+                  <th>Approver</th>
                   <th>Initiated</th>
-                  <th>Sent Emp</th>
-                  <th>Emp Done</th>
-                  <th>Sent Mgr</th>
-                  <th>Mgr Done</th>
-                  <th>Dept Head</th>
-                  <th>Emp Ack</th>
+                  {/* <th>Sent Emp</th> */}
+                  <th>Employee</th>
+                  {/* <th>Sent Mgr</th> */}
+                  <th>Manager</th>
+                  <th>Department Head</th>
+                  <th>Employee Acknowledge</th>
                 </tr>
               </thead>
               <tbody>
@@ -236,13 +236,13 @@ export default function FormProgressTrackerPage() {
                     <td style={{ color: tracker.initiated ? "green" : "red" }}>
                       {tracker.initiated ? "✔" : "✖"}
                     </td>
-                    <td
+                    {/* <td
                       style={{
                         color: tracker.sentToEmployee ? "green" : "red",
                       }}
                     >
                       {tracker.sentToEmployee ? "✔" : "✖"}
-                    </td>
+                    </td> */}
                     <td
                       style={{
                         color: tracker.employeeCompleted ? "green" : "red",
@@ -250,11 +250,11 @@ export default function FormProgressTrackerPage() {
                     >
                       {tracker.employeeCompleted ? "✔" : "✖"}
                     </td>
-                    <td
+                    {/* <td
                       style={{ color: tracker.sentToManager ? "green" : "red" }}
                     >
                       {tracker.sentToManager ? "✔" : "✖"}
-                    </td>
+                    </td> */}
                     <td
                       style={{
                         color: tracker.managerCompleted ? "green" : "red",
@@ -281,57 +281,63 @@ export default function FormProgressTrackerPage() {
               </tbody>
             </table>
 
-            <div
-              className="fld-pagination-container"
-              style={{ marginTop: "0.5rem" }}
-            >
-              <div className="fld-pagination-info">
-                <span className="fld-show-entries-label">Pages&nbsp;</span>
-                <CustomDropdown
-                  value={itemsPerPage}
-                  onChange={(val) => {
-                    setItemsPerPage(Number(val));
-                    setCurrentPage(1);
-                  }}
-                  options={[5, 10, 15, 20, 25]}
-                />
-                <span className="fld-show-entries-label">&nbsp;</span>
-                <span className="fld-pagination-status">
-                  &nbsp;&nbsp;Showing {startIndex + 1} to{" "}
-                  {Math.min(endIndex, trackers.length)} of {trackers.length}{" "}
-                  entries
-                </span>
-              </div>
-              <div className="fld-pagination-controls">
-                <button
-                  onClick={goToPrev}
-                  disabled={currentPage === 1}
-                  className="fld-pagination-btn"
-                  aria-label="Previous page"
-                >
-                  ‹
-                </button>
-                {[...Array(totalPages)].map((_, i) => (
-                  <button
-                    key={i + 1}
-                    onClick={() => goToPage(i + 1)}
-                    className={`fld-pagination-btn${
-                      currentPage === i + 1 ? " fld-pagination-btn-active" : ""
-                    }`}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-                <button
-                  onClick={goToNext}
-                  disabled={currentPage === totalPages}
-                  className="fld-pagination-btn"
-                  aria-label="Next page"
-                >
-                  ›
-                </button>
-              </div>
-            </div>
+            <div className="fld-pagination-container" style={{ marginTop: "0.5rem" }}>
+  {/* Left */}
+  <div className="fld-pagination-left">
+    <span className="fld-show-entries-label">Show</span>
+
+    <CustomDropdown
+      value={itemsPerPage}
+      onChange={(val) => {
+        setItemsPerPage(Number(val));
+        setCurrentPage(1);
+      }}
+      options={[5, 10, 15]}
+    />
+    <span className="fld-show-entries-label">entries</span>
+  </div>
+
+  {/* Center */}
+  <div className="fld-pagination-center">
+    <span className="fld-pagination-status">
+      Showing {startIndex + 1} to {Math.min(endIndex, trackers.length)} of {trackers.length} entries
+    </span>
+  </div>
+
+  {/* Right */}
+  <div className="fld-pagination-controls">
+    <button
+      onClick={goToPrev}
+      disabled={currentPage === 1}
+      className="fld-pagination-btn"
+      aria-label="Previous page"
+    >
+      ‹
+    </button>
+
+    {[...Array(totalPages)].map((_, i) => (
+      <button
+        key={i + 1}
+        onClick={() => goToPage(i + 1)}
+        className={`fld-pagination-btn${
+          currentPage === i + 1 ? " fld-pagination-btn-active" : ""
+        }`}
+      >
+        {i + 1}
+      </button>
+    ))}
+
+    <button
+      onClick={goToNext}
+      disabled={currentPage === totalPages}
+      className="fld-pagination-btn"
+      aria-label="Next page"
+    >
+      ›
+    </button>
+  </div>
+</div>
+            
           </div>
         </div>
       )}
