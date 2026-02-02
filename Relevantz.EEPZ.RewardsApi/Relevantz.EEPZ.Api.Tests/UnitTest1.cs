@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using Relevantz.EEPZ.Api.Controllers; // Ensure this matches your actual controller namespace
+using Relevantz.EEPZ.Api.Controllers; 
 using Relevantz.EEPZ.Api.Tests.Helpers;
 using Relevantz.EEPZ.Business.Services.Interfaces;
  
@@ -33,9 +33,7 @@ namespace Relevantz.EEPZ.Api.Tests.Controllers
             _serviceMock.VerifyNoOtherCalls();
         }
  
-        // ========================================================
-        // APPROVED NOMINATIONS
-        // ========================================================
+        
         [Test]
         public async Task GetApprovedNominationsByDeptHead_ReturnsOk_WhenSuccessTrue()
         {
@@ -88,9 +86,7 @@ namespace Relevantz.EEPZ.Api.Tests.Controllers
             });
         }
  
-        // ========================================================
-        // NOMINATION DETAILS
-        // ========================================================
+      
         [Test]
         public async Task GetNominationDetails_ReturnsOk_WhenSuccessTrue()
         {
@@ -143,9 +139,7 @@ namespace Relevantz.EEPZ.Api.Tests.Controllers
             });
         }
  
-        // ========================================================
-        // DEPARTMENT STATISTICS
-        // ========================================================
+        
         [Test]
         public async Task GetDepartmentStatistics_ReturnsOk_WhenSuccessTrue()
         {
