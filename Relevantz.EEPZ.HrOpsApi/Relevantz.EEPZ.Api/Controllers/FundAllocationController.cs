@@ -503,24 +503,31 @@ namespace Relevantz.EEPZ.Api.Controllers
             EEPZBusinessLog.LogBusinessInformation("Utilization updated successfully for allocation {AllocationId}", request.AllocationId);
             return Ok(result);
         }
+        
         /// <summary>
-        /// Retrieves all fund allocations associated with a specific department budget.
-        /// </summary>
-        /// <param name="budgetId">The budget identifier.</param>
-        /// <returns>200 OK with allocation list</returns>
-        [HttpGet("by-budget/{budgetId}")]
-        public async Task<IActionResult> GetFundAllocationsByBudget(int budgetId)
-        {
-            EEPZBusinessLog.LogBusinessInformation("Retrieving fund allocations for budget {BudgetId}", budgetId);
+/// Retrieves all fund allocations associated with a specific department budget.
+/// </summary>
+/// <param name="budgetId">The budget identifier.</param>
+/// <returns>
+/// 200 OK with allocation list,
+/// 500 Internal Server Error on failure.
+/// </returns>
+[HttpGet("by-budget/{budgetId}")]
+public async Task<IActionResult> GetAllocationsByBudget(int budgetId)
+{
+    EEPZBusinessLog.LogBusinessInformation("Retrieving allocations for budget {BudgetId}", budgetId);
 
-            var result = await _fundAllocationService.GetFundAllocationsByBudgetAsync(budgetId);
+    var result = await _departmentBudgetService.GetAllocationsByBudgetAsync(budgetId);
 
-            EEPZBusinessLog.LogBusinessInformation("Retrieved {Count} fund allocations for budget {BudgetId}",
-                result.Data?.Count ?? 0, budgetId);
-            return Ok(result);
-        }
+    EEPZBusinessLog.LogBusinessInformation("Retrieved {Count} allocations for budget {BudgetId}",
+        result.Data?.Count ?? 0, budgetId);
+    
+    return Ok(result);
+}
 
-
-        #endregion
+#endregion
     }
 }
+
+        
+
