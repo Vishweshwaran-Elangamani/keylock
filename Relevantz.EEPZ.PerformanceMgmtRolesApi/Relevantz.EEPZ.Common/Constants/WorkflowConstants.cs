@@ -24,8 +24,8 @@ namespace Relevantz.EEPZ.Common.Constants
 
     public static class ReviewerRoles
     {
-        public const string Reviewer = "Reviewer";  // L2
-        public const string Approver = "Approver";  // L1
+        public const string Reviewer = "Reviewer";  
+        public const string Approver = "Approver";  
     }
 
     public static class ResponseStatuses

@@ -61,7 +61,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             var scopeAssessmentIds = await GetScopeAssessmentIdsForReviewerAsync(l2EmployeeId);
             if (!scopeAssessmentIds.Any()) return Enumerable.Empty<ApproverAssignmentRowDto>();
 
-            // Exclude assessments that are fully decided by L2 already
             var latestL2Decisions = await GetLatestDecisionDetailIdsByReviewerAsync();
             var fullyDecidedAssessmentIds = await GetFullyDecidedAssessmentIdsAsync(scopeAssessmentIds, latestL2Decisions);
             var visibleAssessmentIds = scopeAssessmentIds.Except(fullyDecidedAssessmentIds).ToList();
@@ -83,7 +82,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             var scopeAssessmentIds = await GetScopeAssessmentIdsForReviewerAsync(l2EmployeeId);
             if (!scopeAssessmentIds.Any()) return Enumerable.Empty<ApproverAssignmentRowDto>();
 
-            // Assessments having any L2 decision (Approved/Rejected) on any detail
             var assessmentsWithL2Decision = await _ctx.Assessmentreviews
                 .Where(ar => ar.ReviewerRole == nameof(ReviewerRole.Reviewer)
                              && (ar.ReviewStatus == nameof(ReviewStatus.Approved)
@@ -114,11 +112,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             var scopeAssessmentIds = await GetScopeAssessmentIdsForReviewerAsync(l2EmployeeId);
             if (!scopeAssessmentIds.Any()) return Enumerable.Empty<ReviewerAssessmentViewDto>();
 
-            // L1 (Approver) must be fully complete for all details (Approved & with Rating != 0)
             var l1CompleteAssessmentIds = await GetAssessmentsWhereL1IsCompleteAsync(scopeAssessmentIds);
             if (!l1CompleteAssessmentIds.Any()) return Enumerable.Empty<ReviewerAssessmentViewDto>();
 
-            // Exclude assessments that already have any L2 decision (Approved/Rejected)
             var assessmentsWithL2Decision = await _ctx.Assessmentreviews
                 .Where(ar => ar.ReviewerRole == nameof(ReviewerRole.Reviewer)
                              && (ar.ReviewStatus == nameof(ReviewStatus.Approved)
@@ -220,7 +216,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
             var finalDecision = approved ? nameof(ReviewStatus.Approved) : nameof(ReviewStatus.Rejected);
 
-            // Update all existing L2 reviews with ratings for these details
             var reviewsToUpdate = await _ctx.Assessmentreviews
                 .Where(ar => ar.ReviewerRole == nameof(ReviewerRole.Reviewer)
                              && ar.ReviewerId == reviewerUserId
@@ -240,7 +235,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
             if (rejected)
             {
-                // Add or update a rating==0 note for the decision at least on one detail
                 var note = reviewerComment ?? FormattingConstants.DefaultRejectionNote;
                 var firstDetailId = detailIds.First();
 
@@ -274,7 +268,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
             else
             {
-                // Clean-up any previous rating==0 notes for these details if approved
                 var notesToDelete = await _ctx.Assessmentreviews
                     .Where(ar => ar.ReviewerRole == nameof(ReviewerRole.Reviewer)
                                  && ar.ReviewerId == reviewerUserId
@@ -286,7 +279,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
             await _ctx.SaveChangesAsync();
 
-            // Mark FormProgressTracker if exists (no local try/catch; rely on global handler)
             var assessment = await _ctx.Selfassessments.FirstOrDefaultAsync(a => a.AssessmentId == assessmentId);
             if (assessment != null)
             {
@@ -351,7 +343,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
         public async Task<ReviewerDecisionDto?> GetLatestReviewerDecisionAsync(int assessmentId)
         {
-            // FIX: Properly filter by assessmentId via join to Assessmentdetails
             var decision = await _ctx.Assessmentreviews
                 .Where(ar => ar.ReviewerRole == nameof(ReviewerRole.Reviewer) && ar.Rating == 0)
                 .Join(_ctx.Assessmentdetails,
@@ -524,7 +515,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             var approver = nameof(ReviewerRole.Approver);
             var approved = nameof(ReviewStatus.Approved);
 
-            // For each detail, ensure there exists an Approver review with rating != 0 and Approved status
             var perDetail = await _ctx.Assessmentdetails
                 .Where(ad => scopeAssessmentIds.Contains(ad.AssessmentId))
                 .GroupJoin(
@@ -586,7 +576,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 ? $"{userProfile.FirstName} {userProfile.LastName}".Trim()
                 : (string.IsNullOrWhiteSpace(userAuth?.Email) ? employee.EmployeeCompanyId : userAuth.Email);
 
-            // Latest L1 and L2 reviews per DetailId
             var latestL1 = await _ctx.Assessmentreviews
                 .Where(ar => ar.ReviewerRole == nameof(ReviewerRole.Approver))
                 .GroupBy(ar => ar.DetailId)
