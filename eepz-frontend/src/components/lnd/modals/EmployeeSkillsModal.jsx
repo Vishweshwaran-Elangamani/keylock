@@ -130,7 +130,6 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
         approval.status === APPROVAL_STATUS.PENDING
       ) {
         try {
-          // Try to parse notes as JSON
           const notes = JSON.parse(approval.notes || "{}");
           return notes.MenteeEmployeeId === employee.employeeId;
         } catch (error) {
@@ -183,9 +182,8 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
         setShowConfirmModal(false);
         setSkillToDelete(null);
         fetchEmployeeSkills();
-        fetchApprovalHistory(); 
-      fetchTeamAssignments();
-        
+        fetchApprovalHistory();
+        fetchTeamAssignments();
       } else {
         toast.error(response.data.message || LND_TOASTS.FAILED_TO_DELETE_SKILL);
       }
@@ -202,8 +200,8 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
     setShowRecordModal(false);
     setSelectedSkill(null);
     fetchEmployeeSkills();
-    fetchApprovalHistory();  
-      fetchTeamAssignments();
+    fetchApprovalHistory();
+    fetchTeamAssignments();
   };
 
   const handleOpenRequestSme = (skill) => {

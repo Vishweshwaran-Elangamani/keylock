@@ -21,8 +21,6 @@ const Pagination = ({
   // Derived navigation states
   const hasPreviousPage = currentPage > 1;
   const hasNextPage = currentPage < totalPages;
-
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (

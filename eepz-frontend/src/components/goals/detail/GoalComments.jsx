@@ -26,7 +26,7 @@ const GoalComments = ({
   const [filter, setFilter] = useState("all");
   const [sortOrder, setSortOrder] = useState("desc");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [characterCount, setCharacterCount] = useState(0);  
+  const [characterCount, setCharacterCount] = useState(0);
   const MAX_CHARS = 1000;
   const isManagerOrDeptHead =
     user.role === "Manager" || user.role === "Department Head";
@@ -56,7 +56,7 @@ const GoalComments = ({
     } finally {
       setLoading(false);
     }
-  };          
+  };
 
   const handleCommentChange = (e) => {
     const value = e.target.value;

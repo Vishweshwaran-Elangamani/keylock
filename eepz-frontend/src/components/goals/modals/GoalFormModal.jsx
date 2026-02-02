@@ -46,7 +46,6 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
   const [assigneeSearchTerm, setAssigneeSearchTerm] = useState("");
   const assigneeDropdownRef = useRef(null);
 
-  // Custom dropdown states
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [showProjectDropdown, setShowProjectDropdown] = useState(false);
   const typeDropdownRef = useRef(null);
@@ -598,7 +597,6 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
     return project ? project.projectName : "Select Project";
   };
 
-  // Goal type options
   const goalTypeOptions = [
     { value: GOAL_TYPES.SELF, label: GOAL_TYPE_LABELS[GOAL_TYPES.SELF] },
     ...(canSelectTeamType

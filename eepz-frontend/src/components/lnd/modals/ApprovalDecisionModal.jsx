@@ -59,9 +59,7 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
   ];
 
   const hasAttachment = approval.attachmentPath || approval.attachmentFileName;
-
   let canPreview = false;
-
   if (hasAttachment) {
     if (extension) {
       if (nonPreviewableExtensions.includes(extension)) {
@@ -217,7 +215,6 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
 
     const isSmeRequest = approval.approvalType === APPROVAL_TYPE.SME_REQUEST;
     const notesToSend = isSmeRequest ? approval.notes || "" : notes.trim();
-
     if (!isSmeRequest && !notesToSend) {
       toast.error(LND_TOASTS.PROVIDE_NOTES_MESSAGE);
       return;
@@ -413,7 +410,6 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
                   </div>
                 )}
               </div>
-
               {/* Footer */}
               <div className={styles.footer}>
                 <button

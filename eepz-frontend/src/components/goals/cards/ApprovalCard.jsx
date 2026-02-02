@@ -69,9 +69,7 @@ const ApprovalCard = ({ approval, onDecide, canDecide = true, onRefresh }) => {
         </div>
 
         {/* Goal Title */}
-        <h5 className={styles.goalTitle}>
-          {approval.goalTitle}
-        </h5>
+        <h5 className={styles.goalTitle}>{approval.goalTitle}</h5>
 
         {/* Requester Info */}
         <div className={styles.requesterInfo}>
@@ -79,9 +77,7 @@ const ApprovalCard = ({ approval, onDecide, canDecide = true, onRefresh }) => {
             {getInitials(approval.requesterName)}
           </div>
           <div>
-            <div className={styles.requesterName}>
-              {approval.requesterName}
-            </div>
+            <div className={styles.requesterName}>{approval.requesterName}</div>
             <div className={styles.requestedDate}>
               <i className="bi bi-clock me-1"></i>
               Requested {formatDate(approval.requestedOn)}
@@ -118,7 +114,9 @@ const ApprovalCard = ({ approval, onDecide, canDecide = true, onRefresh }) => {
 
         {/* No Attachments Warning (for completion approvals) */}
         {!hasAttachments && approval.approvalType === "completion" && (
-          <div className={`alert alert-warning mb-3 ${styles.noAttachmentsWarning}`}>
+          <div
+            className={`alert alert-warning mb-3 ${styles.noAttachmentsWarning}`}
+          >
             <i className="bi bi-exclamation-triangle me-2"></i>
             No proof attachments submitted
           </div>
@@ -157,9 +155,11 @@ const ApprovalCard = ({ approval, onDecide, canDecide = true, onRefresh }) => {
 
         {/* Already Decided - Success/Rejected State */}
         {approval.approvalStatus !== "pending" && (
-          <div className={`alert alert-${
-            approval.approvalStatus === "approved" ? "success" : "danger"
-          } mb-0 ${styles.decisionAlert}`}>
+          <div
+            className={`alert alert-${
+              approval.approvalStatus === "approved" ? "success" : "danger"
+            } mb-0 ${styles.decisionAlert}`}
+          >
             <div className={styles.decisionAlertContent}>
               <i
                 className={`bi bi-${

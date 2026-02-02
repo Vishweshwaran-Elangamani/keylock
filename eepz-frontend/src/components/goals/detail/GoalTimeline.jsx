@@ -1,4 +1,3 @@
-// GoalTimeline.jsx
 import { useState, useEffect } from "react";
 import goalService from "../../../services/goals/goalService";
 import Alert from "../common/Alert";
@@ -162,7 +161,9 @@ const GoalTimeline = ({ goalId }) => {
 
       <div className={`card ${styles.card}`}>
         <div className={styles.header}>
-          <div className={`d-flex justify-content-between align-items-center flex-wrap gap-3 ${styles.headerContent}`}>
+          <div
+            className={`d-flex justify-content-between align-items-center flex-wrap gap-3 ${styles.headerContent}`}
+          >
             <h6 className={`mb-0 ${styles.title}`}>
               <i className="bi bi-clock-history me-2"></i>
               Timeline
@@ -177,7 +178,11 @@ const GoalTimeline = ({ goalId }) => {
                   <button
                     key={type.value}
                     type="button"
-                    className={`btn ${filter === type.value ? "btn-primary" : "btn-outline-secondary"} ${styles.filterBtn}`}
+                    className={`btn ${
+                      filter === type.value
+                        ? "btn-primary"
+                        : "btn-outline-secondary"
+                    } ${styles.filterBtn}`}
                     onClick={() => setFilter(type.value)}
                   >
                     <i className={`bi ${type.icon} me-1`}></i>
@@ -217,21 +222,32 @@ const GoalTimeline = ({ goalId }) => {
                     key={`${event.timestamp}-${index}`}
                     className={styles.eventWrapper}
                   >
-                    <div 
-                      className={`${styles.eventIcon} ${styles[event.type] || ''}`}
+                    <div
+                      className={`${styles.eventIcon} ${
+                        styles[event.type] || ""
+                      }`}
                       style={{ backgroundColor: eventColor }}
                     >
-                      <i className={`bi ${eventIcon}`} ></i>
+                      <i className={`bi ${eventIcon}`}></i>
                     </div>
 
-                    <div 
+                    <div
                       className={`card ${styles.eventCard}`}
-                      onMouseEnter={(e) => e.currentTarget.classList.add(styles.hover)}
-                      onMouseLeave={(e) => e.currentTarget.classList.remove(styles.hover)}
+                      onMouseEnter={(e) =>
+                        e.currentTarget.classList.add(styles.hover)
+                      }
+                      onMouseLeave={(e) =>
+                        e.currentTarget.classList.remove(styles.hover)
+                      }
                     >
                       <div className={`card-body ${styles.eventCardBody}`}>
-                        <div className={`d-flex justify-content-between align-items-start mb-2 ${styles.eventHeader}`}>
-                          <h6 className={styles.eventTitle} style={{ color: eventColor }}>
+                        <div
+                          className={`d-flex justify-content-between align-items-start mb-2 ${styles.eventHeader}`}
+                        >
+                          <h6
+                            className={styles.eventTitle}
+                            style={{ color: eventColor }}
+                          >
                             {eventTitle}
                           </h6>
                           <small
@@ -244,9 +260,13 @@ const GoalTimeline = ({ goalId }) => {
                         </div>
 
                         {event.userName && (
-                          <div className={`d-flex align-items-center gap-2 mb-2 ${styles.eventUser}`}>
+                          <div
+                            className={`d-flex align-items-center gap-2 mb-2 ${styles.eventUser}`}
+                          >
                             <i className="bi bi-person-circle"></i>
-                            <span className={styles.eventUserName}>{event.userName}</span>
+                            <span className={styles.eventUserName}>
+                              {event.userName}
+                            </span>
                           </div>
                         )}
 
@@ -258,24 +278,24 @@ const GoalTimeline = ({ goalId }) => {
 
                         {event.metadata &&
                           Object.keys(event.metadata).length > 0 && (
-                          <div className={styles.metadataSection}>
-                            <div className="row g-2">
-                              {Object.entries(event.metadata).map(
-                                ([key, value]) => (
-                                  <div key={key} className="col-md-6">
-                                    <div className={styles.metadataLabel}>
-                                      <i className="bi bi-info-circle me-1"></i>
-                                      {formatMetadataKey(key)}
+                            <div className={styles.metadataSection}>
+                              <div className="row g-2">
+                                {Object.entries(event.metadata).map(
+                                  ([key, value]) => (
+                                    <div key={key} className="col-md-6">
+                                      <div className={styles.metadataLabel}>
+                                        <i className="bi bi-info-circle me-1"></i>
+                                        {formatMetadataKey(key)}
+                                      </div>
+                                      <div className={styles.metadataValue}>
+                                        {formatMetadataValue(key, value)}
+                                      </div>
                                     </div>
-                                    <div className={styles.metadataValue}>
-                                      {formatMetadataValue(key, value)}
-                                    </div>
-                                  </div>
-                                )
-                              )}
+                                  )
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
                       </div>
                     </div>
                   </div>

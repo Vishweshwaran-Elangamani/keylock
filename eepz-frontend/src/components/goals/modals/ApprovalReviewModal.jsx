@@ -635,7 +635,9 @@ const ApprovalReviewModal = ({
                                   )} ${styles.attachmentIcon}`}
                                 ></i>
                                 <div className="flex-grow-1">
-                                  <div className={`fw-semibold mb-1 ${styles.attachmentTitle}`}>
+                                  <div
+                                    className={`fw-semibold mb-1 ${styles.attachmentTitle}`}
+                                  >
                                     {attachment.attachmentTitle}
                                   </div>
                                   <div className="text-muted small">

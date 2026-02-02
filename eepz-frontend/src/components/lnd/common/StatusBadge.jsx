@@ -26,7 +26,7 @@ const StatusBadge = ({ status }) => {
         whiteSpace: 'nowrap'
       }}
     >
-      {Icon && <Icon size={14} />}  {/* Changed from {Icon} to <Icon /> */}
+      {Icon && <Icon size={14} />}  
       {config.label}
     </span>
   );

@@ -90,11 +90,10 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
   const [fetchingEmployees, setFetchingEmployees] = useState(true);
   const [fetchingSkills, setFetchingSkills] = useState(false);
   const [allSkillsLoaded, setAllSkillsLoaded] = useState(false);
-  // Confirmation modal state
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [pendingSubmit, setPendingSubmit] = useState(null);
   const isEditMode = !!skill?.mapperId;
-  // Load employees and all skills on mount
+
   useEffect(() => {
     fetchEmployees();
     if (!isEditMode) {
@@ -106,7 +105,7 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
       fetchEmployeeSkills();
     }
   }, [allSkillsLoaded]);
-  // Load available skills when employee is selected AND all skills are loaded
+
   useEffect(() => {
     if (selectedEmployeeId && !isEditMode && allSkillsLoaded) {
       fetchEmployeeSkills();

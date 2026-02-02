@@ -1,4 +1,4 @@
-// GoalChecklist.jsx
+// GoalChecklist
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../contexts/auth/AuthContext";
 import goalService from "../../../services/goals/goalService";
@@ -289,7 +289,8 @@ const GoalChecklist = ({
       if (onProgressChange) {
         onProgressChange(goal.progressPercent || 0);
       }
-      setAlert({        type: "danger",
+      setAlert({
+        type: "danger",
         message: error.response?.data?.message || "Failed to update checklist",
       });
       setPendingToggle(null);
@@ -448,7 +449,9 @@ const GoalChecklist = ({
       )}
 
       {/* Description Section */}
-      <div className={`goal-card-header d-flex justify-content-between align-items-center ${styles.descriptionHeader}`}>
+      <div
+        className={`goal-card-header d-flex justify-content-between align-items-center ${styles.descriptionHeader}`}
+      >
         <div>
           <i className="bi bi-file-text me-2"></i>
           Description
@@ -457,7 +460,9 @@ const GoalChecklist = ({
             isUserAcknowledged ||
             isGoalOverdue ||
             canViewAsManager) && (
-            <span className={`badge bg-secondary text-white ms-2 ${styles.badgeLocked}`}>
+            <span
+              className={`badge bg-secondary text-white ms-2 ${styles.badgeLocked}`}
+            >
               <i className="bi bi-lock-fill me-1"></i>
               {isCompleted
                 ? "View Only"
@@ -535,7 +540,9 @@ const GoalChecklist = ({
           isUserAcknowledged ||
           isGoalOverdue ||
           canViewAsManager) && (
-          <span className={`badge bg-secondary text-white ms-2 ${styles.badgeLockedSm}`}>
+          <span
+            className={`badge bg-secondary text-white ms-2 ${styles.badgeLockedSm}`}
+          >
             <i className="bi bi-lock-fill me-1"></i>
             {isCompleted
               ? "View Only"
@@ -552,7 +559,10 @@ const GoalChecklist = ({
       <div className={`card-body ${styles.checklistBody}`}>
         {totalDisplayedItems === 0 ? (
           <div className={styles.emptyState}>
-            <i className="bi bi-inbox" style={{ fontSize: "3rem", opacity: 0.3 }}></i>
+            <i
+              className="bi bi-inbox"
+              style={{ fontSize: "3rem", opacity: 0.3 }}
+            ></i>
             <p className="mt-3 mb-0" style={{ fontWeight: 500 }}>
               No checklist items
             </p>
@@ -563,16 +573,18 @@ const GoalChecklist = ({
         ) : isGrouped ? (
           Object.entries(displayedChecklist).map(([assigneeId, group]) => (
             <div key={assigneeId} className="mb-3">
-              <div className={`${styles.groupHeader} ${group.isCurrentUser ? styles.currentUserHeader : ""}`}>
+              <div
+                className={`${styles.groupHeader} ${
+                  group.isCurrentUser ? styles.currentUserHeader : ""
+                }`}
+              >
                 <i
                   className={`bi ${
                     group.isCurrentUser ? "bi-person-fill" : "bi-person-badge"
                   } text-primary`}
                 ></i>
                 <span className="fw-semibold">
-                  {group.isCurrentUser
-                    ? "Your Tasks"
-                    : `${group.name}'s Tasks`}
+                  {group.isCurrentUser ? "Your Tasks" : `${group.name}'s Tasks`}
                 </span>
                 <span className="badge bg-secondary ms-auto">
                   {
@@ -657,7 +669,6 @@ const GoalChecklist = ({
   );
 };
 
-// Checklist Item Component
 const ChecklistItem = ({ item, isDisabled, onToggle, isLast = false }) => {
   const isItemCompleted = Boolean(item.isCompletedForCurrentUser);
 
@@ -691,12 +702,20 @@ const ChecklistItem = ({ item, isDisabled, onToggle, isLast = false }) => {
         </div>
 
         <div className={styles.content}>
-          <div className={`${styles.title} ${isItemCompleted ? styles.strikethrough : ""}`}>
+          <div
+            className={`${styles.title} ${
+              isItemCompleted ? styles.strikethrough : ""
+            }`}
+          >
             {item.title}
           </div>
 
           {item.description && (
-            <div className={`${styles.description} ${isItemCompleted ? styles.strikethrough : ""}`}>
+            <div
+              className={`${styles.description} ${
+                isItemCompleted ? styles.strikethrough : ""
+              }`}
+            >
               {item.description}
             </div>
           )}
@@ -714,4 +733,3 @@ const ChecklistItem = ({ item, isDisabled, onToggle, isLast = false }) => {
 };
 
 export default GoalChecklist;
-

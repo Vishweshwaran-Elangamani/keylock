@@ -1,4 +1,3 @@
-// GoalFilters.jsx
 import { useState, useRef, useEffect } from "react";
 import {
   GOAL_STATUS,

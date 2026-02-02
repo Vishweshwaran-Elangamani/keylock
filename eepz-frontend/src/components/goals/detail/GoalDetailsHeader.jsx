@@ -250,7 +250,7 @@ const GoalDetailsHeader = ({
     <div className={`card d-flex mb-3 ${styles.card}`}>
       <div className={`card-body ${styles.cardBody}`}>
         <div className="row">
-          {/* Left Section - Title, Progress, Actions */}
+          {/* Title, Progress, Actions */}
           <div className="col-lg-7 col-md-12">
             {/* Badges */}
             <div
@@ -276,7 +276,6 @@ const GoalDetailsHeader = ({
 
             {/* Title */}
             <h4 className={`mb-3 ${styles.title}`}>{goal.title}</h4>
-
             {/* Progress Section */}
             <div className="mb-3">
               {isEmployeeAssignee ? (

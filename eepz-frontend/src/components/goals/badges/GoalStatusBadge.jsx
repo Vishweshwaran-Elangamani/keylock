@@ -3,7 +3,6 @@ import {
   STATUS_LABELS,
 } from "../../../constants/goals/goalConstants";
 
-// Icon map with PascalCase status keys
 const ICON_MAP = {
   Pending: "bi-clock",
   Open: "bi-folder2-open",
@@ -34,11 +33,9 @@ const SIZE_CONFIG = {
   },
 };
 
-// Badge styling with animations for special states
 const GetStatusStyle = (status) => {
   const statusLower = status?.toLowerCase() || "";
 
-  // Special animations for status states
   if (statusLower === "closed") {
     return {
       boxShadow: "0 2px 6px rgba(220, 53, 69, 0.25)",

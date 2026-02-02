@@ -97,7 +97,6 @@ const UploadProofModal = ({ assignment, onClose, onSuccess }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           <form onSubmit={handleSubmit}>
             <div className={styles.body}>
               {/* Assignment Info */}

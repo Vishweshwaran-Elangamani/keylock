@@ -17,8 +17,8 @@ const RequestReopenModal = ({ assignment, onClose, onSuccess }) => {
 
       if (response.data.success) {
         toast.success("Reopen request submitted successfully!");
-        onSuccess(); // Call the onSuccess function to refresh the assignments list
-        onClose(); // Close the modal
+        onSuccess();
+        onClose(); 
       } else {
         toast.error("Failed to submit reopen request.");
       }

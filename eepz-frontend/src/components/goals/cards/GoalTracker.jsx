@@ -56,9 +56,7 @@ const GoalTracker = ({ summary }) => {
     <div className="row g-3 mb-4">
       {cards.map((card) => (
         <div key={card.key} className="col-12 col-md-6 col-lg">
-          <div
-            className={`card h-100 ${styles.card} ${styles[card.variant]}`}
-          >
+          <div className={`card h-100 ${styles.card} ${styles[card.variant]}`}>
             <div className={`card-body ${styles.cardBody}`}>
               <div className="d-flex justify-content-between align-items-start">
                 <div>

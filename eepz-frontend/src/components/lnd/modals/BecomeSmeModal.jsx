@@ -32,12 +32,10 @@ const BecomeSmeModal = ({ skill, onClose, onSuccess }) => {
   };
 
   const handleFileChange = (selectedFile) => {
-    // Validate file size
     if (selectedFile.size > FILE_UPLOAD.MAX_SIZE) {
       toast.error(LND_TOASTS.FILE_SIZE_MESSAGE);
       return;
     }
-
     // Validate file type
     if (!FILE_UPLOAD.ALLOWED_TYPES.includes(selectedFile.type)) {
       toast.error(LND_TOASTS.FILE_TYPE_MESSAGE);
@@ -175,7 +173,6 @@ const BecomeSmeModal = ({ skill, onClose, onSuccess }) => {
                 )}
               </div>
             </div>
-
             {/* Footer */}
             <div className={styles.footer}>
               <button
