@@ -17,9 +17,13 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
  
 using Serilog;
- 
-using Relevantz.EEPZ.Data.DBContexts; 
- 
+using Relevantz.EEPZ.Data.Repository;
+using Relevantz.EEPZ.Core.Services;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Diagnostics;
+
+// ADDED (metrics)
 using Prometheus;
  
 var builder = WebApplication.CreateBuilder(args);
@@ -144,26 +148,17 @@ builder.Services.AddAuthentication(o =>
         }
     };
 });
- 
 
-// Authorization — secure-by-default (+ optional MFA policy)
+builder.Services.AddAuthorization();
+builder.Services.AddScoped<DbContext>(sp => sp.GetRequiredService<EEPZDbContext>());
 
-builder.Services.AddAuthorization(options =>
-{
-    options.FallbackPolicy = new AuthorizationPolicyBuilder()
-        .RequireAuthenticatedUser()
-        .Build();
- 
-    options.AddPolicy("RequireMfa", p => p.RequireClaim("mfa", "true"));
-});
- 
+builder.Services.AddScoped<IHRNominationRepository, HRNominationRepository>();
+builder.Services.AddScoped<IHRNominationService, HRNominationService>();
+builder.Services.AddScoped<IManagerNominationRepository, ManagerNominationRepository>();
+builder.Services.AddScoped<IManagerNominationService, ManagerNominationService>();
+builder.Services.AddScoped<IEmployeeNominationRepository, EmployeeNominationRepository>();
+builder.Services.AddScoped<IEmployeeNominationService, EmployeeNominationService>();
 
-DiRegistration.RegisterByConvention(builder.Services,
-    "Relevantz.EEPZ.Core",
-    "Relevantz.EEPZ.Data");
- 
-
-var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("DevCors", p => p
@@ -208,8 +203,8 @@ builder.Services.Configure<FormOptions>(o =>
 builder.Services.AddHealthChecks()
     .AddCheck("self", () => HealthCheckResult.Healthy("App is running"), tags: new[] { "live" })
     .AddCheck<MySqlDbHealthCheck>("mysql-db", tags: new[] { "ready", "db", "mysql" });
- 
 
+//  Register custom exception handling middleware (added)
 builder.Services.AddTransient<Relevantz.EEPZ.Api.Middleware.ExceptionHandlingMiddleware>();
  
 var app = builder.Build();
@@ -219,55 +214,10 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
-else
-{
-    app.UseHsts();
-}
- 
 
-app.Use(async (ctx, next) =>
-{
-    ctx.Response.Headers.Remove("Server");
-    ctx.Response.Headers["X-Content-Type-Options"] = "nosniff";
-    ctx.Response.Headers["X-Frame-Options"] = "DENY";
-    ctx.Response.Headers["Referrer-Policy"] = "no-referrer";
-    ctx.Response.Headers["Permissions-Policy"] = "geolocation=(), camera=(), microphone=()";
- 
-    var isSwagger = ctx.Request.Path.StartsWithSegments("/swagger") || string.Equals(ctx.Request.Path, "/");
-    if (!isSwagger)
-        ctx.Response.Headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'; base-uri 'none'";
- 
-    await next();
-});
- 
-
-
-app.UseRateLimiter();
- 
-
-app.UseHttpMetrics();
-app.MapMetrics("/metrics");
- 
-
-app.UseSerilogRequestLogging(options =>
-{
-    options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
-    options.GetLevel = (httpContext, elapsed, ex) =>
-        ex != null || httpContext.Response.StatusCode >= 500
-            ? Serilog.Events.LogEventLevel.Error
-            : httpContext.Response.StatusCode >= 400
-                ? Serilog.Events.LogEventLevel.Warning
-                : Serilog.Events.LogEventLevel.Information;
- 
-    options.EnrichDiagnosticContext = (diag, ctx) =>
-    {
-        diag.Set("RequestHost", ctx.Request.Host.Value);
-        diag.Set("RequestScheme", ctx.Request.Scheme);
-        diag.Set("RemoteIP", ctx.Connection.RemoteIpAddress?.ToString());
-        diag.Set("CorrelationId", ctx.TraceIdentifier);
-    };
-});
- 
+//  Removed: Inline UseExceptionHandler block
+//  Add custom exception handling middleware early in the pipeline (added)
+app.UseMiddleware<Relevantz.EEPZ.Api.Middleware.ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
  
