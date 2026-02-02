@@ -14,7 +14,7 @@ import {
   YAxis
 } from "recharts";
 import CountUp from "react-countup";
-import { Users, Target, Shield, TrendingUp, Calendar, AlertTriangle, Briefcase, Award } from "lucide-react";
+import { Users, Target, Shield, TrendingUp, Calendar, AlertTriangle, Briefcase, Award, ChevronDown, ChevronUp } from "lucide-react";
 import goalService from "../../services/goals/goalService";
 import lndService from "../../services/lnd/lndService";
 import { getTeamMembers, getMyNominations } from "../../services/performancemanagement/manager/managernominationapi";
@@ -24,10 +24,7 @@ import slaService from "../../services/sla/slaService";
 import internalOpportunityService from "../../services/internal/internalOpportunityService";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
-
-
 import "../../styles/auth/ManagerDashboard.css";
-
 
 const formatStatusLabel = (raw) => {
   if (!raw) return "";
@@ -35,11 +32,12 @@ const formatStatusLabel = (raw) => {
   return lower.replace(/\b\w/g, (c) => c.toUpperCase());
 };
 
-
 const ManagerDashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [goalType, setGoalType] = useState("team");
+  const [showAllNominations, setShowAllNominations] = useState(false);
+  const [showAllOpportunities, setShowAllOpportunities] = useState(false);
   const [dashboardData, setDashboardData] = useState({
     dashboardSummary: null,
     allGoals: [],
@@ -55,18 +53,14 @@ const ManagerDashboard = () => {
     opportunities: []
   });
 
-
   const BLUE_COLORS = ["#1E40AF", "#3B82F6", "#60A5FA", "#93C5FD", "#DBEAFE", "#2563EB"];
 
-
   useEffect(() => { fetchAllData(); }, []);
-
 
   const getUserData = () => {
     try { return JSON.parse(localStorage.getItem("user")); }
     catch { return null; }
   };
-
 
   const extractData = (response) => {
     if (!response) return [];
@@ -75,7 +69,6 @@ const ManagerDashboard = () => {
     const paths = [data?.data?.items, data?.data?.$values, data?.data, data?.items, data?.$values, data];
     return paths.find(p => Array.isArray(p)) || [];
   };
-
 
   const fetchAllData = async () => {
     try {
@@ -87,9 +80,7 @@ const ManagerDashboard = () => {
         return;
       }
 
-
       const managerId = user.empMasterId || user.employeeMasterId || user.id;
-
 
       const [
         dashboardSummaryRes, 
@@ -117,9 +108,7 @@ const ManagerDashboard = () => {
         internalOpportunityService.getActiveOpportunities().catch(() => ({ data: [] }))
       ]);
 
-
       const allGoalsExtracted = extractData(allGoalsRes);
-
 
       const extractedSelfGoals = allGoalsExtracted.filter((g) => {
         const title = (g.title || "").toLowerCase();
@@ -127,13 +116,11 @@ const ManagerDashboard = () => {
         return title.includes("self") || title.includes("personal") || type === "self";
       });
 
-
       const extractedTeamGoals = allGoalsExtracted.filter((g) => {
         const title = (g.title || "").toLowerCase();
         const type = (g.goalType || g.type || "").toLowerCase();
         return (title.includes("team") || type === "team") && !title.includes("self") && !title.includes("personal");
       });
-
 
       const extractedOrgGoals = allGoalsExtracted.filter((g) => {
         const title = (g.title || "").toLowerCase();
@@ -141,18 +128,13 @@ const ManagerDashboard = () => {
         return title.includes("org") || type === "org" || type === "organization";
       });
 
-
       const allGoalsCombined = [
         ...extractedSelfGoals.map((g) => ({ ...g, goalType: "self" })),
         ...extractedTeamGoals.map((g) => ({ ...g, goalType: "team" })),
         ...extractedOrgGoals.map((g) => ({ ...g, goalType: "org" }))
       ];
 
-
       const allMeetings = myMeetingsRes?.data?.meetings || [];
-
-      console.log('Total Meetings Retrieved:', allMeetings.length);
-      console.log('First Meeting:', allMeetings[0]);
 
       const oneOnOneReports = allMeetings.filter(m => {
         const title = (m.title || m.meetingTitle || m.subject || '').toLowerCase();
@@ -170,13 +152,7 @@ const ManagerDashboard = () => {
                description.includes('1:1');
       });
 
-
-      console.log('Total Meetings:', allMeetings.length);
-      console.log('One-on-one Meetings:', oneOnOneReports.length);
-
       const opportunities = extractData(opportunitiesRes);
-      console.log('Opportunities data:', opportunities);
-
 
       setDashboardData({
         dashboardSummary: dashboardSummaryRes?.data || null,
@@ -200,7 +176,6 @@ const ManagerDashboard = () => {
     }
   };
 
-
   const getKPIStats = () => {
     const totalTeamMembers = dashboardData.subordinateEmployees.length || dashboardData.teamMembers.length;
     const totalNominations = dashboardData.managerNominations.length;
@@ -209,15 +184,12 @@ const ManagerDashboard = () => {
       return status === "inprogress" || status === "pending" || status === "approved" || status === "open";
     }).length;
 
-
     const pendingEscalations = dashboardData.managerEscalations.filter((e) => e.escalationStatus?.toLowerCase() === "pending").length;
-
 
     const upcomingMeetings = dashboardData.myMeetings.filter((m) => {
       const meetingDate = new Date(m.meetingDate || m.date);
       return meetingDate > new Date();
     }).length;
-
 
     return {
       totalTeamMembers,
@@ -232,7 +204,6 @@ const ManagerDashboard = () => {
     };
   };
 
-
   const getGoalsByType = () => {
     const goals = dashboardData.allGoals.filter((g) => {
       const goalTypeLower = (g.goalType || g.type || "").toLowerCase();
@@ -242,11 +213,9 @@ const ManagerDashboard = () => {
       return false;
     });
 
-
     if (!goals || goals.length === 0) {
       return { total: 0, completed: 0, inProgress: 0, pending: 0, chartData: [] };
     }
-
 
     const completed = goals.filter((g) => (g.status || g.goalStatus || "").toLowerCase() === "completed").length;
     const inProgress = goals.filter((g) => (g.status || g.goalStatus || "").toLowerCase() === "inprogress").length;
@@ -255,17 +224,14 @@ const ManagerDashboard = () => {
       return status === "pending" || status === "open" || status === "approved";
     }).length;
 
-
     const chartData = [
       completed > 0 && { name: "Completed", value: completed, fill: BLUE_COLORS[0] },
       inProgress > 0 && { name: "In Progress", value: inProgress, fill: BLUE_COLORS[1] },
       pending > 0 && { name: "Pending", value: pending, fill: BLUE_COLORS[2] }
     ].filter(Boolean);
 
-
     return { total: goals.length, completed, inProgress, pending, chartData };
   };
-
 
   const getOpportunitiesOverview = () => {
     const opportunities = dashboardData.opportunities;
@@ -299,7 +265,6 @@ const ManagerDashboard = () => {
     };
   };
 
-
   const getTeamAssignmentStatus = () => {
     const statusCount = {};
     dashboardData.teamAssignments.forEach((assignment) => {
@@ -312,7 +277,6 @@ const ManagerDashboard = () => {
       .filter((item) => item.value > 0);
   };
 
-
   const getEscalationHistory = () => {
     const ESCALATION_COLORS = {
       Pending: BLUE_COLORS[2],
@@ -323,7 +287,6 @@ const ManagerDashboard = () => {
       InProgress: BLUE_COLORS[1]
     };
 
-
     const escalations = dashboardData.managerEscalations;
     const statusCount = {};
     escalations.forEach((esc) => {
@@ -332,13 +295,11 @@ const ManagerDashboard = () => {
       statusCount[key] = (statusCount[key] || 0) + 1;
     });
 
-
     const chartData = Object.entries(statusCount).map(([name, value]) => ({
       name,
       value,
       fill: ESCALATION_COLORS[name] || BLUE_COLORS[2]
     }));
-
 
     return {
       total: escalations.length,
@@ -349,14 +310,12 @@ const ManagerDashboard = () => {
     };
   };
 
-
   const getNominationOverview = () => {
     const nominations = dashboardData.managerNominations;
     const now = new Date();
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth();
     const total = nominations.length;
-
 
     const thisMonth = nominations.filter((nom) => {
       const dateFields = [nom.createdDate, nom.submittedDate, nom.nominationDate, nom.createdAt, nom.submittedAt];
@@ -371,14 +330,11 @@ const ManagerDashboard = () => {
       return false;
     }).length;
 
-
     const pending = nominations.filter((nom) => {
       const status = (nom.status || nom.nominationStatus || nom.currentStatus || "").toLowerCase();
       return status.includes("pending") || status === "submitted" || status === "open";
     }).length;
 
-
-    // Group by reward type
     const byRewardType = {};
     nominations.forEach((nom) => {
       const rewardType = nom.rewardType || nom.rewardTypeName || nom.awardType || nom.opportunity?.rewardType || "Other";
@@ -393,14 +349,12 @@ const ManagerDashboard = () => {
 
     const rewardTypeList = Object.values(byRewardType);
 
-
     const statusCount = {};
     nominations.forEach((nom) => {
       const rawStatus = nom.status || nom.nominationStatus || nom.currentStatus || "Unknown";
       const key = formatStatusLabel(rawStatus);
       statusCount[key] = (statusCount[key] || 0) + 1;
     });
-
 
     const chartData = Object.entries(statusCount).map(([name, value]) => ({
       name,
@@ -412,7 +366,6 @@ const ManagerDashboard = () => {
               BLUE_COLORS[1]
     }));
 
-
     return { 
       total, 
       thisMonth, 
@@ -421,7 +374,6 @@ const ManagerDashboard = () => {
       rewardTypeList
     };
   };
-
 
   const getMeetingScheduleData = () => {
     const meetings = dashboardData.myMeetings;
@@ -434,17 +386,14 @@ const ManagerDashboard = () => {
       }
     });
 
-
     const chartData = Object.entries(monthlyData).sort((a, b) => a[0].localeCompare(b[0])).slice(-6)
       .map(([month, count]) => ({
         month: new Date(month + "-01").toLocaleDateString("en-US", { month: "short", year: "numeric" }),
         count
       }));
 
-
     return { total: meetings.length, chartData };
   };
-
 
   const getMeetingOverview = () => {
     const now = new Date();
@@ -454,7 +403,6 @@ const ManagerDashboard = () => {
     return { total, upcoming, completed };
   };
 
-
   if (loading) return (
     <div className="ada-loading-container">
       <div className="spinner-border text-primary" role="status">
@@ -462,7 +410,6 @@ const ManagerDashboard = () => {
       </div>
     </div>
   );
-
 
   const kpiStats = getKPIStats();
   const goalsData = getGoalsByType();
@@ -473,7 +420,6 @@ const ManagerDashboard = () => {
   const meetingScheduleData = getMeetingScheduleData();
   const meetingOverview = getMeetingOverview();
 
-
   const kpiCards = [
     { icon: Users, value: kpiStats.totalTeamMembers, label: "Team Members", trend: `${kpiStats.totalTeamMembers} total`, iconClass: "ada-stat-icon-primary" },
     { icon: Target, value: kpiStats.ongoingGoalsCount, label: "Ongoing Goals", trend: `${kpiStats.myProjectsCount} projects`, iconClass: "ada-stat-icon-info", up: true },
@@ -482,11 +428,15 @@ const ManagerDashboard = () => {
     { icon: AlertTriangle, value: kpiStats.totalEscalations, label: "Escalations", trend: `${kpiStats.pendingEscalations} pending`, iconClass: "ada-stat-icon-purple" }
   ];
 
+  // SHOW ONLY 3 NOMINATIONS, DROPDOWN IF MORE THAN 3
+  const displayedNominations = showAllNominations ? nominationOverview.rewardTypeList : nominationOverview.rewardTypeList.slice(0, 3);
+  
+  // SHOW ONLY 3 OPPORTUNITIES, DROPDOWN IF MORE THAN 3
+  const displayedOpportunities = showAllOpportunities ? opportunitiesData.opportunityList : opportunitiesData.opportunityList.slice(0, 3);
 
   return (
     <div className="ada-dashboard">
       <Breadcrumb items={[{ label: "Manager Dashboard" }]} />
-
 
       <div className="ada-stats-grid">
         {kpiCards.map(({ icon: Icon, value, label, trend, iconClass, up }, i) => (
@@ -506,9 +456,7 @@ const ManagerDashboard = () => {
         ))}
       </div>
 
-
       <div className="manager-cards-container">
-        {/* ROW 1: Goals, Nominations, Opportunities */}
         <div className="manager-row">
           <div className="ada-chart-card">
             <div className="ada-card-header">
@@ -539,7 +487,6 @@ const ManagerDashboard = () => {
                     </div>
                   </div>
 
-
                   {goalsData.chartData.length > 0 && (
                     <ResponsiveContainer width="100%" height={220}>
                       <PieChart>
@@ -558,8 +505,7 @@ const ManagerDashboard = () => {
             </div>
           </div>
 
-
-          {/* UPDATED: Nominations Card with Reward Types */}
+          {/* NOMINATIONS CARD WITH DROPDOWN */}
           <div className="ada-chart-card">
             <div className="ada-card-header">
               <div className="ada-card-title">
@@ -584,7 +530,6 @@ const ManagerDashboard = () => {
                     </div>
                   </div>
 
-
                   {nominationOverview.chartData.length > 0 && (
                     <ResponsiveContainer width="100%" height={180}>
                       <PieChart>
@@ -596,33 +541,37 @@ const ManagerDashboard = () => {
                     </ResponsiveContainer>
                   )}
 
-                  {/* List of reward types */}
                   {nominationOverview.rewardTypeList.length > 0 && (
-                    <div className="ada-nomination-list">
-                      {nominationOverview.rewardTypeList.map((item, i) => (
-                        <div key={i} className="ada-nomination-item">
-                          <Award size={18} style={{ color: BLUE_COLORS[i % BLUE_COLORS.length], flexShrink: 0 }} />
-                          <div className="ada-nomination-info">
-                            <div className="ada-nomination-name">{item.name}</div>
-                            <div className="ada-nomination-bar">
-                              <div
-                                className="ada-nomination-fill"
-                                style={{
-                                  width: `${(item.count / nominationOverview.total) * 100}%`,
-                                  backgroundColor: BLUE_COLORS[i % BLUE_COLORS.length]
-                                }}
-                              />
+                    <>
+                      <div className="ada-nomination-list">
+                        {displayedNominations.map((item, i) => (
+                          <div key={i} className="ada-nomination-item">
+                            <Award size={18} style={{ color: BLUE_COLORS[i % BLUE_COLORS.length], flexShrink: 0 }} />
+                            <div className="ada-nomination-info">
+                              <div className="ada-nomination-name">{item.name}</div>
+                              <div className="ada-nomination-bar">
+                                <div
+                                  className="ada-nomination-fill"
+                                  style={{
+                                    width: `${(item.count / nominationOverview.total) * 100}%`,
+                                    backgroundColor: BLUE_COLORS[i % BLUE_COLORS.length]
+                                  }}
+                                />
+                              </div>
                             </div>
+                            <span className="ada-nomination-count" style={{ color: BLUE_COLORS[i % BLUE_COLORS.length] }}>
+                              {item.count}
+                            </span>
                           </div>
-                          <span 
-                            className="ada-nomination-count" 
-                            style={{ color: BLUE_COLORS[i % BLUE_COLORS.length] }}
-                          >
-                            {item.count}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                      
+                      {nominationOverview.rewardTypeList.length > 3 && (
+                        <button className="ada-view-all-btn" onClick={() => setShowAllNominations(!showAllNominations)}>
+                          {showAllNominations ? <><ChevronUp size={16} /> Show Less</> : <><ChevronDown size={16} /> View All Nominations</>}
+                        </button>
+                      )}
+                    </>
                   )}
                 </>
               ) : (
@@ -631,8 +580,7 @@ const ManagerDashboard = () => {
             </div>
           </div>
 
-
-          {/* Internal Opportunities Card */}
+          {/* OPPORTUNITIES CARD WITH DROPDOWN */}
           <div className="ada-chart-card">
             <div className="ada-card-header">
               <div className="ada-card-title">
@@ -670,31 +618,36 @@ const ManagerDashboard = () => {
                   )}
 
                   {opportunitiesData.opportunityList.length > 0 && (
-                    <div className="ada-opportunity-list">
-                      {opportunitiesData.opportunityList.map((item, i) => (
-                        <div key={i} className="ada-opportunity-item">
-                          <Briefcase size={18} style={{ color: BLUE_COLORS[i % BLUE_COLORS.length], flexShrink: 0 }} />
-                          <div className="ada-opportunity-info">
-                            <div className="ada-opportunity-name">{item.name}</div>
-                            <div className="ada-opportunity-bar">
-                              <div
-                                className="ada-opportunity-fill"
-                                style={{
-                                  width: `${(item.count / opportunitiesData.total) * 100}%`,
-                                  backgroundColor: BLUE_COLORS[i % BLUE_COLORS.length]
-                                }}
-                              />
+                    <>
+                      <div className="ada-opportunity-list">
+                        {displayedOpportunities.map((item, i) => (
+                          <div key={i} className="ada-opportunity-item">
+                            <Briefcase size={18} style={{ color: BLUE_COLORS[i % BLUE_COLORS.length], flexShrink: 0 }} />
+                            <div className="ada-opportunity-info">
+                              <div className="ada-opportunity-name">{item.name}</div>
+                              <div className="ada-opportunity-bar">
+                                <div
+                                  className="ada-opportunity-fill"
+                                  style={{
+                                    width: `${(item.count / opportunitiesData.total) * 100}%`,
+                                    backgroundColor: BLUE_COLORS[i % BLUE_COLORS.length]
+                                  }}
+                                />
+                              </div>
                             </div>
+                            <span className="ada-opportunity-count" style={{ color: BLUE_COLORS[i % BLUE_COLORS.length] }}>
+                              {item.count}
+                            </span>
                           </div>
-                          <span 
-                            className="ada-opportunity-count" 
-                            style={{ color: BLUE_COLORS[i % BLUE_COLORS.length] }}
-                          >
-                            {item.count}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                      
+                      {opportunitiesData.opportunityList.length > 3 && (
+                        <button className="ada-view-all-btn" onClick={() => setShowAllOpportunities(!showAllOpportunities)}>
+                          {showAllOpportunities ? <><ChevronUp size={16} /> Show Less</> : <><ChevronDown size={16} /> View All Opportunities</>}
+                        </button>
+                      )}
+                    </>
                   )}
                 </>
               ) : (
@@ -704,8 +657,7 @@ const ManagerDashboard = () => {
           </div>
         </div>
 
-
-        {/* ROW 2: Team L&D, Escalations, Meetings */}
+        {/* ROW 2 */}
         <div className="manager-row">
           <div className="ada-chart-card">
             <div className="ada-card-header">
@@ -731,7 +683,6 @@ const ManagerDashboard = () => {
             </div>
           </div>
 
-
           <div className="ada-chart-card">
             <div className="ada-card-header">
               <div className="ada-card-title">
@@ -756,7 +707,6 @@ const ManagerDashboard = () => {
                     </div>
                   </div>
 
-
                   {escalationHistory.chartData.length > 0 && (
                     <ResponsiveContainer width="100%" height={220}>
                       <PieChart>
@@ -774,7 +724,6 @@ const ManagerDashboard = () => {
               )}
             </div>
           </div>
-
 
           <div className="ada-chart-card">
             <div className="ada-card-header">
@@ -801,7 +750,6 @@ const ManagerDashboard = () => {
                     </div>
                   </div>
 
-
                   {meetingScheduleData.chartData.length > 0 && (
                     <ResponsiveContainer width="100%" height={220}>
                       <LineChart data={meetingScheduleData.chartData}>
@@ -824,6 +772,5 @@ const ManagerDashboard = () => {
     </div>
   );
 };
-
 
 export default ManagerDashboard;

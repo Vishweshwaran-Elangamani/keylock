@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PieChart, Pie, Cell, AreaChart, Area, CartesianGrid, Tooltip, Legend, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import CountUp from "react-countup";
-import { Target, BookOpen, Calendar, AlertTriangle, TrendingUp, Trophy, Medal, Briefcase } from "lucide-react";
+import { Target, BookOpen, Calendar, AlertTriangle, TrendingUp, Trophy, Medal, Briefcase, ChevronDown, ChevronUp } from "lucide-react";
 import goalService from "../../services/goals/goalService";
 import lndService from "../../services/lnd/lndService";
 import rsvpService from "../../services/meeting/rsvpService";
@@ -17,6 +17,8 @@ import "../../styles/auth/EmployeeDashboard.css";
 const EmployeeDashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [showAllRecognitions, setShowAllRecognitions] = useState(false);
+  const [showAllOpportunities, setShowAllOpportunities] = useState(false);
   const [dashboardData, setDashboardData] = useState({
     goals: [], 
     lndAssignments: [], 
@@ -62,6 +64,7 @@ const EmployeeDashboard = () => {
 
       const empId = user.empMasterId || user.employeeMasterId || user.id;
 
+
       console.log('Fetching data for Employee ID:', empId);
 
 
@@ -100,7 +103,9 @@ const EmployeeDashboard = () => {
 
       const myNominations = extractData(myNominationsRes);
 
+
       console.log('My Nominations (FULL DATA):', JSON.stringify(myNominations, null, 2));
+
 
       if (myNominations.length > 0) {
         console.log('First nomination keys:', Object.keys(myNominations[0]));
@@ -116,12 +121,15 @@ const EmployeeDashboard = () => {
           ''
         ).toLowerCase();
 
+
         console.log(`Nomination ${n.nominationId} status:`, status);
+
 
         if (!status) {
           console.warn('No status field found, treating all nominations as approved');
           return true;
         }
+
 
         return status === 'approved';
       });
@@ -146,7 +154,7 @@ const EmployeeDashboard = () => {
 
       console.log('Performance Stats:', stats);
 
-      // Extract opportunities data
+
       const opportunities = extractData(opportunitiesRes);
       console.log('Opportunities data:', opportunities);
 
@@ -191,10 +199,13 @@ const EmployeeDashboard = () => {
   const getPerformanceOverview = () => {
     const { myRecognitions, stats } = dashboardData.performance;
 
+
     console.log('getPerformanceOverview - myRecognitions:', myRecognitions);
     console.log('getPerformanceOverview - stats:', stats);
 
+
     const byRewardType = {};
+
 
     myRecognitions.forEach(r => {
       const type = (
@@ -206,7 +217,9 @@ const EmployeeDashboard = () => {
         "Other"
       );
 
+
       console.log(`Processing nomination ${r.nominationId}, type: ${type}`);
+
 
       byRewardType[type] = (byRewardType[type] || 0) + 1;
     });
@@ -256,7 +269,7 @@ const EmployeeDashboard = () => {
     const opportunities = dashboardData.opportunities;
     if (!opportunities?.length) return { total: 0, opportunityList: [], chartData: [] };
 
-    // Group by opportunity name/title and count
+
     const byOpportunity = {};
     opportunities.forEach(opp => {
       const name = opp.title || opp.opportunityName || opp.name || "Unnamed Opportunity";
@@ -270,14 +283,16 @@ const EmployeeDashboard = () => {
       byOpportunity[name].count += 1;
     });
 
+
     const opportunityList = Object.values(byOpportunity);
 
-    // Create chart data (if needed for pie chart - can be removed if not using)
+
     const chartData = opportunityList.map((item, i) => ({
       name: item.name,
       value: item.count,
       fill: BLUE_COLORS[i % BLUE_COLORS.length]
     }));
+
 
     return { 
       total: opportunities.length, 
@@ -426,6 +441,13 @@ const EmployeeDashboard = () => {
   ];
 
 
+  // SHOW ONLY 3 RECOGNITIONS, DROPDOWN IF MORE THAN 3
+  const displayedRecognitions = showAllRecognitions ? perfOverview.chartData : perfOverview.chartData.slice(0, 3);
+  
+  // SHOW ONLY 2 OPPORTUNITIES, DROPDOWN IF MORE THAN 2
+  const displayedOpportunities = showAllOpportunities ? opportunitiesData.opportunityList : opportunitiesData.opportunityList.slice(0, 2);
+
+
   return (
     <div className="hr-dashboard-container">
       <Breadcrumb items={[{ label: "Employee Dashboard" }]} />
@@ -453,8 +475,8 @@ const EmployeeDashboard = () => {
 
 
       <div className="dashboard-cards-container">
-        {/* ROW 1: Performance, Goals, Opportunities */}
         <div className="dashboard-row">
+          {/* PERFORMANCE & RECOGNITION CARD */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -466,38 +488,43 @@ const EmployeeDashboard = () => {
               {perfOverview.totalRecognitions > 0 ? (
                 <>
                   <div className="emp-stats-grid emp-stats-2col">
-                    <StatCard type="recognition" value={perfOverview.totalRecognitions} label="My Recognitions" />
-                    <StatCard type="org-noms" value={perfOverview.totalNominations} label="Total Nominations" />
+                    <StatCard type="recognition" value={perfOverview.totalRecognitions} label="MY RECOGNITIONS" />
+                    <StatCard type="org-noms" value={perfOverview.totalNominations} label="TOTAL NOMINATIONS" />
                   </div>
-                  <div className="emp-trophy-section">
+                  
+                  {/* TROPHY - WRAPPED IN CENTER WRAPPER LIKE PIE CHART */}
+                  <div className="emp-chart-center-wrapper">
                     <div className="emp-trophy-container">
                       <Trophy size={100} className="emp-trophy-icon" />
                       <div className="emp-trophy-badge">{perfOverview.totalRecognitions}</div>
                     </div>
-                    <h4 className="emp-trophy-title">My Recognitions</h4>
-                    {perfOverview.chartData.length > 0 && (
+                  </div>
+
+                  {perfOverview.chartData.length > 0 && (
+                    <>
                       <div className="emp-recognition-list">
-                        {perfOverview.chartData.map((item, i) => (
+                        {displayedRecognitions.map((item, i) => (
                           <div key={i} className="emp-recognition-item">
-                            <Medal size={24} className="emp-recognition-medal" style={{ '--medal-color': item.fill }} />
+                            <Medal size={24} className="emp-recognition-medal" style={{ color: item.fill }} />
                             <div className="emp-recognition-info">
                               <div className="emp-recognition-name">{item.name}</div>
                               <div className="emp-recognition-bar">
-                                <div
-                                  className="emp-recognition-fill"
-                                  style={{
-                                    '--fill-width': `${(item.value / perfOverview.totalRecognitions) * 100}%`,
-                                    '--fill-color': item.fill
-                                  }}
-                                />
+                                <div className="emp-recognition-fill" style={{ width: `${(item.value / perfOverview.totalRecognitions) * 100}%`, backgroundColor: item.fill }} />
                               </div>
                             </div>
-                            <span className="emp-recognition-count" style={{ '--count-color': item.fill }}>{item.value}</span>
+                            <span className="emp-recognition-count" style={{ color: item.fill }}>{item.value}</span>
                           </div>
                         ))}
                       </div>
-                    )}
-                  </div>
+                      
+                      {/* SHOW BUTTON ONLY IF MORE THAN 3 ITEMS */}
+                      {perfOverview.chartData.length > 3 && (
+                        <button className="emp-view-all-btn" onClick={() => setShowAllRecognitions(!showAllRecognitions)}>
+                          {showAllRecognitions ? <><ChevronUp size={16} /> Show Less</> : <><ChevronDown size={16} /> View All Rewards</>}
+                        </button>
+                      )}
+                    </>
+                  )}
                 </>
               ) : (
                 <div className="no-data-message">No approved recognitions yet</div>
@@ -506,6 +533,7 @@ const EmployeeDashboard = () => {
           </div>
 
 
+          {/* GOALS OVERVIEW CARD */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -517,25 +545,21 @@ const EmployeeDashboard = () => {
               {goalsData.total > 0 ? (
                 <>
                   <div className="emp-stats-grid">
-                    <StatCard type="total-purple" value={goalsData.total} label="Total" />
-                    <StatCard type="completed-purple" value={goalsData.completed} label="Completed" />
-                    <StatCard type="inprogress-coral" value={goalsData.inProgress} label="In Progress" />
+                    <StatCard type="total-purple" value={goalsData.total} label="TOTAL" />
+                    <StatCard type="completed-purple" value={goalsData.completed} label="COMPLETED" />
+                    <StatCard type="inprogress-coral" value={goalsData.inProgress} label="IN PROGRESS" />
                   </div>
                   {goalsData.chartData.length > 0 && (
-                    <ResponsiveContainer width="100%" height={240}>
-                      <PieChart>
-                        <Pie data={goalsData.chartData} cx="50%" cy="45%" outerRadius={80} dataKey="value" label={false}>
-                          {goalsData.chartData.map((entry, i) => <Cell key={`cell-${i}`} fill={entry.fill} />)}
-                        </Pie>
-                        <Tooltip />
-                        <Legend layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
-                          formatter={(value, entry) => {
-                            const item = goalsData.chartData.find(d => d.name === entry.value);
-                            return `${item?.name || value}: ${item?.value || 0}`;
-                          }}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
+                    <div className="emp-chart-center-wrapper">
+                      <ResponsiveContainer width="100%" height={200}>
+                        <PieChart>
+                          <Pie data={goalsData.chartData} cx="50%" cy="50%" outerRadius={70} dataKey="value" label={false}>
+                            {goalsData.chartData.map((entry, i) => <Cell key={`cell-${i}`} fill={entry.fill} />)}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
                   )}
                 </>
               ) : (
@@ -545,7 +569,7 @@ const EmployeeDashboard = () => {
           </div>
 
 
-          {/* UPDATED: Internal Opportunities Card - Show opportunity names */}
+          {/* INTERNAL OPPORTUNITIES CARD */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -556,63 +580,45 @@ const EmployeeDashboard = () => {
             <div className="card-body">
               {opportunitiesData.total > 0 ? (
                 <>
-                  {/* Single stat card for Opportunities Awaiting */}
                   <div className="emp-stats-grid emp-stats-1col">
-                    <StatCard 
-                      type="total-purple" 
-                      value={opportunitiesData.total} 
-                      label="Opportunities Awaiting" 
-                    />
+                    <StatCard type="total-purple" value={opportunitiesData.total} label="OPPORTUNITIES AWAITING" />
                   </div>
-
-                  {/* Pie chart if multiple opportunities */}
                   {opportunitiesData.chartData.length > 0 && (
-                    <ResponsiveContainer width="100%" height={200}>
-                      <PieChart>
-                        <Pie 
-                          data={opportunitiesData.chartData} 
-                          cx="50%" 
-                          cy="50%" 
-                          outerRadius={70} 
-                          dataKey="value" 
-                          label={false}
-                        >
-                          {opportunitiesData.chartData.map((entry, i) => (
-                            <Cell key={`cell-${i}`} fill={entry.fill} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  )}
-
-                  {/* List of opportunity names */}
-                  {opportunitiesData.opportunityList.length > 0 && (
-                    <div className="emp-opportunity-list">
-                      {opportunitiesData.opportunityList.map((item, i) => (
-                        <div key={i} className="emp-opportunity-item">
-                          <Briefcase size={20} style={{ color: BLUE_COLORS[i % BLUE_COLORS.length], flexShrink: 0 }} />
-                          <div className="emp-opportunity-info">
-                            <div className="emp-opportunity-name">{item.name}</div>
-                            <div className="emp-opportunity-bar">
-                              <div
-                                className="emp-opportunity-fill"
-                                style={{
-                                  width: `${(item.count / opportunitiesData.total) * 100}%`,
-                                  backgroundColor: BLUE_COLORS[i % BLUE_COLORS.length]
-                                }}
-                              />
-                            </div>
-                          </div>
-                          <span 
-                            className="emp-opportunity-count" 
-                            style={{ color: BLUE_COLORS[i % BLUE_COLORS.length] }}
-                          >
-                            {item.count}
-                          </span>
-                        </div>
-                      ))}
+                    <div className="emp-chart-center-wrapper">
+                      <ResponsiveContainer width="100%" height={200}>
+                        <PieChart>
+                          <Pie data={opportunitiesData.chartData} cx="50%" cy="50%" outerRadius={70} dataKey="value" label={false}>
+                            {opportunitiesData.chartData.map((entry, i) => <Cell key={`cell-${i}`} fill={entry.fill} />)}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
                     </div>
+                  )}
+                  {opportunitiesData.opportunityList.length > 0 && (
+                    <>
+                      <div className="emp-opportunity-list">
+                        {displayedOpportunities.map((item, i) => (
+                          <div key={i} className="emp-opportunity-item">
+                            <Briefcase size={20} style={{ color: BLUE_COLORS[i % BLUE_COLORS.length], flexShrink: 0 }} />
+                            <div className="emp-opportunity-info">
+                              <div className="emp-opportunity-name">{item.name}</div>
+                              <div className="emp-opportunity-bar">
+                                <div className="emp-opportunity-fill" style={{ width: `${(item.count / opportunitiesData.total) * 100}%`, backgroundColor: BLUE_COLORS[i % BLUE_COLORS.length] }} />
+                              </div>
+                            </div>
+                            <span className="emp-opportunity-count" style={{ color: BLUE_COLORS[i % BLUE_COLORS.length] }}>{item.count}</span>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      {/* SHOW BUTTON ONLY IF MORE THAN 2 ITEMS */}
+                      {opportunitiesData.opportunityList.length > 2 && (
+                        <button className="emp-view-all-btn" onClick={() => setShowAllOpportunities(!showAllOpportunities)}>
+                          {showAllOpportunities ? <><ChevronUp size={16} /> Show Less</> : <><ChevronDown size={16} /> View All Opportunities</>}
+                        </button>
+                      )}
+                    </>
                   )}
                 </>
               ) : (
@@ -623,8 +629,9 @@ const EmployeeDashboard = () => {
         </div>
 
 
-        {/* ROW 2: L&D, SLA, Meetings */}
+        {/* SECOND ROW */}
         <div className="dashboard-row">
+          {/* LEARNING & DEVELOPMENT CARD */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -636,26 +643,22 @@ const EmployeeDashboard = () => {
               {lndData.total > 0 ? (
                 <>
                   <div className="emp-stats-grid emp-stats-4col">
-                    <StatCard type="total-purple" value={lndData.total} label="Total Skills" />
-                    <StatCard type="low-rating" value={lndData.low} label="Rating 1-4" />
-                    <StatCard type="medium-rating" value={lndData.medium} label="Rating 5-7" />
-                    <StatCard type="high-rating" value={lndData.high} label="Rating 8-10" />
+                    <StatCard type="total-purple" value={lndData.total} label="TOTAL SKILLS" />
+                    <StatCard type="low-rating" value={lndData.low} label="RATING 1-4" />
+                    <StatCard type="medium-rating" value={lndData.medium} label="RATING 5-7" />
+                    <StatCard type="high-rating" value={lndData.high} label="RATING 8-10" />
                   </div>
                   {lndData.chartData.length > 0 && (
-                    <ResponsiveContainer width="100%" height={240}>
-                      <PieChart>
-                        <Pie data={lndData.chartData} cx="50%" cy="45%" outerRadius={80} dataKey="value" label={false}>
-                          {lndData.chartData.map((entry, i) => <Cell key={`cell-${i}`} fill={entry.fill} />)}
-                        </Pie>
-                        <Tooltip />
-                        <Legend layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
-                          formatter={(value, entry) => {
-                            const item = lndData.chartData.find(d => d.name === entry.value);
-                            return `${item?.name || value}: ${item?.value || 0}`;
-                          }}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
+                    <div className="emp-chart-center-wrapper">
+                      <ResponsiveContainer width="100%" height={200}>
+                        <PieChart>
+                          <Pie data={lndData.chartData} cx="50%" cy="50%" outerRadius={70} dataKey="value" label={false}>
+                            {lndData.chartData.map((entry, i) => <Cell key={`cell-${i}`} fill={entry.fill} />)}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
                   )}
                 </>
               ) : (
@@ -665,6 +668,7 @@ const EmployeeDashboard = () => {
           </div>
 
 
+          {/* SLA OVERVIEW CARD */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -676,25 +680,21 @@ const EmployeeDashboard = () => {
               {slaData.total > 0 ? (
                 <>
                   <div className="emp-stats-grid">
-                    <StatCard type="total-purple" value={slaData.total} label="Total" />
-                    <StatCard type="open" value={slaData.open} label="Open" />
-                    <StatCard type="overdue" value={slaData.overdue} label="Overdue" />
+                    <StatCard type="total-purple" value={slaData.total} label="TOTAL" />
+                    <StatCard type="open" value={slaData.open} label="OPEN" />
+                    <StatCard type="overdue" value={slaData.overdue} label="OVERDUE" />
                   </div>
                   {slaData.chartData.length > 0 && (
-                    <ResponsiveContainer width="100%" height={240}>
-                      <PieChart>
-                        <Pie data={slaData.chartData} cx="50%" cy="45%" outerRadius={80} dataKey="value" label={false}>
-                          {slaData.chartData.map((entry, i) => <Cell key={`cell-${i}`} fill={entry.fill} />)}
-                        </Pie>
-                        <Tooltip />
-                        <Legend layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
-                          formatter={(value, entry) => {
-                            const item = slaData.chartData.find(d => d.name === entry.value);
-                            return `${item?.name || value}: ${item?.value || 0}`;
-                          }}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
+                    <div className="emp-chart-center-wrapper">
+                      <ResponsiveContainer width="100%" height={200}>
+                        <PieChart>
+                          <Pie data={slaData.chartData} cx="50%" cy="50%" outerRadius={70} dataKey="value" label={false}>
+                            {slaData.chartData.map((entry, i) => <Cell key={`cell-${i}`} fill={entry.fill} />)}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
                   )}
                 </>
               ) : (
@@ -704,7 +704,7 @@ const EmployeeDashboard = () => {
           </div>
 
 
-          {/* MOVED: Meetings Card to Row 2 */}
+          {/* MEETINGS SCHEDULED CARD */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -716,26 +716,28 @@ const EmployeeDashboard = () => {
               {meetingsData.total > 0 ? (
                 <>
                   <div className="emp-stats-grid">
-                    <StatCard type="total-purple" value={meetingsData.total} label="Total" />
-                    <StatCard type="completed-purple" value={meetingsData.upcoming} label="Upcoming" />
-                    <StatCard type="inprogress-coral" value={meetingsData.completed} label="Completed" />
+                    <StatCard type="total-purple" value={meetingsData.total} label="TOTAL" />
+                    <StatCard type="completed-purple" value={meetingsData.upcoming} label="UPCOMING" />
+                    <StatCard type="inprogress-coral" value={meetingsData.completed} label="COMPLETED" />
                   </div>
                   {meetingsData.chartData.length > 0 && (
-                    <ResponsiveContainer width="100%" height={240}>
-                      <AreaChart data={meetingsData.chartData}>
-                        <defs>
-                          <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor={BLUE_COLORS[2]} stopOpacity={0.8} />
-                            <stop offset="95%" stopColor={BLUE_COLORS[2]} stopOpacity={0.1} />
-                          </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
-                        <XAxis dataKey="month" stroke="#9ca3af" fontSize={10} />
-                        <YAxis stroke="#9ca3af" fontSize={11} />
-                        <Tooltip contentStyle={{ backgroundColor: "#fff", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "12px" }} />
-                        <Area type="monotone" dataKey="count" stroke={BLUE_COLORS[2]} strokeWidth={2} fillOpacity={1} fill="url(#colorCount)" />
-                      </AreaChart>
-                    </ResponsiveContainer>
+                    <div className="emp-chart-center-wrapper">
+                      <ResponsiveContainer width="100%" height={200}>
+                        <AreaChart data={meetingsData.chartData}>
+                          <defs>
+                            <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor={BLUE_COLORS[2]} stopOpacity={0.8} />
+                              <stop offset="95%" stopColor={BLUE_COLORS[2]} stopOpacity={0.1} />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
+                          <XAxis dataKey="month" stroke="#9ca3af" fontSize={10} />
+                          <YAxis stroke="#9ca3af" fontSize={11} />
+                          <Tooltip contentStyle={{ backgroundColor: "#fff", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "12px" }} />
+                          <Area type="monotone" dataKey="count" stroke={BLUE_COLORS[2]} strokeWidth={2} fillOpacity={1} fill="url(#colorCount)" />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
                   )}
                 </>
               ) : (
