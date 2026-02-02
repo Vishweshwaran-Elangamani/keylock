@@ -8,12 +8,14 @@ using Relevantz.EEPZ.Common.Utils;
 using Relevantz.EEPZ.Data.IRepository;
 using Relevantz.EEPZ.Core.IService;
 
+
 namespace Relevantz.EEPZ.Core.Service
 {
     public class SlaEscalationService : ISlaEscalationService
     {
         private readonly ISlaEscalationRepository _slaEscalationRepository;
         private readonly IViolationService _violationService;
+
 
         public SlaEscalationService(
             ISlaEscalationRepository slaEscalationRepository,
@@ -23,179 +25,165 @@ namespace Relevantz.EEPZ.Core.Service
             _violationService = violationService;
         }
 
+
         public async Task<ApiResponseDto<List<SlaEscalationResponseDto>>> GetAllSlaEscalationsAsync()
         {
-            try
-            {
-                EEPZBusinessLog.LogServiceInformation("Fetching all SLA escalations");
+            EEPZBusinessLog.LogServiceInformation("Fetching all SLA escalations");
 
-                var escalations = await _slaEscalationRepository.GetAllAsync();
-                var response = escalations.Select(MapToEscalationResponse).ToList();
 
-                EEPZBusinessLog.LogServiceInformation("Retrieved {Count} SLA escalations", response.Count);
+            var escalations = await _slaEscalationRepository.GetAllAsync();
+            var response = escalations.Select(MapToEscalationResponse).ToList();
 
-                return ApiResponseDto<List<SlaEscalationResponseDto>>.SuccessResponse(
-                    response,
-                    $"Retrieved {response.Count} SLA escalations");
-            }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogServiceError("Error fetching all SLA escalations", ex);
-                throw;
-            }
+
+            EEPZBusinessLog.LogServiceInformation("Retrieved {Count} SLA escalations", response.Count);
+
+
+            return ApiResponseDto<List<SlaEscalationResponseDto>>.SuccessResponse(
+                response,
+                $"Retrieved {response.Count} SLA escalations");
         }
+
 
         public async Task<ApiResponseDto<List<SlaEscalationResponseDto>>> GetSlaEscalationsByEmployeeAsync(int employeeUserId)
         {
-            try
-            {
-                EEPZBusinessLog.LogServiceInformation("Fetching SLA escalations for employee {EmployeeUserId}", employeeUserId);
+            EEPZBusinessLog.LogServiceInformation("Fetching SLA escalations for employee {EmployeeUserId}", employeeUserId);
 
-                var escalations = await _slaEscalationRepository.GetByEmployeeUserIdAsync(employeeUserId);
-                var response = escalations.Select(MapToEscalationResponse).ToList();
 
-                EEPZBusinessLog.LogServiceInformation("Retrieved {Count} escalations for employee {EmployeeUserId}",
-                    response.Count, employeeUserId);
+            var escalations = await _slaEscalationRepository.GetByEmployeeUserIdAsync(employeeUserId);
+            var response = escalations.Select(MapToEscalationResponse).ToList();
 
-                return ApiResponseDto<List<SlaEscalationResponseDto>>.SuccessResponse(
-                    response,
-                    $"Retrieved {response.Count} escalations for employee");
-            }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogServiceError("Error fetching SLA escalations for employee {EmployeeUserId}", ex, employeeUserId);
-                throw;
-            }
+
+            EEPZBusinessLog.LogServiceInformation("Retrieved {Count} escalations for employee {EmployeeUserId}",
+                response.Count, employeeUserId);
+
+
+            return ApiResponseDto<List<SlaEscalationResponseDto>>.SuccessResponse(
+                response,
+                $"Retrieved {response.Count} escalations for employee");
         }
+
 
         public async Task<ApiResponseDto<SlaEscalationResponseDto>> GetSlaEscalationByIdAsync(int escalationId)
         {
-            try
+            EEPZBusinessLog.LogServiceInformation("Fetching SLA escalation {EscalationId}", escalationId);
+
+
+            var escalation = await _slaEscalationRepository.GetByIdAsync(escalationId);
+
+
+            if (escalation == null)
             {
-                EEPZBusinessLog.LogServiceInformation("Fetching SLA escalation {EscalationId}", escalationId);
-
-                var escalation = await _slaEscalationRepository.GetByIdAsync(escalationId);
-
-                if (escalation == null)
-                {
-                    EEPZBusinessLog.LogServiceWarning("SLA escalation {EscalationId} not found", escalationId);
-                    return ApiResponseDto<SlaEscalationResponseDto>.ErrorResponse("Escalation not found");
-                }
-
-                var response = MapToEscalationResponse(escalation);
-
-                EEPZBusinessLog.LogServiceInformation("SLA escalation {EscalationId} retrieved successfully", escalationId);
-
-                return ApiResponseDto<SlaEscalationResponseDto>.SuccessResponse(
-                    response,
-                    "Escalation details retrieved");
+                EEPZBusinessLog.LogServiceWarning("SLA escalation {EscalationId} not found", escalationId);
+                return ApiResponseDto<SlaEscalationResponseDto>.ErrorResponse("Escalation not found");
             }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogServiceError("Error fetching SLA escalation {EscalationId}", ex, escalationId);
-                throw;
-            }
+
+
+            var response = MapToEscalationResponse(escalation);
+
+
+            EEPZBusinessLog.LogServiceInformation("SLA escalation {EscalationId} retrieved successfully", escalationId);
+
+
+            return ApiResponseDto<SlaEscalationResponseDto>.SuccessResponse(
+                response,
+                "Escalation details retrieved");
         }
+
 
         public async Task<ApiResponseDto<object>> GetCombinedViolationsAndEscalationsAsync()
         {
-            try
+            EEPZBusinessLog.LogServiceInformation("Fetching combined violations and SLA escalations");
+
+
+            var violationsResult = await _violationService.GetAllViolationsAsync();
+
+
+            var escalations = await _slaEscalationRepository.GetAllAsync();
+            var escalationData = escalations.Select(e => new
             {
-                EEPZBusinessLog.LogServiceInformation("Fetching combined violations and SLA escalations");
-
-                var violationsResult = await _violationService.GetAllViolationsAsync();
-
-                var escalations = await _slaEscalationRepository.GetAllAsync();
-                var escalationData = escalations.Select(e => new
+                type = "SLA Escalation",
+                id = e.EscalationId,
+                employeeUserId = e.Sla?.EmployeeId,
+                employeeName = GetEmployeeName(e.Sla?.Employee?.Userprofile),
+                violation = e.Reason,
+                severity = GetSeverityLevel(CalculateDaysOverdue(e.Sla?.Deadline)),
+                status = e.EscalationStatus,
+                reportedDate = e.SubmittedAt,
+                details = new
                 {
-                    type = "SLA Escalation",
-                    id = e.EscalationId,
-                    employeeUserId = e.Sla?.EmployeeId,
-                    employeeName = GetEmployeeName(e.Sla?.Employee?.Userprofile),
-                    violation = e.Reason,
-                    severity = GetSeverityLevel(CalculateDaysOverdue(e.Sla?.Deadline)),
-                    status = e.EscalationStatus,
-                    reportedDate = e.SubmittedAt,
-                    details = new
-                    {
-                        slaType = e.Sla?.Slatype,
-                        escalationLevel = e.EscalationLevel,
-                        daysOverdue = CalculateDaysOverdue(e.Sla?.Deadline)
-                    }
-                }).ToList();
+                    slaType = e.Sla?.Slatype,
+                    escalationLevel = e.EscalationLevel,
+                    daysOverdue = CalculateDaysOverdue(e.Sla?.Deadline)
+                }
+            }).ToList();
 
-                var combinedData = new
-                {
-                    violations = violationsResult.Data,
-                    slaEscalations = escalationData,
-                    summary = new
-                    {
-                        totalViolations = violationsResult.Data?.Count() ?? 0,
-                        totalEscalations = escalationData.Count,
-                        totalCombined = (violationsResult.Data?.Count() ?? 0) + escalationData.Count
-                    }
-                };
 
-                EEPZBusinessLog.LogServiceInformation("Combined data retrieved: {TotalViolations} violations, {TotalEscalations} escalations",
-                    combinedData.summary.totalViolations, combinedData.summary.totalEscalations);
-
-                return ApiResponseDto<object>.SuccessResponse(
-                    combinedData,
-                    "Combined violations and escalations retrieved");
-            }
-            catch (Exception ex)
+            var combinedData = new
             {
-                EEPZBusinessLog.LogServiceError("Error fetching combined violations and escalations", ex);
-                throw;
-            }
+                violations = violationsResult.Data,
+                slaEscalations = escalationData,
+                summary = new
+                {
+                    totalViolations = violationsResult.Data?.Count() ?? 0,
+                    totalEscalations = escalationData.Count,
+                    totalCombined = (violationsResult.Data?.Count() ?? 0) + escalationData.Count
+                }
+            };
+
+
+            EEPZBusinessLog.LogServiceInformation("Combined data retrieved: {TotalViolations} violations, {TotalEscalations} escalations",
+                combinedData.summary.totalViolations, combinedData.summary.totalEscalations);
+
+
+            return ApiResponseDto<object>.SuccessResponse(
+                combinedData,
+                "Combined violations and escalations retrieved");
         }
+
 
         public async Task<ApiResponseDto<object>> GetSlaEscalationStatsAsync()
         {
-            try
+            EEPZBusinessLog.LogServiceInformation("Fetching SLA escalation statistics");
+
+
+            var escalations = await _slaEscalationRepository.GetAllAsync();
+
+
+            var stats = new
             {
-                EEPZBusinessLog.LogServiceInformation("Fetching SLA escalation statistics");
+                totalEscalations = escalations.Count,
+                openEscalations = escalations.Count(e => e.EscalationStatus == "Open" || e.EscalationStatus == "Pending"),
+                resolvedEscalations = escalations.Count(e => e.EscalationStatus == "Resolved"),
+                byLevel = escalations.GroupBy(e => e.EscalationLevel)
+                    .Select(g => new { level = g.Key, count = g.Count() })
+                    .ToList(),
+                bySeverity = escalations.GroupBy(e => GetSeverityLevel(CalculateDaysOverdue(e.Sla?.Deadline)))
+                    .Select(g => new { severity = g.Key, count = g.Count() })
+                    .ToList(),
+                recent = escalations
+                    .OrderByDescending(e => e.SubmittedAt)
+                    .Take(5)
+                    .Select(e => new
+                    {
+                        escalationId = e.EscalationId,
+                        employeeName = GetEmployeeName(e.Sla?.Employee?.Userprofile),
+                        slaType = e.Sla?.Slatype,
+                        escalationLevel = e.EscalationLevel,
+                        submittedAt = e.SubmittedAt
+                    })
+                    .ToList()
+            };
 
-                var escalations = await _slaEscalationRepository.GetAllAsync();
 
-                var stats = new
-                {
-                    totalEscalations = escalations.Count,
-                    openEscalations = escalations.Count(e => e.EscalationStatus == "Open" || e.EscalationStatus == "Pending"),
-                    resolvedEscalations = escalations.Count(e => e.EscalationStatus == "Resolved"),
-                    byLevel = escalations.GroupBy(e => e.EscalationLevel)
-                        .Select(g => new { level = g.Key, count = g.Count() })
-                        .ToList(),
-                    bySeverity = escalations.GroupBy(e => GetSeverityLevel(CalculateDaysOverdue(e.Sla?.Deadline)))
-                        .Select(g => new { severity = g.Key, count = g.Count() })
-                        .ToList(),
-                    recent = escalations
-                        .OrderByDescending(e => e.SubmittedAt)
-                        .Take(5)
-                        .Select(e => new
-                        {
-                            escalationId = e.EscalationId,
-                            employeeName = GetEmployeeName(e.Sla?.Employee?.Userprofile),
-                            slaType = e.Sla?.Slatype,
-                            escalationLevel = e.EscalationLevel,
-                            submittedAt = e.SubmittedAt
-                        })
-                        .ToList()
-                };
+            EEPZBusinessLog.LogServiceInformation("Escalation statistics retrieved: Total={Total}, Open={Open}, Resolved={Resolved}",
+                stats.totalEscalations, stats.openEscalations, stats.resolvedEscalations);
 
-                EEPZBusinessLog.LogServiceInformation("Escalation statistics retrieved: Total={Total}, Open={Open}, Resolved={Resolved}",
-                    stats.totalEscalations, stats.openEscalations, stats.resolvedEscalations);
 
-                return ApiResponseDto<object>.SuccessResponse(
-                    stats,
-                    "Escalation statistics retrieved");
-            }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogServiceError("Error fetching SLA escalation statistics", ex);
-                throw;
-            }
+            return ApiResponseDto<object>.SuccessResponse(
+                stats,
+                "Escalation statistics retrieved");
         }
+
 
         // Helper methods
         private SlaEscalationResponseDto MapToEscalationResponse(Slaescalation escalation)
@@ -229,6 +217,7 @@ namespace Relevantz.EEPZ.Core.Service
             };
         }
 
+
         private string GetEmployeeName(Userprofile? userprofile)
         {
             if (userprofile == null)
@@ -236,12 +225,14 @@ namespace Relevantz.EEPZ.Core.Service
             return $"{userprofile.FirstName} {userprofile.LastName}";
         }
 
+
         private int CalculateDaysOverdue(DateTime? deadline)
         {
             if (!deadline.HasValue || deadline.Value >= DateTime.Now)
                 return 0;
             return (int)(DateTime.Now - deadline.Value).TotalDays;
         }
+
 
         private string GetSeverityLevel(int daysOverdue)
         {

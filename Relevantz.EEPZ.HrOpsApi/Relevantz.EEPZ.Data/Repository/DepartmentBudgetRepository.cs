@@ -6,6 +6,7 @@ using Relevantz.EEPZ.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
+
 namespace Relevantz.EEPZ.Data.Repository
 {
     /// <summary>
@@ -17,280 +18,214 @@ namespace Relevantz.EEPZ.Data.Repository
         private readonly EEPZDbContext _context;
         private readonly ILogger<DepartmentBudgetRepository> _logger;
 
+
         public DepartmentBudgetRepository(EEPZDbContext context, ILogger<DepartmentBudgetRepository> logger)
         {
             _context = context;
             _logger = logger;
         }
 
+
         public async Task<Departmentbudget?> GetByIdAsync(int budgetId)
         {
-            try
-            {
-                if (budgetId <= 0)
-                    return null;
+            if (budgetId <= 0)
+                return null;
 
-                return await _context.Departmentbudgets.FindAsync(budgetId);
-            }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogRepositoryError("Error fetching department budget {BudgetId}", ex, budgetId);
-                throw;
-            }
+
+            return await _context.Departmentbudgets.FindAsync(budgetId);
         }
+
 
         public async Task<Departmentbudget?> GetByDepartmentIdAsync(int departmentId)
         {
-            try
-            {
-                if (departmentId <= 0)
-                    return null;
+            if (departmentId <= 0)
+                return null;
 
-                return await _context.Departmentbudgets
-                    .FirstOrDefaultAsync(b => b.DepartmentId == departmentId);
-            }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogRepositoryError("Error fetching budget for department {DepartmentId}", ex, departmentId);
-                throw;
-            }
+
+            return await _context.Departmentbudgets
+                .FirstOrDefaultAsync(b => b.DepartmentId == departmentId);
         }
+
 
         public async Task<List<Departmentbudget>> GetAllAsync()
         {
-            try
-            {
-                return await _context.Departmentbudgets
-                    .OrderBy(b => b.DepartmentId)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogRepositoryError("Error fetching all department budgets", ex);
-                throw;
-            }
+            return await _context.Departmentbudgets
+                .OrderBy(b => b.DepartmentId)
+                .ToListAsync();
         }
+
 
         public async Task<List<Departmentbudget>> GetByFiscalYearAsync(int fiscalYear)
         {
-            try
-            {
-                if (fiscalYear <= 0)
-                    return new List<Departmentbudget>();
+            if (fiscalYear <= 0)
+                return new List<Departmentbudget>();
 
-                return await _context.Departmentbudgets
-                    .Where(b => b.FiscalYear == fiscalYear)
-                    .OrderBy(b => b.DepartmentId)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogRepositoryError("Error fetching budgets for fiscal year {FiscalYear}", ex, fiscalYear);
-                throw;
-            }
+
+            return await _context.Departmentbudgets
+                .Where(b => b.FiscalYear == fiscalYear)
+                .OrderBy(b => b.DepartmentId)
+                .ToListAsync();
         }
+
 
         public async Task<Departmentbudget?> GetByDepartmentAndFiscalYearAsync(int departmentId, int fiscalYear)
         {
-            try
-            {
-                if (departmentId <= 0 || fiscalYear <= 0)
-                    return null;
+            if (departmentId <= 0 || fiscalYear <= 0)
+                return null;
 
-                return await _context.Departmentbudgets
-                    .FirstOrDefaultAsync(b =>
-                        b.DepartmentId == departmentId &&
-                        b.FiscalYear == fiscalYear);
-            }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogRepositoryError("Error fetching budget for department {DepartmentId}, fiscal year {FiscalYear}", 
-                    ex, departmentId, fiscalYear);
-                throw;
-            }
+
+            return await _context.Departmentbudgets
+                .FirstOrDefaultAsync(b =>
+                    b.DepartmentId == departmentId &&
+                    b.FiscalYear == fiscalYear);
         }
+
 
         public async Task<Departmentbudget> CreateAsync(Departmentbudget budget)
         {
-            try
-            {
-                budget.CreatedAt = DateTime.Now;
-                budget.UpdatedAt = DateTime.Now;
+            budget.CreatedAt = DateTime.Now;
+            budget.UpdatedAt = DateTime.Now;
 
-                _context.Departmentbudgets.Add(budget);
-                await _context.SaveChangesAsync();
 
-                EEPZBusinessLog.LogRepositoryInformation(RepositoryMessages.DepartmentBudgetCreated, budget.BudgetId);
+            _context.Departmentbudgets.Add(budget);
+            await _context.SaveChangesAsync();
 
-                return budget;
-            }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogRepositoryError("Error creating department budget", ex);
-                throw;
-            }
+
+            EEPZBusinessLog.LogRepositoryInformation(RepositoryMessages.DepartmentBudgetCreated, budget.BudgetId);
+
+
+            return budget;
         }
+
 
         public async Task<Departmentbudget> UpdateAsync(Departmentbudget budget)
         {
-            try
+            var existingBudget = await _context.Departmentbudgets.FindAsync(budget.BudgetId);
+            if (existingBudget == null)
             {
-                var existingBudget = await _context.Departmentbudgets.FindAsync(budget.BudgetId);
-                if (existingBudget == null)
-                {
-                    EEPZBusinessLog.LogRepositoryWarning(RepositoryMessages.DepartmentBudgetNotFound, budget.BudgetId);
-                    throw new InvalidOperationException($"Department budget with ID {budget.BudgetId} not found");
-                }
-
-                budget.UpdatedAt = DateTime.Now;
-                _context.Departmentbudgets.Update(budget);
-                await _context.SaveChangesAsync();
-
-                EEPZBusinessLog.LogRepositoryInformation(RepositoryMessages.DepartmentBudgetUpdated, budget.BudgetId);
-
-                return budget;
+                EEPZBusinessLog.LogRepositoryWarning(RepositoryMessages.DepartmentBudgetNotFound, budget.BudgetId);
+                throw new InvalidOperationException($"Department budget with ID {budget.BudgetId} not found");
             }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogRepositoryError("Error updating department budget {BudgetId}", ex, budget.BudgetId);
-                throw;
-            }
+
+
+            budget.UpdatedAt = DateTime.Now;
+            _context.Departmentbudgets.Update(budget);
+            await _context.SaveChangesAsync();
+
+
+            EEPZBusinessLog.LogRepositoryInformation(RepositoryMessages.DepartmentBudgetUpdated, budget.BudgetId);
+
+
+            return budget;
         }
+
 
         public async Task<bool> DeleteAsync(int budgetId)
         {
-            try
-            {
-                if (budgetId <= 0)
-                    return false;
+            if (budgetId <= 0)
+                return false;
 
-                var budget = await _context.Departmentbudgets.FindAsync(budgetId);
-                if (budget == null)
-                    return false;
 
-                _context.Departmentbudgets.Remove(budget);
-                await _context.SaveChangesAsync();
+            var budget = await _context.Departmentbudgets.FindAsync(budgetId);
+            if (budget == null)
+                return false;
 
-                EEPZBusinessLog.LogRepositoryInformation(RepositoryMessages.DepartmentBudgetDeleted, budgetId);
 
-                return true;
-            }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogRepositoryError("Error deleting department budget {BudgetId}", ex, budgetId);
-                throw;
-            }
+            _context.Departmentbudgets.Remove(budget);
+            await _context.SaveChangesAsync();
+
+
+            EEPZBusinessLog.LogRepositoryInformation(RepositoryMessages.DepartmentBudgetDeleted, budgetId);
+
+
+            return true;
         }
+
 
         public async Task<int> DeleteAllocationsByDepartmentIdAsync(int departmentId)
         {
-            try
+            if (departmentId <= 0)
+                return 0;
+
+
+            var allocations = await _context.Budgetallocations
+                .Where(a => a.DepartmentId == departmentId)
+                .ToListAsync();
+
+
+            if (allocations.Count > 0)
             {
-                if (departmentId <= 0)
-                    return 0;
+                _context.Budgetallocations.RemoveRange(allocations);
+                await _context.SaveChangesAsync();
 
-                var allocations = await _context.Budgetallocations
-                    .Where(a => a.DepartmentId == departmentId)
-                    .ToListAsync();
 
-                if (allocations.Count > 0)
-                {
-                    _context.Budgetallocations.RemoveRange(allocations);
-                    await _context.SaveChangesAsync();
-
-                    EEPZBusinessLog.LogRepositoryInformation(
-                        RepositoryMessages.AllocationsDeletedByDepartment,
-                        allocations.Count,
-                        departmentId
-                    );
-                }
-
-                return allocations.Count;
+                EEPZBusinessLog.LogRepositoryInformation(
+                    RepositoryMessages.AllocationsDeletedByDepartment,
+                    allocations.Count,
+                    departmentId
+                );
             }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogRepositoryError("Error deleting allocations for department {DepartmentId}", ex, departmentId);
-                throw;
-            }
+
+
+            return allocations.Count;
         }
+
 
         public async Task<Budgetallocation?> GetAllocationByIdAsync(int allocationId)
         {
-            try
-            {
-                if (allocationId <= 0)
-                    return null;
+            if (allocationId <= 0)
+                return null;
 
-                return await _context.Budgetallocations.FindAsync(allocationId);
-            }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogRepositoryError("Error fetching allocation {AllocationId}", ex, allocationId);
-                throw;
-            }
+
+            return await _context.Budgetallocations.FindAsync(allocationId);
         }
+
 
         public async Task<List<Budgetallocation>> GetAllocationsByBudgetIdAsync(int budgetId)
         {
-            try
-            {
-                if (budgetId <= 0)
-                    return new List<Budgetallocation>();
+            if (budgetId <= 0)
+                return new List<Budgetallocation>();
 
-                return await BaseAllocationQuery()
-                    .Where(a => a.BudgetId == budgetId)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogRepositoryError("Error fetching allocations for budget {BudgetId}", ex, budgetId);
-                throw;
-            }
+
+            return await BaseAllocationQuery()
+                .Where(a => a.BudgetId == budgetId)
+                .ToListAsync();
         }
+
 
         public async Task<Budgetallocation> UpdateAllocationAsync(Budgetallocation allocation)
         {
-            try
+            var existingAllocation = await _context.Budgetallocations.FindAsync(allocation.AllocationId);
+            if (existingAllocation == null)
             {
-                var existingAllocation = await _context.Budgetallocations.FindAsync(allocation.AllocationId);
-                if (existingAllocation == null)
-                {
-                    EEPZBusinessLog.LogRepositoryWarning(RepositoryMessages.AllocationNotFound, allocation.AllocationId);
-                    throw new InvalidOperationException($"Budget allocation with ID {allocation.AllocationId} not found");
-                }
-
-                allocation.UpdatedAt = DateTime.Now;
-                _context.Budgetallocations.Update(allocation);
-                await _context.SaveChangesAsync();
-
-                EEPZBusinessLog.LogRepositoryInformation(RepositoryMessages.AllocationUpdated, allocation.AllocationId);
-
-                return allocation;
+                EEPZBusinessLog.LogRepositoryWarning(RepositoryMessages.AllocationNotFound, allocation.AllocationId);
+                throw new InvalidOperationException($"Budget allocation with ID {allocation.AllocationId} not found");
             }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogRepositoryError("Error updating allocation {AllocationId}", ex, allocation.AllocationId);
-                throw;
-            }
+
+
+            allocation.UpdatedAt = DateTime.Now;
+            _context.Budgetallocations.Update(allocation);
+            await _context.SaveChangesAsync();
+
+
+            EEPZBusinessLog.LogRepositoryInformation(RepositoryMessages.AllocationUpdated, allocation.AllocationId);
+
+
+            return allocation;
         }
+
 
         public async Task<decimal> GetTotalUtilizedByDepartmentAsync(int departmentId)
         {
-            try
-            {
-                if (departmentId <= 0)
-                    return 0;
+            if (departmentId <= 0)
+                return 0;
 
-                return await _context.Budgetallocations
-                    .Where(a => a.DepartmentId == departmentId)
-                    .SumAsync(a => a.UtilizedAmount ?? 0);
-            }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogRepositoryError("Error calculating total utilized for department {DepartmentId}", ex, departmentId);
-                throw;
-            }
+
+            return await _context.Budgetallocations
+                .Where(a => a.DepartmentId == departmentId)
+                .SumAsync(a => a.UtilizedAmount ?? 0);
         }
+
 
         private IQueryable<Budgetallocation> BaseAllocationQuery()
         {

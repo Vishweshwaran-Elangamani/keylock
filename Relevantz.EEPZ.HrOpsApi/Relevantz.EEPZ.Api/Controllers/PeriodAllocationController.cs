@@ -4,6 +4,7 @@ using Relevantz.EEPZ.Common.Utils;
 using Relevantz.EEPZ.Core.IService;
 using Microsoft.Extensions.Logging;
 
+
 namespace Relevantz.EEPZ.Api.Controllers
 {
     /// <summary>
@@ -16,6 +17,7 @@ namespace Relevantz.EEPZ.Api.Controllers
     {
         private readonly IPeriodAllocationService _periodAllocationService;
         private readonly ILogger<PeriodAllocationController> _logger;
+
 
         /// <summary>
         /// Initializes a new instance of <see cref="PeriodAllocationController"/>.
@@ -30,6 +32,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             _logger = logger;
         }
 
+
         /// <summary>
         /// Creates a new period-based budget allocation.
         /// </summary>
@@ -42,30 +45,26 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> CreatePeriodAllocation([FromBody] CreatePeriodAllocationDto request)
         {
-            try
+            EEPZBusinessLog.LogBusinessInformation("Creating period allocation for budget {BudgetId}, period {Period}, year {PeriodYear}, amount: {AllocatedAmount}",
+                request.BudgetId, request.Period, request.PeriodYear, request.AllocatedAmount);
+
+
+            var result = await _periodAllocationService.CreatePeriodAllocationAsync(request);
+
+
+            if (!result.Success)
             {
-                EEPZBusinessLog.LogBusinessInformation("Creating period allocation for budget {BudgetId}, period {Period}, year {PeriodYear}, amount: {AllocatedAmount}",
-                    request.BudgetId, request.Period, request.PeriodYear, request.AllocatedAmount);
-
-                var result = await _periodAllocationService.CreatePeriodAllocationAsync(request);
-
-                if (!result.Success)
-                {
-                    EEPZBusinessLog.LogBusinessWarning("Period allocation creation failed for budget {BudgetId}: {Message}",
-                        request.BudgetId, result.Message);
-                    return BadRequest(result);
-                }
-
-                EEPZBusinessLog.LogBusinessInformation("Period allocation created successfully for budget {BudgetId}, period {Period}",
-                    request.BudgetId, request.Period);
-                return Ok(result);
+                EEPZBusinessLog.LogBusinessWarning("Period allocation creation failed for budget {BudgetId}: {Message}",
+                    request.BudgetId, result.Message);
+                return BadRequest(result);
             }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogBusinessError("Error creating period allocation for budget {BudgetId}", ex, request.BudgetId);
-                throw;
-            }
+
+
+            EEPZBusinessLog.LogBusinessInformation("Period allocation created successfully for budget {BudgetId}, period {Period}",
+                request.BudgetId, request.Period);
+            return Ok(result);
         }
+
 
         /// <summary>
         /// Updates an existing period allocation amount or configuration.
@@ -79,30 +78,26 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpPut("update")]
         public async Task<IActionResult> UpdatePeriodAllocation([FromBody] UpdatePeriodAllocationDto request)
         {
-            try
+            EEPZBusinessLog.LogBusinessInformation("Updating period allocation {PeriodAllocationId}",
+                request.PeriodAllocationId);
+
+
+            var result = await _periodAllocationService.UpdatePeriodAllocationAsync(request);
+
+
+            if (!result.Success)
             {
-                EEPZBusinessLog.LogBusinessInformation("Updating period allocation {PeriodAllocationId}",
-                    request.PeriodAllocationId);
-
-                var result = await _periodAllocationService.UpdatePeriodAllocationAsync(request);
-
-                if (!result.Success)
-                {
-                    EEPZBusinessLog.LogBusinessWarning("Period allocation update failed for {PeriodAllocationId}: {Message}",
-                        request.PeriodAllocationId, result.Message);
-                    return BadRequest(result);
-                }
-
-                EEPZBusinessLog.LogBusinessInformation("Period allocation {PeriodAllocationId} updated successfully",
-                    request.PeriodAllocationId);
-                return Ok(result);
+                EEPZBusinessLog.LogBusinessWarning("Period allocation update failed for {PeriodAllocationId}: {Message}",
+                    request.PeriodAllocationId, result.Message);
+                return BadRequest(result);
             }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogBusinessError("Error updating period allocation {PeriodAllocationId}", ex, request.PeriodAllocationId);
-                throw;
-            }
+
+
+            EEPZBusinessLog.LogBusinessInformation("Period allocation {PeriodAllocationId} updated successfully",
+                request.PeriodAllocationId);
+            return Ok(result);
         }
+
 
         /// <summary>
         /// Deletes a period allocation based on its identifier.
@@ -117,28 +112,24 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpDelete("{periodAllocationId}")]
         public async Task<IActionResult> DeletePeriodAllocation(int periodAllocationId)
         {
-            try
+            EEPZBusinessLog.LogBusinessInformation("Deleting period allocation {PeriodAllocationId}", periodAllocationId);
+
+
+            var result = await _periodAllocationService.DeletePeriodAllocationAsync(periodAllocationId);
+
+
+            if (!result.Success)
             {
-                EEPZBusinessLog.LogBusinessInformation("Deleting period allocation {PeriodAllocationId}", periodAllocationId);
-
-                var result = await _periodAllocationService.DeletePeriodAllocationAsync(periodAllocationId);
-
-                if (!result.Success)
-                {
-                    EEPZBusinessLog.LogBusinessWarning("Period allocation deletion failed for {PeriodAllocationId}: {Message}",
-                        periodAllocationId, result.Message);
-                    return BadRequest(result);
-                }
-
-                EEPZBusinessLog.LogBusinessInformation("Period allocation {PeriodAllocationId} deleted successfully", periodAllocationId);
-                return Ok(result);
+                EEPZBusinessLog.LogBusinessWarning("Period allocation deletion failed for {PeriodAllocationId}: {Message}",
+                    periodAllocationId, result.Message);
+                return BadRequest(result);
             }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogBusinessError("Error deleting period allocation {PeriodAllocationId}", ex, periodAllocationId);
-                throw;
-            }
+
+
+            EEPZBusinessLog.LogBusinessInformation("Period allocation {PeriodAllocationId} deleted successfully", periodAllocationId);
+            return Ok(result);
         }
+
 
         /// <summary>
         /// Retrieves a specific period allocation by its ID.
@@ -152,27 +143,23 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("{periodAllocationId}")]
         public async Task<IActionResult> GetPeriodAllocationById(int periodAllocationId)
         {
-            try
+            EEPZBusinessLog.LogBusinessInformation("Retrieving period allocation {PeriodAllocationId}", periodAllocationId);
+
+
+            var result = await _periodAllocationService.GetPeriodAllocationByIdAsync(periodAllocationId);
+
+
+            if (!result.Success)
             {
-                EEPZBusinessLog.LogBusinessInformation("Retrieving period allocation {PeriodAllocationId}", periodAllocationId);
-
-                var result = await _periodAllocationService.GetPeriodAllocationByIdAsync(periodAllocationId);
-
-                if (!result.Success)
-                {
-                    EEPZBusinessLog.LogBusinessWarning("Period allocation {PeriodAllocationId} not found", periodAllocationId);
-                    return NotFound(result);
-                }
-
-                EEPZBusinessLog.LogBusinessInformation("Period allocation {PeriodAllocationId} retrieved successfully", periodAllocationId);
-                return Ok(result);
+                EEPZBusinessLog.LogBusinessWarning("Period allocation {PeriodAllocationId} not found", periodAllocationId);
+                return NotFound(result);
             }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogBusinessError("Error retrieving period allocation {PeriodAllocationId}", ex, periodAllocationId);
-                throw;
-            }
+
+
+            EEPZBusinessLog.LogBusinessInformation("Period allocation {PeriodAllocationId} retrieved successfully", periodAllocationId);
+            return Ok(result);
         }
+
 
         /// <summary>
         /// Retrieves all period allocations in the system.
@@ -184,21 +171,16 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("all")]
         public async Task<IActionResult> GetAllPeriodAllocations()
         {
-            try
-            {
-                EEPZBusinessLog.LogBusinessInformation("Retrieving all period allocations");
+            EEPZBusinessLog.LogBusinessInformation("Retrieving all period allocations");
 
-                var result = await _periodAllocationService.GetAllPeriodAllocationsAsync();
 
-                EEPZBusinessLog.LogBusinessInformation("Retrieved {Count} period allocations", result.Data?.Count ?? 0);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogBusinessError("Error retrieving all period allocations", ex);
-                throw;
-            }
+            var result = await _periodAllocationService.GetAllPeriodAllocationsAsync();
+
+
+            EEPZBusinessLog.LogBusinessInformation("Retrieved {Count} period allocations", result.Data?.Count ?? 0);
+            return Ok(result);
         }
+
 
         /// <summary>
         /// Retrieves all period allocations associated with a specific department budget.
@@ -211,21 +193,15 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("by-budget/{budgetId}")]
         public async Task<IActionResult> GetPeriodAllocationsByBudget(int budgetId)
         {
-            try
-            {
-                EEPZBusinessLog.LogBusinessInformation("Retrieving period allocations for budget {BudgetId}", budgetId);
+            EEPZBusinessLog.LogBusinessInformation("Retrieving period allocations for budget {BudgetId}", budgetId);
 
-                var result = await _periodAllocationService.GetPeriodAllocationsByBudgetAsync(budgetId);
 
-                EEPZBusinessLog.LogBusinessInformation("Retrieved {Count} period allocations for budget {BudgetId}",
-                    result.Data?.Count ?? 0, budgetId);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogBusinessError("Error retrieving period allocations for budget {BudgetId}", ex, budgetId);
-                throw;
-            }
+            var result = await _periodAllocationService.GetPeriodAllocationsByBudgetAsync(budgetId);
+
+
+            EEPZBusinessLog.LogBusinessInformation("Retrieved {Count} period allocations for budget {BudgetId}",
+                result.Data?.Count ?? 0, budgetId);
+            return Ok(result);
         }
     }
 }

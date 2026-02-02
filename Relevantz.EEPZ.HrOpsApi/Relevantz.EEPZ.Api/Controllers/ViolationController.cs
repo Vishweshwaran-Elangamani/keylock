@@ -7,6 +7,7 @@ using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Common.Utils;
 using Relevantz.EEPZ.Core.IService;
 
+
 namespace Relevantz.EEPZ.Api.Controllers
 {
     /// <summary>
@@ -22,6 +23,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         private readonly IViolationService _violationService;
         private readonly ISlaEscalationService _slaEscalationService;
         private readonly ILogger<ViolationController> _logger;
+
 
         /// <summary>
         /// Initializes a new instance of <see cref="ViolationController"/>.
@@ -39,7 +41,9 @@ namespace Relevantz.EEPZ.Api.Controllers
             _logger = logger;
         }
 
+
         #region Violation Endpoints
+
 
         /// <summary>
         /// Retrieves all violations in the system.  
@@ -50,21 +54,16 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "Admin,HR")]
         public async Task<IActionResult> GetAllViolations()
         {
-            try
-            {
-                EEPZBusinessLog.LogBusinessInformation("Retrieving all violations");
+            EEPZBusinessLog.LogBusinessInformation("Retrieving all violations");
 
-                var result = await _violationService.GetAllViolationsAsync();
 
-                EEPZBusinessLog.LogBusinessInformation("Retrieved {Count} violations", result.Data?.Count ?? 0);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogBusinessError("Error retrieving all violations", ex);
-                throw;
-            }
+            var result = await _violationService.GetAllViolationsAsync();
+
+
+            EEPZBusinessLog.LogBusinessInformation("Retrieved {Count} violations", result.Data?.Count ?? 0);
+            return Ok(result);
         }
+
 
         /// <summary>
         /// Retrieves a specific violation by its ID.  
@@ -76,27 +75,23 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "Admin,HR,Manager")]
         public async Task<IActionResult> GetViolationById(int id)
         {
-            try
+            EEPZBusinessLog.LogBusinessInformation("Retrieving violation {ViolationId}", id);
+
+
+            var result = await _violationService.GetViolationByIdAsync(id);
+
+
+            if (!result.Success)
             {
-                EEPZBusinessLog.LogBusinessInformation("Retrieving violation {ViolationId}", id);
-
-                var result = await _violationService.GetViolationByIdAsync(id);
-
-                if (!result.Success)
-                {
-                    EEPZBusinessLog.LogBusinessWarning("Violation {ViolationId} not found", id);
-                    return NotFound(result);
-                }
-
-                EEPZBusinessLog.LogBusinessInformation("Violation {ViolationId} retrieved successfully", id);
-                return Ok(result);
+                EEPZBusinessLog.LogBusinessWarning("Violation {ViolationId} not found", id);
+                return NotFound(result);
             }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogBusinessError("Error retrieving violation {ViolationId}", ex, id);
-                throw;
-            }
+
+
+            EEPZBusinessLog.LogBusinessInformation("Violation {ViolationId} retrieved successfully", id);
+            return Ok(result);
         }
+
 
         /// <summary>
         /// Retrieves violations for a specific employee.  
@@ -106,41 +101,40 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("employee/{EmployeeUserId}")]
         public async Task<IActionResult> GetViolationsByEmployee(int EmployeeUserId)
         {
-            try
+            var currentUserIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+
+            if (!int.TryParse(currentUserIdClaim, out int currentUserId))
             {
-                var currentUserIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                    ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+                EEPZBusinessLog.LogBusinessWarning("Invalid user authentication for violations retrieval");
+                return Unauthorized(new { success = false, message = "Invalid user authentication" });
+            }
 
-                if (!int.TryParse(currentUserIdClaim, out int currentUserId))
-                {
-                    EEPZBusinessLog.LogBusinessWarning("Invalid user authentication for violations retrieval");
-                    return Unauthorized(new { success = false, message = "Invalid user authentication" });
-                }
 
-                var isHR = User.IsInRole("Admin") || User.IsInRole("HR");
+            var isHR = User.IsInRole("Admin") || User.IsInRole("HR");
 
-                if (!isHR && currentUserId != EmployeeUserId)
-                {
-                    EEPZBusinessLog.LogBusinessWarning("User {CurrentUserId} attempted unauthorized access to violations of user {EmployeeUserId}",
-                        currentUserId, EmployeeUserId);
-                    return Forbid("You can only view your own violations");
-                }
 
-                EEPZBusinessLog.LogBusinessInformation("User {CurrentUserId} retrieving violations for employee {EmployeeUserId}",
+            if (!isHR && currentUserId != EmployeeUserId)
+            {
+                EEPZBusinessLog.LogBusinessWarning("User {CurrentUserId} attempted unauthorized access to violations of user {EmployeeUserId}",
                     currentUserId, EmployeeUserId);
-
-                var result = await _violationService.GetViolationsByEmployeeAsync(EmployeeUserId);
-
-                EEPZBusinessLog.LogBusinessInformation("Retrieved {Count} violations for employee {EmployeeUserId}",
-                    result.Data?.Count ?? 0, EmployeeUserId);
-                return Ok(result);
+                return Forbid("You can only view your own violations");
             }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogBusinessError("Error retrieving violations for employee {EmployeeUserId}", ex, EmployeeUserId);
-                throw;
-            }
+
+
+            EEPZBusinessLog.LogBusinessInformation("User {CurrentUserId} retrieving violations for employee {EmployeeUserId}",
+                currentUserId, EmployeeUserId);
+
+
+            var result = await _violationService.GetViolationsByEmployeeAsync(EmployeeUserId);
+
+
+            EEPZBusinessLog.LogBusinessInformation("Retrieved {Count} violations for employee {EmployeeUserId}",
+                result.Data?.Count ?? 0, EmployeeUserId);
+            return Ok(result);
         }
+
 
         /// <summary>
         /// Retrieves violations linked to a specific policy.  
@@ -151,22 +145,17 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "Admin,HR")]
         public async Task<IActionResult> GetViolationsByPolicy(int policyId)
         {
-            try
-            {
-                EEPZBusinessLog.LogBusinessInformation("Retrieving violations for policy {PolicyId}", policyId);
+            EEPZBusinessLog.LogBusinessInformation("Retrieving violations for policy {PolicyId}", policyId);
 
-                var result = await _violationService.GetViolationsByPolicyAsync(policyId);
 
-                EEPZBusinessLog.LogBusinessInformation("Retrieved {Count} violations for policy {PolicyId}",
-                    result.Data?.Count ?? 0, policyId);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogBusinessError("Error retrieving violations for policy {PolicyId}", ex, policyId);
-                throw;
-            }
+            var result = await _violationService.GetViolationsByPolicyAsync(policyId);
+
+
+            EEPZBusinessLog.LogBusinessInformation("Retrieved {Count} violations for policy {PolicyId}",
+                result.Data?.Count ?? 0, policyId);
+            return Ok(result);
         }
+
 
         /// <summary>
         /// Reports a new policy violation.  
@@ -177,39 +166,37 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "Admin,HR,Manager")]
         public async Task<IActionResult> ReportViolation([FromBody] ReportViolationRequestDto request)
         {
-            try
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+
+            if (!int.TryParse(userIdClaim, out int reportedByUserId))
             {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                    ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-
-                if (!int.TryParse(userIdClaim, out int reportedByUserId))
-                {
-                    EEPZBusinessLog.LogBusinessWarning("Unable to extract user ID for reporting violation");
-                    return Unauthorized(new { success = false, message = "Invalid user authentication" });
-                }
-
-                EEPZBusinessLog.LogBusinessInformation("User {ReportedByUserId} reporting violation for employee {EmployeeUserId}, policy {PolicyId}",
-                    reportedByUserId, request.EmployeeUserId, request.PolicyId);
-
-                var result = await _violationService.ReportViolationAsync(request, reportedByUserId);
-
-                if (!result.Success)
-                {
-                    EEPZBusinessLog.LogBusinessWarning("Violation report failed for employee {EmployeeUserId}: {Message}",
-                        request.EmployeeUserId, result.Message);
-                    return BadRequest(result);
-                }
-
-                EEPZBusinessLog.LogBusinessInformation("Violation reported successfully for employee {EmployeeUserId} by user {ReportedByUserId}",
-                    request.EmployeeUserId, reportedByUserId);
-                return Ok(result);
+                EEPZBusinessLog.LogBusinessWarning("Unable to extract user ID for reporting violation");
+                return Unauthorized(new { success = false, message = "Invalid user authentication" });
             }
-            catch (Exception ex)
+
+
+            EEPZBusinessLog.LogBusinessInformation("User {ReportedByUserId} reporting violation for employee {EmployeeUserId}, policy {PolicyId}",
+                reportedByUserId, request.EmployeeUserId, request.PolicyId);
+
+
+            var result = await _violationService.ReportViolationAsync(request, reportedByUserId);
+
+
+            if (!result.Success)
             {
-                EEPZBusinessLog.LogBusinessError("Error reporting violation", ex);
-                throw;
+                EEPZBusinessLog.LogBusinessWarning("Violation report failed for employee {EmployeeUserId}: {Message}",
+                    request.EmployeeUserId, result.Message);
+                return BadRequest(result);
             }
+
+
+            EEPZBusinessLog.LogBusinessInformation("Violation reported successfully for employee {EmployeeUserId} by user {ReportedByUserId}",
+                request.EmployeeUserId, reportedByUserId);
+            return Ok(result);
         }
+
 
         /// <summary>
         /// Resolves an existing violation.  
@@ -221,33 +208,30 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "Admin,HR")]
         public async Task<IActionResult> ResolveViolation(int id, [FromBody] ResolveViolationRequestDto request)
         {
-            try
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+
+            if (int.TryParse(userIdClaim, out int userId))
             {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                    ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-
-                if (int.TryParse(userIdClaim, out int userId))
-                {
-                    EEPZBusinessLog.LogBusinessInformation("User {UserId} resolving violation {ViolationId}", userId, id);
-                }
-
-                var result = await _violationService.ResolveViolationAsync(id, request);
-
-                if (!result.Success)
-                {
-                    EEPZBusinessLog.LogBusinessWarning("Violation {ViolationId} resolution failed: {Message}", id, result.Message);
-                    return BadRequest(result);
-                }
-
-                EEPZBusinessLog.LogBusinessInformation("Violation {ViolationId} resolved successfully", id);
-                return Ok(result);
+                EEPZBusinessLog.LogBusinessInformation("User {UserId} resolving violation {ViolationId}", userId, id);
             }
-            catch (Exception ex)
+
+
+            var result = await _violationService.ResolveViolationAsync(id, request);
+
+
+            if (!result.Success)
             {
-                EEPZBusinessLog.LogBusinessError("Error resolving violation {ViolationId}", ex, id);
-                throw;
+                EEPZBusinessLog.LogBusinessWarning("Violation {ViolationId} resolution failed: {Message}", id, result.Message);
+                return BadRequest(result);
             }
+
+
+            EEPZBusinessLog.LogBusinessInformation("Violation {ViolationId} resolved successfully", id);
+            return Ok(result);
         }
+
 
         /// <summary>
         /// Retrieves aggregated violation statistics.  
@@ -257,25 +241,22 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "Admin,HR")]
         public async Task<IActionResult> GetViolationStats()
         {
-            try
-            {
-                EEPZBusinessLog.LogBusinessInformation("Retrieving violation statistics");
+            EEPZBusinessLog.LogBusinessInformation("Retrieving violation statistics");
 
-                var result = await _violationService.GetViolationStatsAsync();
 
-                EEPZBusinessLog.LogBusinessInformation("Violation statistics retrieved successfully");
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogBusinessError("Error retrieving violation statistics", ex);
-                throw;
-            }
+            var result = await _violationService.GetViolationStatsAsync();
+
+
+            EEPZBusinessLog.LogBusinessInformation("Violation statistics retrieved successfully");
+            return Ok(result);
         }
+
 
         #endregion
 
+
         #region SLA Escalation Endpoints
+
 
         /// <summary>
         /// Retrieves all SLA escalations.  
@@ -285,21 +266,16 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "Admin,HR")]
         public async Task<IActionResult> GetAllSlaEscalations()
         {
-            try
-            {
-                EEPZBusinessLog.LogBusinessInformation("Fetching all SLA escalations");
+            EEPZBusinessLog.LogBusinessInformation("Fetching all SLA escalations");
 
-                var result = await _slaEscalationService.GetAllSlaEscalationsAsync();
 
-                EEPZBusinessLog.LogBusinessInformation("Retrieved {Count} SLA escalations", result.Data?.Count ?? 0);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogBusinessError("Error retrieving all SLA escalations", ex);
-                throw;
-            }
+            var result = await _slaEscalationService.GetAllSlaEscalationsAsync();
+
+
+            EEPZBusinessLog.LogBusinessInformation("Retrieved {Count} SLA escalations", result.Data?.Count ?? 0);
+            return Ok(result);
         }
+
 
         /// <summary>
         /// Retrieves SLA escalations for a specific employee.  
@@ -309,41 +285,40 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("sla-escalations/employee/{EmployeeUserId}")]
         public async Task<IActionResult> GetSlaEscalationsByEmployee(int EmployeeUserId)
         {
-            try
+            var currentUserIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+
+            if (!int.TryParse(currentUserIdClaim, out int currentUserId))
             {
-                var currentUserIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                    ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+                EEPZBusinessLog.LogBusinessWarning("Invalid user authentication for SLA escalations retrieval");
+                return Unauthorized(new { success = false, message = "Invalid user authentication" });
+            }
 
-                if (!int.TryParse(currentUserIdClaim, out int currentUserId))
-                {
-                    EEPZBusinessLog.LogBusinessWarning("Invalid user authentication for SLA escalations retrieval");
-                    return Unauthorized(new { success = false, message = "Invalid user authentication" });
-                }
 
-                var isHR = User.IsInRole("Admin") || User.IsInRole("HR");
+            var isHR = User.IsInRole("Admin") || User.IsInRole("HR");
 
-                if (!isHR && currentUserId != EmployeeUserId)
-                {
-                    EEPZBusinessLog.LogBusinessWarning("Unauthorized SLA escalation access attempt by user {CurrentUserId} for employee {EmployeeUserId}",
-                        currentUserId, EmployeeUserId);
-                    return Forbid("You can only view your own SLA escalations");
-                }
 
-                EEPZBusinessLog.LogBusinessInformation("User {CurrentUserId} retrieving SLA escalations for employee {EmployeeUserId}",
+            if (!isHR && currentUserId != EmployeeUserId)
+            {
+                EEPZBusinessLog.LogBusinessWarning("Unauthorized SLA escalation access attempt by user {CurrentUserId} for employee {EmployeeUserId}",
                     currentUserId, EmployeeUserId);
-
-                var result = await _slaEscalationService.GetSlaEscalationsByEmployeeAsync(EmployeeUserId);
-
-                EEPZBusinessLog.LogBusinessInformation("Retrieved {Count} SLA escalations for employee {EmployeeUserId}",
-                    result.Data?.Count ?? 0, EmployeeUserId);
-                return Ok(result);
+                return Forbid("You can only view your own SLA escalations");
             }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogBusinessError("Error retrieving SLA escalations for employee {EmployeeUserId}", ex, EmployeeUserId);
-                throw;
-            }
+
+
+            EEPZBusinessLog.LogBusinessInformation("User {CurrentUserId} retrieving SLA escalations for employee {EmployeeUserId}",
+                currentUserId, EmployeeUserId);
+
+
+            var result = await _slaEscalationService.GetSlaEscalationsByEmployeeAsync(EmployeeUserId);
+
+
+            EEPZBusinessLog.LogBusinessInformation("Retrieved {Count} SLA escalations for employee {EmployeeUserId}",
+                result.Data?.Count ?? 0, EmployeeUserId);
+            return Ok(result);
         }
+
 
         /// <summary>
         /// Retrieves details for a specific SLA escalation.
@@ -353,46 +328,46 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("sla-escalations/{escalationId}")]
         public async Task<IActionResult> GetSlaEscalationById(int escalationId)
         {
-            try
+            EEPZBusinessLog.LogBusinessInformation("Retrieving SLA escalation {EscalationId}", escalationId);
+
+
+            var result = await _slaEscalationService.GetSlaEscalationByIdAsync(escalationId);
+
+
+            if (!result.Success)
             {
-                EEPZBusinessLog.LogBusinessInformation("Retrieving SLA escalation {EscalationId}", escalationId);
-
-                var result = await _slaEscalationService.GetSlaEscalationByIdAsync(escalationId);
-
-                if (!result.Success)
-                {
-                    EEPZBusinessLog.LogBusinessWarning("SLA escalation {EscalationId} not found", escalationId);
-                    return NotFound(result);
-                }
-
-                var currentUserIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                    ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-
-                if (int.TryParse(currentUserIdClaim, out int currentUserId))
-                {
-                    var isHR = User.IsInRole("Admin") || User.IsInRole("HR");
-
-                    var escalation = result.Data;
-                    var isOwner = escalation?.SlaId != null;
-                    var isAssigned = escalation?.EscalatedToEmployeeId == currentUserId;
-
-                    if (!isHR && !isOwner && !isAssigned)
-                    {
-                        EEPZBusinessLog.LogBusinessWarning("User {UserId} denied access to SLA escalation {EscalationId}",
-                            currentUserId, escalationId);
-                        return Forbid("You don't have permission to view this escalation");
-                    }
-                }
-
-                EEPZBusinessLog.LogBusinessInformation("SLA escalation {EscalationId} retrieved successfully", escalationId);
-                return Ok(result);
+                EEPZBusinessLog.LogBusinessWarning("SLA escalation {EscalationId} not found", escalationId);
+                return NotFound(result);
             }
-            catch (Exception ex)
+
+
+            var currentUserIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+
+            if (int.TryParse(currentUserIdClaim, out int currentUserId))
             {
-                EEPZBusinessLog.LogBusinessError("Error retrieving SLA escalation {EscalationId}", ex, escalationId);
-                throw;
+                var isHR = User.IsInRole("Admin") || User.IsInRole("HR");
+
+
+                var escalation = result.Data;
+                var isOwner = escalation?.SlaId != null;
+                var isAssigned = escalation?.EscalatedToEmployeeId == currentUserId;
+
+
+                if (!isHR && !isOwner && !isAssigned)
+                {
+                    EEPZBusinessLog.LogBusinessWarning("User {UserId} denied access to SLA escalation {EscalationId}",
+                        currentUserId, escalationId);
+                    return Forbid("You don't have permission to view this escalation");
+                }
             }
+
+
+            EEPZBusinessLog.LogBusinessInformation("SLA escalation {EscalationId} retrieved successfully", escalationId);
+            return Ok(result);
         }
+
 
         /// <summary>
         /// Retrieves combined violation and SLA escalation records.
@@ -402,21 +377,16 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "Admin,HR")]
         public async Task<IActionResult> GetCombinedViolationsAndEscalations()
         {
-            try
-            {
-                EEPZBusinessLog.LogBusinessInformation("Retrieving combined violations and escalations");
+            EEPZBusinessLog.LogBusinessInformation("Retrieving combined violations and escalations");
 
-                var result = await _slaEscalationService.GetCombinedViolationsAndEscalationsAsync();
 
-                EEPZBusinessLog.LogBusinessInformation("Combined violations and escalations retrieved successfully");
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogBusinessError("Error retrieving combined violations and escalations", ex);
-                throw;
-            }
+            var result = await _slaEscalationService.GetCombinedViolationsAndEscalationsAsync();
+
+
+            EEPZBusinessLog.LogBusinessInformation("Combined violations and escalations retrieved successfully");
+            return Ok(result);
         }
+
 
         /// <summary>
         /// Retrieves SLA escalation statistics.
@@ -426,21 +396,16 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "Admin,HR")]
         public async Task<IActionResult> GetSlaEscalationStats()
         {
-            try
-            {
-                EEPZBusinessLog.LogBusinessInformation("Retrieving SLA escalation statistics");
+            EEPZBusinessLog.LogBusinessInformation("Retrieving SLA escalation statistics");
 
-                var result = await _slaEscalationService.GetSlaEscalationStatsAsync();
 
-                EEPZBusinessLog.LogBusinessInformation("SLA escalation statistics retrieved successfully");
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                EEPZBusinessLog.LogBusinessError("Error retrieving SLA escalation statistics", ex);
-                throw;
-            }
+            var result = await _slaEscalationService.GetSlaEscalationStatsAsync();
+
+
+            EEPZBusinessLog.LogBusinessInformation("SLA escalation statistics retrieved successfully");
+            return Ok(result);
         }
+
 
         #endregion
     }
