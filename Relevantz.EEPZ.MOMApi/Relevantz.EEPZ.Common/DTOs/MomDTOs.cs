@@ -345,6 +345,19 @@ namespace Relevantz.EEPZ.Common.DTOs
         [Range(1, 100)]
         public int PageSize { get; set; } = 20;
     }
+    /// <summary>
+    /// Paginated response wrapper for list endpoints
+    /// </summary>
+    public class PaginatedResponse<T>
+    {
+        public List<T> Data { get; set; } = new();
+        public int TotalCount { get; set; }
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
+        public int TotalPages { get; set; }
+        public bool HasPreviousPage { get; set; }
+        public bool HasNextPage { get; set; }
+    }
 
     public class MomStatisticsDto
     {
@@ -358,4 +371,5 @@ namespace Relevantz.EEPZ.Common.DTOs
         public Dictionary<string, int> MomsByDepartment { get; set; } = new();
         public Dictionary<string, int> MomsByMeetingType { get; set; } = new();
     }
+
 }
