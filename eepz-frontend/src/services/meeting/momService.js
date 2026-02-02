@@ -58,6 +58,7 @@ const momService = {
   /**
    * Create a new MOM
    * Enhanced with date validation and error handling
+   * CHANGED: POST /Mom/create → POST /Mom
    */
   createMom: async (momData) => {
     // Client-side validation for meeting date (±7 to 30 days)
@@ -75,14 +76,25 @@ const momService = {
       };
     }
     
-    return apiRequest("post", "/Mom/create", momData);
+    // CHANGED: Removed "/create" - RESTful endpoint
+    return apiRequest("post", "/Mom", momData);
   },
 
   /**
    * Update an existing MOM
    * Enhanced with empty payload validation
+   * CHANGED: PUT /Mom/update → PUT /Mom/{momId}
    */
   updateMom: async (momData) => {
+    // Validate momId
+    if (!momData.momId || momData.momId <= 0) {
+      throw {
+        success: false,
+        message: 'Invalid MOM ID',
+        validationErrors: ['MOM ID is required']
+      };
+    }
+    
     // Validate that at least one field is being updated
     const hasData = Object.keys(momData).some(key => 
       key !== 'momId' && momData[key] !== null && momData[key] !== undefined && momData[key] !== ''
@@ -113,7 +125,8 @@ const momService = {
       }
     }
     
-    return apiRequest("put", "/Mom/update", momData);
+    //CHANGED: PUT /Mom/{momId} - RESTful endpoint with momId in URL
+    return apiRequest("put", `/Mom/${momData.momId}`, momData);
   },
 
   /**

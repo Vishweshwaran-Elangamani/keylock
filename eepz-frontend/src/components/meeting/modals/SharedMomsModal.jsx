@@ -286,15 +286,7 @@ const SharedMomsModal = ({ onClose }) => {
                   >
                     Shared MOMs
                   </h5>
-                  <button
-                    type="button"
-                    className="btn btn-sm btn-outline-primary d-flex align-items-center gap-2"
-                    onClick={() => loadSharedMoms(true)}
-                    disabled={refreshing}
-                  >
-                    <RefreshCw size={14} className={refreshing ? 'spinner-icon' : ''} />
-                    {refreshing ? 'Refreshing...' : 'Refresh'}
-                  </button>
+                  
                 </div>
 
                 <ul className="smm-tabs nav nav-pills">

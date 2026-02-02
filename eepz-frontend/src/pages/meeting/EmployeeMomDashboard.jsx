@@ -99,16 +99,17 @@ const EmployeeMomDashboard = () => {
         return status === "Pending";
       });
 
-      // Filter pending invitations
+      // ✅ FIXED: Filter pending invitations based on numeric rsvpStatus (0 = Pending)
       const pendingInvites = invitationsData.filter((inv) => {
         const rsvpStatus = getProperty(inv, 'rsvpStatus', 'RsvpStatus');
-        return rsvpStatus === "Pending";
+        // Check for numeric 0 (Pending) or string "Pending"
+        return rsvpStatus === 0 || rsvpStatus === "0" || rsvpStatus === "Pending";
       });
 
       setStats({
         myMoms: Array.isArray(myMomsData) ? myMomsData.length : 0,
         pendingActionItems: pendingActions.length,
-        meetingInvitations: pendingInvites.length,
+        meetingInvitations: pendingInvites.length, // ✅ Now shows correct pending count
         sharedMoms: Array.isArray(sharedData) ? sharedData.length : 0,
       });
 
