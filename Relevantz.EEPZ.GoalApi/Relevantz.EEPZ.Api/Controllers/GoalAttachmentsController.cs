@@ -4,6 +4,7 @@ using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Core.Services.Interface;
+using Serilog;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Relevantz.EEPZ.Api.Controllers.Goals
@@ -25,6 +26,8 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             _service = service;
             _baseService = baseService;
+
+            Log.Debug("GoalAttachmentsController initialized.");
         }
 
         /// <summary>
@@ -39,7 +42,22 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             var userId = GetEmpMasterId();
 
+            Log.Information(
+                "UploadFile START | GoalId={GoalId} | UserId={UserId} | FileName={FileName} | Title={Title}",
+                goalId,
+                userId,
+                file?.FileName,
+                title
+            );
+
             var result = await _service.UploadFile(goalId, file, title, userId);
+
+            Log.Information(
+                "UploadFile END | GoalId={GoalId} | UserId={UserId} | Success={Success}",
+                goalId,
+                userId,
+                result != null
+            );
 
             var response = ApiResponseModel<FileUploadResponseModel>.SuccessResponse(
                 ResponseMessages.Codes.FILE_UPLOADED_SUCCESS,
@@ -50,23 +68,6 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             return Ok(response);
         }
 
-        // /// <summary>
-        // /// Retrieves a list of all attachments for a specific goal.
-        // /// </summary>
-        // [HttpGet("api/goals/{goalId}")]
-        // public async Task<IActionResult> ListAttachments(int goalId)
-        // {
-        //     var items = await _service.ListAttachmentsAsync(goalId);
-
-        //     var response = ApiResponseModel<List<GoalAttachment>>.SuccessResponse(
-        //         ResponseMessages.Codes.FILE_DOWNLOADED_SUCCESS,
-        //         items,
-        //         new { GoalId = goalId, AttachmentCount = items.Count }
-        //     );
-
-        //     return Ok(response);
-        // }
-
         /// <summary>
         /// Downloads a specific attachment by its ID.
         /// </summary>
@@ -75,9 +76,23 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             var userId = GetEmpMasterId();
 
+            Log.Information(
+                "GetAttachmentFile START | AttachmentId={AttachmentId} | UserId={UserId}",
+                attachmentId,
+                userId
+            );
+
             var (fileBytes, contentType, fileName) = await _service.GetAttachmentFile(
                 attachmentId,
                 userId
+            );
+
+            Log.Information(
+                "GetAttachmentFile END | AttachmentId={AttachmentId} | UserId={UserId} | FileName={FileName} | FileSize={FileSize}",
+                attachmentId,
+                userId,
+                fileName,
+                fileBytes?.Length
             );
 
             Response.Headers.Add("Content-Disposition", $"attachment; filename=\"{fileName}\"");
@@ -94,7 +109,20 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             var userId = GetEmpMasterId();
 
+            Log.Information(
+                "GetAttachmentFilePreview START | AttachmentId={AttachmentId} | UserId={UserId}",
+                attachmentId,
+                userId
+            );
+
             var result = await _service.GetAttachmentFilePreview(attachmentId, userId);
+
+            Log.Information(
+                "GetAttachmentFilePreview END | AttachmentId={AttachmentId} | UserId={UserId} | FileName={FileName}",
+                attachmentId,
+                userId,
+                result.FileName
+            );
 
             return File(
                 result.FileBytes,
@@ -112,7 +140,19 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             var userId = GetEmpMasterId();
 
+            Log.Information(
+                "DeleteAttachment START | AttachmentId={AttachmentId} | UserId={UserId}",
+                attachmentId,
+                userId
+            );
+
             await _service.DeleteAttachment(attachmentId, userId);
+
+            Log.Information(
+                "DeleteAttachment END | AttachmentId={AttachmentId} | UserId={UserId} | Deleted=true",
+                attachmentId,
+                userId
+            );
 
             var response = ApiResponseModel.SuccessResponse(
                 ResponseMessages.Codes.FILE_DELETED_SUCCESS,

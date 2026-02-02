@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
+using Serilog;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Relevantz.EEPZ.Api.Controllers.Goals
@@ -24,6 +25,8 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             _service = service;
             _baseService = baseService;
+
+            Log.Debug("GoalsController initialized.");
         }
 
         /// <summary>
@@ -38,7 +41,21 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             var userId = GetEmpMasterId();
             var role = GetUserRole();
 
+            Log.Information(
+                "CreateGoal START | UserId={UserId} | Role={Role} | GoalTitle={Title}",
+                userId,
+                role,
+                dto?.Title
+            );
+
             var result = await _service.CreateGoal(dto, userId, role);
+
+            Log.Information(
+                "CreateGoal END | UserId={UserId} | Role={Role} | CreatedGoalId={GoalId}",
+                userId,
+                role,
+                result?.Data
+            );
 
             return CreatedAtAction(nameof(GetGoalDetailsById), new { id = result.Data }, result);
         }
@@ -52,7 +69,20 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             var userId = GetEmpMasterId();
             var role = GetUserRole();
 
+            Log.Information(
+                "GetGoalDetails START | GoalId={GoalId} | UserId={UserId} | Role={Role}",
+                id,
+                userId,
+                role
+            );
+
             var goal = await _baseService.GetGoal(id, userId, role);
+
+            Log.Information(
+                "GetGoalDetails END | GoalId={GoalId} | UserId={UserId}",
+                id,
+                userId
+            );
 
             var response = ApiResponseModel<GoalDetailModel>.SuccessResponse(
                 ResponseMessages.Codes.GOAL_RETRIEVED_SUCCESS,
@@ -72,7 +102,22 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             var userId = GetEmpMasterId();
             var role = GetUserRole();
 
+            Log.Information(
+                "QueryGoals START | UserId={UserId} | Role={Role} | Page={Page} | PageSize={PageSize} | Search={Search}",
+                userId,
+                role,
+                query.Page,
+                query.PageSize,
+                query.Search ?? "null"
+            );
+
             var goals = await _service.QueryGoals(query, userId, role);
+
+            Log.Information(
+                "QueryGoals END | UserId={UserId} | TotalReturned={Count}",
+                userId,
+                goals?.Count
+            );
 
             var response = ApiResponseModel<List<GoalSummaryModel>>.SuccessResponse(
                 ResponseMessages.Codes.GOAL_RETRIEVED_SUCCESS,
@@ -98,7 +143,21 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             var userId = GetEmpMasterId();
             var role = GetUserRole();
 
+            Log.Information(
+                "UpdateGoal START | GoalId={GoalId} | UserId={UserId} | Role={Role}",
+                id,
+                userId,
+                role
+            );
+
             var result = await _service.UpdateGoal(id, dto, userId, role);
+
+            Log.Information(
+                "UpdateGoal END | GoalId={GoalId} | UserId={UserId} | Success={Success}",
+                id,
+                userId,
+                result.Success
+            );
 
             return Ok(result);
         }
@@ -109,7 +168,15 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         [HttpGet("/api/goals/{id}/assignees")]
         public async Task<IActionResult> GetAssignees(int id)
         {
+            Log.Information("GetAssignees START | GoalId={GoalId}", id);
+
             var assignees = await _service.GetAssignees(id);
+
+            Log.Information(
+                "GetAssignees END | GoalId={GoalId} | Count={Count}",
+                id,
+                assignees.Count
+            );
 
             var response = ApiResponseModel<List<AssigneeModel>>.SuccessResponse(
                 ResponseMessages.Codes.ASSIGNMENT_RETRIEVED_SUCCESS,
@@ -121,7 +188,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         }
 
         /// <summary>
-        /// Assigns a goal to employees, restricted to managers and department heads.
+        /// Assigns a goal to employees.
         /// </summary>
         [HttpPost("/api/goals/{id}/assign")]
         [Authorize(Roles = $"{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD}")]
@@ -130,7 +197,21 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             var userId = GetEmpMasterId();
             var role = GetUserRole();
 
+            Log.Information(
+                "Assign START | GoalId={GoalId} | UserId={UserId} | Role={Role}",
+                id,
+                userId,
+                role
+            );
+
             var result = await _service.Assign(id, dto, userId, role);
+
+            Log.Information(
+                "Assign END | GoalId={GoalId} | UserId={UserId} | Success={Success}",
+                id,
+                userId,
+                result.Success
+            );
 
             return Ok(result);
         }
@@ -143,7 +224,15 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             var userId = GetEmpMasterId();
 
+            Log.Information("GetUserProjects START | UserId={UserId}", userId);
+
             var userProjects = await _service.GetUserProjects(userId);
+
+            Log.Information(
+                "GetUserProjects END | UserId={UserId} | Count={Count}",
+                userId,
+                userProjects.Count
+            );
 
             var response = ApiResponseModel<List<ProjectModel>>.SuccessResponse(
                 ResponseMessages.Codes.PROJECTS_RETRIEVED_SUCCESS,
@@ -155,7 +244,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         }
 
         /// <summary>
-        /// Retrieves all projects, accessible by managers and leadership roles.
+        /// Retrieves all projects.
         /// </summary>
         [HttpGet("/api/goals/projects")]
         [Authorize(
@@ -163,7 +252,11 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         )]
         public async Task<IActionResult> GetAllProjects()
         {
+            Log.Information("GetAllProjects START");
+
             var allProjects = await _service.GetAllProjects();
+
+            Log.Information("GetAllProjects END | ProjectCount={Count}", allProjects.Count);
 
             var response = ApiResponseModel<List<ProjectModel>>.SuccessResponse(
                 ResponseMessages.Codes.PROJECTS_RETRIEVED_SUCCESS,
@@ -180,7 +273,17 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         [HttpGet("/api/goals/projects/{projectId}")]
         public async Task<IActionResult> GetProject(int projectId)
         {
+            Log.Information(
+                "GetProject START | ProjectId={ProjectId}",
+                projectId
+            );
+
             var project = await _service.GetProject(projectId);
+
+            Log.Information(
+                "GetProject END | ProjectId={ProjectId}",
+                projectId
+            );
 
             var response = ApiResponseModel<ProjectModel>.SuccessResponse(
                 ResponseMessages.Codes.PROJECT_RETRIEVED_SUCCESS,

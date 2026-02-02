@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
+using Serilog;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Relevantz.EEPZ.Api.Controllers.Goals
@@ -25,6 +26,8 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             _service = service;
             _baseService = baseService;
+
+            Log.Debug("GoalProgressController initialized.");
         }
 
         /// <summary>
@@ -38,7 +41,21 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             var userId = GetEmpMasterId();
 
+            Log.Information(
+                "UpdateChecklistStatus START | GoalId={GoalId} | UserId={UserId} | ChecklistItemId={ChecklistItemId} | Status={Status}",
+                goalId,
+                userId,
+                dto?.IsCompleted
+            );
+
             var result = await _service.UpdateChecklistStatus(goalId, dto, userId);
+
+            Log.Information(
+                "UpdateChecklistStatus END | GoalId={GoalId} | UserId={UserId} | Success={Success}",
+                goalId,
+                userId,
+                result.Success
+            );
 
             return Ok(result);
         }
@@ -57,32 +74,26 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             var userId = GetEmpMasterId();
 
+            Log.Information(
+                "UpdateProgressPercentage START | GoalId={GoalId} | UserId={UserId} | UpdatedValue={Percent}",
+                goalId,
+                userId
+            );
+
             var result = await _service.UpdateProgressPercentage(goalId, dto, userId);
+
+            Log.Information(
+                "UpdateProgressPercentage END | GoalId={GoalId} | UserId={UserId} | Success={Success}",
+                goalId,
+                userId,
+                result.Success
+            );
 
             return Ok(result);
         }
 
-        // /// <summary>
-        // /// Retrieves the progress percentage of a specific goal for the current user.
-        // /// </summary>
-        // [HttpGet("api/goals/{goalId}")]
-        // public async Task<IActionResult> GetProgress(int goalId)
-        // {
-        //     var userId = GetEmpMasterId();
-
-        //     var percent = await _service.GetGoalProgressPercentAsync(goalId, userId);
-
-        //     var response = ApiResponseModel<object>.SuccessResponse(
-        //         ResponseMessages.Codes.PROGRESS_CALCULATED_SUCCESS,
-        //         new { progress = percent },
-        //         new { GoalId = goalId, UserId = userId }
-        //     );
-
-        //     return Ok(response);
-        // }
-
         /// <summary>
-        /// Retrieves the team progress percentage for a specific goal, accessible by managers and leadership roles.
+        /// Retrieves the team progress percentage for a specific goal.
         /// </summary>
         [HttpGet("api/goals/{goalId}/team")]
         [Authorize(
@@ -92,7 +103,20 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             var userId = GetEmpMasterId();
 
+            Log.Information(
+                "GetTeamProgressPercentage START | GoalId={GoalId} | ManagerId={UserId}",
+                goalId,
+                userId
+            );
+
             var percent = await _service.GetTeamGoalProgressForManager(goalId, userId);
+
+            Log.Information(
+                "GetTeamProgressPercentage END | GoalId={GoalId} | ManagerId={UserId} | TeamProgress={Progress}",
+                goalId,
+                userId,
+                percent
+            );
 
             var response = ApiResponseModel<object>.SuccessResponse(
                 ResponseMessages.Codes.PROGRESS_CALCULATED_SUCCESS,
@@ -104,14 +128,27 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         }
 
         /// <summary>
-        /// Retrieves cascading progress for a specific goal, reflecting dependent goals' progress.
+        /// Retrieves cascading progress for a specific goal.
         /// </summary>
         [HttpGet("api/goals/{goalId}/cascading")]
         public async Task<IActionResult> GetDependentProgress(int goalId)
         {
             var userId = GetEmpMasterId();
 
+            Log.Information(
+                "GetDependentProgress START | GoalId={GoalId} | UserId={UserId}",
+                goalId,
+                userId
+            );
+
             var progress = await _service.GetDependentProgress(goalId, userId);
+
+            Log.Information(
+                "GetDependentProgress END | GoalId={GoalId} | UserId={UserId} | CascadingProgress={Progress}",
+                goalId,
+                userId,
+                progress
+            );
 
             var response = ApiResponseModel<object>.SuccessResponse(
                 ResponseMessages.Codes.PROGRESS_CALCULATED_SUCCESS,
@@ -123,14 +160,27 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         }
 
         /// <summary>
-        /// Retrieves the progress hierarchy for a specific goal, showing structured progress details.
+        /// Retrieves the progress hierarchy for a specific goal.
         /// </summary>
         [HttpGet("api/goals/{goalId}/hierarchy")]
         public async Task<IActionResult> FetchGoalProgressTree(int goalId)
         {
             var userId = GetEmpMasterId();
 
+            Log.Information(
+                "FetchGoalProgressTree START | GoalId={GoalId} | UserId={UserId}",
+                goalId,
+                userId
+            );
+
             var hierarchy = await _service.FetchGoalProgressTree(goalId, userId);
+
+            Log.Information(
+                "FetchGoalProgressTree END | GoalId={GoalId} | UserId={UserId} | HasHierarchy={HasData}",
+                goalId,
+                userId,
+                hierarchy != null
+            );
 
             var response = ApiResponseModel<GoalProgressHierarchyModel>.SuccessResponse(
                 ResponseMessages.Codes.PROGRESS_CALCULATED_SUCCESS,
