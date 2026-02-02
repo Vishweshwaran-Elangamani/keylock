@@ -24,7 +24,11 @@ const HRMomDetails = () => {
   const [mom, setMom] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const accent = "#97247e";
+
+  // Helper to get property with PascalCase/camelCase fallback
+  const getProperty = (obj, camelKey, pascalKey) => {
+    return obj?.[camelKey] ?? obj?.[pascalKey] ?? null;
+  };
 
   useEffect(() => {
     if (momId) {
@@ -37,15 +41,40 @@ const HRMomDetails = () => {
     setError(null);
     try {
       const response = await momService.getMomById(momId);
+      
+      // Extract mom data with fallback
       let momData = null;
-      if (response?.success && response?.data) momData = response.data;
-      else if (response?.data) momData = response.data;
-      else if (response) momData = response;
+      if (response?.success && response?.data) {
+        momData = response.data;
+      } else if (response?.Success && response?.Data) {
+        momData = response.Data;
+      } else if (response?.data) {
+        momData = response.data;
+      } else if (response?.Data) {
+        momData = response.Data;
+      } else if (response) {
+        momData = response;
+      }
+
+      if (!momData) {
+        throw new Error("No MOM data received");
+      }
+
       setMom(momData);
     } catch (err) {
       console.error("Fetch MOM details error:", err);
-      setError("Failed to load MOM details");
-      toastr.error("Failed to load MOM details");
+      
+      // Enhanced error handling
+      if (err.retryAfter) {
+        setError(`Rate limit exceeded. Please wait ${err.retryAfter} seconds.`);
+        toastr.error(`Rate limit exceeded. Please wait ${err.retryAfter} seconds.`);
+      } else if (err.message) {
+        setError(`Failed to load MOM details: ${err.message}`);
+        toastr.error(`Failed to load MOM details: ${err.message}`);
+      } else {
+        setError("Failed to load MOM details");
+        toastr.error("Failed to load MOM details");
+      }
     } finally {
       setLoading(false);
     }
@@ -62,7 +91,7 @@ const HRMomDetails = () => {
       <span
         className={`hrmom-badge ${badgeMap[type] || "hrmom-badge-secondary"}`}
       >
-        {type}
+        {type || 'Other'}
       </span>
     );
   };
@@ -75,6 +104,23 @@ const HRMomDetails = () => {
         </span>
       );
     }
+    
+    if (status === "Completed") {
+      return (
+        <span className="hrmom-badge hrmom-badge-success hrmom-badge-icon">
+          <CheckCircle size={14} /> Completed
+        </span>
+      );
+    }
+    
+    if (status === "Pending") {
+      return (
+        <span className="hrmom-badge hrmom-badge-warning hrmom-badge-icon">
+          <Clock size={14} /> Pending
+        </span>
+      );
+    }
+    
     return null;
   };
 
@@ -127,19 +173,36 @@ const HRMomDetails = () => {
   };
 
   const calculateActionItemStats = () => {
-    if (!mom?.actionItems || !Array.isArray(mom.actionItems)) {
+    if (!mom) {
       return { total: 0, completed: 0, pending: 0, overdue: 0 };
     }
 
-    return {
-      total: mom.actionItems.length,
-      completed: mom.actionItems.filter((ai) => ai.status === "Completed")
-        .length,
-      pending: mom.actionItems.filter(
-        (ai) => ai.status === "Pending" && !ai.isOverdue
-      ).length,
-      overdue: mom.actionItems.filter((ai) => ai.isOverdue).length,
-    };
+    const actionItems = getProperty(mom, 'actionItems', 'ActionItems');
+    
+    if (!Array.isArray(actionItems)) {
+      return { total: 0, completed: 0, pending: 0, overdue: 0 };
+    }
+
+    const total = actionItems.length;
+    let completed = 0;
+    let pending = 0;
+    let overdue = 0;
+
+    actionItems.forEach((ai) => {
+      const status = getProperty(ai, 'status', 'Status');
+      const isOverdueFlag = getProperty(ai, 'isOverdue', 'IsOverdue');
+      const dueDate = getProperty(ai, 'dueDate', 'DueDate');
+
+      if (status === "Completed") {
+        completed++;
+      } else if (isOverdueFlag || (status === "Pending" && dueDate && new Date(dueDate) < new Date())) {
+        overdue++;
+      } else if (status === "Pending") {
+        pending++;
+      }
+    });
+
+    return { total, completed, pending, overdue };
   };
 
   if (loading) {
@@ -162,6 +225,9 @@ const HRMomDetails = () => {
           <div className="hrmom-error-card">
             <AlertCircle size={48} className="hrmom-error-icon" />
             <h3 className="hrmom-error-title">{error || "MOM not found"}</h3>
+            <p className="text-muted mb-4">
+              The requested meeting minute could not be loaded.
+            </p>
             <button
               className="hrmom-btn hrmom-btn-primary"
               onClick={() => navigate(-1)}
@@ -176,6 +242,20 @@ const HRMomDetails = () => {
   }
 
   const actionStats = calculateActionItemStats();
+  
+  // Extract properties with fallback
+  const meetingTitle = getProperty(mom, 'meetingTitle', 'MeetingTitle');
+  const meetingType = getProperty(mom, 'meetingType', 'MeetingType');
+  const meetingDate = getProperty(mom, 'meetingDate', 'MeetingDate');
+  const meetingLink = getProperty(mom, 'meetingLink', 'MeetingLink');
+  const departmentName = getProperty(mom, 'departmentName', 'DepartmentName');
+  const submittedByName = getProperty(mom, 'submittedByEmployeeName', 'SubmittedByEmployeeName');
+  const submittedByRole = getProperty(mom, 'submittedByRole', 'SubmittedByRole');
+  const createdAt = getProperty(mom, 'createdAt', 'CreatedAt');
+  const updatedAt = getProperty(mom, 'updatedAt', 'UpdatedAt');
+  const commentsObservations = getProperty(mom, 'commentsObservations', 'CommentsObservations');
+  const discussionPoints = getProperty(mom, 'discussionPoints', 'DiscussionPoints');
+  const actionItems = getProperty(mom, 'actionItems', 'ActionItems');
 
   return (
     <div className="hrmom-wrapper">
@@ -201,7 +281,7 @@ const HRMomDetails = () => {
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
-                  navigate("/hr/dasboard/meetmom");
+                  navigate("/hr/dashboard/meetmom");
                 }}
                 className="hrmom-breadcrumb-link"
               >
@@ -219,6 +299,7 @@ const HRMomDetails = () => {
           </ol>
         </nav>
 
+        {/* Stats Cards */}
         <div className="hrmom-stats-grid">
           <div className="hrmom-stat-card">
             <div className="hrmom-stat-content">
@@ -228,9 +309,7 @@ const HRMomDetails = () => {
               />
               <div className="hrmom-stat-info">
                 <div className="hrmom-stat-value">
-                  {Array.isArray(mom.discussionPoints)
-                    ? mom.discussionPoints.length
-                    : 0}
+                  {Array.isArray(discussionPoints) ? discussionPoints.length : 0}
                 </div>
                 <div className="hrmom-stat-label">Discussion Points</div>
               </div>
@@ -252,6 +331,19 @@ const HRMomDetails = () => {
 
           <div className="hrmom-stat-card">
             <div className="hrmom-stat-content">
+              <CheckCircle
+                size={24}
+                className="hrmom-stat-icon hrmom-stat-icon-success"
+              />
+              <div className="hrmom-stat-info">
+                <div className="hrmom-stat-value">{actionStats.completed}</div>
+                <div className="hrmom-stat-label">Completed</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="hrmom-stat-card">
+            <div className="hrmom-stat-content">
               <AlertCircle
                 size={24}
                 className="hrmom-stat-icon hrmom-stat-icon-danger"
@@ -264,17 +356,20 @@ const HRMomDetails = () => {
           </div>
         </div>
 
+        {/* Meeting Details Card */}
         <div className="hrmom-card">
           <div className="hrmom-card-body">
             <div className="hrmom-meeting-header">
               <div className="hrmom-meeting-info">
-                <h3 className="hrmom-meeting-title">{mom.meetingTitle}</h3>
+                <h3 className="hrmom-meeting-title">
+                  {meetingTitle || 'Untitled Meeting'}
+                </h3>
                 <div className="hrmom-meeting-badges">
-                  {getMeetingTypeBadge(mom.meetingType)}
-                  {mom.departmentName && (
+                  {getMeetingTypeBadge(meetingType)}
+                  {departmentName && (
                     <span className="hrmom-badge hrmom-badge-light">
                       <Users size={14} />
-                      {mom.departmentName}
+                      {departmentName}
                     </span>
                   )}
                 </div>
@@ -288,17 +383,17 @@ const HRMomDetails = () => {
                     Meeting Date &amp; Time
                   </div>
                   <div className="hrmom-detail-value">
-                    {formatDateTime(mom.meetingDate)}
+                    {formatDateTime(meetingDate)}
                   </div>
                 </div>
               </div>
 
-              {mom.meetingLink && (
+              {meetingLink && (
                 <div className="hrmom-detail-item">
                   <div className="hrmom-detail-content">
                     <div className="hrmom-detail-label">Meeting Link</div>
                     <a
-                      href={mom.meetingLink}
+                      href={meetingLink}
                       target="_blank"
                       rel="noreferrer"
                       className="hrmom-detail-link"
@@ -313,11 +408,11 @@ const HRMomDetails = () => {
                 <div className="hrmom-detail-content">
                   <div className="hrmom-detail-label">Submitted By</div>
                   <div className="hrmom-detail-value">
-                    {mom.submittedByEmployeeName || "Unknown"}
+                    {submittedByName || "Unknown"}
                   </div>
-                  {mom.submittedByRole && (
+                  {submittedByRole && (
                     <small className="hrmom-detail-meta">
-                      {mom.submittedByRole}
+                      {submittedByRole}
                     </small>
                   )}
                 </div>
@@ -326,12 +421,14 @@ const HRMomDetails = () => {
               <div className="hrmom-detail-item">
                 <div className="hrmom-detail-content">
                   <div className="hrmom-detail-label">Tracking</div>
-                  <div className="hrmom-detail-value hrmom-detail-value-sm">
-                    Created: {formatDate(mom.createdAt)}
-                  </div>
-                  {mom.updatedAt && (
+                  {createdAt && (
                     <div className="hrmom-detail-value hrmom-detail-value-sm">
-                      Updated: {formatDate(mom.updatedAt)}
+                      Created: {formatDate(createdAt)}
+                    </div>
+                  )}
+                  {updatedAt && (
+                    <div className="hrmom-detail-value hrmom-detail-value-sm">
+                      Updated: {formatDate(updatedAt)}
                     </div>
                   )}
                 </div>
@@ -340,7 +437,8 @@ const HRMomDetails = () => {
           </div>
         </div>
 
-        {mom.commentsObservations && (
+        {/* Comments Section */}
+        {commentsObservations && commentsObservations.trim() && (
           <div className="hrmom-card">
             <div className="hrmom-card-header">
               <h5 className="hrmom-card-title">
@@ -350,113 +448,149 @@ const HRMomDetails = () => {
             </div>
             <div className="hrmom-card-body">
               <div className="hrmom-comments-box">
-                {mom.commentsObservations}
+                {commentsObservations}
               </div>
             </div>
           </div>
         )}
 
+        {/* Two Column Layout */}
         <div className="hrmom-two-column-grid">
+          {/* Discussion Points */}
           <div className="hrmom-card">
             <div className="hrmom-card-header">
               <h5 className="hrmom-card-title">
                 <MessageSquare size={22} />
                 Discussion Points (
-                {Array.isArray(mom.discussionPoints)
-                  ? mom.discussionPoints.length
-                  : 0}
-                )
+                {Array.isArray(discussionPoints) ? discussionPoints.length : 0})
               </h5>
             </div>
             <div className="hrmom-card-body">
-              {mom.discussionPoints &&
-              Array.isArray(mom.discussionPoints) &&
-              mom.discussionPoints.length > 0 ? (
+              {Array.isArray(discussionPoints) && discussionPoints.length > 0 ? (
                 <div className="hrmom-discussion-list">
-                  {mom.discussionPoints.map((dp, index) => (
-                    <div
-                      key={dp.pointId || index}
-                      className="hrmom-discussion-item"
-                    >
-                      <div className="hrmom-discussion-content">
-                        <p className="hrmom-discussion-text">
-                          {dp.pointText || dp.point || "No details"}
-                        </p>
-                        {dp.timestamp && (
-                          <small className="hrmom-discussion-time">
-                            <Clock size={12} />
-                            Discussed at: {formatDateTime(dp.timestamp)}
-                          </small>
-                        )}
+                  {discussionPoints.map((dp, index) => {
+                    const pointId = getProperty(dp, 'pointId', 'PointId');
+                    const pointText = getProperty(dp, 'pointText', 'PointText') || 
+                                     getProperty(dp, 'point', 'Point');
+                    const timestamp = getProperty(dp, 'timestamp', 'Timestamp');
+
+                    return (
+                      <div
+                        key={pointId || index}
+                        className="hrmom-discussion-item"
+                      >
+                        <div className="hrmom-discussion-index">
+                          {index + 1}
+                        </div>
+                        <div className="hrmom-discussion-content">
+                          <p className="hrmom-discussion-text">
+                            {pointText || "No details"}
+                          </p>
+                          {timestamp && (
+                            <small className="hrmom-discussion-time">
+                              <Clock size={12} />
+                              Discussed at: {formatDateTime(timestamp)}
+                            </small>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="hrmom-empty-state">
-                  No discussion points recorded
+                  <MessageSquare size={32} className="text-muted mb-2" />
+                  <p className="mb-0">No discussion points recorded</p>
                 </div>
               )}
             </div>
           </div>
 
+          {/* Action Items */}
           <div className="hrmom-card">
             <div className="hrmom-card-header">
               <h5 className="hrmom-card-title">
                 <CheckCircle size={22} />
                 Action Items ({actionStats.total})
               </h5>
+              {actionStats.total > 0 && (
+                <div className="d-flex gap-2">
+                  <span className="badge bg-success">
+                    {actionStats.completed} Completed
+                  </span>
+                  <span className="badge bg-warning">
+                    {actionStats.pending} Pending
+                  </span>
+                  {actionStats.overdue > 0 && (
+                    <span className="badge bg-danger">
+                      {actionStats.overdue} Overdue
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
             <div className="hrmom-card-body">
-              {mom.actionItems &&
-              Array.isArray(mom.actionItems) &&
-              mom.actionItems.length > 0 ? (
+              {Array.isArray(actionItems) && actionItems.length > 0 ? (
                 <div className="hrmom-action-items-list">
-                  {mom.actionItems.map((ai, index) => (
-                    <div
-                      key={ai.actionItemId || index}
-                      className="hrmom-action-item"
-                    >
-                      <div className="hrmom-action-item-header">
-                        <div className="hrmom-action-item-content">
-                          <div className="hrmom-action-item-title">
-                            {ai.taskDescription || ai.task || "No description"}
+                  {actionItems.map((ai, index) => {
+                    const actionItemId = getProperty(ai, 'actionItemId', 'ActionItemId');
+                    const taskDescription = getProperty(ai, 'taskDescription', 'TaskDescription') || 
+                                          getProperty(ai, 'task', 'Task');
+                    const assignedToName = getProperty(ai, 'assignedToEmployeeName', 'AssignedToEmployeeName') || 
+                                          getProperty(ai, 'assignTo', 'AssignTo');
+                    const dueDate = getProperty(ai, 'dueDate', 'DueDate');
+                    const status = getProperty(ai, 'status', 'Status');
+                    const isOverdueFlag = getProperty(ai, 'isOverdue', 'IsOverdue');
+                    const priority = getProperty(ai, 'priority', 'Priority');
+                    const notes = getProperty(ai, 'notes', 'Notes');
+
+                    // Calculate overdue if flag not present
+                    const isOverdue = isOverdueFlag || 
+                                     (status === 'Pending' && dueDate && new Date(dueDate) < new Date());
+
+                    return (
+                      <div
+                        key={actionItemId || index}
+                        className="hrmom-action-item"
+                      >
+                        <div className="hrmom-action-item-header">
+                          <div className="hrmom-action-item-content">
+                            <div className="hrmom-action-item-title">
+                              {taskDescription || "No description"}
+                            </div>
+                            {notes && (
+                              <small className="hrmom-action-item-notes">
+                                {notes}
+                              </small>
+                            )}
                           </div>
-                          {ai.notes && (
-                            <small className="hrmom-action-item-notes">
-                              {ai.notes}
-                            </small>
-                          )}
+                        </div>
+                        <div className="hrmom-action-item-details">
+                          <div className="hrmom-action-item-detail">
+                            <User size={14} />
+                            <span>{assignedToName || "Unassigned"}</span>
+                          </div>
+                          <div className="hrmom-action-item-detail">
+                            <Calendar size={14} />
+                            <span
+                              className={isOverdue ? "hrmom-date-overdue" : ""}
+                            >
+                              {formatDate(dueDate)}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="hrmom-action-item-badges">
+                          {getStatusBadge(status, isOverdue)}
+                          {priority && getPriorityBadge(priority)}
                         </div>
                       </div>
-                      <div className="hrmom-action-item-details">
-                        <div className="hrmom-action-item-detail">
-                          <User size={14} />
-                          <span>
-                            {ai.assignedToEmployeeName ||
-                              ai.assignTo ||
-                              "Unassigned"}
-                          </span>
-                        </div>
-                        <div className="hrmom-action-item-detail">
-                          <Calendar size={14} />
-                          <span
-                            className={ai.isOverdue ? "hrmom-date-overdue" : ""}
-                          >
-                            {formatDate(ai.dueDate)}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="hrmom-action-item-badges">
-                        {getStatusBadge(ai.status, ai.isOverdue)}
-                        {ai.priority && getPriorityBadge(ai.priority)}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="hrmom-empty-state">
-                  No action items recorded
+                  <CheckCircle size={32} className="text-muted mb-2" />
+                  <p className="mb-0">No action items recorded</p>
                 </div>
               )}
             </div>

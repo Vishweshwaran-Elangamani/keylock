@@ -41,18 +41,35 @@ const EmployeeMomDashboard = () => {
     }
   }, [location.state]);
 
+  // Helper to get property with PascalCase/camelCase fallback
+  const getProperty = (obj, camelKey, pascalKey) => {
+    return obj?.[camelKey] ?? obj?.[pascalKey] ?? null;
+  };
+
   const loadAllEmployees = async () => {
     try {
       const res = await employeeService.getAllEmployees();
-      if (res?.success && Array.isArray(res.data)) {
+      const employeeData = res?.data || res?.Data || [];
+      const employeeSuccess = res?.success || res?.Success;
+
+      if (employeeSuccess && Array.isArray(employeeData)) {
         const map = {};
-        res.data.forEach((emp) => {
-          map[emp.employeeMasterId] = `${emp.firstName} ${emp.lastName}`;
+        employeeData.forEach((emp) => {
+          const empId = getProperty(emp, 'employeeMasterId', 'EmployeeMasterId') || 
+                        getProperty(emp, 'employeeId', 'EmployeeId');
+          const firstName = getProperty(emp, 'firstName', 'FirstName') || '';
+          const lastName = getProperty(emp, 'lastName', 'LastName') || '';
+          if (empId) {
+            map[empId] = `${firstName} ${lastName}`.trim();
+          }
         });
         setEmployeeMap(map);
       }
     } catch (error) {
       console.error("Error loading employees:", error);
+      if (error.retryAfter) {
+        console.warn(`Rate limit: retry after ${error.retryAfter} seconds`);
+      }
     }
   };
 
@@ -62,61 +79,94 @@ const EmployeeMomDashboard = () => {
 
       const [myMomsRes, actionItemsRes, invitationsRes, sharedRes] =
         await Promise.all([
-          momService.getMyMoms(),
+          momService.getMyMoms({ pageNumber: 1, pageSize: 100 }),
           momService.getMyActionItems(),
           rsvpService.getMyInvitations(),
           momService.getMomsSharedWithMe(),
         ]);
 
-      const pendingActions =
-        actionItemsRes.data?.filter((item) => item.status === "Pending") || [];
-      const pendingInvites =
-        invitationsRes.data?.filter((inv) => inv.rsvpStatus === "Pending") ||
-        [];
+      // Extract data with PascalCase/camelCase fallback
+      const myMomsData = myMomsRes?.data?.data || myMomsRes?.data?.Data || 
+                         myMomsRes?.Data?.Data || myMomsRes?.data || [];
+      
+      const actionItemsData = actionItemsRes?.data || actionItemsRes?.Data || [];
+      const invitationsData = invitationsRes?.data || invitationsRes?.Data || [];
+      const sharedData = sharedRes?.data || sharedRes?.Data || [];
+
+      // Filter pending actions
+      const pendingActions = actionItemsData.filter((item) => {
+        const status = getProperty(item, 'status', 'Status');
+        return status === "Pending";
+      });
+
+      // Filter pending invitations
+      const pendingInvites = invitationsData.filter((inv) => {
+        const rsvpStatus = getProperty(inv, 'rsvpStatus', 'RsvpStatus');
+        return rsvpStatus === "Pending";
+      });
 
       setStats({
-        myMoms: myMomsRes.data?.length || 0,
+        myMoms: Array.isArray(myMomsData) ? myMomsData.length : 0,
         pendingActionItems: pendingActions.length,
         meetingInvitations: pendingInvites.length,
-        sharedMoms: sharedRes.data?.length || 0,
+        sharedMoms: Array.isArray(sharedData) ? sharedData.length : 0,
       });
 
       const activity = [];
 
-      if (myMomsRes.data) {
-        myMomsRes.data.slice(0, 3).forEach((mom) => {
+      // Add recent MOMs to activity
+      if (Array.isArray(myMomsData) && myMomsData.length > 0) {
+        myMomsData.slice(0, 3).forEach((mom) => {
+          const meetingTitle = getProperty(mom, 'meetingTitle', 'MeetingTitle');
+          const createdAt = getProperty(mom, 'createdAt', 'CreatedAt');
+          const meetingId = getProperty(mom, 'meetingId', 'MeetingId');
+
           activity.push({
             type: "mom",
-            title: mom.meetingTitle,
-            date: mom.createdAt,
+            title: meetingTitle || 'Untitled Meeting',
+            date: createdAt,
             icon: "bi-file-text",
             color: "primary",
-            meetingId: mom.meetingId,
+            meetingId: meetingId,
             meetingData: mom,
           });
         });
       }
 
-      if (invitationsRes.data) {
-        invitationsRes.data.slice(0, 2).forEach((inv) => {
+      // Add recent invitations to activity
+      if (Array.isArray(invitationsData) && invitationsData.length > 0) {
+        invitationsData.slice(0, 2).forEach((inv) => {
+          const meetingTitle = getProperty(inv, 'meetingTitle', 'MeetingTitle');
+          const meetingDate = getProperty(inv, 'meetingDate', 'MeetingDate');
+          const meetingId = getProperty(inv, 'meetingId', 'MeetingId');
+
           activity.push({
             type: "invitation",
-            title: inv.meetingTitle,
-            date: inv.meetingDate,
+            title: meetingTitle || 'Untitled Meeting',
+            date: meetingDate,
             icon: "bi-calendar-event",
             color: "warning",
-            meetingId: inv.meetingId,
+            meetingId: meetingId,
             meetingData: inv,
           });
         });
       }
 
       setRecentActivity(
-        activity.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5)
+        activity
+          .sort((a, b) => new Date(b.date) - new Date(a.date))
+          .slice(0, 5)
       );
     } catch (error) {
-      toastr.error("Failed to load dashboard data");
-      console.error(error);
+      console.error("Dashboard data error:", error);
+      
+      if (error.retryAfter) {
+        toastr.error(`Rate limit exceeded. Please wait ${error.retryAfter} seconds.`);
+      } else if (error.message) {
+        toastr.error(`Failed to load dashboard: ${error.message}`);
+      } else {
+        toastr.error("Failed to load dashboard data");
+      }
     } finally {
       setLoading(false);
     }
@@ -124,10 +174,20 @@ const EmployeeMomDashboard = () => {
 
   const fetchMeetings = async () => {
     try {
-      const res = await momService.getMyMoms();
-      setMeetings(res.data || []);
+      const res = await momService.getMyMoms({ pageNumber: 1, pageSize: 100 });
+      
+      // Extract meetings data with fallback
+      const meetingsData = res?.data?.data || res?.data?.Data || 
+                          res?.Data?.Data || res?.data || [];
+      
+      setMeetings(Array.isArray(meetingsData) ? meetingsData : []);
     } catch (error) {
-      toastr.error("Failed to load meetings");
+      console.error("Failed to load meetings:", error);
+      if (error.retryAfter) {
+        console.warn(`Rate limit: retry after ${error.retryAfter} seconds`);
+      } else {
+        toastr.error("Failed to load meetings");
+      }
     }
   };
 
@@ -318,6 +378,7 @@ const EmployeeMomDashboard = () => {
                         key={idx}
                         item={item}
                         onClick={() => handleActivityClick(item)}
+                        getProperty={getProperty}
                       />
                     ))}
                   </div>
@@ -352,48 +413,60 @@ const EmployeeMomDashboard = () => {
                 ) : (
                   <>
                     <div className="emd-meetings-list">
-                      {meetings.slice(0, 5).map((m) => (
-                        <div
-                          key={m.meetingId}
-                          className="emd-meeting-item"
-                          onClick={() => openMeetingDetails(m)}
-                        >
-                          <div className="emd-meeting-main">
-                            <div className="emd-meeting-title-row">
-                              <span className="emd-meeting-title">
-                                {m.meetingTitle}
-                              </span>
-                              <span className="emd-meeting-type-pill">
-                                {m.meetingType}
-                              </span>
-                            </div>
-                            <div className="emd-meeting-meta-row">
-                              <span className="emd-meta-item">
-                                <i className="bi bi-calendar3"></i>
-                                {new Date(m.meetingDate).toLocaleDateString()}
-                              </span>
-                              <span className="emd-meta-item">
-                                <i className="bi bi-clock"></i>
-                                {new Date(m.meetingDate).toLocaleTimeString(
-                                  [],
-                                  {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  }
-                                )}
-                              </span>
-                              {m.actionItems && m.actionItems.length > 0 && (
-                                <span className="emd-meta-item">
-                                  <i className="bi bi-check-circle"></i>
-                                  {m.actionItems.length} action
-                                  {m.actionItems.length !== 1 ? "s" : ""}
+                      {meetings.slice(0, 5).map((m) => {
+                        const meetingId = getProperty(m, 'meetingId', 'MeetingId');
+                        const meetingTitle = getProperty(m, 'meetingTitle', 'MeetingTitle');
+                        const meetingType = getProperty(m, 'meetingType', 'MeetingType');
+                        const meetingDate = getProperty(m, 'meetingDate', 'MeetingDate');
+                        const actionItems = getProperty(m, 'actionItems', 'ActionItems') || [];
+
+                        return (
+                          <div
+                            key={meetingId}
+                            className="emd-meeting-item"
+                            onClick={() => openMeetingDetails(m)}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => e.key === 'Enter' && openMeetingDetails(m)}
+                          >
+                            <div className="emd-meeting-main">
+                              <div className="emd-meeting-title-row">
+                                <span className="emd-meeting-title">
+                                  {meetingTitle || 'Untitled Meeting'}
                                 </span>
-                              )}
+                                <span className="emd-meeting-type-pill">
+                                  {meetingType || 'Other'}
+                                </span>
+                              </div>
+                              <div className="emd-meeting-meta-row">
+                                <span className="emd-meta-item">
+                                  <i className="bi bi-calendar3"></i>
+                                  {meetingDate 
+                                    ? new Date(meetingDate).toLocaleDateString()
+                                    : 'No date'}
+                                </span>
+                                <span className="emd-meta-item">
+                                  <i className="bi bi-clock"></i>
+                                  {meetingDate
+                                    ? new Date(meetingDate).toLocaleTimeString([], {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      })
+                                    : '--:--'}
+                                </span>
+                                {Array.isArray(actionItems) && actionItems.length > 0 && (
+                                  <span className="emd-meta-item">
+                                    <i className="bi bi-check-circle"></i>
+                                    {actionItems.length} action
+                                    {actionItems.length !== 1 ? "s" : ""}
+                                  </span>
+                                )}
+                              </div>
                             </div>
+                            <i className="bi bi-chevron-right emd-meeting-arrow"></i>
                           </div>
-                          <i className="bi bi-chevron-right emd-meeting-arrow"></i>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
 
                     {meetings.length > 5 && (
@@ -433,7 +506,13 @@ const EmployeeMomDashboard = () => {
 
 const StatCard = ({ icon, variant, count, label, onClick }) => (
   <div className="col-xl-3 col-lg-6 col-md-6 col-sm-6 col-12">
-    <div className="emd-stat-card-horizontal" onClick={onClick}>
+    <div 
+      className="emd-stat-card-horizontal" 
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === 'Enter' && onClick()}
+    >
       <div className={`emd-stat-icon-block emd-stat-icon-block-${variant}`}>
         <i className={`${icon} emd-stat-icon emd-stat-icon-${variant}`} />
       </div>
@@ -445,33 +524,59 @@ const StatCard = ({ icon, variant, count, label, onClick }) => (
   </div>
 );
 
-const ActivityItem = ({ item, onClick }) => (
-  <div className="emd-activity-item" onClick={onClick}>
-    <div
-      className={`emd-activity-icon-wrapper emd-activity-${
-        item.color || "primary"
-      }`}
+const ActivityItem = ({ item, onClick, getProperty }) => {
+  const formatDate = (dateString) => {
+    if (!dateString) return 'No date';
+    try {
+      return new Date(dateString).toLocaleDateString();
+    } catch {
+      return 'Invalid date';
+    }
+  };
+
+  const formatTime = (dateString) => {
+    if (!dateString) return '--:--';
+    try {
+      return new Date(dateString).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch {
+      return '--:--';
+    }
+  };
+
+  return (
+    <div 
+      className="emd-activity-item" 
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === 'Enter' && onClick()}
     >
-      <i className={`${item.icon} emd-activity-icon`} />
-    </div>
-    <div className="emd-activity-main">
-      <h6 className="emd-activity-title">{item.title}</h6>
-      <div className="emd-activity-meta-row">
-        <span className="emd-meta-item">
-          <i className="bi bi-calendar3"></i>
-          {new Date(item.date).toLocaleDateString()}
-        </span>
-        <span className="emd-meta-item">
-          <i className="bi bi-clock"></i>
-          {new Date(item.date).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-        </span>
+      <div
+        className={`emd-activity-icon-wrapper emd-activity-${
+          item.color || "primary"
+        }`}
+      >
+        <i className={`${item.icon} emd-activity-icon`} />
       </div>
+      <div className="emd-activity-main">
+        <h6 className="emd-activity-title">{item.title}</h6>
+        <div className="emd-activity-meta-row">
+          <span className="emd-meta-item">
+            <i className="bi bi-calendar3"></i>
+            {formatDate(item.date)}
+          </span>
+          <span className="emd-meta-item">
+            <i className="bi bi-clock"></i>
+            {formatTime(item.date)}
+          </span>
+        </div>
+      </div>
+      <i className="bi bi-arrow-right emd-activity-arrow" />
     </div>
-    <i className="bi bi-arrow-right emd-activity-arrow" />
-  </div>
-);
+  );
+};
 
 export default EmployeeMomDashboard;

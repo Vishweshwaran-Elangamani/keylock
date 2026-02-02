@@ -30,66 +30,121 @@ const ActionItemsManagement = () => {
         employeeService.getAllEmployees(),
       ]);
 
-      if (employeesRes.success && employeesRes.data) {
+      // Handle PascalCase or camelCase employee response
+      const employeeData = employeesRes.data || employeesRes.Data || [];
+      const employeeSuccess = employeesRes.success || employeesRes.Success;
+
+      if (employeeSuccess && employeeData.length > 0) {
         const nameMap = {};
-        employeesRes.data.forEach((emp) => {
-          nameMap[emp.employeeMasterId] = `${emp.firstName} ${emp.lastName}`;
+        employeeData.forEach((emp) => {
+          const empId = emp.employeeMasterId || emp.EmployeeMasterId || emp.employeeId || emp.EmployeeId;
+          const firstName = emp.firstName || emp.FirstName || '';
+          const lastName = emp.lastName || emp.LastName || '';
+          if (empId) {
+            nameMap[empId] = `${firstName} ${lastName}`.trim();
+          }
         });
         setEmployeeMap(nameMap);
       }
 
-      const items = actionItemsRes.data || [];
+      // Handle PascalCase or camelCase action items response
+      const items = actionItemsRes.data || actionItemsRes.Data || [];
       setActionItems(items);
     } catch (err) {
       console.error("ERROR loading data:", err);
-      toastr.error("Failed to load action items");
+      
+      // Enhanced error handling
+      if (err.retryAfter) {
+        toastr.error(`Rate limit exceeded. Please wait ${err.retryAfter} seconds.`);
+      } else if (err.message) {
+        toastr.error(`Failed to load action items: ${err.message}`);
+      } else {
+        toastr.error("Failed to load action items");
+      }
     } finally {
       setLoading(false);
     }
   };
 
+  // Helper to get property with PascalCase/camelCase fallback
+  const getProperty = (obj, camelKey, pascalKey) => {
+    return obj?.[camelKey] || obj?.[pascalKey] || null;
+  };
+
   const getMeetingTitle = (item) => {
+    // Try multiple possible property paths
     return (
-      item.meetingTitle ||
-      item.MeetingTitle ||
-      item.mom?.meetingTitle ||
-      item.mom?.MeetingTitle ||
-      item.Mom?.meetingTitle ||
-      item.Mom?.MeetingTitle ||
+      getProperty(item, 'meetingTitle', 'MeetingTitle') ||
+      getProperty(item.mom, 'meetingTitle', 'MeetingTitle') ||
+      getProperty(item.Mom, 'meetingTitle', 'MeetingTitle') ||
       "No title available"
     );
   };
 
+  const getTaskDescription = (item) => {
+    return getProperty(item, 'taskDescription', 'TaskDescription') || 'No description';
+  };
+
+  const getDueDate = (item) => {
+    return getProperty(item, 'dueDate', 'DueDate');
+  };
+
+  const getStatus = (item) => {
+    return getProperty(item, 'status', 'Status') || 'Pending';
+  };
+
+  const getActionItemId = (item) => {
+    return getProperty(item, 'actionItemId', 'ActionItemId');
+  };
+
+  const getAssignedByName = (item) => {
+    return getProperty(item, 'assignedByEmployeeName', 'AssignedByEmployeeName');
+  };
+
+  const getAssignedById = (item) => {
+    return getProperty(item, 'assignedByEmployeeId', 'AssignedByEmployeeId');
+  };
+
   const filteredItems = actionItems.filter((item) => {
     const meetingTitle = getMeetingTitle(item);
+    const taskDescription = getTaskDescription(item);
     const term = searchTerm.trim().toLowerCase();
 
     const matchesSearch =
       term.length === 0 ||
-      item.taskDescription?.toLowerCase().includes(term) ||
+      taskDescription.toLowerCase().includes(term) ||
       meetingTitle.toLowerCase().includes(term);
 
     if (!matchesSearch) return false;
 
-    if (filter === "pending") return item.status === "Pending";
-    if (filter === "completed") return item.status === "Completed";
-    if (filter === "overdue")
-      return item.status === "Pending" && new Date(item.dueDate) < new Date();
+    const status = getStatus(item);
+    const dueDate = getDueDate(item);
+
+    if (filter === "pending") return status === "Pending";
+    if (filter === "completed") return status === "Completed";
+    if (filter === "overdue") {
+      return status === "Pending" && dueDate && new Date(dueDate) < new Date();
+    }
 
     return true;
   });
 
   const stats = {
     total: actionItems.length,
-    pending: actionItems.filter((i) => i.status === "Pending").length,
-    completed: actionItems.filter((i) => i.status === "Completed").length,
-    overdue: actionItems.filter(
-      (i) => i.status === "Pending" && new Date(i.dueDate) < new Date()
-    ).length,
+    pending: actionItems.filter((i) => getStatus(i) === "Pending").length,
+    completed: actionItems.filter((i) => getStatus(i) === "Completed").length,
+    overdue: actionItems.filter((i) => {
+      const status = getStatus(i);
+      const dueDate = getDueDate(i);
+      return status === "Pending" && dueDate && new Date(dueDate) < new Date();
+    }).length,
   };
 
-  const isOverdue = (item) =>
-    item.status === "Pending" && new Date(item.dueDate) < new Date();
+  const isOverdue = (item) => {
+    const status = getStatus(item);
+    const dueDate = getDueDate(item);
+    return status === "Pending" && dueDate && new Date(dueDate) < new Date();
+  };
 
   const handleSearchClick = () => {
     const trimmed = searchInput.trim();
@@ -102,6 +157,14 @@ const ActionItemsManagement = () => {
     setSearchInput("");
     setSearchTerm("");
     setIsSearching(false);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSearchClick();
+    } else if (e.key === "Escape") {
+      handleCancelClick();
+    }
   };
 
   if (loading) {
@@ -164,6 +227,9 @@ const ActionItemsManagement = () => {
             <div
               className="card aim-stat-card"
               onClick={() => setFilter("all")}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && setFilter("all")}
             >
               <div className="card-body aim-stat-card-body">
                 <div className="aim-stat-icon aim-stat-icon-total">
@@ -180,7 +246,50 @@ const ActionItemsManagement = () => {
           <div className="col-lg-3 col-md-6">
             <div
               className="card aim-stat-card"
+              onClick={() => setFilter("pending")}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && setFilter("pending")}
+            >
+              <div className="card-body aim-stat-card-body">
+                <div className="aim-stat-icon aim-stat-icon-pending">
+                  <i className="bi bi-clock-history"></i>
+                </div>
+                <div className="aim-stat-text">
+                  <h4 className="aim-stat-value">{stats.pending}</h4>
+                  <p className="aim-stat-label">Pending</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-lg-3 col-md-6">
+            <div
+              className="card aim-stat-card"
+              onClick={() => setFilter("completed")}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && setFilter("completed")}
+            >
+              <div className="card-body aim-stat-card-body">
+                <div className="aim-stat-icon aim-stat-icon-completed">
+                  <i className="bi bi-check-circle"></i>
+                </div>
+                <div className="aim-stat-text">
+                  <h4 className="aim-stat-value">{stats.completed}</h4>
+                  <p className="aim-stat-label">Completed</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-lg-3 col-md-6">
+            <div
+              className="card aim-stat-card"
               onClick={() => setFilter("overdue")}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && setFilter("overdue")}
             >
               <div className="card-body aim-stat-card-body">
                 <div className="aim-stat-icon aim-stat-icon-overdue">
@@ -207,12 +316,10 @@ const ActionItemsManagement = () => {
                   <input
                     type="text"
                     className="form-control aim-search-input"
-                    placeholder="Search action items..."
+                    placeholder="Search action items by task or meeting title..."
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") handleSearchClick();
-                    }}
+                    onKeyDown={handleKeyDown}
                   />
 
                   <div className="aim-search-separator" />
@@ -231,6 +338,7 @@ const ActionItemsManagement = () => {
                       type="button"
                       onClick={handleSearchClick}
                       className="aim-search-action-btn aim-search-btn"
+                      disabled={!searchInput.trim()}
                     >
                       <Search size={16} />
                       Search
@@ -245,6 +353,29 @@ const ActionItemsManagement = () => {
                 </span>
               </div>
             </div>
+
+            {filter !== 'all' && (
+              <div className="mt-3">
+                <span className="badge bg-primary me-2">
+                  Filter: {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                </span>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-outline-secondary"
+                  onClick={() => setFilter('all')}
+                >
+                  Clear Filter
+                </button>
+              </div>
+            )}
+
+            {searchTerm && (
+              <div className="mt-2">
+                <small className="text-muted">
+                  Searching for: "<strong>{searchTerm}</strong>"
+                </small>
+              </div>
+            )}
           </div>
         </div>
 
@@ -260,8 +391,23 @@ const ActionItemsManagement = () => {
                   <p className="aim-empty-text">
                     {searchTerm
                       ? "Try adjusting your search criteria"
+                      : filter !== 'all'
+                      ? `No ${filter} action items`
                       : "You have no action items assigned"}
                   </p>
+                  {(searchTerm || filter !== 'all') && (
+                    <button
+                      className="btn btn-primary mt-3"
+                      onClick={() => {
+                        setSearchInput("");
+                        setSearchTerm("");
+                        setIsSearching(false);
+                        setFilter('all');
+                      }}
+                    >
+                      Clear All Filters
+                    </button>
+                  )}
                 </div>
               </div>
             ) : (
@@ -269,14 +415,33 @@ const ActionItemsManagement = () => {
                 {filteredItems.map((item) => {
                   const overdueStatus = isOverdue(item);
                   const meetingTitle = getMeetingTitle(item);
+                  const taskDescription = getTaskDescription(item);
+                  const dueDate = getDueDate(item);
+                  const status = getStatus(item);
+                  const actionItemId = getActionItemId(item);
+                  const assignedByName = getAssignedByName(item);
+                  const assignedById = getAssignedById(item);
 
                   return (
-                    <div key={item.actionItemId} className="col-lg-6 col-xl-4">
+                    <div key={actionItemId} className="col-lg-6 col-xl-4">
                       <div className="card aim-item-card h-100">
                         <div className="card-body aim-item-card-body">
-                          <h6 className="aim-item-title">
-                            {item.taskDescription}
-                          </h6>
+                          <div className="d-flex justify-content-between align-items-start mb-2">
+                            <h6 className="aim-item-title flex-grow-1">
+                              {taskDescription}
+                            </h6>
+                            <span
+                              className={`badge ${
+                                status === "Completed"
+                                  ? "bg-success"
+                                  : overdueStatus
+                                  ? "bg-danger"
+                                  : "bg-warning text-dark"
+                              }`}
+                            >
+                              {overdueStatus ? "Overdue" : status}
+                            </span>
+                          </div>
 
                           <div className="aim-item-meeting">
                             <small className="aim-item-meeting-text">
@@ -293,34 +458,34 @@ const ActionItemsManagement = () => {
                                   overdueStatus ? "aim-item-due-overdue" : ""
                                 }
                               >
-                                {new Date(item.dueDate).toLocaleDateString(
-                                  "en-US",
-                                  {
-                                    year: "numeric",
-                                    month: "short",
-                                    day: "numeric",
-                                  }
-                                )}
+                                {dueDate
+                                  ? new Date(dueDate).toLocaleDateString(
+                                      "en-US",
+                                      {
+                                        year: "numeric",
+                                        month: "short",
+                                        day: "numeric",
+                                      }
+                                    )
+                                  : "No due date"}
                               </span>
                             </div>
 
-                            {item.assignedByEmployeeName && (
+                            {assignedByName && (
                               <div className="aim-item-meta-row">
                                 <strong>Assigned by:</strong>
-                                <span>{item.assignedByEmployeeName}</span>
+                                <span>{assignedByName}</span>
                               </div>
                             )}
 
-                            {!item.assignedByEmployeeName &&
-                              item.assignedByEmployeeId && (
-                                <div className="aim-item-meta-row">
-                                  <strong>Assigned by:</strong>
-                                  <span>
-                                    {employeeMap[item.assignedByEmployeeId] ||
-                                      "—"}
-                                  </span>
-                                </div>
-                              )}
+                            {!assignedByName && assignedById && (
+                              <div className="aim-item-meta-row">
+                                <strong>Assigned by:</strong>
+                                <span>
+                                  {employeeMap[assignedById] || `ID: ${assignedById}`}
+                                </span>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>

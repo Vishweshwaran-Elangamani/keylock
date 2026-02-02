@@ -17,11 +17,12 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "../../styles/mom/components/MeetingInvitations.css";
 
+// ✅ CHANGED: Use numeric values to match backend enum
 const RSVP_STATUS = {
-  ACCEPTED: { label: "Accepted", value: "Accepted" },
-  DECLINED: { label: "Declined", value: "Declined" },
-  TENTATIVE: { label: "Tentative", value: "Tentative" },
-  PENDING: { label: "Pending", value: "Pending" },
+  PENDING: { label: "Pending", value: 0 },
+  ACCEPTED: { label: "Accepted", value: 1 },
+  DECLINED: { label: "Declined", value: 2 },
+  TENTATIVE: { label: "Tentative", value: 3 },
 };
 
 const MeetingInvitations = () => {
@@ -60,10 +61,11 @@ const MeetingInvitations = () => {
     setSelectedInvitation(invitation);
     setErrorMessage("");
 
-    const currentStatus = invitation.rsvpStatus || RSVP_STATUS.PENDING.value;
+    // Get current status as number
+    const currentStatus = invitation.rsvpStatus ?? invitation.RsvpStatus ?? RSVP_STATUS.PENDING.value;
     setRsvpStatus(currentStatus);
 
-    setRsvpComment(invitation.rsvpComments || "");
+    setRsvpComment(invitation.rsvpComments || invitation.RsvpComments || "");
   };
 
   const closeRsvpModal = () => {
@@ -87,11 +89,14 @@ const MeetingInvitations = () => {
       setSubmitting(true);
       setErrorMessage("");
 
+      // Send with PascalCase keys and numeric enum
       const payload = {
-        meetingId: Number(meetingId),
-        rsvpStatus: rsvpStatus,
-        rsvpComments: rsvpComment.trim(),
+        MeetingId: Number(meetingId),
+        RsvpStatus: Number(rsvpStatus), // ✅ Convert to number
+        RsvpComments: rsvpComment.trim(),
       };
+
+      console.log("Submitting RSVP with payload:", payload);
 
       const response = await rsvpService.submitRsvp(payload);
 
@@ -127,32 +132,50 @@ const MeetingInvitations = () => {
     }
   };
 
+  // ✅ UPDATED: Handle both numeric and string status values
   const getStatusBadge = (status) => {
-    switch (status) {
-      case RSVP_STATUS.ACCEPTED.value:
+    // Convert to number if needed
+    const statusNum = typeof status === 'string' ? parseInt(status) : Number(status);
+
+    switch (statusNum) {
+      case 1: // Accepted
         return (
           <span className="mi-badge mi-badge-accepted">
             <CheckCircle size={14} /> Accepted
           </span>
         );
-      case RSVP_STATUS.DECLINED.value:
+      case 2: // Declined
         return (
           <span className="mi-badge mi-badge-declined">
             <XCircle size={14} /> Declined
           </span>
         );
-      case RSVP_STATUS.TENTATIVE.value:
+      case 3: // Tentative
         return (
           <span className="mi-badge mi-badge-tentative">
             <AlertCircle size={14} /> Tentative
           </span>
         );
-      default:
+      default: // 0 or Pending
         return (
           <span className="mi-badge mi-badge-pending">
             <Clock size={14} /> Pending
           </span>
         );
+    }
+  };
+
+  // ✅ NEW: Helper to get status label from numeric value
+  const getStatusLabel = (statusNum) => {
+    switch (Number(statusNum)) {
+      case 1:
+        return "Accepted";
+      case 2:
+        return "Declined";
+      case 3:
+        return "Tentative";
+      default:
+        return "Pending";
     }
   };
 
@@ -277,12 +300,13 @@ const MeetingInvitations = () => {
                   "Untitled Meeting";
                 const meetingDate = getField(inv, "meetingDate", "MeetingDate");
                 const rsvpStatusValue =
-                  getField(inv, "rsvpStatus", "RSVPStatus") ||
-                  RSVP_STATUS.PENDING.value;
+                  getField(inv, "rsvpStatus", "RsvpStatus") ?? RSVP_STATUS.PENDING.value;
 
                 const invitedAt = getField(inv, "invitedAt", "InvitedAt");
                 const schedulerName = getField(
                   inv,
+                  "scheduledByEmployeeName",
+                  "ScheduledByEmployeeName",
                   "schedulerName",
                   "SchedulerName",
                   "organizerName",
@@ -441,6 +465,8 @@ const MeetingInvitations = () => {
 
                           {getField(
                             selectedInvitation,
+                            "scheduledByEmployeeName",
+                            "ScheduledByEmployeeName",
                             "schedulerName",
                             "SchedulerName",
                             "organizerName",
@@ -453,6 +479,8 @@ const MeetingInvitations = () => {
                                 <strong>
                                   {getField(
                                     selectedInvitation,
+                                    "scheduledByEmployeeName",
+                                    "ScheduledByEmployeeName",
                                     "schedulerName",
                                     "SchedulerName",
                                     "organizerName",
@@ -469,8 +497,8 @@ const MeetingInvitations = () => {
                     {getField(
                       selectedInvitation,
                       "rsvpStatus",
-                      "RSVPStatus"
-                    ) !== RSVP_STATUS.PENDING && (
+                      "RsvpStatus"
+                    ) !== RSVP_STATUS.PENDING.value && (
                       <div className="alert alert-info mi-current-status-alert">
                         <AlertCircle
                           size={18}
@@ -478,15 +506,17 @@ const MeetingInvitations = () => {
                         />
                         <div className="mi-current-status-text">
                           <strong>Current Response:</strong>{" "}
-                          {getField(
-                            selectedInvitation,
-                            "rsvpStatus",
-                            "RSVPStatus"
+                          {getStatusLabel(
+                            getField(
+                              selectedInvitation,
+                              "rsvpStatus",
+                              "RsvpStatus"
+                            )
                           )}
                           {getField(
                             selectedInvitation,
                             "rsvpResponseDate",
-                            "RSVPResponseDate"
+                            "RsvpResponseDate"
                           ) && (
                             <div className="mi-current-status-meta">
                               Responded on{" "}
@@ -494,7 +524,7 @@ const MeetingInvitations = () => {
                                 getField(
                                   selectedInvitation,
                                   "rsvpResponseDate",
-                                  "RSVPResponseDate"
+                                  "RsvpResponseDate"
                                 )
                               )}
                             </div>
@@ -516,8 +546,8 @@ const MeetingInvitations = () => {
                           name="rsvpStatus"
                           id="rsvp-accepted"
                           value={RSVP_STATUS.ACCEPTED.value}
-                          checked={rsvpStatus === RSVP_STATUS.ACCEPTED.value}
-                          onChange={(e) => setRsvpStatus(e.target.value)}
+                          checked={Number(rsvpStatus) === RSVP_STATUS.ACCEPTED.value}
+                          onChange={(e) => setRsvpStatus(Number(e.target.value))}
                         />
 
                         <label
@@ -534,8 +564,8 @@ const MeetingInvitations = () => {
                           name="rsvpStatus"
                           id="rsvp-tentative"
                           value={RSVP_STATUS.TENTATIVE.value}
-                          checked={rsvpStatus === RSVP_STATUS.TENTATIVE.value}
-                          onChange={(e) => setRsvpStatus(e.target.value)}
+                          checked={Number(rsvpStatus) === RSVP_STATUS.TENTATIVE.value}
+                          onChange={(e) => setRsvpStatus(Number(e.target.value))}
                         />
 
                         <label
@@ -552,8 +582,8 @@ const MeetingInvitations = () => {
                           name="rsvpStatus"
                           id="rsvp-declined"
                           value={RSVP_STATUS.DECLINED.value}
-                          checked={rsvpStatus === RSVP_STATUS.DECLINED.value}
-                          onChange={(e) => setRsvpStatus(e.target.value)}
+                          checked={Number(rsvpStatus) === RSVP_STATUS.DECLINED.value}
+                          onChange={(e) => setRsvpStatus(Number(e.target.value))}
                         />
                         <label
                           className="btn btn-outline-danger mi-rsvp-option"
@@ -580,14 +610,14 @@ const MeetingInvitations = () => {
                       {getField(
                         selectedInvitation,
                         "rsvpComments",
-                        "RSVPComments"
+                        "RsvpComments"
                       ) && (
                         <small className="mi-previous-comment">
                           <strong>Previous comment:</strong> "
                           {getField(
                             selectedInvitation,
                             "rsvpComments",
-                            "RSVPComments"
+                            "RsvpComments"
                           )}
                           "
                         </small>
@@ -624,8 +654,8 @@ const MeetingInvitations = () => {
                           {getField(
                             selectedInvitation,
                             "rsvpStatus",
-                            "RSVPStatus"
-                          ) === RSVP_STATUS.PENDING
+                            "RsvpStatus"
+                          ) === RSVP_STATUS.PENDING.value
                             ? "Submit RSVP"
                             : "Update RSVP"}
                         </>

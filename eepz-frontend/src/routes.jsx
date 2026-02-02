@@ -1660,7 +1660,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/hr/dasboard/meetmom/:momId"
+        path="/hr/dashboard/meetmom/:momId"
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">

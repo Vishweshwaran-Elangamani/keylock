@@ -18,6 +18,7 @@ const rsvpService = {
 
   submitRsvp: async (rsvpData) => {
     try {
+      console.log("Submitting RSVP:", rsvpData);
       const response = await apii.post("/rsvp", rsvpData);
       return response.data;
     } catch (error) {
@@ -25,9 +26,10 @@ const rsvpService = {
     }
   },
 
-  updateParticipantRsvp: async (participantId, rsvpData) => {
+  updateParticipantRsvp: async (meetingId, rsvpData) => {
     try {
-      const response = await apii.put(`/rsvp/${participantId}`, rsvpData, {
+      console.log("Updating RSVP:", rsvpData);
+      const response = await apii.put(`/rsvp/${meetingId}`, rsvpData, {
         headers: { "Content-Type": "application/json" },
       });
       return response.data;

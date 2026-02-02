@@ -35,6 +35,11 @@ const ManagerMomDashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
 
+  // Helper to get property with PascalCase/camelCase fallback
+  const getProperty = (obj, camelKey, pascalKey) => {
+    return obj?.[camelKey] ?? obj?.[pascalKey] ?? null;
+  };
+
   useEffect(() => {
     loadDashboardData();
   }, []);
@@ -42,7 +47,7 @@ const ManagerMomDashboard = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       loadDashboardData(true);
-    }, 30000);
+    }, 30000); // Refresh every 30 seconds
     return () => clearInterval(interval);
   }, []);
 
@@ -57,56 +62,109 @@ const ManagerMomDashboard = () => {
 
       const [myMomsRes, meetingsRes, employeesRes, actionItemsAssignedByMeRes] =
         await Promise.all([
-          momService.getMyMoms(),
+          momService.getMyMoms({ pageNumber: 1, pageSize: 100 }),
           meetingService.getMyMeetings(),
           employeeService.getAllEmployees(),
           momService.getActionItemsAssignedByMe(),
         ]);
 
-      if (employeesRes?.success && employeesRes?.data) {
+      // Extract employee data
+      const employeeData = employeesRes?.data || employeesRes?.Data || [];
+      const employeeSuccess = employeesRes?.success || employeesRes?.Success;
+
+      if (employeeSuccess && Array.isArray(employeeData)) {
         const nameMap = {};
-        employeesRes.data.forEach((emp) => {
-          nameMap[emp.employeeMasterId] = `${emp.firstName} ${emp.lastName}`;
+        employeeData.forEach((emp) => {
+          const empId = getProperty(emp, 'employeeMasterId', 'EmployeeMasterId') || 
+                        getProperty(emp, 'employeeId', 'EmployeeId');
+          const firstName = getProperty(emp, 'firstName', 'FirstName') || '';
+          const lastName = getProperty(emp, 'lastName', 'LastName') || '';
+          if (empId) {
+            nameMap[empId] = `${firstName} ${lastName}`.trim();
+          }
         });
         setEmployeeMap(nameMap);
       }
 
-      const allActionItems = actionItemsAssignedByMeRes?.data || [];
-      const overdueCount = allActionItems.filter((ai) => {
-        const dueDate = new Date(ai.dueDate);
-        return ai.status === "Pending" && dueDate < new Date();
+      // Extract action items
+      const allActionItems = actionItemsAssignedByMeRes?.data || 
+                            actionItemsAssignedByMeRes?.Data || [];
+      
+      const overdueCount = Array.isArray(allActionItems) 
+        ? allActionItems.filter((ai) => {
+            const dueDate = getProperty(ai, 'dueDate', 'DueDate');
+            const status = getProperty(ai, 'status', 'Status');
+            const isOverdue = getProperty(ai, 'isOverdue', 'IsOverdue');
+            
+            if (isOverdue) return true;
+            if (status === "Pending" && dueDate) {
+              return new Date(dueDate) < new Date();
+            }
+            return false;
+          }).length
+        : 0;
+
+      // Extract meetings data
+      const meetingsData = meetingsRes?.data?.meetings || 
+                          meetingsRes?.data?.Meetings || 
+                          meetingsRes?.Data?.meetings || 
+                          meetingsRes?.Data?.Meetings || 
+                          meetingsRes?.data || 
+                          meetingsRes?.Data || [];
+      
+      const meetings = Array.isArray(meetingsData) ? meetingsData : [];
+      
+      const totalMeetingsCount = meetingsRes?.data?.totalCount || 
+                                meetingsRes?.data?.TotalCount || 
+                                meetingsRes?.Data?.totalCount || 
+                                meetingsRes?.Data?.TotalCount || 
+                                meetings.length;
+
+      // Extract MOMs data
+      const momsData = myMomsRes?.data?.data || 
+                      myMomsRes?.data?.Data || 
+                      myMomsRes?.Data?.Data || 
+                      myMomsRes?.data || 
+                      myMomsRes?.Data || [];
+      
+      const momsArray = Array.isArray(momsData) ? momsData : [];
+
+      // Count One-on-One meetings
+      const oneOnOnesCount = meetings.filter((m) => {
+        const meetingType = getProperty(m, 'meetingType', 'MeetingType');
+        return meetingType === "One-on-One";
       }).length;
 
-      const meetings = meetingsRes?.data?.meetings || [];
-
       setStats({
-        teamMomsCount: myMomsRes?.data?.length || 0,
-        oneOnOnesCount:
-          meetings.filter((m) => m.meetingType === "One-on-One").length || 0,
+        teamMomsCount: momsArray.length,
+        oneOnOnesCount: oneOnOnesCount,
         overdueActionsCount: overdueCount,
-        totalMeetingsCount:
-          meetingsRes?.data?.totalCount || meetings.length || 0,
+        totalMeetingsCount: totalMeetingsCount,
       });
 
       setActionItems(allActionItems);
 
+      // Fetch RSVP data for each meeting
       const meetingsWithRsvp = await Promise.all(
         meetings.map(async (meeting) => {
           try {
-            const rsvpSummaryResponse = await rsvpService.getMeetingRsvpSummary(
-              meeting.meetingId
-            );
-            const rsvpSummary = rsvpSummaryResponse?.data;
+            const meetingId = getProperty(meeting, 'meetingId', 'MeetingId');
+            const rsvpSummaryResponse = await rsvpService.getMeetingRsvpSummary(meetingId);
+            
+            const rsvpData = rsvpSummaryResponse?.data || 
+                           rsvpSummaryResponse?.Data || 
+                           rsvpSummaryResponse;
 
             return {
               ...meeting,
-              rsvpAcceptedCount: rsvpSummary?.acceptedCount || 0,
-              rsvpTotalInvitations: rsvpSummary?.totalInvitations || 0,
-              rsvpParticipants: rsvpSummary?.participants || [],
+              rsvpAcceptedCount: getProperty(rsvpData, 'acceptedCount', 'AcceptedCount') || 0,
+              rsvpTotalInvitations: getProperty(rsvpData, 'totalInvitations', 'TotalInvitations') || 0,
+              rsvpParticipants: getProperty(rsvpData, 'participants', 'Participants') || [],
             };
           } catch (error) {
+            const meetingId = getProperty(meeting, 'meetingId', 'MeetingId');
             console.error(
-              `Failed to get RSVP summary for meeting ${meeting.meetingId}`,
+              `Failed to get RSVP summary for meeting ${meetingId}`,
               error
             );
             return {
@@ -120,10 +178,20 @@ const ManagerMomDashboard = () => {
       );
 
       setUpcomingMeetings(meetingsWithRsvp);
-      setRecentTeamMoms(myMomsRes?.data?.slice(0, 5) || []);
+      setRecentTeamMoms(momsArray.slice(0, 5));
     } catch (err) {
-      toastr.error("Failed to load Manager MOM dashboard");
-      console.error(err);
+      console.error("Dashboard load error:", err);
+      
+      // Enhanced error handling
+      if (err.retryAfter) {
+        if (!silentRefresh) {
+          toastr.error(`Rate limit exceeded. Please wait ${err.retryAfter} seconds.`);
+        }
+      } else if (err.message) {
+        toastr.error(`Failed to load dashboard: ${err.message}`);
+      } else {
+        toastr.error("Failed to load Manager MOM dashboard");
+      }
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -135,13 +203,17 @@ const ManagerMomDashboard = () => {
 
   const formatDateTime = (isoString) => {
     if (!isoString) return "−";
-    const date = new Date(isoString);
-    const dd = String(date.getDate()).padStart(2, "0");
-    const mm = String(date.getMonth() + 1).padStart(2, "0");
-    const yyyy = date.getFullYear();
-    const hh = String(date.getHours()).padStart(2, "0");
-    const min = String(date.getMinutes()).padStart(2, "0");
-    return `${dd}-${mm}-${yyyy} ${hh}:${min}`;
+    try {
+      const date = new Date(isoString);
+      const dd = String(date.getDate()).padStart(2, "0");
+      const mm = String(date.getMonth() + 1).padStart(2, "0");
+      const yyyy = date.getFullYear();
+      const hh = String(date.getHours()).padStart(2, "0");
+      const min = String(date.getMinutes()).padStart(2, "0");
+      return `${dd}-${mm}-${yyyy} ${hh}:${min}`;
+    } catch {
+      return "−";
+    }
   };
 
   const safeTotal = upcomingMeetings.length;
@@ -171,6 +243,7 @@ const ManagerMomDashboard = () => {
         >
           <span className="visually-hidden">Loading...</span>
         </div>
+        <p className="managermom-loading-text">Loading dashboard...</p>
       </div>
     );
   }
@@ -208,6 +281,7 @@ const ManagerMomDashboard = () => {
       </div>
 
       <div className="managermom-container">
+        {/* Stats Cards */}
         <div className="row g-3 mb-4">
           <StatCard
             icon="bi-file-text"
@@ -235,6 +309,17 @@ const ManagerMomDashboard = () => {
           />
         </div>
 
+        {/* Refresh indicator */}
+        {refreshing && (
+          <div className="alert alert-info py-2 mb-3">
+            <small>
+              <i className="bi bi-arrow-clockwise me-2"></i>
+              Refreshing data...
+            </small>
+          </div>
+        )}
+
+        {/* Toolbar */}
         <div className="managermom-toolbar">
           <div
             className="managermom-view-switch"
@@ -279,6 +364,7 @@ const ManagerMomDashboard = () => {
           </div>
         </div>
 
+        {/* Upcoming Meetings Header */}
         <div className="managermom-upcoming-header">
           <h5 className="managermom-upcoming-title">Upcoming Meetings</h5>
           <span className="badge managermom-upcoming-count">
@@ -286,6 +372,7 @@ const ManagerMomDashboard = () => {
           </span>
         </div>
 
+        {/* Table View */}
         {viewMode === "table" ? (
           <div className="managermom-table-shell">
             <div className="table-responsive">
@@ -313,6 +400,11 @@ const ManagerMomDashboard = () => {
                     </tr>
                   ) : (
                     paginatedMeetings.map((meeting) => {
+                      const meetingId = getProperty(meeting, 'meetingId', 'MeetingId');
+                      const meetingTitle = getProperty(meeting, 'meetingTitle', 'MeetingTitle');
+                      const meetingDate = getProperty(meeting, 'meetingDate', 'MeetingDate');
+                      const meetingType = getProperty(meeting, 'meetingType', 'MeetingType');
+
                       const widthClass = getProgressWidthClass(
                         meeting.rsvpAcceptedCount,
                         meeting.rsvpTotalInvitations
@@ -320,27 +412,30 @@ const ManagerMomDashboard = () => {
 
                       return (
                         <tr
-                          key={meeting.meetingId}
+                          key={meetingId}
                           className="managermom-table-row"
                           onClick={() => openMeetingDetails(meeting)}
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(e) => e.key === 'Enter' && openMeetingDetails(meeting)}
                         >
                           <td>
                             <div className="managermom-meeting-title-cell">
                               <span className="fw-semibold">
-                                {meeting.meetingTitle}
+                                {meetingTitle || 'Untitled Meeting'}
                               </span>
                             </div>
                           </td>
 
                           <td>
                             <span className="text-muted">
-                              {formatDateTime(meeting.meetingDate)}
+                              {formatDateTime(meetingDate)}
                             </span>
                           </td>
 
                           <td>
                             <span className="badge managermom-type-badge">
-                              {meeting.meetingType || "General"}
+                              {meetingType || "General"}
                             </span>
                           </td>
 
@@ -350,6 +445,9 @@ const ManagerMomDashboard = () => {
                                 <div
                                   className={`progress-bar bg-success ${widthClass}`}
                                   role="progressbar"
+                                  aria-valuenow={meeting.rsvpAcceptedCount}
+                                  aria-valuemin="0"
+                                  aria-valuemax={meeting.rsvpTotalInvitations}
                                 ></div>
                               </div>
                               <small className="text-muted">
@@ -384,6 +482,7 @@ const ManagerMomDashboard = () => {
                                 e.stopPropagation();
                                 openMeetingDetails(meeting);
                               }}
+                              aria-label={`View ${meetingTitle}`}
                             >
                               <i className="bi bi-eye me-1"></i>
                               View
@@ -416,8 +515,9 @@ const ManagerMomDashboard = () => {
             )}
           </div>
         ) : (
+          /* Grid View */
           <>
-            <div className="row g-3">
+            <div className="row g-3 mb-4">
               {paginatedMeetings.length === 0 ? (
                 <div className="col-12 managermom-empty-card-wrapper">
                   <i className="bi bi-calendar-x managermom-empty-icon"></i>
@@ -425,16 +525,24 @@ const ManagerMomDashboard = () => {
                 </div>
               ) : (
                 paginatedMeetings.map((meeting) => {
+                  const meetingId = getProperty(meeting, 'meetingId', 'MeetingId');
+                  const meetingTitle = getProperty(meeting, 'meetingTitle', 'MeetingTitle');
+                  const meetingDate = getProperty(meeting, 'meetingDate', 'MeetingDate');
+                  const meetingType = getProperty(meeting, 'meetingType', 'MeetingType');
+
                   const widthClass = getProgressWidthClass(
                     meeting.rsvpAcceptedCount,
                     meeting.rsvpTotalInvitations
                   );
 
                   return (
-                    <div key={meeting.meetingId} className="col-lg-4 col-md-6">
+                    <div key={meetingId} className="col-lg-4 col-md-6">
                       <div
                         className="h-100 managermom-meeting-card"
                         onClick={() => openMeetingDetails(meeting)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => e.key === 'Enter' && openMeetingDetails(meeting)}
                       >
                         <div className="card-body">
                           <div className="managermom-meeting-card-header">
@@ -442,17 +550,17 @@ const ManagerMomDashboard = () => {
                               <i className="bi bi-calendar-event managermom-card-avatar-icon"></i>
                             </div>
                             <span className="badge managermom-type-badge">
-                              {meeting.meetingType || "General"}
+                              {meetingType || "General"}
                             </span>
                           </div>
 
                           <h6 className="card-title fw-semibold mb-2">
-                            {meeting.meetingTitle}
+                            {meetingTitle || 'Untitled Meeting'}
                           </h6>
 
                           <p className="text-muted small mb-3">
                             <i className="bi bi-clock me-1"></i>
-                            {formatDateTime(meeting.meetingDate)}
+                            {formatDateTime(meetingDate)}
                           </p>
 
                           <div className="managermom-meeting-card-footer">
@@ -468,6 +576,9 @@ const ManagerMomDashboard = () => {
                               <div
                                 className={`progress-bar bg-success ${widthClass}`}
                                 role="progressbar"
+                                aria-valuenow={meeting.rsvpAcceptedCount}
+                                aria-valuemin="0"
+                                aria-valuemax={meeting.rsvpTotalInvitations}
                               ></div>
                             </div>
                           </div>
@@ -478,9 +589,24 @@ const ManagerMomDashboard = () => {
                 })
               )}
             </div>
+
+            {safeTotal > 0 && viewMode === "grid" && (
+              <div className="managermom-pf-wrap">
+                <PaginationFooter
+                  currentPage={validCurrentPage}
+                  totalItems={safeTotal}
+                  itemsPerPage={perPage}
+                  onPageChange={(p) => setCurrentPage(p)}
+                  showPageSizeDropdown={false}
+                  showStatusText={true}
+                  pageNumberMode="compact"
+                />
+              </div>
+            )}
           </>
         )}
 
+        {/* Meeting Details Modal */}
         {selectedMeeting && (
           <ManagerMeetingDetailsModal
             meeting={selectedMeeting}
