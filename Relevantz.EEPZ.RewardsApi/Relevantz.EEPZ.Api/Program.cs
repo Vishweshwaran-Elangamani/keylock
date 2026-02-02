@@ -210,10 +210,6 @@ builder.Services.AddHealthChecks()
     .AddCheck<MySqlDbHealthCheck>("mysql-db", tags: new[] { "ready", "db", "mysql" });
  
 
-<<<<<<< Updated upstream
-//  Register custom exception handling middleware (added)
-=======
->>>>>>> Stashed changes
 builder.Services.AddTransient<Relevantz.EEPZ.Api.Middleware.ExceptionHandlingMiddleware>();
  
 var app = builder.Build();
@@ -229,11 +225,6 @@ else
 }
  
 
-<<<<<<< Updated upstream
-//  Removed: Inline UseExceptionHandler block
-//  Add custom exception handling middleware early in the pipeline (added)
-app.UseMiddleware<Relevantz.EEPZ.Api.Middleware.ExceptionHandlingMiddleware>();
-=======
 app.Use(async (ctx, next) =>
 {
     ctx.Response.Headers.Remove("Server");
@@ -277,7 +268,6 @@ app.UseSerilogRequestLogging(options =>
     };
 });
  
->>>>>>> Stashed changes
 
 app.UseHttpsRedirection();
  
