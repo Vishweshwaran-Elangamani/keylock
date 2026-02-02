@@ -30,10 +30,10 @@ const ReopenSLAForm = ({ sla, onClose, onSuccess }) => {
         reopenedByEmployeeId: user.empId,
       };
 
-const response = await slaService.reopenSLA(sla.slaid, {
-  extensionDays: 1,
-  reopenReason: formData.reason,
-});
+      const response = await slaService.reopenSLA(sla.slaid, {
+        extensionDays: 1,
+        reopenReason: formData.reason,
+      });
 
       if (response.success) {
         toast.success("SLA reopened successfully");

@@ -126,9 +126,7 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
           <form className="esla-form" onSubmit={handleSubmit}>
             <div className="esla-sla-info">
               <small className="esla-sla-label">Current SLA</small>
-              <strong className="esla-sla-type">
-                {sla?.slatype || "N/A"}
-              </strong>
+              <strong className="esla-sla-type">{sla?.slatype || "N/A"}</strong>
               <small className="esla-sla-employee">
                 Employee: {sla?.employeeName || "N/A"}
               </small>
@@ -139,10 +137,7 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
                 Deadline <span className="esla-required">*</span>
               </label>
 
-              <div
-                ref={calendarAnchorRef}
-                className="esla-calendar-container"
-              >
+              <div ref={calendarAnchorRef} className="esla-calendar-container">
                 <input
                   type="text"
                   readOnly

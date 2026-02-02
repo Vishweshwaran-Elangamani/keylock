@@ -95,7 +95,10 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
 
   return (
     <>
-      <div className="esc-modal-backdrop" onClick={() => !loading && onClose()} />
+      <div
+        className="esc-modal-backdrop"
+        onClick={() => !loading && onClose()}
+      />
       <div className="esc-modal-wrapper">
         <div className="esc-modal-container">
           <div className="esc-modal-header">
@@ -114,8 +117,14 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
             {error && (
               <div className="esc-error-alert">
                 <AlertCircle size={18} />
-                <div><p>{error}</p></div>
-                <button onClick={() => setError(null)} className="esc-error-close" type="button">
+                <div>
+                  <p>{error}</p>
+                </div>
+                <button
+                  onClick={() => setError(null)}
+                  className="esc-error-close"
+                  type="button"
+                >
                   <X size={16} />
                 </button>
               </div>
@@ -125,11 +134,15 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
               <div className="esc-sla-info">
                 <div className="esc-info-row">
                   <span className="esc-info-label">SLA Type:</span>
-                  <span className="esc-info-value">{sla?.slatype || "N/A"}</span>
+                  <span className="esc-info-value">
+                    {sla?.slatype || "N/A"}
+                  </span>
                 </div>
                 <div className="esc-info-row">
                   <span className="esc-info-label">Employee:</span>
-                  <span className="esc-info-value">{sla?.employeeName || "N/A"}</span>
+                  <span className="esc-info-value">
+                    {sla?.employeeName || "N/A"}
+                  </span>
                 </div>
                 <div className="esc-info-row">
                   <span className="esc-info-label">Deadline:</span>
@@ -141,7 +154,11 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
 
               <div className="esc-form-group">
                 <CustomDropdown
-                  label={<span className="esc-dd-label">Reason <span className="esc-required">*</span></span>}
+                  label={
+                    <span className="esc-dd-label">
+                      Reason <span className="esc-required">*</span>
+                    </span>
+                  }
                   required
                   name="reason"
                   value={formData.reason}
@@ -162,24 +179,39 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                   rows={3}
                   value={formData.description}
                   onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, description: e.target.value }))
+                    setFormData((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
                   }
                   placeholder="Provide detailed context..."
                   disabled={loading}
                   maxLength={500}
                   required
                 />
-                <small className="esc-char-count">{formData.description.length}/500</small>
+                <small className="esc-char-count">
+                  {formData.description.length}/500
+                </small>
               </div>
             </form>
           </div>
 
           <div className="esc-modal-footer">
-            <button type="button" className="esc-btn esc-btn-secondary" onClick={onClose} disabled={loading}>
+            <button
+              type="button"
+              className="esc-btn esc-btn-secondary"
+              onClick={onClose}
+              disabled={loading}
+            >
               Cancel
             </button>
 
-            <button onClick={handleSubmit} className="esc-btn esc-btn-primary" disabled={!isValid} type="button">
+            <button
+              onClick={handleSubmit}
+              className="esc-btn esc-btn-primary"
+              disabled={!isValid}
+              type="button"
+            >
               {loading ? (
                 <>
                   <span className="esc-spinner" />

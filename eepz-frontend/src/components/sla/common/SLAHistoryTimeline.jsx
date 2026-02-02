@@ -21,13 +21,21 @@ const SLAHistoryTimeline = ({ history }) => {
         return { icon: TrendingUp, label: "Status Changed", variant: "status" };
       case "Escalated":
       case "EscalatedToDeptHead":
-        return { icon: AlertTriangle, label: "Escalated", variant: "escalated" };
+        return {
+          icon: AlertTriangle,
+          label: "Escalated",
+          variant: "escalated",
+        };
       case "Reopened":
         return { icon: RotateCcw, label: "Reopened", variant: "reopened" };
       case "Closed":
         return { icon: CheckCircle, label: "Closed", variant: "closed" };
       case "ComplianceChanged":
-        return { icon: Clock, label: "Compliance Changed", variant: "compliance" };
+        return {
+          icon: Clock,
+          label: "Compliance Changed",
+          variant: "compliance",
+        };
       case "AutoClosed":
         return { icon: XCircle, label: "Auto Closed", variant: "autoclosed" };
       default:

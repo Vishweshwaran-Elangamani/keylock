@@ -163,8 +163,7 @@ const SLADetails = () => {
     try {
       setRefreshing(true);
       setShowCloseConfirmation(false);
-     const res = await slaService.closeSLA(sla.slaid);
-
+      const res = await slaService.closeSLA(sla.slaid);
 
       if (res?.success) {
         toast.success("SLA closed successfully");

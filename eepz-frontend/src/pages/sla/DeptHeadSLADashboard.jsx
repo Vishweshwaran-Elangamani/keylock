@@ -479,7 +479,6 @@ const DeptHeadSLADashboard = () => {
                           <div className="dh-sla-employee-name">
                             {esc.employeeName}
                           </div>
-                        
                         </div>
                       </div>
                     </td>
