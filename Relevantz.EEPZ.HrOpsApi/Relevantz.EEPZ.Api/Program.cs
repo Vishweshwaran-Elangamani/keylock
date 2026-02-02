@@ -22,37 +22,39 @@ using Relevantz.EEPZ.Core.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ===========================
-// SERILOG CONFIGURATION
-// ===========================
+// SERILOG CONFIGURATION FROM APPSETTINGS WITH FILTERING
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Information()
-    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-    .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
-    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
-    .MinimumLevel.Override("System", LogEventLevel.Warning)
+    .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
     .Enrich.WithProperty("Application", "EEPZ-HR-Operations")
-    .Enrich.WithProperty("Service", "EEPZ-HR-Operations")
     .Enrich.WithProperty("Environment", builder.Environment.EnvironmentName)
+    
+    // Override console sink for all logs
     .WriteTo.Console(
-        outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}] [{Level:u3}] [{SourceContext}] {Message:lj}{NewLine}{Exception}",
-        restrictedToMinimumLevel: LogEventLevel.Information
-    )
-    .WriteTo.File(
-        path: "logs/eepz-.log",
-        rollingInterval: RollingInterval.Day,
-        retainedFileCountLimit: 30,
-        outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}] [{Level:u3}] [{SourceContext}] {Message:lj}{NewLine}{Exception}",
-        restrictedToMinimumLevel: LogEventLevel.Information
-    )
-    .WriteTo.File(
-        path: "logs/eepz-errors-.log",
-        restrictedToMinimumLevel: LogEventLevel.Error,
-        rollingInterval: RollingInterval.Day,
-        retainedFileCountLimit: 30,
-        outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}] [{Level:u3}] [{SourceContext}] {Message:lj}{NewLine}{Exception}"
-    )
+        outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}] [{Level:u3}] {SourceContext} {Message:lj}{NewLine}{Exception}",
+        restrictedToMinimumLevel: LogEventLevel.Information)
+    
+    // SERVICE LOGS - Filter only "Service" category to /app/Logs/service-logs/
+    .WriteTo.Logger(lc => lc
+        .Filter.ByIncludingOnly(Serilog.Filters.Matching.FromSource("Service"))
+        .WriteTo.File(
+            path: "/app/Logs/service-logs/log-.txt",
+            rollingInterval: RollingInterval.Day,
+            retainedFileCountLimit: 30,
+            fileSizeLimitBytes: 52428800,
+            outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}] [{Level:u3}] {SourceContext} {Message:lj}{NewLine}{Exception}",
+            restrictedToMinimumLevel: LogEventLevel.Information))
+    
+    // BUSINESS LOGS - Filter only "Business" category to /app/Logs/business-logs/
+    .WriteTo.Logger(lc => lc
+        .Filter.ByIncludingOnly(Serilog.Filters.Matching.FromSource("Business"))
+        .WriteTo.File(
+            path: "/app/Logs/business-logs/log-.txt",
+            rollingInterval: RollingInterval.Day,
+            retainedFileCountLimit: 30,
+            fileSizeLimitBytes: 52428800,
+            outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}] [{Level:u3}] {SourceContext} {Message:lj}{NewLine}{Exception}"))
+    
     .CreateLogger();
 
 builder.Host.UseSerilog();
@@ -74,9 +76,8 @@ builder.Services.AddControllers()
 
 builder.Services.AddEndpointsApiExplorer();
 
-// ===========================
+
 // SWAGGER CONFIGURATION
-// ===========================
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
@@ -113,9 +114,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// ===========================
 // DATABASE CONFIGURATION
-// ===========================
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Database connection string is not configured");
 
@@ -140,9 +139,7 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
         .EnableDetailedErrors(builder.Environment.IsDevelopment());
 }, ServiceLifetime.Scoped);
 
-// ===========================
 // JWT AUTHENTICATION
-// ===========================
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSettings["SecretKey"]
     ?? throw new InvalidOperationException("JWT Secret Key not configured");
@@ -207,24 +204,18 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("Employee", "HR", "Admin"));
 });
 
-// ===========================
 // MAPSTER CONFIGURATION
-// ===========================
 builder.Services.RegisterMapsterConfiguration();
 Log.Information("Mapster configuration registered successfully");
 
-// ===========================
 // FLUENT VALIDATION
-// ===========================
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<Relevantz.EEPZ.Common.Validators.CreatePolicyRequestDtoValidator>();
 
 Log.Information("FluentValidation registered successfully");
 
-// ===========================
 // DEPENDENCY INJECTION - REPOSITORIES
-// ===========================
 builder.Services.AddScoped<IPolicyRepository, PolicyRepository>();
 builder.Services.AddScoped<IViolationRepository, ViolationRepository>();
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
@@ -237,9 +228,7 @@ builder.Services.AddScoped<IDepartmentBudgetRepository, DepartmentBudgetReposito
 
 Log.Information("Repositories registered successfully");
 
-// ===========================
 // DEPENDENCY INJECTION - SERVICES
-// ===========================
 builder.Services.AddScoped<IPolicyService, PolicyService>();
 builder.Services.AddScoped<IViolationService, ViolationService>();
 builder.Services.AddScoped<IComplianceService, ComplianceService>();
@@ -254,9 +243,7 @@ builder.Services.AddScoped<IMongoDbService, MongoDbService>();
 
 Log.Information("Services registered successfully");
 
-// ===========================
 // CORS CONFIGURATION
-// ===========================
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins")
     .Get<string[]>() ?? Array.Empty<string>();
 
@@ -289,9 +276,7 @@ else
     Log.Information("CORS configured with restricted origins for Production");
 }
 
-// ===========================
 // RESPONSE COMPRESSION
-// ===========================
 builder.Services.AddResponseCompression(options =>
 {
     options.EnableForHttps = true;
@@ -309,9 +294,7 @@ builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
     options.Level = CompressionLevel.Fastest;
 });
 
-// ===========================
 // MEMORY CACHE & HTTP CLIENT
-// ===========================
 builder.Services.AddMemoryCache();
 
 var httpTimeout = builder.Configuration.GetValue<int>("HttpClient:TimeoutSeconds", 30);
@@ -322,9 +305,7 @@ builder.Services.AddHttpClient("DefaultClient")
         client.Timeout = TimeSpan.FromSeconds(httpTimeout);
     });
 
-// ===========================
 // HEALTH CHECKS
-// ===========================
 builder.Services.AddHealthChecks()
     .AddCheck("mysql-db", () =>
     {
@@ -345,9 +326,7 @@ builder.Services.AddHealthChecks()
 
 var app = builder.Build();
 
-// ===========================
 // DATABASE INITIALIZATION
-// ===========================
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -389,9 +368,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// ===========================
 // MIDDLEWARE PIPELINE
-// ===========================
 
 // 1. Response Compression
 app.UseResponseCompression();
@@ -521,9 +498,7 @@ app.UseMiddleware<GlobalExceptionMiddleware>();
 // 12. Map Controllers
 app.MapControllers();
 
-// ===========================
 // HEALTH CHECK ENDPOINTS
-// ===========================
 app.MapHealthChecks("/health/live", new HealthCheckOptions
 {
     Predicate = _ => false,
@@ -634,9 +609,7 @@ if (app.Environment.IsDevelopment())
     }).AllowAnonymous();
 }
 
-// ===========================
 // APPLICATION STARTUP
-// ===========================
 try
 {
     EEPZBusinessLog.LogInformation("EEPZ HR Operations Microservice started successfully on {Environment}",
