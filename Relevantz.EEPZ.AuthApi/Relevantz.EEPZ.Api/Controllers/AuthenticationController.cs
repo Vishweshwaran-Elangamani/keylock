@@ -134,11 +134,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 _logger.LogWarning("Change password attempted with invalid authentication token");
                 return Unauthorized(new { success = false, message = "Invalid user authentication" });
             }
-            if (userId == 0)
-            {
-                _logger.LogWarning("Change password attempted with userId = 0");
-                return Unauthorized(new { success = false, message = "User ID not found" });
-            }
             _logger.LogInformation("Change password initiated for UserId: {UserId}", userId);
             var result = await _authenticationService.ChangePasswordAsync(userId, request);
             if (!result.Success)

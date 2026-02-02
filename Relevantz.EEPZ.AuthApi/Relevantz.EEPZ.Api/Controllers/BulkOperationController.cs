@@ -71,7 +71,6 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         [HttpGet("download-template")]
-        [Authorize]
         public async Task<IActionResult> DownloadExcelTemplate()
         {
             var templateBytes = await _bulkOperationService.GenerateExcelTemplateAsync();
