@@ -428,10 +428,8 @@ const ManagerDashboard = () => {
     { icon: AlertTriangle, value: kpiStats.totalEscalations, label: "Escalations", trend: `${kpiStats.pendingEscalations} pending`, iconClass: "ada-stat-icon-purple" }
   ];
 
-  // SHOW ONLY 3 NOMINATIONS, DROPDOWN IF MORE THAN 3
+  // CALCULATE DISPLAYED ITEMS INLINE
   const displayedNominations = showAllNominations ? nominationOverview.rewardTypeList : nominationOverview.rewardTypeList.slice(0, 3);
-  
-  // SHOW ONLY 3 OPPORTUNITIES, DROPDOWN IF MORE THAN 3
   const displayedOpportunities = showAllOpportunities ? opportunitiesData.opportunityList : opportunitiesData.opportunityList.slice(0, 3);
 
   return (
@@ -458,55 +456,8 @@ const ManagerDashboard = () => {
 
       <div className="manager-cards-container">
         <div className="manager-row">
-          <div className="ada-chart-card">
-            <div className="ada-card-header">
-              <div className="ada-card-title">
-                <i className="bi bi-bullseye" /> Goals Overview
-              </div>
-              <div className="ada-btn-group">
-                <button onClick={() => setGoalType("self")} className={goalType === "self" ? "ada-active" : ""}>Self</button>
-                <button onClick={() => setGoalType("team")} className={goalType === "team" ? "ada-active" : ""}>Team</button>
-                <button onClick={() => setGoalType("org")} className={goalType === "org" ? "ada-active" : ""}>Org</button>
-              </div>
-            </div>
-            <div className="ada-card-body">
-              {goalsData.total > 0 ? (
-                <>
-                  <div className="ada-perf-stats-grid">
-                    <div className="ada-perf-stat-card">
-                      <div className="ada-perf-stat-value">{goalsData.total}</div>
-                      <div className="ada-perf-stat-label">Total</div>
-                    </div>
-                    <div className="ada-perf-stat-card ada-success">
-                      <div className="ada-perf-stat-value">{goalsData.completed}</div>
-                      <div className="ada-perf-stat-label">Completed</div>
-                    </div>
-                    <div className="ada-perf-stat-card ada-info">
-                      <div className="ada-perf-stat-value">{goalsData.inProgress}</div>
-                      <div className="ada-perf-stat-label">In Progress</div>
-                    </div>
-                  </div>
-
-                  {goalsData.chartData.length > 0 && (
-                    <ResponsiveContainer width="100%" height={220}>
-                      <PieChart>
-                        <Pie data={goalsData.chartData} cx="50%" cy="45%" outerRadius={75} dataKey="value" label={false}>
-                          {goalsData.chartData.map((entry, i) => <Cell key={`cell-${i}`} fill={entry.fill} />)}
-                        </Pie>
-                        <Tooltip />
-                        <Legend layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ fontSize: "11px" }} />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  )}
-                </>
-              ) : (
-                <div className="ada-no-data">No goals data available</div>
-              )}
-            </div>
-          </div>
-
-          {/* NOMINATIONS CARD WITH DROPDOWN */}
-          <div className="ada-chart-card">
+          {/* NOMINATIONS CARD - FIRST POSITION */}
+          <div className="ada-chart-card ada-nominations-card">
             <div className="ada-card-header">
               <div className="ada-card-title">
                 <i className="bi bi-award" /> Nominations
@@ -567,7 +518,14 @@ const ManagerDashboard = () => {
                       </div>
                       
                       {nominationOverview.rewardTypeList.length > 3 && (
-                        <button className="ada-view-all-btn" onClick={() => setShowAllNominations(!showAllNominations)}>
+                        <button 
+                          className="ada-nomination-toggle-btn" 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setShowAllNominations(prev => !prev);
+                          }}
+                        >
                           {showAllNominations ? <><ChevronUp size={16} /> Show Less</> : <><ChevronDown size={16} /> View All Nominations</>}
                         </button>
                       )}
@@ -580,8 +538,56 @@ const ManagerDashboard = () => {
             </div>
           </div>
 
-          {/* OPPORTUNITIES CARD WITH DROPDOWN */}
-          <div className="ada-chart-card">
+          {/* GOALS OVERVIEW CARD - SECOND POSITION */}
+          <div className="ada-chart-card ada-goals-card">
+            <div className="ada-card-header">
+              <div className="ada-card-title">
+                <i className="bi bi-bullseye" /> Goals Overview
+              </div>
+              <div className="ada-btn-group">
+                <button onClick={() => setGoalType("self")} className={goalType === "self" ? "ada-active" : ""}>Self</button>
+                <button onClick={() => setGoalType("team")} className={goalType === "team" ? "ada-active" : ""}>Team</button>
+                <button onClick={() => setGoalType("org")} className={goalType === "org" ? "ada-active" : ""}>Org</button>
+              </div>
+            </div>
+            <div className="ada-card-body">
+              {goalsData.total > 0 ? (
+                <>
+                  <div className="ada-perf-stats-grid">
+                    <div className="ada-perf-stat-card">
+                      <div className="ada-perf-stat-value">{goalsData.total}</div>
+                      <div className="ada-perf-stat-label">Total</div>
+                    </div>
+                    <div className="ada-perf-stat-card ada-success">
+                      <div className="ada-perf-stat-value">{goalsData.completed}</div>
+                      <div className="ada-perf-stat-label">Completed</div>
+                    </div>
+                    <div className="ada-perf-stat-card ada-info">
+                      <div className="ada-perf-stat-value">{goalsData.inProgress}</div>
+                      <div className="ada-perf-stat-label">In Progress</div>
+                    </div>
+                  </div>
+
+                  {goalsData.chartData.length > 0 && (
+                    <ResponsiveContainer width="100%" height={220}>
+                      <PieChart>
+                        <Pie data={goalsData.chartData} cx="50%" cy="45%" outerRadius={75} dataKey="value" label={false}>
+                          {goalsData.chartData.map((entry, i) => <Cell key={`cell-${i}`} fill={entry.fill} />)}
+                        </Pie>
+                        <Tooltip />
+                        <Legend layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ fontSize: "11px" }} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  )}
+                </>
+              ) : (
+                <div className="ada-no-data">No goals data available</div>
+              )}
+            </div>
+          </div>
+
+          {/* OPPORTUNITIES CARD - THIRD POSITION */}
+          <div className="ada-chart-card ada-opportunities-card">
             <div className="ada-card-header">
               <div className="ada-card-title">
                 <i className="bi bi-briefcase" /> Internal Opportunities
@@ -643,7 +649,14 @@ const ManagerDashboard = () => {
                       </div>
                       
                       {opportunitiesData.opportunityList.length > 3 && (
-                        <button className="ada-view-all-btn" onClick={() => setShowAllOpportunities(!showAllOpportunities)}>
+                        <button 
+                          className="ada-opportunity-toggle-btn" 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setShowAllOpportunities(prev => !prev);
+                          }}
+                        >
                           {showAllOpportunities ? <><ChevronUp size={16} /> Show Less</> : <><ChevronDown size={16} /> View All Opportunities</>}
                         </button>
                       )}

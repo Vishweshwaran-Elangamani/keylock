@@ -1,4 +1,6 @@
-/* EMPLOYEE DASHBOARD  */
+/* ========================================
+   EMPLOYEE DASHBOARD - COMPLETE CSS
+   ======================================== */
 
 /* LOADING STATE */
 .ada-loading-container {
@@ -6,6 +8,28 @@
   align-items: center;
   justify-content: center;
   min-height: 50vh;
+}
+
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+  border-width: 0.3rem;
+}
+
+.text-primary {
+  color: #1E40AF !important;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 /* MAIN DASHBOARD CONTAINER */
@@ -52,7 +76,7 @@
   font-size: 1.5rem;
 }
 
-/* BLUE NAVY GRADIENT COLORS FOR KPI ICONS  */
+/* BLUE NAVY GRADIENT COLORS FOR KPI ICONS */
 .admin-kpi-icon.admin-purple {
   background: linear-gradient(135deg, rgba(30, 64, 175, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%);
   color: #1E40AF;
@@ -149,7 +173,23 @@
   grid-column: span 1;
 }
 
-/* CARD HEADER - SAME DARK NAVY BLUE GRADIENT AS ADMIN */
+/* CARD ISOLATION - PREVENTS CROSS-CARD INTERFERENCE */
+.emp-recognition-card {
+  isolation: isolate;
+  contain: layout style;
+}
+
+.emp-opportunities-card {
+  isolation: isolate;
+  contain: layout style;
+}
+
+.emp-goals-card {
+  isolation: isolate;
+  contain: layout style;
+}
+
+/* CARD HEADER - SAME DARK NAVY BLUE GRADIENT */
 .card-header-dark {
   padding: 1rem 1.25rem;
   background: linear-gradient(135deg, #27235c 0%, #3b4d8f 100%);
@@ -195,6 +235,7 @@
   color: #9ca3af;
   font-size: 0.875rem;
   flex: 1;
+  min-height: 240px;
 }
 
 /* STAT CARDS GRID */
@@ -235,14 +276,17 @@
   font-size: 1.5rem;
   font-weight: bold;
   margin-bottom: 0.25rem;
+  line-height: 1.2;
 }
 
 .emp-stat-label {
   font-size: 0.7rem;
   font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-/* STAT CARDS - BLUE THEME VARIANTS  */
+/* STAT CARDS - BLUE THEME VARIANTS */
 .emp-stat-recognition {
   background: #e0ecff !important;
   border: 1px solid #2563EB !important;
@@ -412,6 +456,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+  min-width: 0;
 }
 
 .emp-recognition-name {
@@ -419,6 +464,9 @@
   font-weight: 500;
   color: #1E40AF;
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .emp-recognition-bar {
@@ -432,6 +480,7 @@
 .emp-recognition-fill {
   height: 100%;
   transition: width 0.3s ease;
+  border-radius: 3px;
 }
 
 .emp-recognition-count {
@@ -475,6 +524,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+  min-width: 0;
 }
 
 .emp-opportunity-name {
@@ -482,6 +532,9 @@
   font-weight: 500;
   color: #1E40AF;
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .emp-opportunity-bar {
@@ -495,6 +548,7 @@
 .emp-opportunity-fill {
   height: 100%;
   transition: width 0.3s ease;
+  border-radius: 3px;
 }
 
 .emp-opportunity-count {
@@ -505,7 +559,81 @@
   flex-shrink: 0;
 }
 
-/* VIEW ALL BUTTON - STICK TO BOTTOM WITH NO TOP MARGIN */
+/* SEPARATE BUTTON FOR REWARDS/RECOGNITIONS */
+.emp-rewards-toggle-btn {
+  width: 100%;
+  margin-top: 0;
+  padding: 0.625rem;
+  background: linear-gradient(135deg, #1E40AF 0%, #2563EB 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  isolation: isolate;
+  box-shadow: 0 2px 4px rgba(30, 64, 175, 0.2);
+}
+
+.emp-rewards-toggle-btn:hover {
+  background: linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+}
+
+.emp-rewards-toggle-btn:active {
+  transform: translateY(0);
+}
+
+.emp-rewards-toggle-btn:focus {
+  outline: 2px solid #60A5FA;
+  outline-offset: 2px;
+}
+
+/* SEPARATE BUTTON FOR OPPORTUNITIES */
+.emp-opportunities-toggle-btn {
+  width: 100%;
+  margin-top: 0;
+  padding: 0.625rem;
+  background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  isolation: isolate;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.emp-opportunities-toggle-btn:hover {
+  background: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.emp-opportunities-toggle-btn:active {
+  transform: translateY(0);
+}
+
+.emp-opportunities-toggle-btn:focus {
+  outline: 2px solid #93C5FD;
+  outline-offset: 2px;
+}
+
+/* LEGACY VIEW ALL BUTTON - KEEP FOR BACKWARD COMPATIBILITY */
 .emp-view-all-btn {
   width: 100%;
   margin-top: 0;
@@ -523,6 +651,7 @@
   gap: 0.5rem;
   transition: all 0.3s ease;
   flex-shrink: 0;
+  isolation: isolate;
 }
 
 .emp-view-all-btn:hover {
@@ -533,6 +662,23 @@
 
 .emp-view-all-btn:active {
   transform: translateY(0);
+}
+
+/* ANIMATION FOR SMOOTH TRANSITIONS */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.emp-recognition-item,
+.emp-opportunity-item {
+  animation: fadeIn 0.3s ease-out;
 }
 
 /* RESPONSIVE DESIGN */
@@ -555,52 +701,144 @@
 }
 
 @media (max-width: 992px) {
-  .dashboard-row,
-  .dashboard-row-2 {
+  .admin-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dashboard-row {
     grid-template-columns: 1fr;
   }
 
-  .admin-kpi-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .dashboard-row-2 {
+    grid-template-columns: 1fr;
   }
 
   .emp-stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .emp-stats-grid.emp-stats-2col {
-    grid-template-columns: 1fr;
-  }
-
   .emp-stats-grid.emp-stats-4col {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 576px) {
   .admin-kpi-grid {
     grid-template-columns: 1fr;
   }
 
-  .emp-stats-grid,
+  .admin-kpi-card {
+    padding: 1rem;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  .emp-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .emp-stats-grid.emp-stats-2col,
   .emp-stats-grid.emp-stats-4col {
     grid-template-columns: 1fr;
   }
+
+  .emp-recognition-item,
+  .emp-opportunity-item {
+    padding: 0.625rem;
+  }
+
+  .emp-trophy-icon {
+    width: 80px;
+    height: 80px;
+  }
+
+  .emp-trophy-badge {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
 }
 
-@media (max-width: 480px) {
-  .card-header-dark {
-    flex-direction: column;
-    gap: 0.75rem;
-    align-items: stretch;
+/* PRINT STYLES */
+@media print {
+  .hr-dashboard-container {
+    background: #ffffff;
   }
 
+  .dashboard-card {
+    page-break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #e5e7eb;
+  }
+
+  .emp-rewards-toggle-btn,
+  .emp-opportunities-toggle-btn,
+  .emp-view-all-btn {
+    display: none;
+  }
+
+  .admin-kpi-card:hover,
+  .dashboard-card:hover,
+  .emp-stat-card:hover,
+  .emp-recognition-item:hover,
+  .emp-opportunity-item:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+/* ACCESSIBILITY IMPROVEMENTS */
+.emp-rewards-toggle-btn:focus-visible,
+.emp-opportunities-toggle-btn:focus-visible,
+.emp-view-all-btn:focus-visible {
+  outline: 3px solid #60A5FA;
+  outline-offset: 3px;
+}
+
+/* PREVENT TEXT SELECTION ON BUTTONS */
+.emp-rewards-toggle-btn,
+.emp-opportunities-toggle-btn,
+.emp-view-all-btn {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* SMOOTH SCROLLING */
+html {
+  scroll-behavior: smooth;
+}
+
+/* HIGH CONTRAST MODE SUPPORT */
+@media (prefers-contrast: high) {
+  .dashboard-card,
   .admin-kpi-card {
-    flex-direction: column;
-    text-align: center;
+    border-width: 2px;
   }
 
-  .admin-kpi-icon {
-    margin: 0 auto;
+  .emp-recognition-item,
+  .emp-opportunity-item {
+    border-width: 2px;
+  }
+}
+
+/* REDUCED MOTION SUPPORT */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .emp-rewards-toggle-btn:hover,
+  .emp-opportunities-toggle-btn:hover,
+  .admin-kpi-card:hover,
+  .dashboard-card:hover {
+    transform: none;
   }
 }

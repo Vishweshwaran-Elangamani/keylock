@@ -13,7 +13,6 @@ import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import "../../styles/auth/EmployeeDashboard.css";
 
-
 const EmployeeDashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -29,18 +28,14 @@ const EmployeeDashboard = () => {
     opportunities: []
   });
 
-
   const BLUE_COLORS = ["#1E40AF", "#3B82F6", "#60A5FA", "#93C5FD", "#DBEAFE", "#2563EB"];
 
-
   useEffect(() => { fetchAllData(); }, []);
-
 
   const getUserData = () => {
     try { return JSON.parse(localStorage.getItem("user")); }
     catch { return null; }
   };
-
 
   const extractData = (response) => {
     if (!response) return [];
@@ -49,7 +44,6 @@ const EmployeeDashboard = () => {
     const paths = [data?.data?.items, data?.data?.$values, data?.data, data?.items, data?.$values, data];
     return paths.find(p => Array.isArray(p)) || [];
   };
-
 
   const fetchAllData = async () => {
     try {
@@ -61,12 +55,7 @@ const EmployeeDashboard = () => {
         return;
       }
 
-
       const empId = user.empMasterId || user.employeeMasterId || user.id;
-
-
-      console.log('Fetching data for Employee ID:', empId);
-
 
       const [
         selfGoalsRes, 
@@ -86,13 +75,9 @@ const EmployeeDashboard = () => {
         lndService.getMySkills(1, "", "", "asc", 1000).catch(() => ({ data: { items: [] } })),
         rsvpService.getMyInvitations().catch(() => []),
         slaService.getEmployeeSLAs(empId).catch(() => ({ data: [] })),
-        getEmployeeNominations(empId).catch(err => {
-          console.warn('Could not fetch nominations:', err.message);
-          return { data: [] };
-        }),
+        getEmployeeNominations(empId).catch(() => ({ data: [] })),
         internalOpportunityService.getActiveOpportunities().catch(() => ({ data: [] }))
       ]);
-
 
       const allGoals = [
         ...extractData(selfGoalsRes).map(g => ({ ...g, goalType: "self" })),
@@ -100,17 +85,7 @@ const EmployeeDashboard = () => {
         ...extractData(teamGoalsRes).map(g => ({ ...g, goalType: "team" }))
       ];
 
-
       const myNominations = extractData(myNominationsRes);
-
-
-      console.log('My Nominations (FULL DATA):', JSON.stringify(myNominations, null, 2));
-
-
-      if (myNominations.length > 0) {
-        console.log('First nomination keys:', Object.keys(myNominations[0]));
-      }
-
 
       const myRecognitions = myNominations.filter(n => {
         const status = (
@@ -121,22 +96,9 @@ const EmployeeDashboard = () => {
           ''
         ).toLowerCase();
 
-
-        console.log(`Nomination ${n.nominationId} status:`, status);
-
-
-        if (!status) {
-          console.warn('No status field found, treating all nominations as approved');
-          return true;
-        }
-
-
+        if (!status) return true;
         return status === 'approved';
       });
-
-
-      console.log('Filtered Recognitions:', myRecognitions);
-
 
       const stats = {
         totalNominations: myNominations.length,
@@ -151,13 +113,7 @@ const EmployeeDashboard = () => {
         }).length
       };
 
-
-      console.log('Performance Stats:', stats);
-
-
       const opportunities = extractData(opportunitiesRes);
-      console.log('Opportunities data:', opportunities);
-
 
       setDashboardData({
         goals: allGoals,
@@ -169,7 +125,6 @@ const EmployeeDashboard = () => {
         opportunities
       });
 
-
     } catch (err) {
       console.error("Error in fetchAllData:", err);
       toast.error("Failed to load dashboard data");
@@ -178,9 +133,7 @@ const EmployeeDashboard = () => {
     }
   };
 
-
   const isOverdue = (deadline) => deadline && slaService?.isOverdue?.(deadline);
-
 
   const getKPIStats = () => {
     const now = new Date();
@@ -195,17 +148,10 @@ const EmployeeDashboard = () => {
     };
   };
 
-
   const getPerformanceOverview = () => {
     const { myRecognitions, stats } = dashboardData.performance;
 
-
-    console.log('getPerformanceOverview - myRecognitions:', myRecognitions);
-    console.log('getPerformanceOverview - stats:', stats);
-
-
     const byRewardType = {};
-
 
     myRecognitions.forEach(r => {
       const type = (
@@ -217,23 +163,14 @@ const EmployeeDashboard = () => {
         "Other"
       );
 
-
-      console.log(`Processing nomination ${r.nominationId}, type: ${type}`);
-
-
       byRewardType[type] = (byRewardType[type] || 0) + 1;
     });
-
-
-    console.log('Reward types breakdown:', byRewardType);
-
 
     const chartData = Object.entries(byRewardType).map(([name, value], i) => ({
       name,
       value,
       fill: BLUE_COLORS[i % BLUE_COLORS.length]
     }));
-
 
     return {
       totalRecognitions: myRecognitions.length,
@@ -243,16 +180,13 @@ const EmployeeDashboard = () => {
     };
   };
 
-
   const getGoalsOverview = () => {
     const goals = dashboardData.goals;
     if (!goals?.length) return { total: 0, completed: 0, inProgress: 0, pending: 0, chartData: [] };
 
-
     const completed = goals.filter(g => (g.status || g.goalStatus || "").toLowerCase() === "completed").length;
     const inProgress = goals.filter(g => (g.status || g.goalStatus || "").toLowerCase() === "inprogress").length;
     const pending = goals.filter(g => ["pending", "open", "approved"].includes((g.status || g.goalStatus || "").toLowerCase())).length;
-
 
     const chartData = [
       completed > 0 && { name: "Completed", value: completed, fill: BLUE_COLORS[0] },
@@ -260,15 +194,12 @@ const EmployeeDashboard = () => {
       pending > 0 && { name: "Pending", value: pending, fill: BLUE_COLORS[2] }
     ].filter(Boolean);
 
-
     return { total: goals.length, completed, inProgress, pending, chartData };
   };
-
 
   const getOpportunitiesOverview = () => {
     const opportunities = dashboardData.opportunities;
     if (!opportunities?.length) return { total: 0, opportunityList: [], chartData: [] };
-
 
     const byOpportunity = {};
     opportunities.forEach(opp => {
@@ -283,16 +214,13 @@ const EmployeeDashboard = () => {
       byOpportunity[name].count += 1;
     });
 
-
     const opportunityList = Object.values(byOpportunity);
-
 
     const chartData = opportunityList.map((item, i) => ({
       name: item.name,
       value: item.count,
       fill: BLUE_COLORS[i % BLUE_COLORS.length]
     }));
-
 
     return { 
       total: opportunities.length, 
@@ -301,11 +229,9 @@ const EmployeeDashboard = () => {
     };
   };
 
-
   const getLndOverview = () => {
     const skills = dashboardData.lndSkills;
     if (!skills?.length) return { total: 0, low: 0, medium: 0, high: 0, chartData: [] };
-
 
     let low = 0, medium = 0, high = 0;
     skills.forEach(s => {
@@ -317,24 +243,20 @@ const EmployeeDashboard = () => {
       }
     });
 
-
     const chartData = [
       low > 0 && { name: "Rating 1-4", value: low, fill: BLUE_COLORS[2] },
       medium > 0 && { name: "Rating 5-7", value: medium, fill: BLUE_COLORS[1] },
       high > 0 && { name: "Rating 8-10", value: high, fill: BLUE_COLORS[0] }
     ].filter(Boolean);
 
-
     return { total: skills.length, low, medium, high, chartData };
   };
-
 
   const getMeetingsOverview = () => {
     const meetings = dashboardData.meetings;
     const now = new Date();
     const upcoming = meetings.filter(m => new Date(m.meetingDate || m.date) >= now).length;
     const completed = meetings.length - upcoming;
-
 
     const monthlyData = {};
     meetings.forEach(m => {
@@ -345,24 +267,19 @@ const EmployeeDashboard = () => {
       }
     });
 
-
     const chartData = Object.entries(monthlyData).sort((a, b) => a[0].localeCompare(b[0])).slice(-6)
       .map(([month, count]) => ({ month: new Date(month + "-01").toLocaleDateString("en-US", { month: "short", year: "numeric" }), count }));
 
-
     return { total: meetings.length, upcoming, completed, chartData };
   };
-
 
   const getSlaOverview = () => {
     const slas = dashboardData.slas;
     if (!slas?.length) return { total: 0, open: 0, overdue: 0, closed: 0, chartData: [] };
 
-
     const closed = slas.filter(s => (s.status || "").toLowerCase() === "closed").length;
     const open = slas.length - closed;
     const overdue = slas.filter(s => isOverdue(s.deadline || s.dueDate)).length;
-
 
     const chartData = [
       open > 0 && { name: "Open / In Progress", value: open, fill: BLUE_COLORS[1] },
@@ -370,10 +287,8 @@ const EmployeeDashboard = () => {
       closed > 0 && { name: "Closed", value: closed, fill: BLUE_COLORS[0] }
     ].filter(Boolean);
 
-
     return { total: slas.length, open, overdue, closed, chartData };
   };
-
 
   const StatCard = ({ type, value, label }) => (
     <div className={`emp-stat-card emp-stat-${type}`}>
@@ -381,7 +296,6 @@ const EmployeeDashboard = () => {
       <div className="emp-stat-label">{label}</div>
     </div>
   );
-
 
   if (loading) return (
     <div className="ada-loading-container">
@@ -391,7 +305,6 @@ const EmployeeDashboard = () => {
     </div>
   );
 
-
   const kpiStats = getKPIStats();
   const perfOverview = getPerformanceOverview();
   const goalsData = getGoalsOverview();
@@ -399,7 +312,6 @@ const EmployeeDashboard = () => {
   const lndData = getLndOverview();
   const meetingsData = getMeetingsOverview();
   const slaData = getSlaOverview();
-
 
   const kpiCards = [
     { 
@@ -440,18 +352,13 @@ const EmployeeDashboard = () => {
     }
   ];
 
-
-  // SHOW ONLY 3 RECOGNITIONS, DROPDOWN IF MORE THAN 3
+  // CALCULATE DISPLAYED ITEMS INLINE - NO useMemo
   const displayedRecognitions = showAllRecognitions ? perfOverview.chartData : perfOverview.chartData.slice(0, 3);
-  
-  // SHOW ONLY 2 OPPORTUNITIES, DROPDOWN IF MORE THAN 2
   const displayedOpportunities = showAllOpportunities ? opportunitiesData.opportunityList : opportunitiesData.opportunityList.slice(0, 2);
-
 
   return (
     <div className="hr-dashboard-container">
       <Breadcrumb items={[{ label: "Employee Dashboard" }]} />
-
 
       <div className="admin-kpi-grid">
         {kpiCards.map(({ icon, value, label, subtitle, iconClass, showTrend }, i) => {
@@ -473,11 +380,10 @@ const EmployeeDashboard = () => {
         })}
       </div>
 
-
       <div className="dashboard-cards-container">
         <div className="dashboard-row">
           {/* PERFORMANCE & RECOGNITION CARD */}
-          <div className="dashboard-card card-medium">
+          <div className="dashboard-card card-medium emp-recognition-card">
             <div className="card-header-dark">
               <div className="card-header-content">
                 <i className="bi bi-graph-up"></i>
@@ -492,7 +398,6 @@ const EmployeeDashboard = () => {
                     <StatCard type="org-noms" value={perfOverview.totalNominations} label="TOTAL NOMINATIONS" />
                   </div>
                   
-                  {/* TROPHY - WRAPPED IN CENTER WRAPPER LIKE PIE CHART */}
                   <div className="emp-chart-center-wrapper">
                     <div className="emp-trophy-container">
                       <Trophy size={100} className="emp-trophy-icon" />
@@ -517,9 +422,15 @@ const EmployeeDashboard = () => {
                         ))}
                       </div>
                       
-                      {/* SHOW BUTTON ONLY IF MORE THAN 3 ITEMS */}
                       {perfOverview.chartData.length > 3 && (
-                        <button className="emp-view-all-btn" onClick={() => setShowAllRecognitions(!showAllRecognitions)}>
+                        <button 
+                          className="emp-rewards-toggle-btn" 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setShowAllRecognitions(!showAllRecognitions);
+                          }}
+                        >
                           {showAllRecognitions ? <><ChevronUp size={16} /> Show Less</> : <><ChevronDown size={16} /> View All Rewards</>}
                         </button>
                       )}
@@ -532,9 +443,8 @@ const EmployeeDashboard = () => {
             </div>
           </div>
 
-
           {/* GOALS OVERVIEW CARD */}
-          <div className="dashboard-card card-medium">
+          <div className="dashboard-card card-medium emp-goals-card">
             <div className="card-header-dark">
               <div className="card-header-content">
                 <i className="bi bi-bullseye"></i>
@@ -568,9 +478,8 @@ const EmployeeDashboard = () => {
             </div>
           </div>
 
-
           {/* INTERNAL OPPORTUNITIES CARD */}
-          <div className="dashboard-card card-medium">
+          <div className="dashboard-card card-medium emp-opportunities-card">
             <div className="card-header-dark">
               <div className="card-header-content">
                 <i className="bi bi-briefcase"></i>
@@ -612,9 +521,15 @@ const EmployeeDashboard = () => {
                         ))}
                       </div>
                       
-                      {/* SHOW BUTTON ONLY IF MORE THAN 2 ITEMS */}
                       {opportunitiesData.opportunityList.length > 2 && (
-                        <button className="emp-view-all-btn" onClick={() => setShowAllOpportunities(!showAllOpportunities)}>
+                        <button 
+                          className="emp-opportunities-toggle-btn" 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setShowAllOpportunities(!showAllOpportunities);
+                          }}
+                        >
                           {showAllOpportunities ? <><ChevronUp size={16} /> Show Less</> : <><ChevronDown size={16} /> View All Opportunities</>}
                         </button>
                       )}
@@ -627,7 +542,6 @@ const EmployeeDashboard = () => {
             </div>
           </div>
         </div>
-
 
         {/* SECOND ROW */}
         <div className="dashboard-row">
@@ -667,7 +581,6 @@ const EmployeeDashboard = () => {
             </div>
           </div>
 
-
           {/* SLA OVERVIEW CARD */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
@@ -702,7 +615,6 @@ const EmployeeDashboard = () => {
               )}
             </div>
           </div>
-
 
           {/* MEETINGS SCHEDULED CARD */}
           <div className="dashboard-card card-medium">
@@ -750,6 +662,5 @@ const EmployeeDashboard = () => {
     </div>
   );
 };
-
 
 export default EmployeeDashboard;
