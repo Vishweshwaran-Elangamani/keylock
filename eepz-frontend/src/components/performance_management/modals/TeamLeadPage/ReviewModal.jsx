@@ -3,9 +3,13 @@ import ReactDOM from "react-dom";
 import logoImage from "../../../../assets/logodark.png";
 import "../../../../styles/performancemanagement/components/ReviewModal.css";
 
-const CustomRatingDropdown = ({ value, onChange, isReadOnly }) => {
+const CustomRatingDropdown = ({ value, onChange, isReadOnly, competencyName }) => {
   const [open, setOpen] = useState(false);
-  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0, width: 0 });
+  const [menuPosition, setMenuPosition] = useState({
+    top: 0,
+    left: 0,
+    width: 0,
+  });
   const dropdownRef = useRef(null);
 
   const options = [
@@ -22,7 +26,8 @@ const CustomRatingDropdown = ({ value, onChange, isReadOnly }) => {
     setOpen(false);
   };
 
-  const selectedLabel = options.find((opt) => opt.value === value)?.label || "-";
+  const selectedLabel =
+    options.find((opt) => opt.value === value)?.label || "-";
 
   const handleToggle = (e) => {
     e.stopPropagation();
@@ -63,12 +68,20 @@ const CustomRatingDropdown = ({ value, onChange, isReadOnly }) => {
   }, [open]);
 
   if (isReadOnly) {
-    return <span className="tl-read-only-text">{value || "-"}</span>;
+    return (
+      <span className="tl-read-only-text">
+        {value || "-"}
+      </span>
+    );
   }
 
   return (
     <>
-      <div ref={dropdownRef} className="tl-custom-rating-dropdown" tabIndex={0}>
+      <div
+        ref={dropdownRef}
+        className="tl-custom-rating-dropdown"
+        tabIndex={0}
+      >
         <div className="tl-custom-rating-selected" onClick={handleToggle}>
           {selectedLabel}
           <span className="tl-custom-rating-arrow" />
@@ -92,7 +105,9 @@ const CustomRatingDropdown = ({ value, onChange, isReadOnly }) => {
                 key={opt.value}
                 className={
                   "tl-custom-rating-option" +
-                  (opt.value === value ? " tl-custom-rating-option-active" : "")
+                  (opt.value === value
+                    ? " tl-custom-rating-option-active"
+                    : "")
                 }
                 onMouseDown={(e) => {
                   e.preventDefault();
@@ -161,88 +176,6 @@ const ReviewModal = ({
     return "bi-file-earmark";
   };
 
-  // ✅ Build table once (no duplication)
-  const tableElement = (
-    <table className="tl-modal-table" role="table" aria-label="Competencies table">
-      <thead>
-        <tr>
-          <th>COMPETENCIES NAME</th>
-
-          {/* L2 columns */}
-          {active === "l2" && <th>EMP RATING</th>}
-          {active === "l2" && <th>EMP COMMENTS</th>}
-          {active === "l2" && <th>L1 RATING</th>}
-          {active === "l2" && <th>L1 COMMENTS</th>}
-
-          {/* L1 columns */}
-          {active === "l1" && <th>EMP RATING</th>}
-          {active === "l1" && <th>EMP COMMENTS</th>}
-
-          {/* Always show reviewer columns */}
-          <th>{active === "l1" ? "L1 RATING" : "L2 RATING"}</th>
-          <th>{active === "l1" ? "L1 COMMENTS" : "L2 COMMENTS"}</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        {(modalData?.items || []).map((item) => (
-          <tr key={item.detailId}>
-            <td className="tl-comp">
-              <strong>{item.competencyName}</strong>
-            </td>
-
-            {/* L2 view values */}
-            {active === "l2" && <td className="tl-center">{item.employeeRating ?? "-"}</td>}
-            {active === "l2" && <td>{item.employeeComments || "-"}</td>}
-            {active === "l2" && <td className="tl-center">{item.approverRating ?? "-"}</td>}
-            {active === "l2" && <td>{item.approverComments || "-"}</td>}
-
-            {/* L1 view values */}
-            {active === "l1" && <td className="tl-center">{item.employeeRating ?? "-"}</td>}
-            {active === "l1" && <td>{item.employeeComments || "-"}</td>}
-
-            {/* Reviewer input */}
-            <td className="tl-center">
-              <CustomRatingDropdown
-                value={modalRatings[item.detailId]?.rating ?? ""}
-                onChange={(val) => handleInputChange(item.detailId, "rating", val)}
-                isReadOnly={isReadOnly}
-              />
-            </td>
-
-            <td>
-              {isReadOnly ? (
-                <div className="tl-read-only-comment">
-                  {modalRatings[item.detailId]?.comment || "-"}
-                </div>
-              ) : (
-                <textarea
-                  value={modalRatings[item.detailId]?.comment ?? ""}
-                  onChange={(e) => handleInputChange(item.detailId, "comment", e.target.value)}
-                  className="tl-input-text"
-                  placeholder="Enter your comments here..."
-                  rows="3"
-                  aria-label={`Comments for ${item.competencyName}`}
-                />
-              )}
-            </td>
-          </tr>
-        ))}
-
-        {(!modalData?.items || modalData.items.length === 0) && (
-          <tr>
-            <td
-              colSpan={active === "l2" ? 7 : 4}
-              style={{ textAlign: "center", padding: "18px" }}
-            >
-              No competencies found
-            </td>
-          </tr>
-        )}
-      </tbody>
-    </table>
-  );
-
   return (
     <div
       className="tl-modal-overlay"
@@ -254,7 +187,6 @@ const ReviewModal = ({
       aria-label="Review modal"
     >
       <div className="tl-modal" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
         <div className="tl-modal-header">
           <div className="tl-modal-header-left">
             <img src={logoImage} alt="EEPZ Logo" className="tl-modal-logo" />
@@ -280,7 +212,6 @@ const ReviewModal = ({
 
         <div className="tl-modal-divider" />
 
-        {/* Info */}
         <div className="tl-modal-info">
           <div className="tl-info-item">
             <span className="tl-label">Employee</span>
@@ -293,49 +224,142 @@ const ReviewModal = ({
           </div>
         </div>
 
-        {/* L1 rejection note */}
-        {active === "l1" && modalData?.l2Decision === "Rejected" && !isReadOnly && (
-          <div className="tl-rejection">
-            <div className="tl-rejection-header">
-              <i className="bi bi-exclamation-circle-fill" />
-              L2 Rejection Reason
+        {active === "l1" &&
+          modalData?.l2Decision === "Rejected" &&
+          !isReadOnly && (
+            <div className="tl-rejection">
+              <div className="tl-rejection-header">
+                <i className="bi bi-exclamation-circle-fill" />
+                L2 Rejection Reason
+              </div>
+              <p className="tl-rejection-note">
+                {modalData?.l2DecisionNote || "No reason provided"}
+              </p>
             </div>
-            <p className="tl-rejection-note">{modalData?.l2DecisionNote || "No reason provided"}</p>
-          </div>
-        )}
-
-        {/* Body */}
-        <div className="tl-modal-body">
-          {/* ✅ Only L2 table is wrapped -> only L2 is scrollable */}
-          {active === "l2" ? (
-            <div className="tl-modal-table-wrapper">
-              {tableElement}
-            </div>
-          ) : (
-            tableElement
           )}
 
-          {/* Attachments (show for both L1 & L2) */}
+        <div className="tl-modal-body">
+          
+        <div className="tl-modal-table-wrapper">
+
+          <table
+            className="tl-modal-table"
+            role="table"
+            aria-label="Competencies table"
+          >
+            <thead>
+              <tr>
+                <th>COMPETENCIES NAME</th>
+                {active === "l2" && <th>EMP RATING</th>}
+                {active === "l2" && <th>EMP COMMENTS</th>}
+                {active === "l2" && <th>L1 RATING</th>}
+                {active === "l2" && <th>L1 COMMENTS</th>}
+                {active === "l1" && <th>EMP RATING</th>}
+                {active === "l1" && <th>EMP COMMENTS</th>}
+                <th>{active === "l1" ? "L1 RATING" : "L2 RATING"}</th>
+                <th>{active === "l1" ? "L1 COMMENTS" : "L2 COMMENTS"}</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {(modalData?.items || []).map((item) => (
+                <tr key={item.detailId}>
+                  <td className="tl-comp">
+                    <strong>{item.competencyName}</strong>
+                  </td>
+
+                  {active === "l2" && (
+                    <td className="tl-center">{item.employeeRating ?? "-"}</td>
+                  )}
+                  {active === "l2" && <td>{item.employeeComments || "-"}</td>}
+                  {active === "l2" && (
+                    <td className="tl-center">{item.approverRating ?? "-"}</td>
+                  )}
+                  {active === "l2" && <td>{item.approverComments || "-"}</td>}
+
+                  {active === "l1" && (
+                    <td className="tl-center">{item.employeeRating ?? "-"}</td>
+                  )}
+                  {active === "l1" && <td>{item.employeeComments || "-"}</td>}
+
+                  <td className="tl-center">
+                    <CustomRatingDropdown
+                      value={modalRatings[item.detailId]?.rating ?? ""}
+                      onChange={(val) =>
+                        handleInputChange(item.detailId, "rating", val)
+                      }
+                      isReadOnly={isReadOnly}
+                      competencyName={item.competencyName}
+                    />
+                  </td>
+
+                  <td>
+                    {isReadOnly ? (
+                      <div className="tl-read-only-comment">
+                        {modalRatings[item.detailId]?.comment || "-"}
+                      </div>
+                    ) : (
+                      <textarea
+                        value={modalRatings[item.detailId]?.comment ?? ""}
+                        onChange={(e) =>
+                          handleInputChange(
+                            item.detailId,
+                            "comment",
+                            e.target.value
+                          )
+                        }
+                        className="tl-input-text"
+                        placeholder="Enter your comments here..."
+                        rows="3"
+                        aria-label={`Comments for ${item.competencyName}`}
+                      />
+                    )}
+                  </td>
+                </tr>
+              ))}
+
+              {(!modalData?.items || modalData.items.length === 0) && (
+                <tr>
+                  <td
+                    colSpan={active === "l2" ? 9 : 6}
+                    style={{ textAlign: "center", padding: "18px" }}
+                  >
+                    No competencies found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+          </div>
+
           {modalData?.attachments && modalData.attachments.length > 0 && (
             <div className="tl-attachments-section">
               <div className="tl-attachments-header">
-                <i className="bi bi-paperclip" />
+                <i className="bi bi-paperclip"></i>
                 <span>Attachments</span>
               </div>
-
               <div className="tl-attachments-list">
                 {modalData.attachments.map((attachment) => (
-                  <div key={attachment.attachmentId} className="tl-attachment-item">
+                  <div
+                    key={attachment.attachmentId}
+                    className="tl-attachment-item"
+                  >
                     <div className="tl-attachment-info">
                       <i
-                        className={`bi ${getFileIcon(attachment.fileType)} tl-attachment-icon`}
-                      />
+                        className={`bi ${getFileIcon(
+                          attachment.fileType
+                        )} tl-attachment-icon`}
+                      ></i>
                       <div className="tl-attachment-details">
-                        <div className="tl-attachment-name">{attachment.fileName}</div>
+                        <div className="tl-attachment-name">
+                          {attachment.fileName}
+                        </div>
                         <div className="tl-attachment-meta">
                           {formatFileSize(attachment.fileSize)}
                           {attachment.uploadedAt &&
-                            ` • ${new Date(attachment.uploadedAt).toLocaleDateString()}`}
+                            ` • ${new Date(
+                              attachment.uploadedAt
+                            ).toLocaleDateString()}`}
                         </div>
                         {attachment.attachmentNote && (
                           <div className="tl-attachment-note">
@@ -344,13 +368,14 @@ const ReviewModal = ({
                         )}
                       </div>
                     </div>
-
                     <button
                       className="tl-attachment-download"
-                      onClick={() => handleDownloadAttachment(attachment.attachmentId)}
+                      onClick={() =>
+                        handleDownloadAttachment(attachment.attachmentId)
+                      }
                       aria-label={`Download ${attachment.fileName}`}
                     >
-                      <i className="bi bi-download" />
+                      <i className="bi bi-download"></i>
                       Download
                     </button>
                   </div>
@@ -360,10 +385,13 @@ const ReviewModal = ({
           )}
         </div>
 
-        {/* Footer */}
         <div className="tl-modal-footer">
           {isReadOnly ? (
-            <button className="tl-btn tl-btn-cancel" onClick={closeModal} aria-label="Close">
+            <button
+              className="tl-btn tl-btn-cancel"
+              onClick={closeModal}
+              aria-label="Close"
+            >
               Close
             </button>
           ) : (
@@ -418,9 +446,12 @@ const ReviewModal = ({
           )}
         </div>
 
-        {/* L2 Reject Box */}
         {active === "l2" && showRejectReason && !isReadOnly && (
-          <div className="tl-reject-box" role="region" aria-label="Rejection reason">
+          <div
+            className="tl-reject-box"
+            role="region"
+            aria-label="Rejection reason"
+          >
             <label className="tl-reject-label" htmlFor="tl-reason-textarea">
               <i className="bi bi-exclamation-triangle" /> Rejection Reason
             </label>
