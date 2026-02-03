@@ -182,7 +182,7 @@ const Sidebar = ({ allowedRoles = [], currentRole, isOpen, onToggle, onClose }) 
       },
       {
         icon: "bi-briefcase",
-        label: "Internal Opportiunities",
+        label: "Internal Opportunities",
         path: "/internal/opportunities",
       },
       {
@@ -230,7 +230,7 @@ const Sidebar = ({ allowedRoles = [], currentRole, isOpen, onToggle, onClose }) 
       },
       {
         icon: "bi-briefcase",
-        label: "Internal Opportiunities",
+        label: "Internal Opportunities",
         path: "/internal/opportunities",
       },
       {

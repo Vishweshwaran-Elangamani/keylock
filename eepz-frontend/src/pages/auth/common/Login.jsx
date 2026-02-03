@@ -297,18 +297,6 @@ const Login = () => {
                   Welcome back! Please enter your credentials
                 </p>
               </div>
-              {error && (
-                <div className="alert alert-danger d-flex align-items-start mb-4 eepz-animate-slide-in">
-                  <i
-                    className="bi bi-exclamation-triangle-fill me-2 mt-1"
-                    style={{ fontSize: "1.25rem" }}
-                  ></i>
-                  <div>
-                    <strong>Error</strong>
-                    <p className="mb-0 mt-1">{error}</p>
-                  </div>
-                </div>
-              )}
               <form onSubmit={handleSubmit} noValidate autoComplete="off">
                 <div className="mb-4">
                   <label htmlFor="email" className="form-label-log fw-semibold">

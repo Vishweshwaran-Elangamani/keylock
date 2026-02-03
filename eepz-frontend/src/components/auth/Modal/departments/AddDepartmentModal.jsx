@@ -4,25 +4,29 @@ import departmentService from "../../../../services/auth/departmentService";
 import userService from "../../../../services/auth/userService";
 import { toast } from "sonner";
 import "../../../../styles/auth/department/AddDepartmentModal.css";
+
 const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
     departmentName: "",
     departmentCode: "",
     description: "",
     status: "Active",
-    parentDepartmentId: null,
-    hodEmployeeId: null,
+    parentDepartmentId: "",
+    hodEmployeeId: "",
   });
+
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [departments, setDepartments] = useState([]);
   const [departmentHeads, setDepartmentHeads] = useState([]);
   const [loadingDropdowns, setLoadingDropdowns] = useState(true);
+
   useEffect(() => {
     if (show) {
       fetchDropdownData();
     }
   }, [show]);
+
   const fetchDropdownData = async () => {
     try {
       setLoadingDropdowns(true);
@@ -45,14 +49,16 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
       setLoadingDropdowns(false);
     }
   };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value === "" ? null : value,
+      [name]: value,
     }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
+
   const statusOptions = useMemo(
     () => [
       { value: "Active", label: "Active" },
@@ -60,6 +66,7 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
     ],
     []
   );
+
   const parentDepartmentOptions = useMemo(
     () => [
       { value: "", label: "-- None (Root Department) --" },
@@ -70,6 +77,7 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
     ],
     [departments]
   );
+
   const hodOptions = useMemo(
     () => [
       { value: "", label: "-- Select HOD --" },
@@ -80,6 +88,7 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
     ],
     [departmentHeads]
   );
+
   const CustomDropdown = ({
     options,
     value,
@@ -93,15 +102,18 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [openUpward, setOpenUpward] = useState(forceUpward);
     const dropdownRef = useRef(null);
+
     const toggleDropdown = () => {
       if (!disabled) {
         setIsOpen(!isOpen);
       }
     };
+
     const handleSelect = (selectedValue) => {
       onChange({ target: { name, value: selectedValue } });
       setIsOpen(false);
     };
+
     useEffect(() => {
       if (forceUpward) {
         setOpenUpward(true);
@@ -119,6 +131,7 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
         }
       }
     }, [isOpen, forceUpward]);
+
     useEffect(() => {
       const handleClickOutside = (event) => {
         if (
@@ -132,7 +145,9 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
       return () =>
         document.removeEventListener("mousedown", handleClickOutside);
     }, []);
+
     const selectedOption = options.find((opt) => opt.value === value);
+
     return (
       <div
         ref={dropdownRef}
@@ -168,6 +183,7 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
       </div>
     );
   };
+
   const validateForm = () => {
     const newErrors = {};
     if (!formData.departmentName.trim()) {
@@ -188,6 +204,7 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
@@ -225,7 +242,9 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
       setLoading(false);
     }
   };
+
   if (!show) return null;
+
   return (
     <>
       <div className="adm-backdrop" onClick={onClose} />
@@ -262,7 +281,7 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
                         type="text"
                         name="departmentName"
                         placeholder="e.g., Human Resources"
-                        value={formData.departmentName}
+                        value={formData.departmentName || ""}
                         onChange={handleChange}
                         disabled={loading}
                         maxLength={100}
@@ -286,7 +305,7 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
                         type="text"
                         name="departmentCode"
                         placeholder="e.g., HR-001"
-                        value={formData.departmentCode}
+                        value={formData.departmentCode || ""}
                         onChange={handleChange}
                         disabled={loading}
                         maxLength={20}
@@ -306,7 +325,7 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
                     <textarea
                       name="description"
                       placeholder="Brief description of the department"
-                      value={formData.description}
+                      value={formData.description || ""}
                       onChange={handleChange}
                       disabled={loading}
                       maxLength={255}
@@ -322,7 +341,7 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
                       <CustomDropdown
                         name="status"
                         options={statusOptions}
-                        value={formData.status}
+                        value={formData.status || ""}
                         onChange={handleChange}
                         placeholder="Select Status"
                         disabled={loading}
@@ -404,4 +423,5 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
     </>
   );
 };
+
 export default AddDepartmentModal;

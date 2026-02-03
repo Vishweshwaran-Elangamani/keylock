@@ -1,4 +1,5 @@
 import api from "./api";
+
 const BulkOperationService = {
   bulkCreateUsers: async (users) => {
     try {
@@ -8,9 +9,13 @@ const BulkOperationService = {
       return response.data;
     } catch (error) {
       console.error("Bulk create users error:", error);
-      throw error;
+      const errorMessage = error.response?.data?.Message 
+        || error.response?.data?.message 
+        || error.message;
+      throw new Error(errorMessage);
     }
   },
+
   bulkInactivateUsers: async (userIds) => {
     try {
       const response = await api.post("/BulkOperation/bulk-inactivate-users", {
@@ -19,9 +24,13 @@ const BulkOperationService = {
       return response.data;
     } catch (error) {
       console.error("Bulk inactivate users error:", error);
-      throw error;
+      const errorMessage = error.response?.data?.Message 
+        || error.response?.data?.message 
+        || error.message;
+      throw new Error(errorMessage);
     }
   },
+
   bulkCreateUsersFromExcel: async (file) => {
     try {
       const formData = new FormData();
@@ -38,9 +47,13 @@ const BulkOperationService = {
       return response.data;
     } catch (error) {
       console.error("Bulk create from Excel error:", error);
-      throw error;
+      const errorMessage = error.response?.data?.Message 
+        || error.response?.data?.message 
+        || error.message;
+      throw new Error(errorMessage);
     }
   },
+
   downloadExcelTemplate: async () => {
     try {
       const response = await api.get("/BulkOperation/download-template", {
@@ -72,8 +85,12 @@ const BulkOperationService = {
       return { success: true, message: "Template downloaded successfully" };
     } catch (error) {
       console.error("Download template error:", error);
-      throw error;
+      const errorMessage = error.response?.data?.Message 
+        || error.response?.data?.message 
+        || error.message;
+      throw new Error(errorMessage);
     }
   },
 };
+
 export default BulkOperationService;
