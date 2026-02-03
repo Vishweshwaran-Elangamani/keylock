@@ -17,12 +17,11 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "../../styles/mom/components/MeetingInvitations.css";
 
-// ✅ CHANGED: Use numeric values to match backend enum
 const RSVP_STATUS = {
-  PENDING: { label: "Pending", value: 0 },
-  ACCEPTED: { label: "Accepted", value: 1 },
-  DECLINED: { label: "Declined", value: 2 },
-  TENTATIVE: { label: "Tentative", value: 3 },
+  PENDING: { label: "Pending", value: 0, stringValue: "Pending" },
+  ACCEPTED: { label: "Accepted", value: 1, stringValue: "Accepted" },
+  DECLINED: { label: "Declined", value: 2, stringValue: "Declined" },
+  TENTATIVE: { label: "Tentative", value: 3, stringValue: "Tentative" },
 };
 
 const MeetingInvitations = () => {
@@ -57,13 +56,30 @@ const MeetingInvitations = () => {
     }
   };
 
+  const convertStringStatusToNumber = (status) => {
+    if (typeof status === 'number') return status;
+    
+    const statusStr = String(status).toLowerCase();
+    switch (statusStr) {
+      case 'accepted':
+        return RSVP_STATUS.ACCEPTED.value;
+      case 'declined':
+        return RSVP_STATUS.DECLINED.value;
+      case 'tentative':
+        return RSVP_STATUS.TENTATIVE.value;
+      case 'pending':
+      default:
+        return RSVP_STATUS.PENDING.value;
+    }
+  };
+
   const openRsvpModal = (invitation) => {
     setSelectedInvitation(invitation);
     setErrorMessage("");
 
-    // Get current status as number
     const currentStatus = invitation.rsvpStatus ?? invitation.RsvpStatus ?? RSVP_STATUS.PENDING.value;
-    setRsvpStatus(currentStatus);
+    const numericStatus = convertStringStatusToNumber(currentStatus);
+    setRsvpStatus(numericStatus);
 
     setRsvpComment(invitation.rsvpComments || invitation.RsvpComments || "");
   };
@@ -72,6 +88,21 @@ const MeetingInvitations = () => {
     setSelectedInvitation(null);
     setRsvpComment("");
     setErrorMessage("");
+  };
+
+  const getStatusLabel = (statusNum) => {
+    const numStatus = Number(statusNum);
+    switch (numStatus) {
+      case 1:
+        return "Accepted";
+      case 2:
+        return "Declined";
+      case 3:
+        return "Tentative";
+      case 0:
+      default:
+        return "Pending";
+    }
   };
 
   const handleRsvpSubmit = async () => {
@@ -89,10 +120,9 @@ const MeetingInvitations = () => {
       setSubmitting(true);
       setErrorMessage("");
 
-      // Send with PascalCase keys and numeric enum
       const payload = {
         MeetingId: Number(meetingId),
-        RsvpStatus: Number(rsvpStatus), // ✅ Convert to number
+        RsvpStatus: getStatusLabel(Number(rsvpStatus)),
         RsvpComments: rsvpComment.trim(),
       };
 
@@ -108,7 +138,7 @@ const MeetingInvitations = () => {
 
       toastr.success("RSVP submitted successfully.");
       closeRsvpModal();
-      loadInvitations();
+      await loadInvitations();
     } catch (err) {
       console.error("RSVP submit error:", err);
 
@@ -132,50 +162,35 @@ const MeetingInvitations = () => {
     }
   };
 
-  // ✅ UPDATED: Handle both numeric and string status values
   const getStatusBadge = (status) => {
-    // Convert to number if needed
-    const statusNum = typeof status === 'string' ? parseInt(status) : Number(status);
+    const statusNum = convertStringStatusToNumber(status);
 
     switch (statusNum) {
-      case 1: // Accepted
+      case 1:
         return (
           <span className="mi-badge mi-badge-accepted">
             <CheckCircle size={14} /> Accepted
           </span>
         );
-      case 2: // Declined
+      case 2:
         return (
           <span className="mi-badge mi-badge-declined">
             <XCircle size={14} /> Declined
           </span>
         );
-      case 3: // Tentative
+      case 3:
         return (
           <span className="mi-badge mi-badge-tentative">
             <AlertCircle size={14} /> Tentative
           </span>
         );
-      default: // 0 or Pending
+      case 0:
+      default:
         return (
           <span className="mi-badge mi-badge-pending">
             <Clock size={14} /> Pending
           </span>
         );
-    }
-  };
-
-  // ✅ NEW: Helper to get status label from numeric value
-  const getStatusLabel = (statusNum) => {
-    switch (Number(statusNum)) {
-      case 1:
-        return "Accepted";
-      case 2:
-        return "Declined";
-      case 3:
-        return "Tentative";
-      default:
-        return "Pending";
     }
   };
 
@@ -299,8 +314,7 @@ const MeetingInvitations = () => {
                   getField(inv, "meetingTitle", "MeetingTitle") ||
                   "Untitled Meeting";
                 const meetingDate = getField(inv, "meetingDate", "MeetingDate");
-                const rsvpStatusValue =
-                  getField(inv, "rsvpStatus", "RsvpStatus") ?? RSVP_STATUS.PENDING.value;
+                const rsvpStatusValue = getField(inv, "rsvpStatus", "RsvpStatus") ?? "Pending";
 
                 const invitedAt = getField(inv, "invitedAt", "InvitedAt");
                 const schedulerName = getField(
@@ -314,7 +328,7 @@ const MeetingInvitations = () => {
                 );
 
                 return (
-                  <div key={meetingId || index} className="col-12">
+                  <div key={`${meetingId}-${index}`} className="col-12">
                     <div className="card mi-card">
                       <div className="card-body mi-card-body">
                         <div className="row align-items-start">
@@ -494,11 +508,11 @@ const MeetingInvitations = () => {
                       </div>
                     </div>
 
-                    {getField(
+                    {convertStringStatusToNumber(getField(
                       selectedInvitation,
                       "rsvpStatus",
                       "RsvpStatus"
-                    ) !== RSVP_STATUS.PENDING.value && (
+                    )) !== RSVP_STATUS.PENDING.value && (
                       <div className="alert alert-info mi-current-status-alert">
                         <AlertCircle
                           size={18}
@@ -507,11 +521,11 @@ const MeetingInvitations = () => {
                         <div className="mi-current-status-text">
                           <strong>Current Response:</strong>{" "}
                           {getStatusLabel(
-                            getField(
+                            convertStringStatusToNumber(getField(
                               selectedInvitation,
                               "rsvpStatus",
                               "RsvpStatus"
-                            )
+                            ))
                           )}
                           {getField(
                             selectedInvitation,
@@ -651,11 +665,11 @@ const MeetingInvitations = () => {
                       ) : (
                         <>
                           <Send size={16} />
-                          {getField(
+                          {convertStringStatusToNumber(getField(
                             selectedInvitation,
                             "rsvpStatus",
                             "RsvpStatus"
-                          ) === RSVP_STATUS.PENDING.value
+                          )) === RSVP_STATUS.PENDING.value
                             ? "Submit RSVP"
                             : "Update RSVP"}
                         </>
