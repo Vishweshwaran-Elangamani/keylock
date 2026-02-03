@@ -9,6 +9,7 @@ using Relevantz.EEPZ.Common.Exceptions;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repository.Interface;
+using Serilog;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -42,6 +43,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _updateChecklistStatusValidator = updateChecklistStatusValidator;
             _updateProgressPercentageModelValidator = updateProgressPercentageModelValidator;
             _mapper = mapper;
+
+            Log.Debug("GoalProgressService initialized.");
         }
 
         public async Task<ApiResponseModel> UpdateChecklistStatus(
@@ -50,18 +53,33 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             int currentUserEmployeeMasterId
         )
         {
+            Log.Information(
+                "UpdateChecklistStatus START | GoalId={GoalId} | UserId={UserId} | ChecklistId={ChecklistId} | IsCompleted={IsCompleted}",
+                goalId,
+                currentUserEmployeeMasterId,
+                updateDetails?.ChecklistId,
+                updateDetails?.IsCompleted
+            );
+
             var validationResult = await _updateChecklistStatusValidator.ValidateAsync(
                 updateDetails
             );
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                Log.Warning(
+                    "UpdateChecklistStatus VALIDATION_FAILED | GoalId={GoalId} | UserId={UserId} | Errors={Errors}",
+                    goalId,
+                    currentUserEmployeeMasterId,
+                    string.Join("; ", errors)
+                );
                 throw new BadRequestException("VALIDATION_FAILED", string.Join("; ", errors));
             }
 
             var goal = await _baseRepo.GetGoalById(goalId);
             if (goal == null)
             {
+                Log.Warning("UpdateChecklistStatus FAILED | Goal not found | GoalId={GoalId}", goalId);
                 throw new GoalNotFoundException(goalId);
             }
 
@@ -71,6 +89,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
             if (assignment?.IsAcknowledged == true)
             {
+                Log.Warning(
+                    "UpdateChecklistStatus BLOCKED | Tasks acknowledged | GoalId={GoalId} | UserId={UserId}",
+                    goalId,
+                    currentUserEmployeeMasterId
+                );
                 throw new BusinessRuleException(
                     ResponseMessages.Codes.CHECKLIST_LOCKED,
                     "Your tasks have been acknowledged. You cannot modify the checklist."
@@ -80,10 +103,23 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var checklistItem = await _repo.GetChecklistItem(updateDetails.ChecklistId);
             if (checklistItem == null || checklistItem.GoalId != goalId)
             {
+                Log.Warning(
+                    "UpdateChecklistStatus FAILED | Checklist not found or mismatched | ChecklistId={ChecklistId} | GoalId={GoalId}",
+                    updateDetails.ChecklistId,
+                    goalId
+                );
                 throw new ChecklistNotFoundException(updateDetails.ChecklistId);
             }
 
             await _repo.SetChecklistProgress(
+                updateDetails.ChecklistId,
+                currentUserEmployeeMasterId,
+                updateDetails.IsCompleted
+            );
+
+            Log.Information(
+                "UpdateChecklistStatus | Progress updated | GoalId={GoalId} | ChecklistId={ChecklistId} | UserId={UserId} | Completed={Completed}",
+                goalId,
                 updateDetails.ChecklistId,
                 currentUserEmployeeMasterId,
                 updateDetails.IsCompleted
@@ -95,6 +131,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 goal.Goalstatus = GOAL_STATUS.IN_PROGRESS;
                 await _goalRepo.UpdateGoal(goal);
+
+                Log.Information(
+                    "UpdateChecklistStatus | Goal status moved to IN_PROGRESS | GoalId={GoalId}",
+                    goalId
+                );
             }
 
             var completed = await _baseRepo.CountCompletedForUser(
@@ -103,6 +144,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
             var total = await _baseRepo.CountTotalForUser(goalId, currentUserEmployeeMasterId);
             var percent = total == 0 ? 0 : (int)Math.Round((double)completed / total * 100);
+
+            Log.Information(
+                "UpdateChecklistStatus | Computed Progress | GoalId={GoalId} | UserId={UserId} | Completed={Completed} | Total={Total} | Percent={Percent}",
+                goalId,
+                currentUserEmployeeMasterId,
+                completed,
+                total,
+                percent
+            );
 
             if (percent < 100)
             {
@@ -119,6 +169,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 if (pendingApprovals.Any())
                 {
+                    Log.Information(
+                        "UpdateChecklistStatus | Rejecting pending approvals due to progress < 100 | GoalId={GoalId} | UserId={UserId} | RejectedCount={Count}",
+                        goalId,
+                        currentUserEmployeeMasterId,
+                        pendingApprovals.Count
+                    );
+
                     await _baseRepo.SaveChanges();
 
                     await _repo.AddProgressLog(
@@ -149,6 +206,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 goal.Goalstatus = GOAL_STATUS.IN_PROGRESS;
                 await _goalRepo.UpdateGoal(goal);
+
+                Log.Information(
+                    "UpdateChecklistStatus | Goal status moved to IN_PROGRESS at 100% | GoalId={GoalId}",
+                    goalId
+                );
             }
 
             await _baseRepo.SaveChanges();
@@ -164,6 +226,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     && updateDetails.IsCompleted,
             };
 
+            Log.Information(
+                "UpdateChecklistStatus END | GoalId={GoalId} | ChecklistId={ChecklistId} | NewProgress={NewProgress} | StatusChanged={StatusChanged}",
+                goalId,
+                updateDetails.ChecklistId,
+                percent,
+                metadata.StatusChanged
+            );
+
             return ApiResponseModel.SuccessResponse(
                 ResponseMessages.Codes.CHECKLIST_TOGGLED_SUCCESS,
                 metadata
@@ -176,18 +246,33 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             int currentUserEmployeeMasterId
         )
         {
+            Log.Information(
+                "UpdateProgressPercentage START | GoalId={GoalId} | UserId={UserId} | Percent={Percent} | Source={Source}",
+                goalId,
+                currentUserEmployeeMasterId,
+                updateDetails?.ProgressPercent,
+                updateDetails?.Source
+            );
+
             var validationResult = await _updateProgressPercentageModelValidator.ValidateAsync(
                 updateDetails
             );
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                Log.Warning(
+                    "UpdateProgressPercentage VALIDATION_FAILED | GoalId={GoalId} | UserId={UserId} | Errors={Errors}",
+                    goalId,
+                    currentUserEmployeeMasterId,
+                    string.Join("; ", errors)
+                );
                 throw new BadRequestException("VALIDATION_FAILED", string.Join("; ", errors));
             }
 
             var goal = await _baseRepo.GetGoalById(goalId);
             if (goal == null)
             {
+                Log.Warning("UpdateProgressPercentage FAILED | Goal not found | GoalId={GoalId}", goalId);
                 throw new GoalNotFoundException(goalId);
             }
 
@@ -200,6 +285,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 )
             )
             {
+                Log.Warning(
+                    "UpdateProgressPercentage FORBIDDEN | GoalId={GoalId} | UserId={UserId} | Role={Role}",
+                    goalId,
+                    currentUserEmployeeMasterId,
+                    role
+                );
                 throw new ForbiddenException(ResponseMessages.Codes.PROGRESS_UPDATE_DENIED);
             }
 
@@ -224,6 +315,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 UpdatedBy = currentUserEmployeeMasterId,
             };
 
+            Log.Information(
+                "UpdateProgressPercentage END | GoalId={GoalId} | Percent={Percent} | Source={Source}",
+                goalId,
+                updateDetails.ProgressPercent,
+                updateDetails.Source
+            );
+
             return ApiResponseModel.SuccessResponse(
                 ResponseMessages.Codes.GOAL_PROGRESS_UPDATED,
                 metadata
@@ -232,11 +330,22 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         public async Task<int> GetGoalProgressPercent(int goalId, int forEmployeeMasterId)
         {
+            Log.Information(
+                "GetGoalProgressPercent START | GoalId={GoalId} | ForUserId={UserId}",
+                goalId,
+                forEmployeeMasterId
+            );
+
             var latestLog = await _baseRepo.GetLatestProgressLog(goalId);
 
             if (latestLog != null && latestLog.Source == PROGRESS_SOURCE.MANUAL)
             {
-                return latestLog.ProgressPercent ?? 0;
+                var manual = latestLog.ProgressPercent ?? 0;
+                Log.Information(
+                    "GetGoalProgressPercent | Source=MANUAL | Percent={Percent}",
+                    manual
+                );
+                return manual;
             }
             else
             {
@@ -245,7 +354,16 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     forEmployeeMasterId
                 );
                 var total = await _baseRepo.CountTotalForUser(goalId, forEmployeeMasterId);
-                return total == 0 ? 0 : (int)Math.Round((double)completed / total * 100);
+                var percent = total == 0 ? 0 : (int)Math.Round((double)completed / total * 100);
+
+                Log.Information(
+                    "GetGoalProgressPercent | Source=AUTO | Completed={Completed} | Total={Total} | Percent={Percent}",
+                    completed,
+                    total,
+                    percent
+                );
+
+                return percent;
             }
         }
 
@@ -254,16 +372,32 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             int managerEmployeeMasterId
         )
         {
+            Log.Information(
+                "GetTeamGoalProgressForManager START | GoalId={GoalId} | ManagerId={ManagerId}",
+                goalId,
+                managerEmployeeMasterId
+            );
+
             var goal = await _baseRepo.GetGoalById(goalId);
             if (goal == null)
                 throw new GoalNotFoundException(goalId);
 
             if (goal.GoalType != GOAL_TYPE.TEAM)
-                return await GetGoalProgressPercent(goalId, managerEmployeeMasterId);
+            {
+                var solo = await GetGoalProgressPercent(goalId, managerEmployeeMasterId);
+                Log.Information(
+                    "GetTeamGoalProgressForManager | Non-team goal -> returning user progress | Progress={Progress}",
+                    solo
+                );
+                return solo;
+            }
 
             var assignees = await _baseRepo.GetAssignees(goalId);
             if (!assignees.Any())
+            {
+                Log.Information("GetTeamGoalProgressForManager | No assignees -> 0");
                 return 0;
+            }
 
             var subordinates = await _baseRepo.GetSubordinateEmployeeMasterIds(
                 managerEmployeeMasterId
@@ -274,7 +408,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 .ToList();
 
             if (!relevantAssignees.Any())
+            {
+                Log.Information("GetTeamGoalProgressForManager | No relevant assignees -> 0");
                 return 0;
+            }
 
             int totalProgress = 0;
             foreach (var assignee in relevantAssignees)
@@ -286,11 +423,25 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 totalProgress += progress;
             }
 
-            return totalProgress / relevantAssignees.Count;
+            var avg = totalProgress / relevantAssignees.Count;
+
+            Log.Information(
+                "GetTeamGoalProgressForManager END | Count={Count} | AverageProgress={Average}",
+                relevantAssignees.Count,
+                avg
+            );
+
+            return avg;
         }
 
         public async Task<int> GetDependentProgress(int goalId, int userId)
         {
+            Log.Information(
+                "GetDependentProgress START | GoalId={GoalId} | UserId={UserId}",
+                goalId,
+                userId
+            );
+
             var goal = await _baseRepo.GetGoalById(goalId);
             if (goal == null)
                 throw new GoalNotFoundException(goalId);
@@ -300,6 +451,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             if (!subordinates.Any())
             {
+                Log.Information(
+                    "GetDependentProgress | No subordinates -> OwnProgress={Own}",
+                    ownProgress
+                );
                 return ownProgress;
             }
 
@@ -317,6 +472,18 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var (ownWeight, teamWeight) = GetWeightsForRole(userRole);
 
             var cascadingProgress = (ownProgress * ownWeight + teamProgress * teamWeight) / 100;
+
+            Log.Information(
+                "GetDependentProgress END | GoalId={GoalId} | UserId={UserId} | Own={Own} | Team={Team} | Weights=({OwnW},{TeamW}) | Cascading={Cascading}",
+                goalId,
+                userId,
+                ownProgress,
+                teamProgress,
+                ownWeight,
+                teamWeight,
+                cascadingProgress
+            );
+
             return cascadingProgress;
         }
 
@@ -325,6 +492,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             int userId
         )
         {
+            Log.Information(
+                "FetchGoalProgressTree START | GoalId={GoalId} | UserId={UserId}",
+                goalId,
+                userId
+            );
+
             var user = await _baseRepo.GetEmployeeDetailsByMasterId(userId);
             if (user == null)
                 throw new UserNotFoundException(userId);
@@ -399,7 +572,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 teamWeight = 0;
             }
 
-            return new GoalProgressHierarchyModel
+            var model = new GoalProgressHierarchyModel
             {
                 GoalId = goalId,
                 UserId = userId,
@@ -414,29 +587,65 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 OwnItemsCompleted = ownItemsCompleted,
                 Subordinates = subordinateDetails,
             };
+
+            Log.Information(
+                "FetchGoalProgressTree END | GoalId={GoalId} | UserId={UserId} | Own={Own} | Team={Team} | Cascading={Cascading} | OwnItems={OwnItems} | OwnCompleted={OwnCompleted} | Subs={Subs}",
+                goalId,
+                userId,
+                model.OwnProgress,
+                model.TeamProgress,
+                model.CascadingProgress,
+                model.OwnItemCount,
+                model.OwnItemsCompleted,
+                model.Subordinates?.Count ?? 0
+            );
+
+            return model;
         }
 
         //HELPER METHODS 
 
         private async Task<int> CalculateUserOwnProgress(int goalId, int userId)
         {
+            Log.Debug(
+                "CalculateUserOwnProgress START | GoalId={GoalId} | UserId={UserId}",
+                goalId,
+                userId
+            );
+
             var userItems = await _repo.GetUserOwnChecklistItems(goalId, userId);
 
             if (!userItems.Any())
+            {
+                Log.Debug("CalculateUserOwnProgress | No items -> 0");
                 return 0;
+            }
 
             var completedCount = await _repo.CountUserOwnCompletedItems(goalId, userId);
-            return (int)Math.Round((double)completedCount / userItems.Count * 100);
+            var percent = (int)Math.Round((double)completedCount / userItems.Count * 100);
+
+            Log.Debug(
+                "CalculateUserOwnProgress END | Items={Items} | Completed={Completed} | Percent={Percent}",
+                userItems.Count,
+                completedCount,
+                percent
+            );
+
+            return percent;
         }
 
         private (int ownWeight, int teamWeight) GetWeightsForRole(string? role)
         {
             if (string.IsNullOrWhiteSpace(role))
+            {
+                Log.Debug("GetWeightsForRole | Null/Empty role -> default 50/50");
                 return (50, 50);
+            }
 
             var normalized = role.Trim().ToLower().Replace(" ", "");
 
-            return normalized switch
+            // Deconstruct into named locals
+            var (ownWeight, teamWeight) = normalized switch
             {
                 "employee" => (100, 0),
                 "manager" => (50, 50),
@@ -444,14 +653,29 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 "leadership" => (20, 80),
                 _ => (50, 50),
             };
-        }
 
+            Log.Debug(
+                "GetWeightsForRole | Role={Role} | Normalized={Normalized} | Weights=({Own},{Team})",
+                role,
+                normalized,
+                ownWeight,
+                teamWeight
+            );
+
+            return (ownWeight, teamWeight);
+        }
 
         private async Task<List<SubordinateProgressModel>> BuildSubordinateProgressList(
             int goalId,
             List<int> subordinateIds
         )
         {
+            Log.Debug(
+                "BuildSubordinateProgressList START | GoalId={GoalId} | SubIdsCount={Count}",
+                goalId,
+                subordinateIds?.Count ?? 0
+            );
+
             var subordinateDetails = new List<SubordinateProgressModel>();
 
             if (!subordinateIds.Any())
@@ -484,17 +708,29 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
             }
 
+            Log.Debug(
+                "BuildSubordinateProgressList END | GoalId={GoalId} | SubordinateCount={Count}",
+                goalId,
+                subordinateDetails.Count
+            );
+
             return subordinateDetails;
         }
-
 
         private string GetFullName(Employeedetailsmaster employeeDetails)
         {
             var profile = employeeDetails.Employee?.Userprofile;
             if (profile == null)
+            {
+                Log.Debug("GetFullName | Missing profile -> 'Unknown'");
                 return "Unknown";
+            }
 
-            return $"{profile.FirstName} {profile.LastName}".Trim();
+            var fullName = $"{profile.FirstName} {profile.LastName}".Trim();
+
+            Log.Debug("GetFullName | Resolved={FullName}", fullName);
+
+            return fullName;
         }
     }
 }

@@ -8,6 +8,7 @@ using Relevantz.EEPZ.Common.Exceptions;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repository.Interface;
+using Serilog;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -26,56 +27,134 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _repo = repo;
             _environment = environment;
             _mapper = mapper;
+
+            Log.Debug("BaseGoalService initialized.");
         }
 
-        public bool CanCreate(string role, string goalType) =>
-            (goalType == GOAL_TYPE.SELF)
-            || (
-                goalType == GOAL_TYPE.TEAM
-                && (role == USER_ROLE.MANAGER || role == USER_ROLE.DEPARTMENT_HEAD)
-            )
-            || (goalType == GOAL_TYPE.ORG && role == USER_ROLE.LEADERSHIP);
+        public bool CanCreate(string role, string goalType)
+        {
+            var canCreate =
+                (goalType == GOAL_TYPE.SELF)
+                || (
+                    goalType == GOAL_TYPE.TEAM
+                    && (role == USER_ROLE.MANAGER || role == USER_ROLE.DEPARTMENT_HEAD)
+                )
+                || (goalType == GOAL_TYPE.ORG && role == USER_ROLE.LEADERSHIP);
 
-        public string? GetCreationApprovalType(string goalType) =>
-            goalType == GOAL_TYPE.SELF ? APPROVAL_TYPE.SELF_GOAL_ACTIVATION
-            : goalType == GOAL_TYPE.TEAM ? APPROVAL_TYPE.CREATION
-            : null;
+            Log.Information(
+                "CanCreate | Role={Role} | GoalType={GoalType} | Result={Result}",
+                role,
+                goalType,
+                canCreate
+            );
+            return canCreate;
+        }
+
+        public string? GetCreationApprovalType(string goalType)
+        {
+            var approvalType =
+                goalType == GOAL_TYPE.SELF ? APPROVAL_TYPE.SELF_GOAL_ACTIVATION
+                : goalType == GOAL_TYPE.TEAM ? APPROVAL_TYPE.CREATION
+                : null;
+
+            Log.Information(
+                "GetCreationApprovalType | GoalType={GoalType} | ApprovalType={ApprovalType}",
+                goalType,
+                approvalType ?? "null"
+            );
+
+            return approvalType;
+        }
 
         public async Task<int?> GetApproverForUser(int employeeMasterId, string approvalType)
         {
+            Log.Information(
+                "GetApproverForUser START | EmployeeMasterId={EmployeeMasterId} | ApprovalType={ApprovalType}",
+                employeeMasterId,
+                approvalType
+            );
+
             var managerId = await _repo.GetReportingManagerEmployeeMasterId(employeeMasterId);
+
+            Log.Information(
+                "GetApproverForUser END | EmployeeMasterId={EmployeeMasterId} | ManagerId={ManagerId}",
+                employeeMasterId,
+                managerId.HasValue ? managerId.Value : null
+            );
+
             return managerId;
         }
 
         public async Task<string> GetEmployeeName(int? employeeMasterId)
         {
+            Log.Information(
+                "GetEmployeeName START | EmployeeMasterId={EmployeeMasterId}",
+                employeeMasterId.HasValue ? employeeMasterId.Value : -1
+            );
+
             if (!employeeMasterId.HasValue)
+            {
+                Log.Information("GetEmployeeName | No EmployeeMasterId provided -> UNKNOWN");
                 return PROJECT_STATUS.UNKNOWN;
+            }
 
             var edm = await _repo.GetEmployeeDetailsByMasterId(employeeMasterId.Value);
             if (edm?.Employee?.Userprofile == null)
+            {
+                Log.Information(
+                    "GetEmployeeName | Profile not found for EmployeeMasterId={EmployeeMasterId} -> UNKNOWN",
+                    employeeMasterId.Value
+                );
                 return PROJECT_STATUS.UNKNOWN;
+            }
 
             var profile = edm.Employee.Userprofile;
-            return $"{profile.FirstName} {profile.LastName}";
+            var fullName = $"{profile.FirstName} {profile.LastName}";
+            Log.Information(
+                "GetEmployeeName END | EmployeeMasterId={EmployeeMasterId} | Name={Name}",
+                employeeMasterId.Value,
+                fullName
+            );
+            return fullName;
         }
 
         public async Task<bool> CanMarkComplete(int goalId, int employeeMasterId)
         {
+            Log.Information(
+                "CanMarkComplete START | GoalId={GoalId} | EmployeeMasterId={EmployeeMasterId}",
+                goalId,
+                employeeMasterId
+            );
+
             var goal = await _repo.GetGoalById(goalId);
             if (goal == null)
+            {
+                Log.Information("CanMarkComplete | Goal not found -> false");
                 return false;
+            }
 
             bool isParticipant = await _repo.IsGoalParticipant(goalId, employeeMasterId);
             if (!isParticipant)
+            {
+                Log.Information("CanMarkComplete | Not a participant -> false");
                 return false;
+            }
 
             if (goal.Goalstatus != GOAL_STATUS.OPEN && goal.Goalstatus != GOAL_STATUS.IN_PROGRESS)
+            {
+                Log.Information(
+                    "CanMarkComplete | Invalid status={Status} -> false",
+                    goal.Goalstatus
+                );
                 return false;
+            }
 
             var progress = await GetGoalProgressPercent(goalId, employeeMasterId);
             if (progress < 100)
+            {
+                Log.Information("CanMarkComplete | Progress={Progress} < 100 -> false", progress);
                 return false;
+            }
 
             if (
                 goal.Goalendat.HasValue
@@ -83,47 +162,92 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 && goal.Goalstatus != GOAL_STATUS.REOPENED
             )
             {
+                Log.Information(
+                    "CanMarkComplete | Overdue and not REOPENED | GoalEndAt={GoalEndAt} | Status={Status} -> false",
+                    goal.Goalendat,
+                    goal.Goalstatus
+                );
                 return false;
             }
 
+            Log.Information("CanMarkComplete END -> true");
             return true;
         }
 
         public async Task<int> GetGoalProgressPercent(int goalId, int forEmployeeMasterId)
         {
+            Log.Information(
+                "GetGoalProgressPercent START | GoalId={GoalId} | ForEmployeeMasterId={EmployeeMasterId}",
+                goalId,
+                forEmployeeMasterId
+            );
+
             var latestLog = await _repo.GetLatestProgressLog(goalId);
 
             if (latestLog != null && latestLog.Source == PROGRESS_SOURCE.MANUAL)
             {
-                return latestLog.ProgressPercent ?? 0;
+                var manual = latestLog.ProgressPercent ?? 0;
+                Log.Information(
+                    "GetGoalProgressPercent | MANUAL source | Percent={Percent}",
+                    manual
+                );
+                return manual;
             }
             else
             {
                 var completed = await _repo.CountCompletedForUser(goalId, forEmployeeMasterId);
                 var total = await _repo.CountTotalForUser(goalId, forEmployeeMasterId);
-                return total == 0 ? 0 : (int)Math.Round((double)completed / total * 100);
+                var percent = total == 0 ? 0 : (int)Math.Round((double)completed / total * 100);
+                Log.Information(
+                    "GetGoalProgressPercent | AUTO (checklist) | Completed={Completed} | Total={Total} | Percent={Percent}",
+                    completed,
+                    total,
+                    percent
+                );
+                return percent;
             }
         }
 
         public async Task<bool> CanViewGoal(int goalId, int employeeMasterId)
         {
+            Log.Information(
+                "CanViewGoal START | GoalId={GoalId} | EmployeeMasterId={EmployeeMasterId}",
+                goalId,
+                employeeMasterId
+            );
+
             var goal = await _repo.GetGoalById(goalId);
             if (goal == null)
+            {
+                Log.Information("CanViewGoal | Goal not found -> false");
                 return false;
+            }
 
             var userRole = await _repo.GetUserRole(employeeMasterId);
 
             if (userRole == USER_ROLE.LEADERSHIP)
+            {
+                Log.Information("CanViewGoal | User is LEADERSHIP -> true");
                 return true;
+            }
 
             if (goal.GoalType == GOAL_TYPE.ORG)
+            {
+                Log.Information("CanViewGoal | Goal is ORG -> true");
                 return true;
+            }
 
             if (goal.CreatedBy == employeeMasterId)
+            {
+                Log.Information("CanViewGoal | User is creator -> true");
                 return true;
+            }
 
             if (await _repo.IsUserAssignedToGoal(goalId, employeeMasterId))
+            {
+                Log.Information("CanViewGoal | User is assignee -> true");
                 return true;
+            }
 
             if (goal.GoalType == GOAL_TYPE.SELF && goal.CreatedBy.HasValue)
             {
@@ -132,6 +256,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
                 if (creatorManagerId.HasValue && creatorManagerId.Value == employeeMasterId)
                 {
+                    Log.Information("CanViewGoal | SELF goal, user is creator's manager -> true");
                     return true;
                 }
             }
@@ -141,12 +266,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var deptHead = await _repo.GetEmployeeDetailsByMasterId(employeeMasterId);
                 if (deptHead != null)
                 {
-                    var isInDept = await _repo.IsEmployeeInDepartment(
-                        goalId,
-                        deptHead.DepartmentId
-                    );
+                    var isInDept = await _repo.IsEmployeeInDepartment(goalId, deptHead.DepartmentId);
                     if (isInDept)
+                    {
+                        Log.Information(
+                            "CanViewGoal | DEPARTMENT_HEAD and employee in department -> true"
+                        );
                         return true;
+                    }
                 }
             }
 
@@ -157,9 +284,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
                 if (creatorManagerId.HasValue && creatorManagerId.Value == employeeMasterId)
                 {
+                    Log.Information("CanViewGoal | TEAM goal, user is creator's manager -> true");
                     return true;
                 }
             }
+
+            Log.Information("CanViewGoal END -> false");
             return false;
         }
 
@@ -169,9 +299,19 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string currentUserRole
         )
         {
+            Log.Information(
+                "CanCommentOnGoal START | GoalId={GoalId} | UserId={UserId} | Role={Role}",
+                goalId,
+                currentUserEmployeeMasterId,
+                currentUserRole
+            );
+
             var goal = await _repo.GetGoalById(goalId);
             if (goal == null)
+            {
+                Log.Information("CanCommentOnGoal | Goal not found -> false");
                 return false;
+            }
 
             var isCreator = goal.CreatedBy == currentUserEmployeeMasterId;
             var isAssignee = await _repo.IsUserAssignedToGoal(
@@ -184,16 +324,30 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 case GOAL_TYPE.SELF:
                     if (isCreator)
+                    {
+                        Log.Information("CanCommentOnGoal | SELF | IsCreator -> true");
                         return true;
+                    }
 
                     var creatorManagerId = await _repo.GetReportingManagerEmployeeMasterId(
                         goal.CreatedBy ?? 0
                     );
-                    return creatorManagerId == currentUserEmployeeMasterId;
+                    var selfAllowed = creatorManagerId == currentUserEmployeeMasterId;
+                    Log.Information(
+                        "CanCommentOnGoal | SELF | IsCreatorsManager={IsCreatorsManager} -> {Result}",
+                        selfAllowed,
+                        selfAllowed
+                    );
+                    return selfAllowed;
 
                 case GOAL_TYPE.TEAM:
                     if (isCreator || isAssignee)
+                    {
+                        Log.Information(
+                            "CanCommentOnGoal | TEAM | IsCreatorOrAssignee -> true"
+                        );
                         return true;
+                    }
 
                     if (USER_ROLE.MANAGERIAL_ROLES.Contains(currentUserRole))
                     {
@@ -207,16 +361,30 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                                         assignee.AssignedTo.Value
                                     );
                                 if (assigneeManagerId == currentUserEmployeeMasterId)
+                                {
+                                    Log.Information(
+                                        "CanCommentOnGoal | TEAM | Current user manages an assignee -> true"
+                                    );
                                     return true;
+                                }
                             }
                         }
                     }
+                    Log.Information("CanCommentOnGoal | TEAM -> false");
                     return false;
 
                 case GOAL_TYPE.ORG:
-                    return isCreator || isLeadership;
+                    var orgAllowed = isCreator || isLeadership;
+                    Log.Information(
+                        "CanCommentOnGoal | ORG | IsCreator={IsCreator} | IsLeadership={IsLeadership} -> {Result}",
+                        isCreator,
+                        isLeadership,
+                        orgAllowed
+                    );
+                    return orgAllowed;
 
                 default:
+                    Log.Information("CanCommentOnGoal | DEFAULT -> false");
                     return false;
             }
         }
@@ -227,13 +395,37 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string role
         )
         {
+            Log.Information(
+                "CanUserCommentOnGoal START | GoalId={GoalId} | UserId={UserId} | Role={Role}",
+                goalId,
+                employeeMasterId,
+                role
+            );
+
             var canComment = await _repo.CanUserCommentOnGoal(goalId, employeeMasterId, role);
+
+            Log.Information(
+                "CanUserCommentOnGoal END | GoalId={GoalId} | UserId={UserId} | CanComment={CanComment}",
+                goalId,
+                employeeMasterId,
+                canComment
+            );
+
             return canComment;
         }
 
         public async Task<bool> IsGoalCommentable(int goalId)
         {
+            Log.Information("IsGoalCommentable START | GoalId={GoalId}", goalId);
+
             var isCommentable = await _repo.IsGoalCommentable(goalId);
+
+            Log.Information(
+                "IsGoalCommentable END | GoalId={GoalId} | Result={Result}",
+                goalId,
+                isCommentable
+            );
+
             return isCommentable;
         }
 
@@ -243,62 +435,87 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string currentUserRole
         )
         {
+            Log.Information(
+                "GetGoal START | GoalId={GoalId} | UserId={UserId} | Role={Role}",
+                goalId,
+                currentUserEmployeeMasterId,
+                currentUserRole
+            );
+
             var goal = await _repo.GetGoalById(goalId);
             if (goal == null)
+            {
+                Log.Warning("GetGoal | Goal not found | GoalId={GoalId}", goalId);
                 throw new GoalNotFoundException(goalId);
+            }
 
             var canView = await CanViewGoal(goalId, currentUserEmployeeMasterId);
             if (!canView)
+            {
+                Log.Warning(
+                    "GetGoal | Access denied | GoalId={GoalId} | UserId={UserId}",
+                    goalId,
+                    currentUserEmployeeMasterId
+                );
                 throw new GoalAccessDeniedException();
+            }
 
-            // Use Mapster to map base properties
             var goalDetail = _mapper.Map<GoalDetailModel>(goal);
-
+            Log.Debug("GetGoal | Mapped base goal to GoalDetailModel");
 
             goalDetail.ProgressPercent = await CalculateGoalProgress(
                 goalId,
                 currentUserEmployeeMasterId
             );
-
+            Log.Information(
+                "GetGoal | ProgressPercent={ProgressPercent}",
+                goalDetail.ProgressPercent
+            );
 
             goalDetail.ProjectName = await GetProjectName(goal.ProjectId);
+            Log.Information("GetGoal | ProjectName={ProjectName}", goalDetail.ProjectName);
 
             goalDetail.CreatedByName = await GetEmployeeName(goal.CreatedBy);
-
+            Log.Information("GetGoal | CreatedByName={CreatedByName}", goalDetail.CreatedByName);
 
             goalDetail.Checklist = await MapChecklistItems(
                 goal.GoalChecklists.ToList(),
                 currentUserEmployeeMasterId
             );
-
+            Log.Information("GetGoal | ChecklistCount={Count}", goalDetail.Checklist?.Count ?? 0);
 
             goalDetail.Assignees = await GetAssigneesWithDetails(goalId);
+            Log.Information("GetGoal | AssigneesCount={Count}", goalDetail.Assignees?.Count ?? 0);
 
-            // Set permission flags
             goalDetail.CanEdit =
                 goal.CreatedBy == currentUserEmployeeMasterId
                 && goal.Goalstatus != GOAL_STATUS.COMPLETED
                 && goal.Goalstatus != GOAL_STATUS.CLOSED;
+            Log.Information("GetGoal | CanEdit={CanEdit}", goalDetail.CanEdit);
 
             goalDetail.CanComment = await CanCommentOnGoal(
                 goalId,
                 currentUserEmployeeMasterId,
                 currentUserRole
             );
+            Log.Information("GetGoal | CanComment={CanComment}", goalDetail.CanComment);
 
             goalDetail.CanMarkComplete = await CanMarkComplete(
                 goalId,
                 currentUserEmployeeMasterId
             );
-
+            Log.Information(
+                "GetGoal | CanMarkComplete={CanMarkComplete}",
+                goalDetail.CanMarkComplete
+            );
 
             bool isOverdue =
                 goal.Goalendat.HasValue
                 && goal.Goalendat.Value < DateTime.UtcNow
                 && goal.Goalstatus != GOAL_STATUS.COMPLETED
                 && goal.Goalstatus != GOAL_STATUS.CLOSED;
-
             goalDetail.IsOverdue = isOverdue;
+            Log.Information("GetGoal | IsOverdue={IsOverdue}", isOverdue);
 
             goalDetail.CanRequestReopen =
                 isOverdue
@@ -306,12 +523,21 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     goal.CreatedBy == currentUserEmployeeMasterId
                     || await _repo.IsUserAssignedToGoal(goalId, currentUserEmployeeMasterId)
                 );
+            Log.Information(
+                "GetGoal | CanRequestReopen={CanRequestReopen}",
+                goalDetail.CanRequestReopen
+            );
 
             goalDetail.HasPendingApproval = await _repo.HasPendingApproval(
                 goalId,
                 currentUserEmployeeMasterId
             );
+            Log.Information(
+                "GetGoal | HasPendingApproval={HasPendingApproval}",
+                goalDetail.HasPendingApproval
+            );
 
+            Log.Information("GetGoal END | GoalId={GoalId}", goalId);
             return goalDetail;
         }
 
@@ -320,16 +546,28 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             int currentUserEmployeeMasterId
         )
         {
+            Log.Debug(
+                "CalculateGoalProgress START | GoalId={GoalId} | UserId={UserId}",
+                goalId,
+                currentUserEmployeeMasterId
+            );
+
             var latestLog = await _repo.GetLatestProgressLog(goalId);
 
             if (latestLog != null && latestLog.Source == PROGRESS_SOURCE.MANUAL)
             {
-                return latestLog.ProgressPercent ?? 0;
+                var manualPercent = latestLog.ProgressPercent ?? 0;
+                Log.Debug(
+                    "CalculateGoalProgress | MANUAL source | Percent={Percent}",
+                    manualPercent
+                );
+                return manualPercent;
             }
 
             var allChecklistItems = await _repo.GetChecklistItemsByGoalId(goalId);
             if (allChecklistItems == null || !allChecklistItems.Any())
             {
+                Log.Debug("CalculateGoalProgress | No checklist items -> 0");
                 return 0;
             }
 
@@ -344,16 +582,31 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     completedCount++;
             }
 
-            return (int)Math.Round((double)completedCount / allChecklistItems.Count * 100);
+            var percent = (int)Math.Round((double)completedCount / allChecklistItems.Count * 100);
+            Log.Debug(
+                "CalculateGoalProgress END | Completed={Completed} | Total={Total} | Percent={Percent}",
+                completedCount,
+                allChecklistItems.Count,
+                percent
+            );
+            return percent;
         }
 
         private async Task<string?> GetProjectName(int? projectId)
         {
+            Log.Debug("GetProjectName START | ProjectId={ProjectId}", projectId);
+
             if (!projectId.HasValue)
+            {
+                Log.Debug("GetProjectName | No ProjectId -> null");
                 return null;
+            }
 
             var project = await _repo.GetProjectById(projectId.Value);
-            return project?.ProjectName;
+            var name = project?.ProjectName;
+
+            Log.Debug("GetProjectName END | ProjectId={ProjectId} | Name={Name}", projectId, name);
+            return name;
         }
 
         private async Task<List<GoalChecklistItemModel>> MapChecklistItems(
@@ -361,14 +614,18 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             int currentUserEmployeeMasterId
         )
         {
+            Log.Debug(
+                "MapChecklistItems START | InputCount={Count} | UserId={UserId}",
+                checklists?.Count ?? 0,
+                currentUserEmployeeMasterId
+            );
+
             var checklistModels = new List<GoalChecklistItemModel>();
 
             foreach (var checklist in checklists)
             {
-                // Use Mapster for base mapping
                 var item = _mapper.Map<GoalChecklistItemModel>(checklist);
 
-                // Set completion status
                 item.IsCompletedForCurrentUser = checklist.Goalchecklistprogresses.Any(p =>
                     p.UserId == (checklist.AddedFor ?? currentUserEmployeeMasterId)
                     && p.IsCompleted == true
@@ -377,11 +634,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 checklistModels.Add(item);
             }
 
+            Log.Debug("MapChecklistItems END | OutputCount={Count}", checklistModels.Count);
             return checklistModels;
         }
 
         private async Task<List<AssigneeModel>> GetAssigneesWithDetails(int goalId)
         {
+            Log.Debug("GetAssigneesWithDetails START | GoalId={GoalId}", goalId);
+
             var assignments = await _repo.GetAssignees(goalId);
             var result = new List<AssigneeModel>();
 
@@ -390,15 +650,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 if (!assignment.AssignedTo.HasValue)
                     continue;
 
-                var edm = await _repo.GetEmployeeDetailsByMasterId(
-                    assignment.AssignedTo.Value
-                );
+                var edm = await _repo.GetEmployeeDetailsByMasterId(assignment.AssignedTo.Value);
                 if (edm?.Employee?.Userprofile == null)
                     continue;
 
-
                 var assignee = _mapper.Map<AssigneeModel>(assignment);
-
 
                 var profile = edm.Employee.Userprofile;
                 assignee.Name = $"{profile.FirstName} {profile.LastName}".Trim();
@@ -407,6 +663,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 result.Add(assignee);
             }
 
+            Log.Debug(
+                "GetAssigneesWithDetails END | GoalId={GoalId} | Count={Count}",
+                goalId,
+                result.Count
+            );
             return result;
         }
 
@@ -416,9 +677,17 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string role
         )
         {
+            Log.Information(
+                "GetMarkCompleteEligibility START | GoalId={GoalId} | UserId={UserId} | Role={Role}",
+                goalId,
+                employeeMasterId,
+                role
+            );
+
             var goal = await _repo.GetGoalById(goalId);
             if (goal == null)
             {
+                Log.Information("GetMarkCompleteEligibility | Goal not found -> CanComplete=false");
                 return new CanMarkCompleteModel
                 {
                     CanComplete = false,
@@ -449,6 +718,17 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 reasons.Add("Not a participant");
 
             var shouldRequestReopen = isOverdue && goal.Goalstatus != GOAL_STATUS.REOPENED;
+
+            Log.Information(
+                "GetMarkCompleteEligibility END | GoalId={GoalId} | UserId={UserId} | CanComplete={CanComplete} | Progress={Progress} | IsOverdue={IsOverdue} | HasValidStatus={HasValidStatus} | IsParticipant={IsParticipant}",
+                goalId,
+                employeeMasterId,
+                reasons.Count == 0,
+                progress,
+                isOverdue,
+                hasValidStatus,
+                isParticipant
+            );
 
             return new CanMarkCompleteModel
             {

@@ -9,6 +9,7 @@ using Relevantz.EEPZ.Common.Exceptions;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repository.Interface;
+using Serilog;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -48,6 +49,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _approvalDecisionValidator = approvalDecisionValidator;
             _approvalQueryValidator = approvalQueryValidator;
             _mapper = mapper;
+
+            Log.Debug("GoalApprovalsService initialized.");
         }
 
         public async Task<ApiResponseModel<int>> CreateApprovalRequest(
@@ -57,28 +60,45 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string requesterRole
         )
         {
+            Log.Information(
+                "CreateApprovalRequest START | GoalId={GoalId} | RequestedBy={RequesterId} | Role={Role} | Type={ApprovalType}",
+                goalId,
+                requesterEmployeeMasterId,
+                requesterRole,
+                approvalRequestDetails?.ApprovalType
+            );
+
             var validationResult = await _createApprovalValidator.ValidateAsync(
                 approvalRequestDetails
             );
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                Log.Warning(
+                    "CreateApprovalRequest VALIDATION_FAILED | GoalId={GoalId} | Errors={Errors}",
+                    goalId,
+                    string.Join("; ", errors)
+                );
                 throw new BadRequestException("VALIDATION_FAILED", string.Join("; ", errors));
             }
 
             var goal = await _baseRepo.GetGoalById(goalId);
             if (goal == null)
             {
+                Log.Warning("CreateApprovalRequest | Goal not found | GoalId={GoalId}", goalId);
                 throw new GoalNotFoundException(goalId);
             }
 
             if (approvalRequestDetails.ApprovalType == APPROVAL_TYPE.COMPLETION)
             {
+                Log.Information("CreateApprovalRequest | Branch=COMPLETION");
+
                 if (
                     requesterRole == USER_ROLE.LEADERSHIP
                     && (goal.GoalType?.ToLower() == GOAL_TYPE.ORG)
                 )
                 {
+                    Log.Information("CreateApprovalRequest | Auto-approve COMPLETION for ORG by LEADERSHIP");
                     var autoApproval = new GoalApproval
                     {
                         GoalId = goalId,
@@ -94,6 +114,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     goal.Goalstatus = GOAL_STATUS.COMPLETED;
                     await _baseRepo.SaveChanges();
 
+                    Log.Information(
+                        "CreateApprovalRequest END | AutoApproved COMPLETION | ApprovalId={ApprovalId}",
+                        autoApproval.ApprovalId
+                    );
                     return ApiResponseModel<int>.SuccessResponse(
                         ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
                         autoApproval.ApprovalId
@@ -105,6 +129,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     && (goal.GoalType?.ToLower() == GOAL_TYPE.SELF)
                 )
                 {
+                    Log.Information("CreateApprovalRequest | Auto-approve COMPLETION for SELF by LEADERSHIP");
                     var autoApproval = new GoalApproval
                     {
                         GoalId = goalId,
@@ -120,6 +145,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     goal.Goalstatus = GOAL_STATUS.COMPLETED;
                     await _baseRepo.SaveChanges();
 
+                    Log.Information(
+                        "CreateApprovalRequest END | AutoApproved COMPLETION SELF | ApprovalId={ApprovalId}",
+                        autoApproval.ApprovalId
+                    );
                     return ApiResponseModel<int>.SuccessResponse(
                         ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
                         autoApproval.ApprovalId
@@ -131,6 +160,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
                 if (!managerId.HasValue)
                 {
+                    Log.Warning(
+                        "CreateApprovalRequest | No manager found for COMPLETION | RequesterId={RequesterId}",
+                        requesterEmployeeMasterId
+                    );
                     throw new BusinessRuleException(
                         ResponseMessages.Codes.APPROVAL_NO_MANAGER,
                         "Cannot submit approval: No reporting manager found"
@@ -150,6 +183,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 await _repo.AddApproval(approval);
                 await _baseRepo.SaveChanges();
 
+                Log.Information(
+                    "CreateApprovalRequest END | COMPLETION created PENDING | ApprovalId={ApprovalId}",
+                    approval.ApprovalId
+                );
+
                 return ApiResponseModel<int>.SuccessResponse(
                     ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
                     approval.ApprovalId
@@ -158,8 +196,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             if (approvalRequestDetails.ApprovalType == APPROVAL_TYPE.CLOSURE)
             {
+                Log.Information("CreateApprovalRequest | Branch=CLOSURE");
+
                 if (goal.CreatedBy != requesterEmployeeMasterId)
                 {
+                    Log.Warning(
+                        "CreateApprovalRequest | CLOSURE denied | Not goal creator | GoalId={GoalId} | RequesterId={RequesterId}",
+                        goalId,
+                        requesterEmployeeMasterId
+                    );
                     throw new GoalAccessDeniedException();
                 }
 
@@ -172,6 +217,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     }.Contains(goal.Goalstatus?.ToLower() ?? "")
                 )
                 {
+                    Log.Warning(
+                        "CreateApprovalRequest | CLOSURE invalid status | Status={Status}",
+                        goal.Goalstatus
+                    );
                     throw new BusinessRuleException(
                         ResponseMessages.Codes.GOAL_INVALID_STATUS,
                         "Goal is already completed or closed"
@@ -183,6 +232,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     && (goal.GoalType?.ToLower() == GOAL_TYPE.ORG)
                 )
                 {
+                    Log.Information("CreateApprovalRequest | Auto-approve CLOSURE for ORG by LEADERSHIP");
                     var autoApproval = new GoalApproval
                     {
                         GoalId = goalId,
@@ -199,6 +249,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                     await _baseRepo.SaveChanges();
 
+                    Log.Information(
+                        "CreateApprovalRequest END | AutoApproved CLOSURE | ApprovalId={ApprovalId}",
+                        autoApproval.ApprovalId
+                    );
+
                     return ApiResponseModel<int>.SuccessResponse(
                         ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
                         autoApproval.ApprovalId
@@ -210,6 +265,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
                 if (!managerId.HasValue)
                 {
+                    Log.Warning(
+                        "CreateApprovalRequest | CLOSURE | No manager found | RequesterId={RequesterId}",
+                        requesterEmployeeMasterId
+                    );
                     throw new BusinessRuleException(
                         ResponseMessages.Codes.APPROVAL_NO_MANAGER,
                         "No manager found to approve closure"
@@ -229,6 +288,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 await _repo.AddApproval(approval);
                 await _baseRepo.SaveChanges();
 
+                Log.Information(
+                    "CreateApprovalRequest END | CLOSURE created PENDING | ApprovalId={ApprovalId}",
+                    approval.ApprovalId
+                );
+
                 return ApiResponseModel<int>.SuccessResponse(
                     ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
                     approval.ApprovalId
@@ -237,8 +301,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             if (approvalRequestDetails.ApprovalType == APPROVAL_TYPE.REOPENING)
             {
+                Log.Information("CreateApprovalRequest | Branch=REOPENING");
+
                 if (!goal.Goalendat.HasValue || goal.Goalendat.Value >= DateTime.UtcNow)
                 {
+                    Log.Warning("CreateApprovalRequest | REOPENING denied | Goal not overdue");
                     throw new BusinessRuleException(
                         ResponseMessages.Codes.GOAL_INVALID_STATUS,
                         "Goal is not overdue"
@@ -250,6 +317,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     && !await _baseRepo.IsUserAssignedToGoal(goalId, requesterEmployeeMasterId)
                 )
                 {
+                    Log.Warning(
+                        "CreateApprovalRequest | REOPENING denied | Not creator/assignee | GoalId={GoalId} | RequesterId={RequesterId}",
+                        goalId,
+                        requesterEmployeeMasterId
+                    );
                     throw new GoalAccessDeniedException();
                 }
 
@@ -258,6 +330,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
                 if (!managerId.HasValue)
                 {
+                    Log.Warning(
+                        "CreateApprovalRequest | REOPENING | No manager found | RequesterId={RequesterId}",
+                        requesterEmployeeMasterId
+                    );
                     throw new BusinessRuleException(
                         ResponseMessages.Codes.APPROVAL_NO_MANAGER,
                         "No manager found to approve reopening"
@@ -277,6 +353,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 await _repo.AddApproval(approval);
                 await _baseRepo.SaveChanges();
 
+                Log.Information(
+                    "CreateApprovalRequest END | REOPENING created PENDING | ApprovalId={ApprovalId}",
+                    approval.ApprovalId
+                );
+
                 return ApiResponseModel<int>.SuccessResponse(
                     ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
                     approval.ApprovalId
@@ -285,8 +366,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             if (approvalRequestDetails.ApprovalType == APPROVAL_TYPE.REACTIVATION)
             {
+                Log.Information("CreateApprovalRequest | Branch=REACTIVATION");
+
                 if (goal.CreatedBy != requesterEmployeeMasterId)
                 {
+                    Log.Warning(
+                        "CreateApprovalRequest | REACTIVATION denied | Not goal creator | GoalId={GoalId} | RequesterId={RequesterId}",
+                        goalId,
+                        requesterEmployeeMasterId
+                    );
                     throw new GoalAccessDeniedException();
                 }
 
@@ -296,6 +384,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     )
                 )
                 {
+                    Log.Warning(
+                        "CreateApprovalRequest | REACTIVATION invalid status | Status={Status}",
+                        goal.Goalstatus
+                    );
                     throw new BusinessRuleException(
                         ResponseMessages.Codes.GOAL_INVALID_STATUS,
                         "Only closed or completed goals can be reactivated"
@@ -307,6 +399,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     && (goal.GoalType?.ToLower() == GOAL_TYPE.ORG)
                 )
                 {
+                    Log.Information("CreateApprovalRequest | Auto-approve REACTIVATION for ORG by LEADERSHIP");
                     var autoApproval = new GoalApproval
                     {
                         GoalId = goalId,
@@ -322,6 +415,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     goal.Goalstatus = GOAL_STATUS.REOPENED;
                     await _baseRepo.SaveChanges();
 
+                    Log.Information(
+                        "CreateApprovalRequest END | AutoApproved REACTIVATION | ApprovalId={ApprovalId}",
+                        autoApproval.ApprovalId
+                    );
+
                     return ApiResponseModel<int>.SuccessResponse(
                         ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
                         autoApproval.ApprovalId
@@ -333,6 +431,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
                 if (!managerId.HasValue)
                 {
+                    Log.Warning(
+                        "CreateApprovalRequest | REACTIVATION | No manager found | RequesterId={RequesterId}",
+                        requesterEmployeeMasterId
+                    );
                     throw new BusinessRuleException(
                         ResponseMessages.Codes.APPROVAL_NO_MANAGER,
                         "No manager found to approve reactivation"
@@ -352,11 +454,21 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 await _repo.AddApproval(approval);
                 await _baseRepo.SaveChanges();
 
+                Log.Information(
+                    "CreateApprovalRequest END | REACTIVATION created PENDING | ApprovalId={ApprovalId}",
+                    approval.ApprovalId
+                );
+
                 return ApiResponseModel<int>.SuccessResponse(
                     ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
                     approval.ApprovalId
                 );
             }
+
+            Log.Information(
+                "CreateApprovalRequest | Branch=STANDARD | Type={Type}",
+                approvalRequestDetails.ApprovalType
+            );
 
             var approverId = approvalRequestDetails.ApprovalType switch
             {
@@ -372,6 +484,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             if (!approverId.HasValue)
             {
+                Log.Warning(
+                    "CreateApprovalRequest | STANDARD | No manager found | RequesterId={RequesterId}",
+                    requesterEmployeeMasterId
+                );
                 throw new BusinessRuleException(
                     ResponseMessages.Codes.APPROVAL_NO_MANAGER,
                     "Cannot submit approval: No reporting manager found"
@@ -391,6 +507,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             await _repo.AddApproval(standardApproval);
             await _baseRepo.SaveChanges();
 
+            Log.Information(
+                "CreateApprovalRequest END | STANDARD created PENDING | ApprovalId={ApprovalId}",
+                standardApproval.ApprovalId
+            );
+
             return ApiResponseModel<int>.SuccessResponse(
                 ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
                 standardApproval.ApprovalId
@@ -404,18 +525,32 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string approverRole
         )
         {
+            Log.Information(
+                "ClosePendingApproval START | ApprovalId={ApprovalId} | ApproverId={ApproverId} | Role={Role} | Decision={Decision}",
+                approvalId,
+                approverEmployeeMasterId,
+                approverRole,
+                approvalDesicionDetails?.Decision
+            );
+
             var validationResult = await _approvalDecisionValidator.ValidateAsync(
                 approvalDesicionDetails
             );
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                Log.Warning(
+                    "ClosePendingApproval VALIDATION_FAILED | ApprovalId={ApprovalId} | Errors={Errors}",
+                    approvalId,
+                    string.Join("; ", errors)
+                );
                 throw new BadRequestException("VALIDATION_FAILED", string.Join("; ", errors));
             }
 
             var approval = await _repo.GetApprovalById(approvalId);
             if (approval == null)
             {
+                Log.Warning("ClosePendingApproval | Approval not found | ApprovalId={ApprovalId}", approvalId);
                 throw new ApprovalNotFoundException(approvalId);
             }
 
@@ -423,6 +558,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             if (!approval.ApprovedBy.HasValue)
             {
+                Log.Warning("ClosePendingApproval | Malformed approval (no approver assigned) | ApprovalId={ApprovalId}", approvalId);
                 throw new BadRequestException(
                     ResponseMessages.Codes.APPROVAL_NOT_FOUND,
                     "This approval request is malformed (no approver assigned)."
@@ -431,11 +567,22 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             if (approval.ApprovedBy.Value != approverEmployeeMasterId)
             {
+                Log.Warning(
+                    "ClosePendingApproval | Approver mismatch | ApprovalId={ApprovalId} | ExpectedApproverId={Expected} | Actual={Actual}",
+                    approvalId,
+                    approval.ApprovedBy.Value,
+                    approverEmployeeMasterId
+                );
                 throw new ApprovalAccessDeniedException();
             }
 
             if (approval.ApprovalStatus != APPROVAL_STATUS.PENDING)
             {
+                Log.Warning(
+                    "ClosePendingApproval | Already decided | ApprovalId={ApprovalId} | Status={Status}",
+                    approvalId,
+                    approval.ApprovalStatus
+                );
                 throw new ConflictException(
                     ResponseMessages.Codes.APPROVAL_ALREADY_DECIDED,
                     $"This approval has already been {approval.ApprovalStatus}. Decision was made on {approval.ApprovedOn:yyyy-MM-dd HH:mm}."
@@ -446,6 +593,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             approval.ApprovedOn = DateTime.UtcNow;
             await _repo.UpdateApproval(approval);
 
+            Log.Information(
+                "ClosePendingApproval | Status updated | ApprovalId={ApprovalId} | NewStatus={Status}",
+                approvalId,
+                approval.ApprovalStatus
+            );
+
             if (
                 approval.ApprovalType == APPROVAL_TYPE.COMPLETION
                 || approval.ApprovalType == APPROVAL_TYPE.TASK_ACKNOWLEDGMENT
@@ -453,23 +606,34 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 if (approvalDesicionDetails.Decision == APPROVAL_STATUS.REJECTED)
                 {
+                    Log.Information(
+                        "ClosePendingApproval | Unmarking proof attachments | ApprovalId={ApprovalId}",
+                        approvalId
+                    );
                     await _attachmentRepo.UnmarkProofAttachments(approvalId);
                 }
             }
 
             if (approvalDesicionDetails.Decision == APPROVAL_STATUS.APPROVED)
             {
+                Log.Information(
+                    "ClosePendingApproval | Processing APPROVED branch | Type={Type}",
+                    approval.ApprovalType
+                );
+
                 switch (approval.ApprovalType)
                 {
                     case APPROVAL_TYPE.CREATION:
                     case APPROVAL_TYPE.SELF_GOAL_ACTIVATION:
                         goal.Goalstatus = GOAL_STATUS.OPEN;
                         await _goalRepo.UpdateGoal(goal);
+                        Log.Information("ClosePendingApproval | Goal OPENED | GoalId={GoalId}", goal.GoalId);
                         break;
 
                     case APPROVAL_TYPE.DELEGATION:
                         goal.Goalstatus = GOAL_STATUS.OPEN;
                         await _goalRepo.UpdateGoal(goal);
+                        Log.Information("ClosePendingApproval | Goal OPENED (Delegation) | GoalId={GoalId}", goal.GoalId);
                         break;
 
                     case APPROVAL_TYPE.COMPLETION:
@@ -509,10 +673,18 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             shouldCompleteGoal = requesterRole == USER_ROLE.LEADERSHIP;
                         }
 
+                        Log.Information(
+                            "ClosePendingApproval | COMPLETION decision | GoalType={GoalType} | RequesterRole={RequesterRole} | ShouldComplete={ShouldComplete}",
+                            goal.GoalType,
+                            requesterRole,
+                            shouldCompleteGoal
+                        );
+
                         if (shouldCompleteGoal)
                         {
                             goal.Goalstatus = GOAL_STATUS.COMPLETED;
                             await _goalRepo.UpdateGoal(goal);
+                            Log.Information("ClosePendingApproval | Goal COMPLETED | GoalId={GoalId}", goal.GoalId);
                         }
                         break;
 
@@ -530,6 +702,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                                 assignment.AcknowledgedOn = DateTime.UtcNow;
                                 assignment.AcknowledgedBy = approverEmployeeMasterId;
                                 await _goalRepo.UpdateGoalAssignment(assignment);
+                                Log.Information(
+                                    "ClosePendingApproval | Assignment acknowledged | GoalId={GoalId} | AssigneeId={AssigneeId}",
+                                    goal.GoalId,
+                                    approval.RequestedBy.Value
+                                );
                             }
                         }
                         break;
@@ -537,6 +714,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     case APPROVAL_TYPE.REOPENING:
                         if (!approvalDesicionDetails.NewDeadline.HasValue)
                         {
+                            Log.Warning("ClosePendingApproval | REOPENING missing NewDeadline");
                             throw new BadRequestException(
                                 ResponseMessages.Codes.INVALID_REQUEST,
                                 "New deadline is required to approve reopening request"
@@ -545,6 +723,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                         if (approvalDesicionDetails.NewDeadline.Value <= DateTime.UtcNow)
                         {
+                            Log.Warning(
+                                "ClosePendingApproval | REOPENING invalid NewDeadline | NewDeadline={NewDeadline}",
+                                approvalDesicionDetails.NewDeadline.Value
+                            );
                             throw new BadRequestException(
                                 ResponseMessages.Codes.INVALID_REQUEST,
                                 $"New deadline must be in the future. Deadline must be after {DateTime.UtcNow:yyyy-MM-dd HH:mm}"
@@ -556,6 +738,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         goal.ReopenedBy = approval.RequestedBy;
                         goal.ReopenedOn = DateTime.UtcNow;
                         await _goalRepo.UpdateGoal(goal);
+                        Log.Information(
+                            "ClosePendingApproval | Goal REOPENED | GoalId={GoalId} | NewDeadline={NewDeadline}",
+                            goal.GoalId,
+                            goal.Goalendat
+                        );
                         break;
 
                     case APPROVAL_TYPE.CLOSURE:
@@ -563,14 +750,17 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         goal.ClosedBy = approverEmployeeMasterId;
                         goal.ClosedOn = DateTime.UtcNow;
                         await _goalRepo.UpdateGoal(goal);
+                        Log.Information("ClosePendingApproval | Goal CLOSED | GoalId={GoalId}", goal.GoalId);
                         break;
 
                     case APPROVAL_TYPE.REACTIVATION:
                         goal.Goalstatus = GOAL_STATUS.OPEN;
                         await _goalRepo.UpdateGoal(goal);
+                        Log.Information("ClosePendingApproval | Goal OPENED (Reactivation) | GoalId={GoalId}", goal.GoalId);
                         break;
 
                     default:
+                        Log.Warning("ClosePendingApproval | Unknown approval type | Type={Type}", approval.ApprovalType);
                         throw new InternalServerException(
                             ResponseMessages.Codes.INTERNAL_SERVER_ERROR,
                             $"Unknown approval type: {approval.ApprovalType}"
@@ -579,15 +769,22 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
             else
             {
+                Log.Information(
+                    "ClosePendingApproval | Processing REJECTED branch | Type={Type}",
+                    approval.ApprovalType
+                );
+
                 switch (approval.ApprovalType)
                 {
                     case APPROVAL_TYPE.CREATION:
                     case APPROVAL_TYPE.SELF_GOAL_ACTIVATION:
                         goal.Goalstatus = GOAL_STATUS.CLOSED;
                         await _goalRepo.UpdateGoal(goal);
+                        Log.Information("ClosePendingApproval | Goal CLOSED (Creation/SelfActivation rejected) | GoalId={GoalId}", goal.GoalId);
                         break;
 
                     case APPROVAL_TYPE.DELEGATION:
+                        Log.Information("ClosePendingApproval | Delegation rejected - no goal status change.");
                         break;
 
                     case APPROVAL_TYPE.COMPLETION:
@@ -601,18 +798,22 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         {
                             goal.Goalstatus = GOAL_STATUS.IN_PROGRESS;
                             await _goalRepo.UpdateGoal(goal);
+                            Log.Information("ClosePendingApproval | Goal set to IN_PROGRESS after rejection | GoalId={GoalId}", goal.GoalId);
                         }
                         break;
 
                     case APPROVAL_TYPE.REOPENING:
                         goal.ReopenUntil = null;
                         await _goalRepo.UpdateGoal(goal);
+                        Log.Information("ClosePendingApproval | ReopenUntil cleared after rejection | GoalId={GoalId}", goal.GoalId);
                         break;
 
                     case APPROVAL_TYPE.CLOSURE:
+                        Log.Information("ClosePendingApproval | Closure rejected - no goal status change.");
                         break;
 
                     case APPROVAL_TYPE.REACTIVATION:
+                        Log.Information("ClosePendingApproval | Reactivation rejected - no goal status change.");
                         break;
                 }
             }
@@ -629,6 +830,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 ApprovedOn = approval.ApprovedOn,
             };
 
+            Log.Information(
+                "ClosePendingApproval END | ApprovalId={ApprovalId} | GoalId={GoalId} | Decision={Decision} | Type={Type}",
+                approvalId,
+                goal.GoalId,
+                approvalDesicionDetails.Decision,
+                approval.ApprovalType
+            );
+
             return ApiResponseModel.SuccessResponse(
                 ResponseMessages.Codes.APPROVAL_DECIDED_SUCCESS,
                 metadata
@@ -639,6 +848,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             int approverEmployeeMasterId
         )
         {
+            Log.Information(
+                "GetPendingApprovals START | ApproverId={ApproverId}",
+                approverEmployeeMasterId
+            );
+
             var approvals = await _repo.GetPendingApprovalsForApprover(
                 approverEmployeeMasterId
             );
@@ -660,14 +874,23 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 result.Add(approvalModel);
             }
 
+            Log.Information(
+                "GetPendingApprovals END | ApproverId={ApproverId} | Count={Count}",
+                approverEmployeeMasterId,
+                result.Count
+            );
+
             return result;
         }
 
-        private async Task<(
-            List<GoalAttachmentModel>,
-            List<GoalAttachmentModel>?
-        )> MapAttachmentsForApproval(GoalApproval approval)
+        private async Task<(List<GoalAttachmentModel>, List<GoalAttachmentModel>?)> MapAttachmentsForApproval(GoalApproval approval)
         {
+            Log.Debug(
+                "MapAttachmentsForApproval START | ApprovalId={ApprovalId} | Type={Type}",
+                approval?.ApprovalId,
+                approval?.ApprovalType
+            );
+
             var allAttachments = new List<GoalAttachmentModel>();
             List<GoalAttachmentModel>? proofAttachments = null;
 
@@ -692,6 +915,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
             }
 
+            Log.Debug(
+                "MapAttachmentsForApproval END | ApprovalId={ApprovalId} | All={AllCount} | Proof={ProofCount}",
+                approval?.ApprovalId,
+                allAttachments.Count,
+                proofAttachments?.Count ?? 0
+            );
+
             return (allAttachments, proofAttachments);
         }
 
@@ -701,10 +931,22 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string userRole
         )
         {
+            Log.Information(
+                "GetUserApprovals START | UserId={UserId} | Role={Role} | Query={@Query}",
+                userId,
+                userRole,
+                query
+            );
+
             var validationResult = await _approvalQueryValidator.ValidateAsync(query);
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                Log.Warning(
+                    "GetUserApprovals VALIDATION_FAILED | UserId={UserId} | Errors={Errors}",
+                    userId,
+                    string.Join("; ", errors)
+                );
                 throw new BadRequestException("VALIDATION_FAILED", string.Join("; ", errors));
             }
 
@@ -788,6 +1030,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             var totalPages = (int)Math.Ceiling((double)totalCount / query.PageSize);
 
+            Log.Information(
+                "GetUserApprovals END | UserId={UserId} | Returned={Count} | TotalCount={Total} | Page={Page} | TotalPages={TotalPages}",
+                userId,
+                approvalModels.Count,
+                totalCount,
+                query.Page,
+                totalPages
+            );
+
             return new PagedApprovalsModel
             {
                 Items = approvalModels,
@@ -806,6 +1057,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string userRole
         )
         {
+            Log.Debug(
+                "CalculateApprovalSummaryOptimized START | UserId={UserId} | Role={Role}",
+                userId,
+                userRole
+            );
+
             var baseQuery = _repo
                 .GetGoalApprovalsQueryable()
                 .Where(ga =>
@@ -839,6 +1096,16 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             var total = await _repo.Count(baseQuery);
 
+            Log.Debug(
+                "CalculateApprovalSummaryOptimized END | UserId={UserId} | MyPending={MyPending} | ToReview={ToReview} | MyRequests={MyRequests} | History={History} | Total={Total}",
+                userId,
+                myPending,
+                toReview,
+                myRequests,
+                history,
+                total
+            );
+
             return new ApprovalSummaryModel
             {
                 MyPending = myPending,
@@ -855,30 +1122,35 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string userRole
         )
         {
+            var role = APPROVAL_USER_ROLE.OBSERVER;
+
             if (approval.RequestedBy == userId)
-                return APPROVAL_USER_ROLE.REQUESTER;
-
-            if (approval.ApprovedBy == userId)
-                return APPROVAL_USER_ROLE.APPROVER;
-
-            if (approval.Goal?.CreatedBy == userId)
-                return APPROVAL_USER_ROLE.GOAL_CREATOR;
-
-            if (approval.Goal?.GoalAssignments?.Any(ga => ga.AssignedTo == userId) == true)
-                return APPROVAL_USER_ROLE.GOAL_ASSIGNEE;
-
-            if (
+                role = APPROVAL_USER_ROLE.REQUESTER;
+            else if (approval.ApprovedBy == userId)
+                role = APPROVAL_USER_ROLE.APPROVER;
+            else if (approval.Goal?.CreatedBy == userId)
+                role = APPROVAL_USER_ROLE.GOAL_CREATOR;
+            else if (approval.Goal?.GoalAssignments?.Any(ga => ga.AssignedTo == userId) == true)
+                role = APPROVAL_USER_ROLE.GOAL_ASSIGNEE;
+            else if (
                 approval.ApprovalStatus == APPROVAL_STATUS.PENDING
                 && CanUserApproveTypeInMemory(approval.ApprovalType, userRole)
             )
-                return APPROVAL_USER_ROLE.POTENTIAL_APPROVER;
+                role = APPROVAL_USER_ROLE.POTENTIAL_APPROVER;
 
-            return APPROVAL_USER_ROLE.OBSERVER;
+            Log.Debug(
+                "DetermineUserRoleInApproval | ApprovalId={ApprovalId} | UserId={UserId} | ResultRole={ResultRole}",
+                approval?.ApprovalId,
+                userId,
+                role
+            );
+
+            return role;
         }
 
         private bool CanUserApproveTypeInMemory(string approvalType, string userRole)
         {
-            return approvalType switch
+            var result = approvalType switch
             {
                 APPROVAL_TYPE.CREATION or APPROVAL_TYPE.SELF_GOAL_ACTIVATION =>
                     USER_ROLE.APPROVAL_AUTHORITIES.Contains(userRole),
@@ -896,14 +1168,33 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 _ => false,
             };
+
+            Log.Debug(
+                "CanUserApproveTypeInMemory | ApprovalType={Type} | UserRole={Role} | Result={Result}",
+                approvalType,
+                userRole,
+                result
+            );
+
+            return result;
         }
 
         private bool CanUserMakeDecision(GoalApproval approval, int userId, string userRole)
         {
-            return approval.ApprovalStatus == APPROVAL_STATUS.PENDING
+            var can =
+                approval.ApprovalStatus == APPROVAL_STATUS.PENDING
                 && approval.ApprovedBy == userId
                 && CanUserApproveTypeInMemory(approval.ApprovalType, userRole)
                 && approval.RequestedBy != userId;
+
+            Log.Debug(
+                "CanUserMakeDecision | ApprovalId={ApprovalId} | UserId={UserId} | Result={Result}",
+                approval?.ApprovalId,
+                userId,
+                can
+            );
+
+            return can;
         }
 
         private async Task<UserGoalApprovalModel> MapToUserGoalApprovalModel(
@@ -912,6 +1203,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string userRole
         )
         {
+            Log.Debug(
+                "MapToUserGoalApprovalModel START | ApprovalId={ApprovalId} | UserId={UserId}",
+                approval?.ApprovalId,
+                userId
+            );
+
             var model = _mapper.Map<UserGoalApprovalModel>(approval);
             model.RequestedByName = await _baseService.GetEmployeeName(approval.RequestedBy);
             model.ApproverName = await _baseService.GetEmployeeName(approval.ApprovedBy);
@@ -934,6 +1231,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             model.CanMakeDecision = CanUserMakeDecision(approval, userId, userRole);
             model.UserContext = GenerateUserContext(approval, userId, userRole);
 
+            Log.Debug(
+                "MapToUserGoalApprovalModel END | ApprovalId={ApprovalId} | UserId={UserId} | AllAttachments={All} | ProofAttachments={Proof}",
+                approval?.ApprovalId,
+                userId,
+                model.AllAttachments?.Count ?? 0,
+                model.ProofAttachments?.Count ?? 0
+            );
+
             return model;
         }
 
@@ -941,6 +1246,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             ICollection<GoalAssignment>? assignments
         )
         {
+            Log.Debug(
+                "MapGoalAssignees START | AssignmentsIn={Count}",
+                assignments?.Count ?? 0
+            );
+
             var assignees = new List<AssigneeModel>();
 
             if (assignments != null)
@@ -963,14 +1273,18 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
             }
 
+            Log.Debug("MapGoalAssignees END | AssigneesOut={Count}", assignees.Count);
+
             return assignees;
         }
 
-        private async Task<(
-            List<GoalAttachmentModel>,
-            List<GoalAttachmentModel>
-        )> MapAllAttachments(GoalApproval approval)
+        private async Task<(List<GoalAttachmentModel>, List<GoalAttachmentModel>)> MapAllAttachments(GoalApproval approval)
         {
+            Log.Debug(
+                "MapAllAttachments START | ApprovalId={ApprovalId}",
+                approval?.ApprovalId
+            );
+
             var allAttachments = new List<GoalAttachmentModel>();
             var proofAttachments = new List<GoalAttachmentModel>();
 
@@ -995,6 +1309,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     }
                 }
             }
+
+            Log.Debug(
+                "MapAllAttachments END | ApprovalId={ApprovalId} | All={AllCount} | Proof={ProofCount}",
+                approval?.ApprovalId,
+                allAttachments.Count,
+                proofAttachments.Count
+            );
 
             return (allAttachments, proofAttachments);
         }
@@ -1022,7 +1343,16 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             )
                 contexts.Add("You can review this request");
 
-            return contexts.Any() ? string.Join("; ", contexts) : "Related to your goals or team";
+            var final = contexts.Any() ? string.Join("; ", contexts) : "Related to your goals or team";
+
+            Log.Debug(
+                "GenerateUserContext | ApprovalId={ApprovalId} | UserId={UserId} | Context='{Context}'",
+                approval?.ApprovalId,
+                userId,
+                final
+            );
+
+            return final;
         }
     }
 }

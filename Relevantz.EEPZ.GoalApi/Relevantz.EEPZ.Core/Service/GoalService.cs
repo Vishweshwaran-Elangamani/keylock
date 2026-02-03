@@ -9,6 +9,7 @@ using Relevantz.EEPZ.Common.Exceptions;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repository.Interface;
+using Serilog;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -54,6 +55,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _assignGoalValidator = assignGoalValidator;
             _goalQueryValidator = goalQueryValidator;
             _mapper = mapper;
+
+            Log.Debug("GoalService initialized.");
         }
 
         public async Task<ApiResponseModel<int>> CreateGoal(
@@ -62,15 +65,37 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string currentUserRole
         )
         {
+            Log.Information(
+                "CreateGoal START | UserId={UserId} | Role={Role} | Title={Title} | Type={Type} | ProjectId={ProjectId} | ChecklistCount={ChecklistCount} | Assignees={AssigneeCount}",
+                currentUserEmployeeMasterId,
+                currentUserRole,
+                goal?.Title,
+                goal?.GoalType,
+                goal?.ProjectId,
+                goal?.Checklist?.Count ?? 0,
+                goal?.AssignedToEmployeeMasterIds?.Count ?? 0
+            );
+
             var validationResult = await _createGoalValidator.ValidateAsync(goal);
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                Log.Warning(
+                    "CreateGoal VALIDATION_FAILED | UserId={UserId} | Errors={Errors}",
+                    currentUserEmployeeMasterId,
+                    string.Join("; ", errors)
+                );
                 throw new BadRequestException("VALIDATION_FAILED", string.Join("; ", errors));
             }
 
             if (!_baseService.CanCreate(currentUserRole, goal.GoalType))
             {
+                Log.Warning(
+                    "CreateGoal FORBIDDEN | Role not permitted | UserId={UserId} | Role={Role} | GoalType={GoalType}",
+                    currentUserEmployeeMasterId,
+                    currentUserRole,
+                    goal.GoalType
+                );
                 throw new ForbiddenException(
                     ResponseMessages.Codes.ROLE_INSUFFICIENT,
                     $"Role '{currentUserRole}' not permitted to create '{goal.GoalType}' goals."
@@ -98,6 +123,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 if (!isInProject)
                 {
+                    Log.Warning(
+                        "CreateGoal FORBIDDEN | User not in project | UserId={UserId} | ProjectId={ProjectId}",
+                        currentUserEmployeeMasterId,
+                        goal.ProjectId
+                    );
                     throw new ForbiddenException(
                         ResponseMessages.Codes.PROJECT_NOT_MEMBER,
                         "You are not a member of the selected project."
@@ -112,6 +142,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     || goal.AssignedToEmployeeMasterIds[0] != currentUserEmployeeMasterId
                 )
                 {
+                    Log.Debug(
+                        "CreateGoal | Normalizing SELF goal assignees to current user | UserId={UserId}",
+                        currentUserEmployeeMasterId
+                    );
                     goal.AssignedToEmployeeMasterIds = new List<int>
                     {
                         currentUserEmployeeMasterId,
@@ -130,6 +164,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 if (invalidAssignments.Any())
                 {
+                    Log.Warning(
+                        "CreateGoal INVALID_ASSIGNEES | UserId={UserId} | Invalid={InvalidList}",
+                        currentUserEmployeeMasterId,
+                        string.Join(", ", invalidAssignments)
+                    );
                     throw new BusinessRuleException(
                         ResponseMessages.Codes.GOAL_ASSIGNEE_INVALID,
                         $"Invalid assignees: {string.Join(", ", invalidAssignments)}. You can only assign goals to your direct subordinates."
@@ -153,6 +192,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 ChecklistItemCount = validChecklistItems.Count,
             };
 
+            Log.Information(
+                "CreateGoal END | UserId={UserId} | GoalId={GoalId} | Type={Type} | RequiresApproval={RequiresApproval}",
+                currentUserEmployeeMasterId,
+                goalId,
+                goal.GoalType,
+                metadata.RequiresApproval
+            );
+
             return ApiResponseModel<int>.SuccessResponse(
                 ResponseMessages.Codes.GOAL_CREATED_SUCCESS,
                 goalId,
@@ -167,6 +214,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             List<ChecklistItemModel> validChecklistItems
         )
         {
+            Log.Debug(
+                "CreateGoalInternal START | UserId={UserId} | Role={Role} | Type={Type} | Title={Title} | ValidChecklist={ChecklistCount}",
+                currentUserEmployeeMasterId,
+                currentUserRole,
+                goalDetails?.GoalType,
+                goalDetails?.Title,
+                validChecklistItems?.Count ?? 0
+            );
+
             string initialStatus;
             if (currentUserRole == USER_ROLE.LEADERSHIP)
             {
@@ -242,6 +298,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         ApprovalStatus = APPROVAL_STATUS.PENDING,
                     };
                     await _approvalsRepo.AddApproval(approval);
+
+                    Log.Debug(
+                        "CreateGoalInternal | Created approval | GoalId={GoalId} | Type={Type} | ApproverId={ApproverId}",
+                        goal.GoalId,
+                        approvalType,
+                        approverId
+                    );
                 }
             }
 
@@ -257,6 +320,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
 
             await _baseRepo.SaveChanges();
+
+            Log.Debug(
+                "CreateGoalInternal END | GoalId={GoalId} | InitialStatus={Status} | ChecklistAdded={ChecklistCount}",
+                goal.GoalId,
+                initialStatus,
+                checklistItems.Count
+            );
+
             return goal.GoalId;
         }
 
@@ -266,10 +337,22 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string currentUserRole
         )
         {
+            Log.Information(
+                "QueryGoals START | UserId={UserId} | Role={Role} | Query={@Query}",
+                currentUserEmployeeMasterId,
+                currentUserRole,
+                query
+            );
+
             var validationResult = await _goalQueryValidator.ValidateAsync(query);
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                Log.Warning(
+                    "QueryGoals VALIDATION_FAILED | UserId={UserId} | Errors={Errors}",
+                    currentUserEmployeeMasterId,
+                    string.Join("; ", errors)
+                );
                 throw new BadRequestException("VALIDATION_FAILED", string.Join("; ", errors));
             }
 
@@ -344,19 +427,37 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 result.Add(summary);
             }
 
+            Log.Information(
+                "QueryGoals END | UserId={UserId} | Returned={Count}",
+                currentUserEmployeeMasterId,
+                result.Count
+            );
+
             return result;
         }
 
         private async Task<int> CalculatePersonalProgress(int goalId, int userId)
         {
+            Log.Debug(
+                "CalculatePersonalProgress START | GoalId={GoalId} | UserId={UserId}",
+                goalId,
+                userId
+            );
+
             var goal = await _baseRepo.GetGoalById(goalId);
             if (goal == null)
+            {
+                Log.Debug("CalculatePersonalProgress | Goal not found -> 0 | GoalId={GoalId}", goalId);
                 return 0;
+            }
 
             var userItems = goal.GoalChecklists.Where(c => c.AddedFor == userId).ToList();
 
             if (!userItems.Any())
+            {
+                Log.Debug("CalculatePersonalProgress | No items -> 0 | GoalId={GoalId}", goalId);
                 return 0;
+            }
 
             var completedCount = 0;
             foreach (var item in userItems)
@@ -371,7 +472,17 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
             }
 
-            return (int)Math.Round((double)completedCount / userItems.Count * 100);
+            var percent = (int)Math.Round((double)completedCount / userItems.Count * 100);
+
+            Log.Debug(
+                "CalculatePersonalProgress END | GoalId={GoalId} | Items={Items} | Completed={Completed} | Percent={Percent}",
+                goalId,
+                userItems.Count,
+                completedCount,
+                percent
+            );
+
+            return percent;
         }
 
         public async Task<ApiResponseModel> UpdateGoal(
@@ -381,26 +492,51 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string currentUserRole
         )
         {
+            Log.Information(
+                "UpdateGoal START | GoalId={GoalId} | UserId={UserId} | Role={Role}",
+                goalId,
+                currentUserEmployeeMasterId,
+                currentUserRole
+            );
+
             var validationResult = await _updateGoalValidator.ValidateAsync(goalDetails);
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                Log.Warning(
+                    "UpdateGoal VALIDATION_FAILED | GoalId={GoalId} | UserId={UserId} | Errors={Errors}",
+                    goalId,
+                    currentUserEmployeeMasterId,
+                    string.Join("; ", errors)
+                );
                 throw new BadRequestException("VALIDATION_FAILED", string.Join("; ", errors));
             }
 
             var goal = await _baseRepo.GetGoalById(goalId);
             if (goal == null)
             {
+                Log.Warning("UpdateGoal FAILED | Goal not found | GoalId={GoalId}", goalId);
                 throw new GoalNotFoundException(goalId);
             }
 
             if (goal.GoalType == GOAL_TYPE.ORG && currentUserRole != USER_ROLE.LEADERSHIP)
             {
+                Log.Warning(
+                    "UpdateGoal ACCESS DENIED | ORG goal | GoalId={GoalId} | UserId={UserId} | Role={Role}",
+                    goalId,
+                    currentUserEmployeeMasterId,
+                    currentUserRole
+                );
                 throw new GoalAccessDeniedException();
             }
 
             if (goal.GoalType != GOAL_TYPE.ORG && goal.CreatedBy != currentUserEmployeeMasterId)
             {
+                Log.Warning(
+                    "UpdateGoal ACCESS DENIED | Not creator | GoalId={GoalId} | UserId={UserId}",
+                    goalId,
+                    currentUserEmployeeMasterId
+                );
                 throw new GoalAccessDeniedException();
             }
 
@@ -460,6 +596,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             var metadata = new { GoalId = goalId, UpdatedBy = currentUserEmployeeMasterId };
 
+            Log.Information(
+                "UpdateGoal END | GoalId={GoalId} | UpdatedBy={UserId}",
+                goalId,
+                currentUserEmployeeMasterId
+            );
+
             return ApiResponseModel.SuccessResponse(
                 ResponseMessages.Codes.GOAL_UPDATED_SUCCESS,
                 metadata
@@ -468,15 +610,25 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         private async Task RecalculateProgress(int goalId, int userId)
         {
+            Log.Debug(
+                "RecalculateProgress START | GoalId={GoalId} | UserId={UserId}",
+                goalId,
+                userId
+            );
+
             var goal = await _baseRepo.GetGoalById(goalId);
             if (goal == null)
+            {
+                Log.Debug("RecalculateProgress | Goal not found -> exit | GoalId={GoalId}", goalId);
                 return;
+            }
 
             var checklists = await _baseRepo.GetChecklistItemsByGoalId(goalId);
 
             if (checklists == null || !checklists.Any())
             {
                 await _repo.UpdateGoalProgress(goalId, 0, userId);
+                Log.Debug("RecalculateProgress | No checklist -> progress set to 0 | GoalId={GoalId}", goalId);
                 return;
             }
 
@@ -503,16 +655,33 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 goal.Goalstatus = GOAL_STATUS.IN_PROGRESS;
                 await _repo.UpdateGoal(goal);
+                Log.Debug(
+                    "RecalculateProgress | Goal status adjusted to IN_PROGRESS | GoalId={GoalId}",
+                    goalId
+                );
             }
+
+            Log.Debug(
+                "RecalculateProgress END | GoalId={GoalId} | Items={Items} | Completed={Completed} | NewProgress={Progress}",
+                goalId,
+                totalItems,
+                completedCount,
+                newProgress
+            );
         }
 
         public async Task<List<AssigneeModel>> GetAssignees(int goalId)
         {
-            return await GetAssigneesWithDetails(goalId);
+            Log.Information("GetAssignees START | GoalId={GoalId}", goalId);
+            var result = await GetAssigneesWithDetails(goalId);
+            Log.Information("GetAssignees END | GoalId={GoalId} | Count={Count}", goalId, result.Count);
+            return result;
         }
 
         private async Task<List<AssigneeModel>> GetAssigneesWithDetails(int goalId)
         {
+            Log.Debug("GetAssigneesWithDetails START | GoalId={GoalId}", goalId);
+
             var assignments = await _baseRepo.GetAssignees(goalId);
             var result = new List<AssigneeModel>();
 
@@ -535,6 +704,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 result.Add(assignee);
             }
 
+            Log.Debug("GetAssigneesWithDetails END | GoalId={GoalId} | Count={Count}", goalId, result.Count);
             return result;
         }
 
@@ -545,21 +715,42 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string currentUserRole
         )
         {
+            Log.Information(
+                "Assign START | GoalId={GoalId} | UserId={UserId} | Role={Role} | NewAssignees={Count} | ExtraChecklist={ExtraCount}",
+                goalId,
+                currentUserEmployeeMasterId,
+                currentUserRole,
+                assignmentDetails?.AssignedToEmployeeMasterIds?.Count ?? 0,
+                assignmentDetails?.AdditionalChecklist?.Count ?? 0
+            );
+
             var validationResult = await _assignGoalValidator.ValidateAsync(assignmentDetails);
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                Log.Warning(
+                    "Assign VALIDATION_FAILED | GoalId={GoalId} | UserId={UserId} | Errors={Errors}",
+                    goalId,
+                    currentUserEmployeeMasterId,
+                    string.Join("; ", errors)
+                );
                 throw new BadRequestException("VALIDATION_FAILED", string.Join("; ", errors));
             }
 
             var goal = await _baseRepo.GetGoalById(goalId);
             if (goal == null)
             {
+                Log.Warning("Assign FAILED | Goal not found | GoalId={GoalId}", goalId);
                 throw new GoalNotFoundException(goalId);
             }
 
             if (goal.GoalType != GOAL_TYPE.TEAM)
             {
+                Log.Warning(
+                    "Assign ACCESS DENIED | Not a team goal | GoalId={GoalId} | UserId={UserId}",
+                    goalId,
+                    currentUserEmployeeMasterId
+                );
                 throw new AccessDeniedException(
                     ResponseMessages.Codes.ASSIGNMENT_ACCESS_DENIED,
                     "Only team goals support delegation."
@@ -568,6 +759,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             if (!USER_ROLE.CanAssignGoals(currentUserRole))
             {
+                Log.Warning(
+                    "Assign ACCESS DENIED | Role cannot assign | GoalId={GoalId} | UserId={UserId} | Role={Role}",
+                    goalId,
+                    currentUserEmployeeMasterId,
+                    currentUserRole
+                );
                 throw new AccessDeniedException(
                     ResponseMessages.Codes.ASSIGNMENT_ACCESS_DENIED,
                     "Only managers/dept heads can assign goals."
@@ -586,6 +783,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             if (!isCreator && !isAssignee)
             {
+                Log.Warning(
+                    "Assign ACCESS DENIED | Not creator or assignee | GoalId={GoalId} | UserId={UserId}",
+                    goalId,
+                    currentUserEmployeeMasterId
+                );
                 throw new AccessDeniedException(
                     ResponseMessages.Codes.ASSIGNMENT_ACCESS_DENIED,
                     "Only the goal creator or assigned participants can delegate this goal."
@@ -600,6 +802,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 .ToList();
             if (invalidAssignments.Any())
             {
+                Log.Warning(
+                    "Assign INVALID_SUBORDINATES | GoalId={GoalId} | UserId={UserId} | Invalid={Invalid}",
+                    goalId,
+                    currentUserEmployeeMasterId,
+                    string.Join(", ", invalidAssignments)
+                );
                 throw new BusinessRuleException(
                     ResponseMessages.Codes.ASSIGNMENT_INVALID_SUBORDINATE,
                     $"Invalid assignees: {string.Join(", ", invalidAssignments)}. You can only assign goals to your direct subordinates."
@@ -612,6 +820,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             if (duplicateAssignees.Any())
             {
+                Log.Warning(
+                    "Assign DUPLICATE | GoalId={GoalId} | UserId={UserId} | Duplicates={Duplicates}",
+                    goalId,
+                    currentUserEmployeeMasterId,
+                    string.Join(", ", duplicateAssignees)
+                );
                 throw new ConflictException(
                     ResponseMessages.Codes.ASSIGNMENT_DUPLICATE,
                     $"The following users are already assigned to this goal: {string.Join(", ", duplicateAssignees)}"
@@ -666,6 +880,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 ChecklistItemsAdded = items.Count,
             };
 
+            Log.Information(
+                "Assign END | GoalId={GoalId} | AssignedBy={UserId} | NewAssignees={Count} | ChecklistAdded={ChecklistCount}",
+                goalId,
+                currentUserEmployeeMasterId,
+                assignmentDetails.AssignedToEmployeeMasterIds?.Count ?? 0,
+                items.Count
+            );
+
             return ApiResponseModel.SuccessResponse(
                 ResponseMessages.Codes.ASSIGNMENT_SUCCESS,
                 metadata
@@ -674,12 +896,22 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         public async Task<List<ProjectModel>> GetUserProjects(int employeeMasterId)
         {
+            Log.Information("GetUserProjects START | UserId={UserId}", employeeMasterId);
+
             var userRole = await _baseRepo.GetUserRole(employeeMasterId);
 
             if (userRole == USER_ROLE.LEADERSHIP)
             {
                 var allProjects = await _repo.GetAllProjects();
-                return _mapper.Map<List<ProjectModel>>(allProjects);
+                var mapped = _mapper.Map<List<ProjectModel>>(allProjects);
+
+                Log.Information(
+                    "GetUserProjects END | UserId={UserId} | Role=LEADERSHIP | Count={Count}",
+                    employeeMasterId,
+                    mapped?.Count ?? 0
+                );
+
+                return mapped;
             }
 
             var employeeDetails = await _baseRepo.GetEmployeeDetailsByMasterId(
@@ -687,29 +919,56 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
             if (employeeDetails == null)
             {
+                Log.Information(
+                    "GetUserProjects END | UserId={UserId} | No employee details -> empty list",
+                    employeeMasterId
+                );
                 return new List<ProjectModel>();
             }
 
             var employeeId = employeeDetails.EmployeeId;
             var userProjects = await _repo.GetUserProjectsByEmployeeId(employeeId);
 
-            return _mapper.Map<List<ProjectModel>>(userProjects);
+            var result = _mapper.Map<List<ProjectModel>>(userProjects);
+
+            Log.Information(
+                "GetUserProjects END | UserId={UserId} | Role={Role} | Count={Count}",
+                employeeMasterId,
+                userRole,
+                result?.Count ?? 0
+            );
+
+            return result;
         }
 
         public async Task<List<ProjectModel>> GetAllProjects()
         {
+            Log.Information("GetAllProjects START");
             var allProjects = await _repo.GetAllProjects();
-            return _mapper.Map<List<ProjectModel>>(allProjects);
+            var mapped = _mapper.Map<List<ProjectModel>>(allProjects);
+            Log.Information("GetAllProjects END | Count={Count}", mapped?.Count ?? 0);
+            return mapped;
         }
 
         public async Task<ProjectModel> GetProject(int projectId)
         {
+            Log.Information("GetProject START | ProjectId={ProjectId}", projectId);
+
             var project = await _repo.GetProject(projectId);
             if (project == null)
+            {
+                Log.Warning("GetProject FAILED | Project not found | ProjectId={ProjectId}", projectId);
                 throw new ProjectNotFoundException(projectId);
+            }
 
             var projectModel = _mapper.Map<ProjectModel>(project);
             projectModel.Employees = await _interactionRepo.GetProjectEmployees(projectId);
+
+            Log.Information(
+                "GetProject END | ProjectId={ProjectId} | Employees={Count}",
+                projectId,
+                projectModel.Employees?.Count ?? 0
+            );
 
             return projectModel;
         }
@@ -718,10 +977,17 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         private string? GetShortDescription(string? description)
         {
-            if (string.IsNullOrWhiteSpace(description))
-                return null;
+            var result = string.IsNullOrWhiteSpace(description)
+                ? null
+                : (description.Length > 80 ? description.Substring(0, 80) + "..." : description);
 
-            return description.Length > 80 ? description.Substring(0, 80) + "..." : description;
+            Log.Debug(
+                "GetShortDescription | InLen={InLen} | OutLen={OutLen}",
+                description?.Length ?? 0,
+                result?.Length ?? 0
+            );
+
+            return result;
         }
 
         private async Task<int> CalculateGoalProgress(
@@ -729,17 +995,29 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             int currentUserEmployeeMasterId
         )
         {
+            Log.Debug(
+                "CalculateGoalProgress START | GoalId={GoalId} | UserId={UserId}",
+                goalId,
+                currentUserEmployeeMasterId
+            );
+
             var latestLog = await _baseRepo.GetLatestProgressLog(goalId);
 
             if (latestLog != null && latestLog.Source == PROGRESS_SOURCE.MANUAL)
             {
-                return latestLog.ProgressPercent ?? 0;
+                var manual = latestLog.ProgressPercent ?? 0;
+                Log.Debug(
+                    "CalculateGoalProgress | Source=MANUAL | Percent={Percent}",
+                    manual
+                );
+                return manual;
             }
 
             var allChecklistItems = await _baseRepo.GetChecklistItemsByGoalId(goalId);
 
             if (allChecklistItems == null || !allChecklistItems.Any())
             {
+                Log.Debug("CalculateGoalProgress | No checklist items -> 0");
                 return 0;
             }
 
@@ -754,32 +1032,70 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     completedCount++;
             }
 
-            return (int)Math.Round((double)completedCount / allChecklistItems.Count * 100);
+            var percent = (int)Math.Round((double)completedCount / allChecklistItems.Count * 100);
+
+            Log.Debug(
+                "CalculateGoalProgress END | Completed={Completed} | Total={Total} | Percent={Percent}",
+                completedCount,
+                allChecklistItems.Count,
+                percent
+            );
+
+            return percent;
         }
 
         private async Task<string?> GetProjectName(int? projectId)
         {
+            Log.Debug("GetProjectName START | ProjectId={ProjectId}", projectId);
+
             if (!projectId.HasValue)
+            {
+                Log.Debug("GetProjectName | Null ProjectId -> null");
                 return null;
+            }
 
             var project = await _baseRepo.GetProjectById(projectId.Value);
-            return project?.ProjectName;
+            var name = project?.ProjectName;
+
+            Log.Debug("GetProjectName END | ProjectId={ProjectId} | Name={Name}", projectId, name);
+            return name;
         }
 
         private bool IsGoalOverdue(Goal goal)
         {
-            return goal.Goalendat.HasValue
+            var overdue = goal.Goalendat.HasValue
                 && goal.Goalendat.Value < DateTime.UtcNow
                 && goal.Goalstatus != GOAL_STATUS.COMPLETED
                 && goal.Goalstatus != GOAL_STATUS.CLOSED;
+
+            Log.Debug(
+                "IsGoalOverdue | GoalId={GoalId} | EndAt={EndAt} | Status={Status} | Overdue={Overdue}",
+                goal?.GoalId,
+                goal?.Goalendat,
+                goal?.Goalstatus,
+                overdue
+            );
+
+            return overdue;
         }
 
         private bool CanAssignGoal(Goal goal, int userId, string userRole)
         {
-            return (userRole == USER_ROLE.MANAGER || userRole == USER_ROLE.DEPARTMENT_HEAD)
+            var can =
+                (userRole == USER_ROLE.MANAGER || userRole == USER_ROLE.DEPARTMENT_HEAD)
                 && goal.GoalType == GOAL_TYPE.TEAM
                 && goal.CreatedBy == userId
                 && goal.Goalstatus == GOAL_STATUS.OPEN;
+
+            Log.Debug(
+                "CanAssignGoal | GoalId={GoalId} | UserId={UserId} | Role={Role} | Result={Result}",
+                goal?.GoalId,
+                userId,
+                userRole,
+                can
+            );
+
+            return can;
         }
     }
 }
