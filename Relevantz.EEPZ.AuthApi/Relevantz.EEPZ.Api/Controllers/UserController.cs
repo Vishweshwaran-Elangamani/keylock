@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Relevantz.EEPZ.Common.Constants;
+using FluentValidation;
+
 namespace Relevantz.EEPZ.Api.Controllers
 {
     /// <summary>
@@ -21,13 +23,27 @@ namespace Relevantz.EEPZ.Api.Controllers
     {
         private readonly IProfileService _profileService;
         private readonly IUserManagementService _userManagementService;
+        private readonly IValidator<UpdateProfileRequestDto> _updateProfileValidator;
+        private readonly IValidator<CreateUserRequestDto> _createUserValidator;
+        private readonly IValidator<UpdateUserRequestDto> _updateUserValidator;
+        private readonly IValidator<AssignRoleDepartmentRequestDto> _assignRoleDepartmentValidator;
+
         public UserController(
             IProfileService profileService,
-            IUserManagementService userManagementService)
+            IUserManagementService userManagementService,
+            IValidator<UpdateProfileRequestDto> updateProfileValidator,
+            IValidator<CreateUserRequestDto> createUserValidator,
+            IValidator<UpdateUserRequestDto> updateUserValidator,
+            IValidator<AssignRoleDepartmentRequestDto> assignRoleDepartmentValidator)
         {
             _profileService = profileService;
             _userManagementService = userManagementService;
+            _updateProfileValidator = updateProfileValidator;
+            _createUserValidator = createUserValidator;
+            _updateUserValidator = updateUserValidator;
+            _assignRoleDepartmentValidator = assignRoleDepartmentValidator;
         }
+
         /// <summary>
         /// Gets the current logged-in user's profile.
         /// </summary>
@@ -48,6 +64,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                     profile,
                     MessageConstants.ProfileRetrievedSuccess));
         }
+
         /// <summary>
         /// Gets profile for specific user by ID (Admin/HR only).
         /// </summary>
@@ -63,6 +80,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                     profile,
                     MessageConstants.ProfileRetrievedSuccess));
         }
+
         /// <summary>
         /// Updates current user's profile.
         /// </summary>
@@ -71,12 +89,21 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpPut("profile")]
         public async Task<IActionResult> UpdateMyProfile([FromBody] UpdateProfileRequestDto request)
         {
-            if (!ModelState.IsValid)
+            var validationResult = await _updateProfileValidator.ValidateAsync(request);
+            if (!validationResult.IsValid)
             {
-                return BadRequest(
-                    ApiResponseDto<ProfileResponseDto>.FailureResponse(
-                        MessageConstants.InvalidRequestData));
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Validation failed",
+                    errors = validationResult.Errors.Select(e => new
+                    {
+                        property = e.PropertyName,
+                        error = e.ErrorMessage
+                    })
+                });
             }
+
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
             {
@@ -84,12 +111,14 @@ namespace Relevantz.EEPZ.Api.Controllers
                     ApiResponseDto<ProfileResponseDto>.FailureResponse(
                         MessageConstants.InvalidUserToken));
             }
+
             var updatedProfile = await _profileService.UpdateProfileAsync(userId, request);
             return Ok(
                 ApiResponseDto<ProfileResponseDto>.SuccessResponse(
                     updatedProfile,
                     MessageConstants.ProfileUpdatedSuccess));
         }
+
         /// <summary>
         /// Uploads/updates current user's profile photo (JPEG/PNG/GIF/WEBP, 5MB max).
         /// </summary>
@@ -105,12 +134,14 @@ namespace Relevantz.EEPZ.Api.Controllers
                     ApiResponseDto<ProfileResponseDto>.FailureResponse(
                         MessageConstants.InvalidUserToken));
             }
+
             if (ProfilePhoto == null || ProfilePhoto.Length == 0)
             {
                 return BadRequest(
                     ApiResponseDto<ProfileResponseDto>.FailureResponse(
                         MessageConstants.NoPhotoProvided));
             }
+
             var allowedTypes = new[]
             {
                 "image/jpeg",
@@ -125,6 +156,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                     ApiResponseDto<ProfileResponseDto>.FailureResponse(
                         MessageConstants.InvalidPhotoType));
             }
+
             const long maxFileSize = 5 * 1024 * 1024;
             if (ProfilePhoto.Length > maxFileSize)
             {
@@ -132,6 +164,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                     ApiResponseDto<ProfileResponseDto>.FailureResponse(
                         $"{MessageConstants.PhotoTooLarge} Your file is {ProfilePhoto.Length / 1024 / 1024:F2}MB."));
             }
+
             var request = new UpdateProfileRequestDto
             {
                 ProfilePhoto = ProfilePhoto
@@ -142,6 +175,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                     updatedProfile,
                     MessageConstants.PhotoUploadedSuccess));
         }
+
         /// <summary>
         /// Creates new user (Admin operation).
         /// </summary>
@@ -150,6 +184,21 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserRequestDto request)
         {
+            var validationResult = await _createUserValidator.ValidateAsync(request);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Validation failed",
+                    errors = validationResult.Errors.Select(e => new
+                    {
+                        property = e.PropertyName,
+                        error = e.ErrorMessage
+                    })
+                });
+            }
+
             var createdByUserId =
                 int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
             var user = await _userManagementService.CreateUserAsync(
@@ -160,6 +209,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                     user,
                     MessageConstants.UserCreatedSuccess));
         }
+
         /// <summary>
         /// Updates existing user (Admin operation).
         /// </summary>
@@ -168,6 +218,21 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpPut("update")]
         public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequestDto request)
         {
+            var validationResult = await _updateUserValidator.ValidateAsync(request);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Validation failed",
+                    errors = validationResult.Errors.Select(e => new
+                    {
+                        property = e.PropertyName,
+                        error = e.ErrorMessage
+                    })
+                });
+            }
+
             var updatedByUserId =
                 int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
             var user = await _userManagementService.UpdateUserAsync(
@@ -178,20 +243,22 @@ namespace Relevantz.EEPZ.Api.Controllers
                     user,
                     MessageConstants.UserUpdatedSuccess));
         }
+
         /// <summary>
         /// Gets user by identifier.
         /// </summary>
-        /// <param name="userId">User ID</param>
+        /// <param name="id">User ID</param>
         /// <returns>200 OK with user, 404 if not found</returns>
-        [HttpGet("{userId}")]
-        public async Task<IActionResult> GetUserById(int userId)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUserById(int id)
         {
-            var user = await _userManagementService.GetUserByIdAsync(userId);
+            var user = await _userManagementService.GetUserByIdAsync(id);
             return Ok(
                 ApiResponseDto<UserResponseDto>.SuccessResponse(
                     user,
                     MessageConstants.UserRetrievedSuccess));
         }
+
         /// <summary>
         /// Gets all users.
         /// </summary>
@@ -205,6 +272,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                     users,
                     MessageConstants.UsersRetrievedSuccess));
         }
+
         /// <summary>
         /// Deactivates a user.
         /// </summary>
@@ -219,6 +287,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                     null,
                     MessageConstants.UserDeactivatedSuccess));
         }
+
         /// <summary>
         /// Activates a deactivated user.
         /// </summary>
@@ -233,33 +302,37 @@ namespace Relevantz.EEPZ.Api.Controllers
                     null,
                     MessageConstants.UserActivatedSuccess));
         }
+
         /// <summary>
         /// Gets employees reporting to manager (Manager/HR/Admin only).
         /// </summary>
         /// <param name="managerId">Manager user ID</param>
         /// <returns>200 OK with employees, 403/404/500 on error</returns>
-        [HttpGet("manager/{managerId}/employees")]
-        public async Task<IActionResult> GetEmployeesByManager(int managerId)
+        [HttpGet("manager/{id}/employees")]
+        public async Task<IActionResult> GetEmployeesByManager(int id)
         {
             var currentUserId =
                 int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+
             if (userRole != "HR" &&
                 userRole != "Admin" &&
-                currentUserId != managerId)
+                currentUserId != id)
             {
                 return StatusCode(
                     403,
                     ApiResponseDto<List<UserResponseDto>>.FailureResponse(
                         MessageConstants.ManagerForbidden));
             }
+
             var employees =
-                await _userManagementService.GetEmployeesByManagerAsync(managerId);
+                await _userManagementService.GetEmployeesByManagerAsync(id);
             return Ok(
                 ApiResponseDto<List<UserResponseDto>>.SuccessResponse(
                     employees,
                     MessageConstants.EmployeesRetrievedSuccess));
         }
+
         /// <summary>
         /// Assigns role and department to user.
         /// </summary>
@@ -269,12 +342,28 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> AssignRoleAndDepartment(
             [FromBody] AssignRoleDepartmentRequestDto request)
         {
+            var validationResult = await _assignRoleDepartmentValidator.ValidateAsync(request);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Validation failed",
+                    errors = validationResult.Errors.Select(e => new
+                    {
+                        property = e.PropertyName,
+                        error = e.ErrorMessage
+                    })
+                });
+            }
+
             await _userManagementService.AssignRoleAndDepartmentAsync(request);
             return Ok(
                 ApiResponseDto<object>.SuccessResponse(
                     null,
                     MessageConstants.RoleDepartmentAssignedSuccess));
         }
+
         /// <summary>
         /// Gets next available employee company ID (Admin/HR only).
         /// </summary>

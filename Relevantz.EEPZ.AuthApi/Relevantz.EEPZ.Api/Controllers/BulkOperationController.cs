@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Relevantz.EEPZ.Common.Utils;
 using Relevantz.EEPZ.Common.Constants;
+using FluentValidation;
 
 namespace Relevantz.EEPZ.Api.Controllers
 {
@@ -17,18 +18,39 @@ namespace Relevantz.EEPZ.Api.Controllers
     {
         private readonly IBulkOperationService _bulkOperationService;
         private readonly IExportService _exportService;
+        private readonly IValidator<BulkUserCreateRequestDto> _bulkCreateValidator;
+        private readonly IValidator<BulkUserInactivateRequestDto> _bulkInactivateValidator;
 
         public BulkOperationController(
             IBulkOperationService bulkOperationService,
-            IExportService exportService)
+            IExportService exportService,
+            IValidator<BulkUserCreateRequestDto> bulkCreateValidator,
+            IValidator<BulkUserInactivateRequestDto> bulkInactivateValidator)
         {
             _bulkOperationService = bulkOperationService;
             _exportService = exportService;
+            _bulkCreateValidator = bulkCreateValidator;
+            _bulkInactivateValidator = bulkInactivateValidator;
         }
 
         [HttpPost("bulk-create-users")]
         public async Task<IActionResult> BulkCreateUsers([FromBody] BulkUserCreateRequestDto request)
         {
+            var validationResult = await _bulkCreateValidator.ValidateAsync(request);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Validation failed",
+                    errors = validationResult.Errors.Select(e => new
+                    {
+                        property = e.PropertyName,
+                        error = e.ErrorMessage
+                    })
+                });
+            }
+
             if (!TryGetUserId(out var performedByUserId))
                 return Unauthorized(new { success = false, message = "Invalid user context" });
 
@@ -39,6 +61,21 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpPost("bulk-inactivate-users")]
         public async Task<IActionResult> BulkInactivateUsers([FromBody] BulkUserInactivateRequestDto request)
         {
+            var validationResult = await _bulkInactivateValidator.ValidateAsync(request);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Validation failed",
+                    errors = validationResult.Errors.Select(e => new
+                    {
+                        property = e.PropertyName,
+                        error = e.ErrorMessage
+                    })
+                });
+            }
+
             if (!TryGetUserId(out var performedByUserId))
                 return Unauthorized(new { success = false, message = "Invalid user context" });
 

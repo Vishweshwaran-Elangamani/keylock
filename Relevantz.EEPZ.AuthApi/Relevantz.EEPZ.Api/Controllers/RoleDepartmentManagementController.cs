@@ -82,12 +82,12 @@ namespace Relevantz.EEPZ.Api.Controllers
         /// <summary>
         /// Deletes a role by its unique identifier. (Admin only)
         /// </summary>
-        /// <param name="roleId">Role identifier</param>
-        [HttpDelete("role/{roleId}")]
-        public async Task<IActionResult> DeleteRole(int roleId)
+        /// <param name="id">Role identifier</param>
+        [HttpDelete("role/{id}")]
+        public async Task<IActionResult> DeleteRole(int id)
         {
-            _logger.LogInformation("Deleting role: {RoleId}", roleId);
-            await _roleService.DeleteRoleAsync(roleId);
+            _logger.LogInformation("Deleting role: {RoleId}", id);
+            await _roleService.DeleteRoleAsync(id);
             return Ok(ApiResponseDto<string>.SuccessResponse("Role deleted successfully", "Role deleted successfully"));
         }
         #endregion
@@ -157,13 +157,13 @@ namespace Relevantz.EEPZ.Api.Controllers
         /// <remarks>
         /// NOTE: This endpoint is marked as AllowAnonymous and does not require authentication.
         /// </remarks>
-        /// <param name="departmentId">Department identifier</param>
-        [HttpDelete("department/{departmentId}")]
+        /// <param name="id">Department identifier</param>
+        [HttpDelete("department/{id}")]
         [AllowAnonymous]
-        public async Task<IActionResult> DeleteDepartment(int departmentId)
+        public async Task<IActionResult> DeleteDepartment(int id)
         {
-            _logger.LogInformation("Deleting department: {DepartmentId}", departmentId);
-            await _departmentService.DeleteDepartmentAsync(departmentId);
+            _logger.LogInformation("Deleting department: {DepartmentId}", id);
+            await _departmentService.DeleteDepartmentAsync(id);
             return Ok(ApiResponseDto<string>.SuccessResponse(DepartmentMessages.DepartmentDeletedSuccess, DepartmentMessages.DepartmentDeletedSuccess));
         }
         #endregion
@@ -190,13 +190,13 @@ namespace Relevantz.EEPZ.Api.Controllers
         /// <remarks>
         /// NOTE: This endpoint is marked as AllowAnonymous and does not require authentication.
         /// </remarks>
-        /// <param name="departmentId">Parent department identifier</param>
-        [HttpGet("department/{departmentId}/children")]
+        /// <param name="id">Parent department identifier</param>
+        [HttpGet("department/{id}/children")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetChildDepartments(int departmentId)
+        public async Task<IActionResult> GetChildDepartments(int id)
         {
-            _logger.LogInformation("Retrieving child departments for parent: {ParentDepartmentId}", departmentId);
-            var result = await _departmentService.GetChildDepartmentsAsync(departmentId);
+            _logger.LogInformation("Retrieving child departments for parent: {ParentDepartmentId}", id);
+            var result = await _departmentService.GetChildDepartmentsAsync(id);
             return Ok(ApiResponseDto<List<DepartmentResponseDto>>.SuccessResponse(result, DepartmentMessages.ChildDepartmentsRetrievedSuccess));
         }
         /// <summary>
@@ -219,13 +219,13 @@ namespace Relevantz.EEPZ.Api.Controllers
         /// <remarks>
         /// NOTE: This endpoint is marked as AllowAnonymous and does not require authentication.
         /// </remarks>
-        /// <param name="departmentId">Department identifier</param>
-        [HttpGet("department/{departmentId}/path")]
+        /// <param name="id">Department identifier</param>
+        [HttpGet("department/{id}/path")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetDepartmentPath(int departmentId)
+        public async Task<IActionResult> GetDepartmentPath(int id)
         {
-            _logger.LogInformation("Retrieving department path for: {DepartmentId}", departmentId);
-            var result = await _departmentService.GetDepartmentPathAsync(departmentId);
+            _logger.LogInformation("Retrieving department path for: {DepartmentId}", id);
+            var result = await _departmentService.GetDepartmentPathAsync(id);
             return Ok(ApiResponseDto<List<DepartmentResponseDto>>.SuccessResponse(result, DepartmentMessages.DepartmentPathRetrievedSuccess));
         }
         #endregion
@@ -265,13 +265,13 @@ namespace Relevantz.EEPZ.Api.Controllers
         /// NOTE: This endpoint is marked as AllowAnonymous and does not require authentication.
         /// The status value is taken from the request payload.
         /// </remarks>
-        /// <param name="departmentId">Department identifier</param>
-        [HttpPatch("department/{departmentId}/status")]
+        /// <param name="id">Department identifier</param>
+        [HttpPatch("department/{id}/status")]
         [AllowAnonymous]
-        public async Task<IActionResult> UpdateDepartmentStatus(int departmentId, [FromBody] UpdateStatusRequestDto request)
+        public async Task<IActionResult> UpdateDepartmentStatus(int id, [FromBody] UpdateStatusRequestDto request)
         {
-            _logger.LogInformation("Updating department status: {DepartmentId} to {Status}", departmentId, request.Status);
-            await _departmentService.UpdateDepartmentStatusAsync(departmentId, request.Status);
+            _logger.LogInformation("Updating department status: {DepartmentId} to {Status}", id, request.Status);
+            await _departmentService.UpdateDepartmentStatusAsync(id, request.Status);
             return Ok(ApiResponseDto<string>.SuccessResponse("Status updated successfully", string.Format(DepartmentMessages.StatusUpdatedSuccess, request.Status)));
         }
         #endregion
@@ -298,13 +298,13 @@ namespace Relevantz.EEPZ.Api.Controllers
         /// NOTE: This endpoint is marked as AllowAnonymous and does not require authentication.
         /// Assigns the provided employee as the HOD for the given department.
         /// </remarks>
-        /// <param name="departmentId">Department identifier</param>
-        [HttpPost("department/{departmentId}/hod/assign")]
+        /// <param name="id">Department identifier</param>
+        [HttpPost("department/{id}/hod/assign")]
         [AllowAnonymous]
-        public async Task<IActionResult> AssignHod(int departmentId, [FromBody] AssignHodRequestDto request)
+        public async Task<IActionResult> AssignHod(int id, [FromBody] AssignHodRequestDto request)
         {
-            _logger.LogInformation("Assigning HOD: {HodEmployeeId} to department: {DepartmentId}", request.HodEmployeeId, departmentId);
-            await _departmentService.AssignHodAsync(departmentId, request.HodEmployeeId);
+            _logger.LogInformation("Assigning HOD: {HodEmployeeId} to department: {DepartmentId}", request.HodEmployeeId, id);
+            await _departmentService.AssignHodAsync(id, request.HodEmployeeId);
             return Ok(ApiResponseDto<string>.SuccessResponse(DepartmentMessages.HodAssignedSuccess, DepartmentMessages.HodAssignedSuccess));
         }
         /// <summary>
@@ -313,13 +313,13 @@ namespace Relevantz.EEPZ.Api.Controllers
         /// <remarks>
         /// NOTE: This endpoint is marked as AllowAnonymous and does not require authentication.
         /// </remarks>
-        /// <param name="departmentId">Department identifier</param>
-        [HttpDelete("department/{departmentId}/hod/remove")]
+        /// <param name="id">Department identifier</param>
+        [HttpDelete("department/{id}/hod/remove")]
         [AllowAnonymous]
-        public async Task<IActionResult> RemoveHod(int departmentId)
+        public async Task<IActionResult> RemoveHod(int id)
         {
-            _logger.LogInformation("Removing HOD from department: {DepartmentId}", departmentId);
-            await _departmentService.RemoveHodAsync(departmentId);
+            _logger.LogInformation("Removing HOD from department: {DepartmentId}", id);
+            await _departmentService.RemoveHodAsync(id);
             return Ok(ApiResponseDto<string>.SuccessResponse(DepartmentMessages.HodRemovedSuccess, DepartmentMessages.HodRemovedSuccess));
         }
         #endregion

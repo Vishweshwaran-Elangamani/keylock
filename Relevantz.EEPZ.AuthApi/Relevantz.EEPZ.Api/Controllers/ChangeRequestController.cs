@@ -102,16 +102,16 @@ namespace Relevantz.EEPZ.Api.Controllers
         /// <summary>
         /// Cancels a specific change request submitted by the logged-in user.
         /// </summary>
-        /// <param name="requestId">The identifier of the request to cancel.</param>
+        /// <param name="id">The identifier of the request to cancel.</param>
         /// <returns>
         /// 200 OK if cancelled successfully,  
         /// 400 Bad Request if cancellation is not allowed or fails.
         /// </returns>
-        [HttpDelete("cancel/{requestId}")]
-        public async Task<IActionResult> CancelChangeRequest(int requestId)
+        [HttpDelete("cancel/{id}")]
+        public async Task<IActionResult> CancelChangeRequest(int id)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-            var result = await _changeRequestService.CancelChangeRequestAsync(userId, requestId);
+            var result = await _changeRequestService.CancelChangeRequestAsync(userId, id);
             return Ok(ApiResponseDto<bool>.SuccessResponse(result, "Change request cancelled successfully"));
         }
         /// <summary>
