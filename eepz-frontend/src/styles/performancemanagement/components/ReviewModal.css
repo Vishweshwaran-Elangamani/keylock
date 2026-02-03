@@ -158,6 +158,9 @@
 }
 
 .tl-modal-table-wrapper {
+  
+  max-height: 420px;   /* adjust as needed */
+
   overflow-x: auto;              
   overflow-y: hidden;            
   max-width: 100%;
@@ -196,6 +199,13 @@
     border-radius: 8px;
     overflow: hidden;
 }
+
+.tl-modal-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
 
 
 .tl-modal-table th,

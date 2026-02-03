@@ -689,6 +689,7 @@
   border-radius: 6px;
   cursor: pointer;
   font-size: 12px;
+
   font-weight: 600;
   transition: all 0.3s ease;
 }
@@ -728,14 +729,14 @@
 }
 
 .empassper-empty-title {
-  font-size: 20px;
+  /* font-size: 20px; */
   font-weight: 700;
   color: var(--text);
   margin-bottom: 8px;
 }
 
 .empassper-empty-text {
-  font-size: 14px;
+  /* font-size: 14px; */
   color: var(--text-light);
   margin: 0;
 }
@@ -855,7 +856,7 @@
 }
 
 .empass-appraisal-label {
-  font-size: 10px;
+  /* font-size: 10px; */
   font-weight: 700;
   color: var(--primary);
   text-transform: uppercase;
@@ -1106,7 +1107,7 @@
   font-weight: 500;
   display: inline-block;
   min-width: 50px;
-  text-align: center;
+  text-align: left;
 }
 
 .empass-rating-cell {
@@ -1152,7 +1153,7 @@
 
 .empass-form-table td {
   padding: 8px;
-  font-size: 12px;
+  /* font-size: 12px; */
   color: var(--text);
   border-bottom: 1px solid var(--border);
   border-right: 1px solid var(--border);
@@ -1166,7 +1167,7 @@
   padding: 6px 8px;
   border: 1px solid var(--border);
   border-radius: 4px;
-  font-size: 12px;
+  /* font-size: 12px; */
   text-align: center;
   font-weight: 600;
   background: var(--card);
@@ -1185,7 +1186,7 @@
   padding: 6px;
   border: 1px solid var(--border);
   border-radius: 4px;
-  font-size: 12px;
+  /* font-size: 12px; */
   min-height: 40px;
   resize: vertical;
   transition: all 0.3s ease;
@@ -1427,6 +1428,7 @@
   font-weight: 600;
   color: #1f2937;
   margin-bottom: 6px;
+  text-align: left;
 }
 
 .empass-view-attachment-note {
@@ -1451,7 +1453,7 @@
 
 .empass-download-btn {
   padding: 8px 16px;
-  background: #3b82f6;
+  background:  #27235c;
   color: white;
   border: none;
   border-radius: 6px;

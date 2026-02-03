@@ -865,7 +865,7 @@ function MyAssessments() {
                           <td>
                             {modalMode === "view" ? (
                              <span className="empass-read-only-text">
-                             {item.rating || "-"}
+                             {item.comments}
                            </span>
                            
                             ) : (
