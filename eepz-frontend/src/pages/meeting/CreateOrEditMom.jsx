@@ -66,10 +66,11 @@ const CreateOrEditMom = ({ isEdit = false }) => {
         setAllEmployees(employeeData);
         const nameToIdMap = {};
         employeeData.forEach((emp) => {
-          const firstName = getProperty(emp, 'firstName', 'FirstName') || '';
-          const lastName = getProperty(emp, 'lastName', 'LastName') || '';
-          const empId = getProperty(emp, 'employeeMasterId', 'EmployeeMasterId') || 
-                        getProperty(emp, 'employeeId', 'EmployeeId');
+          const firstName = getProperty(emp, "firstName", "FirstName") || "";
+          const lastName = getProperty(emp, "lastName", "LastName") || "";
+          const empId =
+            getProperty(emp, "employeeMasterId", "EmployeeMasterId") ||
+            getProperty(emp, "employeeId", "EmployeeId");
           const fullName = `${firstName} ${lastName}`.trim();
           if (fullName && empId) {
             nameToIdMap[fullName] = empId;
@@ -80,7 +81,9 @@ const CreateOrEditMom = ({ isEdit = false }) => {
     } catch (err) {
       console.error("Failed to load employees:", err);
       if (err.retryAfter) {
-        toastr.error(`Rate limit exceeded. Please wait ${err.retryAfter} seconds.`);
+        toastr.error(
+          `Rate limit exceeded. Please wait ${err.retryAfter} seconds.`
+        );
       } else {
         toastr.error("Failed to load employees");
       }
@@ -94,25 +97,41 @@ const CreateOrEditMom = ({ isEdit = false }) => {
       const mom = response.data || response.Data || response;
 
       // Extract properties with fallback
-      const discussionPoints = getProperty(mom, 'discussionPoints', 'DiscussionPoints') || [];
-      const actionItems = getProperty(mom, 'actionItems', 'ActionItems') || [];
-      const commentsObservations = getProperty(mom, 'commentsObservations', 'CommentsObservations') || '';
+      const discussionPoints =
+        getProperty(mom, "discussionPoints", "DiscussionPoints") || [];
+      const actionItems = getProperty(mom, "actionItems", "ActionItems") || [];
+      const commentsObservations =
+        getProperty(mom, "commentsObservations", "CommentsObservations") || "";
 
       const mappedActionItems = actionItems.map((item) => ({
-        actionItemId: getProperty(item, 'actionItemId', 'ActionItemId'),
-        taskDescription: getProperty(item, 'taskDescription', 'TaskDescription') || 
-                        getProperty(item, 'task', 'Task') || '',
-        assignedToEmployeeId: getProperty(item, 'assignedToEmployeeId', 'AssignedToEmployeeId'),
-        assignedToEmployeeName: getProperty(item, 'assignedToEmployeeName', 'AssignedToEmployeeName') || 
-                               getProperty(item, 'assignTo', 'AssignTo') || '',
-        dueDate: getProperty(item, 'dueDate', 'DueDate') || '',
-        status: getProperty(item, 'status', 'Status') || 'Pending',
+        actionItemId: getProperty(item, "actionItemId", "ActionItemId"),
+        taskDescription:
+          getProperty(item, "taskDescription", "TaskDescription") ||
+          getProperty(item, "task", "Task") ||
+          "",
+        assignedToEmployeeId: getProperty(
+          item,
+          "assignedToEmployeeId",
+          "AssignedToEmployeeId"
+        ),
+        assignedToEmployeeName:
+          getProperty(
+            item,
+            "assignedToEmployeeName",
+            "AssignedToEmployeeName"
+          ) ||
+          getProperty(item, "assignTo", "AssignTo") ||
+          "",
+        dueDate: getProperty(item, "dueDate", "DueDate") || "",
+        status: getProperty(item, "status", "Status") || "Pending",
       }));
 
       const mappedDiscussionPoints = discussionPoints.map((dp) => ({
-        pointId: getProperty(dp, 'pointId', 'PointId'),
-        point: getProperty(dp, 'pointText', 'PointText') || 
-               getProperty(dp, 'point', 'Point') || '',
+        pointId: getProperty(dp, "pointId", "PointId"),
+        point:
+          getProperty(dp, "pointText", "PointText") ||
+          getProperty(dp, "point", "Point") ||
+          "",
       }));
 
       setFormData({
@@ -122,16 +141,18 @@ const CreateOrEditMom = ({ isEdit = false }) => {
       });
 
       setMeetingData({
-        meetingTitle: getProperty(mom, 'meetingTitle', 'MeetingTitle'),
-        meetingType: getProperty(mom, 'meetingType', 'MeetingType'),
-        meetingDate: getProperty(mom, 'meetingDate', 'MeetingDate'),
-        meetingLink: getProperty(mom, 'meetingLink', 'MeetingLink') || '',
-        attendees: getProperty(mom, 'attendees', 'Attendees') || [],
+        meetingTitle: getProperty(mom, "meetingTitle", "MeetingTitle"),
+        meetingType: getProperty(mom, "meetingType", "MeetingType"),
+        meetingDate: getProperty(mom, "meetingDate", "MeetingDate"),
+        meetingLink: getProperty(mom, "meetingLink", "MeetingLink") || "",
+        attendees: getProperty(mom, "attendees", "Attendees") || [],
       });
     } catch (err) {
       console.error("Failed to load MOM:", err);
       if (err.retryAfter) {
-        toastr.error(`Rate limit exceeded. Please wait ${err.retryAfter} seconds.`);
+        toastr.error(
+          `Rate limit exceeded. Please wait ${err.retryAfter} seconds.`
+        );
       } else {
         toastr.error("Failed to load MOM");
       }
@@ -148,16 +169,18 @@ const CreateOrEditMom = ({ isEdit = false }) => {
       const meeting = response.data || response.Data || response;
 
       setMeetingData({
-        meetingTitle: getProperty(meeting, 'meetingTitle', 'MeetingTitle'),
-        meetingType: getProperty(meeting, 'meetingType', 'MeetingType'),
-        meetingDate: getProperty(meeting, 'meetingDate', 'MeetingDate'),
-        meetingLink: getProperty(meeting, 'meetingLink', 'MeetingLink') || '',
-        attendees: getProperty(meeting, 'attendees', 'Attendees') || [],
+        meetingTitle: getProperty(meeting, "meetingTitle", "MeetingTitle"),
+        meetingType: getProperty(meeting, "meetingType", "MeetingType"),
+        meetingDate: getProperty(meeting, "meetingDate", "MeetingDate"),
+        meetingLink: getProperty(meeting, "meetingLink", "MeetingLink") || "",
+        attendees: getProperty(meeting, "attendees", "Attendees") || [],
       });
     } catch (err) {
       console.error("Failed to load meeting:", err);
       if (err.retryAfter) {
-        toastr.error(`Rate limit exceeded. Please wait ${err.retryAfter} seconds.`);
+        toastr.error(
+          `Rate limit exceeded. Please wait ${err.retryAfter} seconds.`
+        );
       } else {
         toastr.error("Meeting not found");
       }
@@ -178,7 +201,7 @@ const CreateOrEditMom = ({ isEdit = false }) => {
     const newPoints = [...formData.discussionPoints];
     newPoints[index].point = value;
     setFormData((prev) => ({ ...prev, discussionPoints: newPoints }));
-    
+
     // Clear error if exists
     if (errors[`discussionPoint_${index}`]) {
       const newErrors = { ...errors };
@@ -191,7 +214,7 @@ const CreateOrEditMom = ({ isEdit = false }) => {
     const newPoints = [...formData.discussionPoints];
     newPoints.splice(index, 1);
     setFormData((prev) => ({ ...prev, discussionPoints: newPoints }));
-    
+
     // Clear error if exists
     if (errors[`discussionPoint_${index}`]) {
       const newErrors = { ...errors };
@@ -219,7 +242,7 @@ const CreateOrEditMom = ({ isEdit = false }) => {
       newItems[index][field] = value;
     }
     setFormData((prev) => ({ ...prev, actionItems: newItems }));
-    
+
     // Clear error if exists
     if (errors[`actionItem_${index}`]) {
       const newErrors = { ...errors };
@@ -232,7 +255,7 @@ const CreateOrEditMom = ({ isEdit = false }) => {
     const newItems = [...formData.actionItems];
     newItems.splice(index, 1);
     setFormData((prev) => ({ ...prev, actionItems: newItems }));
-    
+
     // Clear error if exists
     if (errors[`actionItem_${index}`]) {
       const newErrors = { ...errors };
@@ -250,7 +273,7 @@ const CreateOrEditMom = ({ isEdit = false }) => {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!meetingData) {
       newErrors.meeting = "Meeting details missing";
     }
@@ -258,10 +281,12 @@ const CreateOrEditMom = ({ isEdit = false }) => {
     // Validate discussion points
     formData.discussionPoints.forEach((point, index) => {
       if (point.point && point.point.trim().length < 3) {
-        newErrors[`discussionPoint_${index}`] = "Discussion point must be at least 3 characters";
+        newErrors[`discussionPoint_${index}`] =
+          "Discussion point must be at least 3 characters";
       }
       if (point.point && point.point.length > 2000) {
-        newErrors[`discussionPoint_${index}`] = "Discussion point cannot exceed 2000 characters";
+        newErrors[`discussionPoint_${index}`] =
+          "Discussion point cannot exceed 2000 characters";
       }
     });
 
@@ -270,25 +295,29 @@ const CreateOrEditMom = ({ isEdit = false }) => {
       if (item.taskDescription && item.taskDescription.trim()) {
         // Task has description, must have employee assigned
         if (!item.assignedToEmployeeId) {
-          newErrors[`actionItem_${index}`] = "Please select an employee for this task";
+          newErrors[`actionItem_${index}`] =
+            "Please select an employee for this task";
         }
-        
+
         // Validate task description length
         if (item.taskDescription.length < 3) {
-          newErrors[`actionItem_${index}`] = "Task description must be at least 3 characters";
+          newErrors[`actionItem_${index}`] =
+            "Task description must be at least 3 characters";
         }
         if (item.taskDescription.length > 1000) {
-          newErrors[`actionItem_${index}`] = "Task description cannot exceed 1000 characters";
+          newErrors[`actionItem_${index}`] =
+            "Task description cannot exceed 1000 characters";
         }
-        
+
         // Validate due date
         if (item.dueDate) {
           const dueDate = new Date(item.dueDate);
           const yesterday = new Date();
           yesterday.setDate(yesterday.getDate() - 1);
-          
+
           if (dueDate < yesterday) {
-            newErrors[`actionItem_${index}_date`] = "Due date cannot be in the past";
+            newErrors[`actionItem_${index}_date`] =
+              "Due date cannot be in the past";
           }
         }
       }
@@ -296,7 +325,9 @@ const CreateOrEditMom = ({ isEdit = false }) => {
 
     // Validate meeting date (if not edit mode)
     if (!isEdit && meetingData?.meetingDate) {
-      const dateValidation = momService.validation.validateMeetingDate(meetingData.meetingDate);
+      const dateValidation = momService.validation.validateMeetingDate(
+        meetingData.meetingDate
+      );
       if (!dateValidation.valid) {
         newErrors.meetingDate = dateValidation.message;
       }
@@ -308,7 +339,7 @@ const CreateOrEditMom = ({ isEdit = false }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       toastr.error("Please check the form for errors");
       return;
@@ -358,16 +389,20 @@ const CreateOrEditMom = ({ isEdit = false }) => {
       }
     } catch (err) {
       console.error("MOM Submission Error:", err);
-      
+
       // Enhanced error handling
       if (err.validationErrors) {
         toastr.error(`Validation Error: ${err.validationErrors}`);
       } else if (err.retryAfter) {
-        toastr.error(`Rate limit exceeded. Please wait ${err.retryAfter} seconds.`);
+        toastr.error(
+          `Rate limit exceeded. Please wait ${err.retryAfter} seconds.`
+        );
       } else if (err.message) {
-        toastr.error(`Failed to ${isEdit ? 'update' : 'create'} MOM: ${err.message}`);
+        toastr.error(
+          `Failed to ${isEdit ? "update" : "create"} MOM: ${err.message}`
+        );
       } else {
-        toastr.error(`Failed to ${isEdit ? 'update' : 'create'} MOM`);
+        toastr.error(`Failed to ${isEdit ? "update" : "create"} MOM`);
       }
     } finally {
       setSubmitting(false);
@@ -409,10 +444,7 @@ const CreateOrEditMom = ({ isEdit = false }) => {
         <div className="alert alert-danger">
           Meeting data unavailable. Please go back and try again.
         </div>
-        <button
-          className="btn btn-primary"
-          onClick={() => navigate(-1)}
-        >
+        <button className="btn btn-primary" onClick={() => navigate(-1)}>
           Go Back
         </button>
       </div>
@@ -463,7 +495,7 @@ const CreateOrEditMom = ({ isEdit = false }) => {
                       <input
                         type="text"
                         className="form-control momce-input"
-                        value={meetingData.meetingTitle || ''}
+                        value={meetingData.meetingTitle || ""}
                         disabled
                       />
                     </div>
@@ -472,7 +504,7 @@ const CreateOrEditMom = ({ isEdit = false }) => {
                       <input
                         type="text"
                         className="form-control momce-input"
-                        value={meetingData.meetingType || ''}
+                        value={meetingData.meetingType || ""}
                         disabled
                       />
                     </div>
@@ -497,7 +529,7 @@ const CreateOrEditMom = ({ isEdit = false }) => {
                         value={
                           Array.isArray(meetingData.attendees)
                             ? `${meetingData.attendees.length} participants`
-                            : meetingData.attendees || 'Not specified'
+                            : meetingData.attendees || "Not specified"
                         }
                         disabled
                       />
@@ -535,7 +567,8 @@ const CreateOrEditMom = ({ isEdit = false }) => {
                   </div>
                   {formData.discussionPoints.length === 0 ? (
                     <div className="alert alert-secondary mb-0">
-                      No discussion points added yet. Click "Add Point" to start.
+                      No discussion points added yet. Click "Add Point" to
+                      start.
                     </div>
                   ) : (
                     <div className="d-flex flex-column gap-3">
@@ -550,10 +583,15 @@ const CreateOrEditMom = ({ isEdit = false }) => {
                                 <textarea
                                   value={dp.point || ""}
                                   onChange={(e) =>
-                                    handleChangeDiscussionPoint(index, e.target.value)
+                                    handleChangeDiscussionPoint(
+                                      index,
+                                      e.target.value
+                                    )
                                   }
                                   className={`form-control momce-textarea ${
-                                    errors[`discussionPoint_${index}`] ? 'is-invalid' : ''
+                                    errors[`discussionPoint_${index}`]
+                                      ? "is-invalid"
+                                      : ""
                                   }`}
                                   rows="2"
                                   placeholder="Enter discussion point..."
@@ -571,7 +609,9 @@ const CreateOrEditMom = ({ isEdit = false }) => {
                               <button
                                 type="button"
                                 className="btn momce-remove-btn"
-                                onClick={() => handleRemoveDiscussionPoint(index)}
+                                onClick={() =>
+                                  handleRemoveDiscussionPoint(index)
+                                }
                               >
                                 <Trash2 size={16} />
                               </button>
@@ -623,15 +663,18 @@ const CreateOrEditMom = ({ isEdit = false }) => {
                                     )
                                   }
                                   className={`form-control momce-input ${
-                                    errors[`actionItem_${index}`] && 
-                                    !errors[`actionItem_${index}`].includes('employee')
-                                      ? 'is-invalid' 
-                                      : ''
+                                    errors[`actionItem_${index}`] &&
+                                    !errors[`actionItem_${index}`].includes(
+                                      "employee"
+                                    )
+                                      ? "is-invalid"
+                                      : ""
                                   }`}
                                   maxLength={1000}
                                 />
                                 <small className="text-muted">
-                                  {item.taskDescription?.length || 0}/1000 characters
+                                  {item.taskDescription?.length || 0}/1000
+                                  characters
                                 </small>
                               </div>
                               <div className="col-md-4">
@@ -646,19 +689,41 @@ const CreateOrEditMom = ({ isEdit = false }) => {
                                   }
                                   className={`form-select momce-input ${
                                     errors[`actionItem_${index}`] &&
-                                    errors[`actionItem_${index}`].includes('employee')
+                                    errors[`actionItem_${index}`].includes(
+                                      "employee"
+                                    )
                                       ? "is-invalid"
                                       : ""
                                   }`}
                                 >
                                   <option value="">Assign to...</option>
                                   {allEmployees.map((emp) => {
-                                    const firstName = getProperty(emp, 'firstName', 'FirstName') || '';
-                                    const lastName = getProperty(emp, 'lastName', 'LastName') || '';
-                                    const empId = getProperty(emp, 'employeeMasterId', 'EmployeeMasterId') || 
-                                                  getProperty(emp, 'employeeId', 'EmployeeId');
-                                    const fullName = `${firstName} ${lastName}`.trim();
-                                    
+                                    const firstName =
+                                      getProperty(
+                                        emp,
+                                        "firstName",
+                                        "FirstName"
+                                      ) || "";
+                                    const lastName =
+                                      getProperty(
+                                        emp,
+                                        "lastName",
+                                        "LastName"
+                                      ) || "";
+                                    const empId =
+                                      getProperty(
+                                        emp,
+                                        "employeeMasterId",
+                                        "EmployeeMasterId"
+                                      ) ||
+                                      getProperty(
+                                        emp,
+                                        "employeeId",
+                                        "EmployeeId"
+                                      );
+                                    const fullName =
+                                      `${firstName} ${lastName}`.trim();
+
                                     return (
                                       <option key={empId} value={fullName}>
                                         {fullName}
@@ -672,12 +737,18 @@ const CreateOrEditMom = ({ isEdit = false }) => {
                                   type="date"
                                   value={item.dueDate || ""}
                                   onChange={(e) =>
-                                    handleChangeActionItem(index, "dueDate", e.target.value)
+                                    handleChangeActionItem(
+                                      index,
+                                      "dueDate",
+                                      e.target.value
+                                    )
                                   }
                                   className={`form-control momce-input ${
-                                    errors[`actionItem_${index}_date`] ? 'is-invalid' : ''
+                                    errors[`actionItem_${index}_date`]
+                                      ? "is-invalid"
+                                      : ""
                                   }`}
-                                  min={new Date().toISOString().split('T')[0]}
+                                  min={new Date().toISOString().split("T")[0]}
                                 />
                                 {errors[`actionItem_${index}_date`] && (
                                   <div className="invalid-feedback d-block">
@@ -689,7 +760,11 @@ const CreateOrEditMom = ({ isEdit = false }) => {
                                 <select
                                   value={item.status || "Pending"}
                                   onChange={(e) =>
-                                    handleChangeActionItem(index, "status", e.target.value)
+                                    handleChangeActionItem(
+                                      index,
+                                      "status",
+                                      e.target.value
+                                    )
                                   }
                                   className="form-select momce-input"
                                 >
@@ -714,7 +789,8 @@ const CreateOrEditMom = ({ isEdit = false }) => {
                             )}
                             {item.assignedToEmployeeId ? (
                               <small className="text-success">
-                                Assigned to Employee ID: {item.assignedToEmployeeId}
+                                Assigned to Employee ID:{" "}
+                                {item.assignedToEmployeeId}
                               </small>
                             ) : (
                               item.taskDescription && (

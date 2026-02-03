@@ -41,7 +41,7 @@ const HRMomDetails = () => {
     setError(null);
     try {
       const response = await momService.getMomById(momId);
-      
+
       // Extract mom data with fallback
       let momData = null;
       if (response?.success && response?.data) {
@@ -63,11 +63,13 @@ const HRMomDetails = () => {
       setMom(momData);
     } catch (err) {
       console.error("Fetch MOM details error:", err);
-      
+
       // Enhanced error handling
       if (err.retryAfter) {
         setError(`Rate limit exceeded. Please wait ${err.retryAfter} seconds.`);
-        toastr.error(`Rate limit exceeded. Please wait ${err.retryAfter} seconds.`);
+        toastr.error(
+          `Rate limit exceeded. Please wait ${err.retryAfter} seconds.`
+        );
       } else if (err.message) {
         setError(`Failed to load MOM details: ${err.message}`);
         toastr.error(`Failed to load MOM details: ${err.message}`);
@@ -91,7 +93,7 @@ const HRMomDetails = () => {
       <span
         className={`hrmom-badge ${badgeMap[type] || "hrmom-badge-secondary"}`}
       >
-        {type || 'Other'}
+        {type || "Other"}
       </span>
     );
   };
@@ -104,7 +106,7 @@ const HRMomDetails = () => {
         </span>
       );
     }
-    
+
     if (status === "Completed") {
       return (
         <span className="hrmom-badge hrmom-badge-success hrmom-badge-icon">
@@ -112,7 +114,7 @@ const HRMomDetails = () => {
         </span>
       );
     }
-    
+
     if (status === "Pending") {
       return (
         <span className="hrmom-badge hrmom-badge-warning hrmom-badge-icon">
@@ -120,7 +122,7 @@ const HRMomDetails = () => {
         </span>
       );
     }
-    
+
     return null;
   };
 
@@ -177,8 +179,8 @@ const HRMomDetails = () => {
       return { total: 0, completed: 0, pending: 0, overdue: 0 };
     }
 
-    const actionItems = getProperty(mom, 'actionItems', 'ActionItems');
-    
+    const actionItems = getProperty(mom, "actionItems", "ActionItems");
+
     if (!Array.isArray(actionItems)) {
       return { total: 0, completed: 0, pending: 0, overdue: 0 };
     }
@@ -189,13 +191,16 @@ const HRMomDetails = () => {
     let overdue = 0;
 
     actionItems.forEach((ai) => {
-      const status = getProperty(ai, 'status', 'Status');
-      const isOverdueFlag = getProperty(ai, 'isOverdue', 'IsOverdue');
-      const dueDate = getProperty(ai, 'dueDate', 'DueDate');
+      const status = getProperty(ai, "status", "Status");
+      const isOverdueFlag = getProperty(ai, "isOverdue", "IsOverdue");
+      const dueDate = getProperty(ai, "dueDate", "DueDate");
 
       if (status === "Completed") {
         completed++;
-      } else if (isOverdueFlag || (status === "Pending" && dueDate && new Date(dueDate) < new Date())) {
+      } else if (
+        isOverdueFlag ||
+        (status === "Pending" && dueDate && new Date(dueDate) < new Date())
+      ) {
         overdue++;
       } else if (status === "Pending") {
         pending++;
@@ -242,20 +247,36 @@ const HRMomDetails = () => {
   }
 
   const actionStats = calculateActionItemStats();
-  
+
   // Extract properties with fallback
-  const meetingTitle = getProperty(mom, 'meetingTitle', 'MeetingTitle');
-  const meetingType = getProperty(mom, 'meetingType', 'MeetingType');
-  const meetingDate = getProperty(mom, 'meetingDate', 'MeetingDate');
-  const meetingLink = getProperty(mom, 'meetingLink', 'MeetingLink');
-  const departmentName = getProperty(mom, 'departmentName', 'DepartmentName');
-  const submittedByName = getProperty(mom, 'submittedByEmployeeName', 'SubmittedByEmployeeName');
-  const submittedByRole = getProperty(mom, 'submittedByRole', 'SubmittedByRole');
-  const createdAt = getProperty(mom, 'createdAt', 'CreatedAt');
-  const updatedAt = getProperty(mom, 'updatedAt', 'UpdatedAt');
-  const commentsObservations = getProperty(mom, 'commentsObservations', 'CommentsObservations');
-  const discussionPoints = getProperty(mom, 'discussionPoints', 'DiscussionPoints');
-  const actionItems = getProperty(mom, 'actionItems', 'ActionItems');
+  const meetingTitle = getProperty(mom, "meetingTitle", "MeetingTitle");
+  const meetingType = getProperty(mom, "meetingType", "MeetingType");
+  const meetingDate = getProperty(mom, "meetingDate", "MeetingDate");
+  const meetingLink = getProperty(mom, "meetingLink", "MeetingLink");
+  const departmentName = getProperty(mom, "departmentName", "DepartmentName");
+  const submittedByName = getProperty(
+    mom,
+    "submittedByEmployeeName",
+    "SubmittedByEmployeeName"
+  );
+  const submittedByRole = getProperty(
+    mom,
+    "submittedByRole",
+    "SubmittedByRole"
+  );
+  const createdAt = getProperty(mom, "createdAt", "CreatedAt");
+  const updatedAt = getProperty(mom, "updatedAt", "UpdatedAt");
+  const commentsObservations = getProperty(
+    mom,
+    "commentsObservations",
+    "CommentsObservations"
+  );
+  const discussionPoints = getProperty(
+    mom,
+    "discussionPoints",
+    "DiscussionPoints"
+  );
+  const actionItems = getProperty(mom, "actionItems", "ActionItems");
 
   return (
     <div className="hrmom-wrapper">
@@ -309,7 +330,9 @@ const HRMomDetails = () => {
               />
               <div className="hrmom-stat-info">
                 <div className="hrmom-stat-value">
-                  {Array.isArray(discussionPoints) ? discussionPoints.length : 0}
+                  {Array.isArray(discussionPoints)
+                    ? discussionPoints.length
+                    : 0}
                 </div>
                 <div className="hrmom-stat-label">Discussion Points</div>
               </div>
@@ -362,7 +385,7 @@ const HRMomDetails = () => {
             <div className="hrmom-meeting-header">
               <div className="hrmom-meeting-info">
                 <h3 className="hrmom-meeting-title">
-                  {meetingTitle || 'Untitled Meeting'}
+                  {meetingTitle || "Untitled Meeting"}
                 </h3>
                 <div className="hrmom-meeting-badges">
                   {getMeetingTypeBadge(meetingType)}
@@ -447,9 +470,7 @@ const HRMomDetails = () => {
               </h5>
             </div>
             <div className="hrmom-card-body">
-              <div className="hrmom-comments-box">
-                {commentsObservations}
-              </div>
+              <div className="hrmom-comments-box">{commentsObservations}</div>
             </div>
           </div>
         )}
@@ -466,13 +487,15 @@ const HRMomDetails = () => {
               </h5>
             </div>
             <div className="hrmom-card-body">
-              {Array.isArray(discussionPoints) && discussionPoints.length > 0 ? (
+              {Array.isArray(discussionPoints) &&
+              discussionPoints.length > 0 ? (
                 <div className="hrmom-discussion-list">
                   {discussionPoints.map((dp, index) => {
-                    const pointId = getProperty(dp, 'pointId', 'PointId');
-                    const pointText = getProperty(dp, 'pointText', 'PointText') || 
-                                     getProperty(dp, 'point', 'Point');
-                    const timestamp = getProperty(dp, 'timestamp', 'Timestamp');
+                    const pointId = getProperty(dp, "pointId", "PointId");
+                    const pointText =
+                      getProperty(dp, "pointText", "PointText") ||
+                      getProperty(dp, "point", "Point");
+                    const timestamp = getProperty(dp, "timestamp", "Timestamp");
 
                     return (
                       <div
@@ -533,20 +556,36 @@ const HRMomDetails = () => {
               {Array.isArray(actionItems) && actionItems.length > 0 ? (
                 <div className="hrmom-action-items-list">
                   {actionItems.map((ai, index) => {
-                    const actionItemId = getProperty(ai, 'actionItemId', 'ActionItemId');
-                    const taskDescription = getProperty(ai, 'taskDescription', 'TaskDescription') || 
-                                          getProperty(ai, 'task', 'Task');
-                    const assignedToName = getProperty(ai, 'assignedToEmployeeName', 'AssignedToEmployeeName') || 
-                                          getProperty(ai, 'assignTo', 'AssignTo');
-                    const dueDate = getProperty(ai, 'dueDate', 'DueDate');
-                    const status = getProperty(ai, 'status', 'Status');
-                    const isOverdueFlag = getProperty(ai, 'isOverdue', 'IsOverdue');
-                    const priority = getProperty(ai, 'priority', 'Priority');
-                    const notes = getProperty(ai, 'notes', 'Notes');
+                    const actionItemId = getProperty(
+                      ai,
+                      "actionItemId",
+                      "ActionItemId"
+                    );
+                    const taskDescription =
+                      getProperty(ai, "taskDescription", "TaskDescription") ||
+                      getProperty(ai, "task", "Task");
+                    const assignedToName =
+                      getProperty(
+                        ai,
+                        "assignedToEmployeeName",
+                        "AssignedToEmployeeName"
+                      ) || getProperty(ai, "assignTo", "AssignTo");
+                    const dueDate = getProperty(ai, "dueDate", "DueDate");
+                    const status = getProperty(ai, "status", "Status");
+                    const isOverdueFlag = getProperty(
+                      ai,
+                      "isOverdue",
+                      "IsOverdue"
+                    );
+                    const priority = getProperty(ai, "priority", "Priority");
+                    const notes = getProperty(ai, "notes", "Notes");
 
                     // Calculate overdue if flag not present
-                    const isOverdue = isOverdueFlag || 
-                                     (status === 'Pending' && dueDate && new Date(dueDate) < new Date());
+                    const isOverdue =
+                      isOverdueFlag ||
+                      (status === "Pending" &&
+                        dueDate &&
+                        new Date(dueDate) < new Date());
 
                     return (
                       <div

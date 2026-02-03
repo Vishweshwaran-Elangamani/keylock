@@ -2,16 +2,16 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import momService from "../../services/meeting/momService";
 import toastr from "toastr";
-import { 
-  ArrowLeft, 
-  Calendar, 
-  Clock, 
-  Users, 
+import {
+  ArrowLeft,
+  Calendar,
+  Clock,
+  Users,
   Link as LinkIcon,
   MessageSquare,
   CheckCircle,
   AlertCircle,
-  FileText 
+  FileText,
 } from "lucide-react";
 import "../../styles/mom/components/MomDetails.css";
 
@@ -40,7 +40,7 @@ const MomDetails = () => {
     setError(null);
     try {
       const response = await momService.getMomById(id);
-      
+
       // Extract mom data with fallback
       let momData = null;
       if (response?.success && response?.data) {
@@ -62,11 +62,13 @@ const MomDetails = () => {
       setMom(momData);
     } catch (err) {
       console.error("Failed to fetch MOM details:", err);
-      
+
       // Enhanced error handling
       if (err.retryAfter) {
         setError(`Rate limit exceeded. Please wait ${err.retryAfter} seconds.`);
-        toastr.error(`Rate limit exceeded. Please wait ${err.retryAfter} seconds.`);
+        toastr.error(
+          `Rate limit exceeded. Please wait ${err.retryAfter} seconds.`
+        );
       } else if (err.message) {
         setError(`Failed to fetch MOM details: ${err.message}`);
         toastr.error(`Failed to fetch MOM details: ${err.message}`);
@@ -109,20 +111,21 @@ const MomDetails = () => {
   };
 
   const getStatusBadge = (status, dueDate) => {
-    const isOverdue = status === "Pending" && dueDate && new Date(dueDate) < new Date();
-    
+    const isOverdue =
+      status === "Pending" && dueDate && new Date(dueDate) < new Date();
+
     if (isOverdue) {
       return <span className="momd-badge momd-badge-danger">Overdue</span>;
     }
-    
+
     if (status === "Completed") {
       return <span className="momd-badge momd-badge-success">Completed</span>;
     }
-    
+
     if (status === "Pending") {
       return <span className="momd-badge momd-badge-warning">Pending</span>;
     }
-    
+
     return <span className="momd-badge momd-badge-secondary">{status}</span>;
   };
 
@@ -148,10 +151,7 @@ const MomDetails = () => {
           <p className="momd-error-text mb-4">
             {error || "No MOM information available."}
           </p>
-          <button 
-            className="btn btn-primary"
-            onClick={() => navigate(-1)}
-          >
+          <button className="btn btn-primary" onClick={() => navigate(-1)}>
             <ArrowLeft size={18} className="me-2" />
             Go Back
           </button>
@@ -161,22 +161,35 @@ const MomDetails = () => {
   }
 
   // Extract properties with fallback
-  const meetingTitle = getProperty(mom, 'meetingTitle', 'MeetingTitle') || 'Untitled Meeting';
-  const meetingType = getProperty(mom, 'meetingType', 'MeetingType') || 'Other';
-  const meetingDate = getProperty(mom, 'meetingDate', 'MeetingDate');
-  const meetingLink = getProperty(mom, 'meetingLink', 'MeetingLink');
-  const attendees = getProperty(mom, 'attendees', 'Attendees');
-  const commentsObservations = getProperty(mom, 'commentsObservations', 'CommentsObservations');
-  const discussionPoints = getProperty(mom, 'discussionPoints', 'DiscussionPoints');
-  const actionItems = getProperty(mom, 'actionItems', 'ActionItems');
-  const submittedByName = getProperty(mom, 'submittedByEmployeeName', 'SubmittedByEmployeeName');
-  const createdAt = getProperty(mom, 'createdAt', 'CreatedAt');
+  const meetingTitle =
+    getProperty(mom, "meetingTitle", "MeetingTitle") || "Untitled Meeting";
+  const meetingType = getProperty(mom, "meetingType", "MeetingType") || "Other";
+  const meetingDate = getProperty(mom, "meetingDate", "MeetingDate");
+  const meetingLink = getProperty(mom, "meetingLink", "MeetingLink");
+  const attendees = getProperty(mom, "attendees", "Attendees");
+  const commentsObservations = getProperty(
+    mom,
+    "commentsObservations",
+    "CommentsObservations"
+  );
+  const discussionPoints = getProperty(
+    mom,
+    "discussionPoints",
+    "DiscussionPoints"
+  );
+  const actionItems = getProperty(mom, "actionItems", "ActionItems");
+  const submittedByName = getProperty(
+    mom,
+    "submittedByEmployeeName",
+    "SubmittedByEmployeeName"
+  );
+  const createdAt = getProperty(mom, "createdAt", "CreatedAt");
 
   // Format attendees
   let formattedAttendees = "N/A";
   if (Array.isArray(attendees)) {
     formattedAttendees = attendees.length > 0 ? attendees.join(", ") : "N/A";
-  } else if (typeof attendees === 'string') {
+  } else if (typeof attendees === "string") {
     formattedAttendees = attendees || "N/A";
   }
 
@@ -184,7 +197,7 @@ const MomDetails = () => {
     <div className="momd-page">
       <div className="momd-container">
         {/* Back Button */}
-        <button 
+        <button
           className="btn btn-link momd-back-btn mb-3"
           onClick={() => navigate(-1)}
         >
@@ -212,7 +225,7 @@ const MomDetails = () => {
                 <Calendar size={20} className="me-2" />
                 Meeting Information
               </h5>
-              
+
               <div className="row g-3">
                 <div className="col-md-6">
                   <p className="momd-field">
@@ -262,7 +275,9 @@ const MomDetails = () => {
                       <Users size={16} className="me-1" />
                       Attendees:
                     </span>
-                    <span className="momd-field-value">{formattedAttendees}</span>
+                    <span className="momd-field-value">
+                      {formattedAttendees}
+                    </span>
                   </p>
                 </div>
 
@@ -273,7 +288,9 @@ const MomDetails = () => {
                         <Users size={16} className="me-1" />
                         Submitted By:
                       </span>
-                      <span className="momd-field-value">{submittedByName}</span>
+                      <span className="momd-field-value">
+                        {submittedByName}
+                      </span>
                     </p>
                   </div>
                 )}
@@ -285,7 +302,9 @@ const MomDetails = () => {
                         <Clock size={16} className="me-1" />
                         Created:
                       </span>
-                      <span className="momd-field-value">{formatDate(createdAt)}</span>
+                      <span className="momd-field-value">
+                        {formatDate(createdAt)}
+                      </span>
                     </p>
                   </div>
                 )}
@@ -299,9 +318,7 @@ const MomDetails = () => {
                   <MessageSquare size={20} className="me-2" />
                   Comments &amp; Observations
                 </h5>
-                <div className="momd-comments-box">
-                  {commentsObservations}
-                </div>
+                <div className="momd-comments-box">{commentsObservations}</div>
               </section>
             )}
 
@@ -310,21 +327,26 @@ const MomDetails = () => {
               <h5 className="momd-section-title">
                 <MessageSquare size={20} className="me-2" />
                 Discussion Points
-                {Array.isArray(discussionPoints) && discussionPoints.length > 0 && (
-                  <span className="badge bg-primary ms-2">
-                    {discussionPoints.length}
-                  </span>
-                )}
+                {Array.isArray(discussionPoints) &&
+                  discussionPoints.length > 0 && (
+                    <span className="badge bg-primary ms-2">
+                      {discussionPoints.length}
+                    </span>
+                  )}
               </h5>
-              {Array.isArray(discussionPoints) && discussionPoints.length > 0 ? (
+              {Array.isArray(discussionPoints) &&
+              discussionPoints.length > 0 ? (
                 <ul className="momd-list">
                   {discussionPoints.map((dp, i) => {
-                    const pointText = getProperty(dp, 'pointText', 'PointText') || 
-                                     getProperty(dp, 'point', 'Point');
+                    const pointText =
+                      getProperty(dp, "pointText", "PointText") ||
+                      getProperty(dp, "point", "Point");
                     return (
                       <li key={i} className="momd-list-item">
                         <div className="momd-list-number">{i + 1}</div>
-                        <div className="momd-list-content">{pointText || "No details"}</div>
+                        <div className="momd-list-content">
+                          {pointText || "No details"}
+                        </div>
                       </li>
                     );
                   })}
@@ -332,7 +354,9 @@ const MomDetails = () => {
               ) : (
                 <div className="momd-empty-state">
                   <MessageSquare size={32} className="momd-empty-icon" />
-                  <p className="momd-muted-text">No discussion points recorded.</p>
+                  <p className="momd-muted-text">
+                    No discussion points recorded.
+                  </p>
                 </div>
               )}
             </section>
@@ -351,13 +375,23 @@ const MomDetails = () => {
               {Array.isArray(actionItems) && actionItems.length > 0 ? (
                 <div className="momd-action-items-grid">
                   {actionItems.map((ai) => {
-                    const actionItemId = getProperty(ai, 'actionItemId', 'ActionItemId');
-                    const taskDescription = getProperty(ai, 'taskDescription', 'TaskDescription') || 
-                                          getProperty(ai, 'task', 'Task');
-                    const assignedToName = getProperty(ai, 'assignedToEmployeeName', 'AssignedToEmployeeName') || 
-                                          getProperty(ai, 'assignTo', 'AssignTo');
-                    const dueDate = getProperty(ai, 'dueDate', 'DueDate');
-                    const status = getProperty(ai, 'status', 'Status') || 'Pending';
+                    const actionItemId = getProperty(
+                      ai,
+                      "actionItemId",
+                      "ActionItemId"
+                    );
+                    const taskDescription =
+                      getProperty(ai, "taskDescription", "TaskDescription") ||
+                      getProperty(ai, "task", "Task");
+                    const assignedToName =
+                      getProperty(
+                        ai,
+                        "assignedToEmployeeName",
+                        "AssignedToEmployeeName"
+                      ) || getProperty(ai, "assignTo", "AssignTo");
+                    const dueDate = getProperty(ai, "dueDate", "DueDate");
+                    const status =
+                      getProperty(ai, "status", "Status") || "Pending";
 
                     return (
                       <div key={actionItemId} className="momd-action-item-card">
@@ -370,7 +404,8 @@ const MomDetails = () => {
                         <div className="momd-action-item-body">
                           <p className="momd-action-item-field">
                             <Users size={14} className="me-1" />
-                            <strong>Assigned to:</strong> {assignedToName || "N/A"}
+                            <strong>Assigned to:</strong>{" "}
+                            {assignedToName || "N/A"}
                           </p>
                           <p className="momd-action-item-field">
                             <Calendar size={14} className="me-1" />

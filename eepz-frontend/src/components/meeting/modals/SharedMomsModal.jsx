@@ -35,12 +35,12 @@ const SharedMomsModal = ({ onClose }) => {
     try {
       if (!silent) setLoading(true);
       else setRefreshing(true);
-      
+
       setError(null);
 
       if (activeTab === "sharedByMe") {
         const response = await momService.getMomsSharedByMe();
-        
+
         // Extract data with fallback
         let momsData = null;
         if (response?.success && response?.data) {
@@ -61,8 +61,9 @@ const SharedMomsModal = ({ onClose }) => {
         const withDetails = await Promise.all(
           rows.map(async (row) => {
             try {
-              const momId = getProperty(row, 'momId', 'MomId') || 
-                           getProperty(row, 'momID', 'MOMID');
+              const momId =
+                getProperty(row, "momId", "MomId") ||
+                getProperty(row, "momID", "MOMID");
 
               if (!momId) {
                 console.warn("No momId found for shared row:", row);
@@ -70,7 +71,7 @@ const SharedMomsModal = ({ onClose }) => {
               }
 
               const momRes = await momService.getMomById(momId);
-              
+
               // Extract MOM data
               let fullMom = null;
               if (momRes?.success && momRes?.data) {
@@ -92,7 +93,7 @@ const SharedMomsModal = ({ onClose }) => {
             } catch (e) {
               console.error(
                 "Failed to load full MOM for sharedByMe row",
-                getProperty(row, 'momId', 'MomId'),
+                getProperty(row, "momId", "MomId"),
                 e
               );
               return { ...row, fullMom: null };
@@ -104,7 +105,7 @@ const SharedMomsModal = ({ onClose }) => {
       } else {
         // Shared with me
         const response = await momService.getMomsSharedWithMe();
-        
+
         // Extract data with fallback
         let momsData = null;
         if (response?.success && response?.data) {
@@ -128,8 +129,12 @@ const SharedMomsModal = ({ onClose }) => {
       // Enhanced error handling
       if (error.retryAfter) {
         if (!silent) {
-          setError(`Rate limit exceeded. Please wait ${error.retryAfter} seconds.`);
-          toastr.error(`Rate limit exceeded. Please wait ${error.retryAfter} seconds.`);
+          setError(
+            `Rate limit exceeded. Please wait ${error.retryAfter} seconds.`
+          );
+          toastr.error(
+            `Rate limit exceeded. Please wait ${error.retryAfter} seconds.`
+          );
         }
       } else if (error.message) {
         setError(error.message);
@@ -147,7 +152,7 @@ const SharedMomsModal = ({ onClose }) => {
   const handleViewMom = async (momId) => {
     try {
       const response = await momService.getMomById(momId);
-      
+
       // Extract MOM data
       let momData = null;
       if (response?.success && response?.data) {
@@ -169,9 +174,11 @@ const SharedMomsModal = ({ onClose }) => {
       setSelectedMom(momData);
     } catch (error) {
       console.error("Failed to load MOM details:", error);
-      
+
       if (error.retryAfter) {
-        toastr.error(`Rate limit exceeded. Please wait ${error.retryAfter} seconds.`);
+        toastr.error(
+          `Rate limit exceeded. Please wait ${error.retryAfter} seconds.`
+        );
       } else if (error.message) {
         toastr.error(`Failed to load MOM details: ${error.message}`);
       } else {
@@ -185,20 +192,20 @@ const SharedMomsModal = ({ onClose }) => {
 
   const getMeetingTitle = (row) => {
     // Try direct properties first
-    let title = getProperty(row, 'meetingTitle', 'MeetingTitle');
-    
+    let title = getProperty(row, "meetingTitle", "MeetingTitle");
+
     // If not found, check fullMom
     if (!title && row.fullMom) {
-      title = getProperty(row.fullMom, 'meetingTitle', 'MeetingTitle');
+      title = getProperty(row.fullMom, "meetingTitle", "MeetingTitle");
     }
-    
+
     // Check mom nested object
     if (!title && row.mom) {
-      title = getProperty(row.mom, 'meetingTitle', 'MeetingTitle');
+      title = getProperty(row.mom, "meetingTitle", "MeetingTitle");
     }
-    
+
     if (!title && row.Mom) {
-      title = getProperty(row.Mom, 'meetingTitle', 'MeetingTitle');
+      title = getProperty(row.Mom, "meetingTitle", "MeetingTitle");
     }
 
     return title || "Untitled Meeting";
@@ -206,20 +213,20 @@ const SharedMomsModal = ({ onClose }) => {
 
   const getMeetingType = (row) => {
     // Try direct properties first
-    let type = getProperty(row, 'meetingType', 'MeetingType');
-    
+    let type = getProperty(row, "meetingType", "MeetingType");
+
     // If not found, check fullMom
     if (!type && row.fullMom) {
-      type = getProperty(row.fullMom, 'meetingType', 'MeetingType');
+      type = getProperty(row.fullMom, "meetingType", "MeetingType");
     }
-    
+
     // Check mom nested object
     if (!type && row.mom) {
-      type = getProperty(row.mom, 'meetingType', 'MeetingType');
+      type = getProperty(row.mom, "meetingType", "MeetingType");
     }
-    
+
     if (!type && row.Mom) {
-      type = getProperty(row.Mom, 'meetingType', 'MeetingType');
+      type = getProperty(row.Mom, "meetingType", "MeetingType");
     }
 
     return type || "Other";
@@ -227,20 +234,20 @@ const SharedMomsModal = ({ onClose }) => {
 
   const getMeetingDate = (row) => {
     // Try direct properties first
-    let date = getProperty(row, 'meetingDate', 'MeetingDate');
-    
+    let date = getProperty(row, "meetingDate", "MeetingDate");
+
     // If not found, check fullMom
     if (!date && row.fullMom) {
-      date = getProperty(row.fullMom, 'meetingDate', 'MeetingDate');
+      date = getProperty(row.fullMom, "meetingDate", "MeetingDate");
     }
-    
+
     // Check mom nested object
     if (!date && row.mom) {
-      date = getProperty(row.mom, 'meetingDate', 'MeetingDate');
+      date = getProperty(row.mom, "meetingDate", "MeetingDate");
     }
-    
+
     if (!date && row.Mom) {
-      date = getProperty(row.Mom, 'meetingDate', 'MeetingDate');
+      date = getProperty(row.Mom, "meetingDate", "MeetingDate");
     }
 
     return date;
@@ -280,13 +287,12 @@ const SharedMomsModal = ({ onClose }) => {
             <div className="smm-header modal-header border-0">
               <div className="w-100 smm-header-left">
                 <div className="d-flex justify-content-between align-items-center mb-3">
-                  <h5 
-                    id="shared-moms-title" 
+                  <h5
+                    id="shared-moms-title"
                     className="smm-title modal-title fw-bold mb-0"
                   >
                     Shared MOMs
                   </h5>
-                  
                 </div>
 
                 <ul className="smm-tabs nav nav-pills">
@@ -391,15 +397,33 @@ const SharedMomsModal = ({ onClose }) => {
 
                     <tbody>
                       {currentMoms.map((mom, index) => {
-                        const momId = getProperty(mom, 'momId', 'MomId') || 
-                                     getProperty(mom, 'momID', 'MOMID');
+                        const momId =
+                          getProperty(mom, "momId", "MomId") ||
+                          getProperty(mom, "momID", "MOMID");
                         const meetingTitle = getMeetingTitle(mom);
                         const meetingType = getMeetingType(mom);
                         const meetingDate = getMeetingDate(mom);
-                        const sharedAt = getProperty(mom, 'sharedAt', 'SharedAt');
-                        const sharedWithName = getProperty(mom, 'sharedWithEmployeeName', 'SharedWithEmployeeName');
-                        const sharedByName = getProperty(mom, 'sharedByEmployeeName', 'SharedByEmployeeName') || 
-                                            getProperty(mom, 'submittedByEmployeeName', 'SubmittedByEmployeeName');
+                        const sharedAt = getProperty(
+                          mom,
+                          "sharedAt",
+                          "SharedAt"
+                        );
+                        const sharedWithName = getProperty(
+                          mom,
+                          "sharedWithEmployeeName",
+                          "SharedWithEmployeeName"
+                        );
+                        const sharedByName =
+                          getProperty(
+                            mom,
+                            "sharedByEmployeeName",
+                            "SharedByEmployeeName"
+                          ) ||
+                          getProperty(
+                            mom,
+                            "submittedByEmployeeName",
+                            "SubmittedByEmployeeName"
+                          );
 
                         return (
                           <tr
@@ -411,7 +435,9 @@ const SharedMomsModal = ({ onClose }) => {
                               onClick={() => handleViewMom(momId)}
                               role="button"
                               tabIndex={0}
-                              onKeyDown={(e) => e.key === 'Enter' && handleViewMom(momId)}
+                              onKeyDown={(e) =>
+                                e.key === "Enter" && handleViewMom(momId)
+                              }
                             >
                               <div className="fw-semibold smm-title-cell">
                                 {meetingTitle}

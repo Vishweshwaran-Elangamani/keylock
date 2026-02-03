@@ -43,12 +43,14 @@ const RSVPSummary = () => {
     try {
       if (!silent) setLoading(true);
       else setRefreshing(true);
-      
+
       setError(null);
 
       // Call 1: Get RSVP summary (counts only)
-      const summaryResponse = await rsvpService.getMeetingRsvpSummary(meetingId);
-      
+      const summaryResponse = await rsvpService.getMeetingRsvpSummary(
+        meetingId
+      );
+
       // Extract summary data
       let summaryData = null;
       if (summaryResponse?.success && summaryResponse?.data) {
@@ -68,13 +70,13 @@ const RSVPSummary = () => {
       // Call 2: Get MOM details (which includes meeting info and participants)
       try {
         // Option A: Try to get all MOMs and find the one with this meeting ID
-        const momsResponse = await momService.getMyMoms({ 
+        const momsResponse = await momService.getMyMoms({
           pageSize: 1000,
-          pageNumber: 1 
+          pageNumber: 1,
         });
-        
+
         let allMoms = [];
-        
+
         // Extract MOMs array from paginated response
         if (momsResponse?.data?.data) {
           allMoms = momsResponse.data.data;
@@ -89,30 +91,35 @@ const RSVPSummary = () => {
         } else if (Array.isArray(momsResponse?.Data)) {
           allMoms = momsResponse.Data;
         }
-        
+
         // Find MOM with this meeting ID
-        const mom = allMoms.find(m => {
-          const mId = getProperty(m, 'meetingId', 'MeetingId');
+        const mom = allMoms.find((m) => {
+          const mId = getProperty(m, "meetingId", "MeetingId");
           return mId && parseInt(mId) === parseInt(meetingId);
         });
-        
+
         if (mom) {
           setMeetingDetails(mom);
-          
+
           // Get participants from MOM's meeting data
-          const participantsList = getProperty(mom, 'participants', 'Participants') || 
-                                  getProperty(mom, 'meetingParticipants', 'MeetingParticipants') ||
-                                  getProperty(mom, 'meetingparticipants', 'Meetingparticipants') ||
-                                  [];
-          
-          setParticipants(Array.isArray(participantsList) ? participantsList : []);
+          const participantsList =
+            getProperty(mom, "participants", "Participants") ||
+            getProperty(mom, "meetingParticipants", "MeetingParticipants") ||
+            getProperty(mom, "meetingparticipants", "Meetingparticipants") ||
+            [];
+
+          setParticipants(
+            Array.isArray(participantsList) ? participantsList : []
+          );
         } else {
           // If MOM not found in user's MOMs, try to get meeting from getMeetingById
-          console.warn("MOM not found in user's MOMs, trying getMeetingById fallback");
-          
+          console.warn(
+            "MOM not found in user's MOMs, trying getMeetingById fallback"
+          );
+
           try {
             const meetingResponse = await momService.getMeetingById(meetingId);
-            
+
             let meetingData = null;
             if (meetingResponse?.success && meetingResponse?.data) {
               meetingData = meetingResponse.data;
@@ -128,11 +135,18 @@ const RSVPSummary = () => {
 
             setMeetingDetails(meetingData);
 
-            const participantsList = getProperty(meetingData, 'participants', 'Participants') || 
-                                    getProperty(meetingData, 'meetingparticipants', 'Meetingparticipants') ||
-                                    [];
-            
-            setParticipants(Array.isArray(participantsList) ? participantsList : []);
+            const participantsList =
+              getProperty(meetingData, "participants", "Participants") ||
+              getProperty(
+                meetingData,
+                "meetingparticipants",
+                "Meetingparticipants"
+              ) ||
+              [];
+
+            setParticipants(
+              Array.isArray(participantsList) ? participantsList : []
+            );
           } catch (fallbackErr) {
             console.error("Fallback getMeetingById also failed:", fallbackErr);
             setMeetingDetails(null);
@@ -141,26 +155,29 @@ const RSVPSummary = () => {
         }
       } catch (err) {
         console.error("Failed to load meeting/MOM details:", err);
-        
+
         // Don't fail the whole summary if meeting details fail
         // Just show summary without meeting title and participants
         setMeetingDetails(null);
         setParticipants([]);
-        
+
         // Show a warning but don't block the page
         if (!silent) {
           toastr.warning("Meeting details unavailable, showing counts only");
         }
       }
-
     } catch (err) {
       console.error("Load summary error:", err);
 
       // Enhanced error handling
       if (err.retryAfter) {
         if (!silent) {
-          setError(`Rate limit exceeded. Please wait ${err.retryAfter} seconds.`);
-          toastr.error(`Rate limit exceeded. Please wait ${err.retryAfter} seconds.`);
+          setError(
+            `Rate limit exceeded. Please wait ${err.retryAfter} seconds.`
+          );
+          toastr.error(
+            `Rate limit exceeded. Please wait ${err.retryAfter} seconds.`
+          );
         }
       } else if (err.response?.status === 403 || err.status === 403) {
         setError("You do not have permission to view this RSVP summary.");
@@ -183,9 +200,10 @@ const RSVPSummary = () => {
 
   const getStatusBadge = (status) => {
     // Handle both string and enum values
-    const statusStr = typeof status === 'number' 
-      ? ['Pending', 'Accepted', 'Declined', 'Tentative'][status] 
-      : status;
+    const statusStr =
+      typeof status === "number"
+        ? ["Pending", "Accepted", "Declined", "Tentative"][status]
+        : status;
 
     switch (statusStr) {
       case "Accepted":
@@ -301,26 +319,36 @@ const RSVPSummary = () => {
   }
 
   // Extract properties from summary
-  const totalInvitations = getProperty(summary, 'totalInvitations', 'TotalInvitations') || 0;
-  const acceptedCount = getProperty(summary, 'acceptedCount', 'AcceptedCount') || 0;
-  const declinedCount = getProperty(summary, 'declinedCount', 'DeclinedCount') || 0;
-  const tentativeCount = getProperty(summary, 'tentativeCount', 'TentativeCount') || 0;
-  const pendingCount = getProperty(summary, 'pendingCount', 'PendingCount') || 0;
+  const totalInvitations =
+    getProperty(summary, "totalInvitations", "TotalInvitations") || 0;
+  const acceptedCount =
+    getProperty(summary, "acceptedCount", "AcceptedCount") || 0;
+  const declinedCount =
+    getProperty(summary, "declinedCount", "DeclinedCount") || 0;
+  const tentativeCount =
+    getProperty(summary, "tentativeCount", "TentativeCount") || 0;
+  const pendingCount =
+    getProperty(summary, "pendingCount", "PendingCount") || 0;
 
   // Get meeting title from meeting details
-  const meetingTitle = meetingDetails 
-    ? getProperty(meetingDetails, 'meetingTitle', 'MeetingTitle') || 'Meeting RSVP Summary'
-    : 'Meeting RSVP Summary';
+  const meetingTitle = meetingDetails
+    ? getProperty(meetingDetails, "meetingTitle", "MeetingTitle") ||
+      "Meeting RSVP Summary"
+    : "Meeting RSVP Summary";
 
   const responsePercentage =
     totalInvitations > 0
       ? Math.round(((totalInvitations - pendingCount) / totalInvitations) * 100)
       : 0;
 
-  const acceptedPct = totalInvitations > 0 ? (acceptedCount / totalInvitations) * 100 : 0;
-  const tentativePct = totalInvitations > 0 ? (tentativeCount / totalInvitations) * 100 : 0;
-  const declinedPct = totalInvitations > 0 ? (declinedCount / totalInvitations) * 100 : 0;
-  const pendingPct = totalInvitations > 0 ? (pendingCount / totalInvitations) * 100 : 0;
+  const acceptedPct =
+    totalInvitations > 0 ? (acceptedCount / totalInvitations) * 100 : 0;
+  const tentativePct =
+    totalInvitations > 0 ? (tentativeCount / totalInvitations) * 100 : 0;
+  const declinedPct =
+    totalInvitations > 0 ? (declinedCount / totalInvitations) * 100 : 0;
+  const pendingPct =
+    totalInvitations > 0 ? (pendingCount / totalInvitations) * 100 : 0;
 
   const acceptedClass = `rsvp-sum-w-${toPercentInt(acceptedPct)}`;
   const tentativeClass = `rsvp-sum-w-${toPercentInt(tentativePct)}`;
@@ -355,8 +383,11 @@ const RSVPSummary = () => {
               disabled={refreshing}
               type="button"
             >
-              <RefreshCw size={16} className={refreshing ? 'spinner-icon' : ''} />
-              {refreshing ? 'Refreshing...' : 'Refresh'}
+              <RefreshCw
+                size={16}
+                className={refreshing ? "spinner-icon" : ""}
+              />
+              {refreshing ? "Refreshing..." : "Refresh"}
             </button>
           </div>
 
@@ -441,7 +472,10 @@ const RSVPSummary = () => {
               <div className="card-body">
                 <h6 className="fw-semibold mb-3">Response Breakdown</h6>
 
-                <div className="progress mb-3 rsvp-sum-progress" style={{ height: '32px' }}>
+                <div
+                  className="progress mb-3 rsvp-sum-progress"
+                  style={{ height: "32px" }}
+                >
                   {acceptedCount > 0 && (
                     <div
                       className={`progress-bar bg-success d-flex align-items-center justify-content-center ${acceptedClass}`}
@@ -517,7 +551,9 @@ const RSVPSummary = () => {
               <h5 className="card-title fw-semibold mb-4 d-flex align-items-center gap-2">
                 <Users size={22} />
                 Participants{" "}
-                {Array.isArray(participants) && participants.length > 0 && `(${participants.length})`}
+                {Array.isArray(participants) &&
+                  participants.length > 0 &&
+                  `(${participants.length})`}
               </h5>
 
               {!Array.isArray(participants) || participants.length === 0 ? (
@@ -548,23 +584,65 @@ const RSVPSummary = () => {
                     </thead>
                     <tbody>
                       {participants.map((participant, index) => {
-                        const participantId = getProperty(participant, 'participantId', 'ParticipantId');
-                        const employeeId = getProperty(participant, 'employeeId', 'EmployeeId');
-                        
+                        const participantId = getProperty(
+                          participant,
+                          "participantId",
+                          "ParticipantId"
+                        );
+                        const employeeId = getProperty(
+                          participant,
+                          "employeeId",
+                          "EmployeeId"
+                        );
+
                         // Get employee name from nested employee object
-                        const employee = getProperty(participant, 'employee', 'Employee');
-                        const userProfile = employee ? getProperty(employee, 'userprofile', 'Userprofile') : null;
-                        
-                        const firstName = userProfile ? getProperty(userProfile, 'firstName', 'FirstName') : '';
-                        const lastName = userProfile ? getProperty(userProfile, 'lastName', 'LastName') : '';
-                        const employeeName = `${firstName} ${lastName}`.trim() || 'Unknown';
-                        
-                        const rsvpStatus = getProperty(participant, 'rsvpstatus', 'Rsvpstatus') || 
-                                          getProperty(participant, 'rsvpStatus', 'RsvpStatus');
-                        const rsvpResponseDate = getProperty(participant, 'rsvpresponseDate', 'RsvpresponseDate') ||
-                                                getProperty(participant, 'rsvpResponseDate', 'RsvpResponseDate');
-                        const rsvpComments = getProperty(participant, 'rsvpcomments', 'Rsvpcomments') ||
-                                            getProperty(participant, 'rsvpComments', 'RsvpComments');
+                        const employee = getProperty(
+                          participant,
+                          "employee",
+                          "Employee"
+                        );
+                        const userProfile = employee
+                          ? getProperty(employee, "userprofile", "Userprofile")
+                          : null;
+
+                        const firstName = userProfile
+                          ? getProperty(userProfile, "firstName", "FirstName")
+                          : "";
+                        const lastName = userProfile
+                          ? getProperty(userProfile, "lastName", "LastName")
+                          : "";
+                        const employeeName =
+                          `${firstName} ${lastName}`.trim() || "Unknown";
+
+                        const rsvpStatus =
+                          getProperty(
+                            participant,
+                            "rsvpstatus",
+                            "Rsvpstatus"
+                          ) ||
+                          getProperty(participant, "rsvpStatus", "RsvpStatus");
+                        const rsvpResponseDate =
+                          getProperty(
+                            participant,
+                            "rsvpresponseDate",
+                            "RsvpresponseDate"
+                          ) ||
+                          getProperty(
+                            participant,
+                            "rsvpResponseDate",
+                            "RsvpResponseDate"
+                          );
+                        const rsvpComments =
+                          getProperty(
+                            participant,
+                            "rsvpcomments",
+                            "Rsvpcomments"
+                          ) ||
+                          getProperty(
+                            participant,
+                            "rsvpComments",
+                            "RsvpComments"
+                          );
 
                         return (
                           <tr key={participantId || employeeId || index}>

@@ -37,9 +37,13 @@ const ActionItemsManagement = () => {
       if (employeeSuccess && employeeData.length > 0) {
         const nameMap = {};
         employeeData.forEach((emp) => {
-          const empId = emp.employeeMasterId || emp.EmployeeMasterId || emp.employeeId || emp.EmployeeId;
-          const firstName = emp.firstName || emp.FirstName || '';
-          const lastName = emp.lastName || emp.LastName || '';
+          const empId =
+            emp.employeeMasterId ||
+            emp.EmployeeMasterId ||
+            emp.employeeId ||
+            emp.EmployeeId;
+          const firstName = emp.firstName || emp.FirstName || "";
+          const lastName = emp.lastName || emp.LastName || "";
           if (empId) {
             nameMap[empId] = `${firstName} ${lastName}`.trim();
           }
@@ -52,10 +56,12 @@ const ActionItemsManagement = () => {
       setActionItems(items);
     } catch (err) {
       console.error("ERROR loading data:", err);
-      
+
       // Enhanced error handling
       if (err.retryAfter) {
-        toastr.error(`Rate limit exceeded. Please wait ${err.retryAfter} seconds.`);
+        toastr.error(
+          `Rate limit exceeded. Please wait ${err.retryAfter} seconds.`
+        );
       } else if (err.message) {
         toastr.error(`Failed to load action items: ${err.message}`);
       } else {
@@ -74,35 +80,42 @@ const ActionItemsManagement = () => {
   const getMeetingTitle = (item) => {
     // Try multiple possible property paths
     return (
-      getProperty(item, 'meetingTitle', 'MeetingTitle') ||
-      getProperty(item.mom, 'meetingTitle', 'MeetingTitle') ||
-      getProperty(item.Mom, 'meetingTitle', 'MeetingTitle') ||
+      getProperty(item, "meetingTitle", "MeetingTitle") ||
+      getProperty(item.mom, "meetingTitle", "MeetingTitle") ||
+      getProperty(item.Mom, "meetingTitle", "MeetingTitle") ||
       "No title available"
     );
   };
 
   const getTaskDescription = (item) => {
-    return getProperty(item, 'taskDescription', 'TaskDescription') || 'No description';
+    return (
+      getProperty(item, "taskDescription", "TaskDescription") ||
+      "No description"
+    );
   };
 
   const getDueDate = (item) => {
-    return getProperty(item, 'dueDate', 'DueDate');
+    return getProperty(item, "dueDate", "DueDate");
   };
 
   const getStatus = (item) => {
-    return getProperty(item, 'status', 'Status') || 'Pending';
+    return getProperty(item, "status", "Status") || "Pending";
   };
 
   const getActionItemId = (item) => {
-    return getProperty(item, 'actionItemId', 'ActionItemId');
+    return getProperty(item, "actionItemId", "ActionItemId");
   };
 
   const getAssignedByName = (item) => {
-    return getProperty(item, 'assignedByEmployeeName', 'AssignedByEmployeeName');
+    return getProperty(
+      item,
+      "assignedByEmployeeName",
+      "AssignedByEmployeeName"
+    );
   };
 
   const getAssignedById = (item) => {
-    return getProperty(item, 'assignedByEmployeeId', 'AssignedByEmployeeId');
+    return getProperty(item, "assignedByEmployeeId", "AssignedByEmployeeId");
   };
 
   const filteredItems = actionItems.filter((item) => {
@@ -229,7 +242,7 @@ const ActionItemsManagement = () => {
               onClick={() => setFilter("all")}
               role="button"
               tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && setFilter("all")}
+              onKeyDown={(e) => e.key === "Enter" && setFilter("all")}
             >
               <div className="card-body aim-stat-card-body">
                 <div className="aim-stat-icon aim-stat-icon-total">
@@ -249,7 +262,7 @@ const ActionItemsManagement = () => {
               onClick={() => setFilter("pending")}
               role="button"
               tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && setFilter("pending")}
+              onKeyDown={(e) => e.key === "Enter" && setFilter("pending")}
             >
               <div className="card-body aim-stat-card-body">
                 <div className="aim-stat-icon aim-stat-icon-pending">
@@ -269,7 +282,7 @@ const ActionItemsManagement = () => {
               onClick={() => setFilter("completed")}
               role="button"
               tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && setFilter("completed")}
+              onKeyDown={(e) => e.key === "Enter" && setFilter("completed")}
             >
               <div className="card-body aim-stat-card-body">
                 <div className="aim-stat-icon aim-stat-icon-completed">
@@ -289,7 +302,7 @@ const ActionItemsManagement = () => {
               onClick={() => setFilter("overdue")}
               role="button"
               tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && setFilter("overdue")}
+              onKeyDown={(e) => e.key === "Enter" && setFilter("overdue")}
             >
               <div className="card-body aim-stat-card-body">
                 <div className="aim-stat-icon aim-stat-icon-overdue">
@@ -354,7 +367,7 @@ const ActionItemsManagement = () => {
               </div>
             </div>
 
-            {filter !== 'all' && (
+            {filter !== "all" && (
               <div className="mt-3">
                 <span className="badge bg-primary me-2">
                   Filter: {filter.charAt(0).toUpperCase() + filter.slice(1)}
@@ -362,7 +375,7 @@ const ActionItemsManagement = () => {
                 <button
                   type="button"
                   className="btn btn-sm btn-outline-secondary"
-                  onClick={() => setFilter('all')}
+                  onClick={() => setFilter("all")}
                 >
                   Clear Filter
                 </button>
@@ -391,18 +404,18 @@ const ActionItemsManagement = () => {
                   <p className="aim-empty-text">
                     {searchTerm
                       ? "Try adjusting your search criteria"
-                      : filter !== 'all'
+                      : filter !== "all"
                       ? `No ${filter} action items`
                       : "You have no action items assigned"}
                   </p>
-                  {(searchTerm || filter !== 'all') && (
+                  {(searchTerm || filter !== "all") && (
                     <button
                       className="btn btn-primary mt-3"
                       onClick={() => {
                         setSearchInput("");
                         setSearchTerm("");
                         setIsSearching(false);
-                        setFilter('all');
+                        setFilter("all");
                       }}
                     >
                       Clear All Filters
@@ -482,7 +495,8 @@ const ActionItemsManagement = () => {
                               <div className="aim-item-meta-row">
                                 <strong>Assigned by:</strong>
                                 <span>
-                                  {employeeMap[assignedById] || `ID: ${assignedById}`}
+                                  {employeeMap[assignedById] ||
+                                    `ID: ${assignedById}`}
                                 </span>
                               </div>
                             )}

@@ -55,10 +55,11 @@ const EmployeeMomDashboard = () => {
       if (employeeSuccess && Array.isArray(employeeData)) {
         const map = {};
         employeeData.forEach((emp) => {
-          const empId = getProperty(emp, 'employeeMasterId', 'EmployeeMasterId') || 
-                        getProperty(emp, 'employeeId', 'EmployeeId');
-          const firstName = getProperty(emp, 'firstName', 'FirstName') || '';
-          const lastName = getProperty(emp, 'lastName', 'LastName') || '';
+          const empId =
+            getProperty(emp, "employeeMasterId", "EmployeeMasterId") ||
+            getProperty(emp, "employeeId", "EmployeeId");
+          const firstName = getProperty(emp, "firstName", "FirstName") || "";
+          const lastName = getProperty(emp, "lastName", "LastName") || "";
           if (empId) {
             map[empId] = `${firstName} ${lastName}`.trim();
           }
@@ -86,24 +87,32 @@ const EmployeeMomDashboard = () => {
         ]);
 
       // Extract data with PascalCase/camelCase fallback
-      const myMomsData = myMomsRes?.data?.data || myMomsRes?.data?.Data || 
-                         myMomsRes?.Data?.Data || myMomsRes?.data || [];
-      
-      const actionItemsData = actionItemsRes?.data || actionItemsRes?.Data || [];
-      const invitationsData = invitationsRes?.data || invitationsRes?.Data || [];
+      const myMomsData =
+        myMomsRes?.data?.data ||
+        myMomsRes?.data?.Data ||
+        myMomsRes?.Data?.Data ||
+        myMomsRes?.data ||
+        [];
+
+      const actionItemsData =
+        actionItemsRes?.data || actionItemsRes?.Data || [];
+      const invitationsData =
+        invitationsRes?.data || invitationsRes?.Data || [];
       const sharedData = sharedRes?.data || sharedRes?.Data || [];
 
       // Filter pending actions
       const pendingActions = actionItemsData.filter((item) => {
-        const status = getProperty(item, 'status', 'Status');
+        const status = getProperty(item, "status", "Status");
         return status === "Pending";
       });
 
       // ✅ FIXED: Filter pending invitations based on numeric rsvpStatus (0 = Pending)
       const pendingInvites = invitationsData.filter((inv) => {
-        const rsvpStatus = getProperty(inv, 'rsvpStatus', 'RsvpStatus');
+        const rsvpStatus = getProperty(inv, "rsvpStatus", "RsvpStatus");
         // Check for numeric 0 (Pending) or string "Pending"
-        return rsvpStatus === 0 || rsvpStatus === "0" || rsvpStatus === "Pending";
+        return (
+          rsvpStatus === 0 || rsvpStatus === "0" || rsvpStatus === "Pending"
+        );
       });
 
       setStats({
@@ -118,13 +127,13 @@ const EmployeeMomDashboard = () => {
       // Add recent MOMs to activity
       if (Array.isArray(myMomsData) && myMomsData.length > 0) {
         myMomsData.slice(0, 3).forEach((mom) => {
-          const meetingTitle = getProperty(mom, 'meetingTitle', 'MeetingTitle');
-          const createdAt = getProperty(mom, 'createdAt', 'CreatedAt');
-          const meetingId = getProperty(mom, 'meetingId', 'MeetingId');
+          const meetingTitle = getProperty(mom, "meetingTitle", "MeetingTitle");
+          const createdAt = getProperty(mom, "createdAt", "CreatedAt");
+          const meetingId = getProperty(mom, "meetingId", "MeetingId");
 
           activity.push({
             type: "mom",
-            title: meetingTitle || 'Untitled Meeting',
+            title: meetingTitle || "Untitled Meeting",
             date: createdAt,
             icon: "bi-file-text",
             color: "primary",
@@ -137,13 +146,13 @@ const EmployeeMomDashboard = () => {
       // Add recent invitations to activity
       if (Array.isArray(invitationsData) && invitationsData.length > 0) {
         invitationsData.slice(0, 2).forEach((inv) => {
-          const meetingTitle = getProperty(inv, 'meetingTitle', 'MeetingTitle');
-          const meetingDate = getProperty(inv, 'meetingDate', 'MeetingDate');
-          const meetingId = getProperty(inv, 'meetingId', 'MeetingId');
+          const meetingTitle = getProperty(inv, "meetingTitle", "MeetingTitle");
+          const meetingDate = getProperty(inv, "meetingDate", "MeetingDate");
+          const meetingId = getProperty(inv, "meetingId", "MeetingId");
 
           activity.push({
             type: "invitation",
-            title: meetingTitle || 'Untitled Meeting',
+            title: meetingTitle || "Untitled Meeting",
             date: meetingDate,
             icon: "bi-calendar-event",
             color: "warning",
@@ -154,15 +163,15 @@ const EmployeeMomDashboard = () => {
       }
 
       setRecentActivity(
-        activity
-          .sort((a, b) => new Date(b.date) - new Date(a.date))
-          .slice(0, 5)
+        activity.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5)
       );
     } catch (error) {
       console.error("Dashboard data error:", error);
-      
+
       if (error.retryAfter) {
-        toastr.error(`Rate limit exceeded. Please wait ${error.retryAfter} seconds.`);
+        toastr.error(
+          `Rate limit exceeded. Please wait ${error.retryAfter} seconds.`
+        );
       } else if (error.message) {
         toastr.error(`Failed to load dashboard: ${error.message}`);
       } else {
@@ -176,11 +185,15 @@ const EmployeeMomDashboard = () => {
   const fetchMeetings = async () => {
     try {
       const res = await momService.getMyMoms({ pageNumber: 1, pageSize: 100 });
-      
+
       // Extract meetings data with fallback
-      const meetingsData = res?.data?.data || res?.data?.Data || 
-                          res?.Data?.Data || res?.data || [];
-      
+      const meetingsData =
+        res?.data?.data ||
+        res?.data?.Data ||
+        res?.Data?.Data ||
+        res?.data ||
+        [];
+
       setMeetings(Array.isArray(meetingsData) ? meetingsData : []);
     } catch (error) {
       console.error("Failed to load meetings:", error);
@@ -415,11 +428,28 @@ const EmployeeMomDashboard = () => {
                   <>
                     <div className="emd-meetings-list">
                       {meetings.slice(0, 5).map((m) => {
-                        const meetingId = getProperty(m, 'meetingId', 'MeetingId');
-                        const meetingTitle = getProperty(m, 'meetingTitle', 'MeetingTitle');
-                        const meetingType = getProperty(m, 'meetingType', 'MeetingType');
-                        const meetingDate = getProperty(m, 'meetingDate', 'MeetingDate');
-                        const actionItems = getProperty(m, 'actionItems', 'ActionItems') || [];
+                        const meetingId = getProperty(
+                          m,
+                          "meetingId",
+                          "MeetingId"
+                        );
+                        const meetingTitle = getProperty(
+                          m,
+                          "meetingTitle",
+                          "MeetingTitle"
+                        );
+                        const meetingType = getProperty(
+                          m,
+                          "meetingType",
+                          "MeetingType"
+                        );
+                        const meetingDate = getProperty(
+                          m,
+                          "meetingDate",
+                          "MeetingDate"
+                        );
+                        const actionItems =
+                          getProperty(m, "actionItems", "ActionItems") || [];
 
                         return (
                           <div
@@ -428,40 +458,46 @@ const EmployeeMomDashboard = () => {
                             onClick={() => openMeetingDetails(m)}
                             role="button"
                             tabIndex={0}
-                            onKeyDown={(e) => e.key === 'Enter' && openMeetingDetails(m)}
+                            onKeyDown={(e) =>
+                              e.key === "Enter" && openMeetingDetails(m)
+                            }
                           >
                             <div className="emd-meeting-main">
                               <div className="emd-meeting-title-row">
                                 <span className="emd-meeting-title">
-                                  {meetingTitle || 'Untitled Meeting'}
+                                  {meetingTitle || "Untitled Meeting"}
                                 </span>
                                 <span className="emd-meeting-type-pill">
-                                  {meetingType || 'Other'}
+                                  {meetingType || "Other"}
                                 </span>
                               </div>
                               <div className="emd-meeting-meta-row">
                                 <span className="emd-meta-item">
                                   <i className="bi bi-calendar3"></i>
-                                  {meetingDate 
+                                  {meetingDate
                                     ? new Date(meetingDate).toLocaleDateString()
-                                    : 'No date'}
+                                    : "No date"}
                                 </span>
                                 <span className="emd-meta-item">
                                   <i className="bi bi-clock"></i>
                                   {meetingDate
-                                    ? new Date(meetingDate).toLocaleTimeString([], {
-                                        hour: "2-digit",
-                                        minute: "2-digit",
-                                      })
-                                    : '--:--'}
+                                    ? new Date(meetingDate).toLocaleTimeString(
+                                        [],
+                                        {
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                        }
+                                      )
+                                    : "--:--"}
                                 </span>
-                                {Array.isArray(actionItems) && actionItems.length > 0 && (
-                                  <span className="emd-meta-item">
-                                    <i className="bi bi-check-circle"></i>
-                                    {actionItems.length} action
-                                    {actionItems.length !== 1 ? "s" : ""}
-                                  </span>
-                                )}
+                                {Array.isArray(actionItems) &&
+                                  actionItems.length > 0 && (
+                                    <span className="emd-meta-item">
+                                      <i className="bi bi-check-circle"></i>
+                                      {actionItems.length} action
+                                      {actionItems.length !== 1 ? "s" : ""}
+                                    </span>
+                                  )}
                               </div>
                             </div>
                             <i className="bi bi-chevron-right emd-meeting-arrow"></i>
@@ -507,12 +543,12 @@ const EmployeeMomDashboard = () => {
 
 const StatCard = ({ icon, variant, count, label, onClick }) => (
   <div className="col-xl-3 col-lg-6 col-md-6 col-sm-6 col-12">
-    <div 
-      className="emd-stat-card-horizontal" 
+    <div
+      className="emd-stat-card-horizontal"
       onClick={onClick}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => e.key === 'Enter' && onClick()}
+      onKeyDown={(e) => e.key === "Enter" && onClick()}
     >
       <div className={`emd-stat-icon-block emd-stat-icon-block-${variant}`}>
         <i className={`${icon} emd-stat-icon emd-stat-icon-${variant}`} />
@@ -527,33 +563,33 @@ const StatCard = ({ icon, variant, count, label, onClick }) => (
 
 const ActivityItem = ({ item, onClick, getProperty }) => {
   const formatDate = (dateString) => {
-    if (!dateString) return 'No date';
+    if (!dateString) return "No date";
     try {
       return new Date(dateString).toLocaleDateString();
     } catch {
-      return 'Invalid date';
+      return "Invalid date";
     }
   };
 
   const formatTime = (dateString) => {
-    if (!dateString) return '--:--';
+    if (!dateString) return "--:--";
     try {
       return new Date(dateString).toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
       });
     } catch {
-      return '--:--';
+      return "--:--";
     }
   };
 
   return (
-    <div 
-      className="emd-activity-item" 
+    <div
+      className="emd-activity-item"
       onClick={onClick}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => e.key === 'Enter' && onClick()}
+      onKeyDown={(e) => e.key === "Enter" && onClick()}
     >
       <div
         className={`emd-activity-icon-wrapper emd-activity-${

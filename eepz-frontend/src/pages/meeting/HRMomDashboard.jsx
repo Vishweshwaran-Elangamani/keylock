@@ -52,15 +52,19 @@ const HRMomDashboard = () => {
     setLoading(true);
     try {
       const response = await momService.getAllMomsForHR(filters);
-      
+
       // Handle both response formats
       const success = response?.success || response?.Success;
-      
+
       if (success) {
         // Extract data with PascalCase/camelCase fallback
         const responseData = response.data || response.Data;
-        const momsData = responseData?.moms || responseData?.Moms || 
-                        responseData?.data || responseData?.Data || [];
+        const momsData =
+          responseData?.moms ||
+          responseData?.Moms ||
+          responseData?.data ||
+          responseData?.Data ||
+          [];
         const total = responseData?.totalCount || responseData?.TotalCount || 0;
         const pages = responseData?.totalPages || responseData?.TotalPages || 1;
 
@@ -74,16 +78,18 @@ const HRMomDashboard = () => {
       }
     } catch (err) {
       console.error("Fetch MOMs error:", err);
-      
+
       // Enhanced error handling
       if (err.retryAfter) {
-        toastr.error(`Rate limit exceeded. Please wait ${err.retryAfter} seconds.`);
+        toastr.error(
+          `Rate limit exceeded. Please wait ${err.retryAfter} seconds.`
+        );
       } else if (err.message) {
         toastr.error(`Failed to load MOMs: ${err.message}`);
       } else {
         toastr.error("Failed to load MOMs");
       }
-      
+
       setMoms([]);
       setTotalMoms(0);
       setTotalPages(1);
@@ -156,7 +162,7 @@ const HRMomDashboard = () => {
 
     return (
       <span className={`badge hrmom-badge bg-${badgeMap[type] || "secondary"}`}>
-        {type || 'Other'}
+        {type || "Other"}
       </span>
     );
   };
@@ -182,9 +188,9 @@ const HRMomDashboard = () => {
     return moms.filter((m) => {
       try {
         const today = new Date();
-        const meetingDate = getProperty(m, 'meetingDate', 'MeetingDate');
+        const meetingDate = getProperty(m, "meetingDate", "MeetingDate");
         if (!meetingDate) return false;
-        
+
         const momDate = new Date(meetingDate);
         return (
           momDate.getMonth() === today.getMonth() &&
@@ -199,7 +205,7 @@ const HRMomDashboard = () => {
   const getTotalActionItems = () => {
     if (!Array.isArray(moms)) return 0;
     return moms.reduce((sum, mom) => {
-      const actionItems = getProperty(mom, 'actionItems', 'ActionItems');
+      const actionItems = getProperty(mom, "actionItems", "ActionItems");
       return sum + (Array.isArray(actionItems) ? actionItems.length : 0);
     }, 0);
   };
@@ -207,30 +213,38 @@ const HRMomDashboard = () => {
   const getOverdueActionItems = () => {
     if (!Array.isArray(moms)) return 0;
     return moms.reduce((sum, mom) => {
-      const actionItems = getProperty(mom, 'actionItems', 'ActionItems');
+      const actionItems = getProperty(mom, "actionItems", "ActionItems");
       if (!Array.isArray(actionItems)) return sum;
-      
-      return sum + actionItems.filter((ai) => {
-        const isOverdue = getProperty(ai, 'isOverdue', 'IsOverdue');
-        const status = getProperty(ai, 'status', 'Status');
-        const dueDate = getProperty(ai, 'dueDate', 'DueDate');
-        
-        // Check if overdue
-        if (isOverdue) return true;
-        
-        // Or check manually
-        if (status === 'Pending' && dueDate) {
-          return new Date(dueDate) < new Date();
-        }
-        
-        return false;
-      }).length;
+
+      return (
+        sum +
+        actionItems.filter((ai) => {
+          const isOverdue = getProperty(ai, "isOverdue", "IsOverdue");
+          const status = getProperty(ai, "status", "Status");
+          const dueDate = getProperty(ai, "dueDate", "DueDate");
+
+          // Check if overdue
+          if (isOverdue) return true;
+
+          // Or check manually
+          if (status === "Pending" && dueDate) {
+            return new Date(dueDate) < new Date();
+          }
+
+          return false;
+        }).length
+      );
     }, 0);
   };
 
   const hasActiveFilters = () => {
-    return filters.searchTerm || filters.meetingType || 
-           filters.departmentId || filters.startDate || filters.endDate;
+    return (
+      filters.searchTerm ||
+      filters.meetingType ||
+      filters.departmentId ||
+      filters.startDate ||
+      filters.endDate
+    );
   };
 
   useEffect(() => {
@@ -312,7 +326,8 @@ const HRMomDashboard = () => {
         {!loading && (
           <div className="alert alert-info d-flex align-items-center justify-content-between mb-3">
             <div>
-              Showing <strong>{moms.length}</strong> of <strong>{totalMoms}</strong> MOMs
+              Showing <strong>{moms.length}</strong> of{" "}
+              <strong>{totalMoms}</strong> MOMs
               {hasActiveFilters() && <span className="ms-2">(filtered)</span>}
             </div>
             <span className="badge bg-primary">
@@ -357,8 +372,8 @@ const HRMomDashboard = () => {
                       <FileText size={40} className="hrmom-empty-icon" />
                       <h6 className="hrmom-empty-title">No MOMs Found</h6>
                       <p className="hrmom-empty-text">
-                        {hasActiveFilters() 
-                          ? "No meeting minutes match your filters" 
+                        {hasActiveFilters()
+                          ? "No meeting minutes match your filters"
                           : "No meeting minutes yet"}
                       </p>
                       {hasActiveFilters() && (
@@ -373,15 +388,47 @@ const HRMomDashboard = () => {
                   </tr>
                 ) : (
                   moms.map((mom) => {
-                    const momId = getProperty(mom, 'momId', 'MomId');
-                    const meetingTitle = getProperty(mom, 'meetingTitle', 'MeetingTitle');
-                    const meetingType = getProperty(mom, 'meetingType', 'MeetingType');
-                    const meetingDate = getProperty(mom, 'meetingDate', 'MeetingDate');
-                    const submittedByName = getProperty(mom, 'submittedByEmployeeName', 'SubmittedByEmployeeName');
-                    const submittedByRole = getProperty(mom, 'submittedByRole', 'SubmittedByRole');
-                    const attendees = getProperty(mom, 'attendees', 'Attendees');
-                    const discussionPoints = getProperty(mom, 'discussionPoints', 'DiscussionPoints');
-                    const actionItems = getProperty(mom, 'actionItems', 'ActionItems');
+                    const momId = getProperty(mom, "momId", "MomId");
+                    const meetingTitle = getProperty(
+                      mom,
+                      "meetingTitle",
+                      "MeetingTitle"
+                    );
+                    const meetingType = getProperty(
+                      mom,
+                      "meetingType",
+                      "MeetingType"
+                    );
+                    const meetingDate = getProperty(
+                      mom,
+                      "meetingDate",
+                      "MeetingDate"
+                    );
+                    const submittedByName = getProperty(
+                      mom,
+                      "submittedByEmployeeName",
+                      "SubmittedByEmployeeName"
+                    );
+                    const submittedByRole = getProperty(
+                      mom,
+                      "submittedByRole",
+                      "SubmittedByRole"
+                    );
+                    const attendees = getProperty(
+                      mom,
+                      "attendees",
+                      "Attendees"
+                    );
+                    const discussionPoints = getProperty(
+                      mom,
+                      "discussionPoints",
+                      "DiscussionPoints"
+                    );
+                    const actionItems = getProperty(
+                      mom,
+                      "actionItems",
+                      "ActionItems"
+                    );
 
                     return (
                       <tr key={momId}>
@@ -392,7 +439,7 @@ const HRMomDashboard = () => {
                             </div>
                             <div>
                               <div className="hrmom-meeting-title">
-                                {meetingTitle || 'Untitled Meeting'}
+                                {meetingTitle || "Untitled Meeting"}
                               </div>
                               <div className="mt-1">
                                 {getMeetingTypeBadge(meetingType)}
@@ -430,8 +477,11 @@ const HRMomDashboard = () => {
                           <div className="hrmom-count-badge">
                             <Users className="hrmom-count-icon hrmom-count-icon-participants" />
                             <span>
-                              {Array.isArray(attendees) ? attendees.length : 
-                               typeof attendees === 'string' ? attendees.split(',').length : 0}
+                              {Array.isArray(attendees)
+                                ? attendees.length
+                                : typeof attendees === "string"
+                                ? attendees.split(",").length
+                                : 0}
                             </span>
                           </div>
                         </td>
@@ -440,7 +490,9 @@ const HRMomDashboard = () => {
                           <div className="hrmom-count-badge">
                             <MessageSquare className="hrmom-count-icon hrmom-count-icon-topics" />
                             <span>
-                              {Array.isArray(discussionPoints) ? discussionPoints.length : 0}
+                              {Array.isArray(discussionPoints)
+                                ? discussionPoints.length
+                                : 0}
                             </span>
                           </div>
                         </td>
@@ -449,7 +501,9 @@ const HRMomDashboard = () => {
                           <div className="hrmom-count-badge">
                             <CheckCircle className="hrmom-count-icon hrmom-count-icon-actions" />
                             <span>
-                              {Array.isArray(actionItems) ? actionItems.length : 0}
+                              {Array.isArray(actionItems)
+                                ? actionItems.length
+                                : 0}
                             </span>
                           </div>
                         </td>
@@ -457,7 +511,9 @@ const HRMomDashboard = () => {
                         <td>
                           <button
                             className="btn btn-sm hrmom-view-btn"
-                            onClick={() => navigate(`/hr/dashboard/meetmom/${momId}`)}
+                            onClick={() =>
+                              navigate(`/hr/dashboard/meetmom/${momId}`)
+                            }
                             title="View MOM details"
                           >
                             <Eye size={14} />

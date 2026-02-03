@@ -22,25 +22,39 @@ const MomDetailsView = ({ mom, onClose }) => {
   if (!mom) return null;
 
   // Extract all properties with fallbacks
-  const meetingTitle = getProperty(mom, 'meetingTitle', 'MeetingTitle') || 'Untitled Meeting';
-  const meetingType = getProperty(mom, 'meetingType', 'MeetingType') || 'Other';
-  const meetingDate = getProperty(mom, 'meetingDate', 'MeetingDate');
-  const meetingLink = getProperty(mom, 'meetingLink', 'MeetingLink');
-  const attendees = getProperty(mom, 'attendees', 'Attendees');
-  const submittedByName = getProperty(mom, 'submittedByEmployeeName', 'SubmittedByEmployeeName');
-  const submittedByRole = getProperty(mom, 'submittedByRole', 'SubmittedByRole');
-  const departmentName = getProperty(mom, 'departmentName', 'DepartmentName');
-  const commentsObservations = getProperty(mom, 'commentsObservations', 'CommentsObservations');
-  const discussionPoints = getProperty(mom, 'discussionPoints', 'DiscussionPoints') || [];
-  const actionItems = getProperty(mom, 'actionItems', 'ActionItems') || [];
-  const createdAt = getProperty(mom, 'createdAt', 'CreatedAt');
-  const updatedAt = getProperty(mom, 'updatedAt', 'UpdatedAt');
+  const meetingTitle =
+    getProperty(mom, "meetingTitle", "MeetingTitle") || "Untitled Meeting";
+  const meetingType = getProperty(mom, "meetingType", "MeetingType") || "Other";
+  const meetingDate = getProperty(mom, "meetingDate", "MeetingDate");
+  const meetingLink = getProperty(mom, "meetingLink", "MeetingLink");
+  const attendees = getProperty(mom, "attendees", "Attendees");
+  const submittedByName = getProperty(
+    mom,
+    "submittedByEmployeeName",
+    "SubmittedByEmployeeName"
+  );
+  const submittedByRole = getProperty(
+    mom,
+    "submittedByRole",
+    "SubmittedByRole"
+  );
+  const departmentName = getProperty(mom, "departmentName", "DepartmentName");
+  const commentsObservations = getProperty(
+    mom,
+    "commentsObservations",
+    "CommentsObservations"
+  );
+  const discussionPoints =
+    getProperty(mom, "discussionPoints", "DiscussionPoints") || [];
+  const actionItems = getProperty(mom, "actionItems", "ActionItems") || [];
+  const createdAt = getProperty(mom, "createdAt", "CreatedAt");
+  const updatedAt = getProperty(mom, "updatedAt", "UpdatedAt");
 
   // Format attendees
   let formattedAttendees = "N/A";
   if (Array.isArray(attendees)) {
     formattedAttendees = attendees.length > 0 ? attendees.join(", ") : "N/A";
-  } else if (typeof attendees === 'string') {
+  } else if (typeof attendees === "string") {
     formattedAttendees = attendees || "N/A";
   }
 
@@ -78,8 +92,9 @@ const MomDetailsView = ({ mom, onClose }) => {
   };
 
   const getStatusBadge = (status, dueDate) => {
-    const isOverdue = status === 'Pending' && dueDate && new Date(dueDate) < new Date();
-    
+    const isOverdue =
+      status === "Pending" && dueDate && new Date(dueDate) < new Date();
+
     if (isOverdue) {
       return (
         <span className="badge bg-danger d-inline-flex align-items-center gap-1">
@@ -88,8 +103,8 @@ const MomDetailsView = ({ mom, onClose }) => {
         </span>
       );
     }
-    
-    if (status === 'Completed') {
+
+    if (status === "Completed") {
       return (
         <span className="badge bg-success d-inline-flex align-items-center gap-1">
           <CheckCircle size={12} />
@@ -97,8 +112,8 @@ const MomDetailsView = ({ mom, onClose }) => {
         </span>
       );
     }
-    
-    if (status === 'Pending') {
+
+    if (status === "Pending") {
       return (
         <span className="badge bg-warning text-dark d-inline-flex align-items-center gap-1">
           <Clock size={12} />
@@ -106,25 +121,25 @@ const MomDetailsView = ({ mom, onClose }) => {
         </span>
       );
     }
-    
+
     return (
       <span className="badge bg-secondary d-inline-flex align-items-center gap-1">
-        {status || 'Unknown'}
+        {status || "Unknown"}
       </span>
     );
   };
 
   const getPriorityBadge = (priority) => {
     if (!priority) return null;
-    
+
     const badgeMap = {
-      High: 'bg-danger',
-      Medium: 'bg-warning text-dark',
-      Low: 'bg-secondary'
+      High: "bg-danger",
+      Medium: "bg-warning text-dark",
+      Low: "bg-secondary",
     };
-    
+
     return (
-      <span className={`badge ${badgeMap[priority] || 'bg-secondary'}`}>
+      <span className={`badge ${badgeMap[priority] || "bg-secondary"}`}>
         {priority}
       </span>
     );
@@ -139,8 +154,8 @@ const MomDetailsView = ({ mom, onClose }) => {
       aria-modal="true"
       aria-labelledby="mom-details-title"
     >
-      <div 
-        className="mdv-dialog modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl" 
+      <div
+        className="mdv-dialog modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mdv-content modal-content border-0 shadow-lg">
@@ -149,8 +164,8 @@ const MomDetailsView = ({ mom, onClose }) => {
             <div className="flex-grow-1">
               <div className="d-flex align-items-center gap-2 mb-2">
                 <FileText size={24} className="text-primary" />
-                <h5 
-                  id="mom-details-title" 
+                <h5
+                  id="mom-details-title"
                   className="mdv-title modal-title fw-bold mb-0"
                 >
                   {meetingTitle}
@@ -193,7 +208,10 @@ const MomDetailsView = ({ mom, onClose }) => {
                       Meeting Date & Time:
                     </small>
                     <div className="fw-semibold d-flex align-items-center gap-2">
-                      <Calendar size={16} className="mdv-icon-primary text-primary" />
+                      <Calendar
+                        size={16}
+                        className="mdv-icon-primary text-primary"
+                      />
                       {formatDateTime(meetingDate)}
                     </div>
                   </div>
@@ -221,7 +239,10 @@ const MomDetailsView = ({ mom, onClose }) => {
                       Attendees:
                     </small>
                     <div className="fw-semibold d-flex align-items-center gap-2">
-                      <Users size={16} className="mdv-icon-primary text-primary" />
+                      <Users
+                        size={16}
+                        className="mdv-icon-primary text-primary"
+                      />
                       {formattedAttendees}
                     </div>
                   </div>
@@ -232,7 +253,10 @@ const MomDetailsView = ({ mom, onClose }) => {
                         Submitted by:
                       </small>
                       <div className="fw-semibold d-flex align-items-center gap-2 mdv-submitter">
-                        <User size={16} className="mdv-icon-primary text-primary" />
+                        <User
+                          size={16}
+                          className="mdv-icon-primary text-primary"
+                        />
                         <span>
                           {submittedByName}
                           {submittedByRole && ` (${submittedByRole})`}
@@ -247,7 +271,10 @@ const MomDetailsView = ({ mom, onClose }) => {
                         Created:
                       </small>
                       <div className="fw-semibold d-flex align-items-center gap-2">
-                        <Clock size={16} className="mdv-icon-primary text-primary" />
+                        <Clock
+                          size={16}
+                          className="mdv-icon-primary text-primary"
+                        />
                         {formatDate(createdAt)}
                       </div>
                     </div>
@@ -259,7 +286,10 @@ const MomDetailsView = ({ mom, onClose }) => {
                         Last Updated:
                       </small>
                       <div className="fw-semibold d-flex align-items-center gap-2">
-                        <Clock size={16} className="mdv-icon-primary text-primary" />
+                        <Clock
+                          size={16}
+                          className="mdv-icon-primary text-primary"
+                        />
                         {formatDate(updatedAt)}
                       </div>
                     </div>
@@ -286,19 +316,22 @@ const MomDetailsView = ({ mom, onClose }) => {
               <h6 className="mdv-section-title fw-semibold mb-3 d-flex align-items-center gap-2">
                 <MessageSquare size={18} />
                 Discussion Points
-                {Array.isArray(discussionPoints) && discussionPoints.length > 0 && (
-                  <span className="badge bg-light text-dark">
-                    {discussionPoints.length}
-                  </span>
-                )}
+                {Array.isArray(discussionPoints) &&
+                  discussionPoints.length > 0 && (
+                    <span className="badge bg-light text-dark">
+                      {discussionPoints.length}
+                    </span>
+                  )}
               </h6>
 
-              {Array.isArray(discussionPoints) && discussionPoints.length > 0 ? (
+              {Array.isArray(discussionPoints) &&
+              discussionPoints.length > 0 ? (
                 <div className="d-flex flex-column gap-2">
                   {discussionPoints.map((dp, index) => {
-                    const pointText = getProperty(dp, 'pointText', 'PointText') || 
-                                     getProperty(dp, 'point', 'Point');
-                    const timestamp = getProperty(dp, 'timestamp', 'Timestamp');
+                    const pointText =
+                      getProperty(dp, "pointText", "PointText") ||
+                      getProperty(dp, "point", "Point");
+                    const timestamp = getProperty(dp, "timestamp", "Timestamp");
 
                     return (
                       <div
@@ -309,7 +342,7 @@ const MomDetailsView = ({ mom, onClose }) => {
                           {index + 1}
                         </div>
                         <div className="flex-grow-1">
-                          <p className="mb-1">{pointText || 'No details'}</p>
+                          <p className="mb-1">{pointText || "No details"}</p>
                           {timestamp && (
                             <small className="text-muted d-flex align-items-center gap-1">
                               <Clock size={12} />
@@ -344,20 +377,26 @@ const MomDetailsView = ({ mom, onClose }) => {
               {Array.isArray(actionItems) && actionItems.length > 0 ? (
                 <div className="d-flex flex-column gap-3">
                   {actionItems.map((ai, index) => {
-                    const taskDescription = getProperty(ai, 'taskDescription', 'TaskDescription') || 
-                                          getProperty(ai, 'task', 'Task');
-                    const assignedToName = getProperty(ai, 'assignedToEmployeeName', 'AssignedToEmployeeName') || 
-                                          getProperty(ai, 'assignTo', 'AssignTo');
-                    const dueDate = getProperty(ai, 'dueDate', 'DueDate');
-                    const status = getProperty(ai, 'status', 'Status') || 'Pending';
-                    const priority = getProperty(ai, 'priority', 'Priority');
-                    const notes = getProperty(ai, 'notes', 'Notes');
+                    const taskDescription =
+                      getProperty(ai, "taskDescription", "TaskDescription") ||
+                      getProperty(ai, "task", "Task");
+                    const assignedToName =
+                      getProperty(
+                        ai,
+                        "assignedToEmployeeName",
+                        "AssignedToEmployeeName"
+                      ) || getProperty(ai, "assignTo", "AssignTo");
+                    const dueDate = getProperty(ai, "dueDate", "DueDate");
+                    const status =
+                      getProperty(ai, "status", "Status") || "Pending";
+                    const priority = getProperty(ai, "priority", "Priority");
+                    const notes = getProperty(ai, "notes", "Notes");
 
                     return (
                       <div key={index} className="mdv-action-item p-3 rounded">
                         <div className="d-flex justify-content-between align-items-start mb-3">
                           <h6 className="fw-semibold mb-0 flex-grow-1">
-                            {taskDescription || 'No description'}
+                            {taskDescription || "No description"}
                           </h6>
                           <div className="d-flex gap-2">
                             {getStatusBadge(status, dueDate)}
@@ -381,8 +420,7 @@ const MomDetailsView = ({ mom, onClose }) => {
                           <div className="col-md-6">
                             <small className="text-muted d-flex align-items-center gap-2">
                               <Calendar size={14} className="text-danger" />
-                              <strong>Due Date:</strong>{" "}
-                              {formatDate(dueDate)}
+                              <strong>Due Date:</strong> {formatDate(dueDate)}
                             </small>
                           </div>
                         </div>
@@ -401,9 +439,9 @@ const MomDetailsView = ({ mom, onClose }) => {
 
           {/* Footer */}
           <div className="mdv-footer modal-footer border-0">
-            <button 
-              type="button" 
-              onClick={onClose} 
+            <button
+              type="button"
+              onClick={onClose}
               className="mdv-close-btn btn btn-secondary px-4 d-flex align-items-center gap-2"
             >
               <X size={16} />

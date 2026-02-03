@@ -75,10 +75,11 @@ const ManagerMomDashboard = () => {
       if (employeeSuccess && Array.isArray(employeeData)) {
         const nameMap = {};
         employeeData.forEach((emp) => {
-          const empId = getProperty(emp, 'employeeMasterId', 'EmployeeMasterId') || 
-                        getProperty(emp, 'employeeId', 'EmployeeId');
-          const firstName = getProperty(emp, 'firstName', 'FirstName') || '';
-          const lastName = getProperty(emp, 'lastName', 'LastName') || '';
+          const empId =
+            getProperty(emp, "employeeMasterId", "EmployeeMasterId") ||
+            getProperty(emp, "employeeId", "EmployeeId");
+          const firstName = getProperty(emp, "firstName", "FirstName") || "";
+          const lastName = getProperty(emp, "lastName", "LastName") || "";
           if (empId) {
             nameMap[empId] = `${firstName} ${lastName}`.trim();
           }
@@ -87,15 +88,17 @@ const ManagerMomDashboard = () => {
       }
 
       // Extract action items
-      const allActionItems = actionItemsAssignedByMeRes?.data || 
-                            actionItemsAssignedByMeRes?.Data || [];
-      
-      const overdueCount = Array.isArray(allActionItems) 
+      const allActionItems =
+        actionItemsAssignedByMeRes?.data ||
+        actionItemsAssignedByMeRes?.Data ||
+        [];
+
+      const overdueCount = Array.isArray(allActionItems)
         ? allActionItems.filter((ai) => {
-            const dueDate = getProperty(ai, 'dueDate', 'DueDate');
-            const status = getProperty(ai, 'status', 'Status');
-            const isOverdue = getProperty(ai, 'isOverdue', 'IsOverdue');
-            
+            const dueDate = getProperty(ai, "dueDate", "DueDate");
+            const status = getProperty(ai, "status", "Status");
+            const isOverdue = getProperty(ai, "isOverdue", "IsOverdue");
+
             if (isOverdue) return true;
             if (status === "Pending" && dueDate) {
               return new Date(dueDate) < new Date();
@@ -105,33 +108,38 @@ const ManagerMomDashboard = () => {
         : 0;
 
       // Extract meetings data
-      const meetingsData = meetingsRes?.data?.meetings || 
-                          meetingsRes?.data?.Meetings || 
-                          meetingsRes?.Data?.meetings || 
-                          meetingsRes?.Data?.Meetings || 
-                          meetingsRes?.data || 
-                          meetingsRes?.Data || [];
-      
+      const meetingsData =
+        meetingsRes?.data?.meetings ||
+        meetingsRes?.data?.Meetings ||
+        meetingsRes?.Data?.meetings ||
+        meetingsRes?.Data?.Meetings ||
+        meetingsRes?.data ||
+        meetingsRes?.Data ||
+        [];
+
       const meetings = Array.isArray(meetingsData) ? meetingsData : [];
-      
-      const totalMeetingsCount = meetingsRes?.data?.totalCount || 
-                                meetingsRes?.data?.TotalCount || 
-                                meetingsRes?.Data?.totalCount || 
-                                meetingsRes?.Data?.TotalCount || 
-                                meetings.length;
+
+      const totalMeetingsCount =
+        meetingsRes?.data?.totalCount ||
+        meetingsRes?.data?.TotalCount ||
+        meetingsRes?.Data?.totalCount ||
+        meetingsRes?.Data?.TotalCount ||
+        meetings.length;
 
       // Extract MOMs data
-      const momsData = myMomsRes?.data?.data || 
-                      myMomsRes?.data?.Data || 
-                      myMomsRes?.Data?.Data || 
-                      myMomsRes?.data || 
-                      myMomsRes?.Data || [];
-      
+      const momsData =
+        myMomsRes?.data?.data ||
+        myMomsRes?.data?.Data ||
+        myMomsRes?.Data?.Data ||
+        myMomsRes?.data ||
+        myMomsRes?.Data ||
+        [];
+
       const momsArray = Array.isArray(momsData) ? momsData : [];
 
       // Count One-on-One meetings
       const oneOnOnesCount = meetings.filter((m) => {
-        const meetingType = getProperty(m, 'meetingType', 'MeetingType');
+        const meetingType = getProperty(m, "meetingType", "MeetingType");
         return meetingType === "One-on-One";
       }).length;
 
@@ -148,21 +156,28 @@ const ManagerMomDashboard = () => {
       const meetingsWithRsvp = await Promise.all(
         meetings.map(async (meeting) => {
           try {
-            const meetingId = getProperty(meeting, 'meetingId', 'MeetingId');
-            const rsvpSummaryResponse = await rsvpService.getMeetingRsvpSummary(meetingId);
-            
-            const rsvpData = rsvpSummaryResponse?.data || 
-                           rsvpSummaryResponse?.Data || 
-                           rsvpSummaryResponse;
+            const meetingId = getProperty(meeting, "meetingId", "MeetingId");
+            const rsvpSummaryResponse = await rsvpService.getMeetingRsvpSummary(
+              meetingId
+            );
+
+            const rsvpData =
+              rsvpSummaryResponse?.data ||
+              rsvpSummaryResponse?.Data ||
+              rsvpSummaryResponse;
 
             return {
               ...meeting,
-              rsvpAcceptedCount: getProperty(rsvpData, 'acceptedCount', 'AcceptedCount') || 0,
-              rsvpTotalInvitations: getProperty(rsvpData, 'totalInvitations', 'TotalInvitations') || 0,
-              rsvpParticipants: getProperty(rsvpData, 'participants', 'Participants') || [],
+              rsvpAcceptedCount:
+                getProperty(rsvpData, "acceptedCount", "AcceptedCount") || 0,
+              rsvpTotalInvitations:
+                getProperty(rsvpData, "totalInvitations", "TotalInvitations") ||
+                0,
+              rsvpParticipants:
+                getProperty(rsvpData, "participants", "Participants") || [],
             };
           } catch (error) {
-            const meetingId = getProperty(meeting, 'meetingId', 'MeetingId');
+            const meetingId = getProperty(meeting, "meetingId", "MeetingId");
             console.error(
               `Failed to get RSVP summary for meeting ${meetingId}`,
               error
@@ -181,11 +196,13 @@ const ManagerMomDashboard = () => {
       setRecentTeamMoms(momsArray.slice(0, 5));
     } catch (err) {
       console.error("Dashboard load error:", err);
-      
+
       // Enhanced error handling
       if (err.retryAfter) {
         if (!silentRefresh) {
-          toastr.error(`Rate limit exceeded. Please wait ${err.retryAfter} seconds.`);
+          toastr.error(
+            `Rate limit exceeded. Please wait ${err.retryAfter} seconds.`
+          );
         }
       } else if (err.message) {
         toastr.error(`Failed to load dashboard: ${err.message}`);
@@ -400,10 +417,26 @@ const ManagerMomDashboard = () => {
                     </tr>
                   ) : (
                     paginatedMeetings.map((meeting) => {
-                      const meetingId = getProperty(meeting, 'meetingId', 'MeetingId');
-                      const meetingTitle = getProperty(meeting, 'meetingTitle', 'MeetingTitle');
-                      const meetingDate = getProperty(meeting, 'meetingDate', 'MeetingDate');
-                      const meetingType = getProperty(meeting, 'meetingType', 'MeetingType');
+                      const meetingId = getProperty(
+                        meeting,
+                        "meetingId",
+                        "MeetingId"
+                      );
+                      const meetingTitle = getProperty(
+                        meeting,
+                        "meetingTitle",
+                        "MeetingTitle"
+                      );
+                      const meetingDate = getProperty(
+                        meeting,
+                        "meetingDate",
+                        "MeetingDate"
+                      );
+                      const meetingType = getProperty(
+                        meeting,
+                        "meetingType",
+                        "MeetingType"
+                      );
 
                       const widthClass = getProgressWidthClass(
                         meeting.rsvpAcceptedCount,
@@ -417,12 +450,14 @@ const ManagerMomDashboard = () => {
                           onClick={() => openMeetingDetails(meeting)}
                           role="button"
                           tabIndex={0}
-                          onKeyDown={(e) => e.key === 'Enter' && openMeetingDetails(meeting)}
+                          onKeyDown={(e) =>
+                            e.key === "Enter" && openMeetingDetails(meeting)
+                          }
                         >
                           <td>
                             <div className="managermom-meeting-title-cell">
                               <span className="fw-semibold">
-                                {meetingTitle || 'Untitled Meeting'}
+                                {meetingTitle || "Untitled Meeting"}
                               </span>
                             </div>
                           </td>
@@ -525,10 +560,26 @@ const ManagerMomDashboard = () => {
                 </div>
               ) : (
                 paginatedMeetings.map((meeting) => {
-                  const meetingId = getProperty(meeting, 'meetingId', 'MeetingId');
-                  const meetingTitle = getProperty(meeting, 'meetingTitle', 'MeetingTitle');
-                  const meetingDate = getProperty(meeting, 'meetingDate', 'MeetingDate');
-                  const meetingType = getProperty(meeting, 'meetingType', 'MeetingType');
+                  const meetingId = getProperty(
+                    meeting,
+                    "meetingId",
+                    "MeetingId"
+                  );
+                  const meetingTitle = getProperty(
+                    meeting,
+                    "meetingTitle",
+                    "MeetingTitle"
+                  );
+                  const meetingDate = getProperty(
+                    meeting,
+                    "meetingDate",
+                    "MeetingDate"
+                  );
+                  const meetingType = getProperty(
+                    meeting,
+                    "meetingType",
+                    "MeetingType"
+                  );
 
                   const widthClass = getProgressWidthClass(
                     meeting.rsvpAcceptedCount,
@@ -542,7 +593,9 @@ const ManagerMomDashboard = () => {
                         onClick={() => openMeetingDetails(meeting)}
                         role="button"
                         tabIndex={0}
-                        onKeyDown={(e) => e.key === 'Enter' && openMeetingDetails(meeting)}
+                        onKeyDown={(e) =>
+                          e.key === "Enter" && openMeetingDetails(meeting)
+                        }
                       >
                         <div className="card-body">
                           <div className="managermom-meeting-card-header">
@@ -555,7 +608,7 @@ const ManagerMomDashboard = () => {
                           </div>
 
                           <h6 className="card-title fw-semibold mb-2">
-                            {meetingTitle || 'Untitled Meeting'}
+                            {meetingTitle || "Untitled Meeting"}
                           </h6>
 
                           <p className="text-muted small mb-3">

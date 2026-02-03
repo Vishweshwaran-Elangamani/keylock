@@ -57,17 +57,17 @@ const MeetingInvitations = () => {
   };
 
   const convertStringStatusToNumber = (status) => {
-    if (typeof status === 'number') return status;
-    
+    if (typeof status === "number") return status;
+
     const statusStr = String(status).toLowerCase();
     switch (statusStr) {
-      case 'accepted':
+      case "accepted":
         return RSVP_STATUS.ACCEPTED.value;
-      case 'declined':
+      case "declined":
         return RSVP_STATUS.DECLINED.value;
-      case 'tentative':
+      case "tentative":
         return RSVP_STATUS.TENTATIVE.value;
-      case 'pending':
+      case "pending":
       default:
         return RSVP_STATUS.PENDING.value;
     }
@@ -77,7 +77,10 @@ const MeetingInvitations = () => {
     setSelectedInvitation(invitation);
     setErrorMessage("");
 
-    const currentStatus = invitation.rsvpStatus ?? invitation.RsvpStatus ?? RSVP_STATUS.PENDING.value;
+    const currentStatus =
+      invitation.rsvpStatus ??
+      invitation.RsvpStatus ??
+      RSVP_STATUS.PENDING.value;
     const numericStatus = convertStringStatusToNumber(currentStatus);
     setRsvpStatus(numericStatus);
 
@@ -314,7 +317,8 @@ const MeetingInvitations = () => {
                   getField(inv, "meetingTitle", "MeetingTitle") ||
                   "Untitled Meeting";
                 const meetingDate = getField(inv, "meetingDate", "MeetingDate");
-                const rsvpStatusValue = getField(inv, "rsvpStatus", "RsvpStatus") ?? "Pending";
+                const rsvpStatusValue =
+                  getField(inv, "rsvpStatus", "RsvpStatus") ?? "Pending";
 
                 const invitedAt = getField(inv, "invitedAt", "InvitedAt");
                 const schedulerName = getField(
@@ -508,11 +512,9 @@ const MeetingInvitations = () => {
                       </div>
                     </div>
 
-                    {convertStringStatusToNumber(getField(
-                      selectedInvitation,
-                      "rsvpStatus",
-                      "RsvpStatus"
-                    )) !== RSVP_STATUS.PENDING.value && (
+                    {convertStringStatusToNumber(
+                      getField(selectedInvitation, "rsvpStatus", "RsvpStatus")
+                    ) !== RSVP_STATUS.PENDING.value && (
                       <div className="alert alert-info mi-current-status-alert">
                         <AlertCircle
                           size={18}
@@ -521,11 +523,13 @@ const MeetingInvitations = () => {
                         <div className="mi-current-status-text">
                           <strong>Current Response:</strong>{" "}
                           {getStatusLabel(
-                            convertStringStatusToNumber(getField(
-                              selectedInvitation,
-                              "rsvpStatus",
-                              "RsvpStatus"
-                            ))
+                            convertStringStatusToNumber(
+                              getField(
+                                selectedInvitation,
+                                "rsvpStatus",
+                                "RsvpStatus"
+                              )
+                            )
                           )}
                           {getField(
                             selectedInvitation,
@@ -560,8 +564,12 @@ const MeetingInvitations = () => {
                           name="rsvpStatus"
                           id="rsvp-accepted"
                           value={RSVP_STATUS.ACCEPTED.value}
-                          checked={Number(rsvpStatus) === RSVP_STATUS.ACCEPTED.value}
-                          onChange={(e) => setRsvpStatus(Number(e.target.value))}
+                          checked={
+                            Number(rsvpStatus) === RSVP_STATUS.ACCEPTED.value
+                          }
+                          onChange={(e) =>
+                            setRsvpStatus(Number(e.target.value))
+                          }
                         />
 
                         <label
@@ -578,8 +586,12 @@ const MeetingInvitations = () => {
                           name="rsvpStatus"
                           id="rsvp-tentative"
                           value={RSVP_STATUS.TENTATIVE.value}
-                          checked={Number(rsvpStatus) === RSVP_STATUS.TENTATIVE.value}
-                          onChange={(e) => setRsvpStatus(Number(e.target.value))}
+                          checked={
+                            Number(rsvpStatus) === RSVP_STATUS.TENTATIVE.value
+                          }
+                          onChange={(e) =>
+                            setRsvpStatus(Number(e.target.value))
+                          }
                         />
 
                         <label
@@ -596,8 +608,12 @@ const MeetingInvitations = () => {
                           name="rsvpStatus"
                           id="rsvp-declined"
                           value={RSVP_STATUS.DECLINED.value}
-                          checked={Number(rsvpStatus) === RSVP_STATUS.DECLINED.value}
-                          onChange={(e) => setRsvpStatus(Number(e.target.value))}
+                          checked={
+                            Number(rsvpStatus) === RSVP_STATUS.DECLINED.value
+                          }
+                          onChange={(e) =>
+                            setRsvpStatus(Number(e.target.value))
+                          }
                         />
                         <label
                           className="btn btn-outline-danger mi-rsvp-option"
@@ -665,11 +681,13 @@ const MeetingInvitations = () => {
                       ) : (
                         <>
                           <Send size={16} />
-                          {convertStringStatusToNumber(getField(
-                            selectedInvitation,
-                            "rsvpStatus",
-                            "RsvpStatus"
-                          )) === RSVP_STATUS.PENDING.value
+                          {convertStringStatusToNumber(
+                            getField(
+                              selectedInvitation,
+                              "rsvpStatus",
+                              "RsvpStatus"
+                            )
+                          ) === RSVP_STATUS.PENDING.value
                             ? "Submit RSVP"
                             : "Update RSVP"}
                         </>
