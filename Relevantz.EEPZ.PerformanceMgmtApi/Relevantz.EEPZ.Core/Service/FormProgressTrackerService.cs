@@ -1,9 +1,9 @@
+using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Common.DTOs.Request;
-
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -11,14 +11,17 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
     {
         private readonly IFormProgressTrackerRepository _repository;
         private readonly ILogger<FormProgressTrackerService> _logger;
+        private readonly IValidator<FormProgressTrackerUpdateDto> _validator;
 
-        public FormProgressTrackerService(
-            IFormProgressTrackerRepository repository,
-            ILogger<FormProgressTrackerService> logger)
-        {
-            _repository = repository;
-            _logger = logger;
-        }
+       public FormProgressTrackerService(
+    IFormProgressTrackerRepository repository,
+    ILogger<FormProgressTrackerService> logger,
+    IValidator<FormProgressTrackerUpdateDto> validator)
+{
+    _repository = repository;
+    _logger = logger;
+    _validator = validator;
+}
 
         public async Task<object> GetAllAsync()
         {
@@ -191,6 +194,19 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             if (dto == null)
                 return new { success = false, message = "Invalid data." };
+
+            
+var validationResult = await _validator.ValidateAsync(dto);
+    if (!validationResult.IsValid)
+    {
+        return new
+        {
+            success = false,
+            message = "Validation failed.",
+            errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList()
+        };
+    }
+
 
             try
             {

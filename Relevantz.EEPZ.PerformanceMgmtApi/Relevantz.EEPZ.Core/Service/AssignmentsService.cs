@@ -1,3 +1,6 @@
+
+using FluentValidation;
+
 using Microsoft.Extensions.Logging;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.DTOs.Request;
@@ -5,21 +8,33 @@ using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Common.DTOs.Response;
 
+using Relevantz.EEPZ.Common.Validators; 
+
+
+
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
-    public class AssignmentsService : IAssignmentsService
-    {
-        private readonly IAssignmentsRepository _repository;
-        private readonly ILogger<AssignmentsService> _logger;
+    
+public class AssignmentsService : IAssignmentsService
+{
+    private readonly IAssignmentsRepository _repository;
+    private readonly ILogger<AssignmentsService> _logger;
+    private readonly IValidator<InitiateAppraisalRequestDto> _initiateValidator;
 
-        public AssignmentsService(
-            IAssignmentsRepository repository,
-            ILogger<AssignmentsService> logger)
-        {
-            _repository = repository;
-            _logger = logger;
-        }
+    public AssignmentsService(
+        IAssignmentsRepository repository,
+        ILogger<AssignmentsService> logger,
+        IValidator<InitiateAppraisalRequestDto> initiateValidator)
+    {
+        _repository = repository;
+        _logger = logger;
+        _initiateValidator = initiateValidator;
+    }
+
+
+        
+            
 
         public async Task<object> InitiateAppraisalAsync(InitiateAppraisalRequestDto request)
         {

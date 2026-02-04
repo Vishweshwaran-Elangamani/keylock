@@ -1,3 +1,4 @@
+using FluentValidation;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;

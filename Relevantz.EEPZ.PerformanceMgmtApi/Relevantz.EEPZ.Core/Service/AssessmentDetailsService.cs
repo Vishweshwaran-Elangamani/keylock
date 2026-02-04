@@ -20,7 +20,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private readonly IFileStorageService _fileStorage;
         private readonly ILogger<AssessmentDetailsService> _logger;
 
-        // Matches a 24-char hex ObjectId-like string
         private static readonly Regex ObjectIdRegex = new Regex("^[a-fA-F0-9]{24}$", RegexOptions.Compiled);
 
         private static class AssessmentStatuses

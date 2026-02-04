@@ -1,3 +1,5 @@
+using FluentValidation;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.DTOs.Request;
@@ -10,14 +12,27 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
     public class FormManagementService : IFormManagementService
     {
         private readonly IFormManagementRepository _repository;
+       private readonly IValidator<CreateFormRequestDto> _createFormValidator;
 
-        public FormManagementService(IFormManagementRepository repository)
-        {
-            _repository = repository;
-        }
+public FormManagementService(
+    IFormManagementRepository repository,
+    IValidator<CreateFormRequestDto> createFormValidator)
+{
+    _repository = repository;
+    _createFormValidator = createFormValidator;
+}
+
+
 
         public async Task<ApiResponse<FormResponseDto>> CreateFormAsync(CreateFormRequestDto request)
         {
+            var validation = await _createFormValidator.ValidateAsync(request);
+if (!validation.IsValid)
+{
+    return ApiResponse<FormResponseDto>.ErrorResponse(
+        "Validation failed: " + string.Join("; ", validation.Errors.Select(e => e.ErrorMessage))
+    );
+}
             try
             {
                 var creator = await _repository.GetUserWithEmployeeAsync(request.CreatedBy);
@@ -31,11 +46,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     return ApiResponse<FormResponseDto>.ErrorResponse("Only HR users can create forms.");
                 }
 
-                if (request.Competencies == null || !request.Competencies.Any())
-                    return ApiResponse<FormResponseDto>.ErrorResponse("At least one competency is required");
+                
 
-                if (string.IsNullOrWhiteSpace(request.Name))
-                    return ApiResponse<FormResponseDto>.ErrorResponse("Form name is required");
+               
 
                 var form = new Assessmentform
                 {
@@ -70,6 +83,16 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         public async Task<ApiResponse<FormResponseDto>> UpdateFormAsync(int formId, CreateFormRequestDto request)
         {
+            if (formId <= 0)
+    return ApiResponse<FormResponseDto>.ErrorResponse("Invalid formId");
+
+var validation = await _createFormValidator.ValidateAsync(request);
+if (!validation.IsValid)
+{
+    return ApiResponse<FormResponseDto>.ErrorResponse(
+        "Validation failed: " + string.Join("; ", validation.Errors.Select(e => e.ErrorMessage))
+    );
+}
             try
             {
                 var form = await _repository.GetFormByIdWithCompetenciesAsync(formId);
@@ -87,8 +110,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     return ApiResponse<FormResponseDto>.ErrorResponse("Only HR users can update forms.");
                 }
 
-                if (request.Competencies == null || !request.Competencies.Any())
-                    return ApiResponse<FormResponseDto>.ErrorResponse("At least one competency is required");
 
                 form.Name = request.Name ?? string.Empty;
                 form.Type = request.Type ?? string.Empty;

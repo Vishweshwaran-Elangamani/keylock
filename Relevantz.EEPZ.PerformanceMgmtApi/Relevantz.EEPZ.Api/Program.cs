@@ -1,3 +1,4 @@
+using FluentValidation;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,10 @@ using Relevantz.EEPZ.Core.Services.Implementations;
 // File storage
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Core.Service;
+
+using Relevantz.EEPZ.Common.Validators;
+using FluentValidation.AspNetCore;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -64,7 +69,6 @@ Log.Information("Shared Uploads Path: {Path}", sharedUploadsPath);
 // ==========================================================================
 // CONTROLLERS + SWAGGER
 // ==========================================================================
-builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(options =>
@@ -202,6 +206,15 @@ builder.Services.AddScoped<ISelfAssessmentService, SelfAssessmentService>();
 // File storage (MongoDB)
 builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDbSettings"));
 builder.Services.AddSingleton<IFileStorageService, FileStorageService>();
+
+builder.Services.AddControllers();
+builder.Services.AddFluentValidationAutoValidation();
+
+builder.Services.AddValidatorsFromAssemblyContaining<InitiateAppraisalRequestDtoValidator>();
+
+builder.Services.AddValidatorsFromAssemblyContaining<CreateFormRequestDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<SubmitSelfAssessmentRequestDtoValidator>();
+
 
 // ==========================================================================
 // CORS
