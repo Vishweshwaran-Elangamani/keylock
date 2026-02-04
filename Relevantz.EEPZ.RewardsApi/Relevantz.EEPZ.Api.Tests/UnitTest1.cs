@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using Relevantz.EEPZ.Api.Controllers; 
-using Relevantz.EEPZ.Api.Tests.Helpers;
-using Relevantz.EEPZ.Business.Services.Interfaces;
+using Relevantz.EEPZ.Api.Controllers;
+using Relevantz.EEPZ.Core.IService;
+using Relevantz.EEPZ.Core.Models;
  
 namespace Relevantz.EEPZ.Api.Tests.Controllers
 {
@@ -33,18 +33,29 @@ namespace Relevantz.EEPZ.Api.Tests.Controllers
             _serviceMock.VerifyNoOtherCalls();
         }
  
-        
+        // -------------------------------
+        // GET: /depthead/{id}/approved-nominations
+        // -------------------------------
+ 
         [Test]
         public async Task GetApprovedNominationsByDeptHead_ReturnsOk_WhenSuccessTrue()
         {
+            // Arrange
             int id = 100;
-            var serviceResult = new TestResponse { success = true, data = new[] { 1, 2 } };
+            var serviceResult = new ApiResponse<object>
+            {
+                Success = true,
+                Data = new[] { 1, 2 }
+            };
  
-            _serviceMock.Setup(s => s.GetApprovedNominationsByDeptHeadAsync(id))
-                        .ReturnsAsync(serviceResult);
+            _serviceMock
+                .Setup(s => s.GetApprovedNominationsByDeptHeadAsync(id))
+                .ReturnsAsync(serviceResult);
  
+            // Act
             var result = await _controller.GetApprovedNominationsByDeptHead(id);
  
+            // Assert
             var obj = result.Should().BeAssignableTo<ObjectResult>().Subject;
             obj.StatusCode.Should().Be(200);
             obj.Value.Should().BeEquivalentTo(serviceResult);
@@ -53,14 +64,22 @@ namespace Relevantz.EEPZ.Api.Tests.Controllers
         [Test]
         public async Task GetApprovedNominationsByDeptHead_ReturnsNotFound_WhenSuccessFalse()
         {
+            // Arrange
             int id = 100;
-            var serviceResult = new TestResponse { success = false, message = "Not found" };
+            var serviceResult = new ApiResponse<object>
+            {
+                Success = false,
+                Message = "Not found"
+            };
  
-            _serviceMock.Setup(s => s.GetApprovedNominationsByDeptHeadAsync(id))
-                        .ReturnsAsync(serviceResult);
+            _serviceMock
+                .Setup(s => s.GetApprovedNominationsByDeptHeadAsync(id))
+                .ReturnsAsync(serviceResult);
  
+            // Act
             var result = await _controller.GetApprovedNominationsByDeptHead(id);
  
+            // Assert
             var obj = result.Should().BeAssignableTo<ObjectResult>().Subject;
             obj.StatusCode.Should().Be(404);
             obj.Value.Should().BeEquivalentTo(serviceResult);
@@ -69,14 +88,18 @@ namespace Relevantz.EEPZ.Api.Tests.Controllers
         [Test]
         public async Task GetApprovedNominationsByDeptHead_Returns500_OnException()
         {
+            // Arrange
             int id = 100;
             var ex = new Exception("Boom");
  
-            _serviceMock.Setup(s => s.GetApprovedNominationsByDeptHeadAsync(id))
-                        .ThrowsAsync(ex);
+            _serviceMock
+                .Setup(s => s.GetApprovedNominationsByDeptHeadAsync(id))
+                .ThrowsAsync(ex);
  
+            // Act
             var result = await _controller.GetApprovedNominationsByDeptHead(id);
  
+            // Assert
             var obj = result.Should().BeAssignableTo<ObjectResult>().Subject;
             obj.StatusCode.Should().Be(500);
             obj.Value.Should().BeEquivalentTo(new
@@ -86,18 +109,29 @@ namespace Relevantz.EEPZ.Api.Tests.Controllers
             });
         }
  
-      
+        // -------------------------------
+        // GET: /nomination-details/{nominationId}
+        // -------------------------------
+ 
         [Test]
         public async Task GetNominationDetails_ReturnsOk_WhenSuccessTrue()
         {
+            // Arrange
             int nominationId = 10;
-            var serviceResult = new TestResponse { success = true, data = new { Id = 10 } };
+            var serviceResult = new ApiResponse<object>
+            {
+                Success = true,
+                Data = new { Id = 10 }
+            };
  
-            _serviceMock.Setup(s => s.GetNominationDetailsAsync(nominationId))
-                        .ReturnsAsync(serviceResult);
+            _serviceMock
+                .Setup(s => s.GetNominationDetailsAsync(nominationId))
+                .ReturnsAsync(serviceResult);
  
+            // Act
             var result = await _controller.GetNominationDetails(nominationId);
  
+            // Assert
             var obj = result.Should().BeAssignableTo<ObjectResult>().Subject;
             obj.StatusCode.Should().Be(200);
             obj.Value.Should().BeEquivalentTo(serviceResult);
@@ -106,14 +140,22 @@ namespace Relevantz.EEPZ.Api.Tests.Controllers
         [Test]
         public async Task GetNominationDetails_ReturnsNotFound_WhenSuccessFalse()
         {
+            // Arrange
             int nominationId = 10;
-            var serviceResult = new TestResponse { success = false, message = "Not found" };
+            var serviceResult = new ApiResponse<object>
+            {
+                Success = false,
+                Message = "Not found"
+            };
  
-            _serviceMock.Setup(s => s.GetNominationDetailsAsync(nominationId))
-                        .ReturnsAsync(serviceResult);
+            _serviceMock
+                .Setup(s => s.GetNominationDetailsAsync(nominationId))
+                .ReturnsAsync(serviceResult);
  
+            // Act
             var result = await _controller.GetNominationDetails(nominationId);
  
+            // Assert
             var obj = result.Should().BeAssignableTo<ObjectResult>().Subject;
             obj.StatusCode.Should().Be(404);
             obj.Value.Should().BeEquivalentTo(serviceResult);
@@ -122,14 +164,18 @@ namespace Relevantz.EEPZ.Api.Tests.Controllers
         [Test]
         public async Task GetNominationDetails_Returns500_OnException()
         {
+            // Arrange
             int nominationId = 10;
             var ex = new Exception("Unexpected!");
  
-            _serviceMock.Setup(s => s.GetNominationDetailsAsync(nominationId))
-                        .ThrowsAsync(ex);
+            _serviceMock
+                .Setup(s => s.GetNominationDetailsAsync(nominationId))
+                .ThrowsAsync(ex);
  
+            // Act
             var result = await _controller.GetNominationDetails(nominationId);
  
+            // Assert
             var obj = result.Should().BeAssignableTo<ObjectResult>().Subject;
             obj.StatusCode.Should().Be(500);
             obj.Value.Should().BeEquivalentTo(new
@@ -139,18 +185,29 @@ namespace Relevantz.EEPZ.Api.Tests.Controllers
             });
         }
  
-        
+        // -------------------------------
+        // GET: /depthead/{id}/statistics
+        // -------------------------------
+ 
         [Test]
         public async Task GetDepartmentStatistics_ReturnsOk_WhenSuccessTrue()
         {
+            // Arrange
             int id = 50;
-            var serviceResult = new TestResponse { success = true, data = new { total = 5 } };
+            var serviceResult = new ApiResponse<object>
+            {
+                Success = true,
+                Data = new { total = 5 }
+            };
  
-            _serviceMock.Setup(s => s.GetDepartmentStatisticsAsync(id))
-                        .ReturnsAsync(serviceResult);
+            _serviceMock
+                .Setup(s => s.GetDepartmentStatisticsAsync(id))
+                .ReturnsAsync(serviceResult);
  
+            // Act
             var result = await _controller.GetDepartmentStatistics(id);
  
+            // Assert
             var obj = result.Should().BeAssignableTo<ObjectResult>().Subject;
             obj.StatusCode.Should().Be(200);
             obj.Value.Should().BeEquivalentTo(serviceResult);
@@ -159,14 +216,22 @@ namespace Relevantz.EEPZ.Api.Tests.Controllers
         [Test]
         public async Task GetDepartmentStatistics_ReturnsNotFound_WhenSuccessFalse()
         {
+            // Arrange
             int id = 50;
-            var serviceResult = new TestResponse { success = false, message = "Not found" };
+            var serviceResult = new ApiResponse<object>
+            {
+                Success = false,
+                Message = "Not found"
+            };
  
-            _serviceMock.Setup(s => s.GetDepartmentStatisticsAsync(id))
-                        .ReturnsAsync(serviceResult);
+            _serviceMock
+                .Setup(s => s.GetDepartmentStatisticsAsync(id))
+                .ReturnsAsync(serviceResult);
  
+            // Act
             var result = await _controller.GetDepartmentStatistics(id);
  
+            // Assert
             var obj = result.Should().BeAssignableTo<ObjectResult>().Subject;
             obj.StatusCode.Should().Be(404);
             obj.Value.Should().BeEquivalentTo(serviceResult);
@@ -175,14 +240,18 @@ namespace Relevantz.EEPZ.Api.Tests.Controllers
         [Test]
         public async Task GetDepartmentStatistics_Returns500_OnException()
         {
+            // Arrange
             int id = 50;
             var ex = new Exception("Oops");
  
-            _serviceMock.Setup(s => s.GetDepartmentStatisticsAsync(id))
-                        .ThrowsAsync(ex);
+            _serviceMock
+                .Setup(s => s.GetDepartmentStatisticsAsync(id))
+                .ThrowsAsync(ex);
  
+            // Act
             var result = await _controller.GetDepartmentStatistics(id);
  
+            // Assert
             var obj = result.Should().BeAssignableTo<ObjectResult>().Subject;
             obj.StatusCode.Should().Be(500);
             obj.Value.Should().BeEquivalentTo(new
@@ -193,5 +262,4 @@ namespace Relevantz.EEPZ.Api.Tests.Controllers
         }
     }
 }
- 
  
