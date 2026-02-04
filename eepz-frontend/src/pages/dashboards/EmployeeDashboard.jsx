@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { PieChart, Pie, Cell, AreaChart, Area, CartesianGrid, Tooltip, Legend, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import { PieChart, Pie, Cell, AreaChart, Area, CartesianGrid, Tooltip, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import CountUp from "react-countup";
 import { Target, BookOpen, Calendar, AlertTriangle, TrendingUp, Trophy, Medal, Briefcase, ChevronDown, ChevronUp } from "lucide-react";
 import goalService from "../../services/goals/goalService";
@@ -13,11 +13,14 @@ import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import "../../styles/auth/EmployeeDashboard.css";
 
+
 const EmployeeDashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [showAllRecognitions, setShowAllRecognitions] = useState(false);
   const [showAllOpportunities, setShowAllOpportunities] = useState(false);
+  const [showAllGoals, setShowAllGoals] = useState(false);
+  const [goalFilter, setGoalFilter] = useState("all");
   const [dashboardData, setDashboardData] = useState({
     goals: [], 
     lndAssignments: [], 
@@ -28,14 +31,18 @@ const EmployeeDashboard = () => {
     opportunities: []
   });
 
+
   const BLUE_COLORS = ["#1E40AF", "#3B82F6", "#60A5FA", "#93C5FD", "#DBEAFE", "#2563EB"];
 
+
   useEffect(() => { fetchAllData(); }, []);
+
 
   const getUserData = () => {
     try { return JSON.parse(localStorage.getItem("user")); }
     catch { return null; }
   };
+
 
   const extractData = (response) => {
     if (!response) return [];
@@ -44,6 +51,7 @@ const EmployeeDashboard = () => {
     const paths = [data?.data?.items, data?.data?.$values, data?.data, data?.items, data?.$values, data];
     return paths.find(p => Array.isArray(p)) || [];
   };
+
 
   const fetchAllData = async () => {
     try {
@@ -55,7 +63,9 @@ const EmployeeDashboard = () => {
         return;
       }
 
+
       const empId = user.empMasterId || user.employeeMasterId || user.id;
+
 
       const [
         selfGoalsRes, 
@@ -79,13 +89,16 @@ const EmployeeDashboard = () => {
         internalOpportunityService.getActiveOpportunities().catch(() => ({ data: [] }))
       ]);
 
+
       const allGoals = [
         ...extractData(selfGoalsRes).map(g => ({ ...g, goalType: "self" })),
         ...extractData(orgGoalsRes).map(g => ({ ...g, goalType: "org" })),
         ...extractData(teamGoalsRes).map(g => ({ ...g, goalType: "team" }))
       ];
 
+
       const myNominations = extractData(myNominationsRes);
+
 
       const myRecognitions = myNominations.filter(n => {
         const status = (
@@ -96,9 +109,11 @@ const EmployeeDashboard = () => {
           ''
         ).toLowerCase();
 
+
         if (!status) return true;
         return status === 'approved';
       });
+
 
       const stats = {
         totalNominations: myNominations.length,
@@ -113,7 +128,9 @@ const EmployeeDashboard = () => {
         }).length
       };
 
+
       const opportunities = extractData(opportunitiesRes);
+
 
       setDashboardData({
         goals: allGoals,
@@ -125,6 +142,7 @@ const EmployeeDashboard = () => {
         opportunities
       });
 
+
     } catch (err) {
       console.error("Error in fetchAllData:", err);
       toast.error("Failed to load dashboard data");
@@ -133,7 +151,9 @@ const EmployeeDashboard = () => {
     }
   };
 
+
   const isOverdue = (deadline) => deadline && slaService?.isOverdue?.(deadline);
+
 
   const getKPIStats = () => {
     const now = new Date();
@@ -148,10 +168,13 @@ const EmployeeDashboard = () => {
     };
   };
 
+
   const getPerformanceOverview = () => {
     const { myRecognitions, stats } = dashboardData.performance;
 
+
     const byRewardType = {};
+
 
     myRecognitions.forEach(r => {
       const type = (
@@ -163,14 +186,17 @@ const EmployeeDashboard = () => {
         "Other"
       );
 
+
       byRewardType[type] = (byRewardType[type] || 0) + 1;
     });
+
 
     const chartData = Object.entries(byRewardType).map(([name, value], i) => ({
       name,
       value,
       fill: BLUE_COLORS[i % BLUE_COLORS.length]
     }));
+
 
     return {
       totalRecognitions: myRecognitions.length,
@@ -180,13 +206,31 @@ const EmployeeDashboard = () => {
     };
   };
 
+
   const getGoalsOverview = () => {
-    const goals = dashboardData.goals;
-    if (!goals?.length) return { total: 0, completed: 0, inProgress: 0, pending: 0, chartData: [] };
+    const allGoals = dashboardData.goals;
+    
+    // Filter goals based on selected filter
+    const goals = goalFilter === "all" 
+      ? allGoals 
+      : allGoals.filter(g => g.goalType === goalFilter);
+    
+    if (!goals?.length) {
+      return { 
+        total: 0, 
+        completed: 0, 
+        inProgress: 0, 
+        pending: 0, 
+        chartData: [],
+        goalList: []
+      };
+    }
+
 
     const completed = goals.filter(g => (g.status || g.goalStatus || "").toLowerCase() === "completed").length;
     const inProgress = goals.filter(g => (g.status || g.goalStatus || "").toLowerCase() === "inprogress").length;
     const pending = goals.filter(g => ["pending", "open", "approved"].includes((g.status || g.goalStatus || "").toLowerCase())).length;
+
 
     const chartData = [
       completed > 0 && { name: "Completed", value: completed, fill: BLUE_COLORS[0] },
@@ -194,12 +238,28 @@ const EmployeeDashboard = () => {
       pending > 0 && { name: "Pending", value: pending, fill: BLUE_COLORS[2] }
     ].filter(Boolean);
 
-    return { total: goals.length, completed, inProgress, pending, chartData };
+    const goalList = goals.map(g => ({
+      name: g.goalName || g.name || g.title || "Unnamed Goal",
+      type: g.goalType || "self",
+      id: g.id || g.goalId
+    }));
+
+
+    return { 
+      total: goals.length, 
+      completed, 
+      inProgress, 
+      pending, 
+      chartData,
+      goalList
+    };
   };
+
 
   const getOpportunitiesOverview = () => {
     const opportunities = dashboardData.opportunities;
     if (!opportunities?.length) return { total: 0, opportunityList: [], chartData: [] };
+
 
     const byOpportunity = {};
     opportunities.forEach(opp => {
@@ -214,13 +274,16 @@ const EmployeeDashboard = () => {
       byOpportunity[name].count += 1;
     });
 
+
     const opportunityList = Object.values(byOpportunity);
+
 
     const chartData = opportunityList.map((item, i) => ({
       name: item.name,
       value: item.count,
       fill: BLUE_COLORS[i % BLUE_COLORS.length]
     }));
+
 
     return { 
       total: opportunities.length, 
@@ -229,9 +292,11 @@ const EmployeeDashboard = () => {
     };
   };
 
+
   const getLndOverview = () => {
     const skills = dashboardData.lndSkills;
     if (!skills?.length) return { total: 0, low: 0, medium: 0, high: 0, chartData: [] };
+
 
     let low = 0, medium = 0, high = 0;
     skills.forEach(s => {
@@ -243,20 +308,24 @@ const EmployeeDashboard = () => {
       }
     });
 
+
     const chartData = [
       low > 0 && { name: "Rating 1-4", value: low, fill: BLUE_COLORS[2] },
       medium > 0 && { name: "Rating 5-7", value: medium, fill: BLUE_COLORS[1] },
       high > 0 && { name: "Rating 8-10", value: high, fill: BLUE_COLORS[0] }
     ].filter(Boolean);
 
+
     return { total: skills.length, low, medium, high, chartData };
   };
+
 
   const getMeetingsOverview = () => {
     const meetings = dashboardData.meetings;
     const now = new Date();
     const upcoming = meetings.filter(m => new Date(m.meetingDate || m.date) >= now).length;
     const completed = meetings.length - upcoming;
+
 
     const monthlyData = {};
     meetings.forEach(m => {
@@ -267,19 +336,24 @@ const EmployeeDashboard = () => {
       }
     });
 
+
     const chartData = Object.entries(monthlyData).sort((a, b) => a[0].localeCompare(b[0])).slice(-6)
       .map(([month, count]) => ({ month: new Date(month + "-01").toLocaleDateString("en-US", { month: "short", year: "numeric" }), count }));
 
+
     return { total: meetings.length, upcoming, completed, chartData };
   };
+
 
   const getSlaOverview = () => {
     const slas = dashboardData.slas;
     if (!slas?.length) return { total: 0, open: 0, overdue: 0, closed: 0, chartData: [] };
 
+
     const closed = slas.filter(s => (s.status || "").toLowerCase() === "closed").length;
     const open = slas.length - closed;
     const overdue = slas.filter(s => isOverdue(s.deadline || s.dueDate)).length;
+
 
     const chartData = [
       open > 0 && { name: "Open / In Progress", value: open, fill: BLUE_COLORS[1] },
@@ -287,8 +361,10 @@ const EmployeeDashboard = () => {
       closed > 0 && { name: "Closed", value: closed, fill: BLUE_COLORS[0] }
     ].filter(Boolean);
 
+
     return { total: slas.length, open, overdue, closed, chartData };
   };
+
 
   const StatCard = ({ type, value, label }) => (
     <div className={`emp-stat-card emp-stat-${type}`}>
@@ -296,6 +372,7 @@ const EmployeeDashboard = () => {
       <div className="emp-stat-label">{label}</div>
     </div>
   );
+
 
   if (loading) return (
     <div className="ada-loading-container">
@@ -305,6 +382,7 @@ const EmployeeDashboard = () => {
     </div>
   );
 
+
   const kpiStats = getKPIStats();
   const perfOverview = getPerformanceOverview();
   const goalsData = getGoalsOverview();
@@ -312,6 +390,7 @@ const EmployeeDashboard = () => {
   const lndData = getLndOverview();
   const meetingsData = getMeetingsOverview();
   const slaData = getSlaOverview();
+
 
   const kpiCards = [
     { 
@@ -352,13 +431,17 @@ const EmployeeDashboard = () => {
     }
   ];
 
+
   // CALCULATE DISPLAYED ITEMS INLINE - NO useMemo
   const displayedRecognitions = showAllRecognitions ? perfOverview.chartData : perfOverview.chartData.slice(0, 3);
-  const displayedOpportunities = showAllOpportunities ? opportunitiesData.opportunityList : opportunitiesData.opportunityList.slice(0, 2);
+  const displayedOpportunities = showAllOpportunities ? opportunitiesData.opportunityList : opportunitiesData.opportunityList.slice(0, 3);
+  const displayedGoals = showAllGoals ? goalsData.goalList : goalsData.goalList.slice(0, 3);
+
 
   return (
     <div className="hr-dashboard-container">
       <Breadcrumb items={[{ label: "Employee Dashboard" }]} />
+
 
       <div className="admin-kpi-grid">
         {kpiCards.map(({ icon, value, label, subtitle, iconClass, showTrend }, i) => {
@@ -379,6 +462,7 @@ const EmployeeDashboard = () => {
           );
         })}
       </div>
+
 
       <div className="dashboard-cards-container">
         <div className="dashboard-row">
@@ -404,6 +488,7 @@ const EmployeeDashboard = () => {
                       <div className="emp-trophy-badge">{perfOverview.totalRecognitions}</div>
                     </div>
                   </div>
+
 
                   {perfOverview.chartData.length > 0 && (
                     <>
@@ -443,12 +528,33 @@ const EmployeeDashboard = () => {
             </div>
           </div>
 
-          {/* GOALS OVERVIEW CARD */}
+
+          {/* GOALS OVERVIEW CARD WITH FILTERS */}
           <div className="dashboard-card card-medium emp-goals-card">
             <div className="card-header-dark">
               <div className="card-header-content">
                 <i className="bi bi-bullseye"></i>
                 <h3>Goals Overview</h3>
+              </div>
+              <div className="emp-goal-filter-buttons">
+                <button 
+                  className={`emp-goal-filter-btn ${goalFilter === "self" ? "active" : ""}`}
+                  onClick={() => { setGoalFilter("self"); setShowAllGoals(false); }}
+                >
+                  Self
+                </button>
+                <button 
+                  className={`emp-goal-filter-btn ${goalFilter === "team" ? "active" : ""}`}
+                  onClick={() => { setGoalFilter("team"); setShowAllGoals(false); }}
+                >
+                  Team
+                </button>
+                <button 
+                  className={`emp-goal-filter-btn ${goalFilter === "org" ? "active" : ""}`}
+                  onClick={() => { setGoalFilter("org"); setShowAllGoals(false); }}
+                >
+                  Org
+                </button>
               </div>
             </div>
             <div className="card-body">
@@ -471,12 +577,44 @@ const EmployeeDashboard = () => {
                       </ResponsiveContainer>
                     </div>
                   )}
+                  
+                  {goalsData.goalList.length > 0 && (
+                    <>
+                      <div className="emp-goal-list">
+                        {displayedGoals.map((goal, i) => (
+                          <div key={i} className="emp-goal-item">
+                            <Target size={18} className="emp-goal-icon" style={{ color: BLUE_COLORS[i % BLUE_COLORS.length] }} />
+                            <div className="emp-goal-info">
+                              <div className="emp-goal-name">{goal.name}</div>
+                              <span className={`emp-goal-type emp-goal-type-${goal.type}`}>
+                                {goal.type.toUpperCase()}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      {goalsData.goalList.length > 3 && (
+                        <button 
+                          className="emp-goals-toggle-btn" 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setShowAllGoals(!showAllGoals);
+                          }}
+                        >
+                          {showAllGoals ? <><ChevronUp size={16} /> Show Less</> : <><ChevronDown size={16} /> View All Goals</>}
+                        </button>
+                      )}
+                    </>
+                  )}
                 </>
               ) : (
-                <div className="no-data-message">No goals overview data</div>
+                <div className="no-data-message">No {goalFilter === "all" ? "" : goalFilter} goals available</div>
               )}
             </div>
           </div>
+
 
           {/* INTERNAL OPPORTUNITIES CARD */}
           <div className="dashboard-card card-medium emp-opportunities-card">
@@ -509,7 +647,7 @@ const EmployeeDashboard = () => {
                       <div className="emp-opportunity-list">
                         {displayedOpportunities.map((item, i) => (
                           <div key={i} className="emp-opportunity-item">
-                            <Briefcase size={20} style={{ color: BLUE_COLORS[i % BLUE_COLORS.length], flexShrink: 0 }} />
+                            <Briefcase size={18} style={{ color: BLUE_COLORS[i % BLUE_COLORS.length], flexShrink: 0 }} />
                             <div className="emp-opportunity-info">
                               <div className="emp-opportunity-name">{item.name}</div>
                               <div className="emp-opportunity-bar">
@@ -521,7 +659,7 @@ const EmployeeDashboard = () => {
                         ))}
                       </div>
                       
-                      {opportunitiesData.opportunityList.length > 2 && (
+                      {opportunitiesData.opportunityList.length > 3 && (
                         <button 
                           className="emp-opportunities-toggle-btn" 
                           onClick={(e) => {
@@ -542,6 +680,7 @@ const EmployeeDashboard = () => {
             </div>
           </div>
         </div>
+
 
         {/* SECOND ROW */}
         <div className="dashboard-row">
@@ -581,6 +720,7 @@ const EmployeeDashboard = () => {
             </div>
           </div>
 
+
           {/* SLA OVERVIEW CARD */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
@@ -615,6 +755,7 @@ const EmployeeDashboard = () => {
               )}
             </div>
           </div>
+
 
           {/* MEETINGS SCHEDULED CARD */}
           <div className="dashboard-card card-medium">
@@ -662,5 +803,6 @@ const EmployeeDashboard = () => {
     </div>
   );
 };
+
 
 export default EmployeeDashboard;

@@ -2,6 +2,7 @@
    EMPLOYEE DASHBOARD - COMPLETE CSS
    ======================================== */
 
+
 /* LOADING STATE */
 .ada-loading-container {
   display: flex;
@@ -10,15 +11,18 @@
   min-height: 50vh;
 }
 
+
 .spinner-border {
   width: 3rem;
   height: 3rem;
   border-width: 0.3rem;
 }
 
+
 .text-primary {
   color: #1E40AF !important;
 }
+
 
 .visually-hidden {
   position: absolute;
@@ -32,12 +36,14 @@
   border-width: 0;
 }
 
+
 /* MAIN DASHBOARD CONTAINER */
 .hr-dashboard-container {
   padding: 0;
   background: #f8f9fa;
   overflow-x: hidden;
 }
+
 
 /* KPI CARDS GRID - FIXED 5 COLUMNS */
 .admin-kpi-grid {
@@ -46,6 +52,7 @@
   gap: 1rem;
   margin-bottom: 1rem;
 }
+
 
 .admin-kpi-card {
   background: #ffffff;
@@ -59,11 +66,13 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 
+
 .admin-kpi-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(39, 35, 92, 0.12);
   border-color: #1E40AF;
 }
+
 
 .admin-kpi-icon {
   width: 50px;
@@ -76,31 +85,37 @@
   font-size: 1.5rem;
 }
 
+
 /* BLUE NAVY GRADIENT COLORS FOR KPI ICONS */
 .admin-kpi-icon.admin-purple {
   background: linear-gradient(135deg, rgba(30, 64, 175, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%);
   color: #1E40AF;
 }
 
+
 .admin-kpi-icon.admin-blue {
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.1) 100%);
   color: #2563EB;
 }
+
 
 .admin-kpi-icon.admin-pink {
   background: linear-gradient(135deg, rgba(96, 165, 250, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%);
   color: #3B82F6;
 }
 
+
 .admin-kpi-icon.admin-green {
   background: linear-gradient(135deg, rgba(129, 140, 248, 0.18) 0%, rgba(59, 130, 246, 0.1) 100%);
   color: #4F46E5;
 }
 
+
 .admin-kpi-icon.admin-cyan {
   background: linear-gradient(135deg, rgba(191, 219, 254, 0.4) 0%, rgba(147, 197, 253, 0.2) 100%);
   color: #60A5FA;
 }
+
 
 .admin-kpi-content {
   flex: 1;
@@ -111,6 +126,7 @@
   align-items: center;
 }
 
+
 .admin-kpi-content h2 {
   font-size: 1.625rem;
   font-weight: 700;
@@ -119,12 +135,14 @@
   line-height: 1;
 }
 
+
 .admin-kpi-content p {
   font-size: 0.8125rem;
   color: #6c757d;
   margin: 0;
   font-weight: 500;
 }
+
 
 .admin-kpi-subtitle {
   display: flex;
@@ -135,12 +153,14 @@
   margin-top: 0.25rem;
 }
 
+
 /* DASHBOARD CARDS CONTAINER */
 .dashboard-cards-container {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
 }
+
 
 .dashboard-row {
   display: grid;
@@ -149,9 +169,11 @@
   align-items: stretch;
 }
 
+
 .dashboard-row-2 {
   grid-template-columns: repeat(2, 1fr);
 }
+
 
 .dashboard-card {
   background: #ffffff;
@@ -164,14 +186,17 @@
   flex-direction: column;
 }
 
+
 .dashboard-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(39, 35, 92, 0.12);
 }
 
+
 .dashboard-card.card-medium {
   grid-column: span 1;
 }
+
 
 /* CARD ISOLATION - PREVENTS CROSS-CARD INTERFERENCE */
 .emp-recognition-card {
@@ -179,15 +204,18 @@
   contain: layout style;
 }
 
+
 .emp-opportunities-card {
   isolation: isolate;
   contain: layout style;
 }
 
+
 .emp-goals-card {
   isolation: isolate;
   contain: layout style;
 }
+
 
 /* CARD HEADER - SAME DARK NAVY BLUE GRADIENT */
 .card-header-dark {
@@ -200,16 +228,19 @@
   flex-shrink: 0;
 }
 
+
 .card-header-content {
   display: flex;
   align-items: center;
   gap: 0.625rem;
 }
 
+
 .card-header-content i {
   font-size: 1.125rem;
   color: #ffffff;
 }
+
 
 .card-header-content h3 {
   margin: 0;
@@ -218,6 +249,44 @@
   color: #ffffff;
 }
 
+
+/* GOAL FILTER BUTTONS - MANAGER STYLE */
+.emp-goal-filter-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+
+.emp-goal-filter-btn {
+  padding: 0.375rem 0.875rem;
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+
+.emp-goal-filter-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+
+.emp-goal-filter-btn.active {
+  background: #ffffff;
+  color: #27235c;
+  border-color: #ffffff;
+  font-weight: 600;
+}
+
+
 /* CARD BODY - USE FLEXBOX TO FILL SPACE */
 .card-body {
   padding: 1.25rem;
@@ -225,6 +294,7 @@
   display: flex;
   flex-direction: column;
 }
+
 
 .no-data-message {
   display: flex;
@@ -238,6 +308,7 @@
   min-height: 240px;
 }
 
+
 /* STAT CARDS GRID */
 .emp-stats-grid {
   display: grid;
@@ -247,18 +318,22 @@
   flex-shrink: 0;
 }
 
+
 .emp-stats-grid.emp-stats-1col {
   grid-template-columns: 1fr;
   margin-bottom: 0.75rem;
 }
 
+
 .emp-stats-grid.emp-stats-2col {
   grid-template-columns: repeat(2, 1fr);
 }
 
+
 .emp-stats-grid.emp-stats-4col {
   grid-template-columns: repeat(4, 1fr);
 }
+
 
 .emp-stat-card {
   padding: 0.75rem;
@@ -267,10 +342,12 @@
   transition: all 0.2s ease;
 }
 
+
 .emp-stat-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
 }
+
 
 .emp-stat-value {
   font-size: 1.5rem;
@@ -279,12 +356,14 @@
   line-height: 1.2;
 }
 
+
 .emp-stat-label {
   font-size: 0.7rem;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
+
 
 /* STAT CARDS - BLUE THEME VARIANTS */
 .emp-stat-recognition {
@@ -296,6 +375,7 @@
   color: #1E40AF !important;
 }
 
+
 .emp-stat-org-noms {
   background: #e5e7ff !important;
   border: 1px solid #4F46E5 !important;
@@ -304,6 +384,7 @@
 .emp-stat-org-noms .emp-stat-label {
   color: #312E81 !important;
 }
+
 
 .emp-stat-total-purple {
   background: #e5e7ff !important;
@@ -314,6 +395,7 @@
   color: #312E81 !important;
 }
 
+
 .emp-stat-completed-purple {
   background: #27235c !important;
   border: 1px solid #4F46E5 !important;
@@ -322,6 +404,7 @@
 .emp-stat-completed-purple .emp-stat-label {
   color: #ffffff !important;
 }
+
 
 .emp-stat-inprogress-coral {
   background: #DBEAFE !important;
@@ -332,6 +415,7 @@
   color: #2563EB !important;
 }
 
+
 .emp-stat-low-rating {
   background: #eff6ff !important;
   border: 1px solid #2563EB !important;
@@ -340,6 +424,7 @@
 .emp-stat-low-rating .emp-stat-label {
   color: #1D4ED8 !important;
 }
+
 
 .emp-stat-medium-rating {
   background: #DBEAFE !important;
@@ -350,6 +435,7 @@
   color: #1E40AF !important;
 }
 
+
 .emp-stat-high-rating {
   background: #1E40AF !important;
   border: 1px solid #2563EB !important;
@@ -358,6 +444,7 @@
 .emp-stat-high-rating .emp-stat-label {
   color: #ffffff !important;
 }
+
 
 .emp-stat-open {
   background: #DBEAFE !important;
@@ -368,6 +455,7 @@
   color: #2563EB !important;
 }
 
+
 .emp-stat-overdue {
   background: #e0ecff !important;
   border: 1px solid #1D4ED8 !important;
@@ -376,6 +464,7 @@
 .emp-stat-overdue .emp-stat-label {
   color: #1E3A8A !important;
 }
+
 
 /* CENTER WRAPPER FOR CHARTS AND TROPHY */
 .emp-chart-center-wrapper {
@@ -387,6 +476,7 @@
   flex-shrink: 0;
 }
 
+
 /* TROPHY SECTION - CENTERED AND COMPACT */
 .emp-trophy-container {
   position: relative;
@@ -395,10 +485,12 @@
   align-items: center;
 }
 
+
 .emp-trophy-icon {
   color: #1E40AF;
   filter: drop-shadow(0 4px 6px rgba(30, 64, 175, 0.4));
 }
+
 
 .emp-trophy-badge {
   position: absolute;
@@ -419,6 +511,7 @@
   color: #1E3A8A;
 }
 
+
 /* RECOGNITION LIST - COMPACT SPACING WITH PROPER BOTTOM MARGIN */
 .emp-recognition-list {
   width: 100%;
@@ -429,6 +522,7 @@
   margin-bottom: 1rem;
   flex: 1;
 }
+
 
 .emp-recognition-item {
   display: flex;
@@ -441,15 +535,18 @@
   transition: all 0.2s ease;
 }
 
+
 .emp-recognition-item:hover {
   background: linear-gradient(135deg, rgba(147, 197, 253, 0.2) 0%, rgba(191, 219, 254, 0.14) 100%);
   border-color: #60A5FA;
   transform: translateX(4px);
 }
 
+
 .emp-recognition-medal {
   flex-shrink: 0;
 }
+
 
 .emp-recognition-info {
   flex: 1;
@@ -459,8 +556,9 @@
   min-width: 0;
 }
 
+
 .emp-recognition-name {
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   font-weight: 500;
   color: #1E40AF;
   line-height: 1.2;
@@ -468,6 +566,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 
 .emp-recognition-bar {
   width: 100%;
@@ -477,11 +576,13 @@
   overflow: hidden;
 }
 
+
 .emp-recognition-fill {
   height: 100%;
   transition: width 0.3s ease;
   border-radius: 3px;
 }
+
 
 .emp-recognition-count {
   font-size: 0.9375rem;
@@ -490,6 +591,94 @@
   text-align: right;
   flex-shrink: 0;
 }
+
+
+/* GOALS LIST - MATCHING OPPORTUNITIES STYLE */
+.emp-goal-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  margin-bottom: 1rem;
+  flex: 1;
+}
+
+
+.emp-goal-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, rgba(147, 197, 253, 0.12) 0%, rgba(191, 219, 254, 0.08) 100%);
+  border-radius: 8px;
+  border: 1px solid #DBEAFE;
+  transition: all 0.2s ease;
+}
+
+
+.emp-goal-item:hover {
+  background: linear-gradient(135deg, rgba(147, 197, 253, 0.2) 0%, rgba(191, 219, 254, 0.14) 100%);
+  border-color: #60A5FA;
+  transform: translateX(4px);
+}
+
+
+.emp-goal-icon {
+  flex-shrink: 0;
+}
+
+
+.emp-goal-info {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+
+.emp-goal-name {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #1E40AF;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+
+.emp-goal-type {
+  font-size: 0.625rem;
+  font-weight: 600;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+}
+
+
+.emp-goal-type-self {
+  background: #E0E7FF;
+  color: #4338CA;
+}
+
+
+.emp-goal-type-team {
+  background: #DBEAFE;
+  color: #1E40AF;
+}
+
+
+.emp-goal-type-org {
+  background: #E0F2FE;
+  color: #0369A1;
+}
+
 
 /* OPPORTUNITIES LIST - COMPACT SPACING WITH PROPER BOTTOM MARGIN */
 .emp-opportunity-list {
@@ -502,6 +691,7 @@
   flex: 1;
 }
 
+
 .emp-opportunity-item {
   display: flex;
   align-items: center;
@@ -513,11 +703,13 @@
   transition: all 0.2s ease;
 }
 
+
 .emp-opportunity-item:hover {
   background: linear-gradient(135deg, rgba(147, 197, 253, 0.2) 0%, rgba(191, 219, 254, 0.14) 100%);
   border-color: #60A5FA;
   transform: translateX(4px);
 }
+
 
 .emp-opportunity-info {
   flex: 1;
@@ -527,8 +719,9 @@
   min-width: 0;
 }
 
+
 .emp-opportunity-name {
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   font-weight: 500;
   color: #1E40AF;
   line-height: 1.2;
@@ -536,6 +729,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 
 .emp-opportunity-bar {
   width: 100%;
@@ -545,11 +739,13 @@
   overflow: hidden;
 }
 
+
 .emp-opportunity-fill {
   height: 100%;
   transition: width 0.3s ease;
   border-radius: 3px;
 }
+
 
 .emp-opportunity-count {
   font-size: 0.9375rem;
@@ -558,6 +754,7 @@
   text-align: right;
   flex-shrink: 0;
 }
+
 
 /* SEPARATE BUTTON FOR REWARDS/RECOGNITIONS */
 .emp-rewards-toggle-btn {
@@ -581,20 +778,24 @@
   box-shadow: 0 2px 4px rgba(30, 64, 175, 0.2);
 }
 
+
 .emp-rewards-toggle-btn:hover {
   background: linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
 }
 
+
 .emp-rewards-toggle-btn:active {
   transform: translateY(0);
 }
+
 
 .emp-rewards-toggle-btn:focus {
   outline: 2px solid #60A5FA;
   outline-offset: 2px;
 }
+
 
 /* SEPARATE BUTTON FOR OPPORTUNITIES */
 .emp-opportunities-toggle-btn {
@@ -618,20 +819,65 @@
   box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
 }
 
+
 .emp-opportunities-toggle-btn:hover {
   background: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
+
 .emp-opportunities-toggle-btn:active {
   transform: translateY(0);
 }
+
 
 .emp-opportunities-toggle-btn:focus {
   outline: 2px solid #93C5FD;
   outline-offset: 2px;
 }
+
+
+/* GOALS TOGGLE BUTTON - BLUE THEME (MATCHING OPPORTUNITIES) */
+.emp-goals-toggle-btn {
+  width: 100%;
+  margin-top: 0;
+  padding: 0.625rem;
+  background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  isolation: isolate;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+
+.emp-goals-toggle-btn:hover {
+  background: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+
+.emp-goals-toggle-btn:active {
+  transform: translateY(0);
+}
+
+
+.emp-goals-toggle-btn:focus {
+  outline: 2px solid #93C5FD;
+  outline-offset: 2px;
+}
+
 
 /* LEGACY VIEW ALL BUTTON - KEEP FOR BACKWARD COMPATIBILITY */
 .emp-view-all-btn {
@@ -654,15 +900,18 @@
   isolation: isolate;
 }
 
+
 .emp-view-all-btn:hover {
   background: linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
 }
 
+
 .emp-view-all-btn:active {
   transform: translateY(0);
 }
+
 
 /* ANIMATION FOR SMOOTH TRANSITIONS */
 @keyframes fadeIn {
@@ -676,10 +925,13 @@
   }
 }
 
+
 .emp-recognition-item,
-.emp-opportunity-item {
+.emp-opportunity-item,
+.emp-goal-item {
   animation: fadeIn 0.3s ease-out;
 }
+
 
 /* RESPONSIVE DESIGN */
 @media (max-width: 1400px) {
@@ -687,72 +939,116 @@
     grid-template-columns: repeat(3, 1fr);
   }
 
+
   .dashboard-row {
     grid-template-columns: repeat(2, 1fr);
   }
+
 
   .dashboard-row-2 {
     grid-template-columns: repeat(2, 1fr);
   }
 
+
   .emp-stats-grid.emp-stats-4col {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
 
 @media (max-width: 992px) {
   .admin-kpi-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
+
   .dashboard-row {
     grid-template-columns: 1fr;
   }
+
 
   .dashboard-row-2 {
     grid-template-columns: 1fr;
   }
 
+
   .emp-stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
 
   .emp-stats-grid.emp-stats-4col {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
+
+@media (max-width: 768px) {
+  .emp-goal-filter-buttons {
+    gap: 0.375rem;
+  }
+  
+  .emp-goal-filter-btn {
+    padding: 0.3rem 0.65rem;
+    font-size: 0.75rem;
+  }
+}
+
+
 @media (max-width: 576px) {
   .admin-kpi-grid {
     grid-template-columns: 1fr;
   }
 
+
   .admin-kpi-card {
     padding: 1rem;
   }
+
+
+  .card-header-dark {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  
+  .emp-goal-filter-buttons {
+    justify-content: stretch;
+  }
+  
+  .emp-goal-filter-btn {
+    flex: 1;
+  }
+
 
   .card-body {
     padding: 1rem;
   }
 
+
   .emp-stats-grid {
     grid-template-columns: 1fr;
   }
+
 
   .emp-stats-grid.emp-stats-2col,
   .emp-stats-grid.emp-stats-4col {
     grid-template-columns: 1fr;
   }
 
+
   .emp-recognition-item,
-  .emp-opportunity-item {
+  .emp-opportunity-item,
+  .emp-goal-item {
     padding: 0.625rem;
   }
+
 
   .emp-trophy-icon {
     width: 80px;
     height: 80px;
   }
+
 
   .emp-trophy-badge {
     width: 40px;
@@ -761,11 +1057,13 @@
   }
 }
 
+
 /* PRINT STYLES */
 @media print {
   .hr-dashboard-container {
     background: #ffffff;
   }
+
 
   .dashboard-card {
     page-break-inside: avoid;
@@ -773,44 +1071,57 @@
     border: 1px solid #e5e7eb;
   }
 
+
   .emp-rewards-toggle-btn,
   .emp-opportunities-toggle-btn,
-  .emp-view-all-btn {
+  .emp-goals-toggle-btn,
+  .emp-view-all-btn,
+  .emp-goal-filter-buttons {
     display: none;
   }
+
 
   .admin-kpi-card:hover,
   .dashboard-card:hover,
   .emp-stat-card:hover,
   .emp-recognition-item:hover,
-  .emp-opportunity-item:hover {
+  .emp-opportunity-item:hover,
+  .emp-goal-item:hover {
     transform: none;
     box-shadow: none;
   }
 }
 
+
 /* ACCESSIBILITY IMPROVEMENTS */
 .emp-rewards-toggle-btn:focus-visible,
 .emp-opportunities-toggle-btn:focus-visible,
-.emp-view-all-btn:focus-visible {
+.emp-goals-toggle-btn:focus-visible,
+.emp-view-all-btn:focus-visible,
+.emp-goal-filter-btn:focus-visible {
   outline: 3px solid #60A5FA;
   outline-offset: 3px;
 }
 
+
 /* PREVENT TEXT SELECTION ON BUTTONS */
 .emp-rewards-toggle-btn,
 .emp-opportunities-toggle-btn,
-.emp-view-all-btn {
+.emp-goals-toggle-btn,
+.emp-view-all-btn,
+.emp-goal-filter-btn {
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
 }
 
+
 /* SMOOTH SCROLLING */
 html {
   scroll-behavior: smooth;
 }
+
 
 /* HIGH CONTRAST MODE SUPPORT */
 @media (prefers-contrast: high) {
@@ -819,11 +1130,14 @@ html {
     border-width: 2px;
   }
 
+
   .emp-recognition-item,
-  .emp-opportunity-item {
+  .emp-opportunity-item,
+  .emp-goal-item {
     border-width: 2px;
   }
 }
+
 
 /* REDUCED MOTION SUPPORT */
 @media (prefers-reduced-motion: reduce) {
@@ -835,8 +1149,10 @@ html {
     transition-duration: 0.01ms !important;
   }
 
+
   .emp-rewards-toggle-btn:hover,
   .emp-opportunities-toggle-btn:hover,
+  .emp-goals-toggle-btn:hover,
   .admin-kpi-card:hover,
   .dashboard-card:hover {
     transform: none;
