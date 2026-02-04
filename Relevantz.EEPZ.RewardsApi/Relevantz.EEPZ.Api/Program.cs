@@ -18,12 +18,12 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Diagnostics;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Core.Service;
-
-
-// ADDED (metrics)
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 var sharedUploadsPath = Path.GetFullPath(Path.Combine(
     Directory.GetCurrentDirectory(),
@@ -42,6 +42,7 @@ else
 }
 builder.Services.AddSingleton(new FileUploadSettings { UploadPath = sharedUploadsPath });
 
+
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
@@ -51,6 +52,7 @@ builder.Host.UseSerilog();
 
 Log.Information("Starting EEPZ Performance Management Application...");
 Log.Information("Shared Uploads Path: {Path}", sharedUploadsPath);
+
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -92,9 +94,12 @@ builder.Services.AddSwaggerGen(options =>
     options.CustomSchemaIds(type => type.FullName.Replace("+", "."));
 });
 
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<EEPZDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+builder.Services.AddScoped<DbContext>(sp => sp.GetRequiredService<EEPZDbContext>());
+
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey not configured");
@@ -119,12 +124,32 @@ builder.Services.AddAuthentication(options =>
         RoleClaimType = ClaimTypes.Role,
         NameClaimType = JwtRegisteredClaimNames.Sub
     };
+
+    // Safe logging (no tokens/headers)
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = ctx =>
+        {
+            Log.Debug("JWT OnMessageReceived Path={Path}", ctx.Request.Path);
+            return Task.CompletedTask;
+        },
+        OnTokenValidated = ctx =>
+        {
+            Log.Information("JWT Validated Sub={Sub} CID={CID}",
+                ctx.Principal?.FindFirstValue(JwtRegisteredClaimNames.Sub),
+                ctx.HttpContext.TraceIdentifier);
+            return Task.CompletedTask;
+        },
+        OnAuthenticationFailed = ctx =>
+        {
+            Log.Warning(ctx.Exception, "JWT Authentication Failed Path={Path}", ctx.Request.Path);
+            return Task.CompletedTask;
+        }
+    };
 });
 
 builder.Services.AddAuthorization();
-builder.Services.AddScoped<DbContext>(sp => sp.GetRequiredService<EEPZDbContext>());
 
-// ✅ Register all repositories and services
 builder.Services.AddScoped<IHRNominationRepository, HRNominationRepository>();
 builder.Services.AddScoped<IHRNominationService, HRNominationService>();
 
@@ -134,9 +159,9 @@ builder.Services.AddScoped<IManagerNominationService, ManagerNominationService>(
 builder.Services.AddScoped<IEmployeeNominationRepository, EmployeeNominationRepository>();
 builder.Services.AddScoped<IEmployeeNominationService, EmployeeNominationService>();
 
-
 builder.Services.AddScoped<IDepartmentHeadNominationRepository, DepartmentHeadNominationRepository>();
 builder.Services.AddScoped<IDepartmentHeadNominationService, DepartmentHeadNominationService>();
+
 
 builder.Services.AddCors(options =>
 {
@@ -149,17 +174,73 @@ builder.Services.AddCors(options =>
     });
 });
 
+
 builder.Services.AddHealthChecks()
     .AddCheck("self", () => HealthCheckResult.Healthy("App is running"), tags: new[] { "live" })
     .AddCheck<MySqlDbHealthCheck>("mysql-db", tags: new[] { "ready", "db", "mysql" });
 
-// Register custom exception handling middleware
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.AddPolicy("PerIp", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 100,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            }));
+});
+
+
 builder.Services.AddTransient<Relevantz.EEPZ.Api.Middleware.ExceptionHandlingMiddleware>();
+
 
 var app = builder.Build();
 
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    // ADDED: HSTS for production
+    app.UseHsts();
+}
+
+
+// SECURITY HEADERS 
+
+app.Use(async (ctx, next) =>
+{
+    ctx.Response.Headers.Remove("Server");
+    ctx.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    ctx.Response.Headers["X-Frame-Options"] = "DENY";
+    ctx.Response.Headers["Referrer-Policy"] = "no-referrer";
+    ctx.Response.Headers["Permissions-Policy"] = "geolocation=(), camera=(), microphone=()";
+
+    var isSwagger = ctx.Request.Path.StartsWithSegments("/swagger") || string.Equals(ctx.Request.Path, "/");
+    if (!isSwagger)
+    {
+        ctx.Response.Headers["Content-Security-Policy"] =
+            "default-src 'none'; frame-ancestors 'none'; base-uri 'none'";
+    }
+
+    await next();
+});
+
+app.UseRateLimiter();
+
+
 app.UseHttpMetrics();
 app.MapMetrics("/metrics");
+
+
+app.UseSerilogRequestLogging();
 
 if (app.Environment.IsDevelopment())
 {
@@ -171,21 +252,18 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseSerilogRequestLogging();
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-}
 
 app.UseMiddleware<Relevantz.EEPZ.Api.Middleware.ExceptionHandlingMiddleware>();
+
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 
+
 app.MapControllers();
+
 
 app.MapHealthChecks("/health/live", new HealthCheckOptions
 {
@@ -226,6 +304,7 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions
     }
 }).AllowAnonymous();
 
+
 try
 {
     Log.Information("EEPZ Performance Management API started successfully on port 5114");
@@ -240,6 +319,7 @@ finally
 {
     Log.CloseAndFlush();
 }
+
 
 public class FileUploadSettings
 {
