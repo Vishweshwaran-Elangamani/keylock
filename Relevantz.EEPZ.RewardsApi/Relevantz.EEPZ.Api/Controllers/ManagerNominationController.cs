@@ -11,7 +11,9 @@ namespace Relevantz.EEPZ.Api.Controllers
     /// view teams and nominations, and submit new nominations.
     /// </summary>
     [ApiController]
+    [ApiVersion("1.0")]
     [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [Authorize]
     [Authorize(Roles = "Manager")]
     [Produces("application/json")]

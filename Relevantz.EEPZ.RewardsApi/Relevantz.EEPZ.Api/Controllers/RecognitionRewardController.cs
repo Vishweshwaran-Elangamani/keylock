@@ -7,8 +7,10 @@ using Relevantz.EEPZ.Core.Services.Interfaces;
 namespace Relevantz.EEPZ.Api.Controllers
 {
     [ApiController]
+    [ApiVersion("1.0")]
     [Authorize]
     [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class RecognitionRewardController : ControllerBase
     {
         private readonly IRecognitionRewardService _service;

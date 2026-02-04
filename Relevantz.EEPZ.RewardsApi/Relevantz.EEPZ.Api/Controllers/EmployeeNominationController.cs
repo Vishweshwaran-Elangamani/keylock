@@ -13,8 +13,10 @@ using Relevantz.EEPZ.Core.Services.Interfaces;
 namespace Relevantz.EEPZ.API.Controllers
 {
     [ApiController]
+    [ApiVersion("1.0")]
     [Authorize]
     [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [Produces(MediaTypeNames.Application.Json)]
     public class EmployeeNominationController : ControllerBase
     {
