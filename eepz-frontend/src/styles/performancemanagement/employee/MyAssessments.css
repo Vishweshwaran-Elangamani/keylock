@@ -1816,3 +1816,35 @@
     transform: rotate(360deg);
   }
 }
+.empass-form-table th:nth-child(1),
+.empass-form-table td:nth-child(1) {
+  width: 240px;
+  min-width: 240px;
+  max-width: 240px;
+}
+ 
+.empass-form-table th:nth-child(2),
+.empass-form-table td:nth-child(2) {
+  width: 260px;
+  min-width: 240px;
+  max-width: 280px;
+}
+ 
+.empass-form-table th:nth-child(3),
+.empass-form-table td:nth-child(3) {
+  width: 140px;
+  min-width: 130px;
+  max-width: 150px;
+  text-align: center;
+}
+ 
+.empass-form-table th:nth-child(4),
+.empass-form-table td:nth-child(4) {
+  width: auto;
+  min-width: 230px;
+}
+ 
+.empass-custom-rating-dropdown {
+  width: 130px !important;
+}
+ 
