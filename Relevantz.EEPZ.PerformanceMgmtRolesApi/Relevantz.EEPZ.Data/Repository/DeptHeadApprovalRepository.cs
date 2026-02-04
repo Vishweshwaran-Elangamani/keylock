@@ -55,7 +55,7 @@ public async Task<PagedResult<Userprofile>> GetUserProfilesPagedAsync(int page, 
     var total = await query.CountAsync();
 
     var items = await query
-        .OrderBy(x => x.EmployeeId) 
+        .OrderBy(x => x.EmployeeId) // stable ordering required for paging
         .Skip((page - 1) * pageSize)
         .Take(pageSize)
         .ToListAsync();
@@ -90,7 +90,7 @@ public async Task<PagedResult<Userprofile>> GetUserProfilesPagedAsync(int page, 
             var total = await query.CountAsync();
 
             var items = await query
-                .OrderBy(x => x.EmployeeId) 
+                .OrderBy(x => x.EmployeeId) // stable ordering
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
