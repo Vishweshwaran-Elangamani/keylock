@@ -1,0 +1,32 @@
+# Build output
+**/bin/
+**/obj/
+
+# IDE
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# OS / misc
+*.swp
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
+
+# Node (if present in the solution)
+node_modules/
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Environment & secrets (do not bake into images)
+.env
+.env.*
+secrets.json
+appsettings.*.local.json

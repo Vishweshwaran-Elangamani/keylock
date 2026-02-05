@@ -1,0 +1,29 @@
+services:
+  rewards-api:
+    build:
+      context: .            # Dockerfile is in THIS folder
+      dockerfile: Dockerfile
+    image: eepz-rewards-api:dev
+    container_name: eepz-rewards-api-dev
+    restart: unless-stopped
+    ports:
+      - "5114:5114"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: "http://+:5114"
+      ConnectionStrings__DefaultConnection: "Server=mysql;Database=eepzdb;User=root;Password=root;"
+    volumes:
+      - ./logs:/app/Logs
+      - shared_uploads:/SharedUploads
+      - dataprotection_keys:/home/app/.aspnet/DataProtection-Keys
+    networks:
+      - eepz-network
+    # No depends_on here because mysql is in another compose project
+
+volumes:
+  shared_uploads:
+  dataprotection_keys:
+
+networks:
+  eepz-network:
+    external: true
