@@ -1,3 +1,9 @@
+
+using FluentValidation;
+using FluentValidation.AspNetCore;
+
+using Relevantz.EEPZ.Common.Validators;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -11,7 +17,7 @@ using Relevantz.EEPZ.Data.Repository.Implementations;
 using Relevantz.EEPZ.Data.DBContexts;
 using System.IdentityModel.Tokens.Jwt;
 using Serilog;
-using PerformanceManagement.Middleware; // <-- Make sure this namespace matches your middleware file
+using PerformanceManagement.Middleware; 
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +60,14 @@ Log.Information("Shared Uploads Path: {Path}", sharedUploadsPath);
 // -----------------------------------------------
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddControllers();
+
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+
+builder.Services.AddValidatorsFromAssemblyContaining<SubmitReviewDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<AcknowledgeRequestDtoValidator>();
+
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -109,7 +123,6 @@ Log.Information("JWT Issuer: {Issuer}", jwtSettings["Issuer"]);
 Log.Information("JWT Audience: {Audience}", jwtSettings["Audience"]);
 Log.Information("JWT SecretKey Length: {Length} characters", secretKey.Length);
 
-// Ensure inbound claim mapping is not altered by defaults
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 builder.Services.AddAuthentication(options =>
@@ -130,7 +143,6 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
         ClockSkew = TimeSpan.Zero,
 
-        // Ensure your controllers can rely on ClaimTypes.NameIdentifier & ClaimTypes.Role
         RoleClaimType = ClaimTypes.Role,
         NameClaimType = ClaimTypes.NameIdentifier
     };
@@ -143,7 +155,6 @@ builder.Services.AddAuthentication(options =>
             if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             {
                 var token = authHeader.Substring("Bearer ".Length).Trim();
-                // Avoid logging the raw token for security. Log only length or a hash if needed.
                 Log.Debug("Token received (length): {Length}", token.Length);
             }
             else
@@ -174,7 +185,6 @@ builder.Services.AddAuthentication(options =>
         {
             Log.Information("Token validated successfully");
 
-            // Map sub -> nameidentifier if token doesn't carry it
             var principal = context.Principal;
             if (principal is not null)
             {
@@ -226,6 +236,8 @@ builder.Services.AddScoped<IDeptHeadApprovalsService, DeptHeadApprovalsService>(
 
 builder.Services.AddScoped<IEmployeesRepository, EmployeesRepository>();
 builder.Services.AddScoped<IEmployeesService, EmployeesService>();
+builder.Services.AddValidatorsFromAssemblyContaining<SubmitReviewDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<AcknowledgeRequestDtoValidator>();
 
 // -----------------------------------------------
 // CORS
@@ -267,7 +279,6 @@ app.UseSerilogRequestLogging(options =>
     };
 });
 
-// 🔐 Global exception handling early to catch downstream errors
 app.UseGlobalExceptionHandling();
 
 app.UseHttpsRedirection();

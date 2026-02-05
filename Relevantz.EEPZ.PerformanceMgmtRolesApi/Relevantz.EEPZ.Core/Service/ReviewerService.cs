@@ -26,7 +26,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _repository = repository;
             _configuration = configuration;
 
-            // Initialize MongoDB GridFS
             var connectionString = _configuration["MongoDbSettings:ConnectionString"];
             var databaseName = _configuration["MongoDbSettings:DatabaseName"];
             var bucketName = _configuration["MongoDbSettings:GridFSBucketName"];
@@ -92,10 +91,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 if (string.IsNullOrWhiteSpace(attachment.FilePath))
                     return (false, null, null, null, new List<string> { "FILE_NOT_FOUND - File path missing." });
 
-                // FilePath contains the GridFS ObjectId
                 var fileId = MongoDB.Bson.ObjectId.Parse(attachment.FilePath);
 
-                // Download file from GridFS
                 var fileBytes = await _gridFSBucket.DownloadAsBytesAsync(fileId);
                 var contentType = attachment.FileType ?? "application/octet-stream";
 
