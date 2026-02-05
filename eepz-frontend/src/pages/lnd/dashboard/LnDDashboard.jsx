@@ -52,7 +52,7 @@ const LnDDashboard = () => {
       const [skillsRes, assignmentsRes, approvalsRes, smeRes] =
         await Promise.all([
           lndService
-            .getMySkills(1) 
+            .getMySkills(1)
             .catch(() => ({ data: { data: { totalCount: 0 } } })),
           lndService
             .getMyAssignments({

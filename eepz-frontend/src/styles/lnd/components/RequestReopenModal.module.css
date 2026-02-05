@@ -1,3 +1,23 @@
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .modalOverlay {
   position: fixed;
   top: 0;
@@ -5,71 +25,300 @@
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
+  z-index: 1500;
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 1000;
+  justify-content: center;
+  padding: 10px;
+  animation: fadeIn 0.2s ease-in-out;
 }
 
 .modalContent {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  width: 450px;
-  text-align: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background: #fff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 480px; 
+  max-height: 85vh; 
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease-out;
+}
+
+.modalHeader {
+  padding: 1rem 1.25rem; 
+  background: rgb(39, 35, 92);
+  border-bottom: 1px solid #e5e7eb;
+  border-radius: 12px 12px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.modalHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem; 
+}
+
+.modalIcon {
+  color: white;
+  width: 20px; 
+  height: 20px;
 }
 
 .modalTitle {
-  font-size: 18px;
+  margin: 0;
+  font-size: 1.125rem; 
   font-weight: 600;
-  margin-bottom: 20px;
-  color: #333;
+  color: white;
 }
 
-.reasonInput {
+.closeButton {
+  border: none;
+  width: 32px; 
+  height: 32px;
+  background-color: transparent;
+  color: white;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 18px; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.closeButton:hover:not(:disabled) {
+  color: #ef4444;
+}
+
+.closeButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.modalBody {
+  overflow-y: auto;
+  flex-grow: 1;
+  padding: 1.25rem; 
+}
+
+.assignmentInfo {
+  background-color: #f9fafb;
+  border-radius: 8px;
+  padding: 0.875rem; 
+  margin-bottom: 1.25rem; 
+  border: 1px solid #e5e7eb;
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline; 
+  padding: 0.4rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.infoRow:last-child {
+  border-bottom: none;
+}
+
+.infoLabel {
+  font-weight: 500;
+  color: #6b7280;
+  font-size: 0.8125rem; 
+  text-align: left; 
+  flex-shrink: 0;
+  min-width: 120px; 
+}
+
+.infoValue {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 0.8125rem; 
+  text-align: left; 
+  flex-grow: 1;
+}
+
+.infoDaysOverdue {
+  font-weight: 700;
+  color: #dc2626;
+  font-size: 0.8125rem; 
+  text-align: left; 
+  flex-grow: 1;
+}
+
+.warningBox {
+  display: flex;
+  gap: 0.625rem; 
+  padding: 0.875rem; 
+  background-color: #fef3c7;
+  border: 1px solid #fcd34d;
+  border-radius: 8px;
+  margin-bottom: 1.25rem; 
+}
+
+.warningIcon {
+  color: #f59e0b;
+  flex-shrink: 0;
+  margin-top: 2px;
+  width: 18px; 
+  height: 18px;
+}
+
+.warningText {
+  margin: 0;
+  font-size: 0.8125rem; 
+  color: #92400e;
+  line-height: 1.5;
+}
+
+.formGroup {
+  margin-bottom: 1.25rem; 
+}
+
+.formLabel {
+  display: block;
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem; 
+}
+
+.required {
+  color: #dc2626;
+}
+
+.textarea {
   width: 100%;
-  height: 100px;
-  padding: 10px;
-  margin-top: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 14px;
-  color: #333;
-  resize: none;
+  padding: 0.625rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.875rem; 
+  font-family: inherit;
+  resize: vertical;
+  min-height: 100px; 
+  max-height: 200px; 
+  transition: all 0.2s;
   outline: none;
 }
 
-.modalActions {
-  margin-top: 20px;
+.textarea:focus {
+  border-color: rgb(39, 35, 92);
+  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+}
+
+.textarea:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+}
+
+.charCount {
+  text-align: right;
+  font-size: 0.6875rem; 
+  color: #9ca3af;
+  margin-top: 0.25rem;
+}
+
+.errorBox {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem; 
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #dc2626;
+  font-size: 0.8125rem; 
+  margin-bottom: 1rem;
 }
 
-.submitButton {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.submitButton:hover {
-  background-color: #45a049;
+.modalFooter {
+  padding: 0.875rem 1.25rem; 
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  gap: 0.625rem; 
+  justify-content: flex-end;
+  flex-shrink: 0;
 }
 
 .cancelButton {
-  background-color: #f44336;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
+  padding: 0.5rem 1rem; 
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.8125rem; 
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  background: #fff;
+  color: #6c757d;
+  transition: all 0.2s;
 }
 
-.cancelButton:hover {
-  background-color: #d32f2f;
+.cancelButton:hover:not(:disabled) {
+  background-color: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.cancelButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.submitButton {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.8125rem; 
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+  background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
+  color: #fff;
+}
+
+.submitButton:hover:not(:disabled) {
+  filter: brightness(105%);
+}
+
+.submitButton:disabled {
+  background: #e5e7eb;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .modalContent {
+    max-width: 100%;
+    margin: 0;
+    border-radius: 0;
+    max-height: 100vh;
+  }
+
+  .modalHeader {
+    padding: 0.875rem;
+  }
+
+  .modalBody {
+    padding: 1rem;
+  }
+
+  .modalTitle {
+    font-size: 1rem;
+  }
+
+  .infoLabel {
+    min-width: 100px;
+    font-size: 0.75rem;
+  }
+
+  .infoValue,
+  .infoDaysOverdue {
+    font-size: 0.75rem;
+  }
 }

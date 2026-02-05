@@ -57,7 +57,7 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
     "rar",
     "7z",
   ];
-
+    
   const hasAttachment = approval.attachmentPath || approval.attachmentFileName;
   let canPreview = false;
   if (hasAttachment) {
@@ -110,16 +110,16 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
         if (blockedContentTypes.includes(contentType)) {
           toast.warning(LND_TOASTS.PREVIEW_NOT_SUPPORTED);
           return;
-        }
+        } 
 
         if (!previewableContentTypes.includes(contentType)) {
           toast.warning(LND_TOASTS.PREVIEW_NOT_SUPPORTED);
           return;
-        }
+        } 
 
         previewFile(response.data, contentType);
         toast.success(LND_TOASTS.LOADING);
-      }
+      } 
     } catch (error) {
       const errorMessage =
         error.response?.data?.message ||
@@ -457,7 +457,7 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
                     processing
                   }
                 >
-                  {processing ? (
+                  {processing ? (                    
                     <>
                       <span
                         className="spinner-border spinner-border-sm"
@@ -488,4 +488,4 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
   );
 };
 
-export default ApprovalDecisionModal;
+export default ApprovalDecisionModal;    

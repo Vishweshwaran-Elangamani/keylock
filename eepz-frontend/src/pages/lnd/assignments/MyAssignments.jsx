@@ -7,45 +7,56 @@ import {
   ChevronDown,
   Filter,
   AlertTriangle,
+  RotateCcw,
+  Clock,
 } from "lucide-react";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 import StatusBadge from "../../../components/lnd/common/StatusBadge";
 import EmptyState from "../../../components/lnd/common/EmptyState";
 import Pagination from "../../../components/lnd/common/Pagination";
 import UploadProofModal from "../../../components/lnd/modals/UploadProofModal";
+import RequestReopenModal from "../../../components/lnd/modals/RequestReopenModal";
 import { lndService, downloadFile } from "../../../services/lnd/lndService";
 import { ASSIGNMENT_STATUS } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
 import styles from "../../../styles/lnd/pages/assignments/MyAssignments.module.css";
 import { LND_TOASTS } from "../../../constants/lnd/lndToasts";
+
 const MyAssignments = () => {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showReopenModal, setShowReopenModal] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState(null);
   const [userRole, setUserRole] = useState("");
   const [rolePrefix, setRolePrefix] = useState("");
+
   // Search
   const [searchTerm, setSearchTerm] = useState("");
   const [searchInput, setSearchInput] = useState("");
+
   // Filter
   const [statusFilter, setStatusFilter] = useState("");
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const dropdownRef = useRef(null);
+
   // Sorting
   const [sortField, setSortField] = useState("");
   const [sortOrderAsc, setSortOrderAsc] = useState(true);
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const roleName = user?.role || "";
     setUserRole(roleName);
     setRolePrefix(getRolePrefix(roleName));
   }, []);
+
   const getRolePrefix = (role) => {
     const prefixMap = {
       Manager: "/manager",
@@ -69,6 +80,7 @@ const MyAssignments = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
   useEffect(() => {
     fetchAssignments();
   }, [
@@ -79,6 +91,7 @@ const MyAssignments = () => {
     sortField,
     sortOrderAsc,
   ]);
+
   const fetchAssignments = async () => {
     try {
       setLoading(true);
@@ -106,42 +119,62 @@ const MyAssignments = () => {
       setLoading(false);
     }
   };
+
   const handleSearchInputChange = (e) => {
     setSearchInput(e.target.value);
   };
+
   const handleSearch = (e) => {
     e.preventDefault();
     setSearchTerm(searchInput);
     setCurrentPage(1);
   };
+
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleSearch(e);
     }
   };
+
   const handleCancelSearch = () => {
     setSearchInput("");
     setSearchTerm("");
     setCurrentPage(1);
   };
+
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
   const handleItemsPerPageChange = (newSize) => {
     setItemsPerPage(newSize);
     setCurrentPage(1);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
   const handleUploadProof = (assignment) => {
     setSelectedAssignment(assignment);
     setShowUploadModal(true);
   };
+
   const handleUploadSuccess = () => {
     setShowUploadModal(false);
     toast.success("Proof uploaded successfully!");
     fetchAssignments();
   };
+
+  const handleRequestReopen = (assignment) => {
+    setSelectedAssignment(assignment);
+    setShowReopenModal(true);
+  };
+
+  const handleReopenSuccess = () => {
+    setShowReopenModal(false);
+    toast.success("Reopen request submitted successfully!");
+    fetchAssignments(); // Refresh to get updated hasPendingReopenRequest flag
+  };
+
   const handleDownloadProof = async (assignment) => {
     try {
       const response = await lndService.downloadAssignmentProof(
@@ -154,6 +187,7 @@ const MyAssignments = () => {
       toast.error(LND_TOASTS.DOWNLOAD_FAILED);
     }
   };
+
   const onSortClick = (field) => {
     if (sortField === field) {
       setSortOrderAsc(!sortOrderAsc);
@@ -163,6 +197,7 @@ const MyAssignments = () => {
     }
     setCurrentPage(1);
   };
+
   const renderSortIcon = (field) => {
     const isActive = sortField === field;
     const iconClass = isActive
@@ -179,6 +214,7 @@ const MyAssignments = () => {
       <ChevronDown size={14} className={`${styles.sortIcon} ${iconClass}`} />
     );
   };
+
   const getStatusLabel = (value) => {
     const statusMap = {
       "": "All Statuses",
@@ -191,6 +227,7 @@ const MyAssignments = () => {
     };
     return statusMap[value] || "All Statuses";
   };
+
   const statusOptions = [
     { value: "", label: "All Statuses" },
     {
@@ -205,6 +242,7 @@ const MyAssignments = () => {
     { value: ASSIGNMENT_STATUS.COMPLETED, label: "Completed" },
     { value: ASSIGNMENT_STATUS.OVERDUE, label: "Overdue" },
   ];
+
   const getHeaderCellClass = (field, align) => {
     const baseClass = styles.tableHeaderCell;
     const alignClass =
@@ -215,11 +253,13 @@ const MyAssignments = () => {
     const activeClass = sortField === field ? styles.tableHeaderCellActive : "";
     return `${baseClass} ${alignClass} ${sortableClass} ${activeClass}`.trim();
   };
+
   const getDropdownItemClass = (currentValue, optionValue) => {
     return `${styles.dropdownItem} ${
       currentValue === optionValue ? styles.dropdownItemActive : ""
     }`.trim();
   };
+
   if (loading && assignments.length === 0) {
     return (
       <div className={styles.loadingContainer}>
@@ -229,6 +269,7 @@ const MyAssignments = () => {
       </div>
     );
   }
+
   return (
     <div>
       <Breadcrumb
@@ -237,6 +278,7 @@ const MyAssignments = () => {
           { label: "My Assignments" },
         ]}
       />
+
       <div className={styles.filterContainer}>
         <form onSubmit={handleSearch} className={styles.searchForm}>
           <div className="input-group">
@@ -265,6 +307,7 @@ const MyAssignments = () => {
             )}
           </div>
         </form>
+
         {/* CUSTOM DROPDOWN */}
         <div ref={dropdownRef} className={styles.dropdownWrapper}>
           <button
@@ -298,6 +341,7 @@ const MyAssignments = () => {
           )}
         </div>
       </div>
+
       {assignments.length === 0 && !loading ? (
         <EmptyState
           icon={Filter}
@@ -329,7 +373,7 @@ const MyAssignments = () => {
                     align: "center",
                   },
                   { label: "Proof", field: null, align: "center" },
-                  { label: "Request Ack", field: null, align: "center" },
+                  { label: "Actions", field: null, align: "center" },
                 ].map(({ label, field, align }) => (
                   <div
                     key={field || label}
@@ -341,6 +385,7 @@ const MyAssignments = () => {
                   </div>
                 ))}
               </div>
+
               {assignments.map((assignment, idx) => (
                 <div
                   key={assignment.assignmentId}
@@ -355,6 +400,7 @@ const MyAssignments = () => {
                   >
                     {assignment.skillName}
                   </div>
+
                   {/* SME Assigned */}
                   <div
                     className={styles.cellSmeName}
@@ -362,10 +408,12 @@ const MyAssignments = () => {
                   >
                     {assignment.smeName}
                   </div>
+
                   {/* Assignment Status */}
                   <div className={styles.cellStatus}>
                     <StatusBadge status={assignment.status} />
                   </div>
+
                   {/* Start Date */}
                   <div className={styles.cellDate}>
                     {assignment.createdOn ? (
@@ -374,6 +422,7 @@ const MyAssignments = () => {
                       <span className={styles.cellNone}>None</span>
                     )}
                   </div>
+
                   {/* Due Date */}
                   <div
                     className={
@@ -396,6 +445,7 @@ const MyAssignments = () => {
                       <span className={styles.cellNone}>None</span>
                     )}
                   </div>
+
                   {/* Score */}
                   <div className={styles.cellScore}>
                     {assignment.completionRating ? (
@@ -404,6 +454,7 @@ const MyAssignments = () => {
                       <span className={styles.cellNone}>None</span>
                     )}
                   </div>
+
                   {/* Proof */}
                   <div className={styles.cellCenter}>
                     {assignment.proofFilePath ? (
@@ -418,14 +469,40 @@ const MyAssignments = () => {
                       <span className={styles.cellNone}>None</span>
                     )}
                   </div>
-                  {/* Request Acknowledgement / Upload Proof */}
+
+                  {/* Actions Column - Upload, Reopen, or Pending */}
                   <div className={styles.cellCenter}>
-                    {assignment.status === ASSIGNMENT_STATUS.IN_PROGRESS ? (
+                    {assignment.status === ASSIGNMENT_STATUS.IN_PROGRESS &&
+                    !assignment.isOverdue ? (
+                      // Upload button for non-overdue assignments
                       <button
                         onClick={() => handleUploadProof(assignment)}
                         className={styles.uploadButton}
+                        title="Upload completion proof"
                       >
                         <Upload size={14} /> Upload
+                      </button>
+                    ) : assignment.status === ASSIGNMENT_STATUS.IN_PROGRESS &&
+                      assignment.isOverdue &&
+                      !assignment.hasPendingReopenRequest ? (
+                      // Reopen button for overdue WITHOUT pending request
+                      <button
+                        onClick={() => handleRequestReopen(assignment)}
+                        className={styles.reopenButton}
+                        title="Request to reopen assignment"
+                      >
+                        <RotateCcw size={14} /> Reopen
+                      </button>
+                    ) : assignment.status === ASSIGNMENT_STATUS.IN_PROGRESS &&
+                      assignment.isOverdue &&
+                      assignment.hasPendingReopenRequest ? (
+                      // Pending button for overdue WITH pending request
+                      <button
+                        disabled
+                        className={styles.pendingButton}
+                        title="Reopen request is pending manager approval"
+                      >
+                        <Clock size={14} /> Reopen Pending
                       </button>
                     ) : (
                       <span className={styles.cellNone}>None</span>
@@ -435,6 +512,7 @@ const MyAssignments = () => {
               ))}
             </div>
           </div>
+
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -447,6 +525,8 @@ const MyAssignments = () => {
           />
         </>
       )}
+
+      {/* Upload Proof Modal */}
       {showUploadModal && (
         <UploadProofModal
           assignment={selectedAssignment}
@@ -454,7 +534,17 @@ const MyAssignments = () => {
           onSuccess={handleUploadSuccess}
         />
       )}
+
+      {/* Request Reopen Modal */}
+      {showReopenModal && (
+        <RequestReopenModal
+          assignment={selectedAssignment}
+          onClose={() => setShowReopenModal(false)}
+          onSuccess={handleReopenSuccess}
+        />
+      )}
     </div>
   );
 };
-export default MyAssignments;                                                                       
+
+export default MyAssignments;

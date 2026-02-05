@@ -39,7 +39,7 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
   const fetchEmployeeSkills = async () => {
     try {
       setLoading(true);
-      const response = isReadOnly
+      const response = isReadOnly  
         ? await lndService.getEmployeeSkillsForHR(
             employee.employeeId,
             1,
@@ -59,13 +59,13 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
     } catch (error) {
       toast.error(LND_TOASTS.FAILED_TO_LOAD_SKILLS);
     } finally {
-      setLoading(false);
+      setLoading(false);        
     }
   };
 
   const fetchTeamAssignments = async () => {
     try {
-      setLoading(true);
+      setLoading(true);        
 
       const response = await lndService.getTeamAssignments(
         1,
@@ -138,7 +138,7 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
       }
       return false;
     });
-  };
+  };              
 
   const hasOngoingAssignments = (skillId) => {
     const ACTIVE_STATUSES = [
@@ -158,12 +158,12 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
   const handleAddSkill = () => {
     setSelectedSkill(null);
     setShowRecordModal(true);
-  };
+  };       
 
   const handleEditSkill = (skill) => {
     setSelectedSkill(skill);
     setShowRecordModal(true);
-  };
+  };   
 
   const handleDeleteClick = (skill) => {
     setSkillToDelete(skill);
@@ -403,4 +403,4 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
     </>
   );
 };
-export default EmployeeSkillsModal;
+export default EmployeeSkillsModal;  

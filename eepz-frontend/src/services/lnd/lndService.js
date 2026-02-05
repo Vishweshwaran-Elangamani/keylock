@@ -839,6 +839,97 @@ export const lndService = {
       return handleError(error);
     }
   },
+  // ASSIGNMENT REOPEN REQUESTS
+
+  /**
+   * Request to reopen an overdue assignment
+   * @param {object} data - { assignmentId, requestNotes }
+   * @returns {Promise} API response
+   */
+  requestAssignmentReopen: async (data) => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/lnd-assignments/request-reopen`,
+        data,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  /**
+   * Get employee's reopen requests
+   * @param {object} params - { pageNumber, statusFilter, searchTerm, pageSize }
+   * @returns {Promise} API response
+   */
+  getMyReopenRequests: async (params = {}) => {
+    try {
+      const defaultParams = {
+        PageNumber: 1,
+        StatusFilter: "",
+        SearchTerm: "",
+        PageSize: 10,
+      };
+
+      const finalParams = { ...defaultParams, ...params };
+      const query = buildQueryString(finalParams);
+
+      const response = await axios.get(
+        `${API_BASE_URL}/lnd-assignments/my-reopen-requests${query}`,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  /**
+   * Manager processes reopen request
+   * @param {object} data - { approvalId, isApproved, managerNotes, newDeadline }
+   * @returns {Promise} API response
+   */
+  processReopenRequest: async (data) => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/lnd-assignments/process-reopen`,
+        data,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  /**
+   * Get team reopen requests (Manager only)
+   * @param {object} params - { pageNumber, statusFilter, searchTerm, pageSize }
+   * @returns {Promise} API response
+   */
+  getTeamReopenRequests: async (params = {}) => {
+    try {
+      const defaultParams = {
+        PageNumber: 1,
+        StatusFilter: "",
+        SearchTerm: "",
+        PageSize: 10,
+      };
+
+      const finalParams = { ...defaultParams, ...params };
+      const query = buildQueryString(finalParams);
+
+      const response = await axios.get(
+        `${API_BASE_URL}/lnd-assignments/team-reopen-requests${query}`,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
 };
 
 /**

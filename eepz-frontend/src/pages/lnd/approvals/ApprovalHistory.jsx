@@ -68,6 +68,25 @@ const ApprovalHistory = () => {
     return prefixMap[role] || "/employee";
   };
 
+  // NEW: Parse approver comments from JSON
+  const parseApproverComments = (approval) => {
+    if (!approval.notes) return null;
+
+    try {
+      const parsed = JSON.parse(approval.notes);
+      return {
+        managerNotes: parsed.ManagerNotes || parsed.managerNotes || null,
+        newDeadline: parsed.NewDeadline || parsed.newDeadline || null,
+        requestNotes: parsed.RequestNotes || parsed.requestNotes || null,
+        originalDeadline:
+          parsed.OriginalDeadline || parsed.originalDeadline || null,
+      };
+    } catch (e) {
+      // If not JSON, return as plain text
+      return { managerNotes: approval.notes };
+    }
+  };
+
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -189,6 +208,7 @@ const ApprovalHistory = () => {
       [APPROVAL_TYPE.SME_REQUEST]: "SME Request",
       [APPROVAL_TYPE.ASSIGNMENT_ACKNOWLEDGEMENT]: "Assignment Acknowledgement",
       [APPROVAL_TYPE.ASSIGNMENT_COMPLETION]: "Assignment Completion",
+      [APPROVAL_TYPE.ASSIGNMENT_REOPEN]: "Assignment Reopen Request",
     };
     return labels[type] || type;
   };
@@ -234,6 +254,10 @@ const ApprovalHistory = () => {
     {
       value: APPROVAL_TYPE.ASSIGNMENT_COMPLETION,
       label: "Assignment Completion",
+    },
+    {
+      value: APPROVAL_TYPE.ASSIGNMENT_REOPEN,
+      label: "Assignment Reopen Request",
     },
   ];
 
@@ -482,104 +506,161 @@ const ApprovalHistory = () => {
               </div>
 
               {/* Table Rows */}
-              {approvals.map((approval, idx) => (
-                <div key={approval.approvalId}>
-                  <div
-                    className={`${styles.tableRow} ${
-                      idx < approvals.length - 1 ? styles.tableRowBorder : ""
-                    }`}
-                  >
-                    <div className={styles.cellRequestType}>
-                      {getApprovalTypeLabel(approval.approvalType)}
-                    </div>
-                    <div className={styles.cellSkill}>
-                      {approval.skillName || "None"}
-                    </div>
-                    <div
-                      className={styles.cellName}
-                      title={approval.requesterName}
-                    >
-                      {approval.requesterName}
-                    </div>
-                    <div
-                      className={styles.cellName}
-                      title={approval.approverName}
-                    >
-                      {approval.approverName || "None"}
-                    </div>
-                    <div>
-                      <StatusBadge status={approval.status} />
-                    </div>
-                    <div className={styles.cellDate}>
-                      {approval.requestedOn
-                        ? new Date(approval.requestedOn).toLocaleDateString()
-                        : "None"}
-                    </div>
-                    <div className={styles.cellAttachment}>
-                      {approval.attachmentPath ? (
-                        <button
-                          onClick={() => handleDownload(approval)}
-                          title="Download Attachment"
-                          className={styles.downloadButton}
-                        >
-                          <Download size={15} />
-                        </button>
-                      ) : (
-                        <span className={styles.cellNone}>None</span>
-                      )}
-                    </div>
+              {approvals.map((approval, idx) => {
+                const approverComments = parseApproverComments(approval);
+                const hasComments =
+                  approverComments && approverComments.managerNotes;
 
-                    <div className={styles.cellComments}>
-                      {approval.approvalType === "SME_REQUEST" ? (
-                        <span className={styles.cellNone}>None</span>
-                      ) : approval.notes ? (
-                        <button
-                          onClick={() =>
-                            setExpandedNotes((prev) => ({
-                              ...prev,
-                              [approval.approvalId]: !prev[approval.approvalId],
-                            }))
-                          }
-                          className={`${styles.commentsButton} ${
-                            expandedNotes?.[approval.approvalId]
-                              ? styles.commentsButtonExpanded
-                              : ""
-                          }`}
-                          title={
-                            expandedNotes?.[approval.approvalId]
-                              ? "Hide comments"
-                              : "Show comments"
-                          }
-                        >
-                          {expandedNotes?.[approval.approvalId]
-                            ? "Hide"
-                            : "View"}
-                        </button>
-                      ) : (
-                        <span className={styles.cellNone}>None</span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Expanded notes */}
-                  {approval.approvalType !== "SME_REQUEST" &&
-                    expandedNotes?.[approval.approvalId] &&
-                    approval.notes && (
-                      <div
-                        className={`${styles.expandedNotes} ${
-                          idx < approvals.length - 1
-                            ? styles.expandedNotesBorder
-                            : ""
-                        }`}
-                      >
-                        <strong className={styles.expandedNotesLabel}>
-                          Approver Comments:
-                        </strong>
-                        {approval.notes}
+                return (
+                  <div key={approval.approvalId}>
+                    <div
+                      className={`${styles.tableRow} ${
+                        idx < approvals.length - 1 ? styles.tableRowBorder : ""
+                      }`}
+                    >
+                      <div className={styles.cellRequestType}>
+                        {getApprovalTypeLabel(approval.approvalType)}
                       </div>
-                    )}
-                </div>
-              ))}
+                      <div className={styles.cellSkill}>
+                        {approval.skillName || "None"}
+                      </div>
+                      <div
+                        className={styles.cellName}
+                        title={approval.requesterName}
+                      >
+                        {approval.requesterName}
+                      </div>
+                      <div
+                        className={styles.cellName}
+                        title={approval.approverName}
+                      >
+                        {approval.approverName || "None"}
+                      </div>
+                      <div>
+                        <StatusBadge status={approval.status} />
+                      </div>
+                      <div className={styles.cellDate}>
+                        {approval.requestedOn
+                          ? new Date(approval.requestedOn).toLocaleDateString()
+                          : "None"}
+                      </div>
+                      <div className={styles.cellAttachment}>
+                        {approval.attachmentPath ? (
+                          <button
+                            onClick={() => handleDownload(approval)}
+                            title="Download Attachment"
+                            className={styles.downloadButton}
+                          >
+                            <Download size={15} />
+                          </button>
+                        ) : (
+                          <span className={styles.cellNone}>None</span>
+                        )}
+                      </div>
+
+                      <div className={styles.cellComments}>
+                        {approval.approvalType === "SME_REQUEST" ? (
+                          <span className={styles.cellNone}>None</span>
+                        ) : hasComments ? (
+                          <button
+                            onClick={() =>
+                              setExpandedNotes((prev) => ({
+                                ...prev,
+                                [approval.approvalId]:
+                                  !prev[approval.approvalId],
+                              }))
+                            }
+                            className={`${styles.commentsButton} ${
+                              expandedNotes?.[approval.approvalId]
+                                ? styles.commentsButtonExpanded
+                                : ""
+                            }`}
+                            title={
+                              expandedNotes?.[approval.approvalId]
+                                ? "Hide comments"
+                                : "Show comments"
+                            }
+                          >
+                            {expandedNotes?.[approval.approvalId]
+                              ? "Hide"
+                              : "View"}
+                          </button>
+                        ) : (
+                          <span className={styles.cellNone}>None</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* EXPANDED COMMENTS SECTION */}
+                    {approval.approvalType !== "SME_REQUEST" &&
+                      expandedNotes?.[approval.approvalId] &&
+                      hasComments && (
+                        <div className={styles.expandedRow}>
+                          <div className={styles.commentsContainer}>
+                            <h4 className={styles.commentsTitle}>
+                              <i className="bi bi-chat-left-text me-2"></i>
+                              Approver Comments
+                            </h4>
+
+                            {approverComments.requestNotes && (
+                              <div className={styles.commentSection}>
+                                <span className={styles.commentLabel}>
+                                  Request Notes:
+                                </span>
+                                <p className={styles.commentText}>
+                                  {approverComments.requestNotes}
+                                </p>
+                              </div>
+                            )}
+
+                            <div className={styles.commentSection}>
+                              <span className={styles.commentLabel}>
+                                Approver's Response:
+                              </span>
+                              <p className={styles.commentText}>
+                                {approverComments.managerNotes}
+                              </p>
+                            </div>
+
+                            {approverComments.originalDeadline && (
+                              <div className={styles.commentSection}>
+                                <span className={styles.commentLabel}>
+                                  Original Deadline:
+                                </span>
+                                <p className={styles.commentText}>
+                                  {new Date(
+                                    approverComments.originalDeadline
+                                  ).toLocaleDateString("en-US", {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                  })}
+                                </p>
+                              </div>
+                            )}
+
+                            {approverComments.newDeadline && (
+                              <div className={styles.commentSection}>
+                                <span className={styles.commentLabel}>
+                                  New Deadline:
+                                </span>
+                                <p className={styles.commentText}>
+                                  {new Date(
+                                    approverComments.newDeadline
+                                  ).toLocaleDateString("en-US", {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                  })}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                  </div>
+                );
+              })}
             </div>
           </div>
 

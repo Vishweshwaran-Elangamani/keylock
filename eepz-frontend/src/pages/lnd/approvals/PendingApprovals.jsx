@@ -11,6 +11,7 @@ import Pagination from "../../../components/lnd/common/Pagination";
 import StatusBadge from "../../../components/lnd/common/StatusBadge";
 import EmptyState from "../../../components/lnd/common/EmptyState";
 import ApprovalDecisionModal from "../../../components/lnd/modals/ApprovalDecisionModal";
+import ReopenApprovalModal from "../../../components/lnd/modals/ReopenApprovalModal";
 import { lndService, downloadFile } from "../../../services/lnd/lndService";
 import { APPROVAL_TYPE } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
@@ -21,6 +22,7 @@ const PendingApprovals = () => {
   const [approvals, setApprovals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showDecisionModal, setShowDecisionModal] = useState(false);
+  const [showReopenModal, setShowReopenModal] = useState(false);
   const [selectedApproval, setSelectedApproval] = useState(null);
   const [userRole, setUserRole] = useState("");
   const [rolePrefix, setRolePrefix] = useState("");
@@ -151,11 +153,19 @@ const PendingApprovals = () => {
 
   const handleReview = (approval) => {
     setSelectedApproval(approval);
-    setShowDecisionModal(true);
+
+    // Check if this is a reopen request
+    if (approval.approvalType === APPROVAL_TYPE.ASSIGNMENT_REOPEN) {
+      setShowReopenModal(true);
+    } else {
+      setShowDecisionModal(true);
+    }
   };
 
   const handleDecisionSuccess = () => {
     setShowDecisionModal(false);
+    setShowReopenModal(false);
+    toast.success("Approval processed successfully!");
     fetchPendingApprovals();
   };
 
@@ -179,6 +189,7 @@ const PendingApprovals = () => {
       [APPROVAL_TYPE.SME_REQUEST]: "SME Request",
       [APPROVAL_TYPE.ASSIGNMENT_ACKNOWLEDGEMENT]: "Assignment Acknowledgement",
       [APPROVAL_TYPE.ASSIGNMENT_COMPLETION]: "Assignment Completion",
+      [APPROVAL_TYPE.ASSIGNMENT_REOPEN]: "Assignment Reopen Request",
     };
     return labels[type] || type;
   };
@@ -199,6 +210,10 @@ const PendingApprovals = () => {
     {
       value: APPROVAL_TYPE.ASSIGNMENT_COMPLETION,
       label: "Assignment Completion",
+    },
+    {
+      value: APPROVAL_TYPE.ASSIGNMENT_REOPEN,
+      label: "Assignment Reopen Request",
     },
   ];
 
@@ -451,10 +466,20 @@ const PendingApprovals = () => {
         </>
       )}
 
+      {/* Regular Approval Modal */}
       {showDecisionModal && (
         <ApprovalDecisionModal
           approval={selectedApproval}
           onClose={() => setShowDecisionModal(false)}
+          onSuccess={handleDecisionSuccess}
+        />
+      )}
+
+      {/* Reopen Request Approval Modal */}
+      {showReopenModal && (
+        <ReopenApprovalModal
+          approval={selectedApproval}
+          onClose={() => setShowReopenModal(false)}
           onSuccess={handleDecisionSuccess}
         />
       )}

@@ -1,0 +1,414 @@
+@keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    animation: fadeIn 0.2s ease-in-out;
+  }
+  
+  .modalContent {
+    background: #fff;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 580px;
+    max-height: 88vh;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.3s ease-out;
+  }
+  
+  .modalHeader {
+    padding: 1.125rem 1.375rem;
+    background: rgb(39, 35, 92);
+    border-bottom: 1px solid #e5e7eb;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  
+  .modalHeaderLeft {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  
+  .modalIcon {
+    color: white;
+    width: 22px;
+    height: 22px;
+  }
+  
+  .modalTitle {
+    margin: 0;
+    font-size: 1.1875rem;
+    font-weight: 600;
+    color: white;
+  }
+  
+  .closeButton {
+    border: none;
+    width: 34px;
+    height: 34px;
+    background-color: transparent;
+    color: white;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 19px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  
+  .closeButton:hover:not(:disabled) {
+    color: #ef4444;
+  }
+  
+  .closeButton:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+  
+  .modalBody {
+    overflow-y: auto;
+    flex-grow: 1;
+    padding: 1.375rem;
+  }
+  
+  .infoSection {
+    margin-bottom: 1.375rem;
+  }
+  
+  .sectionTitle {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.7rem;
+  }
+  
+  .infoGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.9375rem;
+    background-color: #f9fafb;
+    border-radius: 8px;
+    padding: 0.9375rem;
+    border: 1px solid #e5e7eb;
+  }
+  
+  .infoItem {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .infoLabel {
+    font-size: 0.71875rem;
+    font-weight: 500;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .infoValue {
+    font-size: 0.84375rem;
+    font-weight: 600;
+    color: #1f2937;
+  }
+  
+  .infoDaysOverdue {
+    font-size: 0.84375rem;
+    font-weight: 700;
+    color: #dc2626;
+  }
+  
+  .reasonSection {
+    margin-bottom: 1.375rem;
+  }
+  
+  .reasonBox {
+    background-color: #fef3c7;
+    border: 1px solid #fcd34d;
+    border-radius: 8px;
+    padding: 0.9375rem;
+  }
+  
+  .reasonText {
+    margin: 0;
+    font-size: 0.84375rem;
+    color: #92400e;
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+  
+  .decisionToggle {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.375rem;
+  }
+  
+  .toggleButton {
+    flex: 1;
+    padding: 0.6875rem;
+    border: 2px solid #e5e7eb;
+    background-color: white;
+    color: #6b7280;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.84375rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .toggleButton:hover {
+    border-color: #d1d5db;
+    background-color: #f9fafb;
+  }
+  
+  .toggleButtonApprove {
+    border-color: #10b981;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+  }
+  
+  .toggleButtonApprove:hover {
+    filter: brightness(105%);
+  }
+  
+  .toggleButtonReject {
+    border-color: #ef4444;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+  }
+  
+  .toggleButtonReject:hover {
+    filter: brightness(105%);
+  }
+  
+  .formGroup {
+    margin-bottom: 1.375rem;
+  }
+  
+  .formLabel {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 0.5rem;
+    font-size: 0.90625rem;
+  }
+  
+  .required {
+    color: #dc2626;
+  }
+  
+  .dateInput {
+    width: 100%;
+    padding: 0.5625rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.90625rem;
+    transition: all 0.2s;
+    outline: none;
+  }
+  
+  .dateInput:focus {
+    border-color: rgb(39, 35, 92);
+    box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+  }
+  
+  .dateInput:disabled {
+    background-color: #f3f4f6;
+    cursor: not-allowed;
+  }
+  
+  .helpText {
+    margin-top: 0.25rem;
+    font-size: 0.71875rem;
+    color: #6b7280;
+  }
+  
+  .textarea {
+    width: 100%;
+    padding: 0.5625rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.90625rem;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 90px;
+    max-height: 170px;
+    transition: all 0.2s;
+    outline: none;
+  }
+  
+  .textarea:focus {
+    border-color: rgb(39, 35, 92);
+    box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+  }
+  
+  .textarea:disabled {
+    background-color: #f3f4f6;
+    cursor: not-allowed;
+  }
+  
+  .charCount {
+    text-align: right;
+    font-size: 0.71875rem;
+    color: #9ca3af;
+    margin-top: 0.25rem;
+  }
+  
+  .errorBox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6875rem;
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    color: #dc2626;
+    font-size: 0.84375rem;
+    margin-bottom: 1rem;
+  }
+  
+  .modalFooter {
+    padding: 0.9375rem 1.375rem;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    gap: 0.6875rem;
+    justify-content: flex-end;
+    flex-shrink: 0;
+  }
+  
+  .cancelButton {
+    padding: 0.5625rem 1.125rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.84375rem;
+    font-weight: 500;
+    cursor: pointer;
+    background: #fff;
+    color: #6c757d;
+    transition: all 0.2s;
+  }
+  
+  .cancelButton:hover:not(:disabled) {
+    background-color: #f9fafb;
+    border-color: #d1d5db;
+  }
+  
+  .cancelButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .approveButton,
+  .rejectButton {
+    padding: 0.5625rem 1.125rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.84375rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+  }
+  
+  .approveButton {
+    background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
+    color: white;
+  }
+  
+  .approveButton:hover:not(:disabled) {
+    filter: brightness(105%);
+  }
+  
+  .rejectButton {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+  }
+  
+  .rejectButton:hover:not(:disabled) {
+    filter: brightness(105%);
+  }
+  
+  .approveButton:disabled,
+  .rejectButton:disabled {
+    background: #e5e7eb;
+    color: #6c757d;
+    cursor: not-allowed;
+  }
+  
+  @media (max-width: 640px) {
+    .modalContent {
+      max-width: 100%;
+      margin: 0;
+      border-radius: 0;
+      max-height: 100vh;
+    }
+  
+    .infoGrid {
+      grid-template-columns: 1fr;
+    }
+  
+    .decisionToggle {
+      flex-direction: column;
+    }
+  
+    .modalHeader {
+      padding: 0.9375rem;
+    }
+  
+    .modalBody {
+      padding: 1.125rem;
+    }
+  
+    .modalTitle {
+      font-size: 1.0625rem;
+    }
+  
+    .infoLabel {
+      font-size: 0.65625rem;
+    }
+  
+    .infoValue,
+    .infoDaysOverdue {
+      font-size: 0.78125rem;
+    }
+  }
+  

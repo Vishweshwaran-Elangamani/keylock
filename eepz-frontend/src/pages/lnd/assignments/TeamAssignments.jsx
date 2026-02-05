@@ -18,6 +18,7 @@ import { ASSIGNMENT_STATUS } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
 import styles from "../../../styles/lnd/pages/assignments/TeamAssignments.module.css";
 import { LND_TOASTS } from "../../../constants/lnd/lndToasts";
+
 const TeamAssignments = () => {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,27 +28,33 @@ const TeamAssignments = () => {
   const [rolePrefix, setRolePrefix] = useState("");
   const [expandedNotes, setExpandedNotes] = useState({});
   const [exporting, setExporting] = useState(false);
+
   // Search
   const [searchTerm, setSearchTerm] = useState("");
   const [searchInput, setSearchInput] = useState("");
+
   // Filter
   const [statusFilter, setStatusFilter] = useState("");
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const dropdownRef = useRef(null);
+
   // Sorting
   const [sortField, setSortField] = useState("");
   const [sortOrderAsc, setSortOrderAsc] = useState(true);
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const roleName = user?.role || "";
     setUserRole(roleName);
     setRolePrefix(getRolePrefix(roleName));
   }, []);
+
   const getRolePrefix = (role) => {
     const prefixMap = {
       Manager: "/manager",
@@ -71,6 +78,7 @@ const TeamAssignments = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
   useEffect(() => {
     fetchTeamAssignments();
   }, [
@@ -81,6 +89,7 @@ const TeamAssignments = () => {
     sortField,
     sortOrderAsc,
   ]);
+
   const fetchTeamAssignments = async () => {
     try {
       setLoading(true);
@@ -110,6 +119,26 @@ const TeamAssignments = () => {
       setLoading(false);
     }
   };
+
+  // NEW: Parse approver comments from JSON
+  const parseApproverComments = (assignment) => {
+    if (!assignment.completionNotes) return null;
+
+    try {
+      const parsed = JSON.parse(assignment.completionNotes);
+      return {
+        managerNotes: parsed.ManagerNotes || parsed.managerNotes || null,
+        newDeadline: parsed.NewDeadline || parsed.newDeadline || null,
+        requestNotes: parsed.RequestNotes || parsed.requestNotes || null,
+        originalDeadline:
+          parsed.OriginalDeadline || parsed.originalDeadline || null,
+      };
+    } catch (e) {
+      // If not JSON, return as plain text
+      return { managerNotes: assignment.completionNotes };
+    }
+  };
+
   const handleExportToExcel = async () => {
     try {
       setExporting(true);
@@ -135,42 +164,51 @@ const TeamAssignments = () => {
       setExporting(false);
     }
   };
+
   const handleSearchInputChange = (e) => {
     setSearchInput(e.target.value);
   };
+
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     setSearchTerm(searchInput);
     setCurrentPage(1);
   };
+
   const handleCancelSearch = () => {
     setSearchInput("");
     setSearchTerm("");
     setCurrentPage(1);
   };
+
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleSearchSubmit(e);
     }
   };
+
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
   const handleItemsPerPageChange = (newSize) => {
     setItemsPerPage(newSize);
     setCurrentPage(1);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
   const handleCompleteAssignment = (assignment) => {
     setSelectedAssignment(assignment);
     setShowCompleteModal(true);
   };
+
   const handleCompleteSuccess = () => {
     setShowCompleteModal(false);
     toast.success(LND_TOASTS.ASSIGNMENT_COMPLETED_MESSAGE);
     fetchTeamAssignments();
   };
+
   const handleDownloadProof = async (assignment) => {
     try {
       const response = await lndService.downloadAssignmentProof(
@@ -183,6 +221,7 @@ const TeamAssignments = () => {
       toast.error(LND_TOASTS.DOWNLOAD_FAILED);
     }
   };
+
   const onSortClick = (field) => {
     if (sortField === field) {
       setSortOrderAsc(!sortOrderAsc);
@@ -192,6 +231,7 @@ const TeamAssignments = () => {
     }
     setCurrentPage(1);
   };
+
   const renderSortIcon = (field) => {
     const isActive = sortField === field;
     const iconClass = isActive
@@ -208,6 +248,7 @@ const TeamAssignments = () => {
       <ChevronDown size={14} className={`${styles.sortIcon} ${iconClass}`} />
     );
   };
+
   const getStatusLabel = (value) => {
     const statusMap = {
       "": "All Statuses",
@@ -219,6 +260,7 @@ const TeamAssignments = () => {
     };
     return statusMap[value] || "All Statuses";
   };
+
   const statusOptions = [
     { value: "", label: "All Statuses" },
     { value: ASSIGNMENT_STATUS.IN_PROGRESS, label: "In Progress" },
@@ -233,6 +275,7 @@ const TeamAssignments = () => {
     { value: ASSIGNMENT_STATUS.COMPLETED, label: "Completed" },
     { value: ASSIGNMENT_STATUS.OVERDUE, label: "Overdue" },
   ];
+
   const getHeaderCellClass = (field, align) => {
     const baseClass = styles.tableHeaderCell;
     const alignClass =
@@ -243,11 +286,13 @@ const TeamAssignments = () => {
     const activeClass = sortField === field ? styles.tableHeaderCellActive : "";
     return `${baseClass} ${alignClass} ${sortableClass} ${activeClass}`.trim();
   };
+
   const getDropdownItemClass = (currentValue, optionValue) => {
     return `${styles.dropdownItem} ${
       currentValue === optionValue ? styles.dropdownItemActive : ""
     }`.trim();
   };
+
   if (loading && assignments.length === 0) {
     return (
       <div className={styles.loadingContainer}>
@@ -257,6 +302,7 @@ const TeamAssignments = () => {
       </div>
     );
   }
+
   return (
     <div>
       <Breadcrumb
@@ -265,6 +311,7 @@ const TeamAssignments = () => {
           { label: "Team Assignments" },
         ]}
       />
+
       <div className={styles.actionBar}>
         <div className={styles.filterGroup}>
           <form onSubmit={handleSearchSubmit} className={styles.searchForm}>
@@ -294,6 +341,7 @@ const TeamAssignments = () => {
               )}
             </div>
           </form>
+
           {/* CUSTOM DROPDOWN */}
           <div ref={dropdownRef} className={styles.dropdownWrapper}>
             <button
@@ -327,6 +375,7 @@ const TeamAssignments = () => {
             )}
           </div>
         </div>
+
         <button
           onClick={handleExportToExcel}
           disabled={exporting || assignments.length === 0}
@@ -349,6 +398,7 @@ const TeamAssignments = () => {
           )}
         </button>
       </div>
+
       {assignments.length === 0 && !loading ? (
         <EmptyState
           icon={Filter}
@@ -401,139 +451,201 @@ const TeamAssignments = () => {
                   </div>
                 ))}
               </div>
-              {assignments.map((assignment, idx) => (
-                <div key={assignment.assignmentId}>
-                  <div
-                    className={`${styles.tableRow} ${styles.gridLayout} ${
-                      idx < assignments.length - 1 ? styles.tableRowBorder : ""
-                    }`}
-                  >
+
+              {assignments.map((assignment, idx) => {
+                const approverComments = parseApproverComments(assignment);
+                const hasComments =
+                  approverComments && approverComments.managerNotes;
+
+                return (
+                  <div key={assignment.assignmentId}>
                     <div
-                      className={styles.cellName}
-                      title={assignment.menteeName}
+                      className={`${styles.tableRow} ${styles.gridLayout} ${
+                        idx < assignments.length - 1
+                          ? styles.tableRowBorder
+                          : ""
+                      }`}
                     >
-                      {assignment.menteeName}
-                    </div>
-                    <div
-                      className={styles.cellText}
-                      title={assignment.skillName}
-                    >
-                      {assignment.skillName}
-                    </div>
-                    <div
-                      className={`${styles.cellText} ${styles.cellSme}`}
-                      title={assignment.smeName}
-                    >
-                      {assignment.smeName}
-                    </div>
-                    <div className={styles.cellCenter}>
-                      <StatusBadge status={assignment.status} />
-                    </div>
-                    <div className={styles.cellDate}>
-                      {assignment.createdOn ? (
-                        new Date(assignment.createdOn).toLocaleDateString()
-                      ) : (
-                        <span className={styles.cellNone}>None</span>
-                      )}
-                    </div>
-                    <div
-                      className={
-                        assignment.isOverdue
-                          ? styles.cellDateOverdue
-                          : styles.cellDate
-                      }
-                    >
-                      {assignment.deadline ? (
-                        <>
-                          {assignment.isOverdue && (
-                            <AlertTriangle
-                              size={14}
-                              className={styles.overdueIcon}
-                            />
-                          )}
-                          {new Date(assignment.deadline).toLocaleDateString()}
-                        </>
-                      ) : (
-                        <span className={styles.cellNone}>None</span>
-                      )}
-                    </div>
-                    <div className={styles.cellScore}>
-                      {assignment.completionRating ? (
-                        `${assignment.completionRating}/10`
-                      ) : (
-                        <span className={styles.cellNone}>None</span>
-                      )}
-                    </div>
-                    <div className={styles.cellCenter}>
-                      {assignment.proofFilePath ? (
-                        <button
-                          onClick={() => handleDownloadProof(assignment)}
-                          title="Download Proof"
-                          className={styles.downloadButton}
-                        >
-                          <Download size={15} />
-                        </button>
-                      ) : (
-                        <span className={styles.cellNone}>None</span>
-                      )}
-                    </div>
-                    <div className={styles.cellCenter}>
-                      {assignment.status ===
-                      ASSIGNMENT_STATUS.PENDING_MANAGER_ACKNOWLEDGEMENT ? (
-                        <button
-                          onClick={() => handleCompleteAssignment(assignment)}
-                          className={styles.completeButton}
-                        >
-                          <CheckCircle size={16} /> Complete
-                        </button>
-                      ) : assignment.completionNotes ? (
-                        <button
-                          onClick={() =>
-                            setExpandedNotes((prev) => ({
-                              ...prev,
-                              [assignment.assignmentId]:
-                                !prev[assignment.assignmentId],
-                            }))
-                          }
-                          className={`${styles.notesButton} ${
-                            expandedNotes?.[assignment.assignmentId]
-                              ? styles.notesButtonExpanded
-                              : ""
-                          }`}
-                          title={
-                            expandedNotes?.[assignment.assignmentId]
-                              ? "Hide notes"
-                              : "Show notes"
-                          }
-                        >
-                          {expandedNotes?.[assignment.assignmentId]
-                            ? "Hide"
-                            : "View"}
-                        </button>
-                      ) : (
-                        <span className={styles.cellNone}>None</span>
-                      )}
-                    </div>
-                  </div>
-                  {expandedNotes?.[assignment.assignmentId] &&
-                    assignment.completionNotes && (
                       <div
-                        className={`${styles.expandedNotes} ${
-                          idx < assignments.length - 1
-                            ? styles.expandedNotesBorder
-                            : ""
-                        }`}
+                        className={styles.cellName}
+                        title={assignment.menteeName}
                       >
-                        <strong className={styles.notesLabel}>
-                          Approver Comments:
-                        </strong>
-                        {assignment.completionNotes}
+                        {assignment.menteeName}
                       </div>
-                    )}
-                </div>
-              ))}
+                      <div
+                        className={styles.cellText}
+                        title={assignment.skillName}
+                      >
+                        {assignment.skillName}
+                      </div>
+                      <div
+                        className={`${styles.cellText} ${styles.cellSme}`}
+                        title={assignment.smeName}
+                      >
+                        {assignment.smeName}
+                      </div>
+                      <div className={styles.cellCenter}>
+                        <StatusBadge status={assignment.status} />
+                      </div>
+                      <div className={styles.cellDate}>
+                        {assignment.createdOn ? (
+                          new Date(assignment.createdOn).toLocaleDateString()
+                        ) : (
+                          <span className={styles.cellNone}>None</span>
+                        )}
+                      </div>
+                      <div
+                        className={
+                          assignment.isOverdue
+                            ? styles.cellDateOverdue
+                            : styles.cellDate
+                        }
+                      >
+                        {assignment.deadline ? (
+                          <>
+                            {assignment.isOverdue && (
+                              <AlertTriangle
+                                size={14}
+                                className={styles.overdueIcon}
+                              />
+                            )}
+                            {new Date(assignment.deadline).toLocaleDateString()}
+                          </>
+                        ) : (
+                          <span className={styles.cellNone}>None</span>
+                        )}
+                      </div>
+                      <div className={styles.cellScore}>
+                        {assignment.completionRating ? (
+                          `${assignment.completionRating}/10`
+                        ) : (
+                          <span className={styles.cellNone}>None</span>
+                        )}
+                      </div>
+                      <div className={styles.cellCenter}>
+                        {assignment.proofFilePath ? (
+                          <button
+                            onClick={() => handleDownloadProof(assignment)}
+                            title="Download Proof"
+                            className={styles.downloadButton}
+                          >
+                            <Download size={15} />
+                          </button>
+                        ) : (
+                          <span className={styles.cellNone}>None</span>
+                        )}
+                      </div>
+                      <div className={styles.cellCenter}>
+                        {assignment.status ===
+                        ASSIGNMENT_STATUS.PENDING_MANAGER_ACKNOWLEDGEMENT ? (
+                          <button
+                            onClick={() => handleCompleteAssignment(assignment)}
+                            className={styles.completeButton}
+                          >
+                            <CheckCircle size={16} /> Complete
+                          </button>
+                        ) : hasComments ? (
+                          <button
+                            onClick={() =>
+                              setExpandedNotes((prev) => ({
+                                ...prev,
+                                [assignment.assignmentId]:
+                                  !prev[assignment.assignmentId],
+                              }))
+                            }
+                            className={`${styles.notesButton} ${
+                              expandedNotes?.[assignment.assignmentId]
+                                ? styles.notesButtonExpanded
+                                : ""
+                            }`}
+                            title={
+                              expandedNotes?.[assignment.assignmentId]
+                                ? "Hide notes"
+                                : "Show notes"
+                            }
+                          >
+                            {expandedNotes?.[assignment.assignmentId]
+                              ? "Hide"
+                              : "View"}
+                          </button>
+                        ) : (
+                          <span className={styles.cellNone}>None</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* EXPANDED COMMENTS SECTION */}
+                    {expandedNotes?.[assignment.assignmentId] &&
+                      hasComments && (
+                        <div className={styles.expandedRow}>
+                          <div className={styles.commentsContainer}>
+                            <h4 className={styles.commentsTitle}>
+                              <i className="bi bi-chat-left-text me-2"></i>
+                              Approver Comments
+                            </h4>
+
+                            {approverComments.requestNotes && (
+                              <div className={styles.commentSection}>
+                                <span className={styles.commentLabel}>
+                                  Employee's Request:
+                                </span>
+                                <p className={styles.commentText}>
+                                  {approverComments.requestNotes}
+                                </p>
+                              </div>
+                            )}
+
+                            <div className={styles.commentSection}>
+                              <span className={styles.commentLabel}>
+                                Approver's Response:
+                              </span>
+                              <p className={styles.commentText}>
+                                {approverComments.managerNotes}
+                              </p>
+                            </div>
+
+                            {approverComments.originalDeadline && (
+                              <div className={styles.commentSection}>
+                                <span className={styles.commentLabel}>
+                                  Original Deadline:
+                                </span>
+                                <p className={styles.commentText}>
+                                  {new Date(
+                                    approverComments.originalDeadline
+                                  ).toLocaleDateString("en-US", {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                  })}
+                                </p>
+                              </div>
+                            )}
+
+                            {approverComments.newDeadline && (
+                              <div className={styles.commentSection}>
+                                <span className={styles.commentLabel}>
+                                  New Deadline:
+                                </span>
+                                <p className={styles.commentText}>
+                                  {new Date(
+                                    approverComments.newDeadline
+                                  ).toLocaleDateString("en-US", {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                  })}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                  </div>
+                );
+              })}
             </div>
           </div>
+
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -546,6 +658,7 @@ const TeamAssignments = () => {
           />
         </>
       )}
+
       {showCompleteModal && (
         <CompleteAssignmentModal
           assignment={selectedAssignment}
@@ -556,4 +669,5 @@ const TeamAssignments = () => {
     </div>
   );
 };
+
 export default TeamAssignments;
