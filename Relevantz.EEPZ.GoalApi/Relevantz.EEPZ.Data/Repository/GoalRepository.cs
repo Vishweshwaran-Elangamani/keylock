@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Common.Constants;
-
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repository.Interface;
+using Serilog;
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
@@ -24,45 +24,57 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             _db = db;
             _baseRepo = baseRepo;
             environment = _environment;
+
+            Log.Debug("GoalRepository initialized.");
         }
 
         public async Task<List<Goal>> QueryGoals(GoalQueryModel request)
         {
-            var q = _db
-                .Goals.Include(g => g.GoalAssignments)
+            Log.Information(
+                "QueryGoals START | UserId={UserId} | Role={Role} | Filters={@Request}",
+                request.CurrentUserEmpMasterID,
+                request.CurrentUserRole,
+                request
+            );
+
+            var q = _db.Goals
+                .Include(g => g.GoalAssignments)
                 .Include(g => g.Goalprogresslogs)
                 .AsQueryable();
 
-            if (!string.IsNullOrEmpty(request.Type))
-                q = q.Where(g => g.GoalType == request.Type);
 
+            if (!string.IsNullOrEmpty(request.Type))
+            {
+                q = q.Where(g => g.GoalType == request.Type);
+                Log.Debug("QueryGoals | Filter Type={Type}", request.Type);
+            }
+
+           
             if (request.Type == GOAL_TYPE.TEAM)
             {
                 if (request.CurrentUserRole == USER_ROLE.LEADERSHIP)
                 {
                     q = q.Where(g => g.GoalType == GOAL_TYPE.TEAM);
+                    Log.Debug("QueryGoals | Leadership filtering applied");
                 }
                 else if (request.CurrentUserRole == USER_ROLE.DEPARTMENT_HEAD)
                 {
-                    var deptHead = await _db
-                        .Employeedetailsmasters.AsNoTracking()
+                    Log.Debug("QueryGoals | Department Head filtering applied");
+
+                    var deptHead = await _db.Employeedetailsmasters.AsNoTracking()
                         .FirstOrDefaultAsync(e =>
-                            e.EmployeeMasterId == request.CurrentUserEmpMasterID
-                        );
+                            e.EmployeeMasterId == request.CurrentUserEmpMasterID);
 
                     if (deptHead != null)
                     {
                         q = q.Where(g =>
-                            g.CreatedBy == request.CurrentUserEmpMasterID
-                            || g.GoalAssignments.Any(a =>
-                                a.AssignedTo == request.CurrentUserEmpMasterID
-                            )
-                            || (
-                                g.GoalType == GOAL_TYPE.TEAM
-                                && g.GoalAssignments.Any(a =>
-                                    _db.Employeedetailsmasters.Where(e =>
-                                            e.DepartmentId == deptHead.DepartmentId
-                                        )
+                            g.CreatedBy == request.CurrentUserEmpMasterID ||
+                            g.GoalAssignments.Any(a => a.AssignedTo == request.CurrentUserEmpMasterID) ||
+                            (
+                                g.GoalType == GOAL_TYPE.TEAM &&
+                                g.GoalAssignments.Any(a =>
+                                    _db.Employeedetailsmasters
+                                        .Where(e => e.DepartmentId == deptHead.DepartmentId)
                                         .Select(e => e.EmployeeMasterId)
                                         .Contains(a.AssignedTo.Value)
                                 )
@@ -72,23 +84,23 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     else
                     {
                         q = q.Where(g =>
-                            g.CreatedBy == request.CurrentUserEmpMasterID
-                            || g.GoalAssignments.Any(a =>
-                                a.AssignedTo == request.CurrentUserEmpMasterID
-                            )
+                            g.CreatedBy == request.CurrentUserEmpMasterID ||
+                            g.GoalAssignments.Any(a => a.AssignedTo == request.CurrentUserEmpMasterID)
                         );
                     }
                 }
                 else if (request.CurrentUserRole == USER_ROLE.MANAGER)
                 {
-                    var subordinates = await _db
-                        .Employees.Where(e =>
-                            e.ReportingManagerEmployeeId
-                            == _db.Employees.Where(emp =>
-                                    emp.EmployeeId
-                                    == _db.Employeedetailsmasters.Where(edm =>
-                                            edm.EmployeeMasterId == request.CurrentUserEmpMasterID
-                                        )
+                    Log.Debug("QueryGoals | Manager filtering applied");
+
+                    var subordinates = await _db.Employees
+                        .Where(e =>
+                            e.ReportingManagerEmployeeId ==
+                            _db.Employees
+                                .Where(emp =>
+                                    emp.EmployeeId ==
+                                    _db.Employeedetailsmasters
+                                        .Where(edm => edm.EmployeeMasterId == request.CurrentUserEmpMasterID)
                                         .Select(edm => edm.EmployeeId)
                                         .FirstOrDefault()
                                 )
@@ -96,42 +108,40 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                                 .FirstOrDefault()
                         )
                         .Select(e =>
-                            _db.Employeedetailsmasters.Where(edm => edm.EmployeeId == e.EmployeeId)
+                            _db.Employeedetailsmasters
+                                .Where(edm => edm.EmployeeId == e.EmployeeId)
                                 .Select(edm => edm.EmployeeMasterId)
                                 .FirstOrDefault()
                         )
                         .ToListAsync();
 
                     q = q.Where(g =>
-                        g.CreatedBy == request.CurrentUserEmpMasterID
-                        || g.GoalAssignments.Any(a =>
-                            a.AssignedTo == request.CurrentUserEmpMasterID
-                        )
-                        || (
-                            g.GoalType == GOAL_TYPE.TEAM
-                            && g.GoalAssignments.Any(a => subordinates.Contains(a.AssignedTo.Value))
+                        g.CreatedBy == request.CurrentUserEmpMasterID ||
+                        g.GoalAssignments.Any(a => a.AssignedTo == request.CurrentUserEmpMasterID) ||
+                        (
+                            g.GoalType == GOAL_TYPE.TEAM &&
+                            g.GoalAssignments.Any(a => subordinates.Contains(a.AssignedTo.Value))
                         )
                     );
                 }
                 else
                 {
                     q = q.Where(g =>
-                        g.CreatedBy == request.CurrentUserEmpMasterID
-                        || g.GoalAssignments.Any(a =>
-                            a.AssignedTo == request.CurrentUserEmpMasterID
-                        )
+                        g.CreatedBy == request.CurrentUserEmpMasterID ||
+                        g.GoalAssignments.Any(a => a.AssignedTo == request.CurrentUserEmpMasterID)
                     );
                 }
             }
             else
             {
                 q = q.Where(g =>
-                    g.CreatedBy == request.CurrentUserEmpMasterID
-                    || g.GoalAssignments.Any(a => a.AssignedTo == request.CurrentUserEmpMasterID)
-                    || g.GoalType == GOAL_TYPE.ORG
+                    g.CreatedBy == request.CurrentUserEmpMasterID ||
+                    g.GoalAssignments.Any(a => a.AssignedTo == request.CurrentUserEmpMasterID) ||
+                    g.GoalType == GOAL_TYPE.ORG
                 );
             }
 
+           
             if (!string.IsNullOrEmpty(request.Status))
                 q = q.Where(g => g.Goalstatus == request.Status);
 
@@ -145,14 +155,10 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 q = q.Where(g => g.Goalendat != null && g.Goalendat >= request.DueAfter.Value);
 
             if (request.CreatedAfter.HasValue)
-                q = q.Where(g =>
-                    g.Goalcreatedat != null && g.Goalcreatedat >= request.CreatedAfter.Value
-                );
+                q = q.Where(g => g.Goalcreatedat >= request.CreatedAfter.Value);
 
             if (request.CreatedBefore.HasValue)
-                q = q.Where(g =>
-                    g.Goalcreatedat != null && g.Goalcreatedat <= request.CreatedBefore.Value
-                );
+                q = q.Where(g => g.Goalcreatedat <= request.CreatedBefore.Value);
 
             if (request.CreatedByEmployeeMasterId.HasValue)
                 q = q.Where(g => g.CreatedBy == request.CreatedByEmployeeMasterId.Value);
@@ -166,8 +172,8 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
             if (!string.IsNullOrWhiteSpace(request.Search))
                 q = q.Where(g =>
-                    (g.GoalTitle ?? "").Contains(request.Search)
-                    || (g.GoalDescription ?? "").Contains(request.Search)
+                    (g.GoalTitle ?? "").Contains(request.Search) ||
+                    (g.GoalDescription ?? "").Contains(request.Search)
                 );
 
             var result = await q.OrderByDescending(g => g.Goalcreatedat)
@@ -176,63 +182,98 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 .AsNoTracking()
                 .ToListAsync();
 
+            Log.Information(
+                "QueryGoals END | UserId={UserId} | TotalReturned={Count}",
+                request.CurrentUserEmpMasterID,
+                result.Count
+            );
+
             return result;
         }
 
         public async Task AddGoal(Goal goal)
         {
+            Log.Information("AddGoal START | Title={Title} | CreatedBy={UserId}", goal?.GoalTitle, goal?.CreatedBy);
+
             await _db.Goals.AddAsync(goal);
+
+            Log.Information("AddGoal END | Goal created (not saved yet)");
         }
 
         public Task UpdateGoal(Goal goal)
         {
+            Log.Information("UpdateGoal | GoalId={GoalId}", goal?.GoalId);
+
             _db.Goals.Update(goal);
             return Task.CompletedTask;
         }
 
         public async Task<List<Project>> GetUserProjects(int employeeMasterId)
         {
-            var employeeDetails = await _db.Employeedetailsmasters.FirstOrDefaultAsync(edm =>
-                edm.EmployeeMasterId == employeeMasterId
-            );
+            Log.Information("GetUserProjects START | EmployeeMasterId={Id}", employeeMasterId);
+
+            var employeeDetails = await _db.Employeedetailsmasters
+                .FirstOrDefaultAsync(edm => edm.EmployeeMasterId == employeeMasterId);
 
             if (employeeDetails == null)
             {
+                Log.Warning("GetUserProjects | No employee details found for {Id}", employeeMasterId);
                 return new List<Project>();
             }
 
             var employeeId = employeeDetails.EmployeeId;
 
-            var projects = await _db
-                .Projectemployees.Where(pe => pe.EmployeeId == employeeId)
+            var projects = await _db.Projectemployees
+                .Where(pe => pe.EmployeeId == employeeId)
                 .Include(pe => pe.Project)
                 .Select(pe => pe.Project)
                 .Where(p => p != null && p.Status == PROJECT_STATUS.ACTIVE)
                 .ToListAsync();
+
+            Log.Information(
+                "GetUserProjects END | EmployeeMasterId={Id} | Count={Count}",
+                employeeMasterId,
+                projects.Count
+            );
 
             return projects;
         }
 
         public async Task<List<Project>> GetAllProjects()
         {
-            var result = await _db
-                .Projects.Where(p => p.Status == PROJECT_STATUS.ACTIVE)
+            Log.Information("GetAllProjects START");
+
+            var result = await _db.Projects
+                .Where(p => p.Status == PROJECT_STATUS.ACTIVE)
                 .ToListAsync();
+
+            Log.Information("GetAllProjects END | Count={Count}", result.Count);
 
             return result;
         }
 
         public async Task<Project?> GetProject(int projectId)
         {
-            var result = await _db.Projects.FirstOrDefaultAsync(p => p.ProjectId == projectId);
+            Log.Information("GetProject START | ProjectId={ProjectId}", projectId);
+
+            var result = await _db.Projects
+                .FirstOrDefaultAsync(p => p.ProjectId == projectId);
+
+            Log.Information(
+                "GetProject END | ProjectId={ProjectId} | Found={Found}",
+                projectId,
+                result != null
+            );
 
             return result;
         }
 
         public async Task<List<AssigneeModel>> GetAssigneesWithDetails(int goalId)
         {
-            var assignments = await _db
-                .GoalAssignments.Where(a => a.GoalId == goalId)
+            Log.Information("GetAssigneesWithDetails START | GoalId={GoalId}", goalId);
+
+            var assignments = await _db.GoalAssignments
+                .Where(a => a.GoalId == goalId)
                 .ToListAsync();
 
             var result = new List<AssigneeModel>();
@@ -242,13 +283,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 if (!assignment.AssignedTo.HasValue)
                     continue;
 
-                var edm = await _baseRepo.GetEmployeeDetailsByMasterId(
-                    assignment.AssignedTo.Value
-                );
+                var edm = await _baseRepo.GetEmployeeDetailsByMasterId(assignment.AssignedTo.Value);
                 if (edm?.Employee?.Userprofile == null)
-                {
                     continue;
-                }
 
                 var profile = edm.Employee.Userprofile;
                 var role = edm.Role?.RoleName ?? USER_ROLE.EMPLOYEE;
@@ -265,76 +302,126 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 );
             }
 
+            Log.Information(
+                "GetAssigneesWithDetails END | GoalId={GoalId} | Count={Count}",
+                goalId, result.Count);
+
             return result;
         }
 
         public async Task<List<GoalChecklist>> GetChecklistByGoal(int goalId)
         {
-            var result = await _db
-                .GoalChecklists.Include(c => c.Goalchecklistprogresses)
+            Log.Information("GetChecklistByGoal START | GoalId={GoalId}", goalId);
+
+            var result = await _db.GoalChecklists
+                .Include(c => c.Goalchecklistprogresses)
                 .Where(c => c.GoalId == goalId)
                 .ToListAsync();
+
+            Log.Information(
+                "GetChecklistByGoal END | GoalId={GoalId} | Count={Count}",
+                goalId, result.Count);
 
             return result;
         }
 
         public async Task AddChecklistRange(List<GoalChecklist> items)
         {
+            Log.Information("AddChecklistRange START | Count={Count}", items?.Count ?? 0);
+
             await _db.GoalChecklists.AddRangeAsync(items);
+
+            Log.Information("AddChecklistRange END");
         }
 
         public async Task<int> CountTotalForUser(int goalId, int userEmployeeMasterId)
         {
-            var result = await _db
-                .GoalChecklists.Where(c => c.GoalId == goalId && c.AddedFor == userEmployeeMasterId)
+            Log.Information(
+                "CountTotalForUser START | GoalId={GoalId} | UserId={UserId}",
+                goalId,
+                userEmployeeMasterId
+            );
+
+            var result = await _db.GoalChecklists
+                .Where(c => c.GoalId == goalId && c.AddedFor == userEmployeeMasterId)
                 .CountAsync();
+
+            Log.Information(
+                "CountTotalForUser END | GoalId={GoalId} | UserId={UserId} | Total={Total}",
+                goalId,
+                userEmployeeMasterId,
+                result
+            );
 
             return result;
         }
 
         public async Task AddAssignments(List<GoalAssignment> assignments)
         {
+            Log.Information("AddAssignments START | Count={Count}", assignments?.Count ?? 0);
+
             await _db.GoalAssignments.AddRangeAsync(assignments);
+
+            Log.Information("AddAssignments END");
         }
 
         public async Task UpdateGoalAssignment(GoalAssignment assignment)
         {
+            Log.Information("UpdateGoalAssignment | GoalId={GoalId} | UserId={UserId}",
+                assignment?.GoalId, assignment?.AssignedTo);
+
             _db.GoalAssignments.Update(assignment);
         }
 
-        public async Task<(
-            byte[] fileBytes,
-            string contentType,
-            string fileName
-        )?> GetAttachmentForPreview(int attachmentId, int currentUserEmployeeMasterId)
+        public async Task<(byte[] fileBytes, string contentType, string fileName)?>
+            GetAttachmentForPreview(int attachmentId, int currentUserEmployeeMasterId)
         {
+            Log.Information(
+                "GetAttachmentForPreview START | AttachmentId={AttachmentId} | UserId={UserId}",
+                attachmentId,
+                currentUserEmployeeMasterId
+            );
+
             var attachment = await _db
                 .GoalAttachments.Include(a => a.Goal)
                 .FirstOrDefaultAsync(a => a.Goalattachmentsid == attachmentId);
 
             if (attachment == null)
             {
+                Log.Warning(
+                    "GetAttachmentForPreview | Attachment not found | AttachmentId={AttachmentId}",
+                    attachmentId
+                );
                 return null;
             }
 
-            var canView = await CanViewGoal(attachment.GoalId, currentUserEmployeeMasterId);
+            var canView = await CanViewGoal(
+                attachment.GoalId,
+                currentUserEmployeeMasterId
+            );
 
             if (!canView)
             {
+                Log.Warning(
+                    "GetAttachmentForPreview | ACCESS DENIED | AttachmentId={AttachmentId} | UserId={UserId}",
+                    attachmentId,
+                    currentUserEmployeeMasterId
+                );
                 return null;
             }
 
-            string webRootPath = environment.WebRootPath;
-            if (string.IsNullOrEmpty(webRootPath))
-            {
-                webRootPath = Path.Combine(environment.ContentRootPath, "wwwroot");
-            }
+            string webRootPath = environment.WebRootPath ??
+                Path.Combine(environment.ContentRootPath, "wwwroot");
 
             var relativePath = attachment.Attachments?.TrimStart('/') ?? "";
             var fullPath = Path.Combine(webRootPath, relativePath);
 
             if (!File.Exists(fullPath))
             {
+                Log.Warning(
+                    "GetAttachmentForPreview | File not found | Path={Path}",
+                    fullPath
+                );
                 return null;
             }
 
@@ -350,17 +437,32 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 fileName += extension;
             }
 
+            Log.Information(
+                "GetAttachmentForPreview END | AttachmentId={AttachmentId} | FileSize={Size}",
+                attachmentId,
+                fileBytes.Length
+            );
+
             return (fileBytes, contentType, fileName);
         }
 
         private async Task<bool> CanViewGoal(int goalId, int employeeMasterId)
         {
-            var goal = await _db
-                .Goals.Include(g => g.GoalAssignments)
+            Log.Debug(
+                "CanViewGoal START | GoalId={GoalId} | UserId={UserId}",
+                goalId,
+                employeeMasterId
+            );
+
+            var goal = await _db.Goals
+                .Include(g => g.GoalAssignments)
                 .FirstOrDefaultAsync(g => g.GoalId == goalId);
 
             if (goal == null)
+            {
+                Log.Debug("CanViewGoal | Goal not found | GoalId={GoalId}", goalId);
                 return false;
+            }
 
             if (goal.CreatedBy == employeeMasterId)
                 return true;
@@ -372,12 +474,21 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             if (userRole == USER_ROLE.LEADERSHIP)
                 return true;
 
+            Log.Debug(
+                "CanViewGoal END | GoalId={GoalId} | UserId={UserId} | Allowed=false",
+                goalId,
+                employeeMasterId
+            );
+
             return false;
         }
 
         private string GetContentType(string fileName)
         {
             var extension = Path.GetExtension(fileName).ToLowerInvariant();
+
+            Log.Debug("GetContentType | FileName={FileName} | Extension={Ext}", fileName, extension);
+
             return extension switch
             {
                 ".pdf" => "application/pdf",
@@ -385,7 +496,8 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 ".docx" =>
                     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                 ".xls" => "application/vnd.ms-excel",
-                ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                ".xlsx" =>
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 ".png" => "image/png",
                 ".jpg" or ".jpeg" => "image/jpeg",
                 ".txt" => "text/plain",
@@ -394,51 +506,96 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             };
         }
 
-        public async Task<bool> IsManagerOf(
-            int managerEmployeeMasterId,
-            int employeeEmployeeMasterId
-        )
+        public async Task<bool> IsManagerOf(int managerEmployeeMasterId, int employeeEmployeeMasterId)
         {
+            Log.Information(
+                "IsManagerOf START | ManagerId={ManagerId} | EmployeeId={EmployeeId}",
+                managerEmployeeMasterId,
+                employeeEmployeeMasterId
+            );
+
             var employeeManagerId = await _baseRepo.GetReportingManagerEmployeeMasterId(
                 employeeEmployeeMasterId
             );
+
             var result = employeeManagerId == managerEmployeeMasterId;
+
+            Log.Information(
+                "IsManagerOf END | ManagerId={ManagerId} | EmployeeId={EmployeeId} | Result={Result}",
+                managerEmployeeMasterId,
+                employeeEmployeeMasterId,
+                result
+            );
 
             return result;
         }
 
         public async Task<bool> IsManagerOfGoalAssignees(int goalId, int managerId)
         {
-            var assigneeIds = await _db
-                .GoalAssignments.Where(a => a.GoalId == goalId && a.AssignedTo.HasValue)
+            Log.Information(
+                "IsManagerOfGoalAssignees START | GoalId={GoalId} | ManagerId={ManagerId}",
+                goalId,
+                managerId
+            );
+
+            var assigneeIds = await _db.GoalAssignments
+                .Where(a => a.GoalId == goalId && a.AssignedTo.HasValue)
                 .Select(a => a.AssignedTo.Value)
                 .ToListAsync();
 
             foreach (var assigneeId in assigneeIds)
             {
-                var assigneeManagerId = await _baseRepo.GetReportingManagerEmployeeMasterId(
-                    assigneeId
-                );
+                var assigneeManagerId = await _baseRepo.GetReportingManagerEmployeeMasterId(assigneeId);
+
                 if (assigneeManagerId == managerId)
+                {
+                    Log.Information(
+                        "IsManagerOfGoalAssignees END | ManagerId={ManagerId} | True for AssigneeId={Assignee}",
+                        managerId,
+                        assigneeId
+                    );
+
                     return true;
+                }
             }
+
+            Log.Information(
+                "IsManagerOfGoalAssignees END | GoalId={GoalId} | ManagerId={ManagerId} | Result=false",
+                goalId,
+                managerId
+            );
 
             return false;
         }
 
         public async Task<bool> IsEmployeeInProject(int employeeMasterId, int projectId)
         {
-            var employeeDetails = await _db.Employeedetailsmasters.FirstOrDefaultAsync(edm =>
-                edm.EmployeeMasterId == employeeMasterId
+            Log.Information(
+                "IsEmployeeInProject START | UserId={UserId} | ProjectId={ProjectId}",
+                employeeMasterId,
+                projectId
             );
+
+            var employeeDetails = await _db.Employeedetailsmasters
+                .FirstOrDefaultAsync(edm => edm.EmployeeMasterId == employeeMasterId);
 
             if (employeeDetails == null)
             {
+                Log.Warning("IsEmployeeInProject | No employee found | UserId={UserId}", employeeMasterId);
                 return false;
             }
 
-            var result = await _db.Projectemployees.AnyAsync(pe =>
-                pe.EmployeeId == employeeDetails.EmployeeId && pe.ProjectId == projectId
+            var result = await _db.Projectemployees
+                .AnyAsync(pe =>
+                    pe.EmployeeId == employeeDetails.EmployeeId &&
+                    pe.ProjectId == projectId
+                );
+
+            Log.Information(
+                "IsEmployeeInProject END | UserId={UserId} | ProjectId={ProjectId} | Result={Result}",
+                employeeMasterId,
+                projectId,
+                result
             );
 
             return result;
@@ -446,31 +603,56 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
         public async Task<List<Project>> GetUserProjectsByEmployeeId(int employeeId)
         {
-            var result = await _db
-                .Projectemployees.Where(pe => pe.EmployeeId == employeeId)
+            Log.Information("GetUserProjectsByEmployeeId START | EmployeeId={EmployeeId}", employeeId);
+
+            var result = await _db.Projectemployees
+                .Where(pe => pe.EmployeeId == employeeId)
                 .Include(pe => pe.Project)
                 .Select(pe => pe.Project)
                 .ToListAsync();
+
+            Log.Information(
+                "GetUserProjectsByEmployeeId END | EmployeeId={EmployeeId} | Count={Count}",
+                employeeId,
+                result.Count
+            );
 
             return result;
         }
 
         public async Task<bool> IsGoalCreator(int goalId, int employeeMasterId)
         {
+            Log.Information(
+                "IsGoalCreator START | GoalId={GoalId} | UserId={UserId}",
+                goalId,
+                employeeMasterId
+            );
+
             var goal = await _db.Goals.FirstOrDefaultAsync(g => g.GoalId == goalId);
+
             var result = goal?.CreatedBy == employeeMasterId;
+
+            Log.Information(
+                "IsGoalCreator END | GoalId={GoalId} | UserId={UserId} | Result={Result}",
+                goalId,
+                employeeMasterId,
+                result
+            );
 
             return result;
         }
 
         public async Task<List<int>> GetGoalParticipantIds(int goalId)
         {
-            var goal = await _db
-                .Goals.Include(g => g.GoalAssignments)
+            Log.Information("GetGoalParticipantIds START | GoalId={GoalId}", goalId);
+
+            var goal = await _db.Goals
+                .Include(g => g.GoalAssignments)
                 .FirstOrDefaultAsync(g => g.GoalId == goalId);
 
             if (goal == null)
             {
+                Log.Warning("GetGoalParticipantIds | Goal not found | GoalId={GoalId}", goalId);
                 return new List<int>();
             }
 
@@ -480,25 +662,38 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 participants.Add(goal.CreatedBy.Value);
 
             participants.AddRange(
-                goal.GoalAssignments.Where(a => a.AssignedTo.HasValue)
+                goal.GoalAssignments
+                    .Where(a => a.AssignedTo.HasValue)
                     .Select(a => a.AssignedTo!.Value)
             );
 
-            var distinctParticipants = participants.Distinct().ToList();
+            var distinct = participants.Distinct().ToList();
 
-            return distinctParticipants;
+            Log.Information(
+                "GetGoalParticipantIds END | GoalId={GoalId} | Count={Count}",
+                goalId,
+                distinct.Count
+            );
+
+            return distinct;
         }
 
         public async Task AddChecklistItem(GoalChecklist item)
         {
+            Log.Information("AddChecklistItem START | GoalId={GoalId}", item?.GoalId);
+
             await _db.GoalChecklists.AddAsync(item);
             await _db.SaveChangesAsync();
+
+            Log.Information("AddChecklistItem END | ChecklistId={ChecklistId}", item?.ChecklistId);
         }
 
         public async Task DeleteChecklistItem(int checklistId)
         {
-            var progressRecords = await _db
-                .Goalchecklistprogresses.Where(x => x.ChecklistId == checklistId)
+            Log.Information("DeleteChecklistItem START | ChecklistId={ChecklistId}", checklistId);
+
+            var progressRecords = await _db.Goalchecklistprogresses
+                .Where(x => x.ChecklistId == checklistId)
                 .ToListAsync();
 
             _db.Goalchecklistprogresses.RemoveRange(progressRecords);
@@ -510,12 +705,30 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
 
             await _db.SaveChangesAsync();
+
+            Log.Information("DeleteChecklistItem END | ChecklistId={ChecklistId}", checklistId);
         }
 
         public async Task<bool> ChecklistHasProgress(int checklistId, int userId)
         {
-            var result = await _db.Goalchecklistprogresses.AnyAsync(x =>
-                x.ChecklistId == checklistId && x.UserId == userId && x.IsCompleted == true
+            Log.Information(
+                "ChecklistHasProgress START | ChecklistId={ChecklistId} | UserId={UserId}",
+                checklistId,
+                userId
+            );
+
+            var result = await _db.Goalchecklistprogresses
+                .AnyAsync(x =>
+                    x.ChecklistId == checklistId &&
+                    x.UserId == userId &&
+                    x.IsCompleted == true
+                );
+
+            Log.Information(
+                "ChecklistHasProgress END | ChecklistId={ChecklistId} | UserId={UserId} | Result={Result}",
+                checklistId,
+                userId,
+                result
             );
 
             return result;
@@ -523,6 +736,13 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
         public async Task UpdateGoalProgress(int goalId, decimal progress, int userId)
         {
+            Log.Information(
+                "UpdateGoalProgress START | GoalId={GoalId} | Progress={Progress} | UserId={UserId}",
+                goalId,
+                progress,
+                userId
+            );
+
             var newLog = new Goalprogresslog
             {
                 GoalId = goalId,
@@ -534,6 +754,12 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
             await _db.Goalprogresslogs.AddAsync(newLog);
             await _db.SaveChangesAsync();
+
+            Log.Information(
+                "UpdateGoalProgress END | GoalId={GoalId} | LoggedProgress={Progress}",
+                goalId,
+                progress
+            );
         }
     }
 }
