@@ -859,5 +859,311 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 _ => query.OrderByDescending(a => a.CreatedOn),
             };
         }
+
+
+        /// <summary>
+        /// Employee requests to reopen an overdue assignment with explanation notes
+        /// </summary>
+        public async Task<ApiResponse<int>> RequestAssignmentReopen(
+            int employeeId,
+            ReopenAssignmentRequestModel request)
+        {
+            Log.Information(
+                "RequestAssignmentReopen started. EmployeeId={EmployeeId}, AssignmentId={AssignmentId}",
+                employeeId,
+                request.AssignmentId
+            );
+
+            var assignment = await _assignmentRepository.GetAssignmentById(request.AssignmentId);
+
+            if (assignment == null || assignment.MenteeEmployeeId != employeeId)
+            {
+                Log.Warning(
+                    "RequestAssignmentReopen: Assignment not found or access denied. AssignmentId={AssignmentId}",
+                    request.AssignmentId
+                );
+                return new ApiResponse<int>
+                {
+                    Success = false,
+                    Message = LnDConstants.RESPONSE_MESSAGES.ASSIGNMENT_NOT_FOUND
+                };
+            }
+
+            // Check if assignment is eligible for reopen
+            // Must be IN_PROGRESS and deadline must be in the past
+            if (assignment.Status != LnDConstants.ASSIGNMENT_STATUS.IN_PROGRESS)
+            {
+                Log.Warning(
+                    "RequestAssignmentReopen: Assignment not in progress. Status={Status}",
+                    assignment.Status
+                );
+                return new ApiResponse<int>
+                {
+                    Success = false,
+                    Message = LnDConstants.RESPONSE_MESSAGES.ASSIGNMENT_NOT_ELIGIBLE_FOR_REOPEN
+                };
+            }
+
+            // Check if assignment is actually overdue
+            var today = DateTime.Now.Date;
+            var isOverdue = assignment.Deadline.HasValue && assignment.Deadline.Value.Date < today;
+
+            if (!isOverdue)
+            {
+                Log.Warning(
+                    "RequestAssignmentReopen: Assignment is not overdue. Deadline={Deadline}",
+                    assignment.Deadline
+                );
+                return new ApiResponse<int>
+                {
+                    Success = false,
+                    Message = "Assignment deadline has not passed yet. Reopen request is only available for overdue assignments."
+                };
+            }
+
+            // Check if there's already a pending reopen request
+            var existingRequest = await _approvalRepository.GetPendingReopenRequestByAssignment(
+                request.AssignmentId);
+
+            if (existingRequest != null)
+            {
+                Log.Warning(
+                    "RequestAssignmentReopen: Pending request exists. AssignmentId={AssignmentId}",
+                    request.AssignmentId
+                );
+                return new ApiResponse<int>
+                {
+                    Success = false,
+                    Message = LnDConstants.RESPONSE_MESSAGES.PENDING_REOPEN_REQUEST_EXISTS
+                };
+            }
+
+            // Calculate days overdue
+            var daysOverdue = assignment.Deadline.HasValue
+                ? (int)(today - assignment.Deadline.Value.Date).TotalDays
+                : 0;
+
+            // Store request notes in JSON format in the Notes field
+            var notesData = new Dictionary<string, object>
+    {
+        { "RequestNotes", request.RequestNotes },
+        { "OriginalDeadline", assignment.Deadline },
+        { "DaysOverdue", daysOverdue }
+    };
+
+            var approval = new Lndapproval
+            {
+                ApprovalType = LnDConstants.APPROVAL_TYPE.ASSIGNMENT_REOPEN,
+                AssignmentId = request.AssignmentId,
+                SkillId = assignment.SkillId,
+                RequesterEmployeeId = employeeId,
+                ApproverEmployeeId = assignment.MenteeEmployee.ReportingManagerEmployeeId,
+                Status = LnDConstants.APPROVAL_STATUS.PENDING,
+                Notes = JsonSerializer.Serialize(notesData),
+                RequestedOn = DateOnly.FromDateTime(DateTime.Now)
+            };
+
+            await _approvalRepository.AddApproval(approval);
+            await _baseRepository.SaveChanges();
+
+            Log.Information(
+                "RequestAssignmentReopen succeeded. ApprovalId={ApprovalId}, DaysOverdue={DaysOverdue}",
+                approval.ApprovalId,
+                daysOverdue
+            );
+
+            return new ApiResponse<int>
+            {
+                Success = true,
+                Message = LnDConstants.RESPONSE_MESSAGES.REOPEN_REQUEST_SUBMITTED,
+                Data = approval.ApprovalId
+            };
+        }
+
+
+        /// <summary>
+        /// Manager approves or rejects reopen request and sets new deadline if approved
+        /// </summary>
+        public async Task<ApiResponse<bool>> ProcessReopenRequest(
+            int managerId,
+            ProcessReopenRequestModel request)
+        {
+            Log.Information(
+                "ProcessReopenRequest started. ManagerId={ManagerId}, ApprovalId={ApprovalId}, IsApproved={IsApproved}",
+                managerId,
+                request.ApprovalId,
+                request.IsApproved
+            );
+
+            var approval = await _approvalRepository.GetApprovalById(request.ApprovalId);
+
+            if (approval == null ||
+                approval.ApprovalType != LnDConstants.APPROVAL_TYPE.ASSIGNMENT_REOPEN)
+            {
+                Log.Warning(
+                    "ProcessReopenRequest: Approval not found or wrong type. ApprovalId={ApprovalId}",
+                    request.ApprovalId
+                );
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = LnDConstants.RESPONSE_MESSAGES.APPROVAL_NOT_FOUND_OR_NOT_APPROVER
+                };
+            }
+
+            // Verify manager has access
+            if (approval.ApproverEmployeeId != managerId)
+            {
+                Log.Warning("ProcessReopenRequest: Access denied. ManagerId={ManagerId}", managerId);
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = LnDConstants.RESPONSE_MESSAGES.APPROVAL_NOT_FOUND_OR_NOT_APPROVER
+                };
+            }
+
+            if (approval.Status != LnDConstants.APPROVAL_STATUS.PENDING)
+            {
+                Log.Warning(
+                    "ProcessReopenRequest: Already processed. Status={Status}",
+                    approval.Status
+                );
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = LnDConstants.RESPONSE_MESSAGES.APPROVAL_ALREADY_PROCESSED
+                };
+            }
+
+            var assignment = await _assignmentRepository.GetAssignmentById(approval.AssignmentId.Value);
+
+            if (assignment == null)
+            {
+                Log.Warning(
+                    "ProcessReopenRequest: Assignment not found. AssignmentId={AssignmentId}",
+                    approval.AssignmentId
+                );
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = LnDConstants.RESPONSE_MESSAGES.ASSIGNMENT_NOT_FOUND
+                };
+            }
+
+            if (request.IsApproved)
+            {
+                if (!request.NewDeadline.HasValue)
+                {
+                    return new ApiResponse<bool>
+                    {
+                        Success = false,
+                        Message = LnDConstants.RESPONSE_MESSAGES.NEW_DEADLINE_REQUIRED
+                    };
+                }
+
+                // Approve - reopen assignment with new deadline
+                approval.Status = LnDConstants.APPROVAL_STATUS.APPROVED;
+
+                // Update notes with manager response and new deadline
+                var notesData = JsonSerializer.Deserialize<Dictionary<string, object>>(approval.Notes);
+                notesData["ManagerNotes"] = request.ManagerNotes ?? string.Empty;
+                notesData["NewDeadline"] = request.NewDeadline.Value;
+                approval.Notes = JsonSerializer.Serialize(notesData);
+
+                approval.UpdatedOn = DateOnly.FromDateTime(DateTime.Now);
+
+                // Update assignment - reopen and set new deadline
+                assignment.Status = LnDConstants.ASSIGNMENT_STATUS.IN_PROGRESS;
+                assignment.Deadline = request.NewDeadline;
+                assignment.UpdatedByEmployeeId = managerId;
+                assignment.UpdatedOn = DateOnly.FromDateTime(DateTime.Now);
+
+                await _assignmentRepository.UpdateAssignment(assignment);
+
+                Log.Information(
+                    "ProcessReopenRequest: Approved. AssignmentId={AssignmentId}, NewDeadline={NewDeadline}",
+                    assignment.AssignmentId,
+                    request.NewDeadline
+                );
+            }
+            else
+            {
+                // Reject request
+                approval.Status = LnDConstants.APPROVAL_STATUS.REJECTED;
+
+                // Update notes with manager rejection reason
+                var notesData = JsonSerializer.Deserialize<Dictionary<string, object>>(approval.Notes);
+                notesData["ManagerNotes"] = request.ManagerNotes ?? string.Empty;
+                approval.Notes = JsonSerializer.Serialize(notesData);
+
+                approval.UpdatedOn = DateOnly.FromDateTime(DateTime.Now);
+
+                Log.Information(
+                    "ProcessReopenRequest: Rejected. ApprovalId={ApprovalId}",
+                    request.ApprovalId
+                );
+            }
+
+            await _approvalRepository.UpdateApproval(approval);
+            await _baseRepository.SaveChanges();
+
+            return new ApiResponse<bool>
+            {
+                Success = true,
+                Message = request.IsApproved
+                    ? LnDConstants.RESPONSE_MESSAGES.REOPEN_REQUEST_APPROVED
+                    : LnDConstants.RESPONSE_MESSAGES.REOPEN_REQUEST_REJECTED,
+                Data = true
+            };
+        }
+
+        /// <summary>
+        /// Gets employee's own reopen requests
+        /// </summary>
+        public async Task<ApiResponse<PaginatedResponse<ReopenRequestResponseModel>>> GetMyReopenRequests(
+            int employeeId,
+            MyApprovalsRequestModel request)
+        {
+            Log.Information("GetMyReopenRequests started. EmployeeId={EmployeeId}", employeeId);
+
+            var (items, totalCount) = await _approvalRepository.GetMyReopenRequests(employeeId, request);
+
+            return new ApiResponse<PaginatedResponse<ReopenRequestResponseModel>>
+            {
+                Success = true,
+                Data = new PaginatedResponse<ReopenRequestResponseModel>
+                {
+                    Items = items,
+                    TotalCount = totalCount,
+                    PageNumber = request.PageNumber,
+                    PageSize = request.PageSize
+                }
+            };
+        }
+
+        /// <summary>
+        /// Gets manager's team reopen requests for approval
+        /// </summary>
+        public async Task<ApiResponse<PaginatedResponse<ReopenRequestResponseModel>>> GetTeamReopenRequests(
+            int managerId,
+            MyApprovalsRequestModel request)
+        {
+            Log.Information("GetTeamReopenRequests started. ManagerId={ManagerId}", managerId);
+
+            var (items, totalCount) = await _approvalRepository.GetTeamReopenRequests(managerId, request);
+
+            return new ApiResponse<PaginatedResponse<ReopenRequestResponseModel>>
+            {
+                Success = true,
+                Data = new PaginatedResponse<ReopenRequestResponseModel>
+                {
+                    Items = items,
+                    TotalCount = totalCount,
+                    PageNumber = request.PageNumber,
+                    PageSize = request.PageSize
+                }
+            };
+        }
+
     }
 }

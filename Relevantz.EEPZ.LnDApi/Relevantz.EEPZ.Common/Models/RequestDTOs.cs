@@ -249,4 +249,23 @@ namespace Relevantz.EEPZ.Common.Models
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;
     }
+
+
+    // Request model for employee to request reopen
+public class ReopenAssignmentRequestModel
+{
+    public int AssignmentId { get; set; }
+    public string RequestNotes { get; set; }
+}
+
+// Request model for manager to process reopen request
+public class ProcessReopenRequestModel
+{
+    public int ApprovalId { get; set; }
+    public bool IsApproved { get; set; }
+    public string ManagerNotes { get; set; }
+    public DateTime? NewDeadline { get; set; }
+}  
+
+
 }

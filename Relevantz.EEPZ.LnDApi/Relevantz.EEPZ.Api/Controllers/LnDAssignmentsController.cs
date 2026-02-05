@@ -4,7 +4,6 @@ using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Serilog;
-
 namespace Relevantz.EEPZ.Api.Controllers.LnD
 {
     /// <summary>
@@ -338,5 +337,102 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         }
 
         #endregion
+        // Add these endpoints to your existing LnDAssignmentsController
+
+        /// <summary>
+        /// Employee requests to reopen an overdue assignment with explanation
+        /// </summary>
+        [HttpPost("api/lnd-assignments/request-reopen")]
+        public async Task<IActionResult> RequestAssignmentReopen(
+            [FromBody] ReopenAssignmentRequestModel request)
+        {
+            var employeeId = GetCurrentEmployeeId();
+
+            Log.Information(
+                "RequestAssignmentReopen API called. EmployeeId={EmployeeId}, AssignmentId={AssignmentId}",
+                employeeId,
+                request.AssignmentId
+            );
+
+            var result = await _assignmentService.RequestAssignmentReopen(employeeId, request);
+
+            if (result.Success)
+            {
+                Log.Information(
+                    "RequestAssignmentReopen API succeeded. ApprovalId={ApprovalId}",
+                    result.Data
+                );
+                return Ok(result);
+            }
+            else
+            {
+                Log.Warning(
+                    "RequestAssignmentReopen API failed. Message={Message}",
+                    result.Message
+                );
+                return BadRequest(result);
+            }
+        }
+
+        /// <summary>
+        /// Manager processes reopen request (approve/reject with new deadline)
+        /// </summary>
+        [HttpPost("api/lnd-assignments/process-reopen")]
+        public async Task<IActionResult> ProcessReopenRequest(
+            [FromBody] ProcessReopenRequestModel request)
+        {
+            var managerId = GetCurrentEmployeeId();
+
+            Log.Information(
+                "ProcessReopenRequest API called. ManagerId={ManagerId}, ApprovalId={ApprovalId}",
+                managerId,
+                request.ApprovalId
+            );
+
+            var result = await _assignmentService.ProcessReopenRequest(managerId, request);
+
+            if (result.Success)
+            {
+                Log.Information("ProcessReopenRequest API succeeded");
+                return Ok(result);
+            }
+            else
+            {
+                Log.Warning("ProcessReopenRequest API failed. Message={Message}", result.Message);
+                return BadRequest(result);
+            }
+        }
+
+        /// <summary>
+        /// Gets employee's reopen requests with status tracking
+        /// </summary>
+        [HttpGet("api/lnd-assignments/my-reopen-requests")]
+        public async Task<IActionResult> GetMyReopenRequests([FromQuery] MyApprovalsRequestModel request)
+        {
+            var employeeId = GetCurrentEmployeeId();
+
+            Log.Information("GetMyReopenRequests API called. EmployeeId={EmployeeId}", employeeId);
+
+            var result = await _assignmentService.GetMyReopenRequests(employeeId, request);
+
+            return result.Success ? Ok(result) : BadRequest(result);
+        }
+
+        /// <summary>
+        /// Gets manager's team reopen requests pending approval
+        /// </summary>
+        [HttpGet("api/lnd-assignments/team-reopen-requests")]
+        public async Task<IActionResult> GetTeamReopenRequests([FromQuery] MyApprovalsRequestModel request)
+        {
+            var managerId = GetCurrentEmployeeId();
+
+            Log.Information("GetTeamReopenRequests API called. ManagerId={ManagerId}", managerId);
+
+            var result = await _assignmentService.GetTeamReopenRequests(managerId, request);
+
+            return result.Success ? Ok(result) : BadRequest(result);
+        }
+
     }
 }
+

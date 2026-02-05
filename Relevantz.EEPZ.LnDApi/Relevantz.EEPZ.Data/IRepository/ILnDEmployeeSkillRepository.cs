@@ -25,7 +25,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
         Task<(List<Lndemployeeskillmapper> Items, int TotalCount)> GetMySkills(
             int employeeId,
             MySkillsRequestModel request
-        );
+        ); 
         Task<List<int>> GetExistingSkillMappings(int employeeId, List<int> skillIds);
 
         Task<List<Lndapproval>> GetPendingSkillApprovals(int employeeId, int skillId);

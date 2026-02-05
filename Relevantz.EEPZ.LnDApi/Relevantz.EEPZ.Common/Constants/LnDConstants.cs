@@ -68,6 +68,7 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string SME_REQUEST = "SME_REQUEST";
             public const string ASSIGNMENT_ACKNOWLEDGEMENT = "ASSIGNMENT_ACKNOWLEDGEMENT";
             public const string ASSIGNMENT_COMPLETION = "ASSIGNMENT_COMPLETION";
+            public const string ASSIGNMENT_REOPEN = "ASSIGNMENT_REOPEN";
         }
 
         /// <summary>
@@ -281,6 +282,16 @@ namespace Relevantz.EEPZ.Common.Constants
 
             public const string SKILL_DELETE_WITH_ASSIGNMENTS =
                 "Skill deleted successfully. {0} active assignment(s) removed. SME status deactivated if applicable.";
+
+            public const string REOPEN_REQUEST_SUBMITTED = "Reopen request submitted successfully";
+            public const string REOPEN_REQUEST_APPROVED = "Assignment reopened and deadline extended";
+            public const string REOPEN_REQUEST_REJECTED = "Reopen request rejected";
+
+            public const string PENDING_REOPEN_REQUEST_EXISTS = "A pending reopen request already exists for this assignment";
+            public const string NEW_DEADLINE_REQUIRED = "New deadline is required when approving reopen request";
+    public const string ASSIGNMENT_NOT_ELIGIBLE_FOR_REOPEN = 
+    "Only in-progress assignments with passed deadlines can be reopened";
+
         }
     }
 }

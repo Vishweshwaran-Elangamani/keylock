@@ -180,7 +180,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             {
                 query = query.Where(m => m.EmployeeId == request.EmployeeId.Value);
             }
-
+ 
             if (!string.IsNullOrEmpty(request.SearchTerm))
             {
                 query = query.Where(m =>
@@ -189,13 +189,13 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                     || m.Employee.Userprofile.LastName.Contains(request.SearchTerm)
                 );
             }
-
+ 
             var totalCount = await query.CountAsync();
 
             var items = await query
                 .Skip((request.PageNumber - 1) * 1_000_000)
                 .Take(1_000_000)
-                .ToListAsync();
+                .ToListAsync();     
 
             Log.Information(
                 "GetSubordinateSkillsAsync completed. ManagerId={ManagerId}, ReturnedCount={Count}, TotalCount={TotalCount}",
@@ -204,7 +204,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 totalCount
             );
 
-            return (items, totalCount);
+            return (items, totalCount); 
         }
 
         /// <summary>

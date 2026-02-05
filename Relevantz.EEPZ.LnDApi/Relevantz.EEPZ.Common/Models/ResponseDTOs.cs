@@ -122,6 +122,7 @@ namespace Relevantz.EEPZ.Common.Models
 
         public bool IsOverdue { get; set; }
         public int? DaysOverdue { get; set; }
+        public bool HasPendingReopenRequest { get; set; }
     }
 
 
@@ -188,5 +189,24 @@ namespace Relevantz.EEPZ.Common.Models
         public string FileName { get; set; }
         public string ContentType { get; set; }
         public long FileSize { get; set; }
+    }
+
+    public class ReopenRequestResponseModel
+    {
+        public int ApprovalId { get; set; }
+        public int AssignmentId { get; set; }
+        public string MenteeName { get; set; }
+        public string SkillName { get; set; }
+        public string SmeName { get; set; }
+        public DateTime? OriginalDeadline { get; set; }
+        public DateTime? NewDeadline { get; set; }
+        public string RequestNotes { get; set; }
+        public string Status { get; set; }
+        public DateOnly? RequestedOn { get; set; }
+        public string? ManagerNotes { get; set; }
+        public DateOnly? ProcessedOn { get; set; }
+
+        public bool IsOverdue { get; set; }
+        public int? DaysOverdue { get; set; }
     }
 }

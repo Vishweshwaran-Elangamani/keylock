@@ -157,7 +157,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                 id,
                 userId,
                 role
-            );
+            );    
 
             var result = await _baseService.GetMarkCompleteEligibility(id, userId, role);
 
@@ -166,7 +166,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                 id,
                 userId,
                 result != null
-            );
+            );  
 
             var response = ApiResponseModel<CanMarkCompleteModel>.SuccessResponse(
                 ResponseMessages.Codes.GOAL_RETRIEVED_SUCCESS,
@@ -189,7 +189,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                 "FetchProjectTeam START | ProjectId={ProjectId} | UserId={UserId}",
                 projectId,
                 currentUserId
-            );
+            ); 
 
             var subordinates = await _service.FetchProjectTeam(projectId, currentUserId);
 

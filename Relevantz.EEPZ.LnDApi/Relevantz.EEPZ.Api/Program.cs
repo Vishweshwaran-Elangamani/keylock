@@ -298,6 +298,7 @@ builder.Services.AddCors(options =>
                     "https://yourdomain.com",
                     "https://www.yourdomain.com",
                     "http://localhost:3007"
+                    
                 )
                 .AllowAnyMethod()
                 .AllowAnyHeader()

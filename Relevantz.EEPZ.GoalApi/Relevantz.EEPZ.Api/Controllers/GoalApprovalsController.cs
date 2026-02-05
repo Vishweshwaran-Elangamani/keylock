@@ -115,7 +115,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             Log.Information(
                 "PendingApprovals START | ApproverId={ApproverId}",
                 userId
-            );
+            ); 
 
             var approvals = await _service.GetPendingApprovals(userId);
 
@@ -123,7 +123,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                 "PendingApprovals END | ApproverId={ApproverId} | PendingCount={PendingCount}",
                 userId,
                 approvals.Count
-            );
+            ); 
 
             var response = ApiResponseModel<List<GoalApprovalModel>>.SuccessResponse(
                 ResponseMessages.Codes.APPROVAL_RETRIEVED_SUCCESS,

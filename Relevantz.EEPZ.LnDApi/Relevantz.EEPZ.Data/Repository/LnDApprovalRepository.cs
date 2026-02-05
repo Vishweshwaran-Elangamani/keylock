@@ -5,6 +5,8 @@ using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repositories.Interface;
 using Serilog;
+using System.Text.Json;
+
 
 namespace Relevantz.EEPZ.Data.Repositories.Implementations
 {
@@ -278,5 +280,213 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         #endregion
+
+
+        public async Task<Lndapproval?> GetPendingReopenRequestByAssignment(int assignmentId)
+        {
+            Log.Debug("GetPendingReopenRequestByAssignment called. AssignmentId={AssignmentId}", assignmentId);
+
+            return await _context.Lndapprovals
+                .FirstOrDefaultAsync(a =>
+                    a.AssignmentId == assignmentId &&
+                    a.ApprovalType == LnDConstants.APPROVAL_TYPE.ASSIGNMENT_REOPEN &&
+                    a.Status == LnDConstants.APPROVAL_STATUS.PENDING);
+        }
+
+        public async Task<(List<ReopenRequestResponseModel> Items, int TotalCount)> GetMyReopenRequests(
+            int employeeId,
+            MyApprovalsRequestModel request)
+        {
+            Log.Information("GetMyReopenRequests called. EmployeeId={EmployeeId}", employeeId);
+
+            var query = _context.Lndapprovals
+                .Include(a => a.Assignment)
+                    .ThenInclude(a => a.MenteeEmployee)
+                        .ThenInclude(e => e.Userprofile)
+                .Include(a => a.Assignment)
+                    .ThenInclude(a => a.Skill)
+                .Include(a => a.Assignment)
+                    .ThenInclude(a => a.Sme)
+                        .ThenInclude(s => s.Employee)
+                            .ThenInclude(e => e.Userprofile)
+                .Where(a =>
+                    a.RequesterEmployeeId == employeeId &&
+                    a.ApprovalType == LnDConstants.APPROVAL_TYPE.ASSIGNMENT_REOPEN);
+
+            // Status filter
+            if (!string.IsNullOrEmpty(request.Status) && request.Status.ToLower() != "all")
+            {
+                query = query.Where(a => a.Status == request.Status);
+            }
+
+            // Search filter
+            if (!string.IsNullOrEmpty(request.SearchTerm))
+            {
+                var searchLower = request.SearchTerm.ToLower();
+                query = query.Where(a =>
+                    a.Assignment.Skill.SkillName.ToLower().Contains(searchLower) ||
+                    a.Assignment.MenteeEmployee.Userprofile.FirstName.ToLower().Contains(searchLower) ||
+                    a.Assignment.MenteeEmployee.Userprofile.LastName.ToLower().Contains(searchLower) ||
+                    (a.Notes != null && a.Notes.ToLower().Contains(searchLower))
+                );
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .OrderByDescending(a => a.RequestedOn)
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToListAsync();
+
+            var today = DateTime.Now.Date;
+
+            var result = items.Select(a => new ReopenRequestResponseModel
+            {
+                ApprovalId = a.ApprovalId,
+                AssignmentId = a.AssignmentId.Value,
+                MenteeName = a.Assignment.MenteeEmployee.Userprofile.FirstName + " " +
+                            a.Assignment.MenteeEmployee.Userprofile.LastName,
+                SkillName = a.Assignment.Skill.SkillName,
+                SmeName = a.Assignment.Sme.Employee.Userprofile.FirstName + " " +
+                         a.Assignment.Sme.Employee.Userprofile.LastName,
+                OriginalDeadline = a.Assignment.Deadline,
+                NewDeadline = ExtractNewDeadlineFromNotes(a.Notes),
+                RequestNotes = ExtractRequestNotesFromNotes(a.Notes),
+                Status = a.Status,
+                RequestedOn = a.RequestedOn,
+                ManagerNotes = ExtractManagerNotesFromNotes(a.Notes),
+                ProcessedOn = a.UpdatedOn,
+                IsOverdue = a.Assignment.Deadline.HasValue &&
+                            a.Assignment.Deadline.Value.Date < today &&
+                            a.Assignment.Status == LnDConstants.ASSIGNMENT_STATUS.IN_PROGRESS,
+                DaysOverdue = a.Assignment.Deadline.HasValue && a.Assignment.Deadline.Value.Date < today
+                    ? (int)(today - a.Assignment.Deadline.Value.Date).TotalDays
+                    : null
+            }).ToList();
+
+            return (result, totalCount);
+        }
+
+        public async Task<(List<ReopenRequestResponseModel> Items, int TotalCount)> GetTeamReopenRequests(
+            int managerId,
+            MyApprovalsRequestModel request)
+        {
+            Log.Information("GetTeamReopenRequests called. ManagerId={ManagerId}", managerId);
+
+            var query = _context.Lndapprovals
+                .Include(a => a.Assignment)
+                    .ThenInclude(a => a.MenteeEmployee)
+                        .ThenInclude(e => e.Userprofile)
+                .Include(a => a.Assignment)
+                    .ThenInclude(a => a.Skill)
+                .Include(a => a.Assignment)
+                    .ThenInclude(a => a.Sme)
+                        .ThenInclude(s => s.Employee)
+                            .ThenInclude(e => e.Userprofile)
+                .Where(a =>
+                    a.ApproverEmployeeId == managerId &&
+                    a.ApprovalType == LnDConstants.APPROVAL_TYPE.ASSIGNMENT_REOPEN);
+
+            // Status filter
+            if (!string.IsNullOrEmpty(request.Status) && request.Status.ToLower() != "all")
+            {
+                query = query.Where(a => a.Status == request.Status);
+            }
+
+            // Search filter
+            if (!string.IsNullOrEmpty(request.SearchTerm))
+            {
+                var searchLower = request.SearchTerm.ToLower();
+                query = query.Where(a =>
+                    a.Assignment.Skill.SkillName.ToLower().Contains(searchLower) ||
+                    a.Assignment.MenteeEmployee.Userprofile.FirstName.ToLower().Contains(searchLower) ||
+                    a.Assignment.MenteeEmployee.Userprofile.LastName.ToLower().Contains(searchLower) ||
+                    (a.Notes != null && a.Notes.ToLower().Contains(searchLower))
+                );
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .OrderByDescending(a => a.RequestedOn)
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToListAsync();
+
+            var today = DateTime.Now.Date;
+
+            var result = items.Select(a => new ReopenRequestResponseModel
+            {
+                ApprovalId = a.ApprovalId,
+                AssignmentId = a.AssignmentId.Value,
+                MenteeName = a.Assignment.MenteeEmployee.Userprofile.FirstName + " " +
+                            a.Assignment.MenteeEmployee.Userprofile.LastName,
+                SkillName = a.Assignment.Skill.SkillName,
+                SmeName = a.Assignment.Sme.Employee.Userprofile.FirstName + " " +
+                         a.Assignment.Sme.Employee.Userprofile.LastName,
+                OriginalDeadline = a.Assignment.Deadline,
+                NewDeadline = ExtractNewDeadlineFromNotes(a.Notes),
+                RequestNotes = ExtractRequestNotesFromNotes(a.Notes),
+                Status = a.Status,
+                RequestedOn = a.RequestedOn,
+                ManagerNotes = ExtractManagerNotesFromNotes(a.Notes),
+                ProcessedOn = a.UpdatedOn,
+                IsOverdue = a.Assignment.Deadline.HasValue &&
+                            a.Assignment.Deadline.Value.Date < today &&
+                            a.Assignment.Status == LnDConstants.ASSIGNMENT_STATUS.IN_PROGRESS,
+                DaysOverdue = a.Assignment.Deadline.HasValue && a.Assignment.Deadline.Value.Date < today
+                    ? (int)(today - a.Assignment.Deadline.Value.Date).TotalDays
+                    : null
+            }).ToList();
+
+            return (result, totalCount);
+        }
+
+        // Helper methods to parse JSON from Notes field
+        private static DateTime? ExtractNewDeadlineFromNotes(string notes)
+        {
+            if (string.IsNullOrEmpty(notes)) return null;
+
+            var data = JsonSerializer.Deserialize<Dictionary<string, object>>(notes);
+            if (data != null && data.ContainsKey("NewDeadline") && data["NewDeadline"] != null)
+            {
+                var element = (JsonElement)data["NewDeadline"];
+                if (element.ValueKind != JsonValueKind.Null)
+                {
+                    return element.GetDateTime();
+                }
+            }
+
+            return null;
+        }
+
+        private static string ExtractRequestNotesFromNotes(string notes)
+        {
+            if (string.IsNullOrEmpty(notes)) return string.Empty;
+
+            var data = JsonSerializer.Deserialize<Dictionary<string, object>>(notes);
+            if (data != null && data.ContainsKey("RequestNotes") && data["RequestNotes"] != null)
+            {
+                return data["RequestNotes"]?.ToString() ?? string.Empty;
+            }
+
+            return string.Empty;
+        }
+
+        private static string? ExtractManagerNotesFromNotes(string notes)
+        {
+            if (string.IsNullOrEmpty(notes)) return null;
+
+            var data = JsonSerializer.Deserialize<Dictionary<string, object>>(notes);
+            if (data != null && data.ContainsKey("ManagerNotes") && data["ManagerNotes"] != null)
+            {
+                return data["ManagerNotes"]?.ToString();
+            }
+
+            return null;
+        }
+
+
     }
 }

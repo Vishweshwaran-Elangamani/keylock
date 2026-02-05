@@ -26,7 +26,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             _logger = logger;
 
             Log.Debug("BaseGoalController initialized.");
-        }
+        }  
 
         protected string GetUserRole()
         {
@@ -44,7 +44,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                     ResponseMessages.Codes.Unauthorized,
                     "Role claim not found"
                 );
-            }
+            } 
 
             Log.Information("GetUserRole END | Role={Role}", role);
             return role;

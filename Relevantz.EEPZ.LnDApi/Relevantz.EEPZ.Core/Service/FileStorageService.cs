@@ -34,9 +34,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 ChunkSizeBytes = 1048576,
                 WriteConcern = WriteConcern.WMajority,
                 ReadPreference = ReadPreference.Primary,
-            };
+            }; 
 
-            _gridFSBucket = new GridFSBucket(database, bucketOptions);
+            _gridFSBucket = new GridFSBucket(database, bucketOptions); 
         }
 
         /// <summary>

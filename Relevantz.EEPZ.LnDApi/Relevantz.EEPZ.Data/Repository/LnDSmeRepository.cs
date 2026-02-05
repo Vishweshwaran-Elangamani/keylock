@@ -183,7 +183,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             Log.Debug(
                 "GetAvailableSmesWithAssignmentCountsAsync: Filtered to {Count} available SMEs (below max assignments)",
                 availableSmesWithCounts.Count
-            );
+            ); 
 
             if (!string.IsNullOrEmpty(request.SearchTerm))
             {
@@ -250,7 +250,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                         .Contains(lowerSearchTerm)
                     || s.Skill.SkillName.ToLower().Contains(lowerSearchTerm)
                 );
-            }
+            }  
 
             var totalCount = await query.CountAsync();
             var items = await query
@@ -272,7 +272,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                             : null,
                     IsActive = s.IsActive ?? false,
                     ApprovedDate = s.ApprovedOn,
-                })
+                })                    
                 .ToListAsync();
 
             Log.Debug(

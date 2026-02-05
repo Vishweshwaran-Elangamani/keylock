@@ -20,5 +20,15 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
         Task<Lndapproval?> GetPendingAssignmentApproval(int assignmentId, string approvalType);
         Task<Lndattachment> AddAttachment(Lndattachment attachment);
         Task<Lndattachment?> GetAttachmentById(int attachmentId);
+
+        // Add these methods to your existing ILnDApprovalRepository interface
+        Task<Lndapproval?> GetPendingReopenRequestByAssignment(int assignmentId);
+        Task<(List<ReopenRequestResponseModel> Items, int TotalCount)> GetMyReopenRequests(
+            int employeeId,
+            MyApprovalsRequestModel request);
+        Task<(List<ReopenRequestResponseModel> Items, int TotalCount)> GetTeamReopenRequests(
+            int managerId,
+            MyApprovalsRequestModel request);
+
     }
 }

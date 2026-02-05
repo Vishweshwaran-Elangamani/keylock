@@ -62,7 +62,7 @@ namespace Relevantz.EEPZ.Api.Controllers
 
             EEPZBusinessLog.LogBusinessInformation("Retrieved {Count} violations", result.Data?.Count ?? 0);
             return Ok(result);
-        }
+        } 
 
 
         /// <summary>

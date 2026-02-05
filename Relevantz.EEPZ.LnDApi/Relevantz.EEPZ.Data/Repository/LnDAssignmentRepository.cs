@@ -95,9 +95,8 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         /// Gets paginated assignments for a mentee with filtering and search capabilities
         /// </summary>
         public async Task<(List<AssignmentResponseModel> Items, int TotalCount)> GetMyAssignments(
-            int employeeId,
-            AssignmentRequestModel request
-        )
+     int employeeId,
+     AssignmentRequestModel request)
         {
             Log.Information(
                 "GetMyAssignmentsAsync called. EmployeeId={EmployeeId}, StatusFilter={StatusFilter}, Page={PageNumber}",
@@ -177,6 +176,11 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                     UpdatedOn = a.UpdatedOn,
                     IsOverdue = false,
                     DaysOverdue = null,
+                    HasPendingReopenRequest = _context.Lndapprovals.Any(ap =>
+                        ap.AssignmentId == a.AssignmentId &&
+                        ap.RequesterEmployeeId == employeeId &&
+                        ap.ApprovalType == LnDConstants.APPROVAL_TYPE.ASSIGNMENT_REOPEN &&
+                        ap.Status == LnDConstants.APPROVAL_STATUS.PENDING)
                 })
                 .ToListAsync();
 
@@ -190,13 +194,13 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             return (items, totalCount);
         }
 
+
         /// <summary>
         /// Gets paginated assignments for a manager's team with filtering and search capabilities
         /// </summary>
         public async Task<(List<AssignmentResponseModel> Items, int TotalCount)> GetTeamAssignments(
-            int managerId,
-            AssignmentRequestModel request
-        )
+       int managerId,
+       AssignmentRequestModel request)
         {
             Log.Information(
                 "GetTeamAssignmentsAsync called. ManagerId={ManagerId}, StatusFilter={StatusFilter}, Page={PageNumber}",
@@ -212,9 +216,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                     .ThenInclude(s => s.Employee)
                         .ThenInclude(e => e.Userprofile)
                 .Include(a => a.Skill)
-                .Include(a => a.Lndapprovals)
                 .Where(a => a.MenteeEmployee.ReportingManagerEmployeeId == managerId);
 
+            // Apply your existing filters (status, search, etc.)
             if (!string.IsNullOrEmpty(request.StatusFilter))
             {
                 query = query.Where(a => a.Status == request.StatusFilter);
@@ -225,28 +229,21 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 var lowerSearchTerm = request.SearchTerm.ToLower();
                 query = query.Where(a =>
                     a.Skill.SkillName.ToLower().Contains(lowerSearchTerm)
-                    || a.MenteeEmployee.Userprofile.FirstName.ToLower().Contains(lowerSearchTerm)
-                    || a.MenteeEmployee.Userprofile.LastName.ToLower().Contains(lowerSearchTerm)
                     || (
-                        (
-                            a.MenteeEmployee.Userprofile.FirstName
-                            + " "
-                            + a.MenteeEmployee.Userprofile.LastName
-                        )
-                            .ToLower()
-                            .Contains(lowerSearchTerm)
+                        (a.Sme.Employee.Userprofile.FirstName ?? "")
+                        + " "
+                        + (a.Sme.Employee.Userprofile.LastName ?? "")
                     )
-                    || a.Sme.Employee.Userprofile.FirstName.ToLower().Contains(lowerSearchTerm)
-                    || a.Sme.Employee.Userprofile.LastName.ToLower().Contains(lowerSearchTerm)
+                        .ToLower()
+                        .Contains(lowerSearchTerm)
                     || (
-                        (
-                            a.Sme.Employee.Userprofile.FirstName
-                            + " "
-                            + a.Sme.Employee.Userprofile.LastName
-                        )
-                            .ToLower()
-                            .Contains(lowerSearchTerm)
+                        (a.MenteeEmployee.Userprofile.FirstName ?? "")
+                        + " "
+                        + (a.MenteeEmployee.Userprofile.LastName ?? "")
                     )
+                        .ToLower()
+                        .Contains(lowerSearchTerm)
+                    || a.Status.ToLower().Contains(lowerSearchTerm)
                 );
             }
 
@@ -274,19 +271,16 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                     Deadline = a.Deadline,
                     Status = a.Status,
                     ProofFilePath = a.ProofFilePath,
-                    CompletionNotes =
-                        a.Lndapprovals.OrderByDescending(ap => ap.UpdatedOn)
-                            .FirstOrDefault(ap => !string.IsNullOrEmpty(ap.Notes)) != null
-                            ? a
-                                .Lndapprovals.OrderByDescending(ap => ap.UpdatedOn)
-                                .FirstOrDefault(ap => !string.IsNullOrEmpty(ap.Notes))!
-                                .Notes
-                            : null,
+                    CompletionNotes = a.CompletionNotes,
                     CompletionRating = a.CompletionRating,
                     CreatedOn = a.CreatedOn,
                     UpdatedOn = a.UpdatedOn,
                     IsOverdue = false,
                     DaysOverdue = null,
+                    HasPendingReopenRequest = _context.Lndapprovals.Any(ap =>
+                        ap.AssignmentId == a.AssignmentId &&
+                        ap.ApprovalType == LnDConstants.APPROVAL_TYPE.ASSIGNMENT_REOPEN &&
+                        ap.Status == LnDConstants.APPROVAL_STATUS.PENDING)
                 })
                 .ToListAsync();
 
@@ -299,6 +293,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             return (items, totalCount);
         }
+
 
         /// <summary>
         /// Gets paginated assignments where employee is the assigned SME with filtering and search

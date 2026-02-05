@@ -80,7 +80,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                 "GetAttachmentFile START | AttachmentId={AttachmentId} | UserId={UserId}",
                 attachmentId,
                 userId
-            );
+            );  
 
             var (fileBytes, contentType, fileName) = await _service.GetAttachmentFile(
                 attachmentId,
@@ -93,7 +93,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                 userId,
                 fileName,
                 fileBytes?.Length
-            );
+            );  
 
             Response.Headers.Add("Content-Disposition", $"attachment; filename=\"{fileName}\"");
             Response.Headers.Add("Access-Control-Expose-Headers", "Content-Disposition");
@@ -131,7 +131,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                 enableRangeProcessing: true
             );
         }
-
+    
         /// <summary>
         /// Deletes a specific attachment by its ID.
         /// </summary>

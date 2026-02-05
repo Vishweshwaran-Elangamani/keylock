@@ -30,5 +30,14 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             int managerId,
             ExportAssignmentRequestModel request
         );
+        Task<ApiResponse<int>> RequestAssignmentReopen(int employeeId, ReopenAssignmentRequestModel request);
+        Task<ApiResponse<bool>> ProcessReopenRequest(int managerId, ProcessReopenRequestModel request);
+        Task<ApiResponse<PaginatedResponse<ReopenRequestResponseModel>>> GetMyReopenRequests(
+            int employeeId,
+            MyApprovalsRequestModel request);
+        Task<ApiResponse<PaginatedResponse<ReopenRequestResponseModel>>> GetTeamReopenRequests(
+            int managerId,
+            MyApprovalsRequestModel request);
+
     }
 }
