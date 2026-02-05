@@ -27,7 +27,7 @@ const getFeedbackDashboardPath = (roleName) => {
 export default function EmployeeAssignedForms() {
   const user = useMemo(
     () => JSON.parse(localStorage.getItem("user") || "{}") || {},
-    []
+    [],
   );
 
   const [allForms, setAllForms] = useState([]);
@@ -46,14 +46,14 @@ export default function EmployeeAssignedForms() {
       setError("");
       try {
         const response = await hrFormApi.getAllForms(1, 1000);
-        let data = Array.isArray(response?.data)
-          ? response.data
-          : Array.isArray(response?.data?.data)
-          ? response.data.data
+        let data = Array.isArray(response?.data?.items)
+          ? response.data.items
           : [];
+
         const sorted = [...data].sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
         );
+
         setAllForms(sorted);
         setLastFetchTime(new Date().toLocaleTimeString());
       } catch (err) {
@@ -76,7 +76,7 @@ export default function EmployeeAssignedForms() {
         setLoading(false);
       }
     },
-    [user?.empId]
+    [user?.empId],
   );
 
   const fetchSubmittedForms = useCallback(async () => {
@@ -86,8 +86,8 @@ export default function EmployeeAssignedForms() {
       let forms = Array.isArray(response?.data)
         ? response.data
         : Array.isArray(response?.data?.data)
-        ? response.data.data
-        : [];
+          ? response.data.data
+          : [];
       setSubmittedFormIds(new Set(forms.map((r) => r.formId)));
     } catch (error) {
       setSubmittedFormIds(new Set());
@@ -109,7 +109,7 @@ export default function EmployeeAssignedForms() {
     const submitted = submittedFormIds.size;
     const total = allForms.length;
     const remaining = allForms.filter(
-      (f) => !submittedFormIds.has(f.formId)
+      (f) => !submittedFormIds.has(f.formId),
     ).length;
     return { total, submitted, remaining };
   }, [allForms, submittedFormIds]);
@@ -290,7 +290,7 @@ export default function EmployeeAssignedForms() {
                         disabledtitle="Already Submitted"
                         tabIndex={-1}
                         type="button"
->
+                      >
                         <Lock size={16} />
                         Already Submitted
                       </button>

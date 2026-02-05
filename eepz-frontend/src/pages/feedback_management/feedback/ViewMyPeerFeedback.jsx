@@ -21,7 +21,7 @@ export default function ViewMyPeerFeedback() {
   const navigate = useNavigate();
   const user = useMemo(
     () => JSON.parse(localStorage.getItem("user") || "{}") || {},
-    []
+    [],
   );
 
   const [peerFeedback, setPeerFeedback] = useState([]);
@@ -47,13 +47,13 @@ export default function ViewMyPeerFeedback() {
   const checkIsAnonymous = (feedback) => {
     return Boolean(
       feedback.isAnonymous === true ||
-        feedback.isAnonymous === 1 ||
-        feedback.anonymous === true ||
-        feedback.anonymous === 1 ||
-        feedback.is_anonymous === true ||
-        feedback.is_anonymous === 1 ||
-        feedback.IsAnonymous === true ||
-        feedback.IsAnonymous === 1
+      feedback.isAnonymous === 1 ||
+      feedback.anonymous === true ||
+      feedback.anonymous === 1 ||
+      feedback.is_anonymous === true ||
+      feedback.is_anonymous === 1 ||
+      feedback.IsAnonymous === true ||
+      feedback.IsAnonymous === 1,
     );
   };
 
@@ -105,9 +105,9 @@ export default function ViewMyPeerFeedback() {
       try {
         const peerRes = await peerQueueApi.list(1, 1000);
 
-        const feedbackData = Array.isArray(peerRes?.data)
-          ? peerRes.data
-          : peerRes?.data?.data || [];
+        const feedbackData = Array.isArray(peerRes?.data?.data)
+          ? peerRes.data.data
+          : [];
 
         if (Array.isArray(feedbackData)) {
           const myFeedback = feedbackData
@@ -115,7 +115,10 @@ export default function ViewMyPeerFeedback() {
               const isRecipient =
                 Number(p.recipientEmployeeId) === Number(empId);
               const isApproved =
-                p.status === "Approved" || p.Status === "Approved";
+  p.status === "Approved" ||
+  p.status === "Pending" ||
+  p.Status === "Approved";
+
 
               return isRecipient && isApproved;
             })
@@ -133,16 +136,16 @@ export default function ViewMyPeerFeedback() {
                   empMap[p.recipientEmployeeId] ||
                   `Employee ${p.recipientEmployeeId}`,
                 formattedDate: formatDate(
-                  p.submittedDate || p.createdAt || p.CreatedAt
+                  p.submittedDate || p.createdAt || p.CreatedAt,
                 ),
               };
             })
             .sort((a, b) => {
               const dateA = new Date(
-                a.submittedDate || a.createdAt || a.CreatedAt
+                a.submittedDate || a.createdAt || a.CreatedAt,
               );
               const dateB = new Date(
-                b.submittedDate || b.createdAt || b.CreatedAt
+                b.submittedDate || b.createdAt || b.CreatedAt,
               );
               return dateB - dateA;
             });

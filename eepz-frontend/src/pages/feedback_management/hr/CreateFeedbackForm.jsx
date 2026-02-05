@@ -90,7 +90,8 @@ export default function CreateFeedbackForm() {
 
       const response = await hrFormApi.createForm(createPayload);
 
-      if (response?.success || response?.data?.success) {
+      if (response?.status === 201 && response?.data?.formId) {
+
         setSuccess(
           `Form created successfully!\n\n` +
             `Form: ${form.formName}\n` +
@@ -108,7 +109,8 @@ export default function CreateFeedbackForm() {
           navigate("/hr/dashboard/feedback");
         }, 2500);
       } else {
-        setError(response?.message || "Failed to create form");
+        setError(response?.data?.message || "Failed to create form");
+
       }
     } catch (err) {
       console.error("Error:", err);

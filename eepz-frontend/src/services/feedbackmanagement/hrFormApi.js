@@ -1,7 +1,7 @@
 import api from "./index_feedback";
 
 export const hrFormApi = {
-  createForm: (payload) => api.post("/HrFeedbackForm/forms/create", payload),
+  createForm: (payload) => api.post("/HrFeedbackForm/forms", payload),
 
   getFormById: (formId) => api.get(`/HrFeedbackForm/forms/${formId}`),
 

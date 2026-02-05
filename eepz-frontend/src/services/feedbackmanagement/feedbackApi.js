@@ -3,21 +3,34 @@ import axios from "axios";
 import org_api from "./index_org";
 
 export const managerReviewApi = {
-  create: (body) => api.post("/managerreview/create", body),
-  getById: (id) => api.get(`/managerreview/${id}`),
-  getByManager: (managerId) => api.get(`/managerreview/manager/${managerId}`),
-  getForTarget: (employeeId) => api.get(`/managerreview/target/${employeeId}`),
-  update: (id, body) => api.put(`/managerreview/${id}`, body),
-  submit: (id) => api.post(`/managerreview/${id}/submit`),
-  modify: (id) => api.post(`/managerreview/${id}/modify`),
-  finalize: (id) => api.post(`/managerreview/${id}/finalize`),
-  remove: (id) => api.delete(`/managerreview/${id}`),
+  create: (body) => api.post("/ManagerReview/create", body),
+
+  getById: (id) => api.get(`/ManagerReview/${id}`),
+
+  getByManager: (managerId) =>
+    api.get(`/ManagerReview/manager/${managerId}`),
+
+  getForTarget: (employeeId) =>
+    api.get(`/ManagerReview/target/${employeeId}`),
+
+  update: (id, body) => api.put(`/ManagerReview/${id}`, body),
+
+  submit: (id) => api.post(`/ManagerReview/${id}/submit`),
+
+  modify: (id) => api.post(`/ManagerReview/${id}/modify`),
+
+  finalize: (id) => api.post(`/ManagerReview/${id}/finalize`),
+
+  remove: (id) => api.delete(`/ManagerReview/${id}`),
+
   list: (page = 1, size = 20) =>
-    api.get("/managerreview/all", {
+    api.get("/ManagerReview/all", {
       params: { pageNumber: page, pageSize: size },
     }),
-  byStatus: (status) => api.get(`/managerreview/status/${status}`),
+
+  byStatus: (status) => api.get(`/ManagerReview/status/${status}`),
 };
+
 
 export const goalsApi = {
   getAll: () => org_api.get("/goals"),
@@ -63,24 +76,32 @@ export const smeApi = {
 };
 
 export const peerQueueApi = {
-  create: (body) => api.post("/peerfeedbackqueue/create", body),
-  getById: (id) => api.get(`/peerfeedbackqueue/${id}`),
+  create: (body) => api.post("/PeerFeedbackQueue/create", body),
+
+  getById: (id) => api.get(`/PeerFeedbackQueue/${id}`),
+
   approve: (id, { isProfessional, isRelevant, approvedByHRId }) =>
-    api.post(`/peerfeedbackqueue/${id}/approve`, null, {
+    api.post(`/PeerFeedbackQueue/${id}/approve`, null, {
       params: { isProfessional, isRelevant, approvedByHRId },
     }),
+
   reject: (id, { rejectedByHRId }) =>
-    api.post(`/peerfeedbackqueue/${id}/reject`, null, {
+    api.post(`/PeerFeedbackQueue/${id}/reject`, null, {
       params: { rejectedByHRId },
     }),
-  remove: (id) => api.delete(`/peerfeedbackqueue/${id}`),
-  pending: () => api.get("/peerfeedbackqueue/pending"),
-  approved: () => api.get("/peerfeedbackqueue/approved"),
+
+  remove: (id) => api.delete(`/PeerFeedbackQueue/${id}`),
+
+  pending: () => api.get("/PeerFeedbackQueue/pending"),
+
+  approved: () => api.get("/PeerFeedbackQueue/approved"),
+
   list: (page = 1, size = 20) =>
-    api.get("/peerfeedbackqueue/all", {
+    api.get("/PeerFeedbackQueue/all", {
       params: { pageNumber: page, pageSize: size },
     }),
 };
+
 
 export const hrFormApi = {
   createForm: (body) => api.post("/hrfeedbackform/forms/create", body),
