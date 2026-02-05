@@ -6,7 +6,9 @@ import AppraisalDetailsModal from "../../../components/performance_management/mo
 import Breadcrumb from "../../../components/common/Breadcrumb";
 import styles from "../../../styles/performancemanagement/hr/HRViewAssessment.module.css";
 
+
 /* ----------------------------- UI HELPERS ----------------------------- */
+
 
 const CustomDropdown = ({
   value,
@@ -18,16 +20,19 @@ const CustomDropdown = ({
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
 
+
   const selected =
     options.find((o) => o.value === value) || {
       label: placeholder || "Select",
       value: "",
     };
 
+
   const handleSelect = (val) => {
     onChange(val);
     setOpen(false);
   };
+
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -38,6 +43,7 @@ const CustomDropdown = ({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
 
   return (
     <div
@@ -55,6 +61,7 @@ const CustomDropdown = ({
         {selected.label}
         <span className={styles.customArrow} />
       </div>
+
 
       {open && !disabled && (
         <div className={styles.customMenu}>
@@ -75,14 +82,17 @@ const CustomDropdown = ({
   );
 };
 
+
 const PaginationDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
+
 
   const handleSelect = (val) => {
     onChange(val);
     setOpen(false);
   };
+
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -94,6 +104,7 @@ const PaginationDropdown = ({ value, onChange, options }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+
   return (
     <div ref={dropdownRef} className={styles.paginationDropdown} tabIndex={0}>
       <div
@@ -103,6 +114,7 @@ const PaginationDropdown = ({ value, onChange, options }) => {
         {value}
         <span className={styles.paginationArrow} />
       </div>
+
 
       {open && (
         <div className={styles.paginationMenu}>
@@ -123,7 +135,9 @@ const PaginationDropdown = ({ value, onChange, options }) => {
   );
 };
 
+
 /* ----------------------------- UTILITIES ------------------------------ */
+
 
 function exportToCsv(filename, rows) {
   if (!rows || !rows.length) return;
@@ -155,11 +169,13 @@ function exportToCsv(filename, rows) {
   document.body.removeChild(link);
 }
 
+
 function average(values) {
   const arr = (values ?? []).filter((v) => typeof v === "number");
   if (!arr.length) return "N/A";
   return (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(2);
 }
+
 
 function normalizeStatus(status) {
   if (!status || typeof status !== "string") return "completed";
@@ -171,8 +187,10 @@ function normalizeStatus(status) {
   return "completed";
 }
 
+
 function statusBadge(status) {
   const normalized = normalizeStatus(status);
+
 
   if (normalized === "completed") {
     return (
@@ -201,7 +219,9 @@ function statusBadge(status) {
   );
 }
 
+
 /* -------------------------- MAIN COMPONENT ---------------------------- */
+
 
 function HRViewAppraisals() {
   const [loading, setLoading] = useState(true);
@@ -215,19 +235,24 @@ function HRViewAppraisals() {
   const [modalAttachments, setModalAttachments] = useState([]);
   const navigate = useNavigate();
 
+
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
+
   useEffect(() => {
     let mounted = true;
+
 
     async function fetchAppraisals() {
       try {
         setLoading(true);
         setError(null);
 
+
         const res = await api.get("/AssessmentDetails/all-details");
         const p = res?.data;
+
 
         // Accept: [], {success:true, data:[…]}, or {success:true, data:{success:true, data:[…]}}
         const list =
@@ -236,15 +261,18 @@ function HRViewAppraisals() {
           Array.isArray(p?.data?.data) ? p.data.data :
           null;
 
+
         // API signaled failure?
         if (!list && (p?.success === false || p?.data?.success === false)) {
           throw new Error(p?.error || p?.data?.error || "Failed to load data");
         }
 
+
         if (!list) {
           console.error("Unexpected response schema from /AssessmentDetails/all-details:", p);
           throw new Error("Unexpected response format");
         }
+
 
         const safe = list.map((a) => ({
           employeeId: a?.employeeId,
@@ -254,8 +282,10 @@ function HRViewAppraisals() {
           attachments: Array.isArray(a?.attachments) ? a.attachments : [],
         }));
 
+
         const initiatedAppraisals = safe.filter((appraisal) => {
           const comps = Array.isArray(appraisal.competencies) ? appraisal.competencies : [];
+
 
           const hasValidStatus = comps.some((comp) => {
             const status = String(comp?.status ?? comp?.Status ?? "")
@@ -264,10 +294,13 @@ function HRViewAppraisals() {
             return status && status !== "draft" && status !== "save as draft";
           });
 
+
           const hasAnyCompetency = comps.length > 0;
+
 
           return hasValidStatus || hasAnyCompetency;
         });
+
 
         if (!mounted) return;
         setAppraisals(initiatedAppraisals);
@@ -284,11 +317,13 @@ function HRViewAppraisals() {
       }
     }
 
+
     fetchAppraisals();
     return () => {
       mounted = false;
     };
   }, []);
+
 
   /* If current page goes out of range after filters change, clamp it */
   useEffect(() => {
@@ -296,11 +331,14 @@ function HRViewAppraisals() {
     if (currentPage > totalPages) setCurrentPage(totalPages);
   }, [appraisals, rowsPerPage, currentPage]);
 
+
   /* --------------------------- Derived values -------------------------- */
+
 
   const allSummaryRows = useMemo(() => {
     return appraisals.map((a, idx) => {
       const comps = Array.isArray(a.competencies) ? a.competencies : [];
+
 
       const empRatings = comps.map((c) => c?.employeeRating).filter((r) => typeof r === "number");
       const l1Name = comps[0]?.l1ReviewerName ?? "N/A";
@@ -308,9 +346,11 @@ function HRViewAppraisals() {
       const l2Name = comps[0]?.l2ReviewerName ?? "N/A";
       const l2Ratings = comps.map((c) => c?.l2Rating).filter((r) => typeof r === "number");
 
+
       let rawStatus = comps[0]?.status ?? "N/A";
       if (comps.some((c) => c?.status !== rawStatus)) rawStatus = "Mixed";
       const normalizedStatus = normalizeStatus(rawStatus);
+
 
       return {
         key: `${a.employeeId}-${a.projectName}-${idx}`,
@@ -330,6 +370,7 @@ function HRViewAppraisals() {
     });
   }, [appraisals]);
 
+
   const uniqueProjects = useMemo(() => {
     const projects = [{ label: "All Projects", value: "all" }];
     const projectSet = new Set();
@@ -342,22 +383,27 @@ function HRViewAppraisals() {
     return projects;
   }, [allSummaryRows]);
 
+
   const statusOptions = [
     { label: "All Statuses", value: "all" },
     { label: "Pending", value: "pending" },
     { label: "Completed", value: "completed" },
   ];
 
+
   const summaryRows = useMemo(() => {
     let filtered = [...allSummaryRows];
+
 
     if (filterStatus !== "all") {
       filtered = filtered.filter((row) => row.status === filterStatus);
     }
 
+
     if (filterProject !== "all") {
       filtered = filtered.filter((row) => row.projectName === filterProject);
     }
+
 
     if (searchTerm.trim() !== "") {
       const search = searchTerm.trim().toLowerCase();
@@ -366,13 +412,16 @@ function HRViewAppraisals() {
       );
     }
 
+
     return filtered;
   }, [allSummaryRows, filterStatus, filterProject, searchTerm]);
+
 
   const totalPages = Math.max(1, Math.ceil(summaryRows.length / rowsPerPage));
   const indexOfLastItem = currentPage * rowsPerPage;
   const indexOfFirstItem = indexOfLastItem - rowsPerPage;
   const currentItems = summaryRows.slice(indexOfFirstItem, indexOfLastItem);
+
 
   function getPageNumbers() {
     const pages = [];
@@ -399,6 +448,7 @@ function HRViewAppraisals() {
     return pages;
   }
 
+
   const csvData = useMemo(() => {
     return summaryRows.map((r) => ({
       "Employee Name": r.employeeName,
@@ -412,15 +462,18 @@ function HRViewAppraisals() {
     }));
   }, [summaryRows]);
 
+
   const handleViewDetails = (row) => {
     setModalRow(row);
     setModalAttachments(row.attachments || []);
   };
 
+
   const handleSearch = () => {
     setSearchTerm(searchInput);
     setCurrentPage(1);
   };
+
 
   const handleClearFilters = () => {
     setSearchTerm("");
@@ -430,10 +483,13 @@ function HRViewAppraisals() {
     setCurrentPage(1);
   };
 
+
   const hasActiveFilters =
     searchTerm !== "" || filterStatus !== "all" || filterProject !== "all";
 
+
   /* ------------------------------- Render ------------------------------ */
+
 
   if (loading)
     return (
@@ -443,6 +499,7 @@ function HRViewAppraisals() {
       </div>
     );
 
+
   if (error)
     return (
       <div className={styles.hrViewAssessmentError}>
@@ -450,6 +507,7 @@ function HRViewAppraisals() {
         <p>{error}</p>
       </div>
     );
+
 
   if (!appraisals.length)
     return (
@@ -463,6 +521,7 @@ function HRViewAppraisals() {
       </div>
     );
 
+
   return (
     <div className={styles.hrViewAssessmentPage}>
       <Breadcrumb
@@ -471,6 +530,7 @@ function HRViewAppraisals() {
           { label: "Form Progress", path: null },
         ]}
       />
+
 
       <div className={styles.hrViewAssessmentContainer}>
         <div className={styles.hrViewAssessmentFilters}>
@@ -494,6 +554,7 @@ function HRViewAppraisals() {
             </button>
           </div>
 
+
           <div className={styles.hrViewAssessmentFilterGroup}>
             <CustomDropdown
               value={filterStatus}
@@ -505,6 +566,7 @@ function HRViewAppraisals() {
               placeholder="All Statuses"
             />
           </div>
+
 
           <div className={styles.hrViewAssessmentFilterGroup}>
             <CustomDropdown
@@ -518,6 +580,7 @@ function HRViewAppraisals() {
             />
           </div>
 
+
           <div className={styles.hrViewAssessmentFilterGroup}>
             <button
               type="button"
@@ -530,6 +593,7 @@ function HRViewAppraisals() {
             </button>
           </div>
 
+
           <div className={styles.hrViewAssessmentFilterGroup}>
             <button
               type="button"
@@ -540,6 +604,7 @@ function HRViewAppraisals() {
             </button>
           </div>
         </div>
+
 
         <div className={styles.hrViewAssessmentTableCard}>
           <div className={styles.hrViewAssessmentTableWrapper}>
@@ -560,12 +625,12 @@ function HRViewAppraisals() {
               <tbody>
                 {currentItems.length === 0 ? (
                   <tr>
-                   <td colSpan={9} className={styles.hrViewAssessmentEmptyState}>
-  <div className={styles.hrViewAssessmentEmptyStateInner}>
-    <i className="bi bi-inbox"></i>
-    <p>No appraisals match your filters</p>
-  </div>
-</td>
+                    <td colSpan={9} className={styles.hrViewAssessmentEmptyState}>
+                      <div className={styles.hrViewAssessmentEmptyStateInner}>
+                        <i className="bi bi-inbox"></i>
+                        <p>No appraisals match your filters</p>
+                      </div>
+                    </td>
                   </tr>
                 ) : (
                   currentItems.map((row) => (
@@ -597,6 +662,7 @@ function HRViewAppraisals() {
             </table>
           </div>
 
+
           <div className={styles.hrViewAssessmentPaginationContainer}>
             <div className={styles.hrViewAssessmentPaginationInfo}>
               <span className={styles.hrViewAssessmentPaginationLabel}>Show</span>
@@ -613,11 +679,13 @@ function HRViewAppraisals() {
               </span>
             </div>
 
+
             <div className={styles.hrViewAssessmentPaginationStatus}>
               Showing {summaryRows.length === 0 ? 0 : indexOfFirstItem + 1} to{" "}
               {Math.min(indexOfLastItem, summaryRows.length)} of{" "}
               {summaryRows.length} entries
             </div>
+
 
             <nav className={styles.hrViewAssessmentPaginationNav}>
               <ul className={styles.hrViewAssessmentPagination}>
@@ -637,6 +705,7 @@ function HRViewAppraisals() {
                     <i className="bi bi-chevron-left"></i>
                   </button>
                 </li>
+
 
                 {getPageNumbers().map((page, idx) => (
                   <li
@@ -662,6 +731,7 @@ function HRViewAppraisals() {
                   </li>
                 ))}
 
+
                 <li
                   className={`${styles.hrViewAssessmentPageItem}${
                     currentPage === totalPages
@@ -686,6 +756,7 @@ function HRViewAppraisals() {
         </div>
       </div>
 
+
       {/* Mount once; control visibility with `show` */}
       <AppraisalDetailsModal
         show={!!modalRow}
@@ -702,5 +773,6 @@ function HRViewAppraisals() {
     </div>
   );
 }
+
 
 export default HRViewAppraisals;

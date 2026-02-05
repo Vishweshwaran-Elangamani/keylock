@@ -596,7 +596,7 @@ function renderL1Table() {
                     <i className="bi bi-calendar"></i> Date
                   </th>
                   <th>
-                    <i className="bi bi-gear"></i> Action
+                    <i className="bi bi-gear"></i> View
                   </th>
                 </tr>
               </thead>
@@ -669,7 +669,7 @@ function renderL1Table() {
                             className="cg-bulk-btn cg-bulk-btn-view"
                             onClick={() => openModal(assess, true)}
                           >
-                            <i className="bi bi-eye"></i> View
+                            <i className="bi bi-eye"></i> 
                           </button>
                         )}
                       </td>
@@ -757,7 +757,7 @@ function renderL2Table() {
                     <i className="bi bi-calendar"></i> Date
                   </th>
                   <th>
-                    <i className="bi bi-gear"></i> Action
+                    <i className="bi bi-gear"></i> View
                   </th>
                 </tr>
               </thead>
@@ -831,7 +831,7 @@ function renderL2Table() {
                             className="cg-bulk-btn cg-bulk-btn-view"
                             onClick={() => openModal(assess, true)}
                           >
-                            <i className="bi bi-eye"></i> View
+                            <i className="bi bi-eye"></i> 
                           </button>
                         )}
                       </td>

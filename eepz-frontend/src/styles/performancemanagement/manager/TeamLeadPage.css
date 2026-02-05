@@ -551,16 +551,13 @@ body {
 }
 
 .cg-bulk-btn-view {
-  background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+  
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
 }
 
-.cg-bulk-btn-view:hover {
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
-}
+
 
 .cg-bulk-btn-view:focus {
-  background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%) !important;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.18) !important;
 }
 

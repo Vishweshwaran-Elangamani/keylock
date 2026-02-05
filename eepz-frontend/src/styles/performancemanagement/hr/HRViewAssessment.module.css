@@ -1,12 +1,13 @@
 .hrViewAssessmentPage {
   background: #f8fafc;
   min-height: 100vh;
-  padding: 20px;
+  padding: 16px;
 }
 
 .hrViewAssessmentContainer {
-  max-width: 1400px;
+  max-width: 100%;
   margin: 0 auto;
+  padding: 0 8px;
 }
 
 .hrViewAssessmentLoading {
@@ -36,7 +37,7 @@
 
 .hrViewAssessmentLoading p {
   color: #718096;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 500;
 }
 
@@ -45,79 +46,79 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-  padding: 20px;
+  padding: 16px;
   background: #fee2e2;
   border: 2px solid #ef4444;
-  border-radius: 12px;
+  border-radius: 8px;
   color: #991b1b;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
-  margin: 20px 0;
+  margin: 16px 0;
 }
 
 .hrViewAssessmentError i {
-  font-size: 24px;
+  font-size: 22px;
 }
 
 .hrViewAssessmentAlert {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 20px;
+  padding: 16px;
   background: #dbeafe;
   border: 2px solid #3b82f6;
-  border-radius: 12px;
+  border-radius: 8px;
   color: #1e3a8a;
   font-size: 15px;
   font-weight: 500;
-  margin: 20px 0;
+  margin: 16px 0;
 }
 
 .hrViewAssessmentAlert i {
-  font-size: 24px;
+  font-size: 22px;
 }
 
 .hrViewAssessmentPageTitle {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
   color: #27235c;
-  margin: 0 0 24px 0;
+  margin: 0 0 16px 0;
 }
 
 .hrViewAssessmentFilters {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
-  margin-bottom: 24px;
-  padding: 20px;
+  margin-bottom: 16px;
+  padding: 14px;
   background: #fff;
   border: 1px solid #27235c;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
 .hrViewAssessmentFilterGroup {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .hrViewAssessmentSearchGroup {
   display: flex;
   align-items: center;
   border: 1px solid #27235c;
-  border-radius: 8px;
+  border-radius: 6px;
   overflow: hidden;
   background: #fff;
   flex: 1;
-  min-width: 250px;
-  max-width: 400px;
+  min-width: 220px;
+  max-width: 350px;
 }
 
 .hrViewAssessmentSearchInput {
   flex: 1;
-  padding: 10px 16px;
+  padding: 8px 12px;
   border: none;
   font-size: 14px;
   font-weight: 500;
@@ -131,7 +132,7 @@
 }
 
 .hrViewAssessmentSearchBtn {
-  padding: 10px 20px;
+  padding: 8px 16px;
   background: #27235c;
   color: #fff;
   border: none;
@@ -148,16 +149,16 @@
 
 .customDropdown {
   position: relative;
-  min-width: 180px;
+  min-width: 160px;
   user-select: none;
   overflow: visible;
 }
 
 .customSelected {
-  padding: 10px 16px;
-  padding-right: 36px;
+  padding: 8px 12px;
+  padding-right: 32px;
   border: 1.5px solid #27235c;
-  border-radius: 8px;
+  border-radius: 6px;
   background: #fff;
   color: #1a202c;
   font-size: 14px;
@@ -168,12 +169,12 @@
   justify-content: space-between;
   position: relative;
   transition: all 0.2s;
-  height: 40px;
+  height: 36px;
 }
 
 .customSelected:hover {
   border-color: #1e1b45;
-  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+  box-shadow: 0 0 0 2px rgba(39, 35, 92, 0.1);
 }
 
 .customDisabled {
@@ -184,11 +185,11 @@
 
 .customArrow {
   position: absolute;
-  right: 12px;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%) rotate(45deg);
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-right: 2px solid #27235c;
   border-bottom: 2px solid #27235c;
   pointer-events: none;
@@ -207,9 +208,9 @@
   background: #fff;
   border: 1.5px solid #27235c;
   border-top: none;
-  border-radius: 0 0 8px 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  max-height: 250px;
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  max-height: 220px;
   overflow-y: auto;
   z-index: 10000;
   animation: dropdownSlideDown 0.2s ease-out;
@@ -218,7 +219,7 @@
 @keyframes dropdownSlideDown {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(-8px);
   }
   to {
     opacity: 1;
@@ -227,7 +228,7 @@
 }
 
 .customOption {
-  padding: 10px 16px;
+  padding: 8px 12px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
@@ -238,11 +239,6 @@
 
 .customOption:last-child {
   border-bottom: none;
-}
-
-.customOption:first-child {
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
 }
 
 .customOption:hover {
@@ -266,15 +262,15 @@
   padding: 0;
   border-radius: 6px;
   user-select: none;
-  height: 32px;
+  height: 30px;
   width: 100%;
   overflow: visible;
-  min-width: 65px;
-  max-width: 75px;
+  min-width: 60px;
+  max-width: 70px;
 }
 
 .paginationSelected {
-  padding: 0.5rem 1.75rem 0.5rem 0.65rem;
+  padding: 0.4rem 1.6rem 0.4rem 0.6rem;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -287,23 +283,23 @@
   font-size: 0.95rem;
   font-weight: 600;
   color: #27235c;
-  height: 32px;
+  height: 30px;
   transition: all 0.2s ease;
 }
 
 .paginationDropdown:focus-within .paginationSelected,
 .paginationSelected:focus {
   border-color: #27235c;
-  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+  box-shadow: 0 0 0 2px rgba(39, 35, 92, 0.1);
 }
 
 .paginationArrow {
   position: absolute;
-  right: 0.6rem;
+  right: 0.55rem;
   top: 50%;
   transform: translateY(-50%) rotate(225deg);
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-right: 2px solid #6c757d;
   border-bottom: 2px solid #6c757d;
   pointer-events: none;
@@ -323,9 +319,9 @@
   border: 1.5px solid #27235c;
   border-bottom: none;
   border-radius: 6px 6px 0 0;
-  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
   z-index: 10000;
-  max-height: 200px;
+  max-height: 180px;
   overflow-y: auto;
   animation: paginationSlideUp 0.15s ease-out;
 }
@@ -333,7 +329,7 @@
 @keyframes paginationSlideUp {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
@@ -342,7 +338,7 @@
 }
 
 .paginationMenu::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 
 .paginationMenu::-webkit-scrollbar-track {
@@ -360,7 +356,7 @@
 }
 
 .paginationOption {
-  padding: 0.5rem 0.65rem;
+  padding: 0.4rem 0.6rem;
   cursor: pointer;
   user-select: none;
   font-size: 0.95rem;
@@ -395,25 +391,25 @@
 }
 
 .hrViewAssessmentBtnClearFilters {
-  padding: 10px 20px;
+  padding: 8px 16px;
   background: #fff;
   color: #27235c;
   border: 1px solid #27235c;
-  border-radius: 8px;
+  border-radius: 6px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   transition: all 0.2s;
   white-space: nowrap;
 }
 
 .hrViewAssessmentBtnClearFilters:hover:not(:disabled) {
   color: #27235c;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(39, 35, 92, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(39, 35, 92, 0.25);
 }
 
 .hrViewAssessmentBtnClearFilters:disabled {
@@ -423,41 +419,41 @@
 }
 
 .hrViewAssessmentBtnClearFilters i {
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .hrViewAssessmentBtnExport {
-  padding: 10px 20px;
+  padding: 8px 16px;
   background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
   color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   transition: all 0.2s;
   white-space: nowrap;
 }
 
 .hrViewAssessmentBtnExport:hover {
   background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(39, 35, 92, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(39, 35, 92, 0.25);
 }
 
 .hrViewAssessmentBtnExport i {
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .hrViewAssessmentTableCard {
   background: #fff;
   border: 2px solid #27235c;
-
-  overflow: visible;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
 .hrViewAssessmentTableWrapper {
@@ -469,6 +465,7 @@
   width: 100%;
   border-collapse: collapse;
   margin: 0;
+  table-layout: fixed;
 }
 
 .hrViewAssessmentTable thead {
@@ -476,18 +473,30 @@
 }
 
 .hrViewAssessmentTable th {
-  padding: 16px 20px;
-  text-align: left !important;
+  padding: 12px 10px;
+  text-align: center !important;
   font-weight: 700;
   color: #fff;
-  font-size: 13px;
+  font-size: 12px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  white-space: nowrap;
+  letter-spacing: 0.4px;
+  word-wrap: break-word;
+  line-height: 1.4;
+  vertical-align: middle;
 }
 
+.hrViewAssessmentTable th:nth-child(1) { width: 13%; }
+.hrViewAssessmentTable th:nth-child(2) { width: 12%; }
+.hrViewAssessmentTable th:nth-child(3) { width: 10%; }
+.hrViewAssessmentTable th:nth-child(4) { width: 12%; }
+.hrViewAssessmentTable th:nth-child(5) { width: 10%; }
+.hrViewAssessmentTable th:nth-child(6) { width: 12%; }
+.hrViewAssessmentTable th:nth-child(7) { width: 10%; }
+.hrViewAssessmentTable th:nth-child(8) { width: 11%; }
+.hrViewAssessmentTable th:nth-child(9) { width: 10%; }
+
 .hrViewAssessmentTable th.textCenter {
-  text-align: left !important;
+  text-align: center !important;
 }
 
 .hrViewAssessmentTable tbody {
@@ -508,18 +517,20 @@
 }
 
 .hrViewAssessmentTable td {
-  padding: 16px 20px;
+  padding: 12px 10px;
   color: #1a202c;
   font-size: 14px;
   vertical-align: middle;
-  text-align: left !important;
+  text-align: center !important;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .hrViewAssessmentBadge {
   display: inline-flex;
   align-items: center;
-  padding: 6px 12px;
-  border-radius: 20px;
+  padding: 5px 11px;
+  border-radius: 16px;
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
@@ -542,20 +553,20 @@
 
 .hrViewAssessmentActionButtons {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   justify-content: center;
 }
 
 .hrViewAssessmentActionBtn {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 15px;
   transition: all 0.2s;
 }
 
@@ -567,38 +578,48 @@
 .hrViewAssessmentBtnView:hover {
   background: #1976d2;
   color: #fff;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(25, 118, 210, 0.25);
 }
 
 .hrViewAssessmentEmptyState {
   text-align: center;
-  padding: 60px 20px;
-  color: #718096;
+  padding: 0 !important;
+  height: 280px;
 }
 
-.hrViewAssessmentEmptyState i {
-  font-size: 64px;
-  display: block;
-  margin-bottom: 16px;
-  opacity: 0.5;
+.hrViewAssessmentEmptyStateInner {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
-.hrViewAssessmentEmptyState p {
-  font-size: 16px;
-  font-weight: 500;
+.hrViewAssessmentEmptyStateInner i {
+  font-size: 42px;
+  color: #9ca3af;
+  opacity: 0.7;
+}
+
+.hrViewAssessmentEmptyStateInner p {
   margin: 0;
+  font-size: 15px;
+  color: #6b7280;
+  font-weight: 500;
 }
 
 .hrViewAssessmentPaginationContainer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
+  padding: 14px 18px;
   background: #f8f9fa;
   border-top: 1px solid #e5e7eb;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 12px;
   overflow: visible;
   position: relative;
 }
@@ -606,7 +627,7 @@
 .hrViewAssessmentPaginationInfo {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   font-size: 14px;
   color: #718096;
 }
@@ -614,17 +635,6 @@
 .hrViewAssessmentPaginationLabel {
   font-weight: 500;
   white-space: nowrap;
-}
-
-.hrViewAssessmentPaginationSelect {
-  padding: 6px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #1a202c;
-  background: #fff;
-  cursor: pointer;
 }
 
 .hrViewAssessmentPaginationStatus {
@@ -651,16 +661,16 @@
 }
 
 .hrViewAssessmentPageLink {
-  padding: 8px 12px;
+  padding: 7px 11px;
   border: 1px solid #d1d5db;
   background: #fff;
   color: #27235c;
-  border-radius: 6px;
+  border-radius: 5px;
   cursor: pointer;
   font-weight: 600;
   font-size: 14px;
   transition: all 0.2s;
-  min-width: 40px;
+  min-width: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -685,11 +695,11 @@
 
 @media (max-width: 768px) {
   .hrViewAssessmentPage {
-    padding: 12px;
+    padding: 10px;
   }
 
   .hrViewAssessmentFilters {
-    padding: 16px;
+    padding: 12px;
   }
 
   .hrViewAssessmentSearchGroup {
@@ -706,8 +716,8 @@
   }
 
   .paginationDropdown {
-    min-width: 60px;
-    max-width: 70px;
+    min-width: 55px;
+    max-width: 65px;
   }
 
   .hrViewAssessmentBtnClearFilters,
@@ -716,8 +726,14 @@
     justify-content: center;
   }
 
-  .hrViewAssessmentTable {
-    min-width: 1000px;
+  .hrViewAssessmentTable th {
+    font-size: 11px;
+    padding: 10px 8px;
+  }
+
+  .hrViewAssessmentTable td {
+    font-size: 13px;
+    padding: 10px 8px;
   }
 
   .hrViewAssessmentPaginationContainer {
@@ -728,56 +744,23 @@
 
 @media (max-width: 600px) {
   .paginationDropdown {
-    min-width: 55px;
-    max-width: 65px;
+    min-width: 50px;
+    max-width: 60px;
   }
 
   .paginationSelected {
-    font-size: 0.875rem;
-    padding: 0.45rem 1.6rem 0.45rem 0.6rem;
+    font-size: 0.9rem;
+    padding: 0.4rem 1.5rem 0.4rem 0.55rem;
   }
 
   .paginationOption {
-    font-size: 0.875rem;
-    padding: 0.45rem 0.6rem;
+    font-size: 0.9rem;
+    padding: 0.4rem 0.55rem;
   }
 
   .paginationArrow {
-    right: 0.5rem;
-    width: 6px;
-    height: 6px;
+    right: 0.45rem;
+    width: 5px;
+    height: 5px;
   }
 }
-/* Center empty state content in the table cell */
-.hrViewAssessmentEmptyState {
-  text-align: center;
-  padding: 0 !important;              /* remove extra padding */
-  height: 320px;                      /* gives vertical space for centering */
-}
-
-/* Perfect center: vertical + horizontal */
-.hrViewAssessmentEmptyStateInner {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-/* Optional: icon styling */
-.hrViewAssessmentEmptyStateInner i {
-  font-size: 42px;
-  color: #9ca3af;
-  opacity: 0.75;
-}
-
-/* Optional: message styling */
-.hrViewAssessmentEmptyStateInner p {
-  margin: 0;
-  font-size: 1rem;
-  color: #6b7280;
-  font-weight: 500;
-}
-
