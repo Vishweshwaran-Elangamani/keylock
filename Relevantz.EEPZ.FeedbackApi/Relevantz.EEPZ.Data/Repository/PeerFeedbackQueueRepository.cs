@@ -36,11 +36,14 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
+
         public async Task<Peerfeedbackqueue> GetQueueItemByIdAsync(int queueId)
         {
             try
             {
                 return await _context.Peerfeedbackqueues
+                    .AsNoTracking()
+                    .AsSplitQuery()
                     .Include(f => f.SubmittedByEmployee)
                     .Include(f => f.RecipientEmployee)
                     .Include(f => f.ApprovedByHr)
@@ -52,11 +55,14 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
+
         public async Task<List<Peerfeedbackqueue>> GetPendingFeedbackAsync()
         {
             try
             {
                 return await _context.Peerfeedbackqueues
+                    .AsNoTracking()
+                    .AsSplitQuery()
                     .Where(f => f.Status == "Pending")
                     .Include(f => f.SubmittedByEmployee)
                     .Include(f => f.RecipientEmployee)
@@ -69,11 +75,14 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
+
         public async Task<List<Peerfeedbackqueue>> GetUnderReviewFeedbackAsync()
         {
             try
             {
                 return await _context.Peerfeedbackqueues
+                    .AsNoTracking()
+                    .AsSplitQuery()
                     .Where(f => f.Status == "UnderHRReview")
                     .Include(f => f.SubmittedByEmployee)
                     .Include(f => f.RecipientEmployee)
@@ -86,11 +95,14 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
+
         public async Task<List<Peerfeedbackqueue>> GetApprovedFeedbackAsync()
         {
             try
             {
                 return await _context.Peerfeedbackqueues
+                    .AsNoTracking()
+                    .AsSplitQuery()
                     .Where(f => f.Status == "Approved")
                     .Include(f => f.SubmittedByEmployee)
                     .Include(f => f.RecipientEmployee)
@@ -103,11 +115,14 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
+
         public async Task<List<Peerfeedbackqueue>> GetRejectedFeedbackAsync()
         {
             try
             {
                 return await _context.Peerfeedbackqueues
+                    .AsNoTracking()
+                    .AsSplitQuery()
                     .Where(f => f.Status == "Rejected")
                     .Include(f => f.SubmittedByEmployee)
                     .Include(f => f.RecipientEmployee)
@@ -120,11 +135,13 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
+
         public async Task<List<Peerfeedbackqueue>> GetFeedbackByRecipientAsync(int employeeId)
         {
             try
             {
                 return await _context.Peerfeedbackqueues
+                    .AsNoTracking()
                     .Where(f => f.RecipientEmployeeId == employeeId && f.Status == "Approved")
                     .Include(f => f.SubmittedByEmployee)
                     .OrderByDescending(f => f.ApprovedAt)
@@ -136,11 +153,13 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
+
         public async Task<List<Peerfeedbackqueue>> GetFeedbackBySubmitterAsync(int employeeId)
         {
             try
             {
                 return await _context.Peerfeedbackqueues
+                    .AsNoTracking()
                     .Where(f => f.SubmittedByEmployeeId == employeeId)
                     .Include(f => f.RecipientEmployee)
                     .OrderByDescending(f => f.CreatedAt)
@@ -152,11 +171,14 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
+
         public async Task<List<Peerfeedbackqueue>> GetAllPeerFeedbackAsync(int pageNumber = 1, int pageSize = 20)
         {
             try
             {
                 return await _context.Peerfeedbackqueues
+                    .AsNoTracking()
+                    .AsSplitQuery()
                     .Include(f => f.SubmittedByEmployee)
                     .Include(f => f.RecipientEmployee)
                     .Include(f => f.ApprovedByHr)
@@ -171,11 +193,14 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
+
         public async Task<List<Peerfeedbackqueue>> GetFeedbackByStatusAsync(string status)
         {
             try
             {
                 return await _context.Peerfeedbackqueues
+                    .AsNoTracking()
+                    .AsSplitQuery()
                     .Where(f => f.Status == status)
                     .Include(f => f.SubmittedByEmployee)
                     .Include(f => f.RecipientEmployee)
@@ -188,11 +213,13 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
+
         public async Task<List<Peerfeedbackqueue>> GetAnonymousPeerFeedbackAsync()
         {
             try
             {
                 return await _context.Peerfeedbackqueues
+                    .AsNoTracking()
                     .Where(f => f.IsAnonymous && f.Status == "Approved")
                     .Include(f => f.RecipientEmployee)
                     .OrderByDescending(f => f.ApprovedAt)
@@ -204,11 +231,12 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
+
         public async Task<bool> UpdatePeerFeedbackAsync(Peerfeedbackqueue feedback)
         {
             try
             {
-                _context.Peerfeedbackqueues.Update(feedback);
+                _context.Entry(feedback).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
 
                 _logger.LogInformation($"Peer feedback updated: {feedback.QueueId}");
@@ -220,6 +248,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
+
         public async Task<bool> ApprovePeerFeedbackAsync(int queueId, bool isProfessional, bool isRelevant, int approvedByHRId)
         {
             try
@@ -234,7 +263,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 feedback.Status = "Approved";
                 feedback.ApprovedAt = DateTime.UtcNow;
 
-                _context.Peerfeedbackqueues.Update(feedback);
                 await _context.SaveChangesAsync();
 
                 _logger.LogInformation($"Peer feedback approved: {queueId}");
@@ -246,6 +274,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
+
         public async Task<bool> RejectPeerFeedbackAsync(int queueId, int rejectedByHRId)
         {
             try
@@ -258,7 +287,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 feedback.Status = "Rejected";
                 feedback.ApprovedAt = DateTime.UtcNow;
 
-                _context.Peerfeedbackqueues.Update(feedback);
                 await _context.SaveChangesAsync();
 
                 _logger.LogInformation($"Peer feedback rejected: {queueId}");
@@ -270,6 +298,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
+
         public async Task<bool> UpdateFeedbackStatusAsync(int queueId, string newStatus)
         {
             try
@@ -279,8 +308,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     return false;
 
                 feedback.Status = newStatus;
-
-                _context.Peerfeedbackqueues.Update(feedback);
                 await _context.SaveChangesAsync();
 
                 _logger.LogInformation($"Peer feedback status updated: {queueId} → {newStatus}");
@@ -292,6 +319,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
+
         public async Task<bool> DeleteQueueItemAsync(int queueId)
         {
             try
@@ -315,11 +343,14 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
+
         public async Task<bool> QueueItemExistsAsync(int queueId)
         {
             try
             {
-                return await _context.Peerfeedbackqueues.AnyAsync(f => f.QueueId == queueId);
+                return await _context.Peerfeedbackqueues
+                    .AsNoTracking()
+                    .AnyAsync(f => f.QueueId == queueId);
             }
             catch (Exception ex)
             {

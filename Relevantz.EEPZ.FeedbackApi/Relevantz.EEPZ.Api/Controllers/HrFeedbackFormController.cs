@@ -1,12 +1,16 @@
-using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Common.DTOs.Request;
+using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EepzBackend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "HR,Employee,Manager")]
+
+
     public partial class HrFeedbackFormController : ControllerBase
     {
         private readonly IHrFeedbackFormService _service;
@@ -16,106 +20,61 @@ namespace EepzBackend.Controllers
             _service = service;
         }
 
-        /// <summary>
-        /// Create a new HR feedback form
-        /// </summary>
-        [HttpPost("forms/create")]
-        public async Task<ApiResponseDto<HrFeedbackFormResponseDto>> CreateForm(CreateHRFeedbackFormRequestDto dto)
+        [HttpPost("forms")]
+        public async Task<IActionResult> CreateForm([FromBody] CreateHRFeedbackFormRequestDto dto, CancellationToken ct)
         {
-            try
-            {
-                var result = await _service.CreateFormAsync(dto);
-                return ApiResponseDto<HrFeedbackFormResponseDto>.SuccessResponse(result, "HR feedback form created");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<HrFeedbackFormResponseDto>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var created = await _service.CreateFormAsync(dto, ct);
+            return CreatedAtAction(nameof(GetForm), new { formId = created.FormId }, created);
         }
 
-        /// <summary>
-        /// Get a specific HR feedback form by ID
-        /// </summary>
-        [HttpGet("forms/{formId}")]
-        public async Task<ApiResponseDto<HrFeedbackFormResponseDto>> GetForm(int formId)
+        [HttpGet("forms/{formId:int}")]
+        public async Task<IActionResult> GetForm(int formId, CancellationToken ct)
         {
-            try
-            {
-                var result = await _service.GetFormByIdAsync(formId);
-                return ApiResponseDto<HrFeedbackFormResponseDto>.SuccessResponse(result);
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<HrFeedbackFormResponseDto>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.GetFormByIdAsync(formId, ct);
+            if (result == null) return NotFound();
+            return Ok(result);
         }
 
-        /// <summary>
-        /// Get all HR feedback forms
-        /// </summary>
         [HttpGet("forms")]
-        public async Task<ApiResponseDto<List<HrFeedbackFormResponseDto>>> GetAllForms()
+        public async Task<IActionResult> GetAllForms([FromQuery] PaginationRequestDto pagination, CancellationToken ct)
         {
-            try
-            {
-                var result = await _service.GetAllFormsAsync();
-                return ApiResponseDto<List<HrFeedbackFormResponseDto>>.SuccessResponse(result);
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<List<HrFeedbackFormResponseDto>>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _service.GetAllFormsAsync(pagination, ct);
+            return Ok(result);
         }
 
-        /// <summary>
-        /// Get all active HR feedback forms
-        /// </summary>
         [HttpGet("forms/active")]
-        public async Task<ApiResponseDto<List<HrFeedbackFormResponseDto>>> GetActiveForms()
+        public async Task<IActionResult> GetActiveForms([FromQuery] PaginationRequestDto pagination, CancellationToken ct)
         {
-            try
-            {
-                var result = await _service.GetActiveFormsAsync();
-                return ApiResponseDto<List<HrFeedbackFormResponseDto>>.SuccessResponse(result);
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<List<HrFeedbackFormResponseDto>>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _service.GetActiveFormsAsync(pagination, ct);
+            return Ok(result);
         }
 
-        /// <summary>
-        /// Update an existing HR feedback form
-        /// </summary>
-        [HttpPut("forms/{formId}")]
-        public async Task<ApiResponseDto<HrFeedbackFormResponseDto>> UpdateForm(int formId, UpdateHRFormRequestDto dto)
+        [HttpPut("forms/{formId:int}")]
+        public async Task<IActionResult> UpdateForm(int formId, [FromBody] UpdateHRFormRequestDto dto, CancellationToken ct)
         {
-            try
-            {
-                var result = await _service.UpdateFormAsync(formId, dto);
-                return ApiResponseDto<HrFeedbackFormResponseDto>.SuccessResponse(result, "HR feedback form updated");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<HrFeedbackFormResponseDto>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var updated = await _service.UpdateFormAsync(formId, dto, ct);
+            if (updated == null) return NotFound();
+            return Ok(updated);
         }
 
-        /// <summary>
-        /// Delete an HR feedback form
-        /// </summary>
-        [HttpDelete("forms/{formId}")]
-        public async Task<ApiResponseDto<bool>> DeleteForm(int formId)
+        [HttpDelete("forms/{formId:int}")]
+        public async Task<IActionResult> DeleteForm(int formId, CancellationToken ct)
         {
-            try
-            {
-                var result = await _service.DeleteFormAsync(formId);
-                return ApiResponseDto<bool>.SuccessResponse(result, "HR feedback form deleted");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<bool>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var deleted = await _service.DeleteFormAsync(formId, ct);
+            if (!deleted) return NotFound();
+            return NoContent();
         }
     }
 }

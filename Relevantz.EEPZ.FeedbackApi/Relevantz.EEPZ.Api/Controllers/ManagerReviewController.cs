@@ -2,11 +2,14 @@ using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Core.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EepzBackend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Policy = "ManagerOnly")]
+
     public class ManagerReviewController : ControllerBase
     {
         private readonly IManagerReviewService _service;
@@ -17,157 +20,80 @@ namespace EepzBackend.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<ApiResponseDto<ManagerReviewResponseDto>> CreateManagerReview(CreateManagerReviewRequestDto dto)
+        public async Task<IActionResult> CreateManagerReview(CreateManagerReviewRequestDto dto)
         {
-            try
-            {
-                var result = await _service.CreateReviewAsync(dto);
-                return ApiResponseDto<ManagerReviewResponseDto>.SuccessResponse(result, "Manager review created successfully");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<ManagerReviewResponseDto>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.CreateReviewAsync(dto);
+            return Ok(ApiResponseDto<ManagerReviewResponseDto>.SuccessResponse(result, "Manager review created successfully"));
         }
 
         [HttpGet("{reviewcommentId}")]
-        public async Task<ApiResponseDto<ManagerReviewResponseDto>> GetManagerReview(int reviewcommentId)
+        public async Task<IActionResult> GetManagerReview(int reviewcommentId)
         {
-            try
-            {
-                var result = await _service.GetReviewByIdAsync(reviewcommentId);
-                return ApiResponseDto<ManagerReviewResponseDto>.SuccessResponse(result, "Manager review retrieved");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<ManagerReviewResponseDto>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.GetReviewByIdAsync(reviewcommentId);
+            return Ok(ApiResponseDto<ManagerReviewResponseDto>.SuccessResponse(result, "Manager review retrieved"));
         }
 
         [HttpGet("manager/{managerEmployeeId}")]
-        public async Task<ApiResponseDto<List<ManagerReviewResponseDto>>> GetReviewsByManager(int managerEmployeeId)
+        public async Task<IActionResult> GetReviewsByManager(int managerEmployeeId)
         {
-            try
-            {
-                var result = await _service.GetMyReviewsAsync(managerEmployeeId);
-                return ApiResponseDto<List<ManagerReviewResponseDto>>.SuccessResponse(result, "Reviews retrieved");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<List<ManagerReviewResponseDto>>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.GetMyReviewsAsync(managerEmployeeId);
+            return Ok(ApiResponseDto<List<ManagerReviewResponseDto>>.SuccessResponse(result, "Reviews retrieved"));
         }
 
         [HttpGet("target/{targetEmployeeId}")]
-        public async Task<ApiResponseDto<List<ManagerReviewResponseDto>>> GetReviewsForTarget(int targetEmployeeId)
+        public async Task<IActionResult> GetReviewsForTarget(int targetEmployeeId)
         {
-            try
-            {
-                var result = await _service.GetReviewsForMeAsync(targetEmployeeId);
-                return ApiResponseDto<List<ManagerReviewResponseDto>>.SuccessResponse(result, "Reviews retrieved");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<List<ManagerReviewResponseDto>>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.GetReviewsForMeAsync(targetEmployeeId);
+            return Ok(ApiResponseDto<List<ManagerReviewResponseDto>>.SuccessResponse(result, "Reviews retrieved"));
         }
 
         [HttpPut("{reviewcommentId}")]
-        public async Task<ApiResponseDto<ManagerReviewResponseDto>> UpdateManagerReview(int reviewcommentId, UpdateManagerReviewRequestDto dto)
+        public async Task<IActionResult> UpdateManagerReview(int reviewcommentId, UpdateManagerReviewRequestDto dto)
         {
-            try
-            {
-                var result = await _service.UpdateReviewAsync(reviewcommentId, dto);
-                return ApiResponseDto<ManagerReviewResponseDto>.SuccessResponse(result, "Manager review updated");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<ManagerReviewResponseDto>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.UpdateReviewAsync(reviewcommentId, dto);
+            return Ok(ApiResponseDto<ManagerReviewResponseDto>.SuccessResponse(result, "Manager review updated"));
         }
 
         [HttpDelete("{reviewcommentId}")]
-        public async Task<ApiResponseDto<bool>> DeleteManagerReview(int reviewcommentId)
+        public async Task<IActionResult> DeleteManagerReview(int reviewcommentId)
         {
-            try
-            {
-                var result = await _service.DeleteReviewAsync(reviewcommentId);
-                return ApiResponseDto<bool>.SuccessResponse(result, "Manager review deleted");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<bool>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.DeleteReviewAsync(reviewcommentId);
+            return Ok(ApiResponseDto<bool>.SuccessResponse(result, "Manager review deleted"));
         }
 
         [HttpPost("{reviewcommentId}/submit")]
-        public async Task<ApiResponseDto<bool>> SubmitReview(int reviewcommentId)
+        public async Task<IActionResult> SubmitReview(int reviewcommentId)
         {
-            try
-            {
-                var result = await _service.SubmitReviewAsync(reviewcommentId);
-                return ApiResponseDto<bool>.SuccessResponse(result, "Manager review submitted");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<bool>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.SubmitReviewAsync(reviewcommentId);
+            return Ok(ApiResponseDto<bool>.SuccessResponse(result, "Manager review submitted"));
         }
 
         [HttpPost("{reviewcommentId}/modify")]
-        public async Task<ApiResponseDto<bool>> ModifyReview(int reviewcommentId)
+        public async Task<IActionResult> ModifyReview(int reviewcommentId)
         {
-            try
-            {
-                var result = await _service.ModifyReviewAsync(reviewcommentId);
-                return ApiResponseDto<bool>.SuccessResponse(result, "Manager review set to Modified status");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<bool>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.ModifyReviewAsync(reviewcommentId);
+            return Ok(ApiResponseDto<bool>.SuccessResponse(result, "Manager review set to Modified status"));
         }
 
         [HttpPost("{reviewcommentId}/finalize")]
-        public async Task<ApiResponseDto<bool>> FinalizeReview(int reviewcommentId)
+        public async Task<IActionResult> FinalizeReview(int reviewcommentId)
         {
-            try
-            {
-                var result = await _service.FinalizeReviewAsync(reviewcommentId);
-                return ApiResponseDto<bool>.SuccessResponse(result, "Manager review finalized");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<bool>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.FinalizeReviewAsync(reviewcommentId);
+            return Ok(ApiResponseDto<bool>.SuccessResponse(result, "Manager review finalized"));
         }
 
         [HttpGet("all")]
-        public async Task<ApiResponseDto<List<ManagerReviewResponseDto>>> GetAllReviews([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
+        public async Task<IActionResult> GetAllReviews([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
         {
-            try
-            {
-                var result = await _service.GetAllReviewsAsync(pageNumber, pageSize);
-                return ApiResponseDto<List<ManagerReviewResponseDto>>.SuccessResponse(result, "All reviews retrieved");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<List<ManagerReviewResponseDto>>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.GetAllReviewsAsync(pageNumber, pageSize);
+            return Ok(ApiResponseDto<List<ManagerReviewResponseDto>>.SuccessResponse(result, "All reviews retrieved"));
         }
 
         [HttpGet("status/{status}")]
-        public async Task<ApiResponseDto<List<ManagerReviewResponseDto>>> GetReviewsByStatus(string status)
+        public async Task<IActionResult> GetReviewsByStatus(string status)
         {
-            try
-            {
-                var result = await _service.GetReviewsByStatusAsync(status);
-                return ApiResponseDto<List<ManagerReviewResponseDto>>.SuccessResponse(result, $"Reviews with status {status} retrieved");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<List<ManagerReviewResponseDto>>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.GetReviewsByStatusAsync(status);
+            return Ok(ApiResponseDto<List<ManagerReviewResponseDto>>.SuccessResponse(result, $"Reviews with status {status} retrieved"));
         }
     }
 }

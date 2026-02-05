@@ -17,115 +17,59 @@ namespace EepzBackend.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<ApiResponseDto<PeerFeedbackQueueResponseDto>> CreatePeerFeedback(CreatePeerFeedbackRequestDto dto)
+        public async Task<IActionResult> CreatePeerFeedback(CreatePeerFeedbackRequestDto dto)
         {
-            try
-            {
-                var result = await _service.CreatePeerFeedbackAsync(dto);
-                return ApiResponseDto<PeerFeedbackQueueResponseDto>.SuccessResponse(result, "Peer feedback created");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<PeerFeedbackQueueResponseDto>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.CreatePeerFeedbackAsync(dto);
+            return Ok(ApiResponseDto<PeerFeedbackQueueResponseDto>.SuccessResponse(result, "Peer feedback created"));
         }
 
         [HttpGet("{queueId}")]
-        public async Task<ApiResponseDto<PeerFeedbackQueueResponseDto>> GetQueueItem(int queueId)
+        public async Task<IActionResult> GetQueueItem(int queueId)
         {
-            try
-            {
-                var result = await _service.GetQueueItemByIdAsync(queueId);
-                return ApiResponseDto<PeerFeedbackQueueResponseDto>.SuccessResponse(result);
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<PeerFeedbackQueueResponseDto>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.GetQueueItemByIdAsync(queueId);
+            return Ok(ApiResponseDto<PeerFeedbackQueueResponseDto>.SuccessResponse(result));
         }
 
         [HttpGet("pending")]
-        public async Task<ApiResponseDto<List<PeerFeedbackQueueResponseDto>>> GetPendingFeedback()
+        public async Task<IActionResult> GetPendingFeedback()
         {
-            try
-            {
-                var result = await _service.GetPendingFeedbackAsync();
-                return ApiResponseDto<List<PeerFeedbackQueueResponseDto>>.SuccessResponse(result);
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<List<PeerFeedbackQueueResponseDto>>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.GetPendingFeedbackAsync();
+            return Ok(ApiResponseDto<List<PeerFeedbackQueueResponseDto>>.SuccessResponse(result));
         }
 
         [HttpGet("approved")]
-        public async Task<ApiResponseDto<List<PeerFeedbackQueueResponseDto>>> GetApprovedFeedback()
+        public async Task<IActionResult> GetApprovedFeedback()
         {
-            try
-            {
-                var result = await _service.GetApprovedFeedbackAsync();
-                return ApiResponseDto<List<PeerFeedbackQueueResponseDto>>.SuccessResponse(result);
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<List<PeerFeedbackQueueResponseDto>>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.GetApprovedFeedbackAsync();
+            return Ok(ApiResponseDto<List<PeerFeedbackQueueResponseDto>>.SuccessResponse(result));
         }
 
         [HttpGet("all")]
-        public async Task<ApiResponseDto<List<PeerFeedbackQueueResponseDto>>> GetAllPeerFeedback([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
+        public async Task<IActionResult> GetAllPeerFeedback([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
         {
-            try
-            {
-                var result = await _service.GetAllPeerFeedbackAsync(pageNumber, pageSize);
-                return ApiResponseDto<List<PeerFeedbackQueueResponseDto>>.SuccessResponse(result);
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<List<PeerFeedbackQueueResponseDto>>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.GetAllPeerFeedbackAsync(pageNumber, pageSize);
+            return Ok(ApiResponseDto<List<PeerFeedbackQueueResponseDto>>.SuccessResponse(result));
         }
 
         [HttpPost("{queueId}/approve")]
-        public async Task<ApiResponseDto<bool>> ApprovePeerFeedback(int queueId, [FromQuery] bool isProfessional, [FromQuery] bool isRelevant, [FromQuery] int approvedByHRId)
+        public async Task<IActionResult> ApprovePeerFeedback(int queueId, [FromQuery] bool isProfessional, [FromQuery] bool isRelevant, [FromQuery] int approvedByHRId)
         {
-            try
-            {
-                var result = await _service.ApprovePeerFeedbackAsync(queueId, isProfessional, isRelevant, approvedByHRId);
-                return ApiResponseDto<bool>.SuccessResponse(result, "Peer feedback approved");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<bool>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.ApprovePeerFeedbackAsync(queueId, isProfessional, isRelevant, approvedByHRId);
+            return Ok(ApiResponseDto<bool>.SuccessResponse(result, "Peer feedback approved"));
         }
 
         [HttpPost("{queueId}/reject")]
-        public async Task<ApiResponseDto<bool>> RejectPeerFeedback(int queueId, [FromQuery] int rejectedByHRId)
+        public async Task<IActionResult> RejectPeerFeedback(int queueId, [FromQuery] int rejectedByHRId)
         {
-            try
-            {
-                var result = await _service.RejectPeerFeedbackAsync(queueId, rejectedByHRId);
-                return ApiResponseDto<bool>.SuccessResponse(result, "Peer feedback rejected");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<bool>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.RejectPeerFeedbackAsync(queueId, rejectedByHRId);
+            return Ok(ApiResponseDto<bool>.SuccessResponse(result, "Peer feedback rejected"));
         }
 
         [HttpDelete("{queueId}")]
-        public async Task<ApiResponseDto<bool>> DeleteQueueItem(int queueId)
+        public async Task<IActionResult> DeleteQueueItem(int queueId)
         {
-            try
-            {
-                var result = await _service.DeleteQueueItemAsync(queueId);
-                return ApiResponseDto<bool>.SuccessResponse(result, "Queue item deleted");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<bool>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.DeleteQueueItemAsync(queueId);
+            return Ok(ApiResponseDto<bool>.SuccessResponse(result, "Queue item deleted"));
         }
     }
 }

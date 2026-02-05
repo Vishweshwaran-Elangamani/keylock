@@ -1,153 +1,69 @@
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EepzBackend.Controllers
 {
-
     public partial class HrFeedbackFormController
     {
-
-        /// <summary>
-        /// Create a new form response (employee submits feedback)
-        /// </summary>
         [HttpPost("responses/create")]
-        public async Task<ApiResponseDto<HrFeedbackFormResponseResponseDto>> CreateFormResponse(SubmitHRFormResponseRequestDto dto)
+        public async Task<IActionResult> CreateFormResponse([FromBody] SubmitHRFormResponseRequestDto dto, CancellationToken ct)
         {
-            try
-            {
-                var result = await _service.CreateFormResponseAsync(dto);
-                return ApiResponseDto<HrFeedbackFormResponseResponseDto>.SuccessResponse(result, "Form response created");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<HrFeedbackFormResponseResponseDto>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.CreateFormResponseAsync(dto, ct);
+            return Ok(ApiResponseDto<HrFeedbackFormResponseResponseDto>.SuccessResponse(result, "Form response created"));
         }
 
-        /// <summary>
-        /// Get a specific form response by ID
-        /// </summary>
         [HttpGet("responses/{responseId}")]
-        public async Task<ApiResponseDto<HrFeedbackFormResponseResponseDto>> GetFormResponse(int responseId)
+        public async Task<IActionResult> GetFormResponse(int responseId, CancellationToken ct)
         {
-            try
-            {
-                var result = await _service.GetFormResponseByIdAsync(responseId);
-                return ApiResponseDto<HrFeedbackFormResponseResponseDto>.SuccessResponse(result);
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<HrFeedbackFormResponseResponseDto>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.GetFormResponseByIdAsync(responseId, ct);
+            return Ok(ApiResponseDto<HrFeedbackFormResponseResponseDto>.SuccessResponse(result));
         }
 
-        /// <summary>
-        /// Get all responses for a specific form
-        /// </summary>
         [HttpGet("responses/by-form/{formId}")]
-        public async Task<ApiResponseDto<List<HrFeedbackFormResponseResponseDto>>> GetResponsesByForm(int formId)
+        public async Task<IActionResult> GetResponsesByForm(int formId, CancellationToken ct)
         {
-            try
-            {
-                var result = await _service.GetResponsesByFormAsync(formId);
-                return ApiResponseDto<List<HrFeedbackFormResponseResponseDto>>.SuccessResponse(result);
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<List<HrFeedbackFormResponseResponseDto>>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.GetResponsesByFormAsync(formId, ct);
+            return Ok(ApiResponseDto<List<HrFeedbackFormResponseResponseDto>>.SuccessResponse(result));
         }
 
-        /// <summary>
-        /// Get all responses submitted by a specific employee
-        /// </summary>
         [HttpGet("responses/by-employee/{employeeId}")]
-        public async Task<ApiResponseDto<List<HrFeedbackFormResponseResponseDto>>> GetResponsesByEmployee(int employeeId)
+        public async Task<IActionResult> GetResponsesByEmployee(int employeeId, CancellationToken ct)
         {
-            try
-            {
-                var result = await _service.GetResponsesBySubmitterAsync(employeeId);
-                return ApiResponseDto<List<HrFeedbackFormResponseResponseDto>>.SuccessResponse(
-                    result,
-                    $"Retrieved {result.Count} responses for employee {employeeId}"
-                );
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<List<HrFeedbackFormResponseResponseDto>>.ErrorResponse(
-                    $"Error: {ex.Message}",
-                    new List<string> { ex.Message }
-                );
-            }
+            var result = await _service.GetResponsesBySubmitterAsync(employeeId, ct);
+            return Ok(ApiResponseDto<List<HrFeedbackFormResponseResponseDto>>.SuccessResponse(
+                result,
+                $"Retrieved {result.Count} responses for employee {employeeId}"
+            ));
         }
 
-        /// <summary>
-        /// Get all responses pending HR review
-        /// </summary>
         [HttpGet("responses/pending-review")]
-        public async Task<ApiResponseDto<List<HrFeedbackFormResponseResponseDto>>> GetPendingReviewResponses()
+        public async Task<IActionResult> GetPendingReviewResponses(CancellationToken ct)
         {
-            try
-            {
-                var result = await _service.GetPendingReviewResponsesAsync();
-                return ApiResponseDto<List<HrFeedbackFormResponseResponseDto>>.SuccessResponse(result);
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<List<HrFeedbackFormResponseResponseDto>>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.GetPendingReviewResponsesAsync(ct);
+            return Ok(ApiResponseDto<List<HrFeedbackFormResponseResponseDto>>.SuccessResponse(result));
         }
 
-        /// <summary>
-        /// Update an existing form response (before submission)
-        /// </summary>
         [HttpPut("responses/{responseId}")]
-        public async Task<ApiResponseDto<HrFeedbackFormResponseResponseDto>> UpdateFormResponse(int responseId, UpdateHRFormResponseRequestDto dto)
+        public async Task<IActionResult> UpdateFormResponse(int responseId, [FromBody] UpdateHRFormResponseRequestDto dto, CancellationToken ct)
         {
-            try
-            {
-                var result = await _service.UpdateFormResponseAsync(responseId, dto);
-                return ApiResponseDto<HrFeedbackFormResponseResponseDto>.SuccessResponse(result, "Form response updated");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<HrFeedbackFormResponseResponseDto>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.UpdateFormResponseAsync(responseId, dto, ct);
+            return Ok(ApiResponseDto<HrFeedbackFormResponseResponseDto>.SuccessResponse(result, "Form response updated"));
         }
 
-        /// <summary>
-        /// Submit a form response for review
-        /// </summary>
         [HttpPost("responses/{responseId}/submit")]
-        public async Task<ApiResponseDto<bool>> SubmitFormResponse(int responseId)
+        public async Task<IActionResult> SubmitFormResponse(int responseId, CancellationToken ct)
         {
-            try
-            {
-                var result = await _service.SubmitFormResponseAsync(responseId);
-                return ApiResponseDto<bool>.SuccessResponse(result, "Form response submitted");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<bool>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.SubmitFormResponseAsync(responseId, ct);
+            return Ok(ApiResponseDto<bool>.SuccessResponse(result, "Form response submitted"));
         }
 
-        /// <summary>
-        /// Delete a form response
-        /// </summary>
         [HttpDelete("responses/{responseId}")]
-        public async Task<ApiResponseDto<bool>> DeleteFormResponse(int responseId)
+        public async Task<IActionResult> DeleteFormResponse(int responseId, CancellationToken ct)
         {
-            try
-            {
-                var result = await _service.DeleteFormResponseAsync(responseId);
-                return ApiResponseDto<bool>.SuccessResponse(result, "Form response deleted");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponseDto<bool>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
-            }
+            var result = await _service.DeleteFormResponseAsync(responseId, ct);
+            return Ok(ApiResponseDto<bool>.SuccessResponse(result, "Form response deleted"));
         }
     }
 }
