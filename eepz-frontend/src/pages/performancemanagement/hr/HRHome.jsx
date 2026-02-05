@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import styles from "../../../styles/performancemanagement/hr/HRHome.module.css";
 
+
 export default function HRHome() {
   const navigate = useNavigate();
   const [hoveredCard, setHoveredCard] = useState(null);
+
 
   const cards = [
     {
@@ -58,6 +60,7 @@ export default function HRHome() {
     },
   ];
 
+
   return (
     <div className={styles.hrHomeBackground}>
       <div className={styles.hrHomeContainer}>
@@ -69,6 +72,7 @@ export default function HRHome() {
           Initiate, Review, Track the form and nominations
         </p>
 
+
         <div className={styles.hrHomeCardGrid}>
           {cards.map((card, idx) => (
             <div
@@ -76,8 +80,14 @@ export default function HRHome() {
               className={`${styles.hrHomeCard} ${
                 hoveredCard === idx ? styles.hrHomeCardHovered : ""
               }`}
-              onMouseEnter={() => setHoveredCard(idx)}
-              onMouseLeave={() => setHoveredCard(null)}
+              onMouseEnter={(e) => {
+                setHoveredCard(idx);
+                e.currentTarget.style.borderColor = card.accent;
+              }}
+              onMouseLeave={(e) => {
+                setHoveredCard(null);
+                e.currentTarget.style.borderColor = "#27235c";
+              }}
               onClick={() => navigate(card.path)}
               tabIndex={0}
               role="button"
@@ -92,10 +102,15 @@ export default function HRHome() {
               <div className={styles.hrHomeCardHeader}>
                 <div
                   className={styles.hrHomeIconChip}
-                  style={{ background: card.chipBg, color: card.accent }}
+                  style={{ 
+                    background: card.chipBg, 
+                    color: card.accent,
+                    border: `2px solid ${card.accent}30`
+                  }}
                 >
                   <i className={`bi ${card.icon}`} />
                 </div>
+
 
                 <div className={styles.hrHomeTitleDesc}>
                   <div className={styles.hrHomeCardTitle}>{card.title}</div>

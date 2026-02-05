@@ -3,14 +3,16 @@ import { useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "../../../styles/performancemanagement/manager/PerformanceManagerHome.css";
 
+
 export default function PerformanceManagerHome() {
   const navigate = useNavigate();
   const [hoveredCard, setHoveredCard] = useState(null);
 
+
   const cards = [
     {
       title: "Submit Form for Manager",
-      description: "Start a new performance review cycle.",
+      description: "Fill out your performance or goal form.",
       icon: "bi-journal-plus",
       color: "#3B82F6",
       bg: "#F0F6FD",
@@ -18,7 +20,7 @@ export default function PerformanceManagerHome() {
     },
     {
       title: "Manager Nomination",
-      description: "Design or edit performance review forms.",
+      description: "Nominate employees for rewards.",
       icon: "bi-ui-checks",
       color: "#10B981",
       bg: "#EBFAF4",
@@ -26,7 +28,7 @@ export default function PerformanceManagerHome() {
     },
     {
       title: "Performance review",
-      description: "Resume work on your saved drafts.",
+      description: "Acknowledge and rate employee's appraisal.",
       icon: "bi-pencil-square",
       color: "#F59E0B",
       bg: "#FFF7E6",
@@ -34,15 +36,15 @@ export default function PerformanceManagerHome() {
     },
     {
       title: "Manager Acknowledgement",
-      description: "Resume work on your saved drafts.",
+      description: " Confirm the employee’s final rating.",
       icon: "bi-person-check",
       color: "#A855F7",
       bg: "#F6F1FD",
       path: "/manager/dashboard/manager-acknowledgments",
     },
     {
-      title: "Employee Acknowledgement",
-      description: "Resume work on your saved drafts.",
+      title: "My Acknowledgement",
+      description: "Confirm your appraisal rating.",
       icon: "bi-person-badge",
       color: "#0EA5E9",
       bg: "#ECF7FB",
@@ -50,11 +52,12 @@ export default function PerformanceManagerHome() {
     },
   ];
 
+
   return (
     <div className="managerperfromancehome-container">
       <header className="managerperfromancehome-header">
         <h1 className="managerperfromancehome-main-title">
-          Perfomance Management{" "}
+          Performance Management
         </h1>
       </header>
       <div className="managerperfromancehome-cards-grid">
@@ -64,30 +67,44 @@ export default function PerformanceManagerHome() {
             className={`managerperfromancehome-card-admin ${
               hoveredCard === index ? "hovered" : ""
             }`}
-            onMouseEnter={() => setHoveredCard(index)}
-            onMouseLeave={() => setHoveredCard(null)}
+            onMouseEnter={(e) => {
+              setHoveredCard(index);
+              e.currentTarget.style.borderColor = card.color;
+            }}
+            onMouseLeave={(e) => {
+              setHoveredCard(null);
+              e.currentTarget.style.borderColor = "#27235c";
+            }}
             onClick={() => navigate(card.path)}
             tabIndex={0}
+            role="button"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                navigate(card.path);
+              }
+            }}
+            aria-label={`Navigate to ${card.title}: ${card.description}`}
           >
-            <div
-              className="managerperfromancehome-card-icon"
-              style={{
-                background: card.bg,
-                color: card.color,
-              }}
-            >
-              <i className={`bi ${card.icon}`}></i>
-            </div>
-            <div className="managerperfromancehome-card-content">
-              <h3 className="managerperfromancehome-card-title">
-                {card.title}
-              </h3>
-              <p className="managerperfromancehome-card-description">
-                {card.description}
-              </p>
-            </div>
-            <div className="managerperfromancehome-card-arrow">
-              <i className="bi bi-arrow-right"></i>
+            <div className="managerperfromancehome-card-header">
+              <div
+                className="managerperfromancehome-card-icon"
+                style={{
+                  background: card.bg,
+                  color: card.color,
+                  border: `1.5px solid ${card.color}30`,
+                }}
+              >
+                <i className={`bi ${card.icon}`}></i>
+              </div>
+              <div className="managerperfromancehome-card-content">
+                <h3 className="managerperfromancehome-card-title">
+                  {card.title}
+                </h3>
+                <p className="managerperfromancehome-card-description">
+                  {card.description}
+                </p>
+              </div>
             </div>
           </div>
         ))}
