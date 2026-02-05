@@ -1,8 +1,9 @@
+using FluentValidation.AspNetCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.RateLimiting;
-
+using Relevantz.EEPZ.Common.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -29,6 +30,10 @@ using Relevantz.EEPZ.Data.Repository;
 using Relevantz.EEPZ.Data.Repository.Implementations;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Swashbuckle.AspNetCore.SwaggerGen;
+
+using FluentValidation;
+using Relevantz.EEPZ.Common.DTOs.Response;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -79,6 +84,10 @@ builder.Services.AddControllers()
             return new BadRequestObjectResult(problem);
         };
     });
+    
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -230,6 +239,15 @@ builder.Services.AddScoped<IEmployeeNominationService, EmployeeNominationService
 
 builder.Services.AddScoped<IDepartmentHeadNominationRepository, DepartmentHeadNominationRepository>();
 builder.Services.AddScoped<IDepartmentHeadNominationService, DepartmentHeadNominationService>();
+
+builder.Services.AddValidatorsFromAssemblyContaining<HRNominationApprovalDtoValidator>();
+builder.Services.AddScoped<IValidator<HRNominationApprovalDto>, HRNominationApprovalDtoValidator>();
+builder.Services.AddScoped<IValidator<HRNominationRejectDto>, HRNominationRejectDtoValidator>();
+builder.Services.AddScoped<IValidator<CreateRewardTypeDto>, CreateRewardTypeDtoValidator>();
+builder.Services.AddScoped<IValidator<UpdateRewardTypeDto>, UpdateRewardTypeDtoValidator>();
+builder.Services.AddScoped<IValidator<CreateParameterDto>, CreateParameterDtoValidator>();
+builder.Services.AddScoped<IValidator<UpdateParameterDto>, UpdateParameterDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<NominationSubmitDtoValidator>();
 
 // -------------------------------------------------
 // Health checks

@@ -49,7 +49,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             try
             {
-                // 1) Get approved nominations for employee (repository uses AsNoTracking)
                 List<Recognitionstatus> approvedNominations =
                     await _repository.GetApprovedNominationsByEmployeeAsync(employeeId, cancellationToken);
 
@@ -57,11 +56,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 {
                     result.Success = true;
                     result.Message = "No approved notifications found";
-                    // Do NOT set Count (read-only). Assuming DTO calculates Count from Data.
                     return result;
                 }
 
-                // 2) Collect distinct OpportunityIds and batch-load recognition details with RewardType
                 var oppIds = approvedNominations
                     .Select(n => n.OpportunityId)
                     .Where(id => id > 0)
@@ -72,18 +69,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     ? new List<Recognitiondetail>()
                     : await _repository.GetRecognitionDetailsWithRewardTypeByOppIdsAsync(oppIds, cancellationToken);
 
-                // 3) Build index safely (avoid duplicate key exceptions)
                 var detailByOppId = (details ?? new List<Recognitiondetail>())
                     .Where(d => d != null)
                     .GroupBy(d => d.OpportunityId)
                     .ToDictionary(g => g.Key, g => g.First());
 
-                // 4) Map to DTOs (no entity exposure)
                 foreach (var nomination in approvedNominations)
                 {
                     detailByOppId.TryGetValue(nomination.OpportunityId, out var detail);
 
-                    // IMPORTANT: this assumes result.Data is initialized by the DTO (common pattern).
                     result.Data.Add(new EmployeeNotificationItemDto
                     {
                         NominationId = nomination.NominationId,
@@ -111,7 +105,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
             catch (Exception ex)
             {
-                // Log internally, return generic message to avoid leaking details.
                 _logger.LogError(ex, "Error while searching employee notifications. EmployeeId={EmployeeId}", employeeId);
 
                 result.Success = false;

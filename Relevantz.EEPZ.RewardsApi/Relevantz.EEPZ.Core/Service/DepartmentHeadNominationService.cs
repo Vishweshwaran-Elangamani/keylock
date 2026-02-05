@@ -112,14 +112,13 @@ namespace Relevantz.EEPZ.Core.Service
                     });
                 }
 
-                // ✅ Group WITHOUT dynamic binder
                 var grouped = rows
                     .GroupBy(x => new
                     {
                         x.OpportunityId,
                         x.OpportunityName,
                         x.OpportunityDeadline,
-                        RewardTypeKey = x.RewardType // okay as object; if needed use RewardTypeId
+                        RewardTypeKey = x.RewardType 
                     })
                     .Select(g => new
                     {
