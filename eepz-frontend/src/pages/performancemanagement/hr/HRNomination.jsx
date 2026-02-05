@@ -10,6 +10,7 @@ import ActionModal from "../../../components/performance_management/modals/Hrnom
 import Breadcrumb from "../../../components/common/Breadcrumb";
 import styles from "../../../styles/performancemanagement/hr/HrNomination.module.css";
 
+
 function HRNominations() {
   const [nominations, setNominations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -25,11 +26,14 @@ function HRNominations() {
   const [actionNominationId, setActionNominationId] = useState(null);
   const [actionRemarks, setActionRemarks] = useState("");
 
+
   const [showEmployeeList, setShowEmployeeList] = useState(false);
   const [selectedRewardEmployees, setSelectedRewardEmployees] = useState([]);
   const [selectedRewardName, setSelectedRewardName] = useState("");
 
+
   const navigate = useNavigate();
+
 
   const [statistics, setStatistics] = useState({
     totalNominations: 0,
@@ -38,6 +42,7 @@ function HRNominations() {
     rejectedNominations: 0,
   });
   const [statsLoading, setStatsLoading] = useState(true);
+
 
   const THEME = {
     primary: "#27235c",
@@ -52,7 +57,9 @@ function HRNominations() {
     warning: "#F59E0B",
   };
 
+
   const itemsPerPage = 10;
+
 
   useEffect(() => {
     fetchNominations();
@@ -60,6 +67,7 @@ function HRNominations() {
     setCurrentPage(1);
     setShowEmployeeList(false);
   }, [activeTab]);
+
 
   const fetchStatistics = async () => {
     try {
@@ -74,6 +82,7 @@ function HRNominations() {
       setStatsLoading(false);
     }
   };
+
 
   const groupApprovedProfiles = (profiles) => {
     const grouped = {};
@@ -109,10 +118,12 @@ function HRNominations() {
     return Object.values(grouped);
   };
 
+
   const fetchNominations = async () => {
     try {
       setLoading(true);
       let data = null;
+
 
       if (activeTab === "Pending") {
         const res = await api.getAllManagerNominations();
@@ -133,6 +144,7 @@ function HRNominations() {
         };
       }
 
+
       if (data.success) {
         setNominations(data.data);
       }
@@ -144,11 +156,14 @@ function HRNominations() {
     }
   };
 
+
   const groupByRewardType = (nominations) => {
     const grouped = {};
 
+
     nominations.forEach((opp) => {
       const rewardName = opp.rewardType?.rewardName || "Unknown Reward";
+
 
       if (!grouped[rewardName]) {
         grouped[rewardName] = {
@@ -159,6 +174,7 @@ function HRNominations() {
         };
       }
 
+
       opp.nominations.forEach((nom) => {
         if (nom.status === activeTab) {
           grouped[rewardName].employees.push(nom);
@@ -167,8 +183,10 @@ function HRNominations() {
       });
     });
 
+
     return Object.values(grouped).filter((group) => group.totalCount > 0);
   };
+
 
   const filterNominationsByStatus = (status) => {
     return nominations
@@ -179,14 +197,17 @@ function HRNominations() {
       .filter((opp) => opp.nominations.length > 0);
   };
 
+
   const filteredNominations = filterNominationsByStatus(activeTab);
   const groupedRewards = groupByRewardType(filteredNominations);
+
 
   const totalPages = Math.ceil(groupedRewards.length / itemsPerPage);
   const paginatedRewards = groupedRewards.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
 
   const openApproveModal = (nominationId) => {
     setActionType("approve");
@@ -195,6 +216,7 @@ function HRNominations() {
     setShowActionModal(true);
   };
 
+
   const openRejectModal = (nominationId) => {
     setActionType("reject");
     setActionNominationId(nominationId);
@@ -202,11 +224,13 @@ function HRNominations() {
     setShowActionModal(true);
   };
 
+
   const submitAction = async () => {
     if (!actionRemarks.trim()) {
       toast.warning("Please enter remarks");
       return;
     }
+
 
     try {
       if (actionType === "approve") {
@@ -217,16 +241,20 @@ function HRNominations() {
           rejectionRemarks: "Not selected in final round",
         };
 
+
         const { data } = await api.approveNominations(payload);
+
 
         if (data.success || data.Success) {
           toast.success(`✓ Nomination approved successfully!`);
           setShowActionModal(false);
           setActionRemarks("");
 
+
           setSelectedRewardEmployees((prev) =>
             prev.filter((emp) => emp.nominationId !== actionNominationId)
           );
+
 
           fetchNominations();
           fetchStatistics();
@@ -238,14 +266,17 @@ function HRNominations() {
           rejectionRemarks: actionRemarks,
         });
 
+
         if (data.success || data.Success) {
           toast.success(`✓ Nomination rejected successfully!`);
           setShowActionModal(false);
           setActionRemarks("");
 
+
           setSelectedRewardEmployees((prev) =>
             prev.filter((emp) => emp.nominationId !== actionNominationId)
           );
+
 
           fetchNominations();
           fetchStatistics();
@@ -256,6 +287,7 @@ function HRNominations() {
       toast.error("Error: " + (error.response?.data?.message || error.message));
     }
   };
+
 
   const viewDetails = async (nominationId) => {
     try {
@@ -273,11 +305,13 @@ function HRNominations() {
     }
   };
 
+
   const viewEmployeeList = (rewardGroup) => {
     setSelectedRewardName(rewardGroup.rewardName);
     setSelectedRewardEmployees(rewardGroup.employees);
     setShowEmployeeList(true);
   };
+
 
   const goBackToNominations = () => {
     setShowEmployeeList(false);
@@ -285,10 +319,12 @@ function HRNominations() {
     setSelectedRewardEmployees([]);
   };
 
+
   const handleNominationsClick = (e) => {
     if (e) e.preventDefault();
     goBackToNominations();
   };
+
 
   const statIcons = {
     "Total Nominations": "bi-bar-chart-fill",
@@ -297,12 +333,14 @@ function HRNominations() {
     Rejected: "bi-x-circle",
   };
 
+
   const statColors = {
     "Total Nominations": styles.hrNominationStatIconPrimary,
     Pending: styles.hrNominationStatIconWarning,
     Approved: styles.hrNominationStatIconSuccess,
     Rejected: styles.hrNominationStatIconDanger,
   };
+
 
   const StatCard = ({ title, value }) => (
     <div className={styles.hrNominationStatCard}>
@@ -315,6 +353,7 @@ function HRNominations() {
       </div>
     </div>
   );
+
 
   if (loading) {
     return (
@@ -330,10 +369,12 @@ function HRNominations() {
     );
   }
 
+
   if (showEmployeeList) {
     return (
       <div className={styles.hrNominationContainer}>
         <ToastContainer position="top-right" autoClose={3000} />
+
 
         <div className="container-fluid">
           <div
@@ -361,6 +402,7 @@ function HRNominations() {
             />
           </div>
 
+
           <div className={styles.hrNominationEmployeeHeader}>
             <div>
               <h4 className={styles.hrNominationEmployeeHeaderTitle}>
@@ -375,87 +417,87 @@ function HRNominations() {
             </div>
           </div>
 
+
           <div className="row g-3">
             {selectedRewardEmployees.map((employee) => (
               <div key={employee.nominationId} className="col-md-6">
                 <div className={styles.hrNominationEmployeeCard}>
-                  <div className={styles.hrNominationEmployeeCardHeader}>
+                  {/* Blue Header with Avatar and Employee Name */}
+                  <div className={styles.hrNominationEmployeeCardBlueHeader}>
                     <div className={styles.hrNominationEmployeeAvatar}>
                       {employee.nomineeName.charAt(0).toUpperCase()}
                     </div>
-                    <div className={styles.hrNominationEmployeeInfo}>
-                      <h6 className={styles.hrNominationEmployeeName}>
-                        {employee.nomineeName}
-                      </h6>
-                      <p className={styles.hrNominationEmployeeEmail}>
-                        {employee.nomineeEmail}
-                      </p>
-                    </div>
+                    <span className={styles.hrNominationEmployeeHeaderName}>
+                      {employee.nomineeName}
+                    </span>
                   </div>
 
-                  <div className={styles.hrNominationEmployeeInfoGrid}>
-                    <div className={styles.hrNominationEmployeeInfoBox}>
-                      <span className={styles.hrNominationEmployeeInfoLabel}>
-                        Department
-                      </span>
-                      <p className={styles.hrNominationEmployeeInfoValue}>
-                        {employee.nomineeDepartmentName}
-                      </p>
+                  <div className={styles.hrNominationEmployeeCardContent}>
+                    <div className={styles.hrNominationEmployeeInfoGrid}>
+                      <div className={styles.hrNominationEmployeeInfoBox}>
+                        <span className={styles.hrNominationEmployeeInfoLabel}>
+                          Department
+                        </span>
+                        <p className={styles.hrNominationEmployeeInfoValue}>
+                          {employee.nomineeDepartmentName}
+                        </p>
+                      </div>
+                      <div className={styles.hrNominationEmployeeInfoBox}>
+                        <span className={styles.hrNominationEmployeeInfoLabel}>
+                          Submitted
+                        </span>
+                        <p className={styles.hrNominationEmployeeInfoValue}>
+                          {new Date(employee.submittedAt).toLocaleDateString()}
+                        </p>
+                      </div>
                     </div>
-                    <div className={styles.hrNominationEmployeeInfoBox}>
-                      <span className={styles.hrNominationEmployeeInfoLabel}>
-                        Submitted
-                      </span>
-                      <p className={styles.hrNominationEmployeeInfoValue}>
-                        {new Date(employee.submittedAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
 
-                  {employee.justification && (
-                    <div className={styles.hrNominationEmployeeJustification}>
-                      <p
-                        className={styles.hrNominationEmployeeJustificationText}
-                      >
-                        {employee.justification}
-                      </p>
-                    </div>
-                  )}
-
-                  <div className={styles.hrNominationEmployeeActions}>
-                    <button
-                      onClick={() => viewDetails(employee.nominationId)}
-                      title="View Details"
-                      className={`${styles.hrNominationEmployeeActionBtn} ${styles.hrNominationEmployeeActionBtnView}`}
-                    >
-                      <i className="bi bi-eye" />
-                    </button>
-                    {activeTab === "Pending" && (
-                      <>
-                        <button
-                          onClick={() =>
-                            openApproveModal(employee.nominationId)
-                          }
-                          title="Approve"
-                          className={`${styles.hrNominationEmployeeActionBtn} ${styles.hrNominationEmployeeActionBtnApprove}`}
+                    {employee.justification && (
+                      <div className={styles.hrNominationEmployeeJustification}>
+                        <p
+                          className={styles.hrNominationEmployeeJustificationText}
                         >
-                          <i className="bi bi-check-circle" />
-                        </button>
-                        <button
-                          onClick={() => openRejectModal(employee.nominationId)}
-                          title="Reject"
-                          className={`${styles.hrNominationEmployeeActionBtn} ${styles.hrNominationEmployeeActionBtnReject}`}
-                        >
-                          <i className="bi bi-x-circle" />
-                        </button>
-                      </>
+                          {employee.justification}
+                        </p>
+                      </div>
                     )}
+
+                    <div className={styles.hrNominationEmployeeActions}>
+                      <button
+                        onClick={() => viewDetails(employee.nominationId)}
+                        title="View Details"
+                        className={`${styles.hrNominationEmployeeActionBtn} ${styles.hrNominationEmployeeActionBtnView}`}
+                      >
+                        <i className="bi bi-eye" />
+                      </button>
+                      {activeTab === "Pending" && (
+                        <>
+                          <button
+                            onClick={() =>
+                              openApproveModal(employee.nominationId)
+                            }
+                            title="Approve"
+                            className={`${styles.hrNominationEmployeeActionBtn} ${styles.hrNominationEmployeeActionBtnApprove}`}
+                          >
+                            <i className="bi bi-check-circle" />
+                          </button>
+                          <button
+                            onClick={() => openRejectModal(employee.nominationId)}
+                            title="Reject"
+                            className={`${styles.hrNominationEmployeeActionBtn} ${styles.hrNominationEmployeeActionBtnReject}`}
+                          >
+                            <i className="bi bi-x-circle" />
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
+
 
         <ViewDetailsModal
           showModal={showModal}
@@ -464,6 +506,7 @@ function HRNominations() {
           selectedNominationDetails={selectedNominationDetails}
           THEME={THEME}
         />
+
 
         <ActionModal
           show={showActionModal}
@@ -478,9 +521,11 @@ function HRNominations() {
     );
   }
 
+
   return (
     <div className={styles.hrNominationContainer}>
       <ToastContainer position="top-right" autoClose={3000} />
+
 
       <div className="container-fluid">
         <Breadcrumb
@@ -489,6 +534,7 @@ function HRNominations() {
             { label: "Nominations", path: null },
           ]}
         />
+
 
         {statsLoading ? (
           <div className="text-center mb-3">
@@ -522,6 +568,7 @@ function HRNominations() {
             </div>
           </div>
         )}
+
 
         <div className={styles.hrNominationHeader}>
           <div className={styles.hrNominationStatusTabs}>
@@ -557,6 +604,7 @@ function HRNominations() {
             </button>
           </div>
 
+
           <div className={styles.hrNominationViewToggle}>
             <button
               onClick={() => setViewMode("grid")}
@@ -568,6 +616,7 @@ function HRNominations() {
             >
               <i className="bi bi-grid-3x3-gap-fill" style={{ fontSize: 18 }} />
             </button>
+
 
             <button
               onClick={() => setViewMode("table")}
@@ -581,6 +630,7 @@ function HRNominations() {
             </button>
           </div>
         </div>
+
 
         {groupedRewards.length === 0 ? (
           <div className={styles.hrNominationEmptyState}>
@@ -663,6 +713,7 @@ function HRNominations() {
               </table>
             </div>
 
+
             {totalPages > 1 && (
               <nav
                 aria-label="Page navigation"
@@ -734,15 +785,18 @@ function HRNominations() {
                       <i className="bi bi-award-fill" />
                     </div>
 
+
                     <h5 className={styles.hrNominationGridCardTitle}>
                       {reward.rewardName}
                     </h5>
+
 
                     {reward.rewardCategory && (
                       <p className={styles.hrNominationGridCardCategory}>
                         {reward.rewardCategory}
                       </p>
                     )}
+
 
                     <div className={styles.hrNominationGridCardCount}>
                       <i
@@ -758,6 +812,7 @@ function HRNominations() {
                       </div>
                     </div>
 
+
                     <button
                       onClick={() => viewEmployeeList(reward)}
                       className={styles.hrNominationGridCardButton}
@@ -768,6 +823,7 @@ function HRNominations() {
                 </div>
               ))}
             </div>
+
 
             {totalPages > 1 && (
               <nav
@@ -833,6 +889,7 @@ function HRNominations() {
         )}
       </div>
 
+
       <ViewDetailsModal
         showModal={showModal}
         setShowModal={setShowModal}
@@ -840,6 +897,7 @@ function HRNominations() {
         selectedNominationDetails={selectedNominationDetails}
         THEME={THEME}
       />
+
 
       <ActionModal
         show={showActionModal}
@@ -853,5 +911,6 @@ function HRNominations() {
     </div>
   );
 }
+
 
 export default HRNominations;

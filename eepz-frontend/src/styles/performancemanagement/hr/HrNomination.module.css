@@ -5,6 +5,7 @@
   padding-bottom: 32px;
 }
 
+
 .hrNominationLoadingWrapper {
   display: flex;
   justify-content: center;
@@ -13,13 +14,16 @@
   background: #f8fafc;
 }
 
+
 .hrNominationLoadingContent {
   text-align: center;
 }
 
+
 .hrNominationSpinner {
   color: #27235c;
 }
+
 
 .hrNominationStatCard {
   background: #ffffff;
@@ -33,10 +37,12 @@
   gap: 16px;
 }
 
+
 .hrNominationStatCard:hover {
   box-shadow: 0 4px 16px rgba(39, 35, 92, 0.15);
   transform: translateY(-2px);
 }
+
 
 .hrNominationStatIcon {
   width: 48px;
@@ -48,25 +54,30 @@
   font-size: 24px;
 }
 
+
 .hrNominationStatIconPrimary {
   background: #e2ebfd;
   color: #27235c;
 }
+
 
 .hrNominationStatIconWarning {
   background: #fef3c7;
   color: #f59e0b;
 }
 
+
 .hrNominationStatIconSuccess {
   background: #d1fae5;
   color: #10b981;
 }
 
+
 .hrNominationStatIconDanger {
   background: #fee2e2;
   color: #ef4444;
 }
+
 
 .hrNominationStatContent h3 {
   margin: 0 0 4px 0;
@@ -75,12 +86,14 @@
   color: #27235c;
 }
 
+
 .hrNominationStatContent p {
   margin: 0;
   color: #718096;
   font-size: 14px;
   font-weight: 500;
 }
+
 
 .hrNominationStatusTabs {
   background: #27235c;
@@ -90,6 +103,7 @@
   border: 2px solid #27235c;
   width: fit-content;
 }
+
 
 .hrNominationStatusTab {
   background: transparent;
@@ -105,12 +119,14 @@
   transition: background 0.15s, color 0.15s;
 }
 
+
 .hrNominationStatusTabActive {
   background: #fff !important;
   color: #27235c !important;
   font-weight: 700;
   box-shadow: 0 2px 6px rgba(39, 35, 92, 0.08);
 }
+
 
 .hrNominationViewToggle {
   display: flex;
@@ -120,6 +136,7 @@
   background: #fff;
   height: 36px;
 }
+
 
 .hrNominationViewButton {
   background: #fff;
@@ -137,10 +154,12 @@
   cursor: pointer;
 }
 
+
 .hrNominationViewButtonActive {
   background: #27235c !important;
   color: #fff !important;
 }
+
 
 .hrNominationHeader {
   display: flex;
@@ -150,6 +169,7 @@
   flex-wrap: wrap;
   gap: 1rem;
 }
+
 
 .hrNominationEmployeeHeader {
   background: #fff;
@@ -162,6 +182,7 @@
   align-items: center;
 }
 
+
 .hrNominationEmployeeHeaderTitle {
   margin: 0;
   color: #27235c;
@@ -169,11 +190,13 @@
   font-weight: 700;
 }
 
+
 .hrNominationEmployeeHeaderSubtitle {
   margin: 0;
   color: #718096;
   font-size: 13px;
 }
+
 
 .hrNominationEmployeeHeaderBadge {
   background: #27235c;
@@ -184,84 +207,123 @@
   font-weight: 700;
 }
 
+
+/* ========== EMPLOYEE CARD STYLES - COMPACT VERSION WITHOUT EMAIL ========== */
+
 .hrNominationEmployeeCard {
   background: #fff;
-  border: 2px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 14px 16px;
+  border: 2px solid #27235c;
+  border-radius: 8px;
+  overflow: hidden;
   transition: all 0.2s;
   height: 100%;
 }
 
+
 .hrNominationEmployeeCard:hover {
-  border-color: #27235c;
-  box-shadow: 0 4px 12px rgba(39, 35, 92, 0.1);
+  box-shadow: 0 4px 12px rgba(39, 35, 92, 0.2);
+  transform: translateY(-2px);
 }
 
-.hrNominationEmployeeCardHeader {
+
+/* Blue Header with Avatar and Name */
+.hrNominationEmployeeCardBlueHeader {
+  background: #27235c;
+  color: #ffffff;
+  padding: 10px 12px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: 10px;
 }
 
+
+/* Avatar inside Blue Header */
 .hrNominationEmployeeAvatar {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   flex-shrink: 0;
   border-radius: 50%;
-  background: linear-gradient(135deg, #27235c 0%, #2d5b8c 100%);
+  background: linear-gradient(135deg, #e91e63 0%, #c2185b 100%);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.hrNominationEmployeeInfo {
-  flex: 1;
-  min-width: 0;
-  text-align: left;
-}
-
-.hrNominationEmployeeName {
-  margin: 0;
   font-size: 15px;
   font-weight: 700;
-  color: #1a202c;
+  box-shadow: 0 2px 6px rgba(233, 30, 99, 0.4);
 }
+
+
+/* Name Text inside Blue Header */
+.hrNominationEmployeeHeaderName {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.2px;
+}
+
+
+/* Content wrapper */
+.hrNominationEmployeeCardContent {
+  padding: 10px 12px;
+}
+
+
+/* Remove old unused styles */
+.hrNominationEmployeeCardHeader {
+  display: none;
+}
+
+
+.hrNominationEmployeeInfo {
+  display: none;
+}
+
+
+.hrNominationEmployeeName {
+  display: none;
+}
+
+
+.hrNominationEmployeeEmailSection {
+  display: none;
+}
+
 
 .hrNominationEmployeeEmail {
-  margin: 0;
-  font-size: 12px;
-  color: #718096;
+  display: none;
 }
 
+
+/* Info Grid */
 .hrNominationEmployeeInfoGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 12px;
+  gap: 8px;
+  margin-bottom: 10px;
 }
+
 
 .hrNominationEmployeeInfoBox {
   background: #f8f9fc;
-  padding: 8px 10px;
-  border-radius: 6px;
+  padding: 6px 8px;
+  border-radius: 5px;
 }
 
+
 .hrNominationEmployeeInfoLabel {
-  font-size: 10px;
+  font-size: 9px;
   color: #718096;
   font-weight: 600;
   text-transform: uppercase;
   display: block;
+  margin-bottom: 2px;
 }
+
 
 .hrNominationEmployeeInfoValue {
   margin: 0;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: #1a202c;
   overflow: hidden;
@@ -269,37 +331,43 @@
   white-space: nowrap;
 }
 
+
+/* Justification Section */
 .hrNominationEmployeeJustification {
   background: #f8f9fc;
-  padding: 10px;
-  border-radius: 6px;
+  padding: 8px;
+  border-radius: 5px;
   border-left: 3px solid #27235c;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
+
 
 .hrNominationEmployeeJustificationText {
   margin: 0;
-  font-size: 12px;
+  font-size: 11px;
   color: #1a202c;
-  line-height: 1.5;
+  line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
+
+/* Action Buttons */
 .hrNominationEmployeeActions {
   display: flex;
-  gap: 6px;
+  gap: 5px;
   justify-content: center;
 }
 
+
 .hrNominationEmployeeActionBtn {
-  padding: 6px 8px;
+  padding: 5px 7px;
   background: #fff;
   border: 1.3px solid;
-  border-radius: 6px;
-  font-size: 15px;
+  border-radius: 5px;
+  font-size: 14px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -307,20 +375,45 @@
   transition: all 0.2s;
 }
 
+
 .hrNominationEmployeeActionBtnView {
   color: #27235c;
   border-color: #27235c;
 }
+
+
+.hrNominationEmployeeActionBtnView:hover {
+  background: #27235c;
+  color: #fff;
+}
+
 
 .hrNominationEmployeeActionBtnApprove {
   color: #10b981;
   border-color: #10b981;
 }
 
+
+.hrNominationEmployeeActionBtnApprove:hover {
+  background: #10b981;
+  color: #fff;
+}
+
+
 .hrNominationEmployeeActionBtnReject {
   color: #ef4444;
   border-color: #ef4444;
 }
+
+
+.hrNominationEmployeeActionBtnReject:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
+
+/* ========== END EMPLOYEE CARD STYLES ========== */
+
 
 .hrNominationEmptyState {
   background: #fff;
@@ -330,6 +423,7 @@
   text-align: center;
 }
 
+
 .hrNominationEmptyTitle {
   font-size: 16px;
   font-weight: 600;
@@ -337,11 +431,13 @@
   color: #1a202c;
 }
 
+
 .hrNominationEmptyText {
   font-size: 13px;
   margin-bottom: 0;
   color: #718096;
 }
+
 
 .hrNominationTableWrapper {
   background: #fff;
@@ -351,15 +447,18 @@
   margin-bottom: 1.5rem;
 }
 
+
 .hrNominationTable {
   width: 100%;
   border-collapse: collapse;
   margin: 0;
 }
 
+
 .hrNominationTableHead {
   background: #27235c;
 }
+
 
 .hrNominationTableTh {
   font-weight: 700;
@@ -370,36 +469,44 @@
   letter-spacing: 0.4px;
 }
 
+
 .hrNominationTableThLeft {
   text-align: left;
 }
+
 
 .hrNominationTableThCenter {
   text-align: center;
 }
 
+
 .hrNominationTableRow {
   border-bottom: 1px solid #e5e7eb;
 }
 
+
 .hrNominationTableRow:last-child {
   border-bottom: none;
 }
+
 
 .hrNominationTableTd {
   padding: 16px 20px;
   vertical-align: middle;
 }
 
+
 .hrNominationTableTdCenter {
   text-align: center;
 }
+
 
 .hrNominationRewardInfo {
   display: flex;
   align-items: center;
   gap: 12px;
 }
+
 
 .hrNominationRewardIcon {
   width: 40px;
@@ -414,11 +521,13 @@
   font-weight: 700;
 }
 
+
 .hrNominationRewardName {
   font-weight: 700;
   color: #1a202c;
   font-size: 15px;
 }
+
 
 .hrNominationEmployeeCountBadge {
   display: inline-flex;
@@ -431,6 +540,7 @@
   font-size: 14px;
   font-weight: 700;
 }
+
 
 .hrNominationTableViewButton {
   padding: 8px 16px;
@@ -447,10 +557,12 @@
   transition: all 0.2s;
 }
 
+
 .hrNominationTableViewButton:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(39, 35, 92, 0.3);
 }
+
 
 .hrNominationGridCard {
   background: #fff;
@@ -464,10 +576,12 @@
   flex-direction: column;
 }
 
+
 .hrNominationGridCard:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 20px rgba(39, 35, 92, 0.15);
 }
+
 
 .hrNominationGridCardIcon {
   width: 56px;
@@ -482,6 +596,7 @@
   margin-bottom: 16px;
 }
 
+
 .hrNominationGridCardTitle {
   color: #27235c;
   font-size: 17px;
@@ -489,11 +604,13 @@
   margin-bottom: 8px;
 }
 
+
 .hrNominationGridCardCategory {
   color: #718096;
   font-size: 12px;
   margin-bottom: 12px;
 }
+
 
 .hrNominationGridCardCount {
   display: flex;
@@ -505,10 +622,12 @@
   margin-bottom: 16px;
 }
 
+
 .hrNominationGridCardCountIcon {
   font-size: 20px;
   color: #27235c;
 }
+
 
 .hrNominationGridCardCountValue {
   font-size: 24px;
@@ -516,11 +635,13 @@
   color: #27235c;
 }
 
+
 .hrNominationGridCardCountLabel {
   font-size: 11px;
   color: #718096;
   font-weight: 600;
 }
+
 
 .hrNominationGridCardButton {
   width: 100%;
@@ -540,23 +661,26 @@
   transition: all 0.2s;
 }
 
+
 .hrNominationGridCardButton:hover {
   background: #1e1b45;
 }
+
 
 .hrNominationPagination .pagination {
   margin-bottom: 0;
 }
 
+
 .hrNominationPaginationButton {
   color: #27235c;
+  border-color: #27235c;
   font-weight: 600;
-  font-size: 13px;
-  padding: 6px 12px;
 }
 
+
 .hrNominationPaginationButtonActive {
-  background: #27235c !important;
+  background-color: #27235c !important;
+  border-color: #27235c !important;
   color: #fff !important;
-  border: 1px solid #27235c !important;
 }
