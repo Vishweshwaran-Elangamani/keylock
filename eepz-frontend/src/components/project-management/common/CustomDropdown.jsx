@@ -65,10 +65,6 @@ const CustomDropdown = ({
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0, width: 0 });
 
-  // 🔥 FIX: stabilize offset values
-  const offsetX = offset?.x ?? 0;
-  const offsetY = offset?.y ?? 4;
-
   const normalizedOptions = useMemo(
     () => normalizeOptions(options),
     [options]
@@ -92,13 +88,12 @@ const CustomDropdown = ({
     }
 
     setPos({
-      top: rect.bottom + window.scrollY + offsetY,
-      left: left + offsetX,
+      top: rect.bottom + window.scrollY + (offset?.y ?? 4),
+      left: left + (offset?.x ?? 0),
       width: rect.width,
     });
   };
 
-  // 🔥 FIXED dependency array (removed offset object)
   useEffect(() => {
     if (!open) return;
     updatePosition();
@@ -111,7 +106,7 @@ const CustomDropdown = ({
       window.removeEventListener("resize", onResize);
       window.removeEventListener("scroll", onResize, true);
     };
-  }, [open, align, anchorRef, offsetX, offsetY]);
+  }, [open, align, offset, anchorRef]);
 
   useLayoutEffect(() => {
     if (!open || !dropdownRef.current) return;

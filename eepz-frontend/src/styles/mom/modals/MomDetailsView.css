@@ -15,6 +15,22 @@
   display: flex !important;
 }
 
+.mdv-discussion-number {
+  text-align: left;
+  min-width: 24px;         
+  flex-shrink: 0;           
+  margin-top: 2px;
+}
+
+.mdv-discussion-item {
+  align-items: flex-start;  
+}
+
+.mdv-discussion-item .flex-grow-1 {
+  margin-left: 2px;         
+}
+
+
 .mdv-dialog {
   position: relative;
   width: 100%;
@@ -73,6 +89,11 @@
   margin-bottom: -10px;
 }
 
+.mdv-action-item h6 {
+  text-align: left !important;
+  margin-left: 0;
+}
+
 .mdv-icon-primary {
   color: #27235c;
 }
@@ -88,6 +109,8 @@
 
 .mdv-section-title {
   color: #27235c;
+  justify-content: flex-start !important;
+  text-align: left;
 }
 
 .mdv-comments {
@@ -100,6 +123,7 @@
 .mdv-discussion-item {
   background-color: #f8f9fa;
   border: 1px solid #e9ecef;
+  text-align: left;
 }
 
 .mdv-action-item {
@@ -117,7 +141,6 @@
   background-color: #4b5563;
   border: none;
   color: #ffffff;
-  border-radius: 9999px;
   padding: 0.6rem 1.8rem;
   min-width: 120px;
   font-weight: 600;

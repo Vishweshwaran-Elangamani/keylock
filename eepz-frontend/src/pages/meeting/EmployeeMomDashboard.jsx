@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import momService from "../../services/meeting/momService";
 import rsvpService from "../../services/meeting/rsvpService";
 import employeeService from "../../services/meeting/employeeservice";
@@ -8,6 +8,49 @@ import { Home } from "lucide-react";
 import MeetingDetailsModal from "../../components/meeting/modals/MeetingDetailsModal";
 import SharedMomsModal from "../../components/meeting/modals/SharedMomsModal";
 import "../../styles/mom/components/EmployeeMomDashboard.css";
+
+const STORAGE_KEYS = {
+  OPTIMISTIC_MOMS: 'optimistic_moms',
+  OPTIMISTIC_TIMESTAMP: 'optimistic_moms_timestamp'
+};
+
+const saveOptimisticMoms = (moms) => {
+  try {
+    localStorage.setItem(STORAGE_KEYS.OPTIMISTIC_MOMS, JSON.stringify(moms));
+    localStorage.setItem(STORAGE_KEYS.OPTIMISTIC_TIMESTAMP, Date.now().toString());
+  } catch (error) {
+    console.error('Failed to save optimistic MOMs:', error);
+  }
+};
+
+const loadOptimisticMoms = () => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEYS.OPTIMISTIC_MOMS);
+    const timestamp = localStorage.getItem(STORAGE_KEYS.OPTIMISTIC_TIMESTAMP);
+    
+    if (!stored || !timestamp) return [];
+    
+    const age = Date.now() - parseInt(timestamp);
+    if (age > 5 * 60 * 1000) {
+      clearOptimisticMoms();
+      return [];
+    }
+    
+    return JSON.parse(stored);
+  } catch (error) {
+    console.error('Failed to load optimistic MOMs:', error);
+    return [];
+  }
+};
+
+const clearOptimisticMoms = () => {
+  try {
+    localStorage.removeItem(STORAGE_KEYS.OPTIMISTIC_MOMS);
+    localStorage.removeItem(STORAGE_KEYS.OPTIMISTIC_TIMESTAMP);
+  } catch (error) {
+    console.error('Failed to clear optimistic MOMs:', error);
+  }
+};
 
 const EmployeeMomDashboard = () => {
   const navigate = useNavigate();
@@ -22,14 +65,36 @@ const EmployeeMomDashboard = () => {
   });
   const [recentActivity, setRecentActivity] = useState([]);
   const [meetings, setMeetings] = useState([]);
+  const [optimisticMeetings, setOptimisticMeetings] = useState([]);
   const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [showSharedModal, setShowSharedModal] = useState(false);
   const [empMomActive, setEmpMomActive] = useState(null);
+  const syncTimeoutRef = useRef(null);
+  const hasLoadedRef = useRef(false);
 
   useEffect(() => {
-    loadDashboardData();
-    fetchMeetings();
-    loadAllEmployees();
+    const storedOptimistic = loadOptimisticMoms();
+    if (storedOptimistic.length > 0) {
+      setOptimisticMeetings(storedOptimistic);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (optimisticMeetings.length > 0) {
+      saveOptimisticMoms(optimisticMeetings);
+    } else if (hasLoadedRef.current) {
+      clearOptimisticMoms();
+    }
+  }, [optimisticMeetings]);
+
+  useEffect(() => {
+    const initDashboard = async () => {
+      const empMap = await loadAllEmployees();
+      await loadDashboardData();
+      await fetchMeetings(empMap);
+      hasLoadedRef.current = true;
+    };
+    initDashboard();
   }, []);
 
   useEffect(() => {
@@ -41,7 +106,6 @@ const EmployeeMomDashboard = () => {
     }
   }, [location.state]);
 
-  // Helper to get property with PascalCase/camelCase fallback
   const getProperty = (obj, camelKey, pascalKey) => {
     return obj?.[camelKey] ?? obj?.[pascalKey] ?? null;
   };
@@ -56,21 +120,32 @@ const EmployeeMomDashboard = () => {
         const map = {};
         employeeData.forEach((emp) => {
           const empId =
-            getProperty(emp, "employeeMasterId", "EmployeeMasterId") ||
-            getProperty(emp, "employeeId", "EmployeeId");
-          const firstName = getProperty(emp, "firstName", "FirstName") || "";
-          const lastName = getProperty(emp, "lastName", "LastName") || "";
+            emp.employeeMasterId || 
+            emp.EmployeeMasterId ||
+            emp.employeeId || 
+            emp.EmployeeId ||
+            emp.id ||
+            emp.Id;
+            
+          const firstName = emp.firstName || emp.FirstName || "";
+          const lastName = emp.lastName || emp.LastName || "";
+          
           if (empId) {
-            map[empId] = `${firstName} ${lastName}`.trim();
+            const fullName = `${firstName} ${lastName}`.trim();
+            map[String(empId)] = fullName || `Employee ${empId}`;
           }
         });
+        
         setEmployeeMap(map);
+        return map;
       }
+      return {};
     } catch (error) {
       console.error("Error loading employees:", error);
       if (error.retryAfter) {
         console.warn(`Rate limit: retry after ${error.retryAfter} seconds`);
       }
+      return {};
     }
   };
 
@@ -86,124 +161,295 @@ const EmployeeMomDashboard = () => {
           momService.getMomsSharedWithMe(),
         ]);
 
-      // Extract data with PascalCase/camelCase fallback
       const myMomsData =
+        myMomsRes?.data?.data?.data ||
         myMomsRes?.data?.data ||
-        myMomsRes?.data?.Data ||
+        myMomsRes?.data?.Data?.Data ||
         myMomsRes?.Data?.Data ||
-        myMomsRes?.data ||
         [];
 
-      const actionItemsData =
-        actionItemsRes?.data || actionItemsRes?.Data || [];
-      const invitationsData =
-        invitationsRes?.data || invitationsRes?.Data || [];
+      const actionItemsData = actionItemsRes?.data || actionItemsRes?.Data || [];
+      const invitationsData = invitationsRes?.data || invitationsRes?.Data || [];
       const sharedData = sharedRes?.data || sharedRes?.Data || [];
 
-      // Filter pending actions
       const pendingActions = actionItemsData.filter((item) => {
         const status = getProperty(item, "status", "Status");
         return status === "Pending";
       });
 
-      // ✅ FIXED: Filter pending invitations based on numeric rsvpStatus (0 = Pending)
       const pendingInvites = invitationsData.filter((inv) => {
         const rsvpStatus = getProperty(inv, "rsvpStatus", "RsvpStatus");
-        // Check for numeric 0 (Pending) or string "Pending"
-        return (
-          rsvpStatus === 0 || rsvpStatus === "0" || rsvpStatus === "Pending"
-        );
+        return rsvpStatus === 0 || rsvpStatus === "0" || rsvpStatus === "Pending";
       });
 
       setStats({
         myMoms: Array.isArray(myMomsData) ? myMomsData.length : 0,
         pendingActionItems: pendingActions.length,
-        meetingInvitations: pendingInvites.length, // ✅ Now shows correct pending count
+        meetingInvitations: pendingInvites.length,
         sharedMoms: Array.isArray(sharedData) ? sharedData.length : 0,
       });
 
       const activity = [];
 
-      // Add recent MOMs to activity
-      if (Array.isArray(myMomsData) && myMomsData.length > 0) {
-        myMomsData.slice(0, 3).forEach((mom) => {
-          const meetingTitle = getProperty(mom, "meetingTitle", "MeetingTitle");
-          const createdAt = getProperty(mom, "createdAt", "CreatedAt");
-          const meetingId = getProperty(mom, "meetingId", "MeetingId");
+      myMomsData.forEach((mom) => {
+        const meetingTitle = getProperty(mom, "meetingTitle", "MeetingTitle");
+        const date =
+          getProperty(mom, "createdAt", "CreatedAt") ||
+          getProperty(mom, "meetingDate", "MeetingDate");
 
-          activity.push({
-            type: "mom",
-            title: meetingTitle || "Untitled Meeting",
-            date: createdAt,
-            icon: "bi-file-text",
-            color: "primary",
-            meetingId: meetingId,
-            meetingData: mom,
-          });
+        activity.push({
+          type: "mom",
+          title: meetingTitle || "MOM Record",
+          date,
+          icon: "bi-file-text",
+          color: "primary",
+          meetingData: mom,
         });
-      }
+      });
 
-      // Add recent invitations to activity
-      if (Array.isArray(invitationsData) && invitationsData.length > 0) {
-        invitationsData.slice(0, 2).forEach((inv) => {
-          const meetingTitle = getProperty(inv, "meetingTitle", "MeetingTitle");
-          const meetingDate = getProperty(inv, "meetingDate", "MeetingDate");
-          const meetingId = getProperty(inv, "meetingId", "MeetingId");
+      const acceptedInvites = invitationsData.filter((inv) => {
+        const rsvpStatus = getProperty(inv, "rsvpStatus", "RsvpStatus");
+        return rsvpStatus === 1 || rsvpStatus === "1" || rsvpStatus === "Accepted";
+      });
 
-          activity.push({
-            type: "invitation",
-            title: meetingTitle || "Untitled Meeting",
-            date: meetingDate,
-            icon: "bi-calendar-event",
-            color: "warning",
-            meetingId: meetingId,
-            meetingData: inv,
-          });
+      acceptedInvites.forEach((inv) => {
+        const meetingTitle = getProperty(inv, "meetingTitle", "MeetingTitle");
+        const meetingDate = getProperty(inv, "meetingDate", "MeetingDate");
+
+        activity.push({
+          type: "invitation",
+          title: meetingTitle || "Accepted Meeting",
+          date: meetingDate,
+          icon: "bi-calendar-check",
+          color: "success",
+          meetingData: inv,
         });
-      }
+      });
+
+      const validActivity = activity.filter((a) => a.date);
 
       setRecentActivity(
-        activity.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5)
+        validActivity.sort((a, b) => new Date(b.date) - new Date(a.date))
       );
     } catch (error) {
       console.error("Dashboard data error:", error);
-
-      if (error.retryAfter) {
-        toastr.error(
-          `Rate limit exceeded. Please wait ${error.retryAfter} seconds.`
-        );
-      } else if (error.message) {
-        toastr.error(`Failed to load dashboard: ${error.message}`);
-      } else {
-        toastr.error("Failed to load dashboard data");
-      }
+      toastr.error("Failed to load dashboard data");
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchMeetings = async () => {
+  const fetchMeetings = async (empMap = employeeMap) => {
     try {
       const res = await momService.getMyMoms({ pageNumber: 1, pageSize: 100 });
-
-      // Extract meetings data with fallback
-      const meetingsData =
+      const momsData =
+        res?.data?.data?.data ||
         res?.data?.data ||
-        res?.data?.Data ||
+        res?.data?.Data?.Data ||
         res?.Data?.Data ||
-        res?.data ||
         [];
 
-      setMeetings(Array.isArray(meetingsData) ? meetingsData : []);
+      const backendMeetings = Array.isArray(momsData) ? momsData : [];
+      
+      const processedMeetings = backendMeetings.map(mom => {
+        const actionItems = mom.ActionItems || mom.actionItems || [];
+        
+        const processedActionItems = actionItems.map(item => {
+          const assignedId = item.AssignedToEmployeeId || item.assignedToEmployeeId;
+          const existingName = item.AssignedToEmployeeName || item.assignedToEmployeeName;
+          const mappedName = empMap[String(assignedId)];
+          const finalName = existingName || mappedName || `Employee ${assignedId}`;
+          
+          return {
+            ...item,
+            AssignedToEmployeeName: finalName,
+            assignedToEmployeeName: finalName,
+          };
+        });
+        
+        return {
+          ...mom,
+          ActionItems: processedActionItems,
+          actionItems: processedActionItems,
+        };
+      });
+      
+      setMeetings(processedMeetings);
+      
+      setOptimisticMeetings(prev => {
+        const remaining = prev.filter(optMom => {
+          const optId = String(optMom.meetingId || optMom.MeetingId);
+          
+          const existsInBackend = backendMeetings.some(backMom => {
+            const backId = String(backMom.meetingId || backMom.MeetingId);
+            const backTitle = getProperty(backMom, "meetingTitle", "MeetingTitle");
+            const optTitle = getProperty(optMom, "meetingTitle", "MeetingTitle");
+            
+            if (optId.startsWith('temp-')) {
+              const backDate = getProperty(backMom, "meetingDate", "MeetingDate");
+              const optDate = getProperty(optMom, "meetingDate", "MeetingDate");
+              return backTitle === optTitle && 
+                     new Date(backDate).getTime() === new Date(optDate).getTime();
+            }
+            
+            return backId === optId;
+          });
+          
+          return !existsInBackend;
+        });
+        
+        return remaining;
+      });
     } catch (error) {
-      console.error("Failed to load meetings:", error);
-      if (error.retryAfter) {
-        console.warn(`Rate limit: retry after ${error.retryAfter} seconds`);
-      } else {
-        toastr.error("Failed to load meetings");
-      }
+      console.error("Failed to load MOMs:", error);
+      toastr.error("Failed to load MOM records");
     }
   };
+
+  const syncWithBackend = useCallback(async () => {
+    try {
+      await Promise.all([fetchMeetings(employeeMap), loadDashboardData()]);
+    } catch (err) {
+      console.error("Failed to sync with backend", err);
+    }
+  }, [employeeMap]);
+
+  const scheduledSync = useCallback(() => {
+    if (syncTimeoutRef.current) {
+      clearTimeout(syncTimeoutRef.current);
+    }
+    
+    syncTimeoutRef.current = setTimeout(() => {
+      syncWithBackend();
+    }, 2000);
+  }, [syncWithBackend]);
+
+  useEffect(() => {
+    return () => {
+      if (syncTimeoutRef.current) {
+        clearTimeout(syncTimeoutRef.current);
+      }
+    };
+  }, []);
+
+const handleMomCreated = async (newMom) => {
+  try {
+    console.log("New MOM received:", newMom); // Debug log
+    
+    const tempId = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Process action items to ensure employee names are included
+    const processedActionItems = (newMom.actionItems || newMom.ActionItems || []).map(item => {
+      // Get employee ID
+      const assignedId = item.assignedToEmployeeId || 
+                        item.AssignedToEmployeeId || 
+                        item.assignedTo || 
+                        item.AssignedTo;
+      
+      // Priority 1: Use name from backend response
+      const backendName = item.assignedToEmployeeName || 
+                         item.AssignedToEmployeeName ||
+                         item.employeeName ||
+                         item.EmployeeName;
+      
+      // Priority 2: Lookup from employeeMap
+      const mappedName = assignedId ? employeeMap[String(assignedId)] : null;
+      
+      // Final fallback
+      const employeeName = backendName || mappedName || (assignedId ? `Employee ${assignedId}` : "Unassigned");
+      
+      console.log(`Action item: ID=${assignedId}, Backend name=${backendName}, Mapped name=${mappedName}, Final=${employeeName}`);
+      
+      return {
+        ...item,
+        actionItemId: item.actionItemId || item.ActionItemId || `temp-action-${Date.now()}-${Math.random()}`,
+        ActionItemId: item.actionItemId || item.ActionItemId || `temp-action-${Date.now()}-${Math.random()}`,
+        taskDescription: item.taskDescription || item.TaskDescription || "",
+        TaskDescription: item.taskDescription || item.TaskDescription || "",
+        dueDate: item.dueDate || item.DueDate || "",
+        DueDate: item.dueDate || item.DueDate || "",
+        status: item.status || item.Status || "Pending",
+        Status: item.status || item.Status || "Pending",
+        assignedToEmployeeId: assignedId,
+        AssignedToEmployeeId: assignedId,
+        assignedToName: employeeName,
+        AssignedToName: employeeName,
+        assignedToEmployeeName: employeeName,
+        AssignedToEmployeeName: employeeName,
+      };
+    });
+    
+    console.log("Processed action items:", processedActionItems); // Debug log
+    
+    const normalizedMom = {
+      meetingId: newMom.meetingId || newMom.MeetingId || tempId,
+      MeetingId: newMom.meetingId || newMom.MeetingId || tempId,
+      meetingTitle: newMom.meetingTitle || newMom.MeetingTitle || "MOM Record",
+      MeetingTitle: newMom.meetingTitle || newMom.MeetingTitle || "MOM Record",
+      meetingType: newMom.meetingType || newMom.MeetingType || "General",
+      MeetingType: newMom.meetingType || newMom.MeetingType || "General",
+      meetingDate:
+        newMom.meetingDate ||
+        newMom.MeetingDate ||
+        newMom.createdAt ||
+        newMom.CreatedAt ||
+        new Date().toISOString(),
+      MeetingDate:
+        newMom.meetingDate ||
+        newMom.MeetingDate ||
+        newMom.createdAt ||
+        newMom.CreatedAt ||
+        new Date().toISOString(),
+      commentsObservations:
+        newMom.commentsObservations || newMom.CommentsObservations || "",
+      CommentsObservations:
+        newMom.commentsObservations || newMom.CommentsObservations || "",
+      actionItems: processedActionItems,
+      ActionItems: processedActionItems,
+      discussionPoints:
+        newMom.discussionPoints || newMom.DiscussionPoints || [],
+      DiscussionPoints:
+        newMom.discussionPoints || newMom.DiscussionPoints || [],
+      attendees: newMom.attendees || newMom.Attendees || "",
+      Attendees: newMom.attendees || newMom.Attendees || "",
+      isOptimistic: !newMom.meetingId && !newMom.MeetingId,
+      createdAt: newMom.createdAt || newMom.CreatedAt || new Date().toISOString(),
+      CreatedAt: newMom.createdAt || newMom.CreatedAt || new Date().toISOString(),
+    };
+
+    setOptimisticMeetings((prev) => [normalizedMom, ...prev]);
+
+    setRecentActivity((prevActivity) => {
+      const newActivity = {
+        type: "mom",
+        title: normalizedMom.meetingTitle,
+        date: normalizedMom.meetingDate,
+        icon: "bi-file-text",
+        color: "primary",
+        meetingData: normalizedMom,
+      };
+
+      return [newActivity, ...prevActivity].sort(
+        (a, b) => new Date(b.date) - new Date(a.date)
+      );
+    });
+
+    setStats((prevStats) => ({
+      ...prevStats,
+      myMoms: prevStats.myMoms + 1,
+    }));
+
+    // Trigger backend sync after a short delay
+    scheduledSync();
+
+  } catch (err) {
+    console.error("Failed to update dashboard after MOM creation", err);
+    toastr.error("Failed to update dashboard");
+  }
+};
+
+
+  const allMeetings = [...optimisticMeetings, ...meetings];
 
   const openMeetingDetails = (meeting) => setSelectedMeeting(meeting);
   const closeMeetingDetails = () => setSelectedMeeting(null);
@@ -386,10 +632,14 @@ const EmployeeMomDashboard = () => {
                     </p>
                   </div>
                 ) : (
-                  <div className="emd-activity-list">
+                  <div className="emd-activity-list emd-scroll-area">
                     {recentActivity.map((item, idx) => (
                       <ActivityItem
-                        key={idx}
+                        key={`${item.type}-${
+                          item.meetingData?.meetingId ||
+                          item.meetingData?.MeetingId ||
+                          idx
+                        }`}
                         item={item}
                         onClick={() => handleActivityClick(item)}
                         getProperty={getProperty}
@@ -407,14 +657,14 @@ const EmployeeMomDashboard = () => {
                 <div className="emd-card-header">
                   <h5 className="emd-card-title">
                     <i className="bi bi-calendar3"></i>
-                    My Meetings
+                    My MOMs
                   </h5>
                   <span className="emd-count-badge">
-                    {meetings.length} meetings
+                    {allMeetings.length} meetings
                   </span>
                 </div>
 
-                {meetings.length === 0 ? (
+                {allMeetings.length === 0 ? (
                   <div className="emd-empty-state">
                     <div className="emd-empty-icon">
                       <i className="bi bi-calendar-x"></i>
@@ -426,13 +676,9 @@ const EmployeeMomDashboard = () => {
                   </div>
                 ) : (
                   <>
-                    <div className="emd-meetings-list">
-                      {meetings.slice(0, 5).map((m) => {
-                        const meetingId = getProperty(
-                          m,
-                          "meetingId",
-                          "MeetingId"
-                        );
+                    <div className="emd-meetings-list emd-scroll-area">
+                      {allMeetings.map((m) => {
+                        const meetingId = getProperty(m, "meetingId", "MeetingId");
                         const meetingTitle = getProperty(
                           m,
                           "meetingTitle",
@@ -450,11 +696,12 @@ const EmployeeMomDashboard = () => {
                         );
                         const actionItems =
                           getProperty(m, "actionItems", "ActionItems") || [];
+                        const isOptimistic = m.isOptimistic;
 
                         return (
                           <div
                             key={meetingId}
-                            className="emd-meeting-item"
+                            className={`emd-meeting-item ${isOptimistic ? 'emd-meeting-optimistic' : ''}`}
                             onClick={() => openMeetingDetails(m)}
                             role="button"
                             tabIndex={0}
@@ -465,12 +712,18 @@ const EmployeeMomDashboard = () => {
                             <div className="emd-meeting-main">
                               <div className="emd-meeting-title-row">
                                 <span className="emd-meeting-title">
-                                  {meetingTitle || "Untitled Meeting"}
+                                  {meetingTitle || "Untitled MOM"}
+                                  {isOptimistic && (
+                                    <span className="emd-syncing-badge" title="Syncing with server...">
+                                      <i className="bi bi-arrow-repeat"></i>
+                                    </span>
+                                  )}
                                 </span>
                                 <span className="emd-meeting-type-pill">
-                                  {meetingType || "Other"}
+                                  {meetingType || "General"}
                                 </span>
                               </div>
+
                               <div className="emd-meeting-meta-row">
                                 <span className="emd-meta-item">
                                   <i className="bi bi-calendar3"></i>
@@ -478,35 +731,30 @@ const EmployeeMomDashboard = () => {
                                     ? new Date(meetingDate).toLocaleDateString()
                                     : "No date"}
                                 </span>
-                                <span className="emd-meta-item">
-                                  <i className="bi bi-clock"></i>
-                                  {meetingDate
-                                    ? new Date(meetingDate).toLocaleTimeString(
-                                        [],
-                                        {
-                                          hour: "2-digit",
-                                          minute: "2-digit",
-                                        }
-                                      )
-                                    : "--:--"}
-                                </span>
-                                {Array.isArray(actionItems) &&
-                                  actionItems.length > 0 && (
-                                    <span className="emd-meta-item">
-                                      <i className="bi bi-check-circle"></i>
-                                      {actionItems.length} action
-                                      {actionItems.length !== 1 ? "s" : ""}
-                                    </span>
-                                  )}
+
+                                {Array.isArray(actionItems) && (
+                                  <span className="emd-meta-item">
+                                    <i className="bi bi-check2-square"></i>
+                                    {actionItems.length} actions
+                                  </span>
+                                )}
+
+                                {m.commentsObservations && (
+                                  <span className="emd-meta-item">
+                                    <i className="bi bi-chat-left-text"></i>
+                                    Notes Added
+                                  </span>
+                                )}
                               </div>
                             </div>
+
                             <i className="bi bi-chevron-right emd-meeting-arrow"></i>
                           </div>
                         );
                       })}
                     </div>
 
-                    {meetings.length > 5 && (
+                    {allMeetings.length > 5 && (
                       <div className="emd-view-all">
                         <button
                           className="emd-view-all-btn"
@@ -515,7 +763,7 @@ const EmployeeMomDashboard = () => {
                           }
                           type="button"
                         >
-                          View All {meetings.length} Meetings
+                          View All {allMeetings.length} Meetings
                           <i className="bi bi-arrow-right"></i>
                         </button>
                       </div>
@@ -532,6 +780,7 @@ const EmployeeMomDashboard = () => {
             meeting={selectedMeeting}
             onClose={closeMeetingDetails}
             employeeMap={employeeMap}
+            onMomCreated={handleMomCreated}
           />
         )}
 

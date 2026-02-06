@@ -403,11 +403,13 @@ const SharedMomsModal = ({ onClose }) => {
                         const meetingTitle = getMeetingTitle(mom);
                         const meetingType = getMeetingType(mom);
                         const meetingDate = getMeetingDate(mom);
-                        const sharedAt = getProperty(
-                          mom,
-                          "sharedAt",
-                          "SharedAt"
-                        );
+                       const sharedAt =
+  getProperty(mom, "sharedAt", "SharedAt") ||          // shared by me
+  getProperty(mom, "sharedDate", "SharedDate") ||      // shared with me (common)
+  getProperty(mom, "createdAt", "CreatedAt") ||        // fallback
+  getProperty(mom, "createdOn", "CreatedOn") ||        // fallback
+  getProperty(mom, "sharedOn", "SharedOn");            // fallback
+
                         const sharedWithName = getProperty(
                           mom,
                           "sharedWithEmployeeName",

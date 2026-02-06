@@ -597,20 +597,16 @@ const HRSLADashboard = () => {
           </div>
 
           {filteredSlas.length > 0 && (
-            <PaginationFooter
-              currentPage={currentPage}
-              totalItems={filteredSlas.length}
-              itemsPerPage={itemsPerPage}
-              onPageChange={setCurrentPage}
-              onItemsPerPageChange={(size) => {
-                setItemsPerPage(size);
-                setCurrentPage(1);
-              }}
-              pageSizeOptions={[5, 10, 25, 50]}
-              showPageSizeDropdown={true}
-              showStatusText={true}
-              pageNumberMode="compact"
-            />
+           <PaginationFooter
+           totalItems={filteredSlas.length}
+           currentPage={currentPage}
+           setCurrentPage={setCurrentPage}
+           itemsPerPage={itemsPerPage}
+           setItemsPerPage={(size) => {
+           setItemsPerPage(size);
+           setCurrentPage(1);
+            }}
+          />
           )}
         </div>
       )}

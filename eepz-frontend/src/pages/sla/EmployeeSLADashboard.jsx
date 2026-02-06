@@ -107,7 +107,7 @@ const EmployeeSLADashboard = () => {
         filtered = slas.filter(
           (s) =>
             (s.status === "Open" || s.status === "InProgress") &&
-            s.daysUntilDeadline < 0
+            s.daysUntilDeadline < 0,
         );
         break;
       default:
@@ -121,7 +121,7 @@ const EmployeeSLADashboard = () => {
     (slaid) => {
       navigate(`/employee/dashboard/sla/details/${slaid}`);
     },
-    [navigate]
+    [navigate],
   );
 
   const handleRefresh = useCallback(() => {
@@ -136,10 +136,10 @@ const EmployeeSLADashboard = () => {
     const overdue = slas.filter(
       (s) =>
         (s.status === "Open" || s.status === "InProgress") &&
-        s.daysUntilDeadline < 0
+        s.daysUntilDeadline < 0,
     ).length;
     const onTime = slas.filter(
-      (s) => s.complianceStatus && s.complianceStatus === "OnTime"
+      (s) => s.complianceStatus && s.complianceStatus === "OnTime",
     ).length;
 
     return { total, open, inProgress, completed, overdue, onTime };
@@ -173,7 +173,7 @@ const EmployeeSLADashboard = () => {
 
   const paginatedSLAs = filteredSLAs.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   if (loading) {
@@ -296,11 +296,11 @@ const EmployeeSLADashboard = () => {
               className={`emp-sla-view-btn ${
                 viewMode === "table" ? "active" : ""
               }`}
-              onClick={() => {
-                setViewMode("table");
-                setItemsPerPage(10);
-                setCurrentPage(1);
-              }}
+             onClick={() => {
+  setViewMode("table");
+  setCurrentPage(1);
+}}
+
               title="Table View"
               type="button"
             >
@@ -311,11 +311,12 @@ const EmployeeSLADashboard = () => {
               className={`emp-sla-view-btn ${
                 viewMode === "grid" ? "active" : ""
               }`}
-              onClick={() => {
-                setViewMode("grid");
-                setItemsPerPage(9);
-                setCurrentPage(1);
-              }}
+ onClick={() => {
+  setViewMode("grid");
+  setCurrentPage(1);
+}}
+
+
               title="Grid View"
               type="button"
             >
@@ -397,8 +398,8 @@ const EmployeeSLADashboard = () => {
                                   overdue
                                     ? "emp-sla-days-overdue"
                                     : sla.daysUntilDeadline <= 3
-                                    ? "emp-sla-days-warning"
-                                    : "emp-sla-days-ok"
+                                      ? "emp-sla-days-warning"
+                                      : "emp-sla-days-ok"
                                 }`}
                               >
                                 {overdue
@@ -440,144 +441,106 @@ const EmployeeSLADashboard = () => {
                   </table>
                 </div>
 
-                {/* ✅ EXTERNAL PAGINATION FOOTER */}
                 {safeTotal > 0 && (
                   <PaginationFooter
-                    currentPage={currentPage}
                     totalItems={safeTotal}
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
                     itemsPerPage={itemsPerPage}
-                    onPageChange={setCurrentPage}
-                    onItemsPerPageChange={(size) => {
-                      setItemsPerPage(size);
-                      setCurrentPage(1);
-                    }}
-                    pageSizeOptions={[5, 10, 25, 50]}
-                    showPageSizeDropdown={true}
-                    showStatusText={true}
-                    pageNumberMode="compact" // ✅ only numbers like 1 2
+                    setItemsPerPage={setItemsPerPage}
                   />
                 )}
               </div>
             )}
 
             {/* GRID VIEW */}
-            {viewMode === "grid" && (
-              <>
-                <div className="emp-sla-cards-grid">
-                  {paginatedSLAs.map((sla) => {
-                    const overdue = isOverdue(sla);
-                    const statusStyle = overdue
-                      ? {
-                          className: "emp-sla-status-overdue",
-                          icon: AlertTriangle,
-                        }
-                      : getStatusStyle(sla.status);
-                    const IconComponent = statusStyle.icon;
+            {/* GRID VIEW */}
+{viewMode === "grid" && (
+  <div className="emp-sla-grid-container">
+    <div className="emp-sla-cards-grid">
+      {paginatedSLAs.map((sla) => {
+        const overdue = isOverdue(sla);
+        const statusStyle = overdue
+          ? { className: "emp-sla-status-overdue", icon: AlertTriangle }
+          : getStatusStyle(sla.status);
+        const IconComponent = statusStyle.icon;
 
-                    return (
-                      <div key={sla.key} className="emp-sla-card">
-                        <div className="emp-sla-card-header">
-                          <div
-                            className={`emp-sla-card-icon ${statusStyle.className}`}
-                          >
-                            <IconComponent size={20} strokeWidth={2} />
-                          </div>
-                          <div className="emp-sla-card-header-text">
-                            <h6 className="emp-sla-card-title">
-                              {sla.slatype || "SLA"}
-                            </h6>
-                            <span
-                              className={`emp-sla-card-badge ${statusStyle.className}`}
-                            >
-                              {overdue ? "OVERDUE" : sla.status}
-                            </span>
-                          </div>
-                        </div>
+        return (
+          <div key={sla.key} className="emp-sla-card">
+            <div className="emp-sla-card-header">
+              <div className={`emp-sla-card-icon ${statusStyle.className}`}>
+                <IconComponent size={20} strokeWidth={2} />
+              </div>
+              <div className="emp-sla-card-header-text">
+                <h6 className="emp-sla-card-title">{sla.slatype || "SLA"}</h6>
+                <span className={`emp-sla-card-badge ${statusStyle.className}`}>
+                  {overdue ? "OVERDUE" : sla.status}
+                </span>
+              </div>
+            </div>
 
-                        <div className="emp-sla-card-body">
-                          <div className="emp-sla-card-row">
-                            <span className="emp-sla-card-label">Deadline</span>
-                            <span className="emp-sla-card-value">
-                              {dateHelpers.formatDeadline(sla.deadline)}
-                            </span>
-                          </div>
+            <div className="emp-sla-card-body">
+              <div className="emp-sla-card-row">
+                <span className="emp-sla-card-label">Deadline</span>
+                <span className="emp-sla-card-value">
+                  {dateHelpers.formatDeadline(sla.deadline)}
+                </span>
+              </div>
 
-                          <div className="emp-sla-card-row">
-                            <span className="emp-sla-card-label">
-                              Days Remaining
-                            </span>
-                            <span
-                              className={`emp-sla-card-value ${
-                                overdue
-                                  ? "emp-sla-text-danger"
-                                  : "emp-sla-text-success"
-                              }`}
-                            >
-                              {overdue
-                                ? `${Math.abs(sla.daysUntilDeadline)} overdue`
-                                : `${sla.daysUntilDeadline} days`}
-                            </span>
-                          </div>
+              <div className="emp-sla-card-row">
+                <span className="emp-sla-card-label">Days Remaining</span>
+                <span className={`emp-sla-card-value ${overdue ? "emp-sla-text-danger" : "emp-sla-text-success"}`}>
+                  {overdue
+                    ? `${Math.abs(sla.daysUntilDeadline)} overdue`
+                    : `${sla.daysUntilDeadline} days`}
+                </span>
+              </div>
 
-                          <div className="emp-sla-card-row">
-                            <span className="emp-sla-card-label">
-                              Assigned To
-                            </span>
-                            <span className="emp-sla-card-value emp-sla-truncate">
-                              {sla.assignedToName || "-"}
-                            </span>
-                          </div>
+              <div className="emp-sla-card-row">
+                <span className="emp-sla-card-label">Assigned To</span>
+                <span className="emp-sla-card-value emp-sla-truncate">
+                  {sla.assignedToName || "-"}
+                </span>
+              </div>
 
-                          {sla.complianceStatus && (
-                            <div className="emp-sla-card-row">
-                              <span className="emp-sla-card-label">
-                                Compliance
-                              </span>
-                              <span
-                                className={`emp-sla-badge emp-sla-badge-compliance-${sla.complianceStatus.toLowerCase()}`}
-                              >
-                                {sla.complianceStatus}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="emp-sla-card-footer">
-                          <button
-                            className="emp-sla-card-btn"
-                            onClick={() => handleViewDetails(sla.slaid)}
-                            type="button"
-                          >
-                            <Eye size={16} />
-                            View Details
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
+              {sla.complianceStatus && (
+                <div className="emp-sla-card-row">
+                  <span className="emp-sla-card-label">Compliance</span>
+                  <span className={`emp-sla-badge emp-sla-badge-compliance-${sla.complianceStatus.toLowerCase()}`}>
+                    {sla.complianceStatus}
+                  </span>
                 </div>
+              )}
+            </div>
 
-                {/* ✅ EXTERNAL PAGINATION FOOTER for grid too */}
-                {safeTotal > 0 && totalPages > 1 && (
-                  <div className="emp-sla-grid-footer-wrap">
-                    <PaginationFooter
-                      currentPage={currentPage}
-                      totalItems={safeTotal}
-                      itemsPerPage={itemsPerPage}
-                      onPageChange={setCurrentPage}
-                      onItemsPerPageChange={(size) => {
-                        setItemsPerPage(size);
-                        setCurrentPage(1);
-                      }}
-                      pageSizeOptions={[5, 10, 25, 50]}
-                      showPageSizeDropdown={true}
-                      showStatusText={true}
-                      pageNumberMode="compact"
-                    />
-                  </div>
-                )}
-              </>
-            )}
+            <div className="emp-sla-card-footer">
+              <button
+                className="emp-sla-card-btn"
+                onClick={() => handleViewDetails(sla.slaid)}
+                type="button"
+              >
+                <Eye size={16} />
+                View Details
+              </button>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+
+    {/* ✅ PAGINATION FOR GRID VIEW */}
+    {safeTotal > 0 && (
+      <PaginationFooter
+        totalItems={safeTotal}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        itemsPerPage={itemsPerPage}
+        setItemsPerPage={setItemsPerPage}
+      />
+    )}
+  </div>
+)}
+
           </>
         )}
       </div>

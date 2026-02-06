@@ -163,7 +163,11 @@ const SLADetails = () => {
     try {
       setRefreshing(true);
       setShowCloseConfirmation(false);
-      const res = await slaService.closeSLA(sla.slaid);
+      const res = await slaService.closeSLA({
+        slaid: sla.slaid,
+        closedByEmployeeId: user.empId,
+        closureComments: "Closed from details page",
+      });
 
       if (res?.success) {
         toast.success("SLA closed successfully");
@@ -219,6 +223,8 @@ const SLADetails = () => {
   const pendingEscalations = escalations.filter(
     (e) => e.escalationStatus === "Pending"
   ).length;
+
+  
   const slaDashboardPath = user
     ? getSLADashboardPath(user.roleName)
     : "/dashboard/sla";
@@ -226,17 +232,19 @@ const SLADetails = () => {
   return (
     <div className="sla-details-container">
       <div className="sla-details-header">
-        <Breadcrumb
-          items={[
-            {
-              label: "SLA Compliance",
-              path: slaDashboardPath,
-            },
-            {
-              label: `${sla.slatype} - ${sla.employeeName}`,
-            },
-          ]}
-        />
+  
+  <Breadcrumb
+  items={[
+    {
+      label: "SLA Compliance",
+      onClick: () => navigate(-1),  
+    },
+    {
+      label: `${sla.slatype} - ${sla.employeeName}`,
+    },
+  ]}
+/>
+
         <div className="sla-details-actions-wrapper">
           {sla.status !== "Closed" &&
             (user?.roleName === "Employee" || user?.roleName === "Manager") &&

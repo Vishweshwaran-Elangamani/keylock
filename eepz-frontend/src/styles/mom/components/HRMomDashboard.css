@@ -110,6 +110,142 @@
   color: #4b5563;
 }
 
+.hrmom-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;     
+  flex-wrap: wrap;
+}
+
+
+.hrmom-search-wrapper {
+  display: flex;
+  align-items: center;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  height: 46px;
+  min-width: 480px;
+}
+
+.hrmom-search-icon {
+  margin-left: 10px;
+  color: #9ca3af;
+}
+
+.hrmom-search-input {
+  border: none;
+  padding: 12px 14px; 
+  flex: 1;
+  outline: none;
+  font-size: 0.95rem;  
+}
+
+.hrmom-search-btn,
+.hrmom-search-clear {
+  border: none;
+  padding: 10px 18px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.hrmom-search-btn {
+  background: #27235c;
+  color: white;
+  height: 45px;
+}
+
+.hrmom-search-clear {
+  background: #6b7280;
+  color: white;
+  height: 45px;
+}
+
+.hrmom-date-filters {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-left: 100px;
+}
+
+.hrmom-date-group {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.hrmom-date-group input {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 0.85rem;
+  height: 40px;
+}
+
+.hrmom-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.hrmom-calendar-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid #27235c;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  font-weight: 500;
+  color: #27235c;
+  height: 46px;
+  margin-left: -100px;
+  
+}
+
+.hrmom-calendar-input:hover {
+  background: #f5f7fb;
+}
+
+
+.hrmom-clear-btn {
+  background: #9ca3af;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  height: 40px;
+  width: 100px;
+}
+
+.hrmom-calendar-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+  height: 46px;
+  min-width: 170px;
+  transition: all 0.2s ease;
+}
+
+.hrmom-calendar-input:hover {
+  border-color: #27235c;
+}
+
+
 .hrmom-table-card {
   border-radius: 12px;
   border: none;
@@ -123,10 +259,13 @@
 }
 
 .hrmom-table-wrapper {
-  margin-top: 40px;
+  margin-top: 20px;
   overflow-x: auto;
+  overflow-y: visible;   
+  position: relative;
   border-radius: 12px !important;
 }
+
 
 .hrmom-table {
   margin-bottom: 0;

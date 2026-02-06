@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import momService from "../../services/meeting/momService";
 import toastr from "toastr";
@@ -18,6 +18,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "../../styles/mom/components/HRMomDashboard.css";
 import Breadcrumb from "../../components/feedback_management/common/FeedbackBreadcrumb";
 import PaginationFooter from "../../components/project-management/common/PaginationFooter";
+import CustomCalendar from "../../components/project-management/common/CustomCalendar";
 
 const HRMomDashboard = () => {
   const navigate = useNavigate();
@@ -30,73 +31,113 @@ const HRMomDashboard = () => {
     startDate: "",
     endDate: "",
     pageNumber: 1,
-    pageSize: 10,
+    pageSize: 5,
   });
 
+  const handleClearAllFilters = () => {
+    setSearchInput("");
+    setActiveSearchTerm("");
+
+    setFilters({
+      searchTerm: "",
+      meetingType: "",
+      departmentId: "",
+      startDate: "",
+      endDate: "",
+      pageNumber: 1,
+      pageSize: 5,
+    });
+  };
+
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const calendarAnchorRef = useRef(null);
+
+  const [activeSearchTerm, setActiveSearchTerm] = useState("");
+  const [displayMoms, setDisplayMoms] = useState([]);
   const [loading, setLoading] = useState(false);
   const [totalMoms, setTotalMoms] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
   const [searchInput, setSearchInput] = useState("");
 
-  // Helper to get property with PascalCase/camelCase fallback
   const getProperty = (obj, camelKey, pascalKey) => {
     return obj?.[camelKey] ?? obj?.[pascalKey] ?? null;
   };
 
   useEffect(() => {
     fetchMoms();
-  }, [filters.pageNumber, filters.pageSize]);
+  }, [filters]);
 
-  const fetchMoms = async () => {
-    setLoading(true);
-    try {
-      const response = await momService.getAllMomsForHR(filters);
+const fetchMoms = async () => {
+  setLoading(true);
 
-      // Handle both response formats
-      const success = response?.success || response?.Success;
+  try {
+    const apiFilters = {
+      ...filters,
+      meetingDate: filters.startDate || "",
+      startDate: "",
+      endDate: "",
+    };
 
-      if (success) {
-        // Extract data with PascalCase/camelCase fallback
-        const responseData = response.data || response.Data;
-        const momsData =
-          responseData?.moms ||
-          responseData?.Moms ||
-          responseData?.data ||
-          responseData?.Data ||
-          [];
-        const total = responseData?.totalCount || responseData?.TotalCount || 0;
-        const pages = responseData?.totalPages || responseData?.TotalPages || 1;
+    const response = await momService.getAllMomsForHR(apiFilters);
 
-        setMoms(Array.isArray(momsData) ? momsData : []);
-        setTotalMoms(total);
-        setTotalPages(pages);
-      } else {
-        setMoms([]);
-        setTotalMoms(0);
-        setTotalPages(1);
-      }
-    } catch (err) {
-      console.error("Fetch MOMs error:", err);
+    const success = response?.success || response?.Success;
 
-      // Enhanced error handling
-      if (err.retryAfter) {
-        toastr.error(
-          `Rate limit exceeded. Please wait ${err.retryAfter} seconds.`
-        );
-      } else if (err.message) {
-        toastr.error(`Failed to load MOMs: ${err.message}`);
-      } else {
-        toastr.error("Failed to load MOMs");
-      }
+    if (success) {
+      const responseData = response.data || response.Data;
+      const momsData =
+        responseData?.moms ||
+        responseData?.Moms ||
+        responseData?.data ||
+        responseData?.Data ||
+        [];
 
+      const total = responseData?.totalCount || responseData?.TotalCount || 0;
+      const pages = responseData?.totalPages || responseData?.TotalPages || 1;
+
+      setMoms(Array.isArray(momsData) ? momsData : []);
+      setTotalMoms(total);
+      setTotalPages(pages);
+    } else {
       setMoms([]);
       setTotalMoms(0);
       setTotalPages(1);
-    } finally {
-      setLoading(false);
     }
-  };
+  } catch (err) {
+    console.error("Fetch MOMs error:", err);
+    toastr.error("Failed to load MOMs");
+    setMoms([]);
+    setTotalMoms(0);
+    setTotalPages(1);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+  useEffect(() => {
+    if (!activeSearchTerm) {
+      setDisplayMoms(moms);
+      return;
+    }
+
+    const q = activeSearchTerm.toLowerCase();
+
+    const filtered = moms.filter((m) => {
+      const title =
+        getProperty(m, "meetingTitle", "MeetingTitle")?.toLowerCase() || "";
+      const employee =
+        getProperty(
+          m,
+          "submittedByEmployeeName",
+          "SubmittedByEmployeeName",
+        )?.toLowerCase() || "";
+
+      return title.includes(q) || employee.includes(q);
+    });
+
+    setDisplayMoms(filtered);
+  }, [moms, activeSearchTerm]);
 
   const handlePageChange = (newPage) => {
     setFilters((prev) => ({ ...prev, pageNumber: newPage }));
@@ -107,22 +148,35 @@ const HRMomDashboard = () => {
   };
 
   const handleSearch = () => {
+    const value = searchInput.trim();
+    if (!value) return;
+
+    setActiveSearchTerm(value);
+
     setFilters((prev) => ({
       ...prev,
-      searchTerm: searchInput.trim(),
+      searchTerm: value,
       pageNumber: 1,
     }));
-    fetchMoms();
   };
 
   const handleClearSearch = () => {
     setSearchInput("");
+    setActiveSearchTerm("");
+
     setFilters((prev) => ({
       ...prev,
       searchTerm: "",
       pageNumber: 1,
     }));
-    fetchMoms();
+  };
+
+  const handleDateChange = (key, value) => {
+    setFilters((prev) => ({
+      ...prev,
+      [key]: value,
+      pageNumber: 1,
+    }));
   };
 
   const handleFilterChange = (key, value) => {
@@ -131,25 +185,6 @@ const HRMomDashboard = () => {
       [key]: value,
       pageNumber: 1,
     }));
-  };
-
-  const handleApplyFilters = () => {
-    fetchMoms();
-    setShowFilters(false);
-  };
-
-  const handleClearAllFilters = () => {
-    setFilters({
-      searchTerm: "",
-      meetingType: "",
-      departmentId: "",
-      startDate: "",
-      endDate: "",
-      pageNumber: 1,
-      pageSize: filters.pageSize,
-    });
-    setSearchInput("");
-    fetchMoms();
   };
 
   const getMeetingTypeBadge = (type) => {
@@ -223,10 +258,7 @@ const HRMomDashboard = () => {
           const status = getProperty(ai, "status", "Status");
           const dueDate = getProperty(ai, "dueDate", "DueDate");
 
-          // Check if overdue
           if (isOverdue) return true;
-
-          // Or check manually
           if (status === "Pending" && dueDate) {
             return new Date(dueDate) < new Date();
           }
@@ -322,19 +354,32 @@ const HRMomDashboard = () => {
           </div>
         </div>
 
-        {/* Results Summary */}
-        {!loading && (
-          <div className="alert alert-info d-flex align-items-center justify-content-between mb-3">
-            <div>
-              Showing <strong>{moms.length}</strong> of{" "}
-              <strong>{totalMoms}</strong> MOMs
-              {hasActiveFilters() && <span className="ms-2">(filtered)</span>}
-            </div>
-            <span className="badge bg-primary">
-              Page {filters.pageNumber} of {totalPages}
-            </span>
+        <div className="hrmom-filter-bar">
+          <div className="hrmom-search-wrapper">
+            <Search size={16} className="hrmom-search-icon" />
+
+            <input
+              type="text"
+              placeholder="Search meeting title"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="hrmom-search-input"
+            />
+
+            {activeSearchTerm ? (
+              <button
+                className="hrmom-search-clear"
+                onClick={handleClearSearch}
+              >
+                <X size={14} /> Cancel
+              </button>
+            ) : (
+              <button className="hrmom-search-btn" onClick={handleSearch}>
+                Search
+              </button>
+            )}
           </div>
-        )}
+        </div>
 
         <div className="card-body hrmom-table-card-body">
           <div className="hrmom-table-wrapper">
@@ -366,7 +411,7 @@ const HRMomDashboard = () => {
                       </p>
                     </td>
                   </tr>
-                ) : !Array.isArray(moms) || moms.length === 0 ? (
+                ) : !Array.isArray(displayMoms) || displayMoms.length === 0 ? (
                   <tr>
                     <td colSpan="7" className="hrmom-empty-state">
                       <FileText size={40} className="hrmom-empty-icon" />
@@ -387,47 +432,47 @@ const HRMomDashboard = () => {
                     </td>
                   </tr>
                 ) : (
-                  moms.map((mom) => {
+                  displayMoms.map((mom) => {
                     const momId = getProperty(mom, "momId", "MomId");
                     const meetingTitle = getProperty(
                       mom,
                       "meetingTitle",
-                      "MeetingTitle"
+                      "MeetingTitle",
                     );
                     const meetingType = getProperty(
                       mom,
                       "meetingType",
-                      "MeetingType"
+                      "MeetingType",
                     );
                     const meetingDate = getProperty(
                       mom,
                       "meetingDate",
-                      "MeetingDate"
+                      "MeetingDate",
                     );
                     const submittedByName = getProperty(
                       mom,
                       "submittedByEmployeeName",
-                      "SubmittedByEmployeeName"
+                      "SubmittedByEmployeeName",
                     );
                     const submittedByRole = getProperty(
                       mom,
                       "submittedByRole",
-                      "SubmittedByRole"
+                      "SubmittedByRole",
                     );
                     const attendees = getProperty(
                       mom,
                       "attendees",
-                      "Attendees"
+                      "Attendees",
                     );
                     const discussionPoints = getProperty(
                       mom,
                       "discussionPoints",
-                      "DiscussionPoints"
+                      "DiscussionPoints",
                     );
                     const actionItems = getProperty(
                       mom,
                       "actionItems",
-                      "ActionItems"
+                      "ActionItems",
                     );
 
                     return (
@@ -480,8 +525,8 @@ const HRMomDashboard = () => {
                               {Array.isArray(attendees)
                                 ? attendees.length
                                 : typeof attendees === "string"
-                                ? attendees.split(",").length
-                                : 0}
+                                  ? attendees.split(",").length
+                                  : 0}
                             </span>
                           </div>
                         </td>
@@ -532,15 +577,11 @@ const HRMomDashboard = () => {
             moms.length > 0 &&
             totalPages > 0 && (
               <PaginationFooter
+                 totalItems={totalMoms}
                 currentPage={filters.pageNumber}
-                totalItems={totalMoms}
+                setCurrentPage={handlePageChange}
                 itemsPerPage={filters.pageSize}
-                onPageChange={handlePageChange}
-                onItemsPerPageChange={handlePageSizeChange}
-                pageSizeOptions={[5, 10, 25, 50]}
-                showPageSizeDropdown={true}
-                showStatusText={true}
-                pageNumberMode="compact"
+                setItemsPerPage={handlePageSizeChange}
               />
             )}
         </div>

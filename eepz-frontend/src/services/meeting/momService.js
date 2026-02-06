@@ -1,27 +1,31 @@
 import api_mom from "../../services/meeting/index_mom";
 
-/**
- * Generic API request handler with enhanced error handling
- */
 const apiRequest = async (method, url, data = null, config = {}) => {
   try {
-    const response = await api_mom[method](url, data, config);
+    const defaultConfig = {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        ...config.headers
+      },
+      ...config
+    };
 
-    // Check rate limit headers
+    const response = await api_mom[method](url, data, defaultConfig);
+
     const rateLimit = {
       limit: response.headers["x-ratelimit-limit"],
       remaining: response.headers["x-ratelimit-remaining"],
       reset: response.headers["x-ratelimit-reset"],
     };
 
-    // Warn if rate limit is low
     if (rateLimit.remaining && parseInt(rateLimit.remaining) < 10) {
       console.warn(
         `Rate limit warning: ${rateLimit.remaining}/${rateLimit.limit} requests remaining`
       );
     }
 
-    // Check cache status
     const cacheStatus = response.headers["x-cache"];
     if (cacheStatus) {
       console.log(`Cache ${cacheStatus} for ${url}`);
@@ -31,7 +35,6 @@ const apiRequest = async (method, url, data = null, config = {}) => {
   } catch (error) {
     console.error(`API Error [${method.toUpperCase()} ${url}]:`, error);
 
-    // Handle rate limiting
     if (error.response?.status === 429) {
       const retryAfter = error.response.headers["retry-after"] || 60;
       const errorMessage = `Rate limit exceeded. Please try again in ${retryAfter} seconds.`;
@@ -42,7 +45,6 @@ const apiRequest = async (method, url, data = null, config = {}) => {
       };
     }
 
-    // Handle validation errors
     if (error.response?.status === 400) {
       throw {
         ...error.response?.data,
@@ -57,13 +59,7 @@ const apiRequest = async (method, url, data = null, config = {}) => {
 const momService = {
   api_mom,
 
-  /**
-   * Create a new MOM
-   * Enhanced with date validation and error handling
-   * CHANGED: POST /Mom/create → POST /Mom
-   */
   createMom: async (momData) => {
-    // Client-side validation for meeting date (±7 to 30 days)
     const meetingDate = new Date(momData.meetingDate);
     const minDate = new Date();
     minDate.setDate(minDate.getDate() - 7);
@@ -80,17 +76,10 @@ const momService = {
       };
     }
 
-    // CHANGED: Removed "/create" - RESTful endpoint
     return apiRequest("post", "/Mom", momData);
   },
 
-  /**
-   * Update an existing MOM
-   * Enhanced with empty payload validation
-   * CHANGED: PUT /Mom/update → PUT /Mom/{momId}
-   */
   updateMom: async (momData) => {
-    // Validate momId
     if (!momData.momId || momData.momId <= 0) {
       throw {
         success: false,
@@ -99,7 +88,6 @@ const momService = {
       };
     }
 
-    // Validate that at least one field is being updated
     const hasData = Object.keys(momData).some(
       (key) =>
         key !== "momId" &&
@@ -117,7 +105,6 @@ const momService = {
       };
     }
 
-    // Validate date if provided
     if (momData.meetingDate) {
       const meetingDate = new Date(momData.meetingDate);
       const minDate = new Date();
@@ -136,14 +123,9 @@ const momService = {
       }
     }
 
-    //CHANGED: PUT /Mom/{momId} - RESTful endpoint with momId in URL
     return apiRequest("put", `/Mom/${momData.momId}`, momData);
   },
 
-  /**
-   * Get MOMs submitted by current user
-   * NOW WITH PAGINATION SUPPORT
-   */
   getMyMoms: (params = {}) => {
     const {
       pageNumber = 1,
@@ -157,6 +139,7 @@ const momService = {
     const queryParams = new URLSearchParams({
       pageNumber: pageNumber.toString(),
       pageSize: pageSize.toString(),
+      _t: new Date().getTime().toString(),
     });
 
     if (searchTerm) queryParams.append("searchTerm", searchTerm);
@@ -167,16 +150,11 @@ const momService = {
     return apiRequest("get", `/Mom/my-moms?${queryParams.toString()}`);
   },
 
-  /**
-   * Get a specific MOM by ID
-   * Response includes cache headers
-   */
-  getMomById: (momId) => apiRequest("get", `/Mom/${momId}`),
+  getMomById: (momId) => {
+    const timestamp = new Date().getTime();
+    return apiRequest("get", `/Mom/${momId}?_t=${timestamp}`);
+  },
 
-  /**
-   * Delete a MOM with confirmation token
-   * REQUIRES CONFIRMATION TOKEN
-   */
   deleteMom: async (momId, confirmed = false) => {
     if (!confirmed) {
       throw {
@@ -194,10 +172,6 @@ const momService = {
     );
   },
 
-  /**
-   * Delete MOM with confirmation prompt
-   * Helper method that handles confirmation flow
-   */
   deleteMomWithConfirmation: async (momId, meetingTitle = "") => {
     const confirmMessage = meetingTitle
       ? `Are you sure you want to delete the MOM for "${meetingTitle}"?\n\nThis action cannot be undone.`
@@ -221,35 +195,29 @@ const momService = {
     }
   },
 
-  /**
-   * Share a MOM with employees
-   */
   shareMom: (momId, employeeIds) =>
     apiRequest("post", "/Mom/share", {
       momId,
       sharedWithEmployeeIds: employeeIds,
     }),
 
-  /**
-   * Get MOMs shared by current user
-   */
-  getMomsSharedByMe: () => apiRequest("get", "/Mom/shared-by-me"),
+  getMomsSharedByMe: () => {
+    const timestamp = new Date().getTime();
+    return apiRequest("get", `/Mom/shared-by-me?_t=${timestamp}`);
+  },
 
-  /**
-   * Get MOMs shared with current user
-   */
-  getMomsSharedWithMe: () => apiRequest("get", "/Mom/shared-with-me"),
+  getMomsSharedWithMe: () => {
+    const timestamp = new Date().getTime();
+    return apiRequest("get", `/Mom/shared-with-me?_t=${timestamp}`);
+  },
 
-  /**
-   * Get all MOMs for HR with pagination and filters
-   * Enhanced with pagination support
-   */
   getAllMomsForHR: (filters = {}) => {
     const params = new URLSearchParams();
 
-    // Set default pagination
     if (!filters.pageNumber) filters.pageNumber = 1;
     if (!filters.pageSize) filters.pageSize = 20;
+    
+    filters._t = new Date().getTime();
 
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== null && value !== undefined && value !== "") {
@@ -260,9 +228,6 @@ const momService = {
     return apiRequest("get", `/Mom/all-moms?${params.toString()}`);
   },
 
-  /**
-   * Update action item status
-   */
   updateActionItemStatus: (actionItemId, status) =>
     apiRequest(
       "patch",
@@ -271,34 +236,24 @@ const momService = {
       { headers: { "Content-Type": "application/json" } }
     ),
 
-  /**
-   * Get my action items
-   */
-  getMyActionItems: () => apiRequest("get", "/Mom/action-items/my-tasks"),
+  getMyActionItems: () => {
+    const timestamp = new Date().getTime();
+    return apiRequest("get", `/Mom/action-items/my-tasks?_t=${timestamp}`);
+  },
 
-  /**
-   * Get action items assigned by me
-   */
-  getActionItemsAssignedByMe: () =>
-    apiRequest("get", "/Mom/action-items/assigned-by-me"),
+  getActionItemsAssignedByMe: () => {
+    const timestamp = new Date().getTime();
+    return apiRequest("get", `/Mom/action-items/assigned-by-me?_t=${timestamp}`);
+  },
 
-  /**
-   * Get overdue action items
-   */
-  getOverdueActionItems: () => apiRequest("get", "/Mom/action-items/overdue"),
+  getOverdueActionItems: () => {
+    const timestamp = new Date().getTime();
+    return apiRequest("get", `/Mom/action-items/overdue?_t=${timestamp}`);
+  },
 
-  /**
-   * Get all employees
-   */
   getAllEmployees: () => apiRequest("get", "/EmployeeManagement/all"),
 
-  /**
-   * Validation helpers
-   */
   validation: {
-    /**
-     * Validate meeting date
-     */
     validateMeetingDate: (date) => {
       const meetingDate = new Date(date);
       const minDate = new Date();
@@ -318,9 +273,6 @@ const momService = {
       return { valid: true };
     },
 
-    /**
-     * Validate meeting title
-     */
     validateMeetingTitle: (title) => {
       if (!title || title.trim().length < 3) {
         return {
@@ -337,9 +289,6 @@ const momService = {
       return { valid: true };
     },
 
-    /**
-     * Validate discussion point
-     */
     validateDiscussionPoint: (pointText) => {
       if (!pointText || pointText.trim().length === 0) {
         return {
@@ -356,9 +305,6 @@ const momService = {
       return { valid: true };
     },
 
-    /**
-     * Validate action item
-     */
     validateActionItem: (item) => {
       if (!item.taskDescription || item.taskDescription.trim().length === 0) {
         return {
@@ -373,7 +319,6 @@ const momService = {
         };
       }
 
-      // Validate due date
       const dueDate = new Date(item.dueDate);
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
@@ -389,28 +334,16 @@ const momService = {
     },
   },
 
-  /**
-   * Utility helpers
-   */
   utils: {
-    /**
-     * Check if rate limit is approaching
-     */
     isRateLimitLow: (remaining, limit) => {
       if (!remaining || !limit) return false;
-      return parseInt(remaining) / parseInt(limit) < 0.2; // Less than 20%
+      return parseInt(remaining) / parseInt(limit) < 0.2;
     },
 
-    /**
-     * Format date for API
-     */
     formatDateForAPI: (date) => {
       return new Date(date).toISOString();
     },
 
-    /**
-     * Parse pagination response
-     */
     parsePaginatedResponse: (response) => {
       if (!response.data) return null;
 

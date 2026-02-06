@@ -6,7 +6,7 @@ import CustomCalendar from "../../../components/project-management/common/Custom
 import CustomDropdown from "../../../components/project-management/common/CustomDropdown";
 import "../../../styles/mom/modals/CreateMomModal.css";
 
-const CreateMomModal = ({ meetingData, onClose }) => {
+const CreateMomModal = ({ meetingData, onClose, onMomCreated }) => {
   const userId = parseInt(localStorage.getItem("userId")) || 0;
   const userRole = localStorage.getItem("userRole") || "Employee";
 
@@ -55,6 +55,18 @@ const CreateMomModal = ({ meetingData, onClose }) => {
         if (response.data?.success && Array.isArray(response.data.data)) {
           const filteredEmployees = response.data.data.filter(
             (emp) => emp.roleName !== "System Administrator"
+          );
+
+          setEmployees(filteredEmployees);
+        } else if (response.success && Array.isArray(response.data)) {
+          const filteredEmployees = response.data.filter(
+            (emp) => (emp.roleName || emp.RoleName) !== "System Administrator"
+          );
+
+          setEmployees(filteredEmployees);
+        } else if (response.Success && Array.isArray(response.Data)) {
+          const filteredEmployees = response.Data.filter(
+            (emp) => (emp.roleName || emp.RoleName) !== "System Administrator"
           );
 
           setEmployees(filteredEmployees);
@@ -151,36 +163,55 @@ const CreateMomModal = ({ meetingData, onClose }) => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) {
-      toastr.error("Please fix the errors before submitting");
-      return;
+  e.preventDefault();
+  if (!validateForm()) {
+    toastr.error("Please fix the errors before submitting");
+    return;
+  }
+  
+  setSubmitting(true);
+  try {
+    const response = await momService.createMom(formData);
+    
+    const momId = response?.data?.momId || response?.data?.MomId;
+    
+    if (momId && onMomCreated) {
+      const completeMom = await momService.getMomById(momId);
+      onMomCreated(completeMom?.data || completeMom);
+    } else if (onMomCreated) {
+      onMomCreated(response?.data || formData);
     }
+    
+    toastr.success("MOM created successfully");
+    onClose();  
+  } catch (err) {
+    toastr.error("Failed to create MOM");
+    console.error(err);
+  } finally {
+    setSubmitting(false);
+  }
+};
 
-    setSubmitting(true);
-    try {
-      await momService.createMom(formData);
-      toastr.success("MOM created successfully");
-      onClose();
-      window.location.reload();
-    } catch (err) {
-      toastr.error("Failed to create MOM");
-      console.error(err);
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   const getEmployeeName = (assignedId) => {
     if (!assignedId || employees.length === 0) return "";
 
     const id = Number(assignedId);
 
-    const employee = employees.find(
-      (e) => Number(e.employeeMasterId) === id || Number(e.employeeId) === id
-    );
+    const employee = employees.find((e) => {
+      const empMasterId = Number(e.employeeMasterId || e.EmployeeMasterId || 0);
+      const empId = Number(e.employeeId || e.EmployeeId || 0);
+      const eId = Number(e.id || e.Id || 0);
+      
+      return empMasterId === id || empId === id || eId === id;
+    });
 
-    return employee ? `${employee.firstName} ${employee.lastName}` : "";
+    if (!employee) return `Employee ${assignedId}`;
+
+    const firstName = employee.firstName || employee.FirstName || "";
+    const lastName = employee.lastName || employee.LastName || "";
+    
+    return `${firstName} ${lastName}`.trim() || `Employee ${assignedId}`;
   };
 
   const formatDisplayDate = (value) => {
@@ -196,6 +227,20 @@ const CreateMomModal = ({ meetingData, onClose }) => {
   const handleDueDateChange = (index, value) => {
     handleActionItemChange(index, "dueDate", value);
     setCalendarOpenIndex(null);
+  };
+
+  const getEmployeeDropdownOptions = () => {
+    return employees.map((emp) => {
+      const empId = emp.employeeMasterId || emp.EmployeeMasterId || emp.employeeId || emp.EmployeeId || emp.id || emp.Id;
+      const firstName = emp.firstName || emp.FirstName || "";
+      const lastName = emp.lastName || emp.LastName || "";
+      const roleName = emp.roleName || emp.RoleName || "";
+      
+      return {
+        value: empId,
+        label: `${firstName} ${lastName}${roleName ? ` - ${roleName}` : ""}`,
+      };
+    });
   };
 
   return (
@@ -383,10 +428,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                             <CustomDropdown
                               name="assignedToEmployeeId"
                               value={item.assignedToEmployeeId}
-                              options={employees.map((emp) => ({
-                                value: emp.employeeMasterId,
-                                label: `${emp.firstName} ${emp.lastName} - ${emp.roleName}`,
-                              }))}
+                              options={getEmployeeDropdownOptions()}
                               placeholder={
                                 loadingEmployees
                                   ? "Loading..."

@@ -1,110 +1,149 @@
-import React, { useMemo } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import CustomDropdown from "./CustomDropdown";
+import { useState, useRef, useEffect } from "react";
 import "../../../styles/projectmanagement/components/PaginationFooter.css";
 
 const PaginationFooter = ({
-  currentPage,totalItems,
-  itemsPerPage,onPageChange,
-  onItemsPerPageChange,pageSizeOptions = [5, 10, 25, 50],
-  showPageSizeDropdown = true,
-  showStatusText = true,
+  totalItems,
+  currentPage,
+  setCurrentPage,
+  itemsPerPage,
+  setItemsPerPage,
 }) => {
-  const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
+  const [showItemsDropdown, setShowItemsDropdown] = useState(false);
+  const itemsDropdownRef = useRef(null);
 
-  const startIndex =
-    totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+  const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
-  const pageNumbers = useMemo(() => {
-    if (totalPages === 1) return [1];
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        itemsDropdownRef.current &&
+        !itemsDropdownRef.current.contains(event.target)
+      ) {
+        setShowItemsDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-    if (currentPage === totalPages) {
-      return [totalPages - 1, totalPages];
+  const getPageNumbers = () => {
+    const pages = [];
+
+    if (totalPages <= 3) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+      return pages;
     }
 
-    return [currentPage, currentPage + 1];
-  }, [currentPage, totalPages]);
+    if (currentPage <= 2) {
+      return [1, 2, 3];
+    }
 
-  const goToPage = (page) => {
-    if (typeof page !== "number") return;
-    const safePage = Math.max(1, Math.min(page, totalPages));
-    onPageChange(safePage);
+    if (currentPage >= totalPages - 1) {
+      return [totalPages - 2, totalPages - 1, totalPages];
+    }
+
+    return [currentPage - 1, currentPage, currentPage + 1];
   };
 
   return (
-    <div className="pf-pagination">
-      <div className="pf-pagination-info">
-        {showPageSizeDropdown && (
-          <>
-            <span>Show</span>
+    <div className="pagination-footer-container">
+      <div className="pagination-footer-info">
+        <span className="pagination-footer-label">Show</span>
 
-            <div className="pf-rows-dropdown">
-              <CustomDropdown
-                name="itemsPerPage"
-                value={itemsPerPage}
-                options={pageSizeOptions.map((p) => ({
-                  value: p,
-                  label: p,
-                }))}
-                onChange={(_n, v) => {
-                  onItemsPerPageChange(Number(v));
-                  onPageChange(1);
-                }}
-                className="pf-rows-dd"
-              />
+        <div
+          ref={itemsDropdownRef}
+          className="pagination-footer-dropdown-wrapper"
+        >
+          <button
+            type="button"
+            onClick={() => setShowItemsDropdown(!showItemsDropdown)}
+            className="pagination-footer-items-button"
+          >
+            <span>{itemsPerPage}</span>
+            <i
+              className={`bi bi-chevron-${
+                showItemsDropdown ? "up" : "down"
+              } pagination-footer-chevron`}
+            ></i>
+          </button>
+
+          {showItemsDropdown && (
+            <div className="pagination-footer-dropdown">
+              {[5, 10, 25, 50].map((size) => (
+                <div
+                  key={size}
+                  onClick={() => {
+                    setItemsPerPage(size);
+                    setCurrentPage(1);
+                    setShowItemsDropdown(false);
+                  }}
+                  className={`pagination-footer-option ${
+                    itemsPerPage === size ? "pagination-footer-active" : ""
+                  }`}
+                >
+                  {size}
+                </div>
+              ))}
             </div>
+          )}
+        </div>
 
-            <span>entries</span>
-          </>
-        )}
+        <span className="pagination-footer-label">entries</span>
       </div>
 
-      {showStatusText && (
-        <div className="pf-pagination-status">
-          Showing {totalItems === 0 ? 0 : startIndex + 1} to {endIndex} of{" "}
-          {totalItems} entries
-        </div>
-      )}
+      <div className="pagination-footer-status">
+        Showing {indexOfFirstItem + 1} to{" "}
+        {Math.min(indexOfLastItem, totalItems)} of {totalItems} entries
+      </div>
 
-      {totalPages > 1 && (
-        <nav className="pf-pagination-nav">
-          <ul className="pf-pagination-list">
-            <li className={`pf-page-item ${currentPage === 1 ? "disabled" : ""}`}>
-              <button
-                onClick={() => goToPage(currentPage - 1)}
-                disabled={currentPage === 1}
-              >
-                <ChevronLeft size={14} />
-              </button>
-            </li>
+      <nav className="pagination-footer-nav">
+        <ul className="pagination-footer-pages">
+          <li
+            className={`pagination-footer-page-item ${currentPage === 1 ? "disabled" : ""}`}
+          >
+            <button
+              className="pagination-footer-page-link"
+              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              <i className="bi bi-chevron-left"></i>
+            </button>
+          </li>
 
-            {pageNumbers.map((page) => (
-              <li
-                key={page}
-                className={`pf-page-item ${
-                  page === currentPage ? "active" : ""
-                }`}
-              >
-                <button onClick={() => goToPage(page)}>{page}</button>
-              </li>
-            ))}
-
+          {getPageNumbers().map((page, index) => (
             <li
-              className={`pf-page-item ${
-                currentPage === totalPages ? "disabled" : ""
-              }`}
+              key={index}
+              className={`pagination-footer-page-item ${
+                page === currentPage ? "active" : ""
+              } ${typeof page !== "number" ? "disabled" : ""}`}
             >
               <button
-                onClick={() => goToPage(currentPage + 1)}
-                disabled={currentPage === totalPages}
+                className="pagination-footer-page-link"
+                onClick={() => typeof page === "number" && setCurrentPage(page)}
+                disabled={typeof page !== "number"}
               >
-                <ChevronRight size={14} />
+                {page}
               </button>
             </li>
-          </ul>
-        </nav>
-      )}
+          ))}
+
+          <li
+            className={`pagination-footer-page-item ${
+              currentPage === totalPages ? "disabled" : ""
+            }`}
+          >
+            <button
+              className="pagination-footer-page-link"
+              onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+              disabled={currentPage === totalPages}
+            >
+              <i className="bi bi-chevron-right"></i>
+            </button>
+          </li>
+        </ul>
+      </nav>
     </div>
   );
 };

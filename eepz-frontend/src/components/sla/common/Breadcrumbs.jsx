@@ -50,16 +50,22 @@ const Breadcrumb = ({ items = [], dynamicLabels = {} }) => {
                 {isLast ? (
                   <span className="sla-bc-active-text">{resolvedLabel}</span>
                 ) : (
-                  <a
-                    href="#"
-                    className="sla-breadcrumb-link"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (item.path) navigate(item.path);
-                    }}
-                  >
-                    {resolvedLabel}
-                  </a>
+                 <a
+  href="#"
+  className="sla-breadcrumb-link"
+  onClick={(e) => {
+    e.preventDefault();
+
+    if (item.onClick) {
+      item.onClick();        // ← SUPPORT BACK NAVIGATION
+    } else if (item.path) {
+      navigate(item.path);   // ← EXISTING LOGIC
+    }
+  }}
+>
+  {resolvedLabel}
+</a>
+
                 )}
               </li>
 

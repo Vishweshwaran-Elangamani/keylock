@@ -112,16 +112,9 @@ const MomDetailsView = ({ mom, onClose }) => {
         </span>
       );
     }
-
-    if (status === "Pending") {
-      return (
-        <span className="badge bg-warning text-dark d-inline-flex align-items-center gap-1">
-          <Clock size={12} />
-          Pending
-        </span>
-      );
-    }
-
+    
+   
+    
     return (
       <span className="badge bg-secondary d-inline-flex align-items-center gap-1">
         {status || "Unknown"}
@@ -311,7 +304,6 @@ const MomDetailsView = ({ mom, onClose }) => {
               </div>
             )}
 
-            {/* Discussion Points */}
             <div className="mb-4">
               <h6 className="mdv-section-title fw-semibold mb-3 d-flex align-items-center gap-2">
                 <MessageSquare size={18} />
@@ -338,9 +330,7 @@ const MomDetailsView = ({ mom, onClose }) => {
                         key={index}
                         className="mdv-discussion-item p-3 rounded d-flex align-items-start gap-3"
                       >
-                        <div className="mdv-discussion-number fw-bold text-primary">
-                          {index + 1}
-                        </div>
+
                         <div className="flex-grow-1">
                           <p className="mb-1">{pointText || "No details"}</p>
                           {timestamp && (

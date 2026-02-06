@@ -647,7 +647,7 @@ margin-top: -5px;
 }
 
 .managermom-view-btn {
-  background: #27235c;           
+  background-color: #3b3b82;         
   color: #ffffff;
   border: none;
   padding: 6px 14px;
@@ -674,5 +674,25 @@ margin-top: -5px;
 
 .managermom-view-btn i {
   font-size: 0.85rem;
+}
+
+.managermom-shared-btn {
+  background: #1e1b4d; 
+  color: #fff;
+  border-radius: 10px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.managermom-shared-btn:hover,
+.managermom-shared-btn:focus,
+.managermom-shared-btn:active {
+  transform: none !important;
+  box-shadow: none !important;
+  background-color: #27235c;
+  color: #fff !important;
+  outline: none !important;
 }
 

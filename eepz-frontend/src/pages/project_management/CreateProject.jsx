@@ -45,12 +45,12 @@ const CreateProject = () => {
   const [activeManagerTab, setActiveManagerTab] = useState("resource");
   const [selectedResourceOwner, setSelectedResourceOwner] = useState(null);
   const [selectedL1Approver, setSelectedL1Approver] = useState(null);
-  const [selectedL2Approver, setSelectedL2Approver] = useState(null);
   const [startCalendarOpen, setStartCalendarOpen] = useState(false);
   const [endCalendarOpen, setEndCalendarOpen] = useState(false);
   const startDateRef = useRef(null);
   const endDateRef = useRef(null);
   const statusOptions = ["Active", "On Hold", "Completed", "Cancelled"];
+  const [selectedL2Approver, setSelectedL2Approver] = useState(null);
 
   const engagementModels = [
     "Fixed Price",
@@ -646,19 +646,22 @@ const CreateProject = () => {
           </form>
         </div>
       </div>
+      
+<EmployeeSelectionModal
+  show={showManagerModal}
+  onClose={() => setShowManagerModal(false)}
+  employees={employees}                    // ✅ COMPLETE list for ALL tabs
+  allEmployees={employees}                 // ✅ Complete list for dropdowns
+  activeTab={activeManagerTab}
+  setActiveTab={setActiveManagerTab}
+  selectedResourceOwner={selectedResourceOwner}
+  selectedL1Approver={selectedL1Approver}
+  selectedL2Approver={selectedL2Approver}
+  onSelectManager={handleManagerSelect}
+  onConfirm={handleConfirmSelection}
+/>
 
-      <EmployeeSelectionModal
-        show={showManagerModal}
-        onClose={() => setShowManagerModal(false)}
-        employees={employees}
-        activeTab={activeManagerTab}
-        setActiveTab={setActiveManagerTab}
-        selectedResourceOwner={selectedResourceOwner}
-        selectedL1Approver={selectedL1Approver}
-        selectedL2Approver={selectedL2Approver}
-        onSelectManager={handleManagerSelect}
-        onConfirm={handleConfirmSelection}
-      />
+
     </div>
   );
 };

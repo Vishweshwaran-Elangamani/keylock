@@ -52,6 +52,16 @@
   margin-top: 0.5rem;
 }
 
+.smm-th {
+  text-align: left;
+  white-space: nowrap;   
+}
+
+.smm-table {
+  table-layout: auto;
+}
+
+
 .smm-tabs-item {
   display: flex;
   align-items: center;

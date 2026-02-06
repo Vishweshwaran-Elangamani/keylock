@@ -5,6 +5,7 @@
   width: 100%;
   max-width: 100%;
   margin-top: -32px;
+  
 }
 
 .hr-sla-breadcrumb-nav {
@@ -601,19 +602,19 @@
 .hr-sla-table-wrapper {
   background: #ffffff;
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   border: 1px solid #e5e7eb;
-  overflow: visible;
-  width: 100%;
-  max-width: 100%;
+  overflow: visible !important;   /* critical */
+  position: relative;             /* create new stacking context */
+  z-index: 1;
 }
 
 .hr-sla-table-responsive {
-  overflow: visible;
-  border-radius: 12px;
-  width: 100%;
-  max-width: 100%;
+  overflow: visible !important;   /* critical */
+  position: relative;
+  z-index: 1;
 }
+
 
 .hr-sla-table {
   width: 100%;
@@ -623,7 +624,7 @@
   vertical-align: middle;
   border-color: transparent;
   border-collapse: collapse;
-  table-layout: fixed;
+  table-layout: auto;
 }
 
 .hr-sla-table-header {

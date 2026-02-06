@@ -116,11 +116,11 @@ const DeptHeadSLADashboard = () => {
 
   const periodOptions = useMemo(() => {
     const unique = Array.from(
-      new Set(allL2Escalations.map((e) => e.period).filter(Boolean))
+      new Set(allL2Escalations.map((e) => e.period).filter(Boolean)),
     );
     unique.sort();
     return [{ value: "all", label: "All Periods" }].concat(
-      unique.map((p) => ({ value: p, label: p }))
+      unique.map((p) => ({ value: p, label: p })),
     );
   }, [allL2Escalations]);
 
@@ -137,7 +137,7 @@ const DeptHeadSLADashboard = () => {
 
     if (activeTab !== "all") {
       filtered = filtered.filter(
-        (e) => e.escalationStatus.toLowerCase() === activeTab
+        (e) => e.escalationStatus.toLowerCase() === activeTab,
       );
     }
 
@@ -147,7 +147,7 @@ const DeptHeadSLADashboard = () => {
 
     if (selectedStatus !== "all") {
       filtered = filtered.filter(
-        (e) => e.escalationStatus.toLowerCase() === selectedStatus
+        (e) => e.escalationStatus.toLowerCase() === selectedStatus,
       );
     }
 
@@ -157,7 +157,7 @@ const DeptHeadSLADashboard = () => {
         (e) =>
           e.employeeName?.toLowerCase().includes(query) ||
           e.managerName?.toLowerCase().includes(query) ||
-          e.reason?.toLowerCase().includes(query)
+          e.reason?.toLowerCase().includes(query),
       );
     }
 
@@ -265,15 +265,15 @@ const DeptHeadSLADashboard = () => {
 
     const openCount = filteredByPeriod.filter(
       (e) =>
-        e.escalationStatus === "Pending" || e.escalationStatus === "InProgress"
+        e.escalationStatus === "Pending" || e.escalationStatus === "InProgress",
     ).length;
 
     const approvedCount = filteredByPeriod.filter(
-      (e) => e.escalationStatus === "Resolved"
+      (e) => e.escalationStatus === "Resolved",
     ).length;
 
     const closedCount = filteredByPeriod.filter(
-      (e) => e.escalationStatus === "Rejected"
+      (e) => e.escalationStatus === "Rejected",
     ).length;
 
     return {
@@ -508,8 +508,8 @@ const DeptHeadSLADashboard = () => {
                           esc.escalationStatus === "InProgress"
                             ? "dh-sla-badge-pending"
                             : esc.escalationStatus === "Resolved"
-                            ? "dh-sla-badge-resolved"
-                            : "dh-sla-badge-rejected"
+                              ? "dh-sla-badge-resolved"
+                              : "dh-sla-badge-rejected"
                         }`}
                       >
                         {esc.escalationStatus}
@@ -554,12 +554,12 @@ const DeptHeadSLADashboard = () => {
         </div>
 
         <PaginationFooter
-          currentPage={currentPage}
           totalItems={filteredL2Escalations.length}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
           itemsPerPage={itemsPerPage}
-          onPageChange={setCurrentPage}
-          onItemsPerPageChange={(val) => {
-            setItemsPerPage(val);
+          setItemsPerPage={(size) => {
+            setItemsPerPage(size);
             setCurrentPage(1);
           }}
         />

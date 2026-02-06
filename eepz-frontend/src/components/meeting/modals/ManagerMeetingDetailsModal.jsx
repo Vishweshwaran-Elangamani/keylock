@@ -8,6 +8,12 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
     return () => (document.body.style.overflow = "unset");
   }, []);
 
+  // 🔍 Debug (remove later if needed)
+  useEffect(() => {
+    console.log("Meeting object:", meeting);
+    console.log("Participants:", meeting?.rsvpParticipants);
+  }, [meeting]);
+
   if (!meeting) return null;
 
   const formatDateTime = (isoString) => {
@@ -21,7 +27,6 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
     return `${dd}-${mm}-${yyyy} ${hh}:${min}`;
   };
 
-  // ✅ USE VALUES FROM DASHBOARD
   const countAccepted = meeting.rsvpAcceptedCount || 0;
   const totalParticipants = meeting.rsvpTotalInvitations || 0;
 
@@ -98,7 +103,15 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
             <div className="mmdm-participants-list">
               {meeting.rsvpParticipants.map((p) => (
                 <div key={p.employeeId} className="mmdm-participant-card">
-                  <div className="mmdm-participant-name">{p.employeeName}</div>
+                  
+                  {/* ✅ FIXED NAME HANDLING HERE */}
+                  <div className="mmdm-participant-name">
+                    {p.employeeName ||
+                      p.name ||
+                      p.participantName ||
+                      p.employee?.fullName ||
+                      "—"}
+                  </div>
 
                   <span
                     className={`badge ${

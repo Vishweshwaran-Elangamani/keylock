@@ -776,3 +776,11 @@
     margin-bottom: 0.75rem;
   }
 }
+
+.emp-sla-table-container,
+.emp-sla-table-responsive,
+.emp-sla-content {
+  position: relative;
+  z-index: 1;
+  overflow: visible !important;
+}

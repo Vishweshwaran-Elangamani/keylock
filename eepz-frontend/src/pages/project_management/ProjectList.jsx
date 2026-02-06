@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  FolderKanban, Edit, Trash2, UserCog, Users, Calendar, Building, Briefcase, AlertCircle, Home,
-} from "lucide-react";
+import {FolderKanban, Edit, Trash2, UserCog, Users, Calendar, Building, Briefcase, AlertCircle, Home,} 
+from "lucide-react";
 import { toast } from "sonner";
 import projectService from "../../services/project_management/projectService";
 import ProjectListFilterBar from "./ProjectListFilterBar";
@@ -119,8 +118,7 @@ const ProjectList = () => {
     if (activeSearchTerm) {
       const term = activeSearchTerm.toLowerCase();
       filtered = filtered.filter(
-        (project) =>
-          project.projectName?.toLowerCase().includes(term) ||
+        (project) => project.projectName?.toLowerCase().includes(term) ||
           project.department?.toLowerCase().includes(term) ||
           project.businessUnit?.toLowerCase().includes(term)
       );
@@ -776,19 +774,17 @@ const ProjectList = () => {
             </tbody>
           </table>
 
-          <PaginationFooter
-            currentPage={currentPage}
-            totalItems={filteredProjects.length}
-            itemsPerPage={itemsPerPage}
-            onPageChange={(page) => setCurrentPage(page)}
-            onItemsPerPageChange={(size) => {
-              setItemsPerPage(size);
-              setCurrentPage(1);
-            }}
-            pageSizeOptions={pageSizeOptions}
-          />
-        </div>
-      )}
+      <PaginationFooter
+           totalItems={filteredProjects.length}
+           currentPage={currentPage}
+           setCurrentPage={setCurrentPage}
+           itemsPerPage={itemsPerPage}
+           setItemsPerPage={(size) => {
+           setItemsPerPage(size);
+           setCurrentPage(1);
+            }}/>
+         </div>
+       )}
 
       <EditProjectModal
         show={showEditModal}

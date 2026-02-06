@@ -92,7 +92,7 @@ const ManagerSLADashboard = () => {
 
       if (userData.departmentId) {
         const deptHeadRes = await slaService.getDepartmentHeads(
-          userData.departmentId
+          userData.departmentId,
         );
         if (deptHeadRes?.success && Array.isArray(deptHeadRes.data)) {
           setDeptHeads(deptHeadRes.data);
@@ -100,7 +100,7 @@ const ManagerSLADashboard = () => {
       }
 
       const escalationsRes = await slaService.getManagerEscalations(
-        userData.empId
+        userData.empId,
       );
       if (escalationsRes?.success && Array.isArray(escalationsRes.data)) {
         setManagerEscalations(escalationsRes.data);
@@ -130,7 +130,7 @@ const ManagerSLADashboard = () => {
             sla.departmentName?.toLowerCase().includes(term) ||
             sla.slaid?.toString().includes(term) ||
             sla.slatype?.toLowerCase().includes(term) ||
-            sla.assignedToName?.toLowerCase().includes(term)
+            sla.assignedToName?.toLowerCase().includes(term),
         );
       }
 
@@ -140,7 +140,7 @@ const ManagerSLADashboard = () => {
 
       if (complianceFilter !== "All") {
         result = result.filter(
-          (sla) => sla.complianceStatus === complianceFilter
+          (sla) => sla.complianceStatus === complianceFilter,
         );
       }
     } else {
@@ -149,7 +149,7 @@ const ManagerSLADashboard = () => {
         result = result.filter(
           (esc) =>
             esc.reason?.toLowerCase().includes(term) ||
-            esc.employeeName?.toLowerCase().includes(term)
+            esc.employeeName?.toLowerCase().includes(term),
         );
       }
 
@@ -260,7 +260,7 @@ const ManagerSLADashboard = () => {
   const stats = calculateStats();
   const isTeamTab = activeTab === "team-escalation";
 
-  const effectivePageSize = isTeamTab ? itemsPerPage : 9;
+const effectivePageSize = itemsPerPage;
 
   const safeTotal = filteredSlas.length;
   const totalPages = Math.max(1, Math.ceil(safeTotal / effectivePageSize));
@@ -368,7 +368,7 @@ const ManagerSLADashboard = () => {
                 placeholder={
                   activeTab === "team-escalation"
                     ? "Search by reason or employee..."
-                    : "Search by SLA type, assigned to, or department..."
+                    : "Search by SLA type, assigned to"
                 }
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -473,108 +473,123 @@ const ManagerSLADashboard = () => {
             </button>
           ) : null}
         </div>
-      ) : activeTab === "my-escalation" ? (
-        <div className="mgr-sla-escalation-grid">
-          {paginatedData.map((sla) => {
-            const daysRemaining = dateHelpers.daysRemaining(sla.deadline);
+    ) : activeTab === "my-escalation" ? (
+  <>
+    <div className="mgr-sla-escalation-grid">
+      {paginatedData.map((sla) => {
+        const daysRemaining = dateHelpers.daysRemaining(sla.deadline);
 
-            return (
-              <div key={sla.slaid} className="mgr-sla-escalation-col">
-                <div className="mgr-escalation-card">
-                  <div className="mgr-escalation-card-header">
-                    <div className="mgr-escalation-icon-wrapper">
-                      <Zap size={24} className="mgr-escalation-icon" />
-                    </div>
+        return (
+          <div key={sla.slaid} className="mgr-sla-escalation-col">
+            <div className="mgr-escalation-card">
+              <div className="mgr-escalation-card-header">
+                <div className="mgr-escalation-icon-wrapper">
+                  <Zap size={24} className="mgr-escalation-icon" />
+                </div>
 
-                    <div className="mgr-escalation-title-wrapper">
-                      <h6 className="mgr-escalation-title">
-                        {sla.slatype || "Sample SLA"}
-                      </h6>
-                    </div>
+                <div className="mgr-escalation-title-wrapper">
+                  <h6 className="mgr-escalation-title">
+                    {sla.slatype || "Sample SLA"}
+                  </h6>
+                </div>
 
+                <span
+                  className={`mgr-escalation-status-badge ${getStatusBadgeClass(
+                    sla.status
+                  )}`}
+                >
+                  {sla.status === "InProgress"
+                    ? "INPROGRESS"
+                    : sla.status?.toUpperCase()}
+                </span>
+              </div>
+
+              <div className="mgr-escalation-card-body">
+                <div className="mgr-escalation-info-row">
+                  <span className="mgr-escalation-label">Deadline</span>
+                  <span className="mgr-escalation-value">
+                    {dateHelpers.formatDeadline(sla.deadline)}
+                  </span>
+                </div>
+
+                <div className="mgr-escalation-info-row">
+                  <span className="mgr-escalation-label">Days Remaining</span>
+                  <span
+                    className={`mgr-escalation-value ${
+                      daysRemaining < 0
+                        ? "mgr-escalation-value-danger"
+                        : daysRemaining <= 3
+                        ? "mgr-escalation-value-warning"
+                        : "mgr-escalation-value-success"
+                    }`}
+                  >
+                    {Math.abs(daysRemaining)} days
+                  </span>
+                </div>
+
+                <div className="mgr-escalation-info-row">
+                  <span className="mgr-escalation-label">Assigned To</span>
+                  <span className="mgr-escalation-value mgr-text-truncate">
+                    {sla.assignedToName ? (
+                      <span className="mgr-sla-assigned-name">
+                        {sla.assignedToName}
+                      </span>
+                    ) : (
+                      <span className="mgr-sla-not-assigned">Not assigned</span>
+                    )}
+                  </span>
+                </div>
+
+                {sla.complianceStatus && (
+                  <div className="mgr-escalation-info-row">
+                    <span className="mgr-escalation-label">Compliance</span>
                     <span
-                      className={`mgr-escalation-status-badge ${getStatusBadgeClass(
-                        sla.status
-                      )}`}
+                      className={`mgr-compliance-badge ${
+                        sla.complianceStatus === "OnTime"
+                          ? "mgr-compliance-ontime"
+                          : "mgr-compliance-breached"
+                      }`}
                     >
-                      {sla.status === "InProgress"
-                        ? "INPROGRESS"
-                        : sla.status?.toUpperCase()}
+                      {sla.complianceStatus}
                     </span>
                   </div>
-
-                  <div className="mgr-escalation-card-body">
-                    <div className="mgr-escalation-info-row">
-                      <span className="mgr-escalation-label">Deadline</span>
-                      <span className="mgr-escalation-value">
-                        {dateHelpers.formatDeadline(sla.deadline)}
-                      </span>
-                    </div>
-
-                    <div className="mgr-escalation-info-row">
-                      <span className="mgr-escalation-label">
-                        Days Remaining
-                      </span>
-                      <span
-                        className={`mgr-escalation-value ${
-                          daysRemaining < 0
-                            ? "mgr-escalation-value-danger"
-                            : daysRemaining <= 3
-                            ? "mgr-escalation-value-warning"
-                            : "mgr-escalation-value-success"
-                        }`}
-                      >
-                        {Math.abs(daysRemaining)} days
-                      </span>
-                    </div>
-
-                    <div className="mgr-escalation-info-row">
-                      <span className="mgr-escalation-label">Assigned To</span>
-                      <span className="mgr-escalation-value mgr-text-truncate">
-                        {sla.assignedToName ? (
-                          <span className="mgr-sla-assigned-name">
-                            {sla.assignedToName}
-                          </span>
-                        ) : (
-                          <span className="mgr-sla-not-assigned">
-                            Not assigned
-                          </span>
-                        )}
-                      </span>
-                    </div>
-
-                    {sla.complianceStatus && (
-                      <div className="mgr-escalation-info-row">
-                        <span className="mgr-escalation-label">Compliance</span>
-                        <span
-                          className={`mgr-compliance-badge ${
-                            sla.complianceStatus === "OnTime"
-                              ? "mgr-compliance-ontime"
-                              : "mgr-compliance-breached"
-                          }`}
-                        >
-                          {sla.complianceStatus}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="mgr-escalation-card-footer">
-                    <button
-                      type="button"
-                      className="mgr-escalation-view-btn"
-                      onClick={() => handleRowClick(sla.slaid)}
-                    >
-                      <Eye size={16} />
-                      View Details
-                    </button>
-                  </div>
-                </div>
+                )}
               </div>
-            );
-          })}
-        </div>
-      ) : (
+
+              <div className="mgr-escalation-card-footer">
+                <button
+                  type="button"
+                  className="mgr-escalation-view-btn"
+                  onClick={() => handleRowClick(sla.slaid)}
+                >
+                  <Eye size={16} />
+                  View Details
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+
+    {/* ✅ PAGINATION FOR CARD VIEW */}
+    {safeTotal > 0 && (
+      <div className="mgr-pf-wrap mt-4">
+        <PaginationFooter
+          totalItems={safeTotal}
+          currentPage={validCurrentPage}
+          setCurrentPage={setCurrentPage}
+          itemsPerPage={itemsPerPage}
+          setItemsPerPage={(size) => {
+            setItemsPerPage(size);
+            setCurrentPage(1);
+          }}
+        />
+      </div>
+    )}
+  </>
+) : (
+
         <div className="mgr-sla-table-wrapper">
           <div className="mgr-sla-table-container">
             <div className="mgr-sla-table-responsive">
@@ -622,8 +637,8 @@ const ManagerSLADashboard = () => {
                             esc.escalationStatus === "Resolved"
                               ? "mgr-sla-badge-success"
                               : esc.escalationStatus === "InProgress"
-                              ? "mgr-sla-badge-warning"
-                              : "mgr-sla-badge-primary"
+                                ? "mgr-sla-badge-warning"
+                                : "mgr-sla-badge-primary"
                           }`}
                         >
                           {esc.escalationStatus}
@@ -677,16 +692,14 @@ const ManagerSLADashboard = () => {
             {safeTotal > 0 && (
               <div className="mgr-pf-wrap">
                 <PaginationFooter
-                  currentPage={validCurrentPage}
                   totalItems={safeTotal}
-                  itemsPerPage={effectivePageSize}
-                  onPageChange={(p) => setCurrentPage(p)}
-                  onItemsPerPageChange={(size) =>
-                    handleItemsPerPageChange(Number(size))
-                  }
-                  pageSizeOptions={[5, 10, 25, 50]}
-                  showPageSizeDropdown={true}
-                  showStatusText={true}
+                  currentPage={validCurrentPage}
+                  setCurrentPage={setCurrentPage}
+                  itemsPerPage={itemsPerPage}
+                  setItemsPerPage={(size) => {
+                    setItemsPerPage(size);
+                    setCurrentPage(1);
+                  }}
                 />
               </div>
             )}

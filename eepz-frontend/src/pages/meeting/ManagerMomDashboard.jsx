@@ -10,6 +10,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import ManagerMeetingDetailsModal from "../../components/meeting/modals/ManagerMeetingDetailsModal";
 import PaginationFooter from "../../components/project-management/common/PaginationFooter";
+import ManagerSharedMomsModal from "../../components/meeting/modals/ManagerSharedMomsModal";
 import "../../styles/mom/components/ManagerMomDashboard.css";
 
 const ManagerMomDashboard = () => {
@@ -22,6 +23,7 @@ const ManagerMomDashboard = () => {
     totalMeetingsCount: 0,
   });
 
+  const [showSharedMoms, setShowSharedMoms] = useState(false);
   const [upcomingMeetings, setUpcomingMeetings] = useState([]);
   const [recentTeamMoms, setRecentTeamMoms] = useState([]);
   const [actionItems, setActionItems] = useState([]);
@@ -107,17 +109,24 @@ const ManagerMomDashboard = () => {
           }).length
         : 0;
 
-      // Extract meetings data
-      const meetingsData =
-        meetingsRes?.data?.meetings ||
-        meetingsRes?.data?.Meetings ||
-        meetingsRes?.Data?.meetings ||
-        meetingsRes?.Data?.Meetings ||
-        meetingsRes?.data ||
-        meetingsRes?.Data ||
-        [];
+let meetings = [];
 
-      const meetings = Array.isArray(meetingsData) ? meetingsData : [];
+if (Array.isArray(meetingsRes?.data)) {
+  meetings = meetingsRes.data;
+} else if (Array.isArray(meetingsRes?.Data)) {
+  meetings = meetingsRes.Data;
+} else if (Array.isArray(meetingsRes?.data?.meetings)) {
+  meetings = meetingsRes.data.meetings;
+} else if (Array.isArray(meetingsRes?.data?.Meetings)) {
+  meetings = meetingsRes.data.Meetings;
+} else if (Array.isArray(meetingsRes?.Data?.meetings)) {
+  meetings = meetingsRes.Data.meetings;
+} else if (Array.isArray(meetingsRes?.Data?.Meetings)) {
+  meetings = meetingsRes.Data.Meetings;
+}
+
+console.log("ALL MEETINGS FROM API:", meetings);
+
 
       const totalMeetingsCount =
         meetingsRes?.data?.totalCount ||
@@ -234,7 +243,7 @@ const ManagerMomDashboard = () => {
   };
 
   const safeTotal = upcomingMeetings.length;
-  const perPage = viewMode === "grid" ? 9 : itemsPerPage;
+  const perPage = itemsPerPage;
   const totalPages = Math.max(1, Math.ceil(safeTotal / perPage));
   const validCurrentPage = Math.min(currentPage, totalPages);
 
@@ -370,15 +379,24 @@ const ManagerMomDashboard = () => {
             </button>
           </div>
 
-          <div className="managermom-toolbar-right">
-            <button
-              className="btn managermom-schedule-btn"
-              onClick={() => navigate("/manager/dashboard/meetmom/schedule")}
-            >
-              <i className="bi bi-calendar-plus"></i>
-              Schedule Meeting
-            </button>
-          </div>
+  <div className="managermom-toolbar-right d-flex gap-2">
+  <button
+    className="btn managermom-shared-btn"
+    onClick={() => setShowSharedMoms(true)}>
+      
+    <i className="bi bi-share-fill me-1"></i>
+    Shared MOMs
+  </button>
+
+  <button
+    className="btn managermom-schedule-btn"
+    onClick={() => navigate("/manager/dashboard/meetmom/schedule")}
+  >
+    <i className="bi bi-calendar-plus"></i>
+    Schedule Meeting
+  </button>
+</div>
+
         </div>
 
         {/* Upcoming Meetings Header */}
@@ -531,23 +549,21 @@ const ManagerMomDashboard = () => {
               </table>
             </div>
 
-            {safeTotal > 0 && (
-              <div className="managermom-pf-wrap">
-                <PaginationFooter
-                  currentPage={validCurrentPage}
-                  totalItems={safeTotal}
-                  itemsPerPage={perPage}
-                  onPageChange={(p) => setCurrentPage(p)}
-                  onItemsPerPageChange={(size) => {
-                    setItemsPerPage(Number(size));
-                    setCurrentPage(1);
-                  }}
-                  pageSizeOptions={[5, 10, 25, 50]}
-                  showPageSizeDropdown={true}
-                  showStatusText={true}
-                />
-              </div>
-            )}
+           {safeTotal > 0 && (
+  <div className="managermom-pf-wrap">
+    <PaginationFooter
+      totalItems={safeTotal}
+      currentPage={validCurrentPage}
+      setCurrentPage={setCurrentPage}
+      itemsPerPage={itemsPerPage}
+      setItemsPerPage={(size) => {
+        setItemsPerPage(size);
+        setCurrentPage(1);
+      }}
+    />
+  </div>
+)}
+
           </div>
         ) : (
           /* Grid View */
@@ -643,29 +659,34 @@ const ManagerMomDashboard = () => {
               )}
             </div>
 
-            {safeTotal > 0 && viewMode === "grid" && (
-              <div className="managermom-pf-wrap">
-                <PaginationFooter
-                  currentPage={validCurrentPage}
-                  totalItems={safeTotal}
-                  itemsPerPage={perPage}
-                  onPageChange={(p) => setCurrentPage(p)}
-                  showPageSizeDropdown={false}
-                  showStatusText={true}
-                  pageNumberMode="compact"
-                />
-              </div>
-            )}
+           {safeTotal > 0 && viewMode === "grid" && (
+  <div className="managermom-pf-wrap">
+    <PaginationFooter
+      totalItems={safeTotal}
+      currentPage={validCurrentPage}
+      setCurrentPage={setCurrentPage}
+      itemsPerPage={itemsPerPage}
+      setItemsPerPage={(size) => {
+        setItemsPerPage(size);
+        setCurrentPage(1);
+      }}
+    />
+  </div>
+)}
+
           </>
         )}
 
-        {/* Meeting Details Modal */}
         {selectedMeeting && (
           <ManagerMeetingDetailsModal
             meeting={selectedMeeting}
             onClose={closeMeetingDetails}
           />
         )}
+        
+{showSharedMoms && (
+<ManagerSharedMomsModal onClose={() => setShowSharedMoms(false)} />
+)}
       </div>
     </div>
   );
