@@ -1,10 +1,32 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Breadcrumb from "../../../common/Breadcrumb";
 import "../../../../styles/performancemanagement/components/ManagerAcknowledgment.css";
 
-const ManagerAcknowledgmentModal = ({ ackList, error, loading }) => {
+const ManagerAcknowledgmentModal = ({ ackList = [], error, loading }) => {
   const navigate = useNavigate();
+
+  const [entriesOpen, setEntriesOpen] = useState(false);
+  const [selectedEntries, setSelectedEntries] = useState(5);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const onClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setEntriesOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const onEsc = (e) => {
+      if (e.key === "Escape") setEntriesOpen(false);
+    };
+    document.addEventListener("keydown", onEsc);
+    return () => document.removeEventListener("keydown", onEsc);
+  }, []);
 
   const breadcrumbItems = [
     { label: "Performance", path: "/hr/dashboard/performance" },
@@ -28,9 +50,7 @@ const ManagerAcknowledgmentModal = ({ ackList, error, loading }) => {
       ) : error ? (
         <div className="manager-ack-error">{error}</div>
       ) : ackList.length === 0 ? (
-        <div className="manager-ack-no-data">
-          No employee acknowledgments found.
-        </div>
+        <div className="manager-ack-no-data">No employee acknowledgments found.</div>
       ) : (
         <div className="manager-ack-content">
           <div className="manager-ack-table-container">
@@ -42,6 +62,7 @@ const ManagerAcknowledgmentModal = ({ ackList, error, loading }) => {
                   <th>Date Acknowledged</th>
                 </tr>
               </thead>
+
               <tbody>
                 {ackList.map((row, idx) => (
                   <tr key={idx} className={idx % 2 === 0 ? "" : "row-even"}>
@@ -49,14 +70,11 @@ const ManagerAcknowledgmentModal = ({ ackList, error, loading }) => {
                     <td className="cell-comment">{row.employeeComments}</td>
                     <td className="cell-date">
                       {row.acknowledgedAt
-                        ? new Date(row.acknowledgedAt).toLocaleDateString(
-                            "en-US",
-                            {
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                            }
-                          )
+                        ? new Date(row.acknowledgedAt).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })
                         : "-"}
                     </td>
                   </tr>
@@ -68,12 +86,49 @@ const ManagerAcknowledgmentModal = ({ ackList, error, loading }) => {
           <div className="manager-ack-pagination">
             <div className="manager-ack-entries-selector">
               <span>Show</span>
-              <select className="manager-ack-entries-select">
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-              </select>
+
+              <div className="manager-ack-pagination-dropdown" ref={dropdownRef}>
+                <div
+                  className="manager-ack-selected"
+                  tabIndex={0}
+                  role="button"
+                  aria-haspopup="listbox"
+                  aria-expanded={entriesOpen}
+                  onClick={() => setEntriesOpen((p) => !p)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setEntriesOpen((p) => !p);
+                    }
+                  }}
+                >
+                  {selectedEntries}
+                  <span className="manager-ack-arrow" />
+                </div>
+
+                {entriesOpen && (
+                  <div className="manager-ack-menu" role="listbox">
+                    {[5, 10, 15].map((val) => (
+                      <div
+                        key={val}
+                        role="option"
+                        aria-selected={selectedEntries === val}
+                        className={`manager-ack-option ${
+                          selectedEntries === val ? "manager-ack-option-active" : ""
+                        }`}
+                        onClick={() => {
+                          setSelectedEntries(val);
+                          setEntriesOpen(false);
+
+                        }}
+                      >
+                        {val}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <span>entries</span>
             </div>
 
@@ -81,7 +136,6 @@ const ManagerAcknowledgmentModal = ({ ackList, error, loading }) => {
               Showing 1 to {ackList.length} of {ackList.length} entries
             </div>
 
-            {/* Pagination Controls */}
             <nav>
               <ul className="manager-ack-pagination-nav">
                 <li>
@@ -90,9 +144,7 @@ const ManagerAcknowledgmentModal = ({ ackList, error, loading }) => {
                   </button>
                 </li>
                 <li>
-                  <button className="manager-ack-pagination-btn active">
-                    1
-                  </button>
+                  <button className="manager-ack-pagination-btn active">1</button>
                 </li>
                 <li>
                   <button className="manager-ack-pagination-btn" disabled>

@@ -57,8 +57,7 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
 
               <div className="info-item">
                 <div className="item-icon">
-                  <i className="bi bi-briefcase-fill"></i>
-                </div>
+                <i class="bi bi-laptop"></i>                </div>
                 <div className="item-content">
                   <span className="item-label">Category</span>
                   <span className="item-value">
