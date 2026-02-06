@@ -254,7 +254,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         [HttpGet("api/lnd-assignments/sme")]
         public async Task<IActionResult> GetSmeAssignments(
             [FromQuery] AssignmentRequestModel request
-        )
+        ) 
         {
             var smeEmployeeId = GetCurrentEmployeeId();
 
@@ -285,7 +285,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 );
                 return BadRequest(result);
             }
-        }
+        } 
 
         #endregion
 
@@ -337,7 +337,6 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         }
 
         #endregion
-        // Add these endpoints to your existing LnDAssignmentsController
 
         /// <summary>
         /// Employee requests to reopen an overdue assignment with explanation

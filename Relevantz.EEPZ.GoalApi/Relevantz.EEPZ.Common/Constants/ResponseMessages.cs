@@ -360,7 +360,7 @@ namespace Relevantz.EEPZ.Common.Constants
                 "Permission denied",
                 "You do not have sufficient permissions to perform this action."
             ),
-        };
+        };   
 
         public static ResponseMessageInfo GetMessage(string code)
         {

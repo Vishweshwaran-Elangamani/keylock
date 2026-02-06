@@ -329,7 +329,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                     a.Assignment.MenteeEmployee.Userprofile.LastName.ToLower().Contains(searchLower) ||
                     (a.Notes != null && a.Notes.ToLower().Contains(searchLower))
                 );
-            }
+            } 
 
             var totalCount = await query.CountAsync();
 
@@ -366,7 +366,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             }).ToList();
 
             return (result, totalCount);
-        }
+        } 
 
         public async Task<(List<ReopenRequestResponseModel> Items, int TotalCount)> GetTeamReopenRequests(
             int managerId,
