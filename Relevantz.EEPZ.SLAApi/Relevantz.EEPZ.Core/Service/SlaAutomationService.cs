@@ -10,13 +10,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
     public class SlaAutomationService : ISlaAutomationService
     {
         private readonly ISlaRepository _slaRepository;
-        private readonly EmailService _emailService;
+        private readonly IEmailService _emailService;
+
         private readonly ILogger<SlaAutomationService> _logger;
 
         public SlaAutomationService(
-            ISlaRepository slaRepository,
-            EmailService emailService,
-            ILogger<SlaAutomationService> logger)
+    ISlaRepository slaRepository,
+    IEmailService emailService,
+    ILogger<SlaAutomationService> logger)
+
         {
             _slaRepository = slaRepository;
             _emailService = emailService;
@@ -144,69 +146,69 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         #endregion
 
         #region Automation Status
-public async Task<ApiResponse<AutomationStatusResponse>> GetAutomationStatus()
-{
-    var allSlas = await _slaRepository.GetAllSlasAsync();
-    var overdue = await _slaRepository.GetOverdueSlas();
-    var completed = await _slaRepository.GetCompletedSlasAsync();
-
-    int open = allSlas.Count(s => s.Status == "Open" || s.Status == "InProgress");
-    int closed = allSlas.Count(s => s.Status == "Closed");
-
-    double compliance = allSlas.Count == 0
-        ? 0
-        : (double)closed / allSlas.Count * 100;
-
-    return ApiResponse<AutomationStatusResponse>.SuccessResponse(
-        new AutomationStatusResponse
+        public async Task<ApiResponse<AutomationStatusResponse>> GetAutomationStatus()
         {
-            TotalSlas = allSlas.Count,
-            OpenSlas = open,
-            OverdueSlas = overdue.Count(),
-            CompletedSlas = completed.Count(),
-            ClosedSlas = closed,
-            CompliancePercentage = compliance,
-            LastChecked = DateTime.Now
-        },
-        ApiMessages.Success);
-}
+            var allSlas = await _slaRepository.GetAllSlasAsync();
+            var overdue = await _slaRepository.GetOverdueSlas();
+            var completed = await _slaRepository.GetCompletedSlasAsync();
+
+            int open = allSlas.Count(s => s.Status == "Open" || s.Status == "InProgress");
+            int closed = allSlas.Count(s => s.Status == "Closed");
+
+            double compliance = allSlas.Count == 0
+                ? 0
+                : (double)closed / allSlas.Count * 100;
+
+            return ApiResponse<AutomationStatusResponse>.SuccessResponse(
+                new AutomationStatusResponse
+                {
+                    TotalSlas = allSlas.Count,
+                    OpenSlas = open,
+                    OverdueSlas = overdue.Count(),
+                    CompletedSlas = completed.Count(),
+                    ClosedSlas = closed,
+                    CompliancePercentage = compliance,
+                    LastChecked = DateTime.Now
+                },
+                ApiMessages.Success);
+        }
 
 
-#endregion
+        #endregion
 
-#region Automation Logs
+        #region Automation Logs
 
-public async Task<ApiResponse<AutomationLogResponse>> GetAutomationLogs(int days)
-{
-    var history = await _slaRepository.GetAllSlaHistoryAsync();
-    var cutoff = DateTime.Now.AddDays(-days);
-
-    var recent = history.Where(h => h.CreatedAt >= cutoff).ToList();
-
-    var logs = recent.Select(h => new SlaHistoryLogDto
-    {
-        SlahistoryId = h.SlahistoryId,
-        Slaid = h.Slaid,
-        ChangeType = h.ChangeType,
-        ChangedFrom = h.ChangedFrom,
-        ChangedTo = h.ChangedTo,
-        ChangedByEmployeeId = h.ChangedByEmployeeId,
-        Reason = h.Reason,
-        CreatedAt = h.CreatedAt
-    }).ToList();
-
-    return ApiResponse<AutomationLogResponse>.SuccessResponse(
-        new AutomationLogResponse
+        public async Task<ApiResponse<AutomationLogResponse>> GetAutomationLogs(int days)
         {
-            LogCount = logs.Count,
-            Period = $"Last {days} days",
-            Logs = logs
-        },
-        ApiMessages.Success);
-}
+            var history = await _slaRepository.GetAllSlaHistoryAsync();
+            var cutoff = DateTime.Now.AddDays(-days);
+
+            var recent = history.Where(h => h.CreatedAt >= cutoff).ToList();
+
+            var logs = recent.Select(h => new SlaHistoryLogDto
+            {
+                SlahistoryId = h.SlahistoryId,
+                Slaid = h.Slaid,
+                ChangeType = h.ChangeType,
+                ChangedFrom = h.ChangedFrom,
+                ChangedTo = h.ChangedTo,
+                ChangedByEmployeeId = h.ChangedByEmployeeId,
+                Reason = h.Reason,
+                CreatedAt = h.CreatedAt
+            }).ToList();
+
+            return ApiResponse<AutomationLogResponse>.SuccessResponse(
+                new AutomationLogResponse
+                {
+                    LogCount = logs.Count,
+                    Period = $"Last {days} days",
+                    Logs = logs
+                },
+                ApiMessages.Success);
+        }
 
 
-#endregion
+        #endregion
 
 
         private string GetEmployeeName(Employee employee)

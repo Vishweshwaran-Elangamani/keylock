@@ -19,6 +19,13 @@ JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json", optional: false)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+    .AddEnvironmentVariables();
+
 Console.WriteLine("Building........");
 
 Log.Logger = new LoggerConfiguration()
@@ -77,6 +84,7 @@ Log.Information("Database connection configured");
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["SecretKey"];
 
+
 if (string.IsNullOrEmpty(secretKey))
 {
     throw new InvalidOperationException("JWT SecretKey is not configured in appsettings.json");
@@ -93,7 +101,8 @@ builder.Services.AddAuthentication(options =>
     var keyBytes = Encoding.UTF8.GetBytes(secretKey);
 
     options.SaveToken = true;
-    options.RequireHttpsMetadata = false;
+    options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+
 
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -124,37 +133,19 @@ builder.Services.AddAuthentication(options =>
             return Task.CompletedTask;
         },
         OnTokenValidated = context =>
-        {
-            var claims =
-                context.Principal?.Claims.Select(c => $"{c.Type}={c.Value}").ToList()
-                ?? new List<string>();
+{
+    Log.Information("JWT Token validated successfully");
 
-            Log.Information("JWT Token Validated Successfully");
-            Log.Information("   Claims: {Claims}", string.Join(", ", claims));
+    var empMasterIdClaim = context.Principal?.FindFirst("empMasterId");
+    var roleClaim = context.Principal?.FindFirst(ClaimTypes.Role);
 
-            var empMasterIdClaim = context.Principal?.FindFirst("empMasterId");
-            var roleClaim = context.Principal?.FindFirst(ClaimTypes.Role);
+    Log.Information("User Authenticated - empMasterId present: {HasEmpId}, role present: {HasRole}",
+        empMasterIdClaim != null,
+        roleClaim != null);
 
-            if (empMasterIdClaim == null)
-            {
-                Log.Warning("WARNING: empMasterId claim not found!");
-            }
-            else
-            {
-                Log.Information("   empMasterId: {EmpMasterId}", empMasterIdClaim.Value);
-            }
+    return Task.CompletedTask;
+},
 
-            if (roleClaim == null)
-            {
-                Log.Warning("WARNING: role claim not found!");
-            }
-            else
-            {
-                Log.Information("   role: {Role}", roleClaim.Value);
-            }
-
-            return Task.CompletedTask;
-        },
 
         OnChallenge = context =>
         {
@@ -162,19 +153,14 @@ builder.Services.AddAuthentication(options =>
             return Task.CompletedTask;
         },
         OnMessageReceived = context =>
-        {
-            var token = context
-                .Request.Headers["Authorization"]
-                .FirstOrDefault()
-                ?.Split(" ")
-                .Last();
-            if (!string.IsNullOrEmpty(token))
-            {
-                Log.Information("JWT Token Received (first 20 chars): {Token}...",
-                    token.Substring(0, Math.Min(20, token.Length)));
-            }
-            return Task.CompletedTask;
-        },
+ {
+     if (context.Request.Headers.ContainsKey("Authorization"))
+     {
+         Log.Information("JWT token received in request header");
+     }
+     return Task.CompletedTask;
+ },
+
     };
 });
 
@@ -184,22 +170,31 @@ Log.Information("JWT Authentication configured");
 
 builder.Services.AddScoped<IEmailClient, EmailClient>();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ISlaService, SlaService>();
 builder.Services.AddScoped<ISlaRepository, SlaRepository>();
 builder.Services.AddScoped<ISlaAutomationService, SlaAutomationService>();
 
 Log.Information("Dependency Injection configured - EmailService, ISlaService, ISlaRepository");
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("CorsPolicy", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+        if (allowedOrigins != null && allowedOrigins.Length > 0)
+        {
+            policy.WithOrigins(allowedOrigins)
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        }
+        else
+        {
+            Log.Warning("CORS AllowedOrigins not configured. Cross-origin requests will be blocked.");
+        }
     });
 });
+
 
 Log.Information("CORS configured");
 
@@ -224,7 +219,8 @@ app.UseSerilogRequestLogging(options =>
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAll");
+app.UseCors("CorsPolicy");
+
 
 app.UseAuthentication();
 app.UseAuthorization();

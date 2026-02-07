@@ -3,7 +3,8 @@ using Relevantz.EEPZ.Core.Services.Interfaces;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
-    public class EmailService
+    public class EmailService : IEmailService
+
     {
         private readonly IEmailClient _emailClient;
         private readonly ILogger<EmailService> _logger;
