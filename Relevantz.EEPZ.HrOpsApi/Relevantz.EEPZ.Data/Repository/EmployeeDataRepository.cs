@@ -78,66 +78,63 @@ namespace Relevantz.EEPZ.Data.Repository
 
 
         public async Task<GoalAdoptionRateDto> GetGoalAdoptionRateAsync()
+{
+    var totalEmployees = await _context.Userauthentications
+        .Where(u => u.Status == "Active")
+        .CountAsync();
+
+    var employeesWithGoals = await _context.Goals
+        .Where(g => g.CreatedBy != null)
+        .Select(g => g.CreatedBy)
+        .Distinct()
+        .CountAsync();
+        
+    var employeesWithoutGoals = Math.Max(0, totalEmployees - employeesWithGoals);
+
+    var adoptionRate = totalEmployees > 0
+        ? Math.Round((double)employeesWithGoals / totalEmployees * 100, 2)
+        : 0;
+
+    var sixMonthsAgo = DateTime.Now.AddMonths(-6);
+
+    var monthlyTrend = await _context.Goals
+        .Where(g => g.Goalcreatedat >= sixMonthsAgo && g.Goalcreatedat != null)
+        .GroupBy(g => new { g.Goalcreatedat!.Value.Year, g.Goalcreatedat!.Value.Month })
+        .Select(g => new MonthlyGoalTrendDto
         {
-            var totalEmployees = await _context.Userauthentications
-                .Where(u => u.Status == "Active")
-                .CountAsync();
+            Year = g.Key.Year,
+            Month = g.Key.Month,
+            MonthName = g.Key.Year > 0 && g.Key.Month > 0
+                ? new DateTime(g.Key.Year, g.Key.Month, 1).ToString("MMM yyyy")
+                : "Unknown",
+            NewGoals = g.Count()
+        })
+        .OrderBy(g => g.Year).ThenBy(g => g.Month)
+        .ToListAsync();
 
+    var goalTypeDistribution = await _context.Goals
+        .GroupBy(g => g.GoalType ?? "Unspecified")
+        .Select(g => new GoalTypeDistributionDto
+        {
+            GoalType = g.Key,
+            Count = g.Count(),
+            Percentage = totalEmployees > 0
+                ? Math.Round((double)g.Count() / totalEmployees * 100, 2)
+                : 0
+        })
+        .OrderByDescending(g => g.Count)
+        .ToListAsync();
 
-            var employeesWithGoals = await _context.Goals
-                .Where(g => g.CreatedBy != null)
-                .Select(g => g.CreatedBy)
-                .Distinct()
-                .CountAsync();
-
-
-            var adoptionRate = totalEmployees > 0
-                ? Math.Round((double)employeesWithGoals / totalEmployees * 100, 2)
-                : 0;
-
-
-            var sixMonthsAgo = DateTime.Now.AddMonths(-6);
-
-
-            var monthlyTrend = await _context.Goals
-                .Where(g => g.Goalcreatedat >= sixMonthsAgo && g.Goalcreatedat != null)
-                .GroupBy(g => new { g.Goalcreatedat!.Value.Year, g.Goalcreatedat!.Value.Month })
-                .Select(g => new MonthlyGoalTrendDto
-                {
-                    Year = g.Key.Year,
-                    Month = g.Key.Month,
-                    MonthName = g.Key.Year > 0 && g.Key.Month > 0
-                        ? new DateTime(g.Key.Year, g.Key.Month, 1).ToString("MMM yyyy")
-                        : "Unknown",
-                    NewGoals = g.Count()
-                })
-                .OrderBy(g => g.Year).ThenBy(g => g.Month)
-                .ToListAsync();
-
-
-            var goalTypeDistribution = await _context.Goals
-                .GroupBy(g => g.GoalType ?? "Unspecified")
-                .Select(g => new GoalTypeDistributionDto
-                {
-                    GoalType = g.Key,
-                    Count = g.Count(),
-                    Percentage = totalEmployees > 0
-                        ? Math.Round((double)g.Count() / totalEmployees * 100, 2)
-                        : 0
-                })
-                .OrderByDescending(g => g.Count)
-                .ToListAsync();
-
-
-            return new GoalAdoptionRateDto
-            {
-                TotalEmployees = totalEmployees,
-                EmployeesWithGoals = employeesWithGoals,
-                AdoptionRate = adoptionRate,
-                MonthlyTrend = monthlyTrend,
-                GoalTypeDistribution = goalTypeDistribution
-            };
-        }
+    return new GoalAdoptionRateDto
+    {
+        TotalEmployees = totalEmployees,
+        EmployeesWithGoals = employeesWithGoals,
+        EmployeesWithoutGoals = employeesWithoutGoals,
+        AdoptionRate = adoptionRate,
+        MonthlyTrend = monthlyTrend,
+        GoalTypeDistribution = goalTypeDistribution
+    };
+}
 
 
         public async Task<GoalStatisticsDto> GetGoalStatisticsAsync()
