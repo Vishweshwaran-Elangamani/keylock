@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useLayoutEffect,
+  useMemo,
+} from "react";
 import { createPortal } from "react-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import "../../../styles/projectmanagement/components/CustomCalendar.css";
@@ -6,44 +12,49 @@ import "../../../styles/projectmanagement/components/CustomCalendar.css";
 const CustomCalendar = ({
   isOpen,
   onClose,
-  value,
-  onChange,
-  anchorRef,
+  value,      
+  onChange,   
+  anchorRef,   
   position = "auto",
   align = "auto",
   offset = { x: 0, y: 0 },
-  minDate,
+  minDate,   
 }) => {
   const calendarRef = useRef(null);
   const [calendarMonth, setCalendarMonth] = useState(null);
   const [calendarYear, setCalendarYear] = useState(null);
-
   const [calendarPosition, setCalendarPosition] = useState({ top: 0, left: 0 });
 
   const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    "January","February","March","April","May","June",
+    "July","August","September","October","November","December",
   ];
-
   const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+
+  const todayStart = useMemo(() => {
+    const t = new Date();
+    t.setHours(0, 0, 0, 0);
+    return t;
+  }, []);
+
+  const derivedMinDate = useMemo(() => {
+    if (minDate) {
+      const d = new Date(minDate);
+      d.setHours(0, 0, 0, 0);
+      return d > todayStart ? d : todayStart;
+    }
+    return todayStart;
+  }, [minDate, todayStart]);
 
   useEffect(() => {
     if (isOpen) {
-      const date = value ? new Date(value) : new Date();
-      setCalendarMonth(date.getMonth());
-      setCalendarYear(date.getFullYear());
+      const base = value ? new Date(value) : new Date();
+      base.setHours(0, 0, 0, 0);
+      const initial = base < derivedMinDate ? derivedMinDate : base;
+      setCalendarMonth(initial.getMonth());
+      setCalendarYear(initial.getFullYear());
     }
-  }, [isOpen, value]);
+  }, [isOpen, value, derivedMinDate]);
 
   useLayoutEffect(() => {
     if (!isOpen || !anchorRef?.current) return;
@@ -72,59 +83,36 @@ const CustomCalendar = ({
       switch (position) {
         case "below-icon": {
           top = anchorRect.bottom + oy;
-
-          if (align === "right") {
-            left = anchorRect.right - calendarWidth + ox;
-          } else if (align === "left") {
-            left = anchorRect.left + ox;
-          } else {
-            left =
-              anchorRect.left + anchorRect.width / 2 - calendarWidth / 2 + ox;
-          }
+          if (align === "right") left = anchorRect.right - calendarWidth + ox;
+          else if (align === "left") left = anchorRect.left + ox;
+          else left = anchorRect.left + anchorRect.width / 2 - calendarWidth / 2 + ox;
           break;
         }
-
         case "below-input": {
           const wrapperRect = anchorRef.current.getBoundingClientRect();
           top = wrapperRect.bottom + oy;
-
-          if (align === "right") {
-            left = wrapperRect.right - calendarWidth + ox;
-          } else if (align === "left") {
-            left = wrapperRect.left + ox;
-          } else {
-            left =
-              wrapperRect.left + wrapperRect.width / 2 - calendarWidth / 2 + ox;
-          }
+          if (align === "right") left = wrapperRect.right - calendarWidth + ox;
+          else if (align === "left") left = wrapperRect.left + ox;
+          else left = wrapperRect.left + wrapperRect.width / 2 - calendarWidth / 2 + ox;
           break;
         }
-
         case "above-icon": {
           top = anchorRect.top - calendarHeight + oy;
-
-          if (align === "right") {
-            left = anchorRect.right - calendarWidth + ox;
-          } else if (align === "left") {
-            left = anchorRect.left + ox;
-          } else {
-            left =
-              anchorRect.left + anchorRect.width / 2 - calendarWidth / 2 + ox;
-          }
+          if (align === "right") left = anchorRect.right - calendarWidth + ox;
+          else if (align === "left") left = anchorRect.left + ox;
+          else left = anchorRect.left + anchorRect.width / 2 - calendarWidth / 2 + ox;
           break;
         }
-
         case "right-of-icon": {
           top = anchorRect.top + oy;
           left = anchorRect.right + ox;
           break;
         }
-
         case "left-of-icon": {
           top = anchorRect.top + oy;
           left = anchorRect.left - calendarWidth + ox;
           break;
         }
-
         case "auto":
         default: {
           const spaceBelow = viewportHeight - anchorRect.bottom;
@@ -144,27 +132,19 @@ const CustomCalendar = ({
             );
           }
 
-          if (align === "right") {
-            left = anchorRect.right - calendarWidth + ox;
-          } else if (align === "left") {
-            left = anchorRect.left + ox;
-          } else {
-            left =
-              anchorRect.left + anchorRect.width / 2 - calendarWidth / 2 + ox;
-          }
+          if (align === "right") left = anchorRect.right - calendarWidth + ox;
+          else if (align === "left") left = anchorRect.left + ox;
+          else left = anchorRect.left + anchorRect.width / 2 - calendarWidth / 2 + ox;
           break;
         }
       }
 
       if (left < 10) left = 10;
-      if (left + calendarWidth > viewportWidth - 10) {
+      if (left + calendarWidth > viewportWidth - 10)
         left = viewportWidth - calendarWidth - 10;
-      }
-
       if (top < 10) top = 10;
-      if (top + calendarHeight > viewportHeight - 10) {
+      if (top + calendarHeight > viewportHeight - 10)
         top = viewportHeight - calendarHeight - 10;
-      }
 
       setCalendarPosition({ top, left });
     };
@@ -185,7 +165,6 @@ const CustomCalendar = ({
 
   useLayoutEffect(() => {
     if (!isOpen || !calendarRef.current) return;
-
     calendarRef.current.style.top = `${calendarPosition.top}px`;
     calendarRef.current.style.left = `${calendarPosition.left}px`;
   }, [isOpen, calendarPosition]);
@@ -217,84 +196,80 @@ const CustomCalendar = ({
     const prevMonthDays = new Date(year, month, 0).getDate();
 
     const cells = [];
-
     for (let i = startDay - 1; i >= 0; i--) {
       cells.push({ day: prevMonthDays - i, current: false });
     }
-
     for (let d = 1; d <= daysInMonth; d++) {
       cells.push({ day: d, current: true });
     }
-
+    let nextDay = 1;
     while (cells.length % 7 !== 0) {
-      cells.push({ day: (cells.length % 7) + 1, current: false });
+      cells.push({ day: nextDay++, current: false });
     }
-
     return { cells, month, year };
   };
 
   const handleSelectDay = (day, current) => {
     if (!current) return;
-
     const selected = new Date(calendarYear, calendarMonth, day);
-
-    if (minDate) {
-      const minDateObj = new Date(minDate);
-      minDateObj.setHours(0, 0, 0, 0);
-
-      const selectedCopy = new Date(selected);
-      selectedCopy.setHours(0, 0, 0, 0);
-
-      if (selectedCopy < minDateObj) return;
-    }
+    selected.setHours(0, 0, 0, 0);
+    if (selected < derivedMinDate) return;
 
     const yyyy = selected.getFullYear();
     const mm = String(selected.getMonth() + 1).padStart(2, "0");
     const dd = String(selected.getDate()).padStart(2, "0");
-
     onChange(`${yyyy}-${mm}-${dd}`);
     onClose();
   };
 
+  const isBeforeMinMonth = (y, m) => {
+    const firstOfTarget = new Date(y, m, 1);
+    const firstOfMin = new Date(
+      derivedMinDate.getFullYear(),
+      derivedMinDate.getMonth(),
+      1
+    );
+    firstOfTarget.setHours(0, 0, 0, 0);
+    firstOfMin.setHours(0, 0, 0, 0);
+    return firstOfTarget < firstOfMin;
+  };
+
   const goPrevMonth = () => {
     if (calendarMonth === null || calendarYear === null) return;
-
     let m = calendarMonth - 1;
     let y = calendarYear;
-
     if (m < 0) {
       m = 11;
       y -= 1;
     }
-
+    if (isBeforeMinMonth(y, m)) return; 
     setCalendarMonth(m);
     setCalendarYear(y);
   };
 
   const goNextMonth = () => {
     if (calendarMonth === null || calendarYear === null) return;
-
     let m = calendarMonth + 1;
     let y = calendarYear;
-
     if (m > 11) {
       m = 0;
       y += 1;
     }
-
     setCalendarMonth(m);
     setCalendarYear(y);
   };
 
   const goToday = () => {
     const t = new Date();
-    setCalendarMonth(t.getMonth());
-    setCalendarYear(t.getFullYear());
+    t.setHours(0, 0, 0, 0);
+    const target = t < derivedMinDate ? derivedMinDate : t;
 
-    const yyyy = t.getFullYear();
-    const mm = String(t.getMonth() + 1).padStart(2, "0");
-    const dd = String(t.getDate()).padStart(2, "0");
+    setCalendarMonth(target.getMonth());
+    setCalendarYear(target.getFullYear());
 
+    const yyyy = target.getFullYear();
+    const mm = String(target.getMonth() + 1).padStart(2, "0");
+    const dd = String(target.getDate()).padStart(2, "0");
     onChange(`${yyyy}-${mm}-${dd}`);
     onClose();
   };
@@ -303,7 +278,7 @@ const CustomCalendar = ({
 
   const { cells, month, year } = getCalendarMatrix();
   const selectedDate = value ? new Date(value) : null;
-  const minDateObj = minDate ? new Date(minDate) : null;
+  const minDateObj = derivedMinDate;
 
   const calendarContent = (
     <div className="csla-calendar-dropdown" ref={calendarRef}>
@@ -313,6 +288,10 @@ const CustomCalendar = ({
           className="csla-calendar-nav-btn"
           onClick={goPrevMonth}
           aria-label="Previous month"
+          disabled={isBeforeMinMonth(
+            calendarMonth === 0 ? calendarYear - 1 : calendarYear,
+            calendarMonth === 0 ? 11 : calendarMonth - 1
+          )}
         >
           <ChevronLeft size={16} />
         </button>
@@ -347,15 +326,14 @@ const CustomCalendar = ({
           const todayDate = new Date();
           todayDate.setHours(0, 0, 0, 0);
 
-          const isToday =
-            c.current && cellDate.getTime() === todayDate.getTime();
+          const isToday = c.current && cellDate.getTime() === todayDate.getTime();
 
           const isSelected =
             selectedDate &&
             c.current &&
-            cellDate.getDate() === selectedDate.getDate() &&
-            cellDate.getMonth() === selectedDate.getMonth() &&
-            cellDate.getFullYear() === selectedDate.getFullYear();
+            cellDate.getDate() === new Date(selectedDate).getDate() &&
+            cellDate.getMonth() === new Date(selectedDate).getMonth() &&
+            cellDate.getFullYear() === new Date(selectedDate).getFullYear();
 
           const isDisabled = c.current && minDateObj && cellDate < minDateObj;
 

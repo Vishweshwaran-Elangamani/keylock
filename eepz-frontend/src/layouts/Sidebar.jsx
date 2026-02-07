@@ -10,13 +10,12 @@ const Sidebar = ({ allowedRoles = [], currentRole, isOpen, onToggle, onClose }) 
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Detect mobile screen size
   useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth <= 768;
       setIsMobile(mobile);
       if (!mobile) {
-        setSidebarExpanded(true); // Always expanded on desktop
+        setSidebarExpanded(true); 
       }
     };
 
@@ -66,7 +65,7 @@ const Sidebar = ({ allowedRoles = [], currentRole, isOpen, onToggle, onClose }) 
       },
       {
         icon: "bi-file-earmark-check",
-        label: "SLA Management",
+        label: "SLA Compliance",
         path: "/hr/dashboard/sla",
       },
       {
@@ -150,7 +149,7 @@ const Sidebar = ({ allowedRoles = [], currentRole, isOpen, onToggle, onClose }) 
       },
       {
         icon: "bi bi-file-earmark-check",
-        label: "SLA Management",
+        label: "SLA Compliance",
         path: "/department-head/dashboard/sla",
       },
       {
@@ -213,7 +212,7 @@ const Sidebar = ({ allowedRoles = [], currentRole, isOpen, onToggle, onClose }) 
       },
       {
         icon: "bi-file-earmark-check",
-        label: "SLA Management",
+        label: "SLA Compliance",
         path: "/manager/dashboard/sla",
       },
       {
@@ -281,7 +280,6 @@ const Sidebar = ({ allowedRoles = [], currentRole, isOpen, onToggle, onClose }) 
     ],
   };
 
-  // Get menu items based on current role from allowed roles
   const getMenuItems = () => {
     if (allowedRoles.length === 0) {
       return allMenuItems[currentRole] || [];
@@ -313,7 +311,6 @@ const Sidebar = ({ allowedRoles = [], currentRole, isOpen, onToggle, onClose }) 
     }
   };
 
-  // Determine if sidebar should be shown
   const showSidebar = isMobile ? isOpen : true;
   const sidebarClass = isMobile 
     ? `sbd-sidebar sbd-mobile ${isOpen ? "sbd-open" : ""}`
@@ -322,7 +319,6 @@ const Sidebar = ({ allowedRoles = [], currentRole, isOpen, onToggle, onClose }) 
   return (
     <>
       <aside className={sidebarClass}>
-        {/* Logo Section */}
         <div className="sbd-logo-section">
           <img
             src={(isMobile || sidebarExpanded) ? logodarkbarred : icon}
@@ -331,7 +327,6 @@ const Sidebar = ({ allowedRoles = [], currentRole, isOpen, onToggle, onClose }) 
           />
         </div>
 
-        {/* Toggle Button - Only show on desktop */}
         {!isMobile && (
           <button
             className="sbd-toggle-btn"

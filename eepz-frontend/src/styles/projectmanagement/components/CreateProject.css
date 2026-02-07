@@ -324,7 +324,10 @@
   transition: all 0.2s ease;
   min-height: 68px;
   display: flex;
-  align-items: center;
+  align-items: center;      
+  justify-content: flex-start; 
+  width: 100%;
+  text-align: left;        
 }
 
 .prj-manager-box:hover {
@@ -332,32 +335,26 @@
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
 }
 
+.prj-manager-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+}
+
 .prj-manager-name {
   font-weight: 600;
   color: #393939;
   font-size: 0.9375rem;
-  margin-bottom: 0.25rem;
+  line-height: 1.2;
+  margin: 0;            
 }
 
-.prj-manager-role-res {
+.prj-manager-role {
   color: #8d8d8d;
   font-size: 0.8125rem;
   font-weight: 500;
-  margin-left: -35px;
-}
-
-.prj-manager-role-l1 {
-  color: #8d8d8d;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  margin-right: 100px;
-}
-
-.prj-manager-role-l2 {
-  color: #8d8d8d;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  margin-left: -30px;
+  margin: 0;               
 }
 
 .prj-manager-placeholder {
@@ -366,6 +363,15 @@
   gap: 0.625rem;
   color: #8d8d8d;
   font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.prj-manager-role-res,
+.prj-manager-role-l1,
+.prj-manager-role-l2 {
+  all: unset;
+  color: #8d8d8d;
+  font-size: 0.8125rem;
   font-weight: 500;
 }
 

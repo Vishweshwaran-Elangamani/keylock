@@ -8,11 +8,12 @@
   border: 1px solid #e5e7eb;
   width: 260px;
   font-family: 'Poppins', sans-serif;
-  z-index: 10002;
+  z-index: 999999;   
   display: block;
   visibility: visible;
   opacity: 1;
   pointer-events: auto;
+  isolation: isolate; 
 }
 
 .csla-calendar-header {
@@ -23,6 +24,9 @@
   border-bottom: 1px solid #e5e7eb;
   background-color: #f9fafb;
   border-radius: 12px 12px 0 0;
+
+  position: relative; 
+  z-index: 2;
 }
 
 .csla-calendar-nav-btn {
@@ -36,9 +40,17 @@
   justify-content: center;
   transition: color 0.2s ease;
   font-family: 'Poppins', sans-serif;
+
+  position: relative; 
+  z-index: 3;
 }
 
-.csla-calendar-nav-btn:hover {
+.csla-calendar-nav-btn[disabled] {
+  color: #c7c9cf;
+  cursor: not-allowed;
+}
+
+.csla-calendar-nav-btn:hover:not([disabled]) {
   color: #111827;
 }
 

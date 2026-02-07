@@ -214,7 +214,7 @@ const EmployeeSelectionModal = ({
                 name="filterRole"
                 value={filterRole}
                 placeholder="All Roles"
-                options={["All", ...uniqueRoles]}
+                options={["All Roles", ...uniqueRoles]}
                 anchorRef={roleDropdownRef}
                 onChange={(_, v) => setFilterRole(v)}
               />
@@ -226,7 +226,7 @@ const EmployeeSelectionModal = ({
                 name="filterDepartment"
                 value={filterDepartment}
                 placeholder="All Departments"
-                options={["All", ...uniqueDepartments]}
+                options={["All Departments", ...uniqueDepartments]}
                 anchorRef={deptDropdownRef}
                 onChange={(_, v) => setFilterDepartment(v)}
               />
