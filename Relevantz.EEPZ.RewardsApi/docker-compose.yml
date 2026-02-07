@@ -1,29 +1,53 @@
-services:
-  rewards-api:
-    build:
-      context: .            # Dockerfile is in THIS folder
-      dockerfile: Dockerfile
-    image: eepz-rewards-api:dev
-    container_name: eepz-rewards-api-dev
-    restart: unless-stopped
-    ports:
-      - "5114:5114"
-    environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: "http://+:5114"
-      ConnectionStrings__DefaultConnection: "Server=mysql;Database=eepzdb;User=root;Password=root;"
-    volumes:
-      - ./logs:/app/Logs
-      - shared_uploads:/SharedUploads
-      - dataprotection_keys:/home/app/.aspnet/DataProtection-Keys
-    networks:
-      - eepz-network
-    # No depends_on here because mysql is in another compose project
-
-volumes:
-  shared_uploads:
-  dataprotection_keys:
+version: "3.9"
 
 networks:
-  eepz-network:
+  eepz_eepz-network:
     external: true
+
+services:
+  rewards-api:
+    build: .
+    container_name: eepz-rewards-api
+    restart: always
+    ports:
+      - "5114:5114"
+    env_file:
+      - .env
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+      ASPNETCORE_URLS: ${ASPNETCORE_URLS}
+
+      # Use DSNs from .env (NOT hardcoded)
+      CONNECTIONSTRINGS__DEFAULTCONNECTION: ${CONNECTIONSTRINGS__DEFAULTCONNECTION}
+      CONNECTIONSTRINGS__EEPZDB: ${CONNECTIONSTRINGS__EEPZDB}
+
+      # Mongo, JWT, SMTP, AdminSeed from .env
+      MONGODB__CONNECTIONSTRING: ${MONGODB__CONNECTIONSTRING}
+      MONGODB__DATABASENAME: ${MONGODB__DATABASENAME}
+
+      JWT__ISSUER: ${JWT__ISSUER}
+      JWT__AUDIENCE: ${JWT__AUDIENCE}
+      JWT__SECRETKEY: ${JWT__SECRETKEY}
+      JWT__ACCESSTOKENEXPIRATIONMINUTES: ${JWT__ACCESSTOKENEXPIRATIONMINUTES}
+      JWT__REFRESHTOKENEXPIRATIONDAYS: ${JWT__REFRESHTOKENEXPIRATIONDAYS}
+
+      SMTPSETTINGS__HOST: ${SMTPSETTINGS__HOST}
+      SMTPSETTINGS__PORT: ${SMTPSETTINGS__PORT}
+      SMTPSETTINGS__ENABLESSL: ${SMTPSETTINGS__ENABLESSL}
+      SMTPSETTINGS__USERNAME: ${SMTPSETTINGS__USERNAME}
+      SMTPSETTINGS__PASSWORD: ${SMTPSETTINGS__PASSWORD}
+      SMTPSETTINGS__FROMEMAIL: ${SMTPSETTINGS__FROMEMAIL}
+      SMTPSETTINGS__FROMNAME: ${SMTPSETTINGS__FROMNAME}
+
+      ADMINSEEDDATA__EMAIL: ${ADMINSEEDDATA__EMAIL}
+      ADMINSEEDDATA__PASSWORD: ${ADMINSEEDDATA__PASSWORD}
+      ADMINSEEDDATA__FIRSTNAME: ${ADMINSEEDDATA__FIRSTNAME}
+      ADMINSEEDDATA__LASTNAME: ${ADMINSEEDDATA__LASTNAME}
+      ADMINSEEDDATA__EMPLOYEECOMPANYID: ${ADMINSEEDDATA__EMPLOYEECOMPANYID}
+      ADMINSEEDDATA__MOBILENUMBER: ${ADMINSEEDDATA__MOBILENUMBER}
+
+    volumes:
+      - ./logs:/app/Logs
+      - ./dataprotection:/home/app/.aspnet/DataProtection-Keys
+    networks:
+      - eepz_eepz-network

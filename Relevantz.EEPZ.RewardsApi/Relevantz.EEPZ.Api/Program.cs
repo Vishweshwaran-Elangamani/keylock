@@ -31,11 +31,45 @@ using Relevantz.EEPZ.Data.Repository.Implementations;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
+<<<<<<< Updated upstream
 using FluentValidation;
 using Relevantz.EEPZ.Common.DTOs.Response;
 
+=======
+// NEW: Load .env early for local development (DotNetEnv)
+try
+{
+    // Try a few common locations: project root (when running from root) and ../bin/... scenarios
+    var candidates = new[]
+    {
+        Path.Combine(Directory.GetCurrentDirectory(), ".env"),
+        Path.Combine(AppContext.BaseDirectory, ".env"),
+        Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".env"),
+    };
+
+    foreach (var p in candidates)
+    {
+        if (File.Exists(p))
+        {
+            DotNetEnv.Env.Load(p);
+            Console.WriteLine($"[config] Loaded .env from {Path.GetFullPath(p)}");
+            break;
+        }
+    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"[config] Skipped .env load: {ex.Message}");
+}
+>>>>>>> Stashed changes
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Ensure configuration order: appsettings.json -> appsettings.{Env}.json -> Environment Variables
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
 
 // -------------------------------------------------
 // Shared uploads directory
@@ -168,18 +202,26 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
 
 // -------------------------------------------------
-// EF Core (MySQL)
+// EF Core (MySQL) -- now expects CONNECTIONSTRINGS__DEFAULTCONNECTION from env/.env
 // -------------------------------------------------
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException("ConnectionStrings:DefaultConnection is not configured. Ensure it is provided via environment variables (CONNECTIONSTRINGS__DEFAULTCONNECTION) or appsettings.");
+}
 builder.Services.AddDbContext<EEPZDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 builder.Services.AddScoped<DbContext>(sp => sp.GetRequiredService<EEPZDbContext>());
 
 // -------------------------------------------------
-// JWT (sanitized events)
+// JWT (values overridden by env variables loaded from .env)
 // -------------------------------------------------
 var jwtSettings = builder.Configuration.GetSection("Jwt");
-var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey not configured");
+var secretKey = jwtSettings["SecretKey"];
+if (string.IsNullOrWhiteSpace(secretKey))
+{
+    throw new InvalidOperationException("Jwt:SecretKey not configured. Provide JWT__SECRETKEY via environment variables or appsettings.");
+}
 
 builder.Services.AddAuthentication(options =>
 {
