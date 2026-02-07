@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { UserCog, X, CheckCircle, Search } from "lucide-react";
 import CustomDropdown from "../../../components/project-management/common/CustomDropdown";
+import PaginationFooter from "../../../components/project-management/common/PaginationFooter"; 
 import "../../../styles/projectmanagement/components/EmployeeSelectionModal.css";
 
 const EmployeeSelectionModal = ({
   show,
   onClose,
-  employees,
+  employees,  
   activeTab,
   setActiveTab,
   selectedResourceOwner,
@@ -73,7 +74,7 @@ const EmployeeSelectionModal = ({
     return depts.sort((a, b) => a.localeCompare(b));
   }, [employees]);
 
-  const filteredManagers = useMemo(() => {
+  const filteredEmployees = useMemo(() => {
     return (employees || []).filter((emp) => {
       const searchMatch =
         !searchTerm ||
@@ -89,10 +90,13 @@ const EmployeeSelectionModal = ({
     });
   }, [employees, searchTerm, filterRole, filterDepartment]);
 
-  const totalPages = Math.ceil(filteredManagers.length / itemsPerPage) || 1;
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedManagers = filteredManagers.slice(startIndex, endIndex);
+  
+  const totalItems = filteredEmployees.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+  const paginatedEmployees = filteredEmployees.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const goToPage = (page) => {
     setCurrentPage(Math.max(1, Math.min(page, totalPages)));
@@ -325,6 +329,15 @@ const EmployeeSelectionModal = ({
                 </tbody>
               </table>
             </div>
+
+          
+<PaginationFooter
+  totalItems={totalItems}
+  currentPage={currentPage}
+  setCurrentPage={setCurrentPage}
+  itemsPerPage={itemsPerPage}
+  setItemsPerPage={setItemsPerPage}
+/>
           </div>
 
           <div className="prj-modal-footer">

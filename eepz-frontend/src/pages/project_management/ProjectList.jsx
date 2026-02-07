@@ -868,6 +868,7 @@ const ProjectList = () => {
         getMappedCount={getMappedCount}
         getUnmappedCount={getUnmappedCount}
         hasSelectedMapped={hasSelectedMappedEmployees}
+        setPrimaryEmployeeIds={setPrimaryEmployeeIds}
         hasSelectedUnmapped={hasSelectedUnmappedEmployees}/>
 
       <DeleteConfirmationModal

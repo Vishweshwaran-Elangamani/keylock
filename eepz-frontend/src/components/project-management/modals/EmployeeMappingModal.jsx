@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import {
@@ -20,6 +21,7 @@ const EmployeeMappingModal = ({
   mappedEmployees,
   selectedEmployeeIds,
   primaryEmployeeIds,
+  setPrimaryEmployeeIds,
   searchTerm,
   setSearchTerm,
   activeSearchTerm,
@@ -45,6 +47,7 @@ const EmployeeMappingModal = ({
   hasSelectedMapped,
   hasSelectedUnmapped,
 }) => {
+ 
   useEffect(() => {
     if (show) document.body.style.overflow = "hidden";
     else document.body.style.overflow = "unset";
@@ -52,6 +55,34 @@ const EmployeeMappingModal = ({
       document.body.style.overflow = "unset";
     };
   }, [show]);
+
+  useEffect(() => {
+    if (!show) return;
+    if (!Array.isArray(mappedEmployees) || mappedEmployees.length === 0) return;
+    if (typeof setPrimaryEmployeeIds !== "function") return;
+
+    const serverPrimaryMasterIds = mappedEmployees
+      .filter(
+        (m) => m?.isPrimary === true && Number.isInteger(m?.employeeMasterId)
+      )
+      .map((m) => m.employeeMasterId);
+
+    if (serverPrimaryMasterIds.length === 0) return;
+
+    setPrimaryEmployeeIds((prev = []) => {
+      const prevSet = new Set(prev);
+      let changed = false;
+      for (const id of serverPrimaryMasterIds) {
+        if (!prevSet.has(id)) {
+          prevSet.add(id);
+          changed = true;
+        }
+      }
+      return changed ? Array.from(prevSet) : prev;
+    });
+  }, [show, mappedEmployees, setPrimaryEmployeeIds]);
+
+  if (!show) return null;
 
   const handleSearch = () => {
     if (!searchTerm.trim()) return;
@@ -69,8 +100,6 @@ const EmployeeMappingModal = ({
       handleSearch();
     }
   };
-
-  if (!show) return null;
 
   const getProjectManagerIds = () => {
     if (!project) return [];
@@ -336,15 +365,24 @@ const EmployeeMappingModal = ({
                         </tr>
                       ) : (
                         displayEmployees.map((emp) => {
-                          const isMapped = mappedEmployees.some(
+                          const isMapped = (mappedEmployees || []).some(
                             (m) => m.employeeMasterId === emp.employeeMasterId
                           );
+
                           const isSelected = selectedEmployeeIds.includes(
                             emp.employeeMasterId
                           );
-                          const isPrimary = primaryEmployeeIds.includes(
-                            emp.employeeMasterId
+
+                          const mappedRecord = (mappedEmployees || []).find(
+                            (m) => m.employeeMasterId === emp.employeeMasterId
                           );
+
+                          const isPrimaryFromServer =
+                            mappedRecord?.isPrimary === true;
+
+                          const isPrimary =
+                            isPrimaryFromServer ||
+                            primaryEmployeeIds.includes(emp.employeeMasterId);
 
                           return (
                             <tr
@@ -402,14 +440,11 @@ const EmployeeMappingModal = ({
                                   type="checkbox"
                                   className="emm-checkbox"
                                   checked={isPrimary}
-                                  disabled={!isSelected}
+                                  disabled={
+                                    !isSelected && !mappedRecord
+                                  } 
                                   onChange={() =>
                                     onPrimaryToggle(emp.employeeMasterId)
-                                  }
-                                  title={
-                                    !isSelected
-                                      ? "Select employee first"
-                                      : "Mark as primary"
                                   }
                                 />
                               </td>

@@ -3,14 +3,13 @@ import ReactDOM from "react-dom";
 import {
   X,
   Search,
-  ChevronLeft,
-  ChevronRight,
   AlertCircle,
   CheckCircle,
   UserCog,
   Info,
 } from "lucide-react";
 import CustomDropdown from "../../../components/project-management/common/CustomDropdown";
+import PaginationFooter from "../../../components/project-management/common/PaginationFooter";
 import "../../../styles/projectmanagement/modals/ManagerSelectionModal.css";
 
 const ManagerSelectionModal = ({
@@ -33,9 +32,9 @@ const ManagerSelectionModal = ({
   setFilterDepartment,
   paginatedManagers,
   currentPage,
-  totalPages,
+  totalPages,        
   goToPage,
-  getPageNumbers,
+  getPageNumbers,     
   uniqueRoles,
   uniqueDepartments,
   onUpdate,
@@ -94,12 +93,12 @@ const ManagerSelectionModal = ({
     label: d === "All" ? "All Departments" : d,
   }));
 
+  
   const safeTotal =
     typeof totalItems === "number" ? totalItems : paginatedManagers.length;
   const perPage = itemsPerPage || paginatedManagers.length || 1;
   const startIndex = safeTotal === 0 ? 0 : (currentPage - 1) * perPage + 1;
-  const endIndex =
-    safeTotal === 0 ? 0 : Math.min(currentPage * perPage, safeTotal);
+  const endIndex = safeTotal === 0 ? 0 : Math.min(currentPage * perPage, safeTotal);
 
   const modalContent = (
     <>
@@ -201,9 +200,7 @@ const ManagerSelectionModal = ({
             <div className="alert alert-info d-flex align-items-start gap-2 mb-3 msm-current-banner">
               <Info size={18} className="msm-info-icon" />
               <div className="msm-current-content">
-                <strong className="msm-current-label">
-                  Current Selection:
-                </strong>
+                <strong className="msm-current-label">Current Selection:</strong>
                 <div className="mt-1">
                   {getSelectedManager() ? (
                     <span className="badge msm-current-badge">
@@ -351,89 +348,14 @@ const ManagerSelectionModal = ({
               </table>
             </div>
 
-            {totalPages > 1 && (
-              <div className="msm-pagination">
-                <div className="msm-pagination-left">
-                  <span className="msm-pagination-label">Show</span>
-                  <select
-                    className="msm-page-size-select"
-                    value={itemsPerPage}
-                    onChange={(e) => onPageSizeChange(Number(e.target.value))}
-                  >
-                    <option value={5}>5</option>
-                    <option value={10}>10</option>
-                    <option value={25}>25</option>
-                  </select>
-                  <span className="msm-pagination-label">entries</span>
-                </div>
-
-                <div className="msm-pagination-center">
-                  <span className="msm-pagination-status">
-                    Showing {startIndex} to {endIndex} of {safeTotal} entries
-                  </span>
-                </div>
-
-                <div className="msm-pagination-right">
-                  <ul className="msm-page-list">
-                    <li
-                      className={`msm-page-item ${
-                        currentPage === 1 ? "disabled" : ""
-                      }`}
-                    >
-                      <button
-                        className="msm-page-link msm-page-arrow"
-                        onClick={() => goToPage(currentPage - 1)}
-                        disabled={currentPage === 1}
-                        type="button"
-                      >
-                        <ChevronLeft size={16} />
-                      </button>
-                    </li>
-
-                    {getPageNumbers().map((page, index) =>
-                      page === "..." ? (
-                        <li
-                          key={`mgr-ellipsis-${index}`}
-                          className="msm-page-ellipsis"
-                        >
-                          <span className="msm-page-dots">...</span>
-                        </li>
-                      ) : (
-                        <li
-                          key={`mgr-${page}`}
-                          className={`msm-page-item ${
-                            currentPage === page ? "active" : ""
-                          }`}
-                        >
-                          <button
-                            className="msm-page-link"
-                            onClick={() => goToPage(page)}
-                            type="button"
-                          >
-                            {page}
-                          </button>
-                        </li>
-                      )
-                    )}
-
-                    <li
-                      className={`msm-page-item ${
-                        currentPage === totalPages ? "disabled" : ""
-                      }`}
-                    >
-                      <button
-                        className="msm-page-link msm-page-arrow"
-                        onClick={() => goToPage(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                        type="button"
-                      >
-                        <ChevronRight size={16} />
-                      </button>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            )}
+            {/* ✅ Reused PaginationFooter (replaces old inline pagination block) */}
+            <PaginationFooter
+              totalItems={totalItems}
+              currentPage={currentPage}
+              setCurrentPage={goToPage}
+              itemsPerPage={itemsPerPage}
+              setItemsPerPage={onPageSizeChange}
+            />
           </div>
 
           <div className="msm-footer">

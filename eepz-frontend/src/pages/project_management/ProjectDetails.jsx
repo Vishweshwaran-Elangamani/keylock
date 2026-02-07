@@ -56,27 +56,23 @@ const ProjectDetails = () => {
     }
   };
 
-  const fetchPrimaryProjects = async (employees) => {
-    try {
-      const employeeIds = employees.map((emp) => emp.employeeMasterId);
-      const response = await projectService.getPrimaryProjects(employeeIds);
+ const fetchPrimaryProjects = async (employees) => {
+  try {
+    const employeeIds = employees.map((emp) => emp.employeeMasterId);
+    const response = await projectService.getPrimaryProjects(employeeIds);
 
-      if (response.success && response.data) {
-        setPrimaryProjectsMap(response.data);
-      }
-    } catch (err) {
-      console.error("Error fetching primary projects:", err);
+    if (response.success && response.data) {
+      const normalized = Object.entries(response.data).reduce((acc, [k, v]) => {
+        acc[String(k)] = v;
+        return acc;
+      }, {});
+      setPrimaryProjectsMap(normalized);
     }
-  };
+  } catch (err) {
+    console.error("Error fetching primary projects:", err);
+  }
+};
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
 
   const getStatusBadge = (status) => {
     const statusConfig = {
@@ -100,19 +96,35 @@ const ProjectDetails = () => {
     );
   };
 
-  const isEmployeePrimaryForThisProject = (employee) => {
-    const employeeId = employee.employeeMasterId;
-    const primaryProjectInfo = primaryProjectsMap[employeeId];
+ const isEmployeePrimaryForThisProject = (employee) => {
+  const employeeIdKey = String(employee.employeeMasterId);
+  const primaryProjectInfo = primaryProjectsMap?.[employeeIdKey];
 
-    if (!primaryProjectInfo) {
-      return employee.isPrimary === 1 || employee.isPrimary === "1";
-    }
+  if (primaryProjectInfo && primaryProjectInfo.projectId != null) {
+    return Number(primaryProjectInfo.projectId) === Number(projectId);
+  }
 
-    return (
-      primaryProjectInfo &&
-      primaryProjectInfo.projectId === parseInt(projectId, 10)
-    );
-  };
+ 
+  return (
+    employee.isPrimary === true ||
+    employee.isPrimary === 1 ||
+    employee.isPrimary === "1"
+  );
+};
+const formatDate = (dateLike) => {
+  if (!dateLike) return "N/A";
+  try {
+    const d = new Date(dateLike);
+    if (Number.isNaN(d.getTime())) return "N/A";
+    return d.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  } catch {
+    return "N/A";
+  }
+};
 
   if (isLoading) {
     return (

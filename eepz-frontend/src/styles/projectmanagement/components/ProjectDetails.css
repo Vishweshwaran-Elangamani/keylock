@@ -329,7 +329,6 @@
 }
 
 .prj-detail-employee-card--primary {
-  border: 2px solid #0f62fe;
   background: rgba(15, 98, 254, 0.02);
 }
 
@@ -356,7 +355,7 @@
 }
 
 .prj-detail-badge-primary {
-  background: #0f62fe;
+  background: #27235c;
   color: #ffffff;
 }
 
@@ -386,8 +385,8 @@
 }
 
 .prj-detail-employee-avatar--primary {
-  background: #0f62fe;
-  color: #ffffff;
+    color: #0f62fe;
+
 }
 
 .prj-detail-employee-info {
