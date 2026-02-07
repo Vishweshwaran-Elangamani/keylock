@@ -1,14 +1,118 @@
 import React, { useState } from "react";
 import CreateMomModal from "./CreateMomModal";
 import "../../../styles/mom/modals/MeetingDetailsModal.css";
-
-const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
+ 
+const MeetingDetailsModal = ({ meeting, onClose, employeeMap, onMomCreated }) => {
   const [showCreateMom, setShowCreateMom] = useState(false);
-
+ 
   const toggleCreateMom = () => setShowCreateMom(!showCreateMom);
-
+ 
   if (!meeting) return null;
-
+ 
+  const meetingTitle = meeting.meetingTitle || meeting.MeetingTitle;
+  const meetingType = meeting.meetingType || meeting.MeetingType;
+  const meetingDate =
+    meeting.meetingDate ||
+    meeting.MeetingDate ||
+    meeting.createdAt ||
+    meeting.CreatedAt;
+ 
+  const attendees =
+    meeting.attendees ||
+    meeting.Attendees ||
+    meeting.attendeeNames ||
+    "Not specified";
+ 
+  const meetingLink = meeting.meetingLink || meeting.MeetingLink;
+  const commentsObservations =
+    meeting.commentsObservations || meeting.CommentsObservations;
+ 
+  const discussionPoints =
+    meeting.discussionPoints || meeting.DiscussionPoints || [];
+ 
+  const actionItems = meeting.actionItems || meeting.ActionItems || [];
+ 
+  const getEmployeeName = (actionItem) => {
+    const existingName =
+      actionItem.assignedToEmployeeName ||
+      actionItem.AssignedToEmployeeName ||
+      actionItem.employeeName ||
+      actionItem.EmployeeName;
+ 
+    if (existingName) return existingName;
+ 
+    const assignedId =
+      actionItem.assignedToEmployeeId ||
+      actionItem.AssignedToEmployeeId ||
+      actionItem.assignedEmployeeId ||
+      actionItem.AssignedEmployeeId ||
+      actionItem.employeeId ||
+      actionItem.EmployeeId ||
+      actionItem.assignTo ||
+      actionItem.AssignTo;
+ 
+    if (!assignedId) return "Unassigned";
+ 
+    return employeeMap?.[String(assignedId)];
+  };
+ 
+  const handleMomCreated = (newMom) => {
+    const processedActionItems = (newMom.actionItems || newMom.ActionItems || []).map(item => {
+      const assignedId =
+        item.assignedToEmployeeId ||
+        item.AssignedToEmployeeId ||
+        item.assignedTo ||
+        item.AssignedTo;
+     
+      const existingName =
+        item.assignedToEmployeeName ||
+        item.AssignedToEmployeeName ||
+        item.employeeName ||
+        item.EmployeeName;
+     
+      const finalName = existingName || employeeMap?.[String(assignedId)] || `Employee ${assignedId}`;
+     
+      return {
+        ...item,
+        assignedToEmployeeId: assignedId,
+        AssignedToEmployeeId: assignedId,
+        assignedToEmployeeName: finalName,
+        AssignedToEmployeeName: finalName,
+        taskDescription: item.taskDescription || item.TaskDescription || "",
+        TaskDescription: item.taskDescription || item.TaskDescription || "",
+        dueDate: item.dueDate || item.DueDate || "",
+        DueDate: item.dueDate || item.DueDate || "",
+        status: item.status || item.Status || "Pending",
+        Status: item.status || item.Status || "Pending",
+      };
+    });
+ 
+    const normalizedMom = {
+      meetingId: newMom.meetingId || newMom.MeetingId || newMom.id || Date.now(),
+      MeetingId: newMom.meetingId || newMom.MeetingId || newMom.id || Date.now(),
+      meetingTitle: newMom.meetingTitle || newMom.MeetingTitle || meetingTitle || "MOM Record",
+      MeetingTitle: newMom.meetingTitle || newMom.MeetingTitle || meetingTitle || "MOM Record",
+      meetingType: newMom.meetingType || newMom.MeetingType || meetingType || "General",
+      MeetingType: newMom.meetingType || newMom.MeetingType || meetingType || "General",
+      meetingDate: newMom.meetingDate || newMom.MeetingDate || meetingDate,
+      MeetingDate: newMom.meetingDate || newMom.MeetingDate || meetingDate,
+      commentsObservations: newMom.commentsObservations || newMom.CommentsObservations || "",
+      CommentsObservations: newMom.commentsObservations || newMom.CommentsObservations || "",
+      actionItems: processedActionItems,
+      ActionItems: processedActionItems,
+      discussionPoints: newMom.discussionPoints || newMom.DiscussionPoints || [],
+      DiscussionPoints: newMom.discussionPoints || newMom.DiscussionPoints || [],
+      attendees: newMom.attendees || newMom.Attendees || attendees,
+      Attendees: newMom.attendees || newMom.Attendees || attendees,
+    };
+ 
+    if (onMomCreated) {
+      onMomCreated(normalizedMom);
+    }
+   
+    setShowCreateMom(false);
+  };
+ 
   return (
     <>
       <div
@@ -24,10 +128,10 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
             <div className="mdm-header modal-header border-0">
               <div className="mdm-header-text">
                 <h5 className="mdm-title modal-title fw-bold mb-2">
-                  {meeting.meetingTitle}
+                  {meetingTitle}
                 </h5>
                 <span className="mdm-type-badge badge bg-light text-primary">
-                  {meeting.meetingType}
+                  {meetingType}
                 </span>
               </div>
               <button
@@ -36,7 +140,7 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
                 onClick={onClose}
               ></button>
             </div>
-
+ 
             <div className="mdm-body modal-body">
               <div className="row g-3 mb-4">
                 <div className="col-md-6">
@@ -44,36 +148,25 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
                     <div className="d-flex align-items-center gap-2 mb-2">
                       <i className="bi bi-calendar3 text-primary"></i>
                       <small className="text-muted fw-semibold">
-                        Date &amp; Time
+                        Date & Time
                       </small>
                     </div>
                     <span className="d-block fw-medium">
-                      {new Date(meeting.meetingDate).toLocaleString("en-US", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </span>
-                  </div>
-                </div>
-                <div className="col-md-6">
-                  <div className="mdm-info-card p-3 rounded">
-                    <div className="d-flex align-items-center gap-2 mb-2">
-                      <i className="bi bi-people text-success"></i>
-                      <small className="text-muted fw-semibold">
-                        Attendees
-                      </small>
-                    </div>
-                    <span className="d-block fw-medium">
-                      {meeting.attendees || "Not specified"}
+                      {meetingDate
+                        ? new Date(meetingDate).toLocaleString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })
+                        : "Not available"}
                     </span>
                   </div>
                 </div>
               </div>
-
-              {meeting.meetingLink && (
+ 
+              {meetingLink && (
                 <div className="mb-4">
                   <div className="mdm-link-card p-3 rounded">
                     <div className="d-flex align-items-center gap-2 mb-2">
@@ -83,7 +176,7 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
                       </small>
                     </div>
                     <a
-                      href={meeting.meetingLink}
+                      href={meetingLink}
                       target="_blank"
                       rel="noreferrer"
                       className="mdm-link text-primary text-decoration-none d-flex align-items-center gap-2 fw-medium"
@@ -94,111 +187,91 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
                   </div>
                 </div>
               )}
-
-              {meeting.commentsObservations && (
+ 
+              {commentsObservations && (
                 <div className="mb-4">
-                  <h6 className="mdm-section-title fw-semibold mb-3 d-flex align-items-center gap-2">
-                    <i className="bi bi-chat-left-text text-info"></i>
-                    Comments &amp; Observations
+                  <h6 className="mdm-section-title fw-semibold mb-3">
+                    Comments & Observations
                   </h6>
                   <div className="mdm-comments-card p-3 rounded">
-                    <p className="mb-0">{meeting.commentsObservations}</p>
+                    <p className="mb-0">{commentsObservations}</p>
                   </div>
                 </div>
               )}
-
-              {meeting.discussionPoints &&
-                meeting.discussionPoints.length > 0 && (
-                  <div className="mb-4">
-                    <h6 className="mdm-section-title fw-semibold mb-3 d-flex align-items-center gap-2">
-                      <i className="bi bi-chat-dots text-warning"></i>
-                      Discussion Points
-                      <span className="badge bg-light text-dark">
-                        {meeting.discussionPoints.length}
-                      </span>
-                    </h6>
-                    <div className="d-flex flex-column gap-2">
-                      {meeting.discussionPoints.map((dp, i) => (
-                        <div
-                          key={i}
-                          className="mdm-discussion-card p-3 rounded d-flex align-items-start gap-3"
-                        >
-                          <span className="flex-grow-1">{dp.pointText}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-              {meeting.actionItems && meeting.actionItems.length > 0 && (
+ 
+              {discussionPoints.length > 0 && (
                 <div className="mb-4">
-                  <h6 className="mdm-section-title fw-semibold mb-3 d-flex align-items-center gap-2">
-                    <i className="bi bi-check2-square text-success"></i>
-                    Action Items
-                    <span className="badge bg-light text-dark">
-                      {meeting.actionItems.length}
-                    </span>
+                  <h6 className="mdm-section-title fw-semibold mb-3">
+                    Discussion Points
                   </h6>
-                  <div className="d-flex flex-column gap-3">
-                    {meeting.actionItems.map((ai, i) => (
-                      <div key={i} className="mdm-action-card p-3 rounded">
-                        <div className="d-flex justify-content-between align-items-start mb-3">
-                          <h6 className="fw-semibold mb-0 flex-grow-1 pe-2">
-                            {ai.taskDescription}
-                          </h6>
-                        </div>
-                        <div className="mdm-action-meta d-flex flex-wrap gap-3 text-muted small">
-                          <span className="d-flex align-items-center gap-2">
-                            <i className="bi bi-person-circle text-primary"></i>
-                            <span>
-                              <strong>Assigned to:</strong>{" "}
-                              <span className="text-primary fw-medium">
-                                {employeeMap[ai.assignedToEmployeeId] ||
-                                  `Employee ${ai.assignedToEmployeeId}`}
-                              </span>
-                            </span>
+                  {discussionPoints.map((dp, i) => (
+                    <div key={i} className="mdm-discussion-card p-3 rounded mb-2">
+                      {dp.pointText || dp.PointText || dp.point || "No details"}
+                    </div>
+                  ))}
+                </div>
+              )}
+ 
+              {actionItems.length > 0 && (
+                <div className="mb-4">
+                  <h6 className="mdm-section-title fw-semibold mb-3">
+                    Action Items
+                  </h6>
+                  {actionItems.map((ai, i) => {
+                    const task =
+                      ai.taskDescription ||
+                      ai.TaskDescription ||
+                      ai.task ||
+                      ai.Task ||
+                      "No description";
+ 
+                    const due =
+                      ai.dueDate ||
+                      ai.DueDate ||
+                      ai.targetDate ||
+                      ai.TargetDate ||
+                      null;
+ 
+                    const employeeName = getEmployeeName(ai);
+ 
+                    return (
+                      <div key={i} className="mdm-action-card p-3 rounded mb-2">
+                        <div className="fw-semibold mb-2">{task}</div>
+                        <div className="small text-muted">
+                          <span className="me-3">
+                            <i className="bi bi-person-fill me-1"></i>
+                            Assigned to: <strong>{employeeName}</strong>
                           </span>
-                          <span className="d-flex align-items-center gap-2">
-                            <i className="bi bi-calendar-event text-danger"></i>
-                            <span>
-                              <strong>Due:</strong>{" "}
-                              {new Date(ai.dueDate).toLocaleDateString()}
-                            </span>
+                          <span>
+                            <i className="bi bi-calendar-event me-1"></i>
+                            Due: <strong>{due ? new Date(due).toLocaleDateString() : "N/A"}</strong>
                           </span>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                    );
+                  })}
                 </div>
               )}
-
+ 
               <button
-                className="mdm-create-mom-btn btn btn-outline-primary w-100 py-2 d-flex align-items-center justify-content-center gap-2 shadow-sm"
+                className="mdm-create-mom-btn btn btn-outline-primary w-100 py-2"
                 onClick={toggleCreateMom}
               >
-                <i
-                  className={`bi ${
-                    showCreateMom ? "bi-x-circle" : "bi-plus-circle"
-                  }`}
-                ></i>
-                {showCreateMom
-                  ? "Cancel MOM Creation"
-                  : "Create MOM for this Meeting"}
+                {showCreateMom ? "Cancel MOM Creation" : "Create MOM for this Meeting"}
               </button>
-
+ 
               {showCreateMom && (
                 <CreateMomModal
                   meetingData={meeting}
                   onClose={toggleCreateMom}
+                  onMomCreated={handleMomCreated}
+                  employeeMap={employeeMap}
                 />
               )}
             </div>
-
+ 
             <div className="mdm-footer modal-footer border-0">
-              <button
-                className="mdm-close-btn btn btn-secondary px-4"
-                onClick={onClose}
-              >
+              <button className="btn btn-secondary px-4" onClick={onClose}>
                 Close
               </button>
             </div>
@@ -208,5 +281,7 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
     </>
   );
 };
-
+ 
 export default MeetingDetailsModal;
+ 
+ 

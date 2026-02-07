@@ -2,11 +2,32 @@
   background-color: #f5f7fb;
   min-height: 100vh;
 }
-
+ 
 .emd-container {
   padding: 24px 24px 32px;
 }
-
+ 
+/* Scrollable card body */
+.emd-scroll-area {
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+ 
+/* Smooth scrollbar */
+.emd-scroll-area::-webkit-scrollbar {
+  width: 6px;
+}
+ 
+.emd-scroll-area::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 6px;
+}
+ 
+.emd-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+ 
 .emd-loading-container {
   display: flex;
   justify-content: center;
@@ -14,11 +35,11 @@
   min-height: 100vh;
   background-color: #f5f7fb;
 }
-
+ 
 .emd-loading-content {
   text-align: center;
 }
-
+ 
 .emd-spinner {
   width: 48px;
   height: 48px;
@@ -28,23 +49,23 @@
   animation: emd-spin 0.8s linear infinite;
   margin: 0 auto 12px;
 }
-
+ 
 @keyframes emd-spin {
   to {
     transform: rotate(360deg);
   }
 }
-
+ 
 .emd-loading-text {
   color: #6b7280;
   font-weight: 500;
   margin: 0;
 }
-
+ 
 .emd-breadcrumb {
   margin-bottom: 20px;
 }
-
+ 
 .emd-breadcrumb-list {
   display: flex;
   align-items: center;
@@ -53,12 +74,12 @@
   list-style: none;
   margin-top: -25px;
 }
-
+ 
 .emd-breadcrumb-item {
   display: flex;
   align-items: center;
 }
-
+ 
 .emd-breadcrumb-link {
   background: none;
   border: none;
@@ -73,51 +94,51 @@
   text-decoration: none;
   transition: color 0.2s ease;
 }
-
+ 
 .emd-breadcrumb-link:hover {
   color: #7a1d65;
   background: rgba(151, 36, 126, 0.08);
 }
-
+ 
 .emd-breadcrumb-home svg {
   width: 1.325rem;
   height: 1.325rem;
 }
-
+ 
 .emd-breadcrumb-separator {
   margin: 0 8px;
   color: #97247e;
   font-size: 1rem;
 }
-
+ 
 .emd-breadcrumb-active span {
   color: #1e293b;
   font-size: 0.875rem;
   font-weight: 600;
 }
-
+ 
 .emd-stats-row {
   margin-bottom: 18px;
 }
-
+ 
 .emd-stat-card-horizontal {
   background: #fff;
-  border-radius: 10px;
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border: 1px solid #27235c;
-  transition: all 0.3s ease;
-  min-height: 95px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+ border-radius: 10px;
+ padding: 12px 16px;
+ display: flex;
+ align-items: center;
+ gap: 12px;
+ border: 1px solid #27235c;
+ transition: all 0.3s ease;
+ min-height: 95px;
+ box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
-
+ 
 .emd-stat-card-horizontal:hover {
   box-shadow: 0 8px 22px rgba(15, 23, 42, 0.16);
   transform: translateY(-2px);
 }
-
+ 
 .emd-stat-icon-block {
   width: 64px;
   height: 64px;
@@ -127,43 +148,43 @@
   justify-content: center;
   flex-shrink: 0;
 }
-
+ 
 .emd-stat-icon {
   font-size: 1.7rem;
 }
-
+ 
 .emd-stat-icon-block-moms {
   background-color: #edf3ff;
 }
-
+ 
 .emd-stat-icon-moms {
   color: #246bff;
 }
-
+ 
 .emd-stat-icon-block-pending {
   background-color: #f0eaff;
 }
-
+ 
 .emd-stat-icon-pending {
   color: #a855f7;
 }
-
+ 
 .emd-stat-icon-block-invites {
   background-color: #e9fbf4;
 }
-
+ 
 .emd-stat-icon-invites {
   color: #16a34a;
 }
-
+ 
 .emd-stat-icon-block-shared {
   background-color: #fff4df;
 }
-
+ 
 .emd-stat-icon-shared {
   color: #f59e0b;
 }
-
+ 
 .emd-stat-center {
   flex: 1;
   display: flex;
@@ -173,27 +194,27 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
-
+ 
 .emd-stat-center-count {
   font-size: 2.1rem;
   font-weight: 700;
   line-height: 1;
   color: #111827;
 }
-
+ 
 .emd-stat-center-label {
   margin-top: 4px;
   font-size: 0.78rem;
   font-weight: 600;
   color: #4b5563;
 }
-
+ 
 .emp-momupdate-buttons-wrapper {
   margin: 1.5rem 0 2rem;
   display: flex;
   justify-content: center;
 }
-
+ 
 .emp-momupdate-buttons-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(200px, 240px));
@@ -201,7 +222,7 @@
   width: 100%;
   max-width: 1000px;
 }
-
+ 
 .emp-momupdate-btn {
   display: flex;
   align-items: center;
@@ -219,40 +240,40 @@
   transition: all 0.25s ease;
   box-shadow: 0 2px 8px rgba(45, 53, 97, 0.25);
 }
-
+ 
 .emp-momupdate-btn-icon {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
-
+ 
 .emp-momupdate-btn-icon .bi {
   font-size: 1.4rem;
   color: #ffffff;
 }
-
+ 
 .emp-momupdate-btn-label {
   font-weight: 600;
   letter-spacing: 0.3px;
   white-space: nowrap;
 }
-
+ 
 .emp-momupdate-btn:hover {
   background: #3a4275;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(45, 53, 97, 0.35);
 }
-
+ 
 .emp-momupdate-btn:active {
   transform: translateY(0);
 }
-
+ 
 .emp-momupdate-btn:focus-visible {
   outline: 3px solid #93c5fd;
   outline-offset: 2px;
 }
-
+ 
 .emd-card {
   background-color: #ffffff;
   border-radius: 16px;
@@ -260,18 +281,18 @@
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
   height: 100%;
 }
-
+ 
 .emd-card-body {
   padding: 20px 22px 18px;
 }
-
+ 
 .emd-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
 }
-
+ 
 .emd-card-title {
   display: flex;
   align-items: center;
@@ -281,12 +302,12 @@
   font-size: 1.05rem;
   font-weight: 600;
 }
-
+ 
 .emd-card-title i {
   font-size: 1.1rem;
   color: #111827;
 }
-
+ 
 .emd-count-badge {
   background-color: #f3f4f6;
   border-radius: 999px;
@@ -295,37 +316,37 @@
   font-weight: 500;
   color: #4b5563;
 }
-
+ 
 .emd-empty-state {
   text-align: center;
   padding: 38px 12px;
 }
-
+ 
 .emd-empty-icon {
   font-size: 3.1rem;
   opacity: 0.35;
   margin-bottom: 10px;
   color: #9ca3af;
 }
-
+ 
 .emd-empty-title {
   margin: 0 0 4px;
   color: #4b5563;
   font-weight: 600;
 }
-
+ 
 .emd-empty-text {
   margin: 0;
   font-size: 0.875rem;
   color: #6b7280;
 }
-
+ 
 .emd-activity-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
-
+ 
 .emd-activity-item {
   display: flex;
   align-items: flex-start;
@@ -335,13 +356,13 @@
   cursor: pointer;
   transition: background-color 0.15s, box-shadow 0.15s, transform 0.15s;
 }
-
+ 
 .emd-activity-item:hover {
   background-color: #f1f5f9;
   box-shadow: 0 6px 14px rgba(17, 24, 39, 0.12);
   transform: translateX(6px);
 }
-
+ 
 .emd-activity-icon-wrapper {
   width: 46px;
   height: 46px;
@@ -351,36 +372,36 @@
   justify-content: center;
   flex-shrink: 0;
 }
-
+ 
 .emd-activity-primary {
   background-color: #e0edff;
   color: #2563eb;
 }
-
+ 
 .emd-activity-warning {
   background-color: #fff4de;
   color: #d97706;
 }
-
+ 
 .emd-activity-success {
   background-color: #dcfce7;
   color: #16a34a;
 }
-
+ 
 .emd-activity-info {
   background-color: #e0f2fe;
   color: #0284c7;
 }
-
+ 
 .emd-activity-icon {
   font-size: 1.25rem;
 }
-
+ 
 .emd-activity-main {
   flex: 1;
   text-align: left;
 }
-
+ 
 .emd-activity-title {
   margin: 0 0 4px;
   font-size: 0.95rem;
@@ -388,7 +409,7 @@
   color: #111827;
   text-align: left;
 }
-
+ 
 .emd-activity-meta-row {
   display: flex;
   flex-wrap: wrap;
@@ -396,28 +417,28 @@
   font-size: 0.8rem;
   color: #6b7280;
 }
-
+ 
 .emd-meta-item {
   display: inline-flex;
   align-items: center;
   gap: 4px;
 }
-
+ 
 .emd-activity-arrow {
   font-size: 1.1rem;
   color: #9ca3af;
   align-self: center;
 }
-
+ 
 .emd-content-row {
   margin-top: 24px;
 }
-
+ 
 .emd-meetings-list {
   display: flex;
   flex-direction: column;
 }
-
+ 
 .emd-meeting-item {
   display: flex;
   align-items: flex-start;
@@ -428,30 +449,30 @@
   border-radius: 12px;
   transition: background-color 0.15s, box-shadow 0.15s, transform 0.15s;
 }
-
+ 
 .emd-meeting-item:hover {
   background-color: #f1f5f9;
   box-shadow: 0 6px 14px rgba(17, 24, 39, 0.12);
   transform: translateX(4px);
 }
-
+ 
 .emd-meeting-main {
   flex: 1;
 }
-
+ 
 .emd-meeting-title-row {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 4px;
 }
-
+ 
 .emd-meeting-title {
   font-size: 0.95rem;
   font-weight: 600;
   color: #111827;
 }
-
+ 
 .emd-meeting-type-pill {
   background-color: #e0edff;
   color: #2563eb;
@@ -460,7 +481,7 @@
   font-size: 0.75rem;
   font-weight: 600;
 }
-
+ 
 .emd-meeting-meta-row {
   display: flex;
   flex-wrap: wrap;
@@ -468,20 +489,20 @@
   font-size: 0.8rem;
   color: #6b7280;
 }
-
+ 
 .emd-meeting-arrow {
   font-size: 1.1rem;
   color: #9ca3af;
   margin-top: 4px;
 }
-
+ 
 .emd-view-all {
   border-top: 1px solid #e5e7eb;
   margin-top: 12px;
   padding-top: 12px;
   text-align: center;
 }
-
+ 
 .emd-view-all-btn {
   background-color: transparent;
   border-radius: 999px;
@@ -496,114 +517,160 @@
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
-
+ 
 .emd-view-all-btn:hover {
   background-color: #2563eb;
   color: #ffffff;
 }
-
+ 
 .emd-view-all-btn i {
   font-size: 0.95rem;
 }
-
+ 
 @media (max-width: 1200px) {
   .emp-momupdate-buttons-grid {
     grid-template-columns: repeat(2, 1fr);
     max-width: 600px;
   }
 }
-
+ 
 @media (max-width: 992px) {
   .emd-container {
     padding: 18px 16px 24px;
   }
-
+ 
   .emd-stat-card-horizontal {
     margin-bottom: 6px;
   }
-
+ 
   .emp-momupdate-buttons-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
-
+ 
   .emp-momupdate-btn {
     padding: 14px 20px;
     height: 52px;
     font-size: 0.95rem;
   }
-
+ 
   .emp-momupdate-btn-icon .bi {
     font-size: 1.3rem;
   }
 }
-
+ 
 @media (max-width: 768px) {
   .emd-card-body {
     padding: 16px 16px 14px;
   }
-
+ 
   .emd-activity-item,
   .emd-meeting-item {
     padding: 10px 6px;
     align-items: flex-start;
   }
-
+ 
   .emd-activity-meta-row,
   .emd-meeting-meta-row {
     flex-direction: column;
     align-items: flex-start;
     gap: 4px;
   }
-
+ 
   .emp-momupdate-buttons-grid {
     gap: 10px;
   }
-
+ 
   .emp-momupdate-btn {
     padding: 12px 16px;
     height: 50px;
     font-size: 0.9rem;
   }
-
+ 
   .emp-momupdate-btn-icon .bi {
     font-size: 1.25rem;
   }
 }
-
+ 
 @media (max-width: 576px) {
   .emd-container {
     padding: 14px 10px 20px;
   }
-
+ 
   .emd-stat-center-count {
     font-size: 1.8rem;
   }
-
+ 
   .emd-stat-card-horizontal {
     padding: 16px 16px;
     gap: 14px;
   }
-
+ 
   .emd-stat-icon-block {
     width: 56px;
     height: 56px;
     border-radius: 16px;
   }
-
+ 
   .emp-momupdate-buttons-wrapper {
     margin: 1rem 0 1.5rem;
   }
-
+ 
   .emp-momupdate-buttons-grid {
     grid-template-columns: 1fr;
     gap: 10px;
     max-width: 100%;
   }
-
+ 
   .emp-momupdate-btn {
     justify-content: flex-start;
     padding: 14px 20px;
     height: 54px;
   }
 }
+ 
+/* Optimistic update styles */
+.emd-meeting-optimistic {
+  opacity: 0.7;
+  position: relative;
+}
+ 
+.emd-syncing-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  font-size: 0.75rem;
+  color: #6c757d;
+  animation: spin 1s linear infinite;
+}
+ 
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+ 
+.emd-meeting-optimistic::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #007bff, transparent);
+  animation: shimmer 1.5s infinite;
+}
+ 
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+ 
+ 

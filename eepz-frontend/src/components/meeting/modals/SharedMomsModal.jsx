@@ -12,7 +12,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import "../../../styles/mom/modals/SharedMomsModal.css";
-
+ 
 const SharedMomsModal = ({ onClose }) => {
   const [activeTab, setActiveTab] = useState("sharedByMe");
   const [sharedByMeMoms, setSharedByMeMoms] = useState([]);
@@ -21,26 +21,26 @@ const SharedMomsModal = ({ onClose }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedMom, setSelectedMom] = useState(null);
   const [error, setError] = useState(null);
-
+ 
   // Helper to get property with PascalCase/camelCase fallback
   const getProperty = (obj, camelKey, pascalKey) => {
     return obj?.[camelKey] ?? obj?.[pascalKey] ?? null;
   };
-
+ 
   useEffect(() => {
     loadSharedMoms();
   }, [activeTab]);
-
+ 
   const loadSharedMoms = async (silent = false) => {
     try {
       if (!silent) setLoading(true);
       else setRefreshing(true);
-
+ 
       setError(null);
-
+ 
       if (activeTab === "sharedByMe") {
         const response = await momService.getMomsSharedByMe();
-
+ 
         // Extract data with fallback
         let momsData = null;
         if (response?.success && response?.data) {
@@ -54,9 +54,9 @@ const SharedMomsModal = ({ onClose }) => {
         } else if (Array.isArray(response)) {
           momsData = response;
         }
-
+ 
         const rows = Array.isArray(momsData) ? momsData : [];
-
+ 
         // Load full MOM details for each shared item
         const withDetails = await Promise.all(
           rows.map(async (row) => {
@@ -64,14 +64,14 @@ const SharedMomsModal = ({ onClose }) => {
               const momId =
                 getProperty(row, "momId", "MomId") ||
                 getProperty(row, "momID", "MOMID");
-
+ 
               if (!momId) {
                 console.warn("No momId found for shared row:", row);
                 return { ...row, fullMom: null };
               }
-
+ 
               const momRes = await momService.getMomById(momId);
-
+ 
               // Extract MOM data
               let fullMom = null;
               if (momRes?.success && momRes?.data) {
@@ -85,7 +85,7 @@ const SharedMomsModal = ({ onClose }) => {
               } else {
                 fullMom = momRes;
               }
-
+ 
               return {
                 ...row,
                 fullMom: fullMom,
@@ -100,12 +100,12 @@ const SharedMomsModal = ({ onClose }) => {
             }
           })
         );
-
+ 
         setSharedByMeMoms(withDetails);
       } else {
         // Shared with me
         const response = await momService.getMomsSharedWithMe();
-
+ 
         // Extract data with fallback
         let momsData = null;
         if (response?.success && response?.data) {
@@ -119,13 +119,13 @@ const SharedMomsModal = ({ onClose }) => {
         } else if (Array.isArray(response)) {
           momsData = response;
         }
-
+ 
         const rows = Array.isArray(momsData) ? momsData : [];
         setSharedWithMeMoms(rows);
       }
     } catch (error) {
       console.error("Load shared MOMs error:", error);
-
+ 
       // Enhanced error handling
       if (error.retryAfter) {
         if (!silent) {
@@ -148,11 +148,11 @@ const SharedMomsModal = ({ onClose }) => {
       setRefreshing(false);
     }
   };
-
+ 
   const handleViewMom = async (momId) => {
     try {
       const response = await momService.getMomById(momId);
-
+ 
       // Extract MOM data
       let momData = null;
       if (response?.success && response?.data) {
@@ -166,15 +166,15 @@ const SharedMomsModal = ({ onClose }) => {
       } else {
         momData = response;
       }
-
+ 
       if (!momData) {
         throw new Error("No MOM data received");
       }
-
+ 
       setSelectedMom(momData);
     } catch (error) {
       console.error("Failed to load MOM details:", error);
-
+ 
       if (error.retryAfter) {
         toastr.error(
           `Rate limit exceeded. Please wait ${error.retryAfter} seconds.`
@@ -186,73 +186,73 @@ const SharedMomsModal = ({ onClose }) => {
       }
     }
   };
-
+ 
   const currentMoms =
     activeTab === "sharedByMe" ? sharedByMeMoms : sharedWithMeMoms;
-
+ 
   const getMeetingTitle = (row) => {
     // Try direct properties first
     let title = getProperty(row, "meetingTitle", "MeetingTitle");
-
+ 
     // If not found, check fullMom
     if (!title && row.fullMom) {
       title = getProperty(row.fullMom, "meetingTitle", "MeetingTitle");
     }
-
+ 
     // Check mom nested object
     if (!title && row.mom) {
       title = getProperty(row.mom, "meetingTitle", "MeetingTitle");
     }
-
+ 
     if (!title && row.Mom) {
       title = getProperty(row.Mom, "meetingTitle", "MeetingTitle");
     }
-
+ 
     return title || "Untitled Meeting";
   };
-
+ 
   const getMeetingType = (row) => {
     // Try direct properties first
     let type = getProperty(row, "meetingType", "MeetingType");
-
+ 
     // If not found, check fullMom
     if (!type && row.fullMom) {
       type = getProperty(row.fullMom, "meetingType", "MeetingType");
     }
-
+ 
     // Check mom nested object
     if (!type && row.mom) {
       type = getProperty(row.mom, "meetingType", "MeetingType");
     }
-
+ 
     if (!type && row.Mom) {
       type = getProperty(row.Mom, "meetingType", "MeetingType");
     }
-
+ 
     return type || "Other";
   };
-
+ 
   const getMeetingDate = (row) => {
     // Try direct properties first
     let date = getProperty(row, "meetingDate", "MeetingDate");
-
+ 
     // If not found, check fullMom
     if (!date && row.fullMom) {
       date = getProperty(row.fullMom, "meetingDate", "MeetingDate");
     }
-
+ 
     // Check mom nested object
     if (!date && row.mom) {
       date = getProperty(row.mom, "meetingDate", "MeetingDate");
     }
-
+ 
     if (!date && row.Mom) {
       date = getProperty(row.Mom, "meetingDate", "MeetingDate");
     }
-
+ 
     return date;
   };
-
+ 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     try {
@@ -267,7 +267,7 @@ const SharedMomsModal = ({ onClose }) => {
       return "N/A";
     }
   };
-
+ 
   return (
     <>
       <div
@@ -294,7 +294,7 @@ const SharedMomsModal = ({ onClose }) => {
                     Shared MOMs
                   </h5>
                 </div>
-
+ 
                 <ul className="smm-tabs nav nav-pills">
                   <li className="nav-item smm-tabs-item">
                     <button
@@ -307,7 +307,7 @@ const SharedMomsModal = ({ onClose }) => {
                       <Share2 size={16} className="me-2" />
                       Shared By Me
                     </button>
-
+ 
                     <button
                       type="button"
                       className={`smm-tab-btn smm-tab-btn-gap ${
@@ -321,7 +321,7 @@ const SharedMomsModal = ({ onClose }) => {
                   </li>
                 </ul>
               </div>
-
+ 
               <button
                 type="button"
                 className="btn-close btn-close-white"
@@ -329,7 +329,7 @@ const SharedMomsModal = ({ onClose }) => {
                 aria-label="Close"
               />
             </div>
-
+ 
             {/* Body */}
             <div className="smm-body modal-body p-0">
               {/* Error State */}
@@ -339,7 +339,7 @@ const SharedMomsModal = ({ onClose }) => {
                   <span>{error}</span>
                 </div>
               )}
-
+ 
               {/* Loading State */}
               {loading ? (
                 <div className="text-center py-5">
@@ -394,7 +394,7 @@ const SharedMomsModal = ({ onClose }) => {
                         </th>
                       </tr>
                     </thead>
-
+ 
                     <tbody>
                       {currentMoms.map((mom, index) => {
                         const momId =
@@ -403,11 +403,13 @@ const SharedMomsModal = ({ onClose }) => {
                         const meetingTitle = getMeetingTitle(mom);
                         const meetingType = getMeetingType(mom);
                         const meetingDate = getMeetingDate(mom);
-                        const sharedAt = getProperty(
-                          mom,
-                          "sharedAt",
-                          "SharedAt"
-                        );
+                       const sharedAt =
+  getProperty(mom, "sharedAt", "SharedAt") ||          // shared by me
+  getProperty(mom, "sharedDate", "SharedDate") ||      // shared with me (common)
+  getProperty(mom, "createdAt", "CreatedAt") ||        // fallback
+  getProperty(mom, "createdOn", "CreatedOn") ||        // fallback
+  getProperty(mom, "sharedOn", "SharedOn");            // fallback
+ 
                         const sharedWithName = getProperty(
                           mom,
                           "sharedWithEmployeeName",
@@ -424,7 +426,7 @@ const SharedMomsModal = ({ onClose }) => {
                             "submittedByEmployeeName",
                             "SubmittedByEmployeeName"
                           );
-
+ 
                         return (
                           <tr
                             key={`shared-mom-${activeTab}-${momId}-${index}`}
@@ -449,21 +451,21 @@ const SharedMomsModal = ({ onClose }) => {
                                 </small>
                               )}
                             </td>
-
+ 
                             <td className="px-4 py-3 smm-td">
                               <span className="badge bg-primary-subtle text-primary">
                                 {meetingType}
                               </span>
                             </td>
-
+ 
                             <td className="px-4 py-3 smm-td">
                               {formatDate(meetingDate)}
                             </td>
-
+ 
                             <td className="px-4 py-3 smm-td">
                               {formatDate(sharedAt)}
                             </td>
-
+ 
                             <td className="px-4 py-3 smm-td">
                               <div className="d-flex align-items-center gap-2">
                                 <Users size={16} className="text-muted" />
@@ -474,7 +476,7 @@ const SharedMomsModal = ({ onClose }) => {
                                 </span>
                               </div>
                             </td>
-
+ 
                             <td className="px-4 py-3 text-center smm-td">
                               <button
                                 type="button"
@@ -494,7 +496,7 @@ const SharedMomsModal = ({ onClose }) => {
                 </div>
               )}
             </div>
-
+ 
             {/* Footer */}
             <div className="smm-footer modal-footer border-0">
               <span className="smm-footer-text text-muted small me-auto">
@@ -502,7 +504,7 @@ const SharedMomsModal = ({ onClose }) => {
                 {activeTab === "sharedByMe" ? "shared" : "received"} MOM
                 {currentMoms.length !== 1 ? "s" : ""}
               </span>
-
+ 
               <button
                 type="button"
                 className="smm-close-btn btn btn-secondary px-4"
@@ -514,7 +516,7 @@ const SharedMomsModal = ({ onClose }) => {
           </div>
         </div>
       </div>
-
+ 
       {/* MOM Details Modal */}
       {selectedMom && (
         <MomDetailsView
@@ -525,5 +527,7 @@ const SharedMomsModal = ({ onClose }) => {
     </>
   );
 };
-
+ 
 export default SharedMomsModal;
+ 
+ 

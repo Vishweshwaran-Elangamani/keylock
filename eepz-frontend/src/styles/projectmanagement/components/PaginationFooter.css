@@ -1,139 +1,130 @@
-.pf-pagination {
-  display: flex;
+/* MAIN CONTAINER — breaks stacking context traps */
+.pagination-footer-container {
+  display: flex !important;
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.25rem;
-  border-top: 1px solid #e5e7eb;
-  flex-wrap: wrap;
-  gap: 1rem;
   background: #ffffff;
-  border-radius: 0 0 12px 12px;
+  border-top: 1px solid #e5e7eb;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+  flex-wrap: wrap;
+ 
+  position: relative;
+  isolation: isolate;   /* ⭐ CRITICAL FIX */
+  z-index: 1;
+  overflow: visible;
 }
-
-.pf-pagination-info {
+ 
+/* Ensure nothing blocks clicks */
+.pagination-footer-container,
+.pagination-footer-container * {
+  pointer-events: auto;
+}
+ 
+/* LEFT SIDE INFO */
+.pagination-footer-info {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+ 
+.pagination-footer-label {
   font-size: 0.875rem;
   color: #6c757d;
+  font-weight: 500;
 }
-
-.pf-rows-dropdown {
-  min-width: 70px;
-  margin-top: 15px;
+ 
+/* DROPDOWN WRAPPER */
+.pagination-footer-dropdown-wrapper {
+  position: relative;
 }
-
-.pf-rows-dd .cdrop-trigger {
-  height: 30px;
-  min-width: 60px;
-  padding: 0.3rem 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  border-radius: 8px;
-  background: #ffffff;
-  color: #27235c;
+ 
+/* ITEMS PER PAGE BUTTON */
+.pagination-footer-items-button {
+  padding: 0.4rem 0.75rem;
   border: 1px solid #e5e7eb;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease,
-    border-color 0.2s ease;
-}
-
-.pf-rows-dd .cdrop-trigger svg {
-  color: #27235c;
-}
-
-.pf-rows-dd .cdrop-trigger:hover {
-  background: #27235c;
-  color: #ffffff;
-  border-color: #27235c;
-  box-shadow: 0 4px 12px rgba(39, 35, 92, 0.25);
-}
-
-.pf-rows-dd .cdrop-trigger:hover svg {
-  color: #ffffff;
-}
-
-.pf-pagination-status {
-  color: #6c757d;
+  border-radius: 6px;
   font-size: 0.875rem;
-  margin-left: -40px;
+  cursor: pointer;
+  background: #fff;
+  color: rgb(39, 35, 92);
+  min-width: 70px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  height: 32px;
 }
-
-.pf-pagination-nav {
-  margin: 0;
+ 
+/* DROPDOWN MENU (OPENS UPWARD) */
+.pagination-footer-dropdown {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  min-width: 70px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  z-index: 10;
 }
-
-.pf-pagination-list {
+ 
+/* DROPDOWN ITEMS */
+.pagination-footer-option {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  text-align: center;
+}
+ 
+.pagination-footer-option:hover {
+  background: #27235c;
+  color: white;
+}
+ 
+.pagination-footer-active {
+  background: #f3f4f6;
+  font-weight: 600;
+}
+ 
+/* STATUS TEXT */
+.pagination-footer-status {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+ 
+/* PAGE BUTTON LIST */
+.pagination-footer-pages {
   display: flex;
   list-style: none;
   gap: 0.3rem;
   margin: 0;
   padding: 0;
 }
-
-.pf-page-item button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+ 
+/* PAGE BUTTON */
+.pagination-footer-page-link {
   min-width: 32px;
   height: 32px;
-  padding: 0.3rem 0.625rem;
   border: 1px solid #e5e7eb;
   border-radius: 6px;
   background: #ffffff;
-  color: #212529;
-  font-size: 0.8125rem;
-  font-weight: 500;
   cursor: pointer;
-  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-
-.pf-rows-dd .cdrop-trigger:hover .cdrop-value {
-  color: #ffffff;
-}
-
-
-.pf-page-item button:hover:not(:disabled) {
-  background: rgba(39, 35, 92, 0.05);
-  border-color: #27235c;
-  color: #27235c;
-}
-
-.pf-page-item.active button {
+ 
+/* ACTIVE PAGE */
+.pagination-footer-page-item.active .pagination-footer-page-link {
   background: #27235c;
-  border-color: transparent;
-  color: #ffffff;
-  box-shadow: 0 2px 6px rgba(39, 35, 92, 0.3);
+  color: white;
 }
-
-.pf-page-item.disabled button {
+ 
+/* DISABLED PAGE */
+.pagination-footer-page-item.disabled .pagination-footer-page-link {
   opacity: 0.5;
-  cursor: not-allowed;
   pointer-events: none;
 }
-
-@media (max-width: 768px) {
-  .pf-pagination {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .pf-pagination-info,
-  .pf-pagination-status {
-    justify-content: center;
-    text-align: center;
-    width: 100%;
-    margin-left: 0;
-  }
-
-  .pf-pagination-nav {
-    width: 100%;
-  }
-
-  .pf-pagination-list {
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-}
+ 
+ 

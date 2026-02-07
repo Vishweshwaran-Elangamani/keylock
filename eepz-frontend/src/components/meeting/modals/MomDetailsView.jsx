@@ -12,15 +12,15 @@ import {
   X,
 } from "lucide-react";
 import "../../../styles/mom/modals/MomDetailsView.css";
-
+ 
 const MomDetailsView = ({ mom, onClose }) => {
   // Helper to get property with PascalCase/camelCase fallback
   const getProperty = (obj, camelKey, pascalKey) => {
     return obj?.[camelKey] ?? obj?.[pascalKey] ?? null;
   };
-
+ 
   if (!mom) return null;
-
+ 
   // Extract all properties with fallbacks
   const meetingTitle =
     getProperty(mom, "meetingTitle", "MeetingTitle") || "Untitled Meeting";
@@ -49,7 +49,7 @@ const MomDetailsView = ({ mom, onClose }) => {
   const actionItems = getProperty(mom, "actionItems", "ActionItems") || [];
   const createdAt = getProperty(mom, "createdAt", "CreatedAt");
   const updatedAt = getProperty(mom, "updatedAt", "UpdatedAt");
-
+ 
   // Format attendees
   let formattedAttendees = "N/A";
   if (Array.isArray(attendees)) {
@@ -57,7 +57,7 @@ const MomDetailsView = ({ mom, onClose }) => {
   } else if (typeof attendees === "string") {
     formattedAttendees = attendees || "N/A";
   }
-
+ 
   const formatDateTime = (dateString) => {
     if (!dateString) return "N/A";
     try {
@@ -75,7 +75,7 @@ const MomDetailsView = ({ mom, onClose }) => {
       return "N/A";
     }
   };
-
+ 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     try {
@@ -90,11 +90,11 @@ const MomDetailsView = ({ mom, onClose }) => {
       return "N/A";
     }
   };
-
+ 
   const getStatusBadge = (status, dueDate) => {
     const isOverdue =
       status === "Pending" && dueDate && new Date(dueDate) < new Date();
-
+ 
     if (isOverdue) {
       return (
         <span className="badge bg-danger d-inline-flex align-items-center gap-1">
@@ -103,7 +103,7 @@ const MomDetailsView = ({ mom, onClose }) => {
         </span>
       );
     }
-
+ 
     if (status === "Completed") {
       return (
         <span className="badge bg-success d-inline-flex align-items-center gap-1">
@@ -112,39 +112,32 @@ const MomDetailsView = ({ mom, onClose }) => {
         </span>
       );
     }
-
-    if (status === "Pending") {
-      return (
-        <span className="badge bg-warning text-dark d-inline-flex align-items-center gap-1">
-          <Clock size={12} />
-          Pending
-        </span>
-      );
-    }
-
+   
+   
+   
     return (
       <span className="badge bg-secondary d-inline-flex align-items-center gap-1">
         {status || "Unknown"}
       </span>
     );
   };
-
+ 
   const getPriorityBadge = (priority) => {
     if (!priority) return null;
-
+ 
     const badgeMap = {
       High: "bg-danger",
       Medium: "bg-warning text-dark",
       Low: "bg-secondary",
     };
-
+ 
     return (
       <span className={`badge ${badgeMap[priority] || "bg-secondary"}`}>
         {priority}
       </span>
     );
   };
-
+ 
   return (
     <div
       className="mdv-overlay modal fade show d-block mdv-modal-open"
@@ -183,7 +176,7 @@ const MomDetailsView = ({ mom, onClose }) => {
                 )}
               </div>
             </div>
-
+ 
             <button
               type="button"
               className="btn-close btn-close-white"
@@ -191,7 +184,7 @@ const MomDetailsView = ({ mom, onClose }) => {
               aria-label="Close"
             ></button>
           </div>
-
+ 
           {/* Body */}
           <div className="mdv-body modal-body">
             {/* Meeting Information Card */}
@@ -201,7 +194,7 @@ const MomDetailsView = ({ mom, onClose }) => {
                   <Calendar size={18} />
                   Meeting Information
                 </h6>
-
+ 
                 <div className="row g-4">
                   <div className="col-md-6">
                     <small className="mdv-muted text-muted d-block mb-1">
@@ -215,7 +208,7 @@ const MomDetailsView = ({ mom, onClose }) => {
                       {formatDateTime(meetingDate)}
                     </div>
                   </div>
-
+ 
                   {meetingLink && (
                     <div className="col-md-6">
                       <small className="mdv-muted text-muted d-block mb-1">
@@ -233,7 +226,7 @@ const MomDetailsView = ({ mom, onClose }) => {
                       </a>
                     </div>
                   )}
-
+ 
                   <div className="col-md-6">
                     <small className="mdv-muted text-muted d-block mb-1">
                       Attendees:
@@ -246,7 +239,7 @@ const MomDetailsView = ({ mom, onClose }) => {
                       {formattedAttendees}
                     </div>
                   </div>
-
+ 
                   {submittedByName && (
                     <div className="col-md-6">
                       <small className="mdv-muted text-muted d-block mb-1">
@@ -264,7 +257,7 @@ const MomDetailsView = ({ mom, onClose }) => {
                       </div>
                     </div>
                   )}
-
+ 
                   {createdAt && (
                     <div className="col-md-6">
                       <small className="mdv-muted text-muted d-block mb-1">
@@ -279,7 +272,7 @@ const MomDetailsView = ({ mom, onClose }) => {
                       </div>
                     </div>
                   )}
-
+ 
                   {updatedAt && (
                     <div className="col-md-6">
                       <small className="mdv-muted text-muted d-block mb-1">
@@ -297,7 +290,7 @@ const MomDetailsView = ({ mom, onClose }) => {
                 </div>
               </div>
             </div>
-
+ 
             {/* Comments & Observations */}
             {commentsObservations && commentsObservations.trim() && (
               <div className="mb-4">
@@ -310,8 +303,7 @@ const MomDetailsView = ({ mom, onClose }) => {
                 </div>
               </div>
             )}
-
-            {/* Discussion Points */}
+ 
             <div className="mb-4">
               <h6 className="mdv-section-title fw-semibold mb-3 d-flex align-items-center gap-2">
                 <MessageSquare size={18} />
@@ -323,7 +315,7 @@ const MomDetailsView = ({ mom, onClose }) => {
                     </span>
                   )}
               </h6>
-
+ 
               {Array.isArray(discussionPoints) &&
               discussionPoints.length > 0 ? (
                 <div className="d-flex flex-column gap-2">
@@ -332,15 +324,13 @@ const MomDetailsView = ({ mom, onClose }) => {
                       getProperty(dp, "pointText", "PointText") ||
                       getProperty(dp, "point", "Point");
                     const timestamp = getProperty(dp, "timestamp", "Timestamp");
-
+ 
                     return (
                       <div
                         key={index}
                         className="mdv-discussion-item p-3 rounded d-flex align-items-start gap-3"
                       >
-                        <div className="mdv-discussion-number fw-bold text-primary">
-                          {index + 1}
-                        </div>
+ 
                         <div className="flex-grow-1">
                           <p className="mb-1">{pointText || "No details"}</p>
                           {timestamp && (
@@ -361,7 +351,7 @@ const MomDetailsView = ({ mom, onClose }) => {
                 </div>
               )}
             </div>
-
+ 
             {/* Action Items */}
             <div className="mb-4">
               <h6 className="mdv-section-title fw-semibold mb-3 d-flex align-items-center gap-2">
@@ -373,7 +363,7 @@ const MomDetailsView = ({ mom, onClose }) => {
                   </span>
                 )}
               </h6>
-
+ 
               {Array.isArray(actionItems) && actionItems.length > 0 ? (
                 <div className="d-flex flex-column gap-3">
                   {actionItems.map((ai, index) => {
@@ -391,7 +381,7 @@ const MomDetailsView = ({ mom, onClose }) => {
                       getProperty(ai, "status", "Status") || "Pending";
                     const priority = getProperty(ai, "priority", "Priority");
                     const notes = getProperty(ai, "notes", "Notes");
-
+ 
                     return (
                       <div key={index} className="mdv-action-item p-3 rounded">
                         <div className="d-flex justify-content-between align-items-start mb-3">
@@ -403,11 +393,11 @@ const MomDetailsView = ({ mom, onClose }) => {
                             {getPriorityBadge(priority)}
                           </div>
                         </div>
-
+ 
                         {notes && (
                           <p className="text-muted small mb-2">{notes}</p>
                         )}
-
+ 
                         <div className="row g-2">
                           <div className="col-md-6">
                             <small className="text-muted d-flex align-items-center gap-2">
@@ -416,7 +406,7 @@ const MomDetailsView = ({ mom, onClose }) => {
                               {assignedToName || "Unassigned"}
                             </small>
                           </div>
-
+ 
                           <div className="col-md-6">
                             <small className="text-muted d-flex align-items-center gap-2">
                               <Calendar size={14} className="text-danger" />
@@ -436,7 +426,7 @@ const MomDetailsView = ({ mom, onClose }) => {
               )}
             </div>
           </div>
-
+ 
           {/* Footer */}
           <div className="mdv-footer modal-footer border-0">
             <button
@@ -453,5 +443,7 @@ const MomDetailsView = ({ mom, onClose }) => {
     </div>
   );
 };
-
+ 
 export default MomDetailsView;
+ 
+ 

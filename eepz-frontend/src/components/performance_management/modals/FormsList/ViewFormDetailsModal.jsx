@@ -2,16 +2,16 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "../../../../styles/performancemanagement/components/ViewFormDetailsModal.css";
-
+ 
 function ViewFormDetailsModal({ formDetails, onClose }) {
   const navigate = useNavigate();
-
+ 
   if (!formDetails) return null;
-
+ 
   return (
     <>
       <div className="view-form-backdrop" onClick={onClose} />
-
+ 
       <div className="view-form-container" onClick={(e) => e.stopPropagation()}>
         <div className="view-form-header">
           <div className="header-title">
@@ -27,7 +27,7 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
             ×
           </button>
         </div>
-
+ 
         <div className="view-form-body">
           <div className="basic-section">
             <h4 className="section-title">
@@ -44,7 +44,7 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
                   <span className="item-value">{formDetails.name}</span>
                 </div>
               </div>
-
+ 
               <div className="info-item">
                 <div className="item-icon">
                   <i className="bi bi-tag-fill"></i>
@@ -54,11 +54,10 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
                   <span className="type-tag">{formDetails.type}</span>
                 </div>
               </div>
-
+ 
               <div className="info-item">
                 <div className="item-icon">
-                  <i className="bi bi-briefcase-fill"></i>
-                </div>
+                <i class="bi bi-laptop"></i>                </div>
                 <div className="item-content">
                   <span className="item-label">Category</span>
                   <span className="item-value">
@@ -66,7 +65,7 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
                   </span>
                 </div>
               </div>
-
+ 
               <div className="info-item total-item">
                 <div className="item-icon">
                   <i className="bi bi-list-check"></i>
@@ -80,7 +79,7 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
               </div>
             </div>
           </div>
-
+ 
           {formDetails.competencies?.length > 0 && (
             <div className="table-section">
               <h4 className="section-title">
@@ -134,7 +133,7 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
               </div>
             </div>
           )}
-
+ 
           {(!formDetails.competencies ||
             formDetails.competencies.length === 0) && (
             <div className="no-data">
@@ -143,7 +142,7 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
             </div>
           )}
         </div>
-
+ 
         <div className="form-footer">
           <button
             className="footer-button close-button"
@@ -172,5 +171,7 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
     </>
   );
 }
-
+ 
 export default ViewFormDetailsModal;
+ 
+ 

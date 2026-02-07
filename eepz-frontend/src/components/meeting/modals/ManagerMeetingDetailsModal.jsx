@@ -1,15 +1,21 @@
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import "../../../styles/mom/modals/ManagerMeetingDetailsModal.css";
-
+ 
 const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => (document.body.style.overflow = "unset");
   }, []);
-
+ 
+  // 🔍 Debug (remove later if needed)
+  useEffect(() => {
+    console.log("Meeting object:", meeting);
+    console.log("Participants:", meeting?.rsvpParticipants);
+  }, [meeting]);
+ 
   if (!meeting) return null;
-
+ 
   const formatDateTime = (isoString) => {
     if (!isoString) return "-";
     const date = new Date(isoString);
@@ -20,14 +26,13 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
     const min = String(date.getMinutes()).padStart(2, "0");
     return `${dd}-${mm}-${yyyy} ${hh}:${min}`;
   };
-
-  // ✅ USE VALUES FROM DASHBOARD
+ 
   const countAccepted = meeting.rsvpAcceptedCount || 0;
   const totalParticipants = meeting.rsvpTotalInvitations || 0;
-
+ 
   const acceptedPercentage =
     totalParticipants > 0 ? (countAccepted / totalParticipants) * 100 : 0;
-
+ 
   const modalContent = (
     <div className="mmdm-overlay" onClick={onClose}>
       <div className="mmdm-modal" onClick={(e) => e.stopPropagation()}>
@@ -41,7 +46,7 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
             ×
           </button>
         </div>
-
+ 
         <div className="mmdm-body">
           <div className="mmdm-stats-card">
             <div className="mmdm-stats-row">
@@ -51,7 +56,7 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
                   {countAccepted}
                 </div>
               </div>
-
+ 
               <div className="mmdm-stat">
                 <div className="mmdm-stat-label">Total Invited</div>
                 <div className="mmdm-stat-value mmdm-stat-total">
@@ -59,14 +64,14 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
                 </div>
               </div>
             </div>
-
+ 
             <progress
               className="mmdm-progress"
               value={acceptedPercentage}
               max="100"
             />
           </div>
-
+ 
           {meeting.meetingLink && (
             <div className="mmdm-meeting-link-wrapper">
               <div className="mmdm-meeting-link-card">
@@ -85,11 +90,11 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
               </div>
             </div>
           )}
-
+ 
           <h6 className="mmdm-participants-title">
             <i className="bi bi-people"></i> Participants ({totalParticipants})
           </h6>
-
+ 
           {meeting.rsvpParticipants?.length === 0 ? (
             <div className="mmdm-no-participants">
               <i className="bi bi-info-circle"></i> No participants found
@@ -98,8 +103,16 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
             <div className="mmdm-participants-list">
               {meeting.rsvpParticipants.map((p) => (
                 <div key={p.employeeId} className="mmdm-participant-card">
-                  <div className="mmdm-participant-name">{p.employeeName}</div>
-
+                 
+                  {/* ✅ FIXED NAME HANDLING HERE */}
+                  <div className="mmdm-participant-name">
+                    {p.employeeName ||
+                      p.name ||
+                      p.participantName ||
+                      p.employee?.fullName ||
+                      "—"}
+                  </div>
+ 
                   <span
                     className={`badge ${
                       p.rsvpStatus === "Accepted"
@@ -113,7 +126,7 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
                   >
                     {p.rsvpStatus}
                   </span>
-
+ 
                   {p.rsvpComments && (
                     <small className="mmdm-participant-comment">
                       <i className="bi bi-chat-dots"></i> {p.rsvpComments}
@@ -124,7 +137,7 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
             </div>
           )}
         </div>
-
+ 
         <div className="mmdm-footer">
           <button className="mmdm-close-btn" onClick={onClose}>
             Close
@@ -133,8 +146,10 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
       </div>
     </div>
   );
-
+ 
   return ReactDOM.createPortal(modalContent, document.body);
 };
-
+ 
 export default ManagerMeetingDetailsModal;
+ 
+ 

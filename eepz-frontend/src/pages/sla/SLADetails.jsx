@@ -21,7 +21,7 @@ import slaService, {
 } from "../../services/sla/slaService";
 import Breadcrumb from "../../components/sla/common/Breadcrumbs";
 import "../../styles/sla/components/SLADetails.css";
-
+ 
 const getSLADashboardPath = (roleName) => {
   const routes = {
     Employee: "/employee/dashboard/sla",
@@ -32,7 +32,7 @@ const getSLADashboardPath = (roleName) => {
   };
   return routes[roleName] || "/employee/dashboard/sla";
 };
-
+ 
 const SLADetails = () => {
   const { slaid } = useParams();
   const navigate = useNavigate();
@@ -50,7 +50,7 @@ const SLADetails = () => {
   const [escalationBlockReason, setEscalationBlockReason] = useState(null);
   const [user, setUser] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
-
+ 
   useEffect(() => {
     try {
       const userData = JSON.parse(localStorage.getItem("user") || "{}");
@@ -60,14 +60,14 @@ const SLADetails = () => {
     }
     fetchSLADetails();
   }, [slaid]);
-
+ 
   const fetchSLADetails = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const userData = JSON.parse(localStorage.getItem("user") || "{}");
       const slaResponse = await slaService.getSLAById(parseInt(slaid));
-
+ 
       if (!slaResponse?.success || !slaResponse.data) {
         setError("SLA not found");
         setSla(null);
@@ -86,7 +86,7 @@ const SLADetails = () => {
         console.warn("Could not load history:", err.message);
         setHistory([]);
       }
-
+ 
       try {
         const escalationsResponse = await slaService.getSLAEscalations(
           parseInt(slaid)
@@ -114,23 +114,23 @@ const SLADetails = () => {
       setLoading(false);
     }
   }, [slaid]);
-
+ 
   const updateEscalationStatus = useCallback(
     (slaData, escalationsData, userData) => {
       if (!slaData || !userData) return;
-
+ 
       const canEscalateL1 = escalationHelpers.canEscalateToL1(
         slaData,
         escalationsData
       );
-
+ 
       const isEligibleRole =
         userData.roleName === "Employee" || userData.roleName === "Manager";
-
+ 
       const canEsc = canEscalateL1 && isEligibleRole;
-
+ 
       setCanEscalate(canEsc);
-
+ 
       if (!canEsc) {
         const reason = escalationHelpers.getEscalationBlockReason(
           slaData,
@@ -158,13 +158,17 @@ const SLADetails = () => {
     }
     setShowEscalationForm(true);
   }, [canEscalate, escalationBlockReason]);
-
+ 
   const handleCloseSLA = useCallback(async () => {
     try {
       setRefreshing(true);
       setShowCloseConfirmation(false);
-      const res = await slaService.closeSLA(sla.slaid);
-
+      const res = await slaService.closeSLA({
+        slaid: sla.slaid,
+        closedByEmployeeId: user.empId,
+        closureComments: "Closed from details page",
+      });
+ 
       if (res?.success) {
         toast.success("SLA closed successfully");
         await fetchSLADetails();
@@ -179,17 +183,17 @@ const SLADetails = () => {
       setRefreshing(false);
     }
   }, [sla, user, fetchSLADetails]);
-
+ 
   const handleReopenSuccess = useCallback(() => {
     setShowReopenForm(false);
     fetchSLADetails();
   }, [fetchSLADetails]);
-
+ 
   const handleEscalationSuccess = useCallback(() => {
     setShowEscalationForm(false);
     fetchSLADetails();
   }, [fetchSLADetails]);
-
+ 
   if (loading) {
     return (
       <div className="sla-details-loading-wrapper">
@@ -213,30 +217,34 @@ const SLADetails = () => {
       </div>
     );
   }
-
+ 
   const daysRemaining = dateHelpers.daysRemaining(sla.deadline);
   const hasEscalations = escalations.length > 0;
   const pendingEscalations = escalations.filter(
     (e) => e.escalationStatus === "Pending"
   ).length;
+ 
+ 
   const slaDashboardPath = user
     ? getSLADashboardPath(user.roleName)
     : "/dashboard/sla";
-
+ 
   return (
     <div className="sla-details-container">
       <div className="sla-details-header">
-        <Breadcrumb
-          items={[
-            {
-              label: "SLA Compliance",
-              path: slaDashboardPath,
-            },
-            {
-              label: `${sla.slatype} - ${sla.employeeName}`,
-            },
-          ]}
-        />
+ 
+  <Breadcrumb
+  items={[
+    {
+      label: "SLA Compliance",
+      onClick: () => navigate(-1),  
+    },
+    {
+      label: `${sla.slatype} - ${sla.employeeName}`,
+    },
+  ]}
+/>
+ 
         <div className="sla-details-actions-wrapper">
           {sla.status !== "Closed" &&
             (user?.roleName === "Employee" || user?.roleName === "Manager") &&
@@ -258,7 +266,7 @@ const SLADetails = () => {
                 Escalated
               </button>
             ))}
-
+ 
           {canReopen && sla.status === "Closed" && (
             <button
               onClick={() => setShowReopenForm(true)}
@@ -268,7 +276,7 @@ const SLADetails = () => {
               Reopen
             </button>
           )}
-
+ 
           {sla.status !== "Closed" && user?.roleName === "Manager" && (
             <button
               onClick={() => setShowCloseConfirmation(true)}
@@ -280,7 +288,7 @@ const SLADetails = () => {
           )}
         </div>
       </div>
-
+ 
       <div className="sla-details-layout">
         <div className="sla-details-left">
           <div className="sla-details-card">
@@ -312,7 +320,7 @@ const SLADetails = () => {
                   </div>
                 </div>
               </div>
-
+ 
               <div className="sla-details-summary-section">
                 <h5 className="sla-details-summary-title">Status Summary</h5>
                 <div className="sla-details-summary-grid">
@@ -397,7 +405,7 @@ const SLADetails = () => {
                   </div>
                 </div>
               </div>
-
+ 
               {sla.reopenedAt && (
                 <div className="sla-details-alert">
                   <RotateCcw size={20} className="sla-details-alert-icon" />
@@ -419,7 +427,7 @@ const SLADetails = () => {
               )}
             </div>
           </div>
-
+ 
           {hasEscalations && (
             <div className="sla-details-card">
               <div className="sla-details-card-body">
@@ -430,7 +438,7 @@ const SLADetails = () => {
                   />
                   Escalation Chain ({escalations.length})
                 </h5>
-
+ 
                 {escalations.map((esc, idx) => (
                   <div
                     key={esc.escalationId}
@@ -517,7 +525,7 @@ const SLADetails = () => {
             </div>
           )}
         </div>
-
+ 
         <div className="sla-details-right">
           <div className="sla-details-card">
             <div className="sla-details-card-body">
@@ -537,7 +545,7 @@ const SLADetails = () => {
           </div>
         </div>
       </div>
-
+ 
       {showReopenForm && (
         <ReopenSLAForm
           sla={sla}
@@ -545,7 +553,7 @@ const SLADetails = () => {
           onSuccess={handleReopenSuccess}
         />
       )}
-
+ 
       {showEscalationForm && (
         <EscalationForm
           sla={sla}
@@ -553,7 +561,7 @@ const SLADetails = () => {
           onSuccess={handleEscalationSuccess}
         />
       )}
-
+ 
       {showCloseConfirmation && (
         <>
           <div
@@ -573,7 +581,7 @@ const SLADetails = () => {
                   <X size={20} />
                 </button>
               </div>
-
+ 
               <div className="sla-close-modal-body">
                 <div className="sla-close-modal-icon-wrapper">
                   <CheckCircle size={48} />
@@ -581,7 +589,7 @@ const SLADetails = () => {
                 <p className="sla-close-modal-description">
                   You're about to mark this SLA as completed and closed.
                 </p>
-
+ 
                 <div className="sla-close-modal-info-box">
                   <div className="sla-close-modal-info-icon">
                     <Info size={18} />
@@ -597,7 +605,7 @@ const SLADetails = () => {
                     </ul>
                   </div>
                 </div>
-
+ 
                 <div className="sla-close-modal-summary">
                   <div className="sla-close-modal-summary-row">
                     <span className="sla-close-modal-summary-label">
@@ -625,7 +633,7 @@ const SLADetails = () => {
                   </div>
                 </div>
               </div>
-
+ 
               <div className="sla-close-modal-actions">
                 <button
                   type="button"
@@ -661,5 +669,7 @@ const SLADetails = () => {
     </div>
   );
 };
-
+ 
 export default SLADetails;
+ 
+ 

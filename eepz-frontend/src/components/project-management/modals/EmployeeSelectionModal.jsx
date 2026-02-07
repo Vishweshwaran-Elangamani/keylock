@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { UserCog, X, CheckCircle, Search } from "lucide-react";
 import CustomDropdown from "../../../components/project-management/common/CustomDropdown";
-import PaginationFooter from "../../../components/project-management/common/PaginationFooter"; 
+import PaginationFooter from "../../../components/project-management/common/PaginationFooter"; // ✅ Import PaginationFooter
 import "../../../styles/projectmanagement/components/EmployeeSelectionModal.css";
-
+ 
 const EmployeeSelectionModal = ({
   show,
   onClose,
-  employees,  
+  employees,  // ✅ COMPLETE employee list from parent
   activeTab,
   setActiveTab,
   selectedResourceOwner,
@@ -16,149 +16,126 @@ const EmployeeSelectionModal = ({
   onSelectManager,
   onConfirm,
 }) => {
-  const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const [filterRole, setFilterRole] = useState("All");
   const [filterDepartment, setFilterDepartment] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
-
-  const itemsPerPage = 10;
-
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+ 
   const roleDropdownRef = useRef(null);
   const deptDropdownRef = useRef(null);
-
+ 
+  // Body scroll lock
   useEffect(() => {
-    if (!show) return;
-    document.body.style.overflow = "hidden";
+    if (show) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "unset";
     return () => {
       document.body.style.overflow = "unset";
     };
   }, [show]);
-
+ 
+  // Reset pagination on filter/search change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, filterRole, filterDepartment]);
-
+  }, [activeSearchTerm, filterRole, filterDepartment]);
+ 
   const handleSearch = () => {
-    if (!searchInput.trim()) return;
-    setSearchTerm(searchInput.trim());
-    setCurrentPage(1);
+    if (!searchTerm.trim()) return;
+    setActiveSearchTerm(searchTerm.trim());
   };
-
+ 
   const handleCancelSearch = () => {
-    setSearchInput("");
     setSearchTerm("");
-    setCurrentPage(1);
+    setActiveSearchTerm("");
   };
-
+ 
   const handleSearchKeyPress = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
       handleSearch();
     }
   };
-
+ 
+  // ✅ All roles/departments from COMPLETE employees list
   const uniqueRoles = useMemo(() => {
-    const roles = [
-      ...new Set((employees || []).map((emp) => emp.roleName).filter(Boolean)),
-    ];
+    const roles = [...new Set((employees || []).map((emp) => emp.roleName).filter(Boolean))];
     return roles.sort((a, b) => a.localeCompare(b));
   }, [employees]);
-
+ 
   const uniqueDepartments = useMemo(() => {
-    const depts = [
-      ...new Set(
-        (employees || []).map((emp) => emp.departmentName).filter(Boolean)
-      ),
-    ];
+    const depts = [...new Set((employees || []).map((emp) => emp.departmentName).filter(Boolean))];
     return depts.sort((a, b) => a.localeCompare(b));
   }, [employees]);
-
+ 
+  // Filter employees (ALL employees available)
   const filteredEmployees = useMemo(() => {
     return (employees || []).filter((emp) => {
-      const searchMatch =
-        !searchTerm ||
+      const searchMatch = !activeSearchTerm ||
         `${emp.firstName} ${emp.lastName} ${emp.roleName} ${emp.departmentName}`
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase());
-
+          .toLowerCase().includes(activeSearchTerm.toLowerCase());
+     
       const roleMatch = filterRole === "All" || emp.roleName === filterRole;
-      const deptMatch =
-        filterDepartment === "All" || emp.departmentName === filterDepartment;
-
+      const deptMatch = filterDepartment === "All" || emp.departmentName === filterDepartment;
+ 
       return searchMatch && roleMatch && deptMatch;
     });
-  }, [employees, searchTerm, filterRole, filterDepartment]);
-
-  
+  }, [employees, activeSearchTerm, filterRole, filterDepartment]);
+ 
+  // Pagination data for PaginationFooter
   const totalItems = filteredEmployees.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
   const paginatedEmployees = filteredEmployees.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
-  const goToPage = (page) => {
-    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+ 
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
-
-  const getPageNumbers = () => {
-    const pages = [];
-    const maxPagesToShow = 5;
-
-    if (totalPages <= maxPagesToShow) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
-    } else if (currentPage <= 3) {
-      for (let i = 1; i <= 4; i++) pages.push(i);
-      pages.push("...");
-      pages.push(totalPages);
-    } else if (currentPage >= totalPages - 2) {
-      pages.push(1);
-      pages.push("...");
-      for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
-    } else {
-      pages.push(1);
-      pages.push("...");
-      for (let i = currentPage - 1; i <= currentPage + 1; i++) pages.push(i);
-      pages.push("...");
-      pages.push(totalPages);
-    }
-    return pages;
+ 
+  const handleItemsPerPageChange = (size) => {
+    setItemsPerPage(size);
+    setCurrentPage(1);
   };
-
+ 
   if (!show) return null;
-
+ 
   const getCurrentSelection = () => {
     if (activeTab === "resource") return selectedResourceOwner;
     if (activeTab === "l1") return selectedL1Approver;
     if (activeTab === "l2") return selectedL2Approver;
     return null;
   };
-
+ 
   const currentSelection = getCurrentSelection();
-
+ 
+  const isSelected = (emp) => {
+    const selected = getCurrentSelection();
+    return selected?.employeeMasterId === emp.employeeMasterId;
+  };
+ 
   return (
     <>
       <div className="prj-modal-backdrop" onClick={onClose} />
       <div className="prj-modal-overlay" role="dialog" aria-modal="true">
         <div className="prj-modal-container">
+          {/* Header */}
           <div className="prj-modal-header">
             <div className="prj-modal-header-content">
               <UserCog size={24} />
               <h3 className="prj-modal-title">Select Manager</h3>
             </div>
-
             <button type="button" className="prj-modal-close" onClick={onClose}>
               <X size={20} />
             </button>
           </div>
-
+ 
+          {/* Tabs */}
           <div className="prj-modal-tabs">
             <button
               type="button"
-              className={`prj-modal-tab ${
-                activeTab === "resource" ? "active" : ""
-              }`}
+              className={`prj-modal-tab ${activeTab === "resource" ? "active" : ""}`}
               onClick={() => setActiveTab("resource")}
             >
               <span>Resource Owner</span>
@@ -166,7 +143,6 @@ const EmployeeSelectionModal = ({
                 <CheckCircle size={16} className="prj-tab-icon" />
               )}
             </button>
-
             <button
               type="button"
               className={`prj-modal-tab ${activeTab === "l1" ? "active" : ""}`}
@@ -177,7 +153,6 @@ const EmployeeSelectionModal = ({
                 <CheckCircle size={16} className="prj-tab-icon" />
               )}
             </button>
-
             <button
               type="button"
               className={`prj-modal-tab ${activeTab === "l2" ? "active" : ""}`}
@@ -189,7 +164,8 @@ const EmployeeSelectionModal = ({
               )}
             </button>
           </div>
-
+ 
+          {/* Current Selection */}
           {currentSelection && (
             <div className="prj-modal-info">
               <span className="prj-info-icon">ℹ️</span>
@@ -201,51 +177,37 @@ const EmployeeSelectionModal = ({
               </div>
             </div>
           )}
-
+ 
+          {/* Filters */}
           <div className="prj-modal-filters">
             <div className="prj-filter-search-container">
               <Search size={18} className="prj-search-icon-left" />
-
               <input
                 type="text"
                 className="prj-search-input-with-btn"
                 placeholder="Search by name, role, or department..."
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyDown={handleSearchKeyPress}
               />
-
-              {searchInput && (
-                <button
-                  type="button"
-                  className="prj-search-clear-btn"
-                  onClick={handleCancelSearch}
-                >
+              {searchTerm && (
+                <button type="button" className="prj-search-clear-btn" onClick={handleCancelSearch}>
                   <X size={16} />
                 </button>
               )}
-
-              {searchTerm ? (
-                <button
-                  type="button"
-                  className="prj-search-btn-inside prj-btn-cancel"
-                  onClick={handleCancelSearch}
-                >
+              {activeSearchTerm ? (
+                <button type="button" className="prj-search-btn-inside prj-btn-cancel" onClick={handleCancelSearch}>
                   <X size={16} />
                   <span>Cancel</span>
                 </button>
               ) : (
-                <button
-                  type="button"
-                  onClick={handleSearch}
-                  className="prj-search-btn-inside"
-                >
+                <button type="button" onClick={handleSearch} className="prj-search-btn-inside">
                   <Search size={16} />
                   <span>Search</span>
                 </button>
               )}
             </div>
-
+ 
             <div ref={roleDropdownRef} className="prj-filter-dd">
               <CustomDropdown
                 label=""
@@ -257,7 +219,7 @@ const EmployeeSelectionModal = ({
                 onChange={(_, v) => setFilterRole(v)}
               />
             </div>
-
+ 
             <div ref={deptDropdownRef} className="prj-filter-dd">
               <CustomDropdown
                 label=""
@@ -270,7 +232,8 @@ const EmployeeSelectionModal = ({
               />
             </div>
           </div>
-
+ 
+          {/* Table */}
           <div className="prj-modal-body">
             <div className="prj-table-wrapper">
               <table className="prj-table">
@@ -282,78 +245,56 @@ const EmployeeSelectionModal = ({
                     <th className="prj-col-dept">Department</th>
                   </tr>
                 </thead>
-
                 <tbody>
-                  {paginatedManagers.length === 0 ? (
+                  {paginatedEmployees.length === 0 ? (
                     <tr>
                       <td colSpan={4} className="prj-table-empty">
-                        No employees found for the selected filters.
+                        {activeSearchTerm
+                          ? "No employees found matching your search"
+                          : "No employees found for selected filters"}
                       </td>
                     </tr>
                   ) : (
-                    paginatedManagers.map((emp) => {
-                      const isSelected =
-                        (activeTab === "resource" &&
-                          selectedResourceOwner?.employeeMasterId ===
-                            emp.employeeMasterId) ||
-                        (activeTab === "l1" &&
-                          selectedL1Approver?.employeeMasterId ===
-                            emp.employeeMasterId) ||
-                        (activeTab === "l2" &&
-                          selectedL2Approver?.employeeMasterId ===
-                            emp.employeeMasterId);
-
-                      return (
-                        <tr
-                          key={emp.employeeMasterId}
-                          className={isSelected ? "prj-table-row-selected" : ""}
-                          onClick={() => onSelectManager(emp)}
-                        >
-                          <td className="prj-table-select-col">
-                            <input
-                              type="radio"
-                              className="prj-radio"
-                              checked={isSelected}
-                              onChange={() => onSelectManager(emp)}
-                            />
-                          </td>
-                          <td className="prj-col-name">
-                            {emp.firstName} {emp.lastName}
-                          </td>
-                          <td className="prj-col-role">{emp.roleName}</td>
-                          <td className="prj-col-dept">{emp.departmentName}</td>
-                        </tr>
-                      );
-                    })
+                    paginatedEmployees.map((emp) => (
+                      <tr
+                        key={emp.employeeMasterId}
+                        className={isSelected(emp) ? "prj-table-row-selected" : ""}
+                        onClick={() => onSelectManager(emp)}
+                      >
+                        <td className="prj-table-select-col">
+                          <input
+                            type="radio"
+                            className="prj-radio"
+                            checked={isSelected(emp)}
+                            onChange={() => onSelectManager(emp)}
+                          />
+                        </td>
+                        <td className="prj-col-name">{emp.firstName} {emp.lastName}</td>
+                        <td className="prj-col-role">{emp.roleName}</td>
+                        <td className="prj-col-dept">{emp.departmentName}</td>
+                      </tr>
+                    ))
                   )}
                 </tbody>
               </table>
             </div>
-
-          
-<PaginationFooter
-  totalItems={totalItems}
-  currentPage={currentPage}
-  setCurrentPage={setCurrentPage}
-  itemsPerPage={itemsPerPage}
-  setItemsPerPage={setItemsPerPage}
-/>
+ 
+            {/* ✅ PaginationFooter - Reused component */}
+            <PaginationFooter
+              currentPage={currentPage}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={handlePageChange}
+              onItemsPerPageChange={handleItemsPerPageChange}
+            />
           </div>
-
+ 
+          {/* Footer */}
           <div className="prj-modal-footer">
-            <button
-              type="button"
-              onClick={onClose}
-              className="prj-btn prj-btn-secondary"
-            >
-              <span>Cancel</span>
+            <button type="button" onClick={onClose} className="prj-btn prj-btn-secondary">
+              Cancel
             </button>
-
-            <button
-              type="button"
-              onClick={onConfirm}
-              className="prj-btn prj-btn-primary"
-            >
+            <button type="button" onClick={onConfirm} className="prj-btn prj-btn-primary">
               <CheckCircle size={18} />
               <span>Confirm Selection</span>
             </button>
@@ -363,5 +304,7 @@ const EmployeeSelectionModal = ({
     </>
   );
 };
-
+ 
 export default EmployeeSelectionModal;
+ 
+ 

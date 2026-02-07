@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import slaService, { dateHelpers } from "../../services/sla/slaService";
 import Breadcrumb from "../../components/sla/common/Breadcrumbs";
-import PaginationFooter from "../../components/project-management/common/PaginationFooter"; // ✅ ADD THIS
+import PaginationFooter from "../../components/project-management/common/PaginationFooter"; 
 import "../../styles/sla/components/EmployeeSLADashboard.css";
 
 const EmployeeSLADashboard = () => {
@@ -107,7 +107,7 @@ const EmployeeSLADashboard = () => {
         filtered = slas.filter(
           (s) =>
             (s.status === "Open" || s.status === "InProgress") &&
-            s.daysUntilDeadline < 0
+            s.daysUntilDeadline < 0,
         );
         break;
       default:
@@ -121,7 +121,7 @@ const EmployeeSLADashboard = () => {
     (slaid) => {
       navigate(`/employee/dashboard/sla/details/${slaid}`);
     },
-    [navigate]
+    [navigate],
   );
 
   const handleRefresh = useCallback(() => {
@@ -136,10 +136,10 @@ const EmployeeSLADashboard = () => {
     const overdue = slas.filter(
       (s) =>
         (s.status === "Open" || s.status === "InProgress") &&
-        s.daysUntilDeadline < 0
+        s.daysUntilDeadline < 0,
     ).length;
     const onTime = slas.filter(
-      (s) => s.complianceStatus && s.complianceStatus === "OnTime"
+      (s) => s.complianceStatus && s.complianceStatus === "OnTime",
     ).length;
 
     return { total, open, inProgress, completed, overdue, onTime };
@@ -173,7 +173,7 @@ const EmployeeSLADashboard = () => {
 
   const paginatedSLAs = filteredSLAs.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   if (loading) {
@@ -280,9 +280,8 @@ const EmployeeSLADashboard = () => {
             ].map(({ key, label }) => (
               <button
                 key={key}
-                className={`emp-sla-tab-pill ${
-                  activeTab === key ? "active" : ""
-                }`}
+                className={`emp-sla-tab-pill ${activeTab === key ? "active" : ""
+                  }`}
                 onClick={() => setActiveTab(key)}
                 type="button"
               >
@@ -293,14 +292,13 @@ const EmployeeSLADashboard = () => {
 
           <div className="emp-sla-view-switcher">
             <button
-              className={`emp-sla-view-btn ${
-                viewMode === "table" ? "active" : ""
-              }`}
+              className={`emp-sla-view-btn ${viewMode === "table" ? "active" : ""
+                }`}
               onClick={() => {
                 setViewMode("table");
-                setItemsPerPage(10);
                 setCurrentPage(1);
               }}
+
               title="Table View"
               type="button"
             >
@@ -308,14 +306,14 @@ const EmployeeSLADashboard = () => {
             </button>
 
             <button
-              className={`emp-sla-view-btn ${
-                viewMode === "grid" ? "active" : ""
-              }`}
+              className={`emp-sla-view-btn ${viewMode === "grid" ? "active" : ""
+                }`}
               onClick={() => {
                 setViewMode("grid");
-                setItemsPerPage(9);
                 setCurrentPage(1);
               }}
+
+
               title="Grid View"
               type="button"
             >
@@ -377,11 +375,10 @@ const EmployeeSLADashboard = () => {
 
                             <td>
                               <span
-                                className={`emp-sla-badge ${
-                                  overdue
+                                className={`emp-sla-badge ${overdue
                                     ? "emp-sla-badge-overdue"
                                     : statusStyle.className
-                                }`}
+                                  }`}
                               >
                                 {overdue ? "OVERDUE" : sla.status}
                               </span>
@@ -393,13 +390,12 @@ const EmployeeSLADashboard = () => {
 
                             <td>
                               <span
-                                className={`emp-sla-days ${
-                                  overdue
+                                className={`emp-sla-days ${overdue
                                     ? "emp-sla-days-overdue"
                                     : sla.daysUntilDeadline <= 3
-                                    ? "emp-sla-days-warning"
-                                    : "emp-sla-days-ok"
-                                }`}
+                                      ? "emp-sla-days-warning"
+                                      : "emp-sla-days-ok"
+                                  }`}
                               >
                                 {overdue
                                   ? `${Math.abs(sla.daysUntilDeadline)} overdue`
@@ -440,55 +436,39 @@ const EmployeeSLADashboard = () => {
                   </table>
                 </div>
 
-                {/* ✅ EXTERNAL PAGINATION FOOTER */}
                 {safeTotal > 0 && (
                   <PaginationFooter
-                    currentPage={currentPage}
                     totalItems={safeTotal}
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
                     itemsPerPage={itemsPerPage}
-                    onPageChange={setCurrentPage}
-                    onItemsPerPageChange={(size) => {
-                      setItemsPerPage(size);
-                      setCurrentPage(1);
-                    }}
-                    pageSizeOptions={[5, 10, 25, 50]}
-                    showPageSizeDropdown={true}
-                    showStatusText={true}
-                    pageNumberMode="compact" // ✅ only numbers like 1 2
+                    setItemsPerPage={setItemsPerPage}
                   />
                 )}
               </div>
             )}
 
             {/* GRID VIEW */}
+            {/* GRID VIEW */}
             {viewMode === "grid" && (
-              <>
+              <div className="emp-sla-grid-container">
                 <div className="emp-sla-cards-grid">
                   {paginatedSLAs.map((sla) => {
                     const overdue = isOverdue(sla);
                     const statusStyle = overdue
-                      ? {
-                          className: "emp-sla-status-overdue",
-                          icon: AlertTriangle,
-                        }
+                      ? { className: "emp-sla-status-overdue", icon: AlertTriangle }
                       : getStatusStyle(sla.status);
                     const IconComponent = statusStyle.icon;
 
                     return (
                       <div key={sla.key} className="emp-sla-card">
                         <div className="emp-sla-card-header">
-                          <div
-                            className={`emp-sla-card-icon ${statusStyle.className}`}
-                          >
+                          <div className={`emp-sla-card-icon ${statusStyle.className}`}>
                             <IconComponent size={20} strokeWidth={2} />
                           </div>
                           <div className="emp-sla-card-header-text">
-                            <h6 className="emp-sla-card-title">
-                              {sla.slatype || "SLA"}
-                            </h6>
-                            <span
-                              className={`emp-sla-card-badge ${statusStyle.className}`}
-                            >
+                            <h6 className="emp-sla-card-title">{sla.slatype || "SLA"}</h6>
+                            <span className={`emp-sla-card-badge ${statusStyle.className}`}>
                               {overdue ? "OVERDUE" : sla.status}
                             </span>
                           </div>
@@ -503,16 +483,8 @@ const EmployeeSLADashboard = () => {
                           </div>
 
                           <div className="emp-sla-card-row">
-                            <span className="emp-sla-card-label">
-                              Days Remaining
-                            </span>
-                            <span
-                              className={`emp-sla-card-value ${
-                                overdue
-                                  ? "emp-sla-text-danger"
-                                  : "emp-sla-text-success"
-                              }`}
-                            >
+                            <span className="emp-sla-card-label">Days Remaining</span>
+                            <span className={`emp-sla-card-value ${overdue ? "emp-sla-text-danger" : "emp-sla-text-success"}`}>
                               {overdue
                                 ? `${Math.abs(sla.daysUntilDeadline)} overdue`
                                 : `${sla.daysUntilDeadline} days`}
@@ -520,9 +492,7 @@ const EmployeeSLADashboard = () => {
                           </div>
 
                           <div className="emp-sla-card-row">
-                            <span className="emp-sla-card-label">
-                              Assigned To
-                            </span>
+                            <span className="emp-sla-card-label">Assigned To</span>
                             <span className="emp-sla-card-value emp-sla-truncate">
                               {sla.assignedToName || "-"}
                             </span>
@@ -530,12 +500,8 @@ const EmployeeSLADashboard = () => {
 
                           {sla.complianceStatus && (
                             <div className="emp-sla-card-row">
-                              <span className="emp-sla-card-label">
-                                Compliance
-                              </span>
-                              <span
-                                className={`emp-sla-badge emp-sla-badge-compliance-${sla.complianceStatus.toLowerCase()}`}
-                              >
+                              <span className="emp-sla-card-label">Compliance</span>
+                              <span className={`emp-sla-badge emp-sla-badge-compliance-${sla.complianceStatus.toLowerCase()}`}>
                                 {sla.complianceStatus}
                               </span>
                             </div>
@@ -557,27 +523,19 @@ const EmployeeSLADashboard = () => {
                   })}
                 </div>
 
-                {/* ✅ EXTERNAL PAGINATION FOOTER for grid too */}
-                {safeTotal > 0 && totalPages > 1 && (
-                  <div className="emp-sla-grid-footer-wrap">
-                    <PaginationFooter
-                      currentPage={currentPage}
-                      totalItems={safeTotal}
-                      itemsPerPage={itemsPerPage}
-                      onPageChange={setCurrentPage}
-                      onItemsPerPageChange={(size) => {
-                        setItemsPerPage(size);
-                        setCurrentPage(1);
-                      }}
-                      pageSizeOptions={[5, 10, 25, 50]}
-                      showPageSizeDropdown={true}
-                      showStatusText={true}
-                      pageNumberMode="compact"
-                    />
-                  </div>
+                {/* PAGINATION FOR GRID VIEW */}
+                {safeTotal > 0 && (
+                  <PaginationFooter
+                    totalItems={safeTotal}
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
+                    itemsPerPage={itemsPerPage}
+                    setItemsPerPage={setItemsPerPage}
+                  />
                 )}
-              </>
+              </div>
             )}
+
           </>
         )}
       </div>
@@ -586,3 +544,4 @@ const EmployeeSLADashboard = () => {
 };
 
 export default EmployeeSLADashboard;
+

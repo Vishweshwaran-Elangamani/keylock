@@ -13,73 +13,73 @@ import {
   Zap,
   X,
 } from "lucide-react";
-
+ 
 import slaService, { dateHelpers } from "../../services/sla/slaService";
 import ManagerEscalationModal from "../../components/sla/modals/ManagerEscalationModal";
 import ResolveEscalationModal from "../../components/sla/modals/ResolveEscalationModal";
 import { formatDate } from "../../utils/sla/dateFormatter";
 import CustomDropdown from "../../components/project-management/common/CustomDropdown";
 import PaginationFooter from "../../components/project-management/common/PaginationFooter";
-
+ 
 import "../../styles/sla/components/ManagerSLADashboard.css";
-
+ 
 const statusOptionsMy = [
   { value: "All", label: "All Status" },
   { value: "Open", label: "Open" },
   { value: "Closed", label: "Closed" },
   { value: "InProgress", label: "In Progress" },
 ];
-
+ 
 const statusOptionsTeam = [
   { value: "All", label: "All Status" },
   { value: "Pending", label: "Pending" },
   { value: "InProgress", label: "In Progress" },
   { value: "Resolved", label: "Resolved" },
 ];
-
+ 
 const complianceOptions = [
   { value: "All", label: "All Compliance" },
   { value: "OnTime", label: "On Time" },
   { value: "Breached", label: "Breached" },
   { value: "Extended", label: "Extended" },
 ];
-
+ 
 const ManagerSLADashboard = () => {
   const navigate = useNavigate();
-
+ 
   const [mySLAs, setMySLAs] = useState([]);
   const [managerEscalations, setManagerEscalations] = useState([]);
   const [deptHeads, setDeptHeads] = useState([]);
-
+ 
   const [loading, setLoading] = useState(true);
-
+ 
   const [activeTab, setActiveTab] = useState("my-escalation");
-
+ 
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
-
+ 
   const [statusFilter, setStatusFilter] = useState("All");
   const [complianceFilter, setComplianceFilter] = useState("All");
-
+ 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-
+ 
   const [showEscalationModal, setShowEscalationModal] = useState(false);
   const [showResolveModal, setShowResolveModal] = useState(false);
-
+ 
   const [selectedSLAForEscalation, setSelectedSLAForEscalation] =
     useState(null);
   const [selectedEscalationForResolve, setSelectedEscalationForResolve] =
     useState(null);
-
+ 
   useEffect(() => {
     loadData();
   }, []);
-
+ 
   useEffect(() => {
     setCurrentPage(1);
   }, [activeSearchTerm, statusFilter, complianceFilter, activeTab]);
-
+ 
   const loadData = async () => {
     setLoading(true);
     try {
@@ -89,23 +89,23 @@ const ManagerSLADashboard = () => {
         setLoading(false);
         return;
       }
-
+ 
       if (userData.departmentId) {
         const deptHeadRes = await slaService.getDepartmentHeads(
-          userData.departmentId
+          userData.departmentId,
         );
         if (deptHeadRes?.success && Array.isArray(deptHeadRes.data)) {
           setDeptHeads(deptHeadRes.data);
         }
       }
-
+ 
       const escalationsRes = await slaService.getManagerEscalations(
-        userData.empId
+        userData.empId,
       );
       if (escalationsRes?.success && Array.isArray(escalationsRes.data)) {
         setManagerEscalations(escalationsRes.data);
       }
-
+ 
       const mySLAsRes = await slaService.getEmployeeSLAs(userData.empId);
       if (mySLAsRes?.success && Array.isArray(mySLAsRes.data)) {
         setMySLAs(mySLAsRes.data);
@@ -117,10 +117,10 @@ const ManagerSLADashboard = () => {
       setLoading(false);
     }
   };
-
+ 
   const filteredSlas = useMemo(() => {
     let result = activeTab === "team-escalation" ? managerEscalations : mySLAs;
-
+ 
     if (activeTab === "my-escalation") {
       if (activeSearchTerm) {
         const term = activeSearchTerm.toLowerCase();
@@ -130,17 +130,17 @@ const ManagerSLADashboard = () => {
             sla.departmentName?.toLowerCase().includes(term) ||
             sla.slaid?.toString().includes(term) ||
             sla.slatype?.toLowerCase().includes(term) ||
-            sla.assignedToName?.toLowerCase().includes(term)
+            sla.assignedToName?.toLowerCase().includes(term),
         );
       }
-
+ 
       if (statusFilter !== "All") {
         result = result.filter((sla) => sla.status === statusFilter);
       }
-
+ 
       if (complianceFilter !== "All") {
         result = result.filter(
-          (sla) => sla.complianceStatus === complianceFilter
+          (sla) => sla.complianceStatus === complianceFilter,
         );
       }
     } else {
@@ -149,15 +149,15 @@ const ManagerSLADashboard = () => {
         result = result.filter(
           (esc) =>
             esc.reason?.toLowerCase().includes(term) ||
-            esc.employeeName?.toLowerCase().includes(term)
+            esc.employeeName?.toLowerCase().includes(term),
         );
       }
-
+ 
       if (statusFilter !== "All") {
         result = result.filter((esc) => esc.escalationStatus === statusFilter);
       }
     }
-
+ 
     return result;
   }, [
     mySLAs,
@@ -167,42 +167,42 @@ const ManagerSLADashboard = () => {
     complianceFilter,
     activeTab,
   ]);
-
+ 
   const handleSearch = () => {
     if (!searchTerm.trim()) return;
     setActiveSearchTerm(searchTerm.trim());
   };
-
+ 
   const handleSearchKeyPress = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
       handleSearch();
     }
   };
-
+ 
   const handleClearSearch = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
   };
-
+ 
   const calculateStats = () => ({
     total: mySLAs.length,
     open: mySLAs.filter((s) => s.status === "Open").length,
     inProgress: mySLAs.filter((s) => s.status === "InProgress").length,
     closed: mySLAs.filter((s) => s.status === "Closed").length,
   });
-
+ 
   const handleViewClick = (e, id) => {
     e.stopPropagation();
     navigate(`/sla/manager/details/${id}`);
   };
-
+ 
   const handleEscalateClick = (e, escalation) => {
     e.stopPropagation();
     setSelectedSLAForEscalation(escalation);
     setShowEscalationModal(true);
   };
-
+ 
   const handleEscalateToDeptHead = async (payload) => {
     try {
       const res = await slaService.escalateToDeptHead(payload);
@@ -217,13 +217,13 @@ const ManagerSLADashboard = () => {
       throw err;
     }
   };
-
+ 
   const handleResolveClick = (e, escalation) => {
     e.stopPropagation();
     setSelectedEscalationForResolve(escalation);
     setShowResolveModal(true);
   };
-
+ 
   const handleResolveEscalation = async (payload) => {
     try {
       const res = await slaService.resolveEscalation(payload);
@@ -237,11 +237,11 @@ const ManagerSLADashboard = () => {
       toast.error("Resolution failed");
     }
   };
-
+ 
   const handleRowClick = (id) => {
     navigate(`/sla/manager/details/${id}`);
   };
-
+ 
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
@@ -249,33 +249,33 @@ const ManagerSLADashboard = () => {
     setComplianceFilter("All");
     toast.info("Filters cleared");
   };
-
+ 
   const getStatusBadgeClass = (status) => {
     if (status === "Closed") return "mgr-sla-status-closed";
     if (status === "Open") return "mgr-sla-status-open";
     if (status === "InProgress") return "mgr-sla-status-inprogress";
     return "mgr-sla-status-open";
   };
-
+ 
   const stats = calculateStats();
   const isTeamTab = activeTab === "team-escalation";
-
-  const effectivePageSize = isTeamTab ? itemsPerPage : 9;
-
+ 
+const effectivePageSize = itemsPerPage;
+ 
   const safeTotal = filteredSlas.length;
   const totalPages = Math.max(1, Math.ceil(safeTotal / effectivePageSize));
   const validCurrentPage = Math.min(currentPage, totalPages);
-
+ 
   const start = (validCurrentPage - 1) * effectivePageSize;
   const end = start + effectivePageSize;
-
+ 
   const paginatedData = filteredSlas.slice(start, end);
-
+ 
   const handleItemsPerPageChange = (size) => {
     setItemsPerPage(size);
     setCurrentPage(1);
   };
-
+ 
   if (loading) {
     return (
       <div className="mgr-sla-wrapper mgr-sla-loading-wrapper">
@@ -286,7 +286,7 @@ const ManagerSLADashboard = () => {
       </div>
     );
   }
-
+ 
   return (
     <div className="mgr-sla-wrapper">
       <nav aria-label="breadcrumb" className="mgr-sla-breadcrumb-nav">
@@ -311,7 +311,7 @@ const ManagerSLADashboard = () => {
           </li>
         </ol>
       </nav>
-
+ 
       <div className="mgr-sla-stats-grid">
         {[
           {
@@ -356,7 +356,7 @@ const ManagerSLADashboard = () => {
           </div>
         ))}
       </div>
-
+ 
       <div className="mgr-sla-filters-card">
         <div className="mgr-sla-filters-row">
           <div className="mgr-sla-filter-col-search">
@@ -368,13 +368,13 @@ const ManagerSLADashboard = () => {
                 placeholder={
                   activeTab === "team-escalation"
                     ? "Search by reason or employee..."
-                    : "Search by SLA type, assigned to, or department..."
+                    : "Search by SLA type, assigned to"
                 }
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyDown={handleSearchKeyPress}
               />
-
+ 
               {activeSearchTerm ? (
                 <button
                   type="button"
@@ -396,7 +396,7 @@ const ManagerSLADashboard = () => {
               )}
             </div>
           </div>
-
+ 
           <div className="mgr-sla-filter-col-status">
             <CustomDropdown
               name="status"
@@ -407,7 +407,7 @@ const ManagerSLADashboard = () => {
               className="mgr-dd"
             />
           </div>
-
+ 
           {activeTab === "my-escalation" && (
             <div className="mgr-sla-filter-col-compliance">
               <CustomDropdown
@@ -420,7 +420,7 @@ const ManagerSLADashboard = () => {
               />
             </div>
           )}
-
+ 
           <div
             className={`mgr-sla-filter-col-actions ${
               activeTab === "my-escalation"
@@ -432,7 +432,7 @@ const ManagerSLADashboard = () => {
           </div>
         </div>
       </div>
-
+ 
       <div className="mgr-sla-tabs-wrapper">
         <div className="mgr-sla-tabs-container">
           {[
@@ -452,7 +452,7 @@ const ManagerSLADashboard = () => {
           ))}
         </div>
       </div>
-
+ 
       {filteredSlas.length === 0 ? (
         <div className="mgr-sla-empty-state-standalone">
           <FileText size={64} className="mgr-sla-empty-icon" />
@@ -460,7 +460,7 @@ const ManagerSLADashboard = () => {
             No {activeTab === "team-escalation" ? "team escalations" : "SLAs"}{" "}
             found
           </p>
-
+ 
           {searchTerm ||
           statusFilter !== "All" ||
           complianceFilter !== "All" ? (
@@ -473,108 +473,123 @@ const ManagerSLADashboard = () => {
             </button>
           ) : null}
         </div>
-      ) : activeTab === "my-escalation" ? (
-        <div className="mgr-sla-escalation-grid">
-          {paginatedData.map((sla) => {
-            const daysRemaining = dateHelpers.daysRemaining(sla.deadline);
-
-            return (
-              <div key={sla.slaid} className="mgr-sla-escalation-col">
-                <div className="mgr-escalation-card">
-                  <div className="mgr-escalation-card-header">
-                    <div className="mgr-escalation-icon-wrapper">
-                      <Zap size={24} className="mgr-escalation-icon" />
-                    </div>
-
-                    <div className="mgr-escalation-title-wrapper">
-                      <h6 className="mgr-escalation-title">
-                        {sla.slatype || "Sample SLA"}
-                      </h6>
-                    </div>
-
+    ) : activeTab === "my-escalation" ? (
+  <>
+    <div className="mgr-sla-escalation-grid">
+      {paginatedData.map((sla) => {
+        const daysRemaining = dateHelpers.daysRemaining(sla.deadline);
+ 
+        return (
+          <div key={sla.slaid} className="mgr-sla-escalation-col">
+            <div className="mgr-escalation-card">
+              <div className="mgr-escalation-card-header">
+                <div className="mgr-escalation-icon-wrapper">
+                  <Zap size={24} className="mgr-escalation-icon" />
+                </div>
+ 
+                <div className="mgr-escalation-title-wrapper">
+                  <h6 className="mgr-escalation-title">
+                    {sla.slatype || "Sample SLA"}
+                  </h6>
+                </div>
+ 
+                <span
+                  className={`mgr-escalation-status-badge ${getStatusBadgeClass(
+                    sla.status
+                  )}`}
+                >
+                  {sla.status === "InProgress"
+                    ? "INPROGRESS"
+                    : sla.status?.toUpperCase()}
+                </span>
+              </div>
+ 
+              <div className="mgr-escalation-card-body">
+                <div className="mgr-escalation-info-row">
+                  <span className="mgr-escalation-label">Deadline</span>
+                  <span className="mgr-escalation-value">
+                    {dateHelpers.formatDeadline(sla.deadline)}
+                  </span>
+                </div>
+ 
+                <div className="mgr-escalation-info-row">
+                  <span className="mgr-escalation-label">Days Remaining</span>
+                  <span
+                    className={`mgr-escalation-value ${
+                      daysRemaining < 0
+                        ? "mgr-escalation-value-danger"
+                        : daysRemaining <= 3
+                        ? "mgr-escalation-value-warning"
+                        : "mgr-escalation-value-success"
+                    }`}
+                  >
+                    {Math.abs(daysRemaining)} days
+                  </span>
+                </div>
+ 
+                <div className="mgr-escalation-info-row">
+                  <span className="mgr-escalation-label">Assigned To</span>
+                  <span className="mgr-escalation-value mgr-text-truncate">
+                    {sla.assignedToName ? (
+                      <span className="mgr-sla-assigned-name">
+                        {sla.assignedToName}
+                      </span>
+                    ) : (
+                      <span className="mgr-sla-not-assigned">Not assigned</span>
+                    )}
+                  </span>
+                </div>
+ 
+                {sla.complianceStatus && (
+                  <div className="mgr-escalation-info-row">
+                    <span className="mgr-escalation-label">Compliance</span>
                     <span
-                      className={`mgr-escalation-status-badge ${getStatusBadgeClass(
-                        sla.status
-                      )}`}
+                      className={`mgr-compliance-badge ${
+                        sla.complianceStatus === "OnTime"
+                          ? "mgr-compliance-ontime"
+                          : "mgr-compliance-breached"
+                      }`}
                     >
-                      {sla.status === "InProgress"
-                        ? "INPROGRESS"
-                        : sla.status?.toUpperCase()}
+                      {sla.complianceStatus}
                     </span>
                   </div>
-
-                  <div className="mgr-escalation-card-body">
-                    <div className="mgr-escalation-info-row">
-                      <span className="mgr-escalation-label">Deadline</span>
-                      <span className="mgr-escalation-value">
-                        {dateHelpers.formatDeadline(sla.deadline)}
-                      </span>
-                    </div>
-
-                    <div className="mgr-escalation-info-row">
-                      <span className="mgr-escalation-label">
-                        Days Remaining
-                      </span>
-                      <span
-                        className={`mgr-escalation-value ${
-                          daysRemaining < 0
-                            ? "mgr-escalation-value-danger"
-                            : daysRemaining <= 3
-                            ? "mgr-escalation-value-warning"
-                            : "mgr-escalation-value-success"
-                        }`}
-                      >
-                        {Math.abs(daysRemaining)} days
-                      </span>
-                    </div>
-
-                    <div className="mgr-escalation-info-row">
-                      <span className="mgr-escalation-label">Assigned To</span>
-                      <span className="mgr-escalation-value mgr-text-truncate">
-                        {sla.assignedToName ? (
-                          <span className="mgr-sla-assigned-name">
-                            {sla.assignedToName}
-                          </span>
-                        ) : (
-                          <span className="mgr-sla-not-assigned">
-                            Not assigned
-                          </span>
-                        )}
-                      </span>
-                    </div>
-
-                    {sla.complianceStatus && (
-                      <div className="mgr-escalation-info-row">
-                        <span className="mgr-escalation-label">Compliance</span>
-                        <span
-                          className={`mgr-compliance-badge ${
-                            sla.complianceStatus === "OnTime"
-                              ? "mgr-compliance-ontime"
-                              : "mgr-compliance-breached"
-                          }`}
-                        >
-                          {sla.complianceStatus}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="mgr-escalation-card-footer">
-                    <button
-                      type="button"
-                      className="mgr-escalation-view-btn"
-                      onClick={() => handleRowClick(sla.slaid)}
-                    >
-                      <Eye size={16} />
-                      View Details
-                    </button>
-                  </div>
-                </div>
+                )}
               </div>
-            );
-          })}
-        </div>
-      ) : (
+ 
+              <div className="mgr-escalation-card-footer">
+                <button
+                  type="button"
+                  className="mgr-escalation-view-btn"
+                  onClick={() => handleRowClick(sla.slaid)}
+                >
+                  <Eye size={16} />
+                  View Details
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+ 
+    {/* ✅ PAGINATION FOR CARD VIEW */}
+    {safeTotal > 0 && (
+      <div className="mgr-pf-wrap mt-4">
+        <PaginationFooter
+          totalItems={safeTotal}
+          currentPage={validCurrentPage}
+          setCurrentPage={setCurrentPage}
+          itemsPerPage={itemsPerPage}
+          setItemsPerPage={(size) => {
+            setItemsPerPage(size);
+            setCurrentPage(1);
+          }}
+        />
+      </div>
+    )}
+  </>
+) : (
+ 
         <div className="mgr-sla-table-wrapper">
           <div className="mgr-sla-table-container">
             <div className="mgr-sla-table-responsive">
@@ -589,7 +604,7 @@ const ManagerSLADashboard = () => {
                     <th>Actions</th>
                   </tr>
                 </thead>
-
+ 
                 <tbody>
                   {paginatedData.map((esc) => (
                     <tr
@@ -605,35 +620,35 @@ const ManagerSLADashboard = () => {
                           </div>
                         </div>
                       </td>
-
+ 
                       <td onClick={() => handleRowClick(esc.slaid)}>
                         {esc.reason || "—"}
                       </td>
-
+ 
                       <td onClick={() => handleRowClick(esc.slaid)}>
                         <span className="mgr-sla-badge mgr-sla-badge-info">
                           {esc.escalationLevel}
                         </span>
                       </td>
-
+ 
                       <td onClick={() => handleRowClick(esc.slaid)}>
                         <span
                           className={`mgr-sla-badge ${
                             esc.escalationStatus === "Resolved"
                               ? "mgr-sla-badge-success"
                               : esc.escalationStatus === "InProgress"
-                              ? "mgr-sla-badge-warning"
-                              : "mgr-sla-badge-primary"
+                                ? "mgr-sla-badge-warning"
+                                : "mgr-sla-badge-primary"
                           }`}
                         >
                           {esc.escalationStatus}
                         </span>
                       </td>
-
+ 
                       <td onClick={() => handleRowClick(esc.slaid)}>
                         {formatDate(esc.submittedAt)}
                       </td>
-
+ 
                       <td>
                         <div className="mgr-sla-actions">
                           <button
@@ -644,7 +659,7 @@ const ManagerSLADashboard = () => {
                           >
                             <Eye size={16} />
                           </button>
-
+ 
                           {esc.escalationStatus !== "Resolved" && (
                             <>
                               <button
@@ -655,7 +670,7 @@ const ManagerSLADashboard = () => {
                               >
                                 <Send size={16} />
                               </button>
-
+ 
                               <button
                                 type="button"
                                 className="mgr-sla-action-btn mgr-sla-action-resolve"
@@ -673,27 +688,25 @@ const ManagerSLADashboard = () => {
                 </tbody>
               </table>
             </div>
-
+ 
             {safeTotal > 0 && (
               <div className="mgr-pf-wrap">
                 <PaginationFooter
-                  currentPage={validCurrentPage}
                   totalItems={safeTotal}
-                  itemsPerPage={effectivePageSize}
-                  onPageChange={(p) => setCurrentPage(p)}
-                  onItemsPerPageChange={(size) =>
-                    handleItemsPerPageChange(Number(size))
-                  }
-                  pageSizeOptions={[5, 10, 25, 50]}
-                  showPageSizeDropdown={true}
-                  showStatusText={true}
+                  currentPage={validCurrentPage}
+                  setCurrentPage={setCurrentPage}
+                  itemsPerPage={itemsPerPage}
+                  setItemsPerPage={(size) => {
+                    setItemsPerPage(size);
+                    setCurrentPage(1);
+                  }}
                 />
               </div>
             )}
           </div>
         </div>
       )}
-
+ 
       {showEscalationModal && selectedSLAForEscalation && (
         <ManagerEscalationModal
           review={selectedSLAForEscalation}
@@ -702,7 +715,7 @@ const ManagerSLADashboard = () => {
           deptHeads={deptHeads}
         />
       )}
-
+ 
       {showResolveModal && selectedEscalationForResolve && (
         <ResolveEscalationModal
           escalation={selectedEscalationForResolve}
@@ -713,5 +726,7 @@ const ManagerSLADashboard = () => {
     </div>
   );
 };
-
+ 
 export default ManagerSLADashboard;
+ 
+ 

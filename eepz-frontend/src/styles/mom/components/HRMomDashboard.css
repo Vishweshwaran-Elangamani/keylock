@@ -4,18 +4,18 @@
   padding: 16px;
   margin-top: -16px;
 }
-
+ 
 .hrmom-dashboard-wrapper {
   max-width: 1400px;
   margin: 0 auto;
 }
-
+ 
 .hrmom-top-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 0 4px 10px rgba(39, 35, 92, 0.15);
   border-color: black;
 }
-
+ 
 .hrmom-header {
   display: flex;
   justify-content: space-between;
@@ -24,20 +24,20 @@
   flex-wrap: wrap;
   gap: 12px;
 }
-
+ 
 .hrmom-top-card {
-  background: #fff;
-  border-radius: 10px;
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border: 1px solid #27235c;
-  transition: all 0.3s ease;
-  min-height: 75px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+ background: #fff;
+ border-radius: 10px;
+ padding: 12px 16px;
+ display: flex;
+ align-items: center;
+ gap: 12px;
+ border: 1px solid #27235c;
+ transition: all 0.3s ease;
+ min-height: 75px;
+ box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
-
+ 
 .hrmom-top-card-inner {
   display: flex;
   align-items: center;
@@ -45,7 +45,7 @@
   width: 100%;
   padding: 14px 22px;
 }
-
+ 
 .hrmom-top-icon {
   width: 52px;
   height: 52px;
@@ -55,37 +55,37 @@
   justify-content: center;
   flex-shrink: 0;
 }
-
+ 
 .hrmom-top-icon-total {
   background-color: #e3ebff;
 }
-
+ 
 .hrmom-top-icon-month {
   background-color: #e4f7e8;
 }
-
+ 
 .hrmom-top-icon-actions {
   background-color: #e4f7e8;
 }
-
+ 
 .hrmom-top-icon-overdue {
   background-color: #ffe5ea;
 }
-
+ 
 .hrmom-top-icon-svg {
   width: 22px;
   height: 22px;
   color: #222a4b;
 }
-
+ 
 .hrmom-top-icon-ok {
   color: #1fb05c;
 }
-
+ 
 .hrmom-top-icon-alert {
   color: #e53347;
 }
-
+ 
 .hrmom-top-center {
   flex: 1;
   display: flex;
@@ -95,7 +95,7 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
-
+ 
 .hrmom-top-count {
   font-size: 1.6rem;
   font-weight: 700;
@@ -103,13 +103,149 @@
   line-height: 1;
   margin-bottom: 2px;
 }
-
+ 
 .hrmom-top-label {
   font-size: 0.75rem;
   font-weight: 600;
   color: #4b5563;
 }
-
+ 
+.hrmom-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;    
+  flex-wrap: wrap;
+}
+ 
+ 
+.hrmom-search-wrapper {
+  display: flex;
+  align-items: center;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  height: 46px;
+  min-width: 480px;
+}
+ 
+.hrmom-search-icon {
+  margin-left: 10px;
+  color: #9ca3af;
+}
+ 
+.hrmom-search-input {
+  border: none;
+  padding: 12px 14px;
+  flex: 1;
+  outline: none;
+  font-size: 0.95rem;  
+}
+ 
+.hrmom-search-btn,
+.hrmom-search-clear {
+  border: none;
+  padding: 10px 18px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+ 
+.hrmom-search-btn {
+  background: #27235c;
+  color: white;
+  height: 45px;
+}
+ 
+.hrmom-search-clear {
+  background: #6b7280;
+  color: white;
+  height: 45px;
+}
+ 
+.hrmom-date-filters {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-left: 100px;
+}
+ 
+.hrmom-date-group {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+ 
+.hrmom-date-group input {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 0.85rem;
+  height: 40px;
+}
+ 
+.hrmom-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+ 
+.hrmom-calendar-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid #27235c;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  font-weight: 500;
+  color: #27235c;
+  height: 46px;
+  margin-left: -100px;
+ 
+}
+ 
+.hrmom-calendar-input:hover {
+  background: #f5f7fb;
+}
+ 
+ 
+.hrmom-clear-btn {
+  background: #9ca3af;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  height: 40px;
+  width: 100px;
+}
+ 
+.hrmom-calendar-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+  height: 46px;
+  min-width: 170px;
+  transition: all 0.2s ease;
+}
+ 
+.hrmom-calendar-input:hover {
+  border-color: #27235c;
+}
+ 
+ 
 .hrmom-table-card {
   border-radius: 12px;
   border: none;
@@ -117,29 +253,32 @@
   background-color: #ffffff;
   overflow: hidden;
 }
-
+ 
 .hrmom-table-card-body {
   padding: 0;
 }
-
+ 
 .hrmom-table-wrapper {
-  margin-top: 40px;
+  margin-top: 20px;
   overflow-x: auto;
+  overflow-y: visible;  
+  position: relative;
   border-radius: 12px !important;
 }
-
+ 
+ 
 .hrmom-table {
   margin-bottom: 0;
   border-collapse: separate;
   border-spacing: 0;
   font-size: 0.875rem;
 }
-
+ 
 .hrmom-table thead {
   background-color: #27235c;
   color: #ffffff;
 }
-
+ 
 .hrmom-table thead th {
   background-color: #27235c;
   color: #ffffff;
@@ -153,14 +292,14 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
-
+ 
 .hrmom-table thead th:nth-child(4),
 .hrmom-table thead th:nth-child(5),
 .hrmom-table thead th:nth-child(6),
 .hrmom-table thead th:last-child {
   text-align: center;
 }
-
+ 
 .hrmom-table tbody td {
   padding: 12px 14px;
   vertical-align: middle;
@@ -171,30 +310,30 @@
   text-align: left;
   background-color: #ffffff;
 }
-
+ 
 .hrmom-table tbody tr:first-child td {
   border-top: none;
 }
-
+ 
 .hrmom-table tbody td:nth-child(4),
 .hrmom-table tbody td:nth-child(5),
 .hrmom-table tbody td:nth-child(6),
 .hrmom-table tbody td:last-child {
   text-align: center;
 }
-
+ 
 .hrmom-table tbody tr {
   transition: background-color 0.15s ease;
 }
-
+ 
 .hrmom-table tbody tr:hover {
   background-color: #f1f5f9;
 }
-
+ 
 .hrmom-table tbody tr:hover td {
   background-color: #f1f5f9;
 }
-
+ 
 .hrmom-table-icon {
   width: 36px;
   height: 36px;
@@ -205,13 +344,13 @@
   justify-content: center;
   flex-shrink: 0;
 }
-
+ 
 .hrmom-table-icon-svg {
   width: 20px;
   height: 20px;
   color: #0284c7;
 }
-
+ 
 .hrmom-meeting-title {
   font-size: 0.813rem;
   color: #1e293b;
@@ -219,14 +358,14 @@
   margin-bottom: 6px;
   line-height: 1.3;
 }
-
+ 
 .hrmom-badge {
   font-size: 0.688rem;
   font-weight: 600;
   padding: 0.25rem 0.55rem;
   border-radius: 4px;
 }
-
+ 
 .hrmom-count-badge {
   display: inline-flex;
   align-items: center;
@@ -238,24 +377,24 @@
   color: #1e293b;
   font-size: 0.875rem;
 }
-
+ 
 .hrmom-count-icon {
   width: 14px;
   height: 14px;
 }
-
+ 
 .hrmom-count-icon-participants {
   color: #0284c7;
 }
-
+ 
 .hrmom-count-icon-topics {
   color: #06b6d4;
 }
-
+ 
 .hrmom-count-icon-actions {
   color: #10b981;
 }
-
+ 
 .hrmom-submitter-name {
   font-size: 0.875rem;
   color: #1e293b;
@@ -263,23 +402,23 @@
   margin-bottom: 2px;
   line-height: 1.2;
 }
-
+ 
 .hrmom-submitter-role {
   font-size: 0.75rem;
   color: #64748b;
   font-weight: 400;
 }
-
+ 
 .hrmom-meeting-date {
   font-size: 0.875rem;
   color: #64748b;
   font-weight: 400;
 }
-
+ 
 .hrmom-date-icon {
   color: #6b7280;
 }
-
+ 
 .hrmom-view-btn {
   background-color: #27235c;
   color: #ffffff;
@@ -293,102 +432,104 @@
   align-items: center;
   justify-content: center;
 }
-
+ 
 .hrmom-view-btn:hover {
   background-color: #1e1b4d;
   color: #ffffff;
   transform: translateY(-1px);
 }
-
+ 
 .hrmom-empty-state {
   padding: 32px 16px;
   text-align: center;
 }
-
+ 
 .hrmom-empty-icon {
   margin-bottom: 8px;
   color: #6b7280;
   opacity: 0.3;
 }
-
+ 
 .hrmom-empty-title {
   margin-bottom: 4px;
   color: #4b5563;
   font-weight: 600;
   font-size: 0.95rem;
 }
-
+ 
 .hrmom-empty-text {
   margin: 0;
   font-size: 0.8rem;
   color: #6b7280;
 }
-
+ 
 @media (max-width: 992px) {
   .hrmom-table-wrapper {
     overflow-x: auto;
   }
-
+ 
   .hrmom-table {
     min-width: 900px;
   }
 }
-
+ 
 @media (max-width: 768px) {
   .hrmom-dashboard-container {
     padding: 12px;
   }
-
+ 
   .hrmom-header {
     flex-direction: column;
     align-items: flex-start;
   }
-
+ 
   .hrmom-table thead th,
   .hrmom-table tbody td {
     padding: 10px 12px;
     font-size: 0.813rem;
   }
-
+ 
   .hrmom-meeting-title {
     font-size: 0.75rem;
   }
-
+ 
   .hrmom-submitter-name,
   .hrmom-meeting-date {
     font-size: 0.813rem;
   }
-
+ 
   .hrmom-top-card {
     height: 92px;
   }
-
+ 
   .hrmom-top-card-inner {
     padding: 12px 16px;
     gap: 12px;
   }
-
+ 
   .hrmom-top-icon {
     width: 48px;
     height: 48px;
     border-radius: 14px;
   }
-
+ 
   .hrmom-top-count {
     font-size: 1.4rem;
   }
-
+ 
   .hrmom-top-label {
     font-size: 0.7rem;
   }
 }
-
+ 
 @media (max-width: 576px) {
   .hrmom-dashboard-container {
     padding: 10px;
   }
-
+ 
   .hrmom-top-card-inner {
     padding: 12px 14px;
   }
 }
+ 
+ 

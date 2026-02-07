@@ -6,7 +6,7 @@
   flex-direction: column;
   margin-top: -35px;
 }
-
+ 
 .emp-sla-loading {
   display: flex;
   flex-direction: column;
@@ -15,7 +15,7 @@
   min-height: 600px;
   gap: 1rem;
 }
-
+ 
 .emp-sla-spinner-border {
   width: 3rem;
   height: 3rem;
@@ -25,7 +25,7 @@
   border-right-color: transparent;
   animation: emp-sla-spin 1s linear infinite;
 }
-
+ 
 .emp-sla-sr-only {
   position: absolute;
   width: 1px;
@@ -37,19 +37,19 @@
   white-space: nowrap;
   border: 0;
 }
-
+ 
 .emp-sla-loading-text {
   color: #6b7280;
   font-size: 0.875rem;
   margin: 0;
 }
-
+ 
 @keyframes emp-sla-spin {
   to {
     transform: rotate(360deg);
   }
 }
-
+ 
 .emp-sla-alert-error {
   background: #fef2f2;
   border: 1px solid #fee2e2;
@@ -60,23 +60,23 @@
   gap: 0.625rem;
   margin-bottom: 1.125rem;
 }
-
+ 
 .emp-sla-alert-icon {
   flex-shrink: 0;
   color: #dc2626;
   margin-top: 2px;
 }
-
+ 
 .emp-sla-alert-content {
   flex: 1;
   font-size: 0.8125rem;
   color: #991b1b;
 }
-
+ 
 .emp-sla-alert-content strong {
   font-weight: 600;
 }
-
+ 
 .emp-sla-alert-close {
   background: none;
   border: none;
@@ -86,7 +86,7 @@
   padding: 0;
   line-height: 1;
 }
-
+ 
 .emp-sla-alert-overdue {
   background: #fef2f2;
   border: 1px solid #fecaca;
@@ -97,7 +97,7 @@
   gap: 0.75rem;
   margin-bottom: 1.125rem;
 }
-
+ 
 .emp-sla-alert-overdue-icon {
   width: 40px;
   height: 40px;
@@ -109,20 +109,20 @@
   color: #dc2626;
   flex-shrink: 0;
 }
-
+ 
 .emp-sla-alert-overdue-title {
   color: #991b1b;
   font-size: 0.9375rem;
   font-weight: 700;
   margin: 0 0 0.125rem;
 }
-
+ 
 .emp-sla-alert-overdue-text {
   color: #7f1d1d;
   font-size: 0.8125rem;
   margin: 0;
 }
-
+ 
 .emp-sla-metric-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -130,7 +130,7 @@
   margin-bottom: 1.5rem;
   margin-top: -10px;
 }
-
+ 
 .emp-sla-metric-card {
   display: flex;
   align-items: center;
@@ -142,12 +142,12 @@
   transition: all 0.2s ease;
   min-height: 100px;
 }
-
+ 
 .emp-sla-metric-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(39, 35, 92, 0.1);
 }
-
+ 
 .emp-sla-metric-icon {
   width: 56px;
   height: 56px;
@@ -158,44 +158,44 @@
   margin-right: 1rem;
   flex-shrink: 0;
 }
-
+ 
 .emp-sla-metric-icon-total {
   background: #e4f0ff;
 }
-
+ 
 .emp-sla-metric-icon-total svg {
   color: #2f64ff;
 }
-
+ 
 .emp-sla-metric-icon-open {
   background: #e9e6ff;
 }
-
+ 
 .emp-sla-metric-icon-open svg {
   color: #4c3fd8;
 }
-
+ 
 .emp-sla-metric-icon-closed {
   background: #e3f9ef;
 }
-
+ 
 .emp-sla-metric-icon-closed svg {
   color: #10b981;
 }
-
+ 
 .emp-sla-metric-icon-ontime {
   background: #e4fff1;
 }
-
+ 
 .emp-sla-metric-icon-ontime svg {
   color: #059669;
 }
-
+ 
 .emp-sla-metric-content {
   display: flex;
   flex-direction: column;
 }
-
+ 
 .emp-sla-metric-value {
   font-size: 1.8rem;
   font-weight: 700;
@@ -203,7 +203,7 @@
   line-height: 1.1;
   margin-left: 35px;
 }
-
+ 
 .emp-sla-metric-label {
   font-size: 0.8rem;
   font-weight: 600;
@@ -212,7 +212,7 @@
   color: #6b7280;
   margin-left: 35px;
 }
-
+ 
 .emp-sla-header-row {
   display: flex;
   align-items: center;
@@ -220,14 +220,14 @@
   gap: 0.75rem;
   margin-bottom: 1.25rem;
 }
-
+ 
 .emp-sla-tabs-strip {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   flex: 1;
 }
-
+ 
 .emp-sla-tabs-container {
   display: flex;
   background: #27235c;
@@ -236,7 +236,7 @@
   gap: 0.375rem;
   box-shadow: 0 2px 8px rgba(39, 35, 92, 0.2);
 }
-
+ 
 .emp-sla-tab-pill {
   flex: 1;
   padding: 0.5rem 1rem;
@@ -251,12 +251,12 @@
   white-space: nowrap;
   text-align: center;
 }
-
+ 
 .emp-sla-tab-pill:hover:not(.active) {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 50px;
 }
-
+ 
 .emp-sla-tab-pill.active {
   background: #ffffff;
   color: #27235c;
@@ -264,7 +264,7 @@
   border-radius: 50px;
   transform: translateY(-1px);
 }
-
+ 
 .emp-sla-view-switcher {
   display: flex;
   gap: 0.25rem;
@@ -273,7 +273,7 @@
   border-radius: 8px;
   border: 1px solid #e5e7eb;
 }
-
+ 
 .emp-sla-view-btn {
   padding: 0.375rem 0.625rem;
   background: transparent;
@@ -289,22 +289,22 @@
   align-items: center;
   justify-content: center;
 }
-
+ 
 .emp-sla-view-btn:hover {
   color: #27235c;
   background: rgba(39, 35, 92, 0.05);
 }
-
+ 
 .emp-sla-view-btn.active {
   background: #27235c;
   color: #fff;
 }
-
+ 
 .emp-sla-content {
   flex: 1;
   overflow: visible;
 }
-
+ 
 .emp-sla-empty {
   background: #ffffff;
   border: 1px solid #f3f4f6;
@@ -317,26 +317,26 @@
   align-items: center;
   justify-content: center;
 }
-
+ 
 .emp-sla-empty-icon {
   color: #cbd5e1;
   opacity: 0.4;
   margin-bottom: 1rem;
 }
-
+ 
 .emp-sla-empty-title {
   color: #111827;
   font-size: 1.125rem;
   font-weight: 700;
   margin: 0 0 0.5rem;
 }
-
+ 
 .emp-sla-empty-text {
   color: #6b7280;
   font-size: 0.9375rem;
   margin: 0;
 }
-
+ 
 .emp-sla-table-container {
   background: #ffffff;
   border: 1px solid #e5e7eb;
@@ -344,25 +344,25 @@
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
-
+ 
 .emp-sla-table-responsive {
   overflow-x: auto;
   overflow-y: visible;
   -webkit-overflow-scrolling: touch;
   border-bottom: 1px solid #e5e7eb;
 }
-
+ 
 .emp-sla-table {
   width: 100%;
   margin: 0;
   border-collapse: collapse;
   min-width: 900px;
 }
-
+ 
 .emp-sla-table-header {
   background: #27235c;
 }
-
+ 
 .emp-sla-table-header th {
   padding: 0.875rem 1rem;
   font-weight: 700;
@@ -374,25 +374,25 @@
   letter-spacing: 0.5px;
   white-space: nowrap;
 }
-
+ 
 .emp-sla-table-header th:first-child {
   border-top-left-radius: 12px;
 }
-
+ 
 .emp-sla-table-header th:last-child {
   border-top-right-radius: 12px;
   text-align: center;
 }
-
+ 
 .emp-sla-clickable-row {
   cursor: pointer;
   transition: background-color 0.15s ease;
 }
-
+ 
 .emp-sla-clickable-row:hover {
   background-color: #f9fafb;
 }
-
+ 
 .emp-sla-table tbody td {
   padding: 0.875rem 1rem;
   font-size: 0.8125rem;
@@ -400,38 +400,38 @@
   vertical-align: middle;
   border-bottom: 1px solid #f1f5f9;
 }
-
+ 
 .emp-sla-table tbody td:last-child {
   text-align: center;
 }
-
+ 
 .emp-sla-table tbody tr:last-child td {
   border-bottom: none;
 }
-
+ 
 .emp-sla-table-type {
   display: flex;
   align-items: center;
   gap: 0.625rem;
 }
-
+ 
 .emp-sla-table-type-text {
   font-weight: 600;
   font-size: 0.875rem;
   color: #111827;
 }
-
+ 
 .emp-sla-table-text {
   color: #475569;
 }
-
+ 
 .emp-sla-cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 1.25rem;
   margin-bottom: 1.5rem;
 }
-
+ 
 .emp-sla-card {
   background: #ffffff;
   border: 1px solid #27235c;
@@ -444,13 +444,13 @@
   flex-direction: column;
   height: 100%;
 }
-
+ 
 .emp-sla-card:hover {
   border-color: #27235c;
   box-shadow: 0 8px 24px rgba(39, 35, 92, 0.2);
   transform: translateY(-4px);
 }
-
+ 
 .emp-sla-card-header {
   display: flex;
   align-items: center;
@@ -459,7 +459,7 @@
   border-bottom: 1px solid #f3f4f6;
   background: #fafbfc;
 }
-
+ 
 .emp-sla-card-icon {
   width: 44px;
   height: 44px;
@@ -470,11 +470,11 @@
   flex-shrink: 0;
   transition: all 0.3s ease;
 }
-
+ 
 .emp-sla-card:hover .emp-sla-card-icon {
   transform: scale(1.1);
 }
-
+ 
 .emp-sla-card-header-text {
   flex: 1;
   min-width: 0;
@@ -483,7 +483,7 @@
   align-items: center;
   gap: 0.75rem;
 }
-
+ 
 .emp-sla-card-title {
   font-size: 1rem;
   font-weight: 700;
@@ -496,7 +496,7 @@
   flex: 1;
   min-width: 0;
 }
-
+ 
 .emp-sla-card-badge {
   display: inline-block;
   padding: 0.3125rem 0.75rem;
@@ -507,12 +507,12 @@
   letter-spacing: 0.5px;
   flex-shrink: 0;
 }
-
+ 
 .emp-sla-card-body {
   padding: 1.125rem;
   flex: 1;
 }
-
+ 
 .emp-sla-card-row {
   display: flex;
   justify-content: space-between;
@@ -520,45 +520,45 @@
   padding: 0.75rem 0;
   border-bottom: 1px solid #f9fafb;
 }
-
+ 
 .emp-sla-card-row:last-child {
   border-bottom: none;
 }
-
+ 
 .emp-sla-card-label {
   font-size: 0.8125rem;
   color: #6b7280;
   font-weight: 600;
 }
-
+ 
 .emp-sla-card-value {
   font-size: 0.8125rem;
   color: #111827;
   font-weight: 600;
   text-align: right;
 }
-
+ 
 .emp-sla-truncate {
   max-width: 55%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
+ 
 .emp-sla-text-danger {
   color: #dc2626 !important;
 }
-
+ 
 .emp-sla-text-success {
   color: #16a34a !important;
 }
-
+ 
 .emp-sla-card-footer {
   padding: 1rem 1.125rem;
   border-top: 1px solid #f3f4f6;
   background: #fafbfc;
 }
-
+ 
 .emp-sla-card-btn {
   width: 100%;
   display: flex;
@@ -575,14 +575,14 @@
   cursor: pointer;
   transition: all 0.2s ease;
 }
-
+ 
 .emp-sla-card-btn:hover {
   background: #27235c;
   color: #ffffff;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(39, 35, 92, 0.3);
 }
-
+ 
 .emp-sla-badge {
   display: inline-block;
   padding: 0.3125rem 0.625rem;
@@ -593,67 +593,67 @@
   line-height: 1.2;
   white-space: nowrap;
 }
-
+ 
 .emp-sla-status-open,
 .emp-sla-badge.emp-sla-status-open,
 .emp-sla-card-icon.emp-sla-status-open {
   background: #dbeafe;
   color: #0f62fe;
 }
-
+ 
 .emp-sla-status-progress,
 .emp-sla-badge.emp-sla-status-progress,
 .emp-sla-card-icon.emp-sla-status-progress {
   background: #fef3c7;
   color: #d4941e;
 }
-
+ 
 .emp-sla-status-closed,
 .emp-sla-badge.emp-sla-status-closed,
 .emp-sla-card-icon.emp-sla-status-closed {
   background: #dcfce7;
   color: #24a148;
 }
-
+ 
 .emp-sla-status-overdue,
 .emp-sla-badge-overdue,
 .emp-sla-card-icon.emp-sla-status-overdue {
   background: #fee2e2;
   color: #e01950;
 }
-
+ 
 .emp-sla-badge-compliance-ontime {
   background: #d1fae5;
   color: #047857;
 }
-
+ 
 .emp-sla-badge-compliance-breached {
   background: #fee2e2;
   color: #b91c1c;
 }
-
+ 
 .emp-sla-badge-compliance-extended {
   background: #fef3c7;
   color: #b45309;
 }
-
+ 
 .emp-sla-days {
   font-weight: 700;
   font-size: 0.875rem;
 }
-
+ 
 .emp-sla-days-overdue {
   color: #dc2626;
 }
-
+ 
 .emp-sla-days-warning {
   color: #e2b93b;
 }
-
+ 
 .emp-sla-days-ok {
   color: #24a148;
 }
-
+ 
 .emp-sla-action-btn {
   display: inline-flex;
   align-items: center;
@@ -668,111 +668,121 @@
   cursor: pointer;
   transition: all 0.2s ease;
 }
-
+ 
 .emp-sla-action-btn:hover {
   background: #0f62fe;
   color: #ffffff;
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(15, 98, 254, 0.25);
 }
-
+ 
 .emp-sla-grid-footer-wrap {
   margin-top: 12px;
   border-radius: 12px;
   overflow: hidden;
 }
-
+ 
 @media (max-width: 1200px) {
   .emp-sla-metric-row {
     grid-template-columns: repeat(2, 1fr);
   }
-
+ 
   .emp-sla-cards-grid {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   }
 }
-
+ 
 @media (max-width: 992px) {
   .emp-sla-table {
     min-width: 800px;
   }
 }
-
+ 
 @media (max-width: 768px) {
   .emp-sla-dashboard {
     padding: 1.25rem;
   }
-
+ 
   .emp-sla-metric-row {
     grid-template-columns: 1fr;
     gap: 0.75rem;
   }
-
+ 
   .emp-sla-header-row {
     flex-direction: column;
     align-items: stretch;
     gap: 1rem;
   }
-
+ 
   .emp-sla-tabs-strip {
     flex-direction: column;
   }
-
+ 
   .emp-sla-tabs-container {
     border-radius: 999px;
     margin-bottom: 0.5rem;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
-
+ 
   .emp-sla-tab-pill {
     flex: 0 0 auto;
     min-width: 100px;
   }
-
+ 
   .emp-sla-cards-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-
+ 
   .emp-sla-card-header-text {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
-
+ 
   .emp-sla-card-title {
     max-width: 100%;
   }
-
+ 
   .emp-sla-table {
     min-width: 700px;
   }
 }
-
+ 
 @media (max-width: 576px) {
   .emp-sla-dashboard {
     padding: 1rem;
   }
-
+ 
   .emp-sla-table {
     min-width: 600px;
   }
 }
-
+ 
 @media (max-width: 480px) {
   .emp-sla-table {
     min-width: 500px;
   }
-
+ 
   .emp-sla-metric-card {
     flex-direction: column;
     text-align: center;
     padding: 1.25rem;
   }
-
+ 
   .emp-sla-metric-icon {
     margin-right: 0;
     margin-bottom: 0.75rem;
   }
 }
+ 
+.emp-sla-table-container,
+.emp-sla-table-responsive,
+.emp-sla-content {
+  position: relative;
+  z-index: 1;
+  overflow: visible !important;
+}
+ 
+ 

@@ -23,44 +23,44 @@ import ConfirmationModal from "../../components/goals/modals/ConfirmationModal";
 import CustomDropdown from "../../components/project-management/common/CustomDropdown";
 import PaginationFooter from "../../components/project-management/common/PaginationFooter";
 import "./../../styles/sla/components/HRSLADashboard.css";
-
+ 
 const HRSLADashboard = () => {
   const navigate = useNavigate();
-
+ 
   const [slas, setSlas] = useState([]);
   const [filteredSlas, setFilteredSlas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+ 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-
+ 
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
-
+ 
   const [statusFilter, setStatusFilter] = useState("All");
   const [typeFilter, setTypeFilter] = useState("All");
   const [complianceFilter, setComplianceFilter] = useState("All");
-
+ 
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedSLA, setSelectedSLA] = useState(null);
-
+ 
   const [showCreateModal, setShowCreateModal] = useState(false);
-
+ 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [slaToDelete, setSlaToDelete] = useState(null);
-
+ 
   const statusFilterRef = useRef(null);
   const complianceFilterRef = useRef(null);
-
+ 
   useEffect(() => {
     fetchSLAs();
   }, []);
-
+ 
   useEffect(() => {
     applyFilters();
   }, [slas, activeSearchTerm, statusFilter, typeFilter, complianceFilter]);
-
+ 
   useEffect(() => {
     setCurrentPage(1);
   }, [
@@ -70,11 +70,11 @@ const HRSLADashboard = () => {
     complianceFilter,
     itemsPerPage,
   ]);
-
+ 
   const fetchSLAs = async () => {
     setLoading(true);
     setError(null);
-
+ 
     try {
       const response = await slaService.getAllSLAs();
       if (response?.success) {
@@ -93,10 +93,10 @@ const HRSLADashboard = () => {
       setLoading(false);
     }
   };
-
+ 
   const applyFilters = () => {
     let filtered = [...slas];
-
+ 
     if (activeSearchTerm) {
       const q = activeSearchTerm.toLowerCase();
       filtered = filtered.filter(
@@ -106,47 +106,47 @@ const HRSLADashboard = () => {
           String(sla.slaid).includes(activeSearchTerm)
       );
     }
-
+ 
     if (statusFilter !== "All") {
       filtered = filtered.filter((sla) => sla.status === statusFilter);
     }
-
+ 
     if (typeFilter !== "All") {
       filtered = filtered.filter((sla) => sla.slatype === typeFilter);
     }
-
+ 
     if (complianceFilter !== "All") {
       filtered = filtered.filter(
         (sla) => sla.complianceStatus === complianceFilter
       );
     }
-
+ 
     setFilteredSlas(filtered);
   };
-
+ 
   const handleSearch = () => {
     if (!searchTerm.trim()) return;
     setActiveSearchTerm(searchTerm.trim());
   };
-
+ 
   const handleCancelSearch = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
   };
-
+ 
   const handleSearchKeyPress = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
       handleSearch();
     }
   };
-
+ 
   const handleEdit = (e, sla) => {
     e.stopPropagation();
     setSelectedSLA(sla);
     setShowEditModal(true);
   };
-
+ 
   const handleUpdate = async (slaid, updateData) => {
     try {
       const response = await slaService.updateSLA(slaid, updateData);
@@ -161,16 +161,16 @@ const HRSLADashboard = () => {
       toast.error("Failed to update SLA");
     }
   };
-
+ 
   const handleDelete = (e, sla) => {
     e.stopPropagation();
     setSlaToDelete(sla);
     setShowConfirmModal(true);
   };
-
+ 
   const confirmDelete = async () => {
     if (!slaToDelete) return;
-
+ 
     try {
       const response = await slaService.deleteSLA(slaToDelete.slaid);
       if (response.success) {
@@ -185,11 +185,11 @@ const HRSLADashboard = () => {
       setSlaToDelete(null);
     }
   };
-
+ 
   const handleRowClick = (slaid) => {
     navigate(`/hr/dashboard/sla/details/${slaid}`);
   };
-
+ 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -198,13 +198,13 @@ const HRSLADashboard = () => {
       day: "numeric",
     });
   };
-
+ 
   const handleExport = () => {
     if (filteredSlas.length === 0) {
       toast.warning("No SLAs to export");
       return;
     }
-
+ 
     const csvData = filteredSlas.map((sla) => ({
       ID: sla.slaid,
       Employee: sla.employeeName,
@@ -214,7 +214,7 @@ const HRSLADashboard = () => {
       Compliance: sla.complianceStatus,
       Deadline: formatDate(sla.deadline),
     }));
-
+ 
     const csv = [
       Object.keys(csvData[0]).join(","),
       ...csvData.map((row) =>
@@ -223,7 +223,7 @@ const HRSLADashboard = () => {
           .join(",")
       ),
     ].join("\n");
-
+ 
     const blob = new Blob([csv], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -232,14 +232,14 @@ const HRSLADashboard = () => {
     a.click();
     toast.success("SLAs exported successfully");
   };
-
+ 
   const calculateStats = () => ({
     total: slas.length,
     open: slas.filter((s) => s.status === "Open").length,
     closed: slas.filter((s) => s.status === "Closed").length,
     onTime: slas.filter((s) => s.complianceStatus === "OnTime").length,
   });
-
+ 
   const getStatusBadgeClass = (status) => {
     switch (status) {
       case "Open":
@@ -253,7 +253,7 @@ const HRSLADashboard = () => {
         return "hr-sla-badge-default";
     }
   };
-
+ 
   const getComplianceBadgeClass = (compliance) => {
     switch (compliance) {
       case "OnTime":
@@ -266,7 +266,7 @@ const HRSLADashboard = () => {
         return "hr-sla-badge-default";
     }
   };
-
+ 
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
@@ -275,34 +275,34 @@ const HRSLADashboard = () => {
     setComplianceFilter("All");
     toast.info("Filters cleared");
   };
-
+ 
   const statusOptions = [
     { value: "All", label: "All Status" },
     { value: "Open", label: "Open" },
     { value: "Closed", label: "Closed" },
     { value: "InProgress", label: "In Progress" },
   ];
-
+ 
   const complianceOptions = [
     { value: "All", label: "All Compliance" },
     { value: "OnTime", label: "On Time" },
     { value: "Breached", label: "Breached" },
     { value: "Extended", label: "Extended" },
   ];
-
+ 
   const safeTotal = filteredSlas.length;
   const totalPages = Math.max(1, Math.ceil(safeTotal / itemsPerPage));
   const startIndex = safeTotal === 0 ? 0 : (currentPage - 1) * itemsPerPage;
   const endIndex =
     safeTotal === 0 ? 0 : Math.min(currentPage * itemsPerPage, safeTotal);
   const currentSLAs = filteredSlas.slice(startIndex, endIndex);
-
+ 
   useEffect(() => {
     if (currentPage > totalPages) setCurrentPage(1);
   }, [totalPages, currentPage]);
-
+ 
   const stats = calculateStats();
-
+ 
   if (loading) {
     return (
       <div className="hr-sla-wrapper">
@@ -313,7 +313,7 @@ const HRSLADashboard = () => {
       </div>
     );
   }
-
+ 
   return (
     <div className="hr-sla-wrapper">
       <nav aria-label="breadcrumb" className="hr-sla-breadcrumb-nav">
@@ -336,7 +336,7 @@ const HRSLADashboard = () => {
           </li>
         </ol>
       </nav>
-
+ 
       {error && (
         <div className="hr-sla-alert-error" role="alert">
           <AlertTriangle size={20} />
@@ -348,7 +348,7 @@ const HRSLADashboard = () => {
           </button>
         </div>
       )}
-
+ 
       <div className="hr-sla-stats-grid">
         {[
           {
@@ -389,14 +389,14 @@ const HRSLADashboard = () => {
           </div>
         ))}
       </div>
-
+ 
       <div className="hr-sla-filters-card">
         <div className="hr-sla-filters-row">
           <div className="hr-sla-search-wrapper">
             <div className="hr-sla-search-icon">
               <Search size={16} />
             </div>
-
+ 
             <input
               type="text"
               className="hr-sla-search-input"
@@ -405,9 +405,9 @@ const HRSLADashboard = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyPress={handleSearchKeyPress}
             />
-
+ 
             <div className="hr-sla-search-separator" />
-
+ 
             {activeSearchTerm ? (
               <button
                 type="button"
@@ -426,7 +426,7 @@ const HRSLADashboard = () => {
               </button>
             )}
           </div>
-
+ 
           <div className="hr-sla-filter-status" ref={statusFilterRef}>
             <CustomDropdown
               label=""
@@ -440,7 +440,7 @@ const HRSLADashboard = () => {
               className="hr-sla-dd"
             />
           </div>
-
+ 
           <div className="hr-sla-filter-compliance" ref={complianceFilterRef}>
             <CustomDropdown
               label=""
@@ -454,16 +454,16 @@ const HRSLADashboard = () => {
               className="hr-sla-dd"
             />
           </div>
-
+ 
           <div className="hr-sla-filter-actions">
             <button className="hr-sla-btn-clear" onClick={clearFilters}>
               <Filter size={16} /> Clear
             </button>
-
+ 
             <button className="hr-sla-btn-export" onClick={handleExport}>
               <Download size={16} /> Export
             </button>
-
+ 
             <button
               className="hr-sla-btn-create"
               onClick={() => setShowCreateModal(true)}
@@ -473,7 +473,7 @@ const HRSLADashboard = () => {
           </div>
         </div>
       </div>
-
+ 
       {currentSLAs.length === 0 ? (
         <div className="hr-sla-empty-state-wrapper">
           <div className="hr-sla-empty-state">
@@ -505,7 +505,7 @@ const HRSLADashboard = () => {
                   <th>Actions</th>
                 </tr>
               </thead>
-
+ 
               <tbody>
                 {currentSLAs.map((sla) => (
                   <tr
@@ -521,13 +521,13 @@ const HRSLADashboard = () => {
                         {sla.employeeEmail}
                       </div>
                     </td>
-
+ 
                     <td>
                       <span className="hr-sla-badge hr-sla-badge-type">
                         {sla.slatype}
                       </span>
                     </td>
-
+ 
                     <td>
                       {sla.assignedToName ? (
                         <span className="hr-sla-assigned-name">
@@ -539,7 +539,7 @@ const HRSLADashboard = () => {
                         </span>
                       )}
                     </td>
-
+ 
                     <td>
                       <div className="hr-sla-deadline-date">
                         {formatDate(sla.deadline)}
@@ -550,7 +550,7 @@ const HRSLADashboard = () => {
                         </div>
                       )}
                     </td>
-
+ 
                     <td>
                       <span
                         className={`hr-sla-badge ${getStatusBadgeClass(
@@ -560,7 +560,7 @@ const HRSLADashboard = () => {
                         {sla.status}
                       </span>
                     </td>
-
+ 
                     <td>
                       <span
                         className={`hr-sla-badge ${getComplianceBadgeClass(
@@ -570,7 +570,7 @@ const HRSLADashboard = () => {
                         {sla.complianceStatus}
                       </span>
                     </td>
-
+ 
                     <td>
                       <div className="hr-sla-actions">
                         <button
@@ -580,7 +580,7 @@ const HRSLADashboard = () => {
                         >
                           <Edit3 size={14} />
                         </button>
-
+ 
                         <button
                           className="hr-sla-action-btn hr-sla-action-delete"
                           onClick={(e) => handleDelete(e, sla)}
@@ -595,26 +595,22 @@ const HRSLADashboard = () => {
               </tbody>
             </table>
           </div>
-
+ 
           {filteredSlas.length > 0 && (
-            <PaginationFooter
-              currentPage={currentPage}
-              totalItems={filteredSlas.length}
-              itemsPerPage={itemsPerPage}
-              onPageChange={setCurrentPage}
-              onItemsPerPageChange={(size) => {
-                setItemsPerPage(size);
-                setCurrentPage(1);
-              }}
-              pageSizeOptions={[5, 10, 25, 50]}
-              showPageSizeDropdown={true}
-              showStatusText={true}
-              pageNumberMode="compact"
-            />
+           <PaginationFooter
+           totalItems={filteredSlas.length}
+           currentPage={currentPage}
+           setCurrentPage={setCurrentPage}
+           itemsPerPage={itemsPerPage}
+           setItemsPerPage={(size) => {
+           setItemsPerPage(size);
+           setCurrentPage(1);
+            }}
+          />
           )}
         </div>
       )}
-
+ 
       <ConfirmationModal
         isOpen={showConfirmModal}
         onClose={() => {
@@ -632,7 +628,7 @@ const HRSLADashboard = () => {
         cancelText="Cancel"
         confirmVariant="danger"
       />
-
+ 
       {showEditModal && selectedSLA && (
         <EditSLAModal
           sla={selectedSLA}
@@ -643,7 +639,7 @@ const HRSLADashboard = () => {
           onUpdate={handleUpdate}
         />
       )}
-
+ 
       {showCreateModal && (
         <CreateSLAModal
           onClose={() => setShowCreateModal(false)}
@@ -656,5 +652,7 @@ const HRSLADashboard = () => {
     </div>
   );
 };
-
+ 
 export default HRSLADashboard;
+ 
+ 

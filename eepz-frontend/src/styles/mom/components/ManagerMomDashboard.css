@@ -3,21 +3,21 @@
   min-height: 100vh;
   margin-top: 15px;
 }
-
+ 
 .managermom-container {
   padding: 16px 24px 24px;
 }
-
+ 
 .breadcrumb-item.active {
   color: #111827;
   font-family: "Poppins", sans-serif;
 }
-
-.sched-breadcrumb-nav-dashboard {
+ 
+.sched-breadcrumb-nav-dashboard{
   --bs-breadcrumb-divider: "";
   margin-left: -150px;
 }
-
+ 
 .sched-breadcrumb-link {
   position: relative;
   display: inline-flex;
@@ -32,20 +32,20 @@
   color: #97247e;
   margin-left: -20px;
 }
-
+ 
 .sched-breadcrumb-link:hover {
   background: rgba(151, 36, 126, 0.08) !important;
 }
-
+ 
 .sched-breadcrumb-link svg {
   stroke: #97247e !important;
 }
-
+ 
 .sched-breadcrumb-active {
   color: #000000;
   font-weight: 600;
 }
-
+ 
 .breadcrumb-separator {
   margin: 0 0.25rem;
   color: #97247e;
@@ -53,7 +53,7 @@
   line-height: 1;
   font-size: 0.9rem;
 }
-
+ 
 .managermom-loading {
   min-height: 100vh;
   background-color: #f5f7fb;
@@ -61,31 +61,31 @@
   align-items: center;
   justify-content: center;
 }
-
+ 
 .managermom-loading-spinner {
   width: 3rem;
   height: 3rem;
 }
-
+ 
 .managermom-stat-card {
-  background: #fff;
-  border-radius: 10px;
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border: 1px solid #27235c;
-  transition: all 0.3s ease;
-  min-height: 90px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  margin-top: -5px;
+ background: #fff;
+ border-radius: 10px;
+ padding: 12px 16px;
+ display: flex;
+ align-items: center;
+ gap: 12px;
+ border: 1px solid #27235c;
+ transition: all 0.3s ease;
+ min-height: 90px;
+ box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+margin-top: -5px;
 }
-
+ 
 .managermom-stat-card:hover {
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
   transform: translateY(-2px);
 }
-
+ 
 .managermom-stat-inner {
   display: flex;
   align-items: center;
@@ -93,7 +93,7 @@
   width: 100%;
   padding: 14px 22px;
 }
-
+ 
 .managermom-stat-icon {
   width: 52px;
   height: 52px;
@@ -103,43 +103,43 @@
   justify-content: center;
   flex-shrink: 0;
 }
-
+ 
 .managermom-stat-icon-pending {
   background-color: #fef3c7;
 }
-
+ 
 .managermom-stat-icon-submitted {
   background-color: #d1fae5;
 }
-
+ 
 .managermom-stat-icon-reviews {
   background-color: #dbeafe;
 }
-
+ 
 .managermom-stat-icon-peer {
   background-color: #f3e8ff;
 }
-
+ 
 .managermom-stat-icon-glyph {
   font-size: 22px;
 }
-
+ 
 .managermom-stat-icon-pending .managermom-stat-icon-glyph {
   color: #d97706;
 }
-
+ 
 .managermom-stat-icon-submitted .managermom-stat-icon-glyph {
   color: #059669;
 }
-
+ 
 .managermom-stat-icon-reviews .managermom-stat-icon-glyph {
   color: #2563eb;
 }
-
+ 
 .managermom-stat-icon-peer .managermom-stat-icon-glyph {
   color: #9333ea;
 }
-
+ 
 .managermom-stat-center {
   flex: 1;
   display: flex;
@@ -149,7 +149,7 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
-
+ 
 .managermom-stat-count {
   font-size: 1.6rem;
   font-weight: 700;
@@ -157,13 +157,13 @@
   line-height: 1;
   margin-bottom: 2px;
 }
-
+ 
 .managermom-stat-label {
   font-size: 0.75rem;
   font-weight: 600;
   color: #4b5563;
 }
-
+ 
 .managermom-toolbar {
   display: flex;
   justify-content: space-between;
@@ -172,7 +172,7 @@
   flex-wrap: wrap;
   gap: 12px;
 }
-
+ 
 .managermom-view-switch {
   display: flex;
   gap: 0.25rem;
@@ -181,7 +181,7 @@
   border-radius: 8px;
   border: 1px solid #e5e7eb;
 }
-
+ 
 .mmview-btn {
   padding: 0.375rem 0.625rem;
   background: transparent;
@@ -197,22 +197,22 @@
   align-items: center;
   justify-content: center;
 }
-
+ 
 .mmview-btn:hover {
   color: #27235c;
   background: rgba(39, 35, 92, 0.05);
 }
-
+ 
 .mmview-btn.active {
   background: #27235c;
   color: #fff;
 }
-
+ 
 .managermom-toolbar-right {
   display: flex;
   gap: 8px;
 }
-
+ 
 .managermom-schedule-btn {
   display: inline-flex;
   align-items: center;
@@ -226,30 +226,30 @@
   color: #ffffff;
   transition: all 0.2s ease;
 }
-
+ 
 .managermom-schedule-btn i {
   font-size: 1rem;
 }
-
+ 
 .managermom-schedule-btn:hover {
   color: #fff;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(151, 36, 126, 0.3);
 }
-
+ 
 .managermom-upcoming-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
 }
-
+ 
 .managermom-upcoming-title {
   margin: 0;
   font-weight: 600;
   color: #1e293b;
 }
-
+ 
 .managermom-upcoming-count {
   background-color: #3b3b82;
   color: #ffffff;
@@ -257,7 +257,7 @@
   padding: 4px 10px;
   font-size: 0.75rem;
 }
-
+ 
 .managermom-table-shell {
   border: 1px solid #e5e7eb;
   border-radius: 12px;
@@ -266,17 +266,17 @@
   position: relative;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
-
+ 
 .managermom-table {
   margin-bottom: 0;
   width: 100%;
   border-collapse: collapse;
 }
-
+ 
 .managermom-table thead tr {
   background-color: #27235c;
 }
-
+ 
 .managermom-table thead th {
   color: #ffffff;
   padding: 14px 16px;
@@ -289,16 +289,16 @@
   text-align: left;
   white-space: nowrap;
 }
-
+ 
 .managermom-table thead th:first-child {
   border-top-left-radius: 12px;
 }
-
+ 
 .managermom-table thead th:last-child {
   border-top-right-radius: 12px;
   text-align: center;
 }
-
+ 
 .managermom-table tbody td {
   padding: 14px 16px;
   font-size: 0.875rem;
@@ -307,32 +307,32 @@
   vertical-align: middle;
   text-align: left;
 }
-
+ 
 .managermom-table tbody tr:last-child td {
   border-bottom: none;
 }
-
+ 
 .managermom-table tbody tr:last-child td:first-child {
   border-bottom-left-radius: 12px;
 }
-
+ 
 .managermom-table tbody tr:last-child td:last-child {
   border-bottom-right-radius: 12px;
 }
-
+ 
 .managermom-table tbody td:last-child {
   text-align: center;
 }
-
+ 
 .managermom-table-row {
   cursor: pointer;
   transition: background-color 0.15s ease;
 }
-
+ 
 .managermom-table-row:hover td {
   background-color: #f9fafb;
 }
-
+ 
 .managermom-type-badge {
   background-color: #f9fafb;
   color: #111827;
@@ -342,44 +342,44 @@
   padding: 4px 8px;
   border-radius: 4px;
 }
-
+ 
 .managermom-attendance {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-
+ 
 .managermom-progress {
   width: 60px;
   height: 6px;
 }
-
+ 
 .managermom-card-progress {
   width: 80px;
   height: 8px;
 }
-
+ 
 .managermom-empty-cell {
   text-align: center;
   padding: 40px 16px;
   color: #6b7280;
 }
-
+ 
 .managermom-empty-icon {
   font-size: 2rem;
 }
-
+ 
 .managermom-empty-text {
   margin-top: 8px;
   margin-bottom: 0;
 }
-
+ 
 .managermom-view-btn {
   border-radius: 6px;
   padding: 4px 10px;
   font-size: 0.8rem;
 }
-
+ 
 .managermom-meeting-card {
   cursor: pointer;
   transition: all 0.3s ease;
@@ -388,20 +388,20 @@
   background: #ffffff;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
-
+ 
 .managermom-meeting-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   border-color: #000000;
 }
-
+ 
 .managermom-meeting-card-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   margin-bottom: 12px;
 }
-
+ 
 .managermom-card-avatar {
   width: 48px;
   height: 48px;
@@ -412,50 +412,49 @@
   justify-content: center;
   flex-shrink: 0;
 }
-
+ 
 .managermom-card-avatar-icon {
   font-size: 1.15rem;
   color: #1976d2;
 }
-
+ 
 .managermom-meeting-card-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
 }
-
+ 
 @keyframes momDropdownFadeIn {
   from {
     opacity: 0;
     transform: translateY(-4px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
-
-
+ 
+ 
 .managermom-page-item {
   display: flex;
 }
-
+ 
 .managermom-page-item.disabled .managermom-page-link {
   opacity: 0.5;
   cursor: not-allowed;
   background: #f9fafb;
   color: #9ca3af;
 }
-
+ 
 .managermom-page-item.active .managermom-page-link {
   background: #27235c;
   color: #ffffff;
   border-color: #27235c;
   font-weight: 600;
 }
-
+ 
 .managermom-page-link {
   display: flex;
   align-items: center;
@@ -473,465 +472,159 @@
   transition: all 0.2s ease;
   font-weight: 500;
 }
-
+ 
 .managermom-page-link:hover:not(.disabled) {
   background: #27235c;
   color: #ffffff;
   border-color: #27235c;
 }
-
-
-.mm-bar-w-0 {
-  width: 0%;
-}
-
-.mm-bar-w-1 {
-  width: 1%;
-}
-
-.mm-bar-w-2 {
-  width: 2%;
-}
-
-.mm-bar-w-3 {
-  width: 3%;
-}
-
-.mm-bar-w-4 {
-  width: 4%;
-}
-
-.mm-bar-w-5 {
-  width: 5%;
-}
-
-.mm-bar-w-6 {
-  width: 6%;
-}
-
-.mm-bar-w-7 {
-  width: 7%;
-}
-
-.mm-bar-w-8 {
-  width: 8%;
-}
-
-.mm-bar-w-9 {
-  width: 9%;
-}
-
-.mm-bar-w-10 {
-  width: 10%;
-}
-
-.mm-bar-w-11 {
-  width: 11%;
-}
-
-.mm-bar-w-12 {
-  width: 12%;
-}
-
-.mm-bar-w-13 {
-  width: 13%;
-}
-
-.mm-bar-w-14 {
-  width: 14%;
-}
-
-.mm-bar-w-15 {
-  width: 15%;
-}
-
-.mm-bar-w-16 {
-  width: 16%;
-}
-
-.mm-bar-w-17 {
-  width: 17%;
-}
-
-.mm-bar-w-18 {
-  width: 18%;
-}
-
-.mm-bar-w-19 {
-  width: 19%;
-}
-
-.mm-bar-w-20 {
-  width: 20%;
-}
-
-.mm-bar-w-21 {
-  width: 21%;
-}
-
-.mm-bar-w-22 {
-  width: 22%;
-}
-
-.mm-bar-w-23 {
-  width: 23%;
-}
-
-.mm-bar-w-24 {
-  width: 24%;
-}
-
-.mm-bar-w-25 {
-  width: 25%;
-}
-
-.mm-bar-w-26 {
-  width: 26%;
-}
-
-.mm-bar-w-27 {
-  width: 27%;
-}
-
-.mm-bar-w-28 {
-  width: 28%;
-}
-
-.mm-bar-w-29 {
-  width: 29%;
-}
-
-.mm-bar-w-30 {
-  width: 30%;
-}
-
-.mm-bar-w-31 {
-  width: 31%;
-}
-
-.mm-bar-w-32 {
-  width: 32%;
-}
-
-.mm-bar-w-33 {
-  width: 33%;
-}
-
-.mm-bar-w-34 {
-  width: 34%;
-}
-
-.mm-bar-w-35 {
-  width: 35%;
-}
-
-.mm-bar-w-36 {
-  width: 36%;
-}
-
-.mm-bar-w-37 {
-  width: 37%;
-}
-
-.mm-bar-w-38 {
-  width: 38%;
-}
-
-.mm-bar-w-39 {
-  width: 39%;
-}
-
-.mm-bar-w-40 {
-  width: 40%;
-}
-
-.mm-bar-w-41 {
-  width: 41%;
-}
-
-.mm-bar-w-42 {
-  width: 42%;
-}
-
-.mm-bar-w-43 {
-  width: 43%;
-}
-
-.mm-bar-w-44 {
-  width: 44%;
-}
-
-.mm-bar-w-45 {
-  width: 45%;
-}
-
-.mm-bar-w-46 {
-  width: 46%;
-}
-
-.mm-bar-w-47 {
-  width: 47%;
-}
-
-.mm-bar-w-48 {
-  width: 48%;
-}
-
-.mm-bar-w-49 {
-  width: 49%;
-}
-
-.mm-bar-w-50 {
-  width: 50%;
-}
-
-.mm-bar-w-51 {
-  width: 51%;
-}
-
-.mm-bar-w-52 {
-  width: 52%;
-}
-
-.mm-bar-w-53 {
-  width: 53%;
-}
-
-.mm-bar-w-54 {
-  width: 54%;
-}
-
-.mm-bar-w-55 {
-  width: 55%;
-}
-
-.mm-bar-w-56 {
-  width: 56%;
-}
-
-.mm-bar-w-57 {
-  width: 57%;
-}
-
-.mm-bar-w-58 {
-  width: 58%;
-}
-
-.mm-bar-w-59 {
-  width: 59%;
-}
-
-.mm-bar-w-60 {
-  width: 60%;
-}
-
-.mm-bar-w-61 {
-  width: 61%;
-}
-
-.mm-bar-w-62 {
-  width: 62%;
-}
-
-.mm-bar-w-63 {
-  width: 63%;
-}
-
-.mm-bar-w-64 {
-  width: 64%;
-}
-
-.mm-bar-w-65 {
-  width: 65%;
-}
-
-.mm-bar-w-66 {
-  width: 66%;
-}
-
-.mm-bar-w-67 {
-  width: 67%;
-}
-
-.mm-bar-w-68 {
-  width: 68%;
-}
-
-.mm-bar-w-69 {
-  width: 69%;
-}
-
-.mm-bar-w-70 {
-  width: 70%;
-}
-
-.mm-bar-w-71 {
-  width: 71%;
-}
-
-.mm-bar-w-72 {
-  width: 72%;
-}
-
-.mm-bar-w-73 {
-  width: 73%;
-}
-
-.mm-bar-w-74 {
-  width: 74%;
-}
-
-.mm-bar-w-75 {
-  width: 75%;
-}
-
-.mm-bar-w-76 {
-  width: 76%;
-}
-
-.mm-bar-w-77 {
-  width: 77%;
-}
-
-.mm-bar-w-78 {
-  width: 78%;
-}
-
-.mm-bar-w-79 {
-  width: 79%;
-}
-
-.mm-bar-w-80 {
-  width: 80%;
-}
-
-.mm-bar-w-81 {
-  width: 81%;
-}
-
-.mm-bar-w-82 {
-  width: 82%;
-}
-
-.mm-bar-w-83 {
-  width: 83%;
-}
-
-.mm-bar-w-84 {
-  width: 84%;
-}
-
-.mm-bar-w-85 {
-  width: 85%;
-}
-
-.mm-bar-w-86 {
-  width: 86%;
-}
-
-.mm-bar-w-87 {
-  width: 87%;
-}
-
-.mm-bar-w-88 {
-  width: 88%;
-}
-
-.mm-bar-w-89 {
-  width: 89%;
-}
-
-.mm-bar-w-90 {
-  width: 90%;
-}
-
-.mm-bar-w-91 {
-  width: 91%;
-}
-
-.mm-bar-w-92 {
-  width: 92%;
-}
-
-.mm-bar-w-93 {
-  width: 93%;
-}
-
-.mm-bar-w-94 {
-  width: 94%;
-}
-
-.mm-bar-w-95 {
-  width: 95%;
-}
-
-.mm-bar-w-96 {
-  width: 96%;
-}
-
-.mm-bar-w-97 {
-  width: 97%;
-}
-
-.mm-bar-w-98 {
-  width: 98%;
-}
-
-.mm-bar-w-99 {
-  width: 99%;
-}
-
-.mm-bar-w-100 {
-  width: 100%;
-}
-
+ 
+ 
+.mm-bar-w-0 { width: 0%; }
+.mm-bar-w-1 { width: 1%; }
+.mm-bar-w-2 { width: 2%; }
+.mm-bar-w-3 { width: 3%; }
+.mm-bar-w-4 { width: 4%; }
+.mm-bar-w-5 { width: 5%; }
+.mm-bar-w-6 { width: 6%; }
+.mm-bar-w-7 { width: 7%; }
+.mm-bar-w-8 { width: 8%; }
+.mm-bar-w-9 { width: 9%; }
+.mm-bar-w-10 { width: 10%; }
+.mm-bar-w-11 { width: 11%; }
+.mm-bar-w-12 { width: 12%; }
+.mm-bar-w-13 { width: 13%; }
+.mm-bar-w-14 { width: 14%; }
+.mm-bar-w-15 { width: 15%; }
+.mm-bar-w-16 { width: 16%; }
+.mm-bar-w-17 { width: 17%; }
+.mm-bar-w-18 { width: 18%; }
+.mm-bar-w-19 { width: 19%; }
+.mm-bar-w-20 { width: 20%; }
+.mm-bar-w-21 { width: 21%; }
+.mm-bar-w-22 { width: 22%; }
+.mm-bar-w-23 { width: 23%; }
+.mm-bar-w-24 { width: 24%; }
+.mm-bar-w-25 { width: 25%; }
+.mm-bar-w-26 { width: 26%; }
+.mm-bar-w-27 { width: 27%; }
+.mm-bar-w-28 { width: 28%; }
+.mm-bar-w-29 { width: 29%; }
+.mm-bar-w-30 { width: 30%; }
+.mm-bar-w-31 { width: 31%; }
+.mm-bar-w-32 { width: 32%; }
+.mm-bar-w-33 { width: 33%; }
+.mm-bar-w-34 { width: 34%; }
+.mm-bar-w-35 { width: 35%; }
+.mm-bar-w-36 { width: 36%; }
+.mm-bar-w-37 { width: 37%; }
+.mm-bar-w-38 { width: 38%; }
+.mm-bar-w-39 { width: 39%; }
+.mm-bar-w-40 { width: 40%; }
+.mm-bar-w-41 { width: 41%; }
+.mm-bar-w-42 { width: 42%; }
+.mm-bar-w-43 { width: 43%; }
+.mm-bar-w-44 { width: 44%; }
+.mm-bar-w-45 { width: 45%; }
+.mm-bar-w-46 { width: 46%; }
+.mm-bar-w-47 { width: 47%; }
+.mm-bar-w-48 { width: 48%; }
+.mm-bar-w-49 { width: 49%; }
+.mm-bar-w-50 { width: 50%; }
+.mm-bar-w-51 { width: 51%; }
+.mm-bar-w-52 { width: 52%; }
+.mm-bar-w-53 { width: 53%; }
+.mm-bar-w-54 { width: 54%; }
+.mm-bar-w-55 { width: 55%; }
+.mm-bar-w-56 { width: 56%; }
+.mm-bar-w-57 { width: 57%; }
+.mm-bar-w-58 { width: 58%; }
+.mm-bar-w-59 { width: 59%; }
+.mm-bar-w-60 { width: 60%; }
+.mm-bar-w-61 { width: 61%; }
+.mm-bar-w-62 { width: 62%; }
+.mm-bar-w-63 { width: 63%; }
+.mm-bar-w-64 { width: 64%; }
+.mm-bar-w-65 { width: 65%; }
+.mm-bar-w-66 { width: 66%; }
+.mm-bar-w-67 { width: 67%; }
+.mm-bar-w-68 { width: 68%; }
+.mm-bar-w-69 { width: 69%; }
+.mm-bar-w-70 { width: 70%; }
+.mm-bar-w-71 { width: 71%; }
+.mm-bar-w-72 { width: 72%; }
+.mm-bar-w-73 { width: 73%; }
+.mm-bar-w-74 { width: 74%; }
+.mm-bar-w-75 { width: 75%; }
+.mm-bar-w-76 { width: 76%; }
+.mm-bar-w-77 { width: 77%; }
+.mm-bar-w-78 { width: 78%; }
+.mm-bar-w-79 { width: 79%; }
+.mm-bar-w-80 { width: 80%; }
+.mm-bar-w-81 { width: 81%; }
+.mm-bar-w-82 { width: 82%; }
+.mm-bar-w-83 { width: 83%; }
+.mm-bar-w-84 { width: 84%; }
+.mm-bar-w-85 { width: 85%; }
+.mm-bar-w-86 { width: 86%; }
+.mm-bar-w-87 { width: 87%; }
+.mm-bar-w-88 { width: 88%; }
+.mm-bar-w-89 { width: 89%; }
+.mm-bar-w-90 { width: 90%; }
+.mm-bar-w-91 { width: 91%; }
+.mm-bar-w-92 { width: 92%; }
+.mm-bar-w-93 { width: 93%; }
+.mm-bar-w-94 { width: 94%; }
+.mm-bar-w-95 { width: 95%; }
+.mm-bar-w-96 { width: 96%; }
+.mm-bar-w-97 { width: 97%; }
+.mm-bar-w-98 { width: 98%; }
+.mm-bar-w-99 { width: 99%; }
+.mm-bar-w-100 { width: 100%; }
+ 
 @media (max-width: 768px) {
   .managermom-toolbar {
     flex-direction: column;
     align-items: stretch;
   }
-
+ 
   .managermom-view-switch {
     justify-content: center;
   }
-
+ 
   .managermom-toolbar-right {
     justify-content: center;
   }
 }
-
+ 
 .managermom-stat-icon-moms {
   background-color: #e0f2fe;
 }
-
 .managermom-stat-icon-moms .managermom-stat-icon-glyph {
   color: #0284c7;
 }
-
+ 
 .managermom-stat-icon-oneonone {
   background-color: #efeaff;
 }
-
 .managermom-stat-icon-oneonone .managermom-stat-icon-glyph {
   color: #6d28d9;
 }
-
+ 
 .managermom-stat-icon-overdue {
   background-color: #ffe5ea;
 }
-
 .managermom-stat-icon-overdue .managermom-stat-icon-glyph {
   color: #e11d48;
 }
-
+ 
 .managermom-stat-icon-meetings {
   background-color: #e4f7e8;
 }
-
 .managermom-stat-icon-meetings .managermom-stat-icon-glyph {
   color: #16a34a;
 }
-
+ 
 .managermom-stat-icon {
   width: 52px;
   height: 52px;
@@ -941,20 +634,20 @@
   justify-content: center;
   flex-shrink: 0;
 }
-
+ 
 .managermom-stat-icon-glyph {
   font-size: 22px;
   line-height: 1;
 }
-
+ 
 .managermom-stat-card:hover .managermom-stat-icon {
   transform: translateY(-1px) scale(1.02);
   box-shadow: 0 0 0 4px rgba(39, 35, 92, 0.06);
   transition: all 0.25s ease;
 }
-
+ 
 .managermom-view-btn {
-  background: #27235c;
+  background-color: #3b3b82;        
   color: #ffffff;
   border: none;
   padding: 6px 14px;
@@ -967,18 +660,41 @@
   cursor: pointer;
   transition: all 0.25s ease;
 }
-
+ 
 .managermom-view-btn:hover {
-  background: #1e1b4d;
+  background: #1e1b4d;            
   color: #ffffff;
-  transform: translateY(-2px);
+  transform: translateY(-2px);  
   box-shadow: 0 4px 10px rgba(39, 35, 92, 0.25);
 }
-
+ 
 .managermom-view-btn:active {
   transform: scale(0.97);
 }
-
+ 
 .managermom-view-btn i {
   font-size: 0.85rem;
 }
+ 
+.managermom-shared-btn {
+  background: #1e1b4d;
+  color: #fff;
+  border-radius: 10px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border: none;
+  transition: all 0.2s ease;
+}
+ 
+.managermom-shared-btn:hover,
+.managermom-shared-btn:focus,
+.managermom-shared-btn:active {
+  transform: none !important;
+  box-shadow: none !important;
+  background-color: #27235c;
+  color: #fff !important;
+  outline: none !important;
+}
+ 
+ 
+ 

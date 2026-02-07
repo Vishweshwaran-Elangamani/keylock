@@ -2,11 +2,11 @@ import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Home } from "lucide-react";
 import "../../../styles/sla/components/Breadcrumbs.css";
-
+ 
 const Breadcrumb = ({ items = [], dynamicLabels = {} }) => {
   const navigate = useNavigate();
   const params = useParams();
-
+ 
   const resolveDynamicLabel = (item) => {
     if (item.param && params[item.param]) {
       if (dynamicLabels[item.param]) return dynamicLabels[item.param];
@@ -14,7 +14,7 @@ const Breadcrumb = ({ items = [], dynamicLabels = {} }) => {
     }
     return item.label;
   };
-
+ 
   return (
     <nav aria-label="breadcrumb" className="sla-bc-scope sla-bc-nav">
       <ol className="sla-bc-ol">
@@ -34,13 +34,13 @@ const Breadcrumb = ({ items = [], dynamicLabels = {} }) => {
             </a>
           </div>
         </li>
-
+ 
         {items?.length > 0 && <span className="sla-bc-separator">/</span>}
-
+ 
         {items.map((item, index) => {
           const resolvedLabel = resolveDynamicLabel(item);
           const isLast = index === items.length - 1;
-
+ 
           return (
             <React.Fragment key={index}>
               <li
@@ -50,19 +50,25 @@ const Breadcrumb = ({ items = [], dynamicLabels = {} }) => {
                 {isLast ? (
                   <span className="sla-bc-active-text">{resolvedLabel}</span>
                 ) : (
-                  <a
-                    href="#"
-                    className="sla-breadcrumb-link"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (item.path) navigate(item.path);
-                    }}
-                  >
-                    {resolvedLabel}
-                  </a>
+                 <a
+  href="#"
+  className="sla-breadcrumb-link"
+  onClick={(e) => {
+    e.preventDefault();
+ 
+    if (item.onClick) {
+      item.onClick();        // ← SUPPORT BACK NAVIGATION
+    } else if (item.path) {
+      navigate(item.path);   // ← EXISTING LOGIC
+    }
+  }}
+>
+  {resolvedLabel}
+</a>
+ 
                 )}
               </li>
-
+ 
               {!isLast && <span className="sla-bc-separator">/</span>}
             </React.Fragment>
           );
@@ -71,5 +77,7 @@ const Breadcrumb = ({ items = [], dynamicLabels = {} }) => {
     </nav>
   );
 };
-
+ 
 export default Breadcrumb;
+ 
+ 

@@ -16,10 +16,10 @@ import EmployeeSelectionModal from "../../components/project-management/modals/E
 import CustomCalendar from "../../components/project-management/common/CustomCalendar";
 import CustomDropdown from "../../components/project-management/common/CustomDropdown";
 import "../../styles/projectmanagement/components/CreateProject.css";
-
+ 
 const CreateProject = () => {
   const navigate = useNavigate();
-
+ 
   const [formData, setFormData] = useState({
     projectName: "",
     clientName: "",
@@ -31,7 +31,7 @@ const CreateProject = () => {
     startDate: "",
     endDate: "",
   });
-
+ 
   const [employees, setEmployees] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [businessUnits, setBusinessUnits] = useState([]);
@@ -45,13 +45,13 @@ const CreateProject = () => {
   const [activeManagerTab, setActiveManagerTab] = useState("resource");
   const [selectedResourceOwner, setSelectedResourceOwner] = useState(null);
   const [selectedL1Approver, setSelectedL1Approver] = useState(null);
-  const [selectedL2Approver, setSelectedL2Approver] = useState(null);
   const [startCalendarOpen, setStartCalendarOpen] = useState(false);
   const [endCalendarOpen, setEndCalendarOpen] = useState(false);
   const startDateRef = useRef(null);
   const endDateRef = useRef(null);
   const statusOptions = ["Active", "On Hold", "Completed", "Cancelled"];
-
+  const [selectedL2Approver, setSelectedL2Approver] = useState(null);
+ 
   const engagementModels = [
     "Fixed Price",
     "Time and Materials",
@@ -60,18 +60,18 @@ const CreateProject = () => {
     "Consulting",
     "Retainer",
   ];
-
+ 
   const PROJECTNAMEREGEX = /^ORG\.[A-Za-zA-Za-z0-9-]+\.[A-Za-zA-Za-z0-9-]+$/;
-
+ 
   useEffect(() => {
     fetchDropdownData();
   }, []);
-
+ 
   const fetchDropdownData = async () => {
     setIsLoadingData(true);
     setBusinessUnitsLoading(true);
     setDepartmentsLoading(true);
-
+ 
     try {
       const [employeesRes, departmentsRes, businessUnitsRes] =
         await Promise.all([
@@ -79,7 +79,7 @@ const CreateProject = () => {
           projectService.getAllDepartments(),
           projectService.getAllBusinessUnits(),
         ]);
-
+ 
       const employeesData = Array.isArray(employeesRes?.data)
         ? employeesRes.data
         : [];
@@ -92,7 +92,7 @@ const CreateProject = () => {
       const businessUnitsData = Array.isArray(businessUnitsRes?.data)
         ? businessUnitsRes.data
         : [];
-
+ 
       setEmployees(employeesData);
       setDepartments(departmentsData);
       setBusinessUnits(businessUnitsData);
@@ -108,65 +108,65 @@ const CreateProject = () => {
       setIsLoadingData(false);
     }
   };
-
+ 
   const handleChange = (e) => {
     const { name, value } = e.target;
     let formattedValue = value;
-
+ 
     if (name === "projectName") formattedValue = value.toUpperCase();
-
+ 
     setFormData((prev) => ({ ...prev, [name]: formattedValue }));
-
+ 
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
-
+ 
   const handleSelectChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
-
+ 
   const validateForm = () => {
     const newErrors = {};
-
+ 
     if (!formData.projectName.trim()) {
       newErrors.projectName = "Project name is required";
     } else if (!PROJECTNAMEREGEX.test(formData.projectName.trim())) {
       newErrors.projectName =
         "Format must be ORG.Dept.Project, e.g., ORG.IT.INTRANET";
     }
-
+ 
     if (!formData.clientName.trim()) {
       newErrors.clientName = "Client name is required";
     } else if (formData.clientName.trim().length < 2) {
       newErrors.clientName = "Client name must be at least 2 characters";
     }
-
+ 
     if (!formData.startDate) newErrors.startDate = "Start date is required";
-
+ 
     if (!String(formData.businessUnit || "").trim())
       newErrors.businessUnit = "Business unit is required";
-
+ 
     if (!String(formData.department || "").trim())
       newErrors.department = "Department is required";
-
+ 
     if (!formData.engagementModel)
       newErrors.engagementModel = "Engagement model is required";
-
+ 
     if (formData.startDate && formData.endDate) {
       if (new Date(formData.endDate) <= new Date(formData.startDate)) {
         newErrors.endDate = "End date must be after start date";
       }
     }
-
+ 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
+ 
   const handleDateChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
   };
-
+ 
   const formatDisplayDate = (iso) => {
     if (!iso) return "";
     const d = new Date(iso);
@@ -176,10 +176,10 @@ const CreateProject = () => {
     const yyyy = d.getFullYear();
     return `${mm}/${dd}/${yyyy}`;
   };
-
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+ 
     if (!validateForm()) {
       setSubmitStatus({
         type: "error",
@@ -187,16 +187,16 @@ const CreateProject = () => {
       });
       return;
     }
-
+ 
     setIsSubmitting(true);
     setSubmitStatus(null);
-
+ 
     try {
       const selectedDepartment = departments.find(
         (dep) => dep.value === formData.department
       );
       const departmentName = selectedDepartment ? selectedDepartment.label : "";
-
+ 
       const projectData = {
         ...formData,
         department: departmentName,
@@ -209,14 +209,14 @@ const CreateProject = () => {
         l1ApproverEmployeeId: selectedL1Approver?.employeeMasterId || null,
         l2ApproverEmployeeId: selectedL2Approver?.employeeMasterId || null,
       };
-
+ 
       await projectService.createProject(projectData);
-
+ 
       setSubmitStatus({
         type: "success",
         message: "Project created successfully! Redirecting...",
       });
-
+ 
       setTimeout(() => navigate("/hr/dashboard/projectmgmt/list"), 2000);
     } catch (error) {
       setSubmitStatus({
@@ -228,7 +228,7 @@ const CreateProject = () => {
       setIsSubmitting(false);
     }
   };
-
+ 
   const handleReset = () => {
     setFormData({
       projectName: "",
@@ -241,7 +241,7 @@ const CreateProject = () => {
       startDate: "",
       endDate: "",
     });
-
+ 
     setSelectedResourceOwner(null);
     setSelectedL1Approver(null);
     setSelectedL2Approver(null);
@@ -250,22 +250,22 @@ const CreateProject = () => {
     setStartCalendarOpen(false);
     setEndCalendarOpen(false);
   };
-
+ 
   const handleOpenManagerModal = (tab) => {
     setActiveManagerTab(tab);
     setShowManagerModal(true);
   };
-
+ 
   const handleManagerSelect = (employee) => {
     if (activeManagerTab === "resource") setSelectedResourceOwner(employee);
     if (activeManagerTab === "l1") setSelectedL1Approver(employee);
     if (activeManagerTab === "l2") setSelectedL2Approver(employee);
   };
-
+ 
   const handleConfirmSelection = () => {
     setShowManagerModal(false);
   };
-
+ 
   return (
     <div className="prj-create-wrapper">
       <nav aria-label="breadcrumb" className="prj-breadcrumb">
@@ -284,7 +284,7 @@ const CreateProject = () => {
           </li>
         </ol>
       </nav>
-
+ 
       {submitStatus && (
         <div className={`prj-alert prj-alert-${submitStatus.type}`}>
           <div className="prj-alert-content">
@@ -304,7 +304,7 @@ const CreateProject = () => {
           </button>
         </div>
       )}
-
+ 
       <div className="prj-main-card">
         <div className="prj-card-body">
           <form onSubmit={handleSubmit}>
@@ -313,7 +313,7 @@ const CreateProject = () => {
                 <div className="prj-section-header">
                   <h5 className="prj-section-title">Basic Information</h5>
                 </div>
-
+ 
                 <div className="prj-section-content">
                   <div className="prj-form-group">
                     <label className="prj-form-label">
@@ -341,7 +341,7 @@ const CreateProject = () => {
                       </div>
                     )}
                   </div>
-
+ 
                   <div className="prj-form-group">
                     <label className="prj-form-label">
                       Client Name <span className="prj-required">*</span>
@@ -362,7 +362,7 @@ const CreateProject = () => {
                       </div>
                     )}
                   </div>
-
+ 
                   <CustomDropdown
                     label="Status"
                     required
@@ -372,7 +372,7 @@ const CreateProject = () => {
                     options={statusOptions}
                     placeholder="Select"
                   />
-
+ 
                   <div className="prj-form-group">
                     <label className="prj-form-label">Description</label>
                     <textarea
@@ -386,13 +386,13 @@ const CreateProject = () => {
                   </div>
                 </div>
               </div>
-
+ 
               <div className="prj-section-card">
                 <div className="prj-section-header">
                   <Building size={20} className="prj-section-icon" />
                   <h5 className="prj-section-title">Organization Details</h5>
                 </div>
-
+ 
                 <div className="prj-section-content">
                   <CustomDropdown
                     label="Business Unit"
@@ -405,7 +405,7 @@ const CreateProject = () => {
                     disabled={businessUnitsLoading}
                     error={errors.businessUnit}
                   />
-
+ 
                   <CustomDropdown
                     label="Department"
                     required
@@ -417,7 +417,7 @@ const CreateProject = () => {
                     disabled={departmentsLoading}
                     error={errors.department}
                   />
-
+ 
                   <CustomDropdown
                     label="Engagement Model"
                     required
@@ -430,13 +430,13 @@ const CreateProject = () => {
                   />
                 </div>
               </div>
-
+ 
               <div className="prj-section-card">
                 <div className="prj-section-header">
                   <CalendarIcon size={20} className="prj-section-icon" />
                   <h5 className="prj-section-title">Project Timeline</h5>
                 </div>
-
+ 
                 <div className="prj-section-content">
                   <div className="prj-form-group">
                     <label className="prj-form-label">
@@ -467,7 +467,7 @@ const CreateProject = () => {
                       </div>
                     )}
                   </div>
-
+ 
                   <CustomCalendar
                     isOpen={startCalendarOpen}
                     onClose={() => setStartCalendarOpen(false)}
@@ -477,7 +477,7 @@ const CreateProject = () => {
                     position="below-icon"
                     align="right"
                   />
-
+ 
                   <div className="prj-form-group">
                     <label className="prj-form-label">
                       End Date <span className="prj-optional">Optional</span>
@@ -505,7 +505,7 @@ const CreateProject = () => {
                       <div className="prj-error-message">{errors.endDate}</div>
                     )}
                   </div>
-
+ 
                   <CustomCalendar
                     isOpen={endCalendarOpen}
                     onClose={() => setEndCalendarOpen(false)}
@@ -517,13 +517,13 @@ const CreateProject = () => {
                   />
                 </div>
               </div>
-
+ 
               <div className="prj-section-card">
                 <div className="prj-section-header">
                   <Users size={20} className="prj-section-icon" />
                   <h5 className="prj-section-title">Reporting Managers</h5>
                 </div>
-
+ 
                 <div className="prj-section-content">
                   {isLoadingData ? (
                     <div className="prj-loading-container">
@@ -556,7 +556,7 @@ const CreateProject = () => {
                           )}
                         </button>
                       </div>
-
+ 
                       <div className="prj-form-group">
                         <label className="prj-form-label">L1 Approver</label>
                         <button
@@ -582,7 +582,7 @@ const CreateProject = () => {
                           )}
                         </button>
                       </div>
-
+ 
                       <div className="prj-form-group">
                         <label className="prj-form-label">L2 Approver</label>
                         <button
@@ -613,7 +613,7 @@ const CreateProject = () => {
                 </div>
               </div>
             </div>
-
+ 
             <div className="prj-form-actions">
               <button
                 type="button"
@@ -624,7 +624,7 @@ const CreateProject = () => {
                 <X size={18} />
                 <span>Reset</span>
               </button>
-
+ 
               <button
                 type="submit"
                 disabled={isSubmitting}
@@ -646,21 +646,26 @@ const CreateProject = () => {
           </form>
         </div>
       </div>
-
-      <EmployeeSelectionModal
-        show={showManagerModal}
-        onClose={() => setShowManagerModal(false)}
-        employees={employees}
-        activeTab={activeManagerTab}
-        setActiveTab={setActiveManagerTab}
-        selectedResourceOwner={selectedResourceOwner}
-        selectedL1Approver={selectedL1Approver}
-        selectedL2Approver={selectedL2Approver}
-        onSelectManager={handleManagerSelect}
-        onConfirm={handleConfirmSelection}
-      />
+     
+<EmployeeSelectionModal
+  show={showManagerModal}
+  onClose={() => setShowManagerModal(false)}
+  employees={employees}                    // ✅ COMPLETE list for ALL tabs
+  allEmployees={employees}                 // ✅ Complete list for dropdowns
+  activeTab={activeManagerTab}
+  setActiveTab={setActiveManagerTab}
+  selectedResourceOwner={selectedResourceOwner}
+  selectedL1Approver={selectedL1Approver}
+  selectedL2Approver={selectedL2Approver}
+  onSelectManager={handleManagerSelect}
+  onConfirm={handleConfirmSelection}
+/>
+ 
+ 
     </div>
   );
 };
-
+ 
 export default CreateProject;
+ 
+ 

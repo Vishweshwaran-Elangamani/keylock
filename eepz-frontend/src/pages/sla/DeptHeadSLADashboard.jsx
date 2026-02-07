@@ -17,37 +17,37 @@ import Breadcrumb from "../../components/sla/common/Breadcrumbs";
 import CustomDropdown from "../../components/project-management/common/CustomDropdown";
 import PaginationFooter from "../../components/project-management/common/PaginationFooter";
 import "../../styles/sla/components/DeptHeadSLADashboard.css";
-
+ 
 const DeptHeadSLADashboard = () => {
   const navigate = useNavigate();
-
+ 
   const [allL2Escalations, setAllL2Escalations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+ 
   const [activeTab, setActiveTab] = useState("all");
-
+ 
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
-
+ 
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedPeriod, setSelectedPeriod] = useState("all");
-
+ 
   const [showResolutionModal, setShowResolutionModal] = useState(false);
   const [selectedEscalation, setSelectedEscalation] = useState(null);
   const [resolutionComments, setResolutionComments] = useState("");
   const [approvingEscalation, setApprovingEscalation] = useState(false);
-
+ 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-
+ 
   const statusFilterRef = useRef(null);
   const periodFilterRef = useRef(null);
-
+ 
   useEffect(() => {
     fetchAllData();
   }, []);
-
+ 
   useEffect(() => {
     setCurrentPage(1);
   }, [
@@ -57,11 +57,11 @@ const DeptHeadSLADashboard = () => {
     activeTab,
     itemsPerPage,
   ]);
-
+ 
   const fetchAllData = async () => {
     setLoading(true);
     setError(null);
-
+ 
     try {
       const user = JSON.parse(localStorage.getItem("user"));
       if (!user?.empId) {
@@ -77,11 +77,11 @@ const DeptHeadSLADashboard = () => {
       setLoading(false);
     }
   };
-
+ 
   const fetchL2Escalations = async (deptHeadId) => {
     try {
       const response = await slaService.getManagerEscalations(deptHeadId);
-
+ 
       if (response?.success) {
         const escalations = Array.isArray(response.data) ? response.data : [];
         const processed = escalations.map((e) => {
@@ -103,7 +103,7 @@ const DeptHeadSLADashboard = () => {
             period: e.reviewCycle || "Q1-2025",
           };
         });
-
+ 
         setAllL2Escalations(processed);
       } else {
         setAllL2Escalations([]);
@@ -113,17 +113,17 @@ const DeptHeadSLADashboard = () => {
       setAllL2Escalations([]);
     }
   };
-
+ 
   const periodOptions = useMemo(() => {
     const unique = Array.from(
-      new Set(allL2Escalations.map((e) => e.period).filter(Boolean))
+      new Set(allL2Escalations.map((e) => e.period).filter(Boolean)),
     );
     unique.sort();
     return [{ value: "all", label: "All Periods" }].concat(
-      unique.map((p) => ({ value: p, label: p }))
+      unique.map((p) => ({ value: p, label: p })),
     );
   }, [allL2Escalations]);
-
+ 
   const statusOptions = [
     { value: "all", label: "All Status" },
     { value: "pending", label: "Pending" },
@@ -131,36 +131,36 @@ const DeptHeadSLADashboard = () => {
     { value: "resolved", label: "Resolved" },
     { value: "rejected", label: "Rejected" },
   ];
-
+ 
   const filteredL2Escalations = useMemo(() => {
     let filtered = [...allL2Escalations];
-
+ 
     if (activeTab !== "all") {
       filtered = filtered.filter(
-        (e) => e.escalationStatus.toLowerCase() === activeTab
+        (e) => e.escalationStatus.toLowerCase() === activeTab,
       );
     }
-
+ 
     if (selectedPeriod !== "all") {
       filtered = filtered.filter((e) => e.period === selectedPeriod);
     }
-
+ 
     if (selectedStatus !== "all") {
       filtered = filtered.filter(
-        (e) => e.escalationStatus.toLowerCase() === selectedStatus
+        (e) => e.escalationStatus.toLowerCase() === selectedStatus,
       );
     }
-
+ 
     if (activeSearchTerm.trim()) {
       const query = activeSearchTerm.toLowerCase();
       filtered = filtered.filter(
         (e) =>
           e.employeeName?.toLowerCase().includes(query) ||
           e.managerName?.toLowerCase().includes(query) ||
-          e.reason?.toLowerCase().includes(query)
+          e.reason?.toLowerCase().includes(query),
       );
     }
-
+ 
     return filtered;
   }, [
     allL2Escalations,
@@ -169,24 +169,24 @@ const DeptHeadSLADashboard = () => {
     selectedStatus,
     activeSearchTerm,
   ]);
-
+ 
   const handleSearch = () => {
     if (!searchTerm.trim()) return;
     setActiveSearchTerm(searchTerm.trim());
   };
-
+ 
   const handleClearSearch = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
   };
-
+ 
   const handleSearchKeyPress = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
       handleSearch();
     }
   };
-
+ 
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
@@ -195,11 +195,11 @@ const DeptHeadSLADashboard = () => {
     setActiveTab("all");
     toast.info("Filters cleared");
   };
-
+ 
   const handleViewDetails = (slaid) => {
     navigate(`/sla/depthead/details/${slaid}`);
   };
-
+ 
   const handleRowClick = (slaid, event) => {
     if (
       event.target.closest("button") ||
@@ -210,26 +210,26 @@ const DeptHeadSLADashboard = () => {
     }
     handleViewDetails(slaid);
   };
-
+ 
   const handleOpenResolutionModal = (escalation, event) => {
     event.stopPropagation();
     setSelectedEscalation(escalation);
     setResolutionComments("");
     setShowResolutionModal(true);
   };
-
+ 
   const handleCloseResolutionModal = () => {
     setShowResolutionModal(false);
     setSelectedEscalation(null);
     setResolutionComments("");
   };
-
+ 
   const handleApproveEscalation = async () => {
     if (!resolutionComments.trim()) {
       toast.warning("Approval comments required");
       return;
     }
-
+ 
     setApprovingEscalation(true);
     try {
       const user = JSON.parse(localStorage.getItem("user"));
@@ -239,9 +239,9 @@ const DeptHeadSLADashboard = () => {
         escalationStatus: "Resolved",
         resolutionComments: resolutionComments.trim(),
       };
-
+ 
       const response = await slaService.resolveEscalation(payload);
-
+ 
       if (response.success) {
         toast.success("Escalation approved successfully");
         handleCloseResolutionModal();
@@ -256,26 +256,26 @@ const DeptHeadSLADashboard = () => {
       setApprovingEscalation(false);
     }
   };
-
+ 
   const calculateStats = () => {
     const filteredByPeriod =
       selectedPeriod === "all"
         ? allL2Escalations
         : allL2Escalations.filter((e) => e.period === selectedPeriod);
-
+ 
     const openCount = filteredByPeriod.filter(
       (e) =>
-        e.escalationStatus === "Pending" || e.escalationStatus === "InProgress"
+        e.escalationStatus === "Pending" || e.escalationStatus === "InProgress",
     ).length;
-
+ 
     const approvedCount = filteredByPeriod.filter(
-      (e) => e.escalationStatus === "Resolved"
+      (e) => e.escalationStatus === "Resolved",
     ).length;
-
+ 
     const closedCount = filteredByPeriod.filter(
-      (e) => e.escalationStatus === "Rejected"
+      (e) => e.escalationStatus === "Rejected",
     ).length;
-
+ 
     return {
       total: filteredByPeriod.length,
       open: openCount,
@@ -283,7 +283,7 @@ const DeptHeadSLADashboard = () => {
       closed: closedCount,
     };
   };
-
+ 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -292,19 +292,19 @@ const DeptHeadSLADashboard = () => {
       year: "numeric",
     });
   };
-
+ 
   const canApprove = (escalation) => {
     const status = escalation.escalationStatus;
     return status === "Pending" || status === "InProgress";
   };
-
+ 
   const stats = calculateStats();
-
+ 
   const paginatedData = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
     return filteredL2Escalations.slice(start, start + itemsPerPage);
   }, [filteredL2Escalations, currentPage, itemsPerPage]);
-
+ 
   if (loading) {
     return (
       <div className="dh-sla-loading-wrapper">
@@ -316,13 +316,13 @@ const DeptHeadSLADashboard = () => {
       </div>
     );
   }
-
+ 
   return (
     <div className="dh-sla-container">
       <Breadcrumb
         items={[{ label: "SLA Compliance" }, { label: "Department Head" }]}
       />
-
+ 
       {error && (
         <div className="dh-sla-error-alert">
           <AlertCircle size={20} />
@@ -332,7 +332,7 @@ const DeptHeadSLADashboard = () => {
           </button>
         </div>
       )}
-
+ 
       <div className="dh-sla-stats-grid">
         <div className="dh-sla-stat-card">
           <div className="dh-sla-stat-icon-wrapper dh-sla-stat-icon-total">
@@ -343,7 +343,7 @@ const DeptHeadSLADashboard = () => {
             <p className="dh-sla-stat-label">TOTAL SLA</p>
           </div>
         </div>
-
+ 
         <div className="dh-sla-stat-card">
           <div className="dh-sla-stat-icon-wrapper dh-sla-stat-icon-open">
             <Clock size={24} />
@@ -353,7 +353,7 @@ const DeptHeadSLADashboard = () => {
             <p className="dh-sla-stat-label">OPEN</p>
           </div>
         </div>
-
+ 
         <div className="dh-sla-stat-card">
           <div className="dh-sla-stat-icon-wrapper dh-sla-stat-icon-approved">
             <CheckCircle size={24} />
@@ -363,7 +363,7 @@ const DeptHeadSLADashboard = () => {
             <p className="dh-sla-stat-label">APPROVED</p>
           </div>
         </div>
-
+ 
         <div className="dh-sla-stat-card">
           <div className="dh-sla-stat-icon-wrapper dh-sla-stat-icon-closed">
             <Lock size={24} />
@@ -374,14 +374,14 @@ const DeptHeadSLADashboard = () => {
           </div>
         </div>
       </div>
-
+ 
       <div className="dh-sla-filters-card">
         <div className="dh-sla-filters-row">
           <div className="dh-sla-search-wrapper">
             <div className="dh-sla-search-icon">
               <Search size={16} />
             </div>
-
+ 
             <input
               type="text"
               className="dh-sla-search-input"
@@ -390,9 +390,9 @@ const DeptHeadSLADashboard = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={handleSearchKeyPress}
             />
-
+ 
             <div className="dh-sla-search-separator" />
-
+ 
             {activeSearchTerm ? (
               <button
                 type="button"
@@ -411,7 +411,7 @@ const DeptHeadSLADashboard = () => {
               </button>
             )}
           </div>
-
+ 
           <div className="dh-sla-filter-status" ref={statusFilterRef}>
             <CustomDropdown
               label=""
@@ -425,7 +425,7 @@ const DeptHeadSLADashboard = () => {
               className="dh-sla-dd"
             />
           </div>
-
+ 
           <div className="dh-sla-filter-period" ref={periodFilterRef}>
             <CustomDropdown
               label=""
@@ -441,9 +441,9 @@ const DeptHeadSLADashboard = () => {
           </div>
         </div>
       </div>
-
+ 
       <div className="dh-sla-tabs-wrapper"></div>
-
+ 
       <div className="dh-sla-table-wrapper">
         <div className="dh-sla-table-responsive">
           <table className="dh-sla-table">
@@ -457,7 +457,7 @@ const DeptHeadSLADashboard = () => {
                 <th>Actions</th>
               </tr>
             </thead>
-
+ 
             <tbody>
               {paginatedData.length === 0 ? (
                 <tr>
@@ -482,13 +482,13 @@ const DeptHeadSLADashboard = () => {
                         </div>
                       </div>
                     </td>
-
+ 
                     <td>
                       <div className="dh-sla-manager-name">
                         {esc.managerName}
                       </div>
                     </td>
-
+ 
                     <td>
                       <div className="dh-sla-reason-cell">
                         <div className="dh-sla-reason-title">{esc.reason}</div>
@@ -500,7 +500,7 @@ const DeptHeadSLADashboard = () => {
                         )}
                       </div>
                     </td>
-
+ 
                     <td>
                       <span
                         className={`dh-sla-badge ${
@@ -508,20 +508,20 @@ const DeptHeadSLADashboard = () => {
                           esc.escalationStatus === "InProgress"
                             ? "dh-sla-badge-pending"
                             : esc.escalationStatus === "Resolved"
-                            ? "dh-sla-badge-resolved"
-                            : "dh-sla-badge-rejected"
+                              ? "dh-sla-badge-resolved"
+                              : "dh-sla-badge-rejected"
                         }`}
                       >
                         {esc.escalationStatus}
                       </span>
                     </td>
-
+ 
                     <td>
                       <div className="dh-sla-date">
                         {formatDate(esc.submittedAt)}
                       </div>
                     </td>
-
+ 
                     <td>
                       <div className="dh-sla-actions">
                         <button
@@ -534,7 +534,7 @@ const DeptHeadSLADashboard = () => {
                         >
                           <Eye size={14} />
                         </button>
-
+ 
                         {canApprove(esc) && (
                           <button
                             className="dh-sla-action-btn dh-sla-action-approve"
@@ -552,31 +552,31 @@ const DeptHeadSLADashboard = () => {
             </tbody>
           </table>
         </div>
-
+ 
         <PaginationFooter
-          currentPage={currentPage}
           totalItems={filteredL2Escalations.length}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
           itemsPerPage={itemsPerPage}
-          onPageChange={setCurrentPage}
-          onItemsPerPageChange={(val) => {
-            setItemsPerPage(val);
+          setItemsPerPage={(size) => {
+            setItemsPerPage(size);
             setCurrentPage(1);
           }}
         />
       </div>
-
+ 
       {showResolutionModal && selectedEscalation && (
         <>
           <div
             className="dh-sla-modal-backdrop"
             onClick={handleCloseResolutionModal}
           />
-
+ 
           <div className="dh-sla-modal-wrapper">
             <div className="dh-sla-modal-container">
               <div className="dh-sla-modal-header">
                 <h3 className="dh-sla-modal-title">Approve L2 Escalation</h3>
-
+ 
                 <button
                   className="dh-sla-modal-close-btn"
                   onClick={handleCloseResolutionModal}
@@ -585,7 +585,7 @@ const DeptHeadSLADashboard = () => {
                   <X size={20} />
                 </button>
               </div>
-
+ 
               <div className="dh-sla-modal-body">
                 <div className="dh-sla-info-box">
                   <div className="dh-sla-info-row">
@@ -594,21 +594,21 @@ const DeptHeadSLADashboard = () => {
                       {selectedEscalation.employeeName}
                     </span>
                   </div>
-
+ 
                   <div className="dh-sla-info-row">
                     <span className="dh-sla-info-label">Manager:</span>
                     <span className="dh-sla-info-value">
                       {selectedEscalation.managerName}
                     </span>
                   </div>
-
+ 
                   <div className="dh-sla-info-row">
                     <span className="dh-sla-info-label">Reason:</span>
                     <span className="dh-sla-info-value">
                       {selectedEscalation.reason}
                     </span>
                   </div>
-
+ 
                   <div className="dh-sla-info-row">
                     <span className="dh-sla-info-label">Status:</span>
                     <span className="dh-sla-info-value">
@@ -616,12 +616,12 @@ const DeptHeadSLADashboard = () => {
                     </span>
                   </div>
                 </div>
-
+ 
                 <div className="dh-sla-form-group">
                   <label className="dh-sla-form-label">
                     Approval Comments <span className="dh-sla-required">*</span>
                   </label>
-
+ 
                   <textarea
                     className="dh-sla-textarea"
                     rows="3"
@@ -631,13 +631,13 @@ const DeptHeadSLADashboard = () => {
                     disabled={approvingEscalation}
                     maxLength={500}
                   />
-
+ 
                   <small className="dh-sla-char-count">
                     {resolutionComments.length}/500
                   </small>
                 </div>
               </div>
-
+ 
               <div className="dh-sla-modal-footer">
                 <button
                   className="dh-sla-btn dh-sla-btn-secondary"
@@ -646,7 +646,7 @@ const DeptHeadSLADashboard = () => {
                 >
                   Cancel
                 </button>
-
+ 
                 <button
                   className="dh-sla-btn dh-sla-btn-primary"
                   onClick={handleApproveEscalation}
@@ -672,5 +672,7 @@ const DeptHeadSLADashboard = () => {
     </div>
   );
 };
-
+ 
 export default DeptHeadSLADashboard;
+ 
+ 

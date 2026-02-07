@@ -17,31 +17,30 @@ import {
 } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../styles/mom/components/HRMomDetails.css";
-
+ 
 const HRMomDetails = () => {
   const { momId } = useParams();
   const navigate = useNavigate();
   const [mom, setMom] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Helper to get property with PascalCase/camelCase fallback
+ 
   const getProperty = (obj, camelKey, pascalKey) => {
     return obj?.[camelKey] ?? obj?.[pascalKey] ?? null;
   };
-
+ 
   useEffect(() => {
     if (momId) {
       fetchMomDetails();
     }
   }, [momId]);
-
+ 
   const fetchMomDetails = async () => {
     setLoading(true);
     setError(null);
     try {
       const response = await momService.getMomById(momId);
-
+ 
       // Extract mom data with fallback
       let momData = null;
       if (response?.success && response?.data) {
@@ -55,20 +54,20 @@ const HRMomDetails = () => {
       } else if (response) {
         momData = response;
       }
-
+ 
       if (!momData) {
         throw new Error("No MOM data received");
       }
-
+ 
       setMom(momData);
     } catch (err) {
       console.error("Fetch MOM details error:", err);
-
+ 
       // Enhanced error handling
       if (err.retryAfter) {
         setError(`Rate limit exceeded. Please wait ${err.retryAfter} seconds.`);
         toastr.error(
-          `Rate limit exceeded. Please wait ${err.retryAfter} seconds.`
+          `Rate limit exceeded. Please wait ${err.retryAfter} seconds.`,
         );
       } else if (err.message) {
         setError(`Failed to load MOM details: ${err.message}`);
@@ -81,7 +80,7 @@ const HRMomDetails = () => {
       setLoading(false);
     }
   };
-
+ 
   const getMeetingTypeBadge = (type) => {
     const badgeMap = {
       "One-on-One": "hrmom-badge-primary",
@@ -97,7 +96,7 @@ const HRMomDetails = () => {
       </span>
     );
   };
-
+ 
   const getStatusBadge = (status, isOverdue) => {
     if (isOverdue) {
       return (
@@ -106,7 +105,7 @@ const HRMomDetails = () => {
         </span>
       );
     }
-
+ 
     if (status === "Completed") {
       return (
         <span className="hrmom-badge hrmom-badge-success hrmom-badge-icon">
@@ -114,18 +113,10 @@ const HRMomDetails = () => {
         </span>
       );
     }
-
-    if (status === "Pending") {
-      return (
-        <span className="hrmom-badge hrmom-badge-warning hrmom-badge-icon">
-          <Clock size={14} /> Pending
-        </span>
-      );
-    }
-
+ 
     return null;
   };
-
+ 
   const getPriorityBadge = (priority) => {
     const badgeMap = {
       High: "hrmom-badge-danger",
@@ -142,7 +133,7 @@ const HRMomDetails = () => {
       </span>
     );
   };
-
+ 
   const formatDateTime = (dateString) => {
     if (!dateString) return "-";
     try {
@@ -159,7 +150,7 @@ const HRMomDetails = () => {
       return "-";
     }
   };
-
+ 
   const formatDate = (dateString) => {
     if (!dateString) return "-";
     try {
@@ -173,28 +164,28 @@ const HRMomDetails = () => {
       return "-";
     }
   };
-
+ 
   const calculateActionItemStats = () => {
     if (!mom) {
       return { total: 0, completed: 0, pending: 0, overdue: 0 };
     }
-
+ 
     const actionItems = getProperty(mom, "actionItems", "ActionItems");
-
+ 
     if (!Array.isArray(actionItems)) {
       return { total: 0, completed: 0, pending: 0, overdue: 0 };
     }
-
+ 
     const total = actionItems.length;
     let completed = 0;
     let pending = 0;
     let overdue = 0;
-
+ 
     actionItems.forEach((ai) => {
       const status = getProperty(ai, "status", "Status");
       const isOverdueFlag = getProperty(ai, "isOverdue", "IsOverdue");
       const dueDate = getProperty(ai, "dueDate", "DueDate");
-
+ 
       if (status === "Completed") {
         completed++;
       } else if (
@@ -206,10 +197,10 @@ const HRMomDetails = () => {
         pending++;
       }
     });
-
+ 
     return { total, completed, pending, overdue };
   };
-
+ 
   if (loading) {
     return (
       <div className="hrmom-wrapper hrmom-loading">
@@ -222,7 +213,7 @@ const HRMomDetails = () => {
       </div>
     );
   }
-
+ 
   if (error || !mom) {
     return (
       <div className="hrmom-wrapper">
@@ -245,9 +236,9 @@ const HRMomDetails = () => {
       </div>
     );
   }
-
+ 
   const actionStats = calculateActionItemStats();
-
+ 
   // Extract properties with fallback
   const meetingTitle = getProperty(mom, "meetingTitle", "MeetingTitle");
   const meetingType = getProperty(mom, "meetingType", "MeetingType");
@@ -257,27 +248,27 @@ const HRMomDetails = () => {
   const submittedByName = getProperty(
     mom,
     "submittedByEmployeeName",
-    "SubmittedByEmployeeName"
+    "SubmittedByEmployeeName",
   );
   const submittedByRole = getProperty(
     mom,
     "submittedByRole",
-    "SubmittedByRole"
+    "SubmittedByRole",
   );
   const createdAt = getProperty(mom, "createdAt", "CreatedAt");
   const updatedAt = getProperty(mom, "updatedAt", "UpdatedAt");
   const commentsObservations = getProperty(
     mom,
     "commentsObservations",
-    "CommentsObservations"
+    "CommentsObservations",
   );
   const discussionPoints = getProperty(
     mom,
     "discussionPoints",
-    "DiscussionPoints"
+    "DiscussionPoints",
   );
   const actionItems = getProperty(mom, "actionItems", "ActionItems");
-
+ 
   return (
     <div className="hrmom-wrapper">
       <div className="hrmom-container">
@@ -296,21 +287,24 @@ const HRMomDetails = () => {
               </a>
               <span className="hrmom-breadcrumb-slash">/</span>
             </li>
-
+ 
             <li className="breadcrumb-item hrmom-breadcrumb-item">
-              <a
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate("/hr/dashboard/meetmom");
+              <span
+                onClick={() => {
+                  if (window.history.length > 2) {
+                    navigate(-1);
+                  } else {
+                    navigate("/hr/dashboard/mom");
+                  }
                 }}
                 className="hrmom-breadcrumb-link"
+                style={{ cursor: "pointer" }}
               >
                 Meetings and MoM
-              </a>
+              </span>
               <span className="hrmom-breadcrumb-slash">/</span>
             </li>
-
+ 
             <li
               className="breadcrumb-item active hrmom-breadcrumb-item"
               aria-current="page"
@@ -319,8 +313,7 @@ const HRMomDetails = () => {
             </li>
           </ol>
         </nav>
-
-        {/* Stats Cards */}
+ 
         <div className="hrmom-stats-grid">
           <div className="hrmom-stat-card">
             <div className="hrmom-stat-content">
@@ -338,7 +331,7 @@ const HRMomDetails = () => {
               </div>
             </div>
           </div>
-
+ 
           <div className="hrmom-stat-card">
             <div className="hrmom-stat-content">
               <CheckCircle
@@ -351,35 +344,8 @@ const HRMomDetails = () => {
               </div>
             </div>
           </div>
-
-          <div className="hrmom-stat-card">
-            <div className="hrmom-stat-content">
-              <CheckCircle
-                size={24}
-                className="hrmom-stat-icon hrmom-stat-icon-success"
-              />
-              <div className="hrmom-stat-info">
-                <div className="hrmom-stat-value">{actionStats.completed}</div>
-                <div className="hrmom-stat-label">Completed</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="hrmom-stat-card">
-            <div className="hrmom-stat-content">
-              <AlertCircle
-                size={24}
-                className="hrmom-stat-icon hrmom-stat-icon-danger"
-              />
-              <div className="hrmom-stat-info">
-                <div className="hrmom-stat-value">{actionStats.overdue}</div>
-                <div className="hrmom-stat-label">Overdue Tasks</div>
-              </div>
-            </div>
-          </div>
         </div>
-
-        {/* Meeting Details Card */}
+ 
         <div className="hrmom-card">
           <div className="hrmom-card-body">
             <div className="hrmom-meeting-header">
@@ -398,7 +364,7 @@ const HRMomDetails = () => {
                 </div>
               </div>
             </div>
-
+ 
             <div className="hrmom-meeting-details">
               <div className="hrmom-detail-item">
                 <div className="hrmom-detail-content">
@@ -410,7 +376,7 @@ const HRMomDetails = () => {
                   </div>
                 </div>
               </div>
-
+ 
               {meetingLink && (
                 <div className="hrmom-detail-item">
                   <div className="hrmom-detail-content">
@@ -426,7 +392,7 @@ const HRMomDetails = () => {
                   </div>
                 </div>
               )}
-
+ 
               <div className="hrmom-detail-item">
                 <div className="hrmom-detail-content">
                   <div className="hrmom-detail-label">Submitted By</div>
@@ -440,7 +406,7 @@ const HRMomDetails = () => {
                   )}
                 </div>
               </div>
-
+ 
               <div className="hrmom-detail-item">
                 <div className="hrmom-detail-content">
                   <div className="hrmom-detail-label">Tracking</div>
@@ -459,7 +425,7 @@ const HRMomDetails = () => {
             </div>
           </div>
         </div>
-
+ 
         {/* Comments Section */}
         {commentsObservations && commentsObservations.trim() && (
           <div className="hrmom-card">
@@ -474,8 +440,7 @@ const HRMomDetails = () => {
             </div>
           </div>
         )}
-
-        {/* Two Column Layout */}
+ 
         <div className="hrmom-two-column-grid">
           {/* Discussion Points */}
           <div className="hrmom-card">
@@ -496,7 +461,7 @@ const HRMomDetails = () => {
                       getProperty(dp, "pointText", "PointText") ||
                       getProperty(dp, "point", "Point");
                     const timestamp = getProperty(dp, "timestamp", "Timestamp");
-
+ 
                     return (
                       <div
                         key={pointId || index}
@@ -528,29 +493,13 @@ const HRMomDetails = () => {
               )}
             </div>
           </div>
-
-          {/* Action Items */}
+ 
           <div className="hrmom-card">
             <div className="hrmom-card-header">
               <h5 className="hrmom-card-title">
                 <CheckCircle size={22} />
                 Action Items ({actionStats.total})
               </h5>
-              {actionStats.total > 0 && (
-                <div className="d-flex gap-2">
-                  <span className="badge bg-success">
-                    {actionStats.completed} Completed
-                  </span>
-                  <span className="badge bg-warning">
-                    {actionStats.pending} Pending
-                  </span>
-                  {actionStats.overdue > 0 && (
-                    <span className="badge bg-danger">
-                      {actionStats.overdue} Overdue
-                    </span>
-                  )}
-                </div>
-              )}
             </div>
             <div className="hrmom-card-body">
               {Array.isArray(actionItems) && actionItems.length > 0 ? (
@@ -559,7 +508,7 @@ const HRMomDetails = () => {
                     const actionItemId = getProperty(
                       ai,
                       "actionItemId",
-                      "ActionItemId"
+                      "ActionItemId",
                     );
                     const taskDescription =
                       getProperty(ai, "taskDescription", "TaskDescription") ||
@@ -568,25 +517,24 @@ const HRMomDetails = () => {
                       getProperty(
                         ai,
                         "assignedToEmployeeName",
-                        "AssignedToEmployeeName"
+                        "AssignedToEmployeeName",
                       ) || getProperty(ai, "assignTo", "AssignTo");
                     const dueDate = getProperty(ai, "dueDate", "DueDate");
                     const status = getProperty(ai, "status", "Status");
                     const isOverdueFlag = getProperty(
                       ai,
                       "isOverdue",
-                      "IsOverdue"
+                      "IsOverdue",
                     );
                     const priority = getProperty(ai, "priority", "Priority");
                     const notes = getProperty(ai, "notes", "Notes");
-
-                    // Calculate overdue if flag not present
+ 
                     const isOverdue =
                       isOverdueFlag ||
                       (status === "Pending" &&
                         dueDate &&
                         new Date(dueDate) < new Date());
-
+ 
                     return (
                       <div
                         key={actionItemId || index}
@@ -639,5 +587,7 @@ const HRMomDetails = () => {
     </div>
   );
 };
-
+ 
 export default HRMomDetails;
+ 
+ 

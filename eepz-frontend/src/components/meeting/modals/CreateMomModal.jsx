@@ -5,15 +5,15 @@ import toastr from "toastr";
 import CustomCalendar from "../../../components/project-management/common/CustomCalendar";
 import CustomDropdown from "../../../components/project-management/common/CustomDropdown";
 import "../../../styles/mom/modals/CreateMomModal.css";
-
-const CreateMomModal = ({ meetingData, onClose }) => {
+ 
+const CreateMomModal = ({ meetingData, onClose, onMomCreated }) => {
   const userId = parseInt(localStorage.getItem("userId")) || 0;
   const userRole = localStorage.getItem("userRole") || "Employee";
-
+ 
   const [employees, setEmployees] = useState([]);
   const [loadingEmployees, setLoadingEmployees] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-
+ 
   const [formData, setFormData] = useState({
     meetingId: meetingData.meetingId || 0,
     meetingTitle: meetingData.meetingTitle || "",
@@ -40,23 +40,35 @@ const CreateMomModal = ({ meetingData, onClose }) => {
         status: ai.status || "Pending",
       })) || [],
   });
-
+ 
   const [errors, setErrors] = useState({});
   const [calendarOpenIndex, setCalendarOpenIndex] = useState(null);
-
+ 
   const calendarRefs = useRef({});
-
+ 
   useEffect(() => {
     const fetchEmployees = async () => {
       setLoadingEmployees(true);
       try {
         const response = await employeeService.getAllEmployees();
-
+ 
         if (response.data?.success && Array.isArray(response.data.data)) {
           const filteredEmployees = response.data.data.filter(
             (emp) => emp.roleName !== "System Administrator"
           );
-
+ 
+          setEmployees(filteredEmployees);
+        } else if (response.success && Array.isArray(response.data)) {
+          const filteredEmployees = response.data.filter(
+            (emp) => (emp.roleName || emp.RoleName) !== "System Administrator"
+          );
+ 
+          setEmployees(filteredEmployees);
+        } else if (response.Success && Array.isArray(response.Data)) {
+          const filteredEmployees = response.Data.filter(
+            (emp) => (emp.roleName || emp.RoleName) !== "System Administrator"
+          );
+ 
           setEmployees(filteredEmployees);
         }
       } catch (error) {
@@ -66,22 +78,22 @@ const CreateMomModal = ({ meetingData, onClose }) => {
         setLoadingEmployees(false);
       }
     };
-
+ 
     fetchEmployees();
   }, []);
-
+ 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: null }));
   };
-
+ 
   const handleDiscussionPointChange = (index, value) => {
     const updated = [...formData.discussionPoints];
     updated[index].pointText = value;
     setFormData((prev) => ({ ...prev, discussionPoints: updated }));
   };
-
+ 
   const addDiscussionPoint = () => {
     setFormData((prev) => ({
       ...prev,
@@ -95,21 +107,21 @@ const CreateMomModal = ({ meetingData, onClose }) => {
       ],
     }));
   };
-
+ 
   const removeDiscussionPoint = (index) => {
     const updated = formData.discussionPoints.filter((_, i) => i !== index);
     setFormData((prev) => ({ ...prev, discussionPoints: updated }));
   };
-
+ 
   const handleActionItemChange = (index, field, value) => {
     const updated = [...formData.actionItems];
     updated[index][field] = value;
     setFormData((prev) => ({ ...prev, actionItems: updated }));
-
+ 
     const errorKey = `actionItem[${index}].${field}`;
     if (errors[errorKey]) setErrors((prev) => ({ ...prev, [errorKey]: null }));
   };
-
+ 
   const addActionItem = () => {
     setFormData((prev) => ({
       ...prev,
@@ -125,14 +137,14 @@ const CreateMomModal = ({ meetingData, onClose }) => {
       ],
     }));
   };
-
+ 
   const removeActionItem = (index) => {
     const updated = formData.actionItems.filter((_, i) => i !== index);
     setFormData((prev) => ({ ...prev, actionItems: updated }));
-
+ 
     if (calendarOpenIndex === index) setCalendarOpenIndex(null);
   };
-
+ 
   const validateForm = () => {
     const newErrors = {};
     formData.actionItems.forEach((item, index) => {
@@ -149,40 +161,59 @@ const CreateMomModal = ({ meetingData, onClose }) => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
+ 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) {
-      toastr.error("Please fix the errors before submitting");
-      return;
+  e.preventDefault();
+  if (!validateForm()) {
+    toastr.error("Please fix the errors before submitting");
+    return;
+  }
+ 
+  setSubmitting(true);
+  try {
+    const response = await momService.createMom(formData);
+   
+    const momId = response?.data?.momId || response?.data?.MomId;
+   
+    if (momId && onMomCreated) {
+      const completeMom = await momService.getMomById(momId);
+      onMomCreated(completeMom?.data || completeMom);
+    } else if (onMomCreated) {
+      onMomCreated(response?.data || formData);
     }
-
-    setSubmitting(true);
-    try {
-      await momService.createMom(formData);
-      toastr.success("MOM created successfully");
-      onClose();
-      window.location.reload();
-    } catch (err) {
-      toastr.error("Failed to create MOM");
-      console.error(err);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
+   
+    toastr.success("MOM created successfully");
+    onClose();  
+  } catch (err) {
+    toastr.error("Failed to create MOM");
+    console.error(err);
+  } finally {
+    setSubmitting(false);
+  }
+};
+ 
+ 
   const getEmployeeName = (assignedId) => {
     if (!assignedId || employees.length === 0) return "";
-
+ 
     const id = Number(assignedId);
-
-    const employee = employees.find(
-      (e) => Number(e.employeeMasterId) === id || Number(e.employeeId) === id
-    );
-
-    return employee ? `${employee.firstName} ${employee.lastName}` : "";
+ 
+    const employee = employees.find((e) => {
+      const empMasterId = Number(e.employeeMasterId || e.EmployeeMasterId || 0);
+      const empId = Number(e.employeeId || e.EmployeeId || 0);
+      const eId = Number(e.id || e.Id || 0);
+     
+      return empMasterId === id || empId === id || eId === id;
+    });
+ 
+    if (!employee) return `Employee ${assignedId}`;
+ 
+    const firstName = employee.firstName || employee.FirstName || "";
+    const lastName = employee.lastName || employee.LastName || "";
+   
+    return `${firstName} ${lastName}`.trim() || `Employee ${assignedId}`;
   };
-
+ 
   const formatDisplayDate = (value) => {
     if (!value) return "";
     const d = new Date(value);
@@ -192,12 +223,26 @@ const CreateMomModal = ({ meetingData, onClose }) => {
     const yyyy = d.getFullYear();
     return `${mm}/${dd}/${yyyy}`;
   };
-
+ 
   const handleDueDateChange = (index, value) => {
     handleActionItemChange(index, "dueDate", value);
     setCalendarOpenIndex(null);
   };
-
+ 
+  const getEmployeeDropdownOptions = () => {
+    return employees.map((emp) => {
+      const empId = emp.employeeMasterId || emp.EmployeeMasterId || emp.employeeId || emp.EmployeeId || emp.id || emp.Id;
+      const firstName = emp.firstName || emp.FirstName || "";
+      const lastName = emp.lastName || emp.LastName || "";
+      const roleName = emp.roleName || emp.RoleName || "";
+     
+      return {
+        value: empId,
+        label: `${firstName} ${lastName}${roleName ? ` - ${roleName}` : ""}`,
+      };
+    });
+  };
+ 
   return (
     <div className="cmm-modal-container">
       <div className="cmm-card-body">
@@ -209,12 +254,12 @@ const CreateMomModal = ({ meetingData, onClose }) => {
             ×
           </button>
         </div>
-
+ 
         <form onSubmit={handleSubmit}>
           <div className="cmm-info-card">
             <div className="cmm-info-card-body">
               <h6 className="cmm-section-title">MEETING INFORMATION</h6>
-
+ 
               <div className="cmm-row">
                 <div className="cmm-col-md-6">
                   <label className="cmm-label">Meeting Title</label>
@@ -225,7 +270,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                     disabled
                   />
                 </div>
-
+ 
                 <div className="cmm-col-md-6">
                   <label className="cmm-label">Meeting Type</label>
                   <input
@@ -235,7 +280,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                     disabled
                   />
                 </div>
-
+ 
                 <div className="cmm-col-12">
                   <label className="cmm-label cmm-flex-gap">
                     <i className="bi bi-people"></i> Attendees
@@ -255,7 +300,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
               </div>
             </div>
           </div>
-
+ 
           <div className="cmm-section">
             <label className="cmm-label cmm-flex-gap">
               <i className="bi bi-chat-left-text"></i> Comments & Observations
@@ -269,7 +314,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
               placeholder="Add any observations or notes about the meeting..."
             />
           </div>
-
+ 
           <div className="cmm-section">
             <div className="cmm-section-header">
               <label className="cmm-section-label cmm-flex-gap">
@@ -283,7 +328,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                 <i className="bi bi-plus-circle"></i> Add Point
               </button>
             </div>
-
+ 
             {formData.discussionPoints.length === 0 ? (
               <div className="cmm-empty-state">
                 <i className="cmm-empty-icon bi bi-chat-dots"></i>
@@ -323,7 +368,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
               </div>
             )}
           </div>
-
+ 
           <div className="cmm-section">
             <div className="cmm-section-header">
               <label className="cmm-section-label cmm-flex-gap">
@@ -337,7 +382,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                 <i className="bi bi-plus-circle"></i> Add Action
               </button>
             </div>
-
+ 
             {formData.actionItems.length === 0 ? (
               <div className="cmm-empty-state">
                 <i className="cmm-empty-icon bi bi-check2-square"></i>
@@ -353,7 +398,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
               <div className="cmm-action-list">
                 {formData.actionItems.map((item, index) => {
                   const isCalendarOpen = calendarOpenIndex === index;
-
+ 
                   return (
                     <div key={index} className="cmm-action-item">
                       <div className="cmm-action-body">
@@ -373,20 +418,17 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                             placeholder="Describe the action item..."
                           />
                         </div>
-
+ 
                         <div className="cmm-row cmm-row-equal">
                           <div className="cmm-col-md-4">
                             <label className="cmm-label cmm-flex-gap">
                               <i className="bi bi-person-circle"></i> Assign To
                             </label>
-
+ 
                             <CustomDropdown
                               name="assignedToEmployeeId"
                               value={item.assignedToEmployeeId}
-                              options={employees.map((emp) => ({
-                                value: emp.employeeMasterId,
-                                label: `${emp.firstName} ${emp.lastName} - ${emp.roleName}`,
-                              }))}
+                              options={getEmployeeDropdownOptions()}
                               placeholder={
                                 loadingEmployees
                                   ? "Loading..."
@@ -402,7 +444,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                               }
                               className="cmm-dd"
                             />
-
+ 
                             {errors[
                               `actionItem[${index}].assignedToEmployeeId`
                             ] && (
@@ -414,7 +456,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                                 }
                               </div>
                             )}
-
+ 
                             {item.assignedToEmployeeId && (
                               <small className="cmm-success-text">
                                 <i className="bi bi-check-circle"></i> Assigned
@@ -425,12 +467,12 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                               </small>
                             )}
                           </div>
-
+ 
                           <div className="cmm-col-md-4">
                             <label className="cmm-label cmm-flex-gap">
                               <i className="bi bi-calendar-event"></i> Due Date
                             </label>
-
+ 
                             <div
                               ref={(el) => (calendarRefs.current[index] = el)}
                               className="cmm-relative cmm-w-100"
@@ -451,7 +493,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                                   )
                                 }
                               />
-
+ 
                               <button
                                 type="button"
                                 className="cmm-calendar-trigger"
@@ -479,7 +521,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                                     strokeWidth="1.8"
                                     fill="none"
                                   />
-
+ 
                                   <line
                                     x1="4"
                                     y1="9"
@@ -497,7 +539,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                                     strokeWidth="1.8"
                                     strokeLinecap="round"
                                   />
-
+ 
                                   <line
                                     x1="15"
                                     y1="3"
@@ -510,7 +552,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                                 </svg>
                               </button>
                             </div>
-
+ 
                             <CustomCalendar
                               isOpen={isCalendarOpen}
                               onClose={() => setCalendarOpenIndex(null)}
@@ -525,17 +567,17 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                               align="left"
                               offset={{ x: 8, y: 8 }}
                             />
-
+ 
                             {errors[`actionItem[${index}].dueDate`] && (
                               <div className="cmm-error">
                                 {errors[`actionItem[${index}].dueDate`]}
                               </div>
                             )}
                           </div>
-
+ 
                           <div className="cmm-col-md-4">
                             <label className="cmm-label">Status</label>
-
+ 
                             <CustomDropdown
                               name="status"
                               value={item.status}
@@ -551,7 +593,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                             />
                           </div>
                         </div>
-
+ 
                         <div className="cmm-action-footer">
                           <button
                             type="button"
@@ -568,7 +610,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
               </div>
             )}
           </div>
-
+ 
           <div className="cmm-actions">
             <button
               type="submit"
@@ -577,7 +619,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
             >
               {submitting ? "Creating MOM..." : "Create MOM"}
             </button>
-
+ 
             <button
               type="button"
               onClick={onClose}
@@ -587,7 +629,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
               Cancel
             </button>
           </div>
-
+ 
           {formData.actionItems.length > 0 && (
             <div className="cmm-note">
               <i className="bi bi-info-circle cmm-note-icon"></i>
@@ -602,5 +644,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
     </div>
   );
 };
-
+ 
 export default CreateMomModal;
+ 
+ 
