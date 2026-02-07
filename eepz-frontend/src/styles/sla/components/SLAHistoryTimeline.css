@@ -188,10 +188,12 @@
 .sla-history-variant-created .sla-history-card {
   border-left-color: #16a34a;
 }
+
 .sla-history-variant-created .sla-history-title,
 .sla-history-variant-created .sla-history-title-iconwrap svg {
   color: #16a34a;
 }
+
 .sla-history-variant-created .sla-history-badge-to {
   background: rgba(22, 163, 74, 0.08);
   color: #16a34a;
@@ -201,10 +203,12 @@
 .sla-history-variant-status .sla-history-card {
   border-left-color: #3b82f6;
 }
+
 .sla-history-variant-status .sla-history-title,
 .sla-history-variant-status .sla-history-title-iconwrap svg {
   color: #3b82f6;
 }
+
 .sla-history-variant-status .sla-history-badge-to {
   background: rgba(59, 130, 246, 0.08);
   color: #3b82f6;
@@ -216,6 +220,7 @@
 .sla-history-variant-escalated .sla-history-title-iconwrap svg {
   color: #f59e0b;
 }
+
 .sla-history-variant-escalated .sla-history-badge-to {
   background: rgba(245, 158, 11, 0.08);
   color: #f59e0b;
@@ -225,10 +230,12 @@
 .sla-history-variant-reopened .sla-history-card {
   border-left-color: #8b5cf6;
 }
+
 .sla-history-variant-reopened .sla-history-title,
 .sla-history-variant-reopened .sla-history-title-iconwrap svg {
   color: #8b5cf6;
 }
+
 .sla-history-variant-reopened .sla-history-badge-to {
   background: rgba(139, 92, 246, 0.08);
   color: #8b5cf6;
@@ -238,10 +245,12 @@
 .sla-history-variant-closed .sla-history-card {
   border-left-color: #10b981;
 }
+
 .sla-history-variant-closed .sla-history-title,
 .sla-history-variant-closed .sla-history-title-iconwrap svg {
   color: #10b981;
 }
+
 .sla-history-variant-closed .sla-history-badge-to {
   background: rgba(16, 185, 129, 0.08);
   color: #10b981;
@@ -251,10 +260,12 @@
 .sla-history-variant-compliance .sla-history-card {
   border-left-color: #6b7280;
 }
+
 .sla-history-variant-compliance .sla-history-title,
 .sla-history-variant-compliance .sla-history-title-iconwrap svg {
   color: #6b7280;
 }
+
 .sla-history-variant-compliance .sla-history-badge-to {
   background: rgba(107, 114, 128, 0.08);
   color: #6b7280;
@@ -264,10 +275,12 @@
 .sla-history-variant-autoclosed .sla-history-card {
   border-left-color: #ef4444;
 }
+
 .sla-history-variant-autoclosed .sla-history-title,
 .sla-history-variant-autoclosed .sla-history-title-iconwrap svg {
   color: #ef4444;
 }
+
 .sla-history-variant-autoclosed .sla-history-badge-to {
   background: rgba(239, 68, 68, 0.08);
   color: #ef4444;
@@ -277,10 +290,12 @@
 .sla-history-variant-default .sla-history-card {
   border-left-color: #6b7280;
 }
+
 .sla-history-variant-default .sla-history-title,
 .sla-history-variant-default .sla-history-title-iconwrap svg {
   color: #6b7280;
 }
+
 .sla-history-variant-default .sla-history-badge-to {
   background: rgba(107, 114, 128, 0.08);
   color: #6b7280;

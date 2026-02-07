@@ -397,7 +397,7 @@
   font-size: 0.875rem !important;
 }
 
-.prj-list-table tbody td:last-child > div {
+.prj-list-table tbody td:last-child>div {
   display: flex !important;
   gap: 0.5rem !important;
   justify-content: center !important;

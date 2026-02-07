@@ -66,7 +66,8 @@
 .sched-breadcrumb-link svg {
   display: block;
 }
-.sched-breadcrumb-home-separator{
+
+.sched-breadcrumb-home-separator {
   color: #97247e;
   margin-left: 10px;
 }
@@ -78,7 +79,7 @@
   font-weight: 500;
   color: #97247e;
   line-height: 1;
-  
+
 }
 
 .sched-breadcrumb-current {
@@ -88,7 +89,7 @@
   line-height: 1;
 }
 
-.breadcrumb-item + .breadcrumb-item::before {
+.breadcrumb-item+.breadcrumb-item::before {
   display: none;
   margin-left: 10px;
 }
@@ -137,7 +138,7 @@
   margin-top: 0;
 }
 
-.sched-dd-label-durr{
+.sched-dd-label-durr {
   margin-top: 10px;
 }
 
@@ -349,13 +350,13 @@
 .sched-dd-dur .cdrop-trigger {
   width: 100% !important;
   box-sizing: border-box !important;
-  
+
 }
 
 .sched-dd-dur .cdrop-trigger {
   height: var(--sched-field-height) !important;
   border-radius: 10px !important;
-    margin-bottom: -10px;
+  margin-bottom: -10px;
 
 }
 

@@ -55,7 +55,7 @@
 .smm-tabs-item {
   display: flex;
   align-items: center;
-  gap:12px;
+  gap: 12px;
 }
 
 .smm-tab-btn {

@@ -238,12 +238,8 @@
   transition: transform 0.25s ease;
 }
 
-.esla-dropdown
-  .cdrop-trigger[aria-expanded="true"]
-  .cdrop-icon,
-.esla-dropdown
-  .cdrop-trigger[aria-expanded="true"]
-  .cdrop-chevron {
+.esla-dropdown .cdrop-trigger[aria-expanded="true"] .cdrop-icon,
+.esla-dropdown .cdrop-trigger[aria-expanded="true"] .cdrop-chevron {
   transform: translateY(-50%) rotate(180deg);
 }
 
@@ -315,6 +311,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }

@@ -165,14 +165,14 @@
 
 .scf-tabs {
   background: #27235c;
-  border-radius: 999px;          
+  border-radius: 999px;
   padding: 4px;
   display: inline-flex;
   gap: 4px;
   margin-bottom: 1.5rem;
   box-shadow: 0 2px 8px rgba(39, 35, 92, 0.15);
 
-  height: 48px;                  
+  height: 48px;
   align-items: center;
   box-sizing: border-box;
 }
@@ -181,9 +181,9 @@
   background: transparent;
   color: #fff;
   border: none;
-  border-radius: 999px;          
-  height: 40px;                  
-  padding: 0 24px;               
+  border-radius: 999px;
+  height: 40px;
+  padding: 0 24px;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
@@ -603,7 +603,7 @@
   .scf-tabs {
     flex-direction: column;
     width: 100%;
-    height: auto;            
+    height: auto;
     border-radius: 16px;
   }
 

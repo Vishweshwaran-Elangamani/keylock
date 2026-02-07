@@ -189,7 +189,7 @@
 }
 
 .hr-sla-filters-card {
- background: #ffffff;
+  background: #ffffff;
   border-radius: 16px;
   padding: 0.9rem 1rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -405,6 +405,7 @@
   min-height: 38px;
   position: relative;
 }
+
 .hr-sla-dd .cdrop-trigger .cdrop-icon {
   transform: translateY(-50%) rotate(0deg) !important;
   transition: transform 0.25s ease;
@@ -482,6 +483,7 @@
     opacity: 0;
     transform: translateY(-4px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
