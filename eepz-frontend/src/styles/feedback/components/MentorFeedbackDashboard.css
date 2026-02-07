@@ -808,7 +808,6 @@
   from {
     transform: rotate(0deg);
   }
-
   to {
     transform: rotate(360deg);
   }
@@ -829,7 +828,7 @@
     max-width: 95%;
   }
 
-
+ 
 }
 
 @media (max-width: 767px) {

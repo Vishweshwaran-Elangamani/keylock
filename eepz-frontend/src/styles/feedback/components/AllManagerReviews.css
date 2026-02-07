@@ -43,7 +43,6 @@
   from {
     transform: rotate(0deg);
   }
-
   to {
     transform: rotate(360deg);
   }
@@ -313,7 +312,7 @@
   overflow: hidden;
 }
 
-.amr-feedback-content .amr-badge+.amr-feedback-text {
+.amr-feedback-content .amr-badge + .amr-feedback-text {
   margin-top: 0.75rem;
 }
 
