@@ -3,6 +3,7 @@ import budgetAllocationService from "../../../services/hr_operations/hr/budgetAl
 import { formatCurrency } from "../../../utils/auth/currencyFormatter";
 import { toast } from "sonner";
 import "../../../styles/hr_operations/hr/EditBudgetModal.css";
+
 const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
   const [formData, setFormData] = useState({
     budgetId: "",
@@ -11,8 +12,10 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
     totalBudget: "",
     allocatedAmount: "",
   });
+
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
   useEffect(() => {
     if (show && budget) {
       setFormData({
@@ -25,8 +28,10 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
       setErrors({});
     }
   }, [show, budget]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({
       ...prev,
       [name]:
@@ -34,42 +39,56 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
           ? parseInt(value)
           : value,
     }));
+
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
+
   const validateForm = () => {
     const newErrors = {};
+
     if (!formData.totalBudget || parseFloat(formData.totalBudget) <= 0) {
       newErrors.totalBudget = "Total budget must be greater than zero";
     }
-    const allocatedAmount = formData.allocatedAmount
-      ? parseFloat(formData.allocatedAmount)
-      : parseFloat(formData.totalBudget);
-    if (allocatedAmount > parseFloat(formData.totalBudget)) {
+
+    if (!formData.allocatedAmount || parseFloat(formData.allocatedAmount) <= 0) {
+      newErrors.allocatedAmount =
+        "Allocated amount is required and must be greater than zero";
+    }
+
+    if (
+      formData.allocatedAmount &&
+      parseFloat(formData.totalBudget) > 0 &&
+      parseFloat(formData.allocatedAmount) > parseFloat(formData.totalBudget)
+    ) {
       newErrors.allocatedAmount = "Allocated amount cannot exceed total budget";
     }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!validateForm()) {
       toast.error("Please fix the errors in the form");
       return;
     }
+
     setLoading(true);
     try {
-      const allocatedAmount = formData.allocatedAmount
-        ? parseFloat(formData.allocatedAmount)
-        : parseFloat(formData.totalBudget);
-      await budgetAllocationService.updateDepartmentBudget({
+      const payload = {
         budgetId: formData.budgetId,
         departmentId: formData.departmentId,
         fiscalYear: formData.fiscalYear,
         totalBudget: parseFloat(formData.totalBudget),
-        allocatedAmount: allocatedAmount,
-      });
+        allocatedAmount: parseFloat(formData.allocatedAmount),
+      };
+
+      await budgetAllocationService.updateDepartmentBudget(payload);
+
       toast.success("Budget updated successfully!");
       onBudgetUpdated();
       handleClose();
@@ -80,11 +99,18 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
       setLoading(false);
     }
   };
+
   const handleClose = () => {
     setErrors({});
     onHide();
   };
+
   if (!show) return null;
+
+  // Coerced values for the comparison panel
+  const newTotal = parseFloat(formData.totalBudget) || 0;
+  const newAllocated = parseFloat(formData.allocatedAmount) || 0;
+
   return (
     <>
       <div className="ebm-backdrop" onClick={handleClose} />
@@ -106,6 +132,7 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
+
           {/* BODY/FORM */}
           <form onSubmit={handleSubmit} className="ebm-form">
             <div className="ebm-modal-body">
@@ -130,6 +157,7 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
                   </span>
                 </div>
               </div>
+
               <div className="ebm-form-grid">
                 {/* Total Budget */}
                 <div className="ebm-form-group">
@@ -156,9 +184,13 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
                     Total budget for this department and fiscal year
                   </small>
                 </div>
-                {/* Allocated Amount */}
+
+                {/* Allocated Amount (Required now) */}
                 <div className="ebm-form-group">
-                  <label className="ebm-form-label">Allocated Amount (₹)</label>
+                  <label className="ebm-form-label">
+                    Allocated Amount (₹){" "}
+                    <span className="ebm-required-asterisk">*</span>
+                  </label>
                   <input
                     type="number"
                     name="allocatedAmount"
@@ -177,10 +209,11 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
                     </div>
                   )}
                   <small className="ebm-form-hint">
-                    Amount available for allocation by HR/DeptHead
+                    Amount available for allocation by HR/DeptHead (must not exceed Total Budget)
                   </small>
                 </div>
               </div>
+
               {/* BUDGET COMPARISON */}
               <div className="ebm-budget-comparison">
                 <div className="ebm-comparison-header">
@@ -202,24 +235,23 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
                       </p>
                     </div>
                   </div>
+
                   {/* New */}
                   <div>
                     <h6 className="ebm-comparison-section-title">NEW</h6>
                     <div className="ebm-comparison-card new">
                       <p className="ebm-comparison-item new">
-                        <strong>Total:</strong>{" "}
-                        {formatCurrency(formData.totalBudget)}
+                        <strong>Total:</strong> {formatCurrency(newTotal)}
                       </p>
                       <p className="ebm-comparison-item new">
                         <strong>Allocated:</strong>{" "}
-                        {formatCurrency(
-                          formData.allocatedAmount || formData.totalBudget
-                        )}
+                        {formatCurrency(newAllocated)}
                       </p>
                     </div>
                   </div>
                 </div>
               </div>
+
               {/* CURRENT UTILIZATION */}
               {budget?.utilizedAmount > 0 && (
                 <div className="ebm-utilization-info">
@@ -244,6 +276,7 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
                 </div>
               )}
             </div>
+
             {/* FOOTER */}
             <div className="ebm-modal-footer">
               <button
@@ -277,4 +310,5 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
     </>
   );
 };
+
 export default EditBudgetModal;
