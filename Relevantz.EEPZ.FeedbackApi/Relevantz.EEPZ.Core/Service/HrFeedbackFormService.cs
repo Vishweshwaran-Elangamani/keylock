@@ -10,17 +10,27 @@ using Relevantz.EEPZ.Common.Constants;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
+    /// <summary>
+    /// Service responsible for managing HR feedback forms and form responses.
+    /// Handles creation, retrieval, updates, distribution, and response lifecycle.
+    /// </summary>
     public class HrFeedbackFormService : IHrFeedbackFormService
     {
         private readonly IHrFeedbackFormRepository _formRepo;
         private readonly ILogger<HrFeedbackFormService> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HrFeedbackFormService"/> class.
+        /// </summary>
         public HrFeedbackFormService(IHrFeedbackFormRepository formRepo, ILogger<HrFeedbackFormService> logger)
         {
             _formRepo = formRepo;
             _logger = logger;
         }
 
+        /// <summary>
+        /// Creates a new HR feedback form in draft state.
+        /// </summary>
         public async Task<HrFeedbackFormResponseDto> CreateFormAsync(CreateHRFeedbackFormRequestDto dto, CancellationToken ct)
         {
             if (dto == null)
@@ -44,6 +54,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return MapFormToResponseDto(form);
         }
 
+        /// <summary>
+        /// Retrieves a feedback form by its identifier.
+        /// </summary>
         public async Task<HrFeedbackFormResponseDto> GetFormByIdAsync(int formId, CancellationToken ct)
         {
             var form = await _formRepo.GetFormByIdAsync(formId, ct)
@@ -52,6 +65,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return MapFormToResponseDto(form);
         }
 
+        /// <summary>
+        /// Retrieves all feedback forms with pagination.
+        /// </summary>
         public async Task<PagedResultDto<HrFeedbackFormResponseDto>> GetAllFormsAsync(PaginationRequestDto pagination, CancellationToken ct)
         {
             var query = _formRepo.Query();
@@ -76,6 +92,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
+        /// <summary>
+        /// Retrieves active feedback forms with pagination.
+        /// </summary>
         public async Task<PagedResultDto<HrFeedbackFormResponseDto>> GetActiveFormsAsync(PaginationRequestDto pagination, CancellationToken ct)
         {
             var query = _formRepo.Query().Where(x => x.Status == FormStatuses.Active);
@@ -97,12 +116,17 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
+        /// <summary>Retrieves forms by form type.</summary>
         public async Task<List<HrFeedbackFormResponseDto>> GetFormsByTypeAsync(string formType, CancellationToken ct) =>
             (await _formRepo.GetFormsByTypeAsync(formType, ct)).Select(MapFormToResponseDto).ToList();
 
+        /// <summary>Retrieves forms created by a specific HR user.</summary>
         public async Task<List<HrFeedbackFormResponseDto>> GetFormsByCreatorAsync(int hrUserId, CancellationToken ct) =>
             (await _formRepo.GetFormsByCreatorAsync(hrUserId, ct)).Select(MapFormToResponseDto).ToList();
 
+        /// <summary>
+        /// Updates a draft feedback form.
+        /// </summary>
         public async Task<HrFeedbackFormResponseDto> UpdateFormAsync(int formId, UpdateHRFormRequestDto dto, CancellationToken ct)
         {
             if (dto == null)
@@ -123,12 +147,17 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return MapFormToResponseDto(form);
         }
 
+        /// <summary>Updates the status of a feedback form.</summary>
         public async Task<bool> UpdateFormStatusAsync(int formId, string newStatus, CancellationToken ct) =>
             await _formRepo.UpdateFormStatusAsync(formId, newStatus, ct);
 
+        /// <summary>Deletes a draft feedback form.</summary>
         public async Task<bool> DeleteFormAsync(int formId, CancellationToken ct) =>
             await _formRepo.DeleteFormAsync(formId, ct);
 
+        /// <summary>
+        /// Creates a response entry for a feedback form.
+        /// </summary>
         public async Task<HrFeedbackFormResponseResponseDto> CreateFormResponseAsync(SubmitHRFormResponseRequestDto dto, CancellationToken ct)
         {
             if (dto == null) throw new ArgumentNullException(nameof(dto));
@@ -149,34 +178,44 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return MapResponseToResponseDto(response);
         }
 
+        /// <summary>Retrieves a specific form response.</summary>
         public async Task<HrFeedbackFormResponseResponseDto> GetFormResponseByIdAsync(int responseId, CancellationToken ct) =>
             MapResponseToResponseDto(await _formRepo.GetFormResponseByIdAsync(responseId, ct)
                 ?? throw new KeyNotFoundException($"Response {responseId} not found."));
 
+        /// <summary>Retrieves responses by form.</summary>
         public async Task<List<HrFeedbackFormResponseResponseDto>> GetResponsesByFormAsync(int formId, CancellationToken ct) =>
             (await _formRepo.GetResponsesByFormAsync(formId, ct)).Select(MapResponseToResponseDto).ToList();
 
+        /// <summary>Retrieves responses submitted by an employee.</summary>
         public async Task<List<HrFeedbackFormResponseResponseDto>> GetResponsesBySubmitterAsync(int employeeId, CancellationToken ct) =>
             (await _formRepo.GetResponsesBySubmitterAsync(employeeId, ct)).Select(MapResponseToResponseDto).ToList();
 
+        /// <summary>Retrieves responses filtered by status.</summary>
         public async Task<List<HrFeedbackFormResponseResponseDto>> GetResponsesByStatusAsync(string status, CancellationToken ct) =>
             (await _formRepo.GetResponsesByStatusAsync(status, ct)).Select(MapResponseToResponseDto).ToList();
 
+        /// <summary>Retrieves all submitted responses.</summary>
         public async Task<List<HrFeedbackFormResponseResponseDto>> GetSubmittedResponsesAsync(CancellationToken ct) =>
             (await _formRepo.GetSubmittedResponsesAsync(ct)).Select(MapResponseToResponseDto).ToList();
 
+        /// <summary>Retrieves responses pending HR review.</summary>
         public async Task<List<HrFeedbackFormResponseResponseDto>> GetPendingReviewResponsesAsync(CancellationToken ct) =>
             (await _formRepo.GetPendingReviewResponsesAsync(ct)).Select(MapResponseToResponseDto).ToList();
 
+        /// <summary>Sets HR review comments and marks response reviewed.</summary>
         public async Task<bool> SetHRReviewAsync(int responseId, string hrComments, int reviewedByHRId, CancellationToken ct) =>
             await _formRepo.SetHRReviewAsync(responseId, hrComments, reviewedByHRId, ct);
 
+        /// <summary>Deletes a form response.</summary>
         public async Task<bool> DeleteFormResponseAsync(int responseId, CancellationToken ct) =>
             await _formRepo.DeleteFormResponseAsync(responseId, ct);
 
+        /// <summary>Marks a form response as submitted.</summary>
         public async Task<bool> SubmitFormResponseAsync(int responseId, CancellationToken ct) =>
             await _formRepo.UpdateResponseStatusAsync(responseId, FormStatuses.Submitted, ct);
 
+        /// <summary>Distributes a form to employees.</summary>
         public async Task<DistributeFormResponse> DistributeFormAsync(int formId, List<int> employeeIds, CancellationToken ct)
         {
             var success = await _formRepo.DistributeFormAsync(formId, employeeIds, ct);
@@ -206,6 +245,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             Status = response.Status ?? FormStatuses.Draft
         };
 
+        /// <summary>
+        /// Updates an existing form response.
+        /// </summary>
         public async Task<HrFeedbackFormResponseResponseDto> UpdateFormResponseAsync(int responseId, UpdateHRFormResponseRequestDto dto, CancellationToken ct)
         {
             var response = await _formRepo.GetFormResponseByIdAsync(responseId, ct)
