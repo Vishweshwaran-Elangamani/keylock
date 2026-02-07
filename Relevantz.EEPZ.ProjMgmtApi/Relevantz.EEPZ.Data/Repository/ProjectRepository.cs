@@ -436,39 +436,71 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
         public async Task<bool> MapEmployeesToProjectAsync(int projectId, List<Projectemployee> employees)
         {
-            var employeeIds = employees.Select(e => e.EmployeeId).ToList();
+            var employeeIds = employees.Select(e => e.EmployeeId).Distinct().ToList();
 
             var existingMappings = await _context.Projectemployees
-                .AsNoTracking()
                 .Where(pe => pe.ProjectId == projectId && employeeIds.Contains(pe.EmployeeId))
-                .Select(pe => pe.EmployeeId)
                 .ToListAsync();
 
-            var newEmployees = employees
-                .Where(e => !existingMappings.Contains(e.EmployeeId))
-                .ToList();
+            var existingByEmpId = existingMappings.ToDictionary(pe => pe.EmployeeId, pe => pe);
+            var inserts = new List<Projectemployee>();
+            var anyChange = false;
 
-            if (!newEmployees.Any())
+            foreach (var incoming in employees)
             {
-                return false;
-            }
-
-            foreach (var emp in newEmployees.Where(e => e.IsPrimary))
-            {
-                var existingPrimaries = await _context.Projectemployees
-                    .Where(pe => pe.EmployeeId == emp.EmployeeId && pe.IsPrimary)
-                    .ToListAsync();
-
-                foreach (var primary in existingPrimaries)
+                if (existingByEmpId.TryGetValue(incoming.EmployeeId, out var existing))
                 {
-                    primary.IsPrimary = false;
+                    if (incoming.IsPrimary && !existing.IsPrimary)
+                    {
+                        var otherPrimaries = await _context.Projectemployees
+                            .Where(pe => pe.EmployeeId == incoming.EmployeeId && pe.IsPrimary && pe.ProjectId != projectId)
+                            .ToListAsync();
+
+                        foreach (var p in otherPrimaries)
+                            p.IsPrimary = false;
+
+                        existing.IsPrimary = true;
+                        anyChange = true;
+                    }
+                    else if (!incoming.IsPrimary && existing.IsPrimary)
+                    {
+                        existing.IsPrimary = false;
+                        anyChange = true;
+                    }
+                }
+                else
+                {
+                    inserts.Add(new Projectemployee
+                    {
+                        ProjectId = projectId,
+                        EmployeeId = incoming.EmployeeId,
+                        AssignedAt = DateTime.UtcNow,
+                        IsPrimary = incoming.IsPrimary
+                    });
+
+                    if (incoming.IsPrimary)
+                    {
+                        var otherPrimaries = await _context.Projectemployees
+                            .Where(pe => pe.EmployeeId == incoming.EmployeeId && pe.IsPrimary)
+                            .ToListAsync();
+
+                        foreach (var p in otherPrimaries)
+                            p.IsPrimary = false;
+                    }
+                    anyChange = true;
                 }
             }
 
-            await _context.Projectemployees.AddRangeAsync(newEmployees);
+            if (inserts.Any())
+                await _context.Projectemployees.AddRangeAsync(inserts);
 
-            var changes = await _context.SaveChangesAsync();
-            return changes > 0;
+            if (anyChange || inserts.Any())
+            {
+                await _context.SaveChangesAsync();
+                return true;
+            }
+
+            return true;
         }
 
         public async Task<bool> UnmapEmployeesFromProjectAsync(int projectId, List<int> employeeIds)

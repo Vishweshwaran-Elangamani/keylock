@@ -159,25 +159,36 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             foreach (var e in request.Employees)
             {
                 if (!await _projectRepository.EmployeeMasterExistsAsync(e.EmployeeId))
-                    invalids.Add($"Employee with ID {e.EmployeeId} does not exist.");
+                    invalids.Add($"Employee master id {e.EmployeeId} does not exist.");
             }
-
             if (invalids.Any())
                 return ApiResponse<bool>.ErrorResponse("Validation failed.", invalids);
 
-            var resourcePoolProject = await _projectRepository.GetResourcePoolProjectAsync();
-            var employeeIds = request.Employees.Select(e => e.EmployeeId).ToList();
+            var resolved = new Dictionary<int, int>();
 
+            foreach (var e in request.Employees.Select(x => x.EmployeeId).Distinct())
+            {
+                var eid = await _projectRepository.GetEmployeeIdByMasterIdAsync(e);
+                if (!eid.HasValue || eid.Value <= 0)
+                    invalids.Add($"Employee master id {e} could not be resolved to EmployeeId.");
+                else
+                    resolved[e] = eid.Value;
+            }
+            if (invalids.Any())
+                return ApiResponse<bool>.ErrorResponse("Validation failed.", invalids);
+
+            var actualEmployeeIds = resolved.Values.Distinct().ToList();
+
+            var resourcePoolProject = await _projectRepository.GetResourcePoolProjectAsync();
             if (resourcePoolProject != null && request.ProjectId != resourcePoolProject.ProjectId)
             {
-                var poolMappings = await _projectRepository.GetResourcePoolMappingsAsync(resourcePoolProject.ProjectId, employeeIds);
+                var poolMappings = await _projectRepository.GetResourcePoolMappingsAsync(resourcePoolProject.ProjectId, actualEmployeeIds);
                 if (poolMappings.Any())
                     await _projectRepository.RemoveProjectEmployeeMappingsAsync(poolMappings);
             }
-
             if (resourcePoolProject != null && request.ProjectId == resourcePoolProject.ProjectId)
             {
-                var otherMappings = await _projectRepository.GetOtherProjectMappingsAsync(resourcePoolProject.ProjectId, employeeIds);
+                var otherMappings = await _projectRepository.GetOtherProjectMappingsAsync(resourcePoolProject.ProjectId, actualEmployeeIds);
                 if (otherMappings.Any())
                     await _projectRepository.RemoveProjectEmployeeMappingsAsync(otherMappings);
             }
@@ -186,20 +197,19 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (project == null)
                 return ApiResponse<bool>.ErrorResponse("Project not found.");
 
-            int? managerMasterId = project.L1approverEmployeeId ?? project.L2approverEmployeeId;
+            int? managerMasterId = project.L1approverEmployeeId ?? project.L2approverEmployeeId ?? project.ResourceOwnerEmployeeId;
             int? managerEmployeeId = managerMasterId.HasValue
                 ? await _projectRepository.GetEmployeeIdByMasterIdAsync(managerMasterId.Value)
                 : null;
 
-            if (managerMasterId.HasValue && !managerEmployeeId.HasValue)
-                return ApiResponse<bool>.ErrorResponse("Invalid reporting manager configuration.");
-
-            var employeesToUpdate = new List<Employee>();
             var mappingUpdates = new List<Projectemployee>();
+            var employeesToUpdate = new List<Employee>();
 
             foreach (var emp in request.Employees.Where(e => e.IsPrimary))
             {
-                var existing = await _projectRepository.GetProjectEmployeesByEmployeeIdAsync(emp.EmployeeId);
+                var actualId = resolved[emp.EmployeeId];
+
+                var existing = await _projectRepository.GetProjectEmployeesByEmployeeIdAsync(actualId);
                 foreach (var map in existing.Where(m => m.IsPrimary && m.ProjectId != request.ProjectId))
                 {
                     map.IsPrimary = false;
@@ -208,15 +218,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 if (managerEmployeeId.HasValue)
                 {
-                    var actualId = await _projectRepository.GetEmployeeIdByMasterIdAsync(emp.EmployeeId);
-                    if (actualId.HasValue)
+                    var empEntity = await _projectRepository.GetEmployeeByIdAsync(actualId);
+                    if (empEntity != null && empEntity.ReportingManagerEmployeeId != managerEmployeeId.Value)
                     {
-                        var empEntity = await _projectRepository.GetEmployeeByIdAsync(actualId.Value);
-                        if (empEntity != null)
-                        {
-                            empEntity.ReportingManagerEmployeeId = managerEmployeeId.Value;
-                            employeesToUpdate.Add(empEntity);
-                        }
+                        empEntity.ReportingManagerEmployeeId = managerEmployeeId.Value;
+                        employeesToUpdate.Add(empEntity);
                     }
                 }
             }
@@ -237,12 +243,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var projectEmployees = request.Employees.Select(e => new Projectemployee
             {
                 ProjectId = request.ProjectId,
-                EmployeeId = e.EmployeeId,
+                EmployeeId = resolved[e.EmployeeId],
                 AssignedAt = DateTime.UtcNow,
                 IsPrimary = e.IsPrimary
             }).ToList();
 
             var mapped = await _projectRepository.MapEmployeesToProjectAsync(request.ProjectId, projectEmployees);
+
             var msg = managerEmployeeId.HasValue
                 ? "Employees mapped. Reporting managers updated, resource pool enforced."
                 : "Employees mapped. No reporting manager assigned, resource pool enforced.";
@@ -340,10 +347,18 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 Status = project.Status,
                 StartDate = project.StartDate.ToDateTime(TimeOnly.MinValue),
                 EndDate = project.EndDate?.ToDateTime(TimeOnly.MinValue),
+
                 ResourceOwner = project.ResourceOwnerEmployee != null ? MapToEmployeeBasicInfo(project.ResourceOwnerEmployee) : null,
                 L1Approver = project.L1approverEmployee != null ? MapToEmployeeBasicInfo(project.L1approverEmployee) : null,
                 L2Approver = project.L2approverEmployee != null ? MapToEmployeeBasicInfo(project.L2approverEmployee) : null,
-                MappedEmployees = projectEmployees.Select(pe => MapToEmployeeBasicInfo(pe.Employee)).ToList(),
+
+                MappedEmployees = projectEmployees.Select(pe =>
+                {
+                    var info = MapToEmployeeBasicInfo(pe.Employee);
+                    info.IsPrimary = pe.IsPrimary;
+                    return info;
+                }).ToList(),
+
                 CreatedAt = project.CreatedAt,
                 UpdatedAt = project.UpdatedAt
             };
