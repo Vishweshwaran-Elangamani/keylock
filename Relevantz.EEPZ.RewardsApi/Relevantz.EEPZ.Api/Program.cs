@@ -30,12 +30,9 @@ using Relevantz.EEPZ.Data.Repository;
 using Relevantz.EEPZ.Data.Repository.Implementations;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Swashbuckle.AspNetCore.SwaggerGen;
-
-<<<<<<< Updated upstream
 using FluentValidation;
 using Relevantz.EEPZ.Common.DTOs.Response;
 
-=======
 // NEW: Load .env early for local development (DotNetEnv)
 try
 {
@@ -61,7 +58,6 @@ catch (Exception ex)
 {
     Console.WriteLine($"[config] Skipped .env load: {ex.Message}");
 }
->>>>>>> Stashed changes
 
 var builder = WebApplication.CreateBuilder(args);
 
