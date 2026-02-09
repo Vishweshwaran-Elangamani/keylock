@@ -30,6 +30,7 @@ using Relevantz.EEPZ.Data.Repository;
 using Relevantz.EEPZ.Data.Repository.Implementations;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Swashbuckle.AspNetCore.SwaggerGen;
+
 using FluentValidation;
 using Relevantz.EEPZ.Common.DTOs.Response;
 
@@ -376,7 +377,7 @@ app.Use(async (ctx, next) =>
 // Rate Limiter
 // -------------------------------------------------
 app.UseRateLimiter();
-
+app.MapGet("/healthz", () => Results.Ok("ok"));
 // -------------------------------------------------
 // Metrics
 // -------------------------------------------------

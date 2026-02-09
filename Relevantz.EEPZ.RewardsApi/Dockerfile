@@ -4,6 +4,8 @@
 # Stage 1: Build
 #############################
 FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine3.19 AS build
+# (Optional) You don't need curl in the build stage; removing it is fine.
+RUN apk add --no-cache icu-libs
 WORKDIR /src
 
 ENV DOTNET_CLI_TELEMETRY_OPTOUT=1 \
@@ -22,8 +24,8 @@ RUN dotnet publish -c Release -o /app/publish
 #############################
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine3.19
 
-# Globalization libs
-RUN apk add --no-cache icu-libs
+# Globalization libs + curl for HEALTHCHECK
+RUN apk add --no-cache icu-libs curl
 
 # Create non-root user
 RUN addgroup -S app || true \
@@ -47,5 +49,9 @@ ENV ASPNETCORE_URLS=http://0.0.0.0:5114 \
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
 EXPOSE 5114
+
+# Container health check (requires /healthz endpoint)
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD wget -qO- http://localhost:5114/healthz || exit 1
 
 ENTRYPOINT ["dotnet", "Relevantz.EEPZ.Api.dll"]

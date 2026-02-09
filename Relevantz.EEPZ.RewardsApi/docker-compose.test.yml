@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  rewards-api:
+    build: .
+    image: eepz-rewards-api:test
+    container_name: eepz-rewards-api-test
+    ports:
+      - "5114:5114"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5114/healthz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+    volumes:
+      - ./logs:/app/Logs
+      - ./dataprotection:/home/app/.aspnet/DataProtection-Keys
