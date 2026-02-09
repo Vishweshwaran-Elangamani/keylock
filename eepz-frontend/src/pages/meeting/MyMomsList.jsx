@@ -1,76 +1,36 @@
 import { useEffect, useState } from "react";
-
 import momService from "../../services/meeting/momService";
-
 import employeeService from "../../services/meeting/employeeservice";
-
 import PaginationFooter from "../../components/project-management/common/PaginationFooter";
-
 import toastr from "toastr";
-
 import { useNavigate } from "react-router-dom";
-
 import {
-  FileText,
-  Calendar,
-  Users,
-  Link as LinkIcon,
-  CheckCircle,
-  Clock,
-  Edit,
-  Trash2,
-  Eye,
-  Plus,
-  AlertTriangle,
-  Share2,
-  Search,
-  X,
-  Home,
-  ChevronLeft,
-  ChevronRight,
+  FileText,Calendar,Users,Link as LinkIcon,CheckCircle,Clock,Edit,Trash2,
+  Eye,Plus,AlertTriangle,Share2,Search,X,Home,ChevronLeft,ChevronRight,
 } from "lucide-react";
 
 import "bootstrap/dist/css/bootstrap.min.css";
-
 import "../../styles/mom/components/MyMomsLists.css";
 
-const MyMomsList = () => {
+  const MyMomsList = () => {
   const [moms, setMoms] = useState([]);
-
   const [loading, setLoading] = useState(true);
-
   const [pageNumber, setPageNumber] = useState(1);
-
   const [pageSize, setPageSize] = useState(10);
-
   const [totalCount, setTotalCount] = useState(0);
-
   const [momSearchTerm, setMomSearchTerm] = useState("");
-
   const [momSearchInput, setMomSearchInput] = useState("");
-
   const [selectedMeetingType, setSelectedMeetingType] = useState("");
-
   const [selectedMom, setSelectedMom] = useState(null);
-
   const [showShareModal, setShowShareModal] = useState(false);
-
   const [shareModalMom, setShareModalMom] = useState(null);
-
   const [employees, setEmployees] = useState([]);
-
   const [employeeMap, setEmployeeMap] = useState({});
-
   const [selectedEmployees, setSelectedEmployees] = useState([]);
-
   const [searchInput, setSearchInput] = useState("");
-
   const [searchTerm, setSearchTerm] = useState("");
-
   const [searchMode, setSearchMode] = useState(false);
-
   const [sharingLoading, setSharingLoading] = useState(false);
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -87,27 +47,18 @@ const MyMomsList = () => {
     try {
       const response = await momService.getMyMoms({
         pageNumber,
-
         pageSize,
-
         searchTerm: momSearchTerm,
-
         meetingType: selectedMeetingType,
       });
 
       let momsArray = [];
-
       let pagination = {
         totalCount: 0,
-
         totalPages: 0,
-
         pageNumber: 1,
-
         pageSize: pageSize,
-
         hasPreviousPage: false,
-
         hasNextPage: false,
       };
 
@@ -116,15 +67,10 @@ const MyMomsList = () => {
 
         pagination = {
           totalCount: response.Data.TotalCount || 0,
-
           totalPages: response.Data.TotalPages || 0,
-
           pageNumber: response.Data.PageNumber || 1,
-
           pageSize: response.Data.PageSize || pageSize,
-
           hasPreviousPage: response.Data.HasPreviousPage || false,
-
           hasNextPage: response.Data.HasNextPage || false,
         };
       } else if (response?.data?.data && Array.isArray(response.data.data)) {
@@ -132,58 +78,41 @@ const MyMomsList = () => {
 
         pagination = {
           totalCount: response.data.totalCount || 0,
-
           totalPages: response.data.totalPages || 0,
-
           pageNumber: response.data.pageNumber || 1,
-
           pageSize: response.data.pageSize || pageSize,
-
           hasPreviousPage: response.data.hasPreviousPage || false,
-
           hasNextPage: response.data.hasNextPage || false,
         };
       }
 
       const momsWithEmployeeNames = momsArray.map((mom) => {
-        const actionItems = mom.ActionItems || mom.actionItems || [];
-
-        const processedActionItems = actionItems.map((ai) => {
-          const assignedId = ai.AssignedToEmployeeId || ai.assignedToEmployeeId;
-
-          const employeeName =
-            employeeMap[String(assignedId)] || `Employee ${assignedId}`;
+      const actionItems = mom.ActionItems || mom.actionItems || [];
+      const processedActionItems = actionItems.map((ai) => {
+      const assignedId = ai.AssignedToEmployeeId || ai.assignedToEmployeeId;
+      const employeeName = employeeMap[String(assignedId)] || `Employee ${assignedId}`;
 
           return {
             ...ai,
-
-            AssignedToEmployeeName: employeeName,
-
-            assignedToEmployeeName: employeeName,
+            AssignedToEmployeeName: employeeName, assignedToEmployeeName: employeeName,
           };
         });
-
         return {
           ...mom,
-
           ActionItems: processedActionItems,
-
           actionItems: processedActionItems,
         };
       });
-
       setMoms(momsWithEmployeeNames);
-
       setTotalCount(pagination.totalCount);
     } catch (err) {
       if (err.retryAfter) {
         toastr.error(
-          `Rate limit exceeded. Please wait ${err.retryAfter} seconds.`
+          `Rate limit exceeded. Please wait ${err.retryAfter} seconds.`,
         );
       } else {
         toastr.error("Failed to load MOMs.");
       }
-
       console.error(err);
     } finally {
       setLoading(false);
@@ -193,34 +122,20 @@ const MyMomsList = () => {
   const loadEmployees = async () => {
     try {
       const response = await employeeService.getEmployees();
-
       if (response.success || response.Success) {
         const employeeData = response.data || response.Data || [];
-
         setEmployees(employeeData);
-
         const map = {};
-
         employeeData.forEach((emp) => {
-          const empId =
-            emp.employeeMasterId ||
-            emp.EmployeeMasterId ||
-            emp.employeeId ||
-            emp.EmployeeId ||
-            emp.id ||
-            emp.Id;
-
+          const empId =   emp.employeeMasterId ||   emp.EmployeeMasterId ||
+            emp.employeeId || emp.EmployeeId || emp.id || emp.Id;
           const firstName = emp.firstName || emp.FirstName || "";
-
           const lastName = emp.lastName || emp.LastName || "";
-
           if (empId) {
             const fullName = `${firstName} ${lastName}`.trim();
-
             map[String(empId)] = fullName || `Employee ${empId}`;
           }
         });
-
         setEmployeeMap(map);
       }
     } catch (err) {
@@ -229,62 +144,42 @@ const MyMomsList = () => {
   };
 
   const openMomDetails = (mom) => {
-    const actionItems = mom.ActionItems || mom.actionItems || [];
-
-    const processedActionItems = actionItems.map((ai) => {
-      const assignedId = ai.AssignedToEmployeeId || ai.assignedToEmployeeId;
+  const actionItems = mom.ActionItems || mom.actionItems || [];
+  const processedActionItems = actionItems.map((ai) => {
+  const assignedId = ai.AssignedToEmployeeId || ai.assignedToEmployeeId;
 
       const employeeName =
-        employeeMap[String(assignedId)] ||
-        ai.AssignedToEmployeeName ||
-        ai.assignedToEmployeeName ||
+        employeeMap[String(assignedId)] ||ai.AssignedToEmployeeName ||ai.assignedToEmployeeName ||
         `Employee ${assignedId}`;
-
       return {
         ...ai,
-
-        AssignedToEmployeeName: employeeName,
-
-        assignedToEmployeeName: employeeName,
+        AssignedToEmployeeName: employeeName, assignedToEmployeeName: employeeName,
       };
     });
 
     setSelectedMom({
       ...mom,
-
       ActionItems: processedActionItems,
-
       actionItems: processedActionItems,
     });
   };
 
   const closeMomDetails = () => setSelectedMom(null);
-
   const openShareModal = (mom) => {
     setShareModalMom(mom);
-
     setShowShareModal(true);
-
     setSelectedEmployees([]);
-
     setSearchInput("");
-
     setSearchTerm("");
-
     setSearchMode(false);
   };
 
   const closeShareModal = () => {
     setShowShareModal(false);
-
     setShareModalMom(null);
-
     setSelectedEmployees([]);
-
     setSearchInput("");
-
     setSearchTerm("");
-
     setSearchMode(false);
   };
 
@@ -292,14 +187,13 @@ const MyMomsList = () => {
     setSelectedEmployees((prev) =>
       prev.includes(employeeId)
         ? prev.filter((id) => id !== employeeId)
-        : [...prev, employeeId]
+        : [...prev, employeeId],
     );
   };
 
   const handleShareMom = async () => {
     if (selectedEmployees.length === 0) {
       toastr.warning("Please select at least one employee");
-
       return;
     }
 
@@ -307,19 +201,15 @@ const MyMomsList = () => {
 
     try {
       const momId = shareModalMom.MomId || shareModalMom.momId;
-
       const response = await momService.shareMom(momId, selectedEmployees);
-
       if (response.success || response.Success) {
         toastr.success(
-          `MOM shared with ${selectedEmployees.length} employee(s)`
+          `MOM shared with ${selectedEmployees.length} employee(s)`,
         );
-
         closeShareModal();
       }
     } catch (err) {
       toastr.error("Failed to share MOM");
-
       console.error(err);
     } finally {
       setSharingLoading(false);
@@ -330,13 +220,10 @@ const MyMomsList = () => {
     try {
       const result = await momService.deleteMomWithConfirmation(
         momId,
-
-        meetingTitle
+        meetingTitle,
       );
-
       if (result.success) {
         toastr.success("MOM deleted successfully");
-
         if (moms.length === 1 && pageNumber > 1) {
           setPageNumber(pageNumber - 1);
         } else {
@@ -350,47 +237,35 @@ const MyMomsList = () => {
         toastr.error("Deletion requires confirmation");
       } else if (err.retryAfter) {
         toastr.error(
-          `Rate limit exceeded. Please wait ${err.retryAfter} seconds.`
+          `Rate limit exceeded. Please wait ${err.retryAfter} seconds.`,
         );
       } else {
         toastr.error("Failed to delete MOM");
       }
-
       console.error(err);
     }
   };
 
   const handleSearch = () => {
     setMomSearchTerm(momSearchInput.trim());
-
     setPageNumber(1);
   };
 
   const handleClearSearch = () => {
     setMomSearchInput("");
-
     setMomSearchTerm("");
-
     setPageNumber(1);
   };
 
   const handleMeetingTypeChange = (type) => {
     setSelectedMeetingType(type);
-
     setPageNumber(1);
   };
 
   const getMeetingTypeBadge = (type) => {
     const badgeMap = {
-      "One-on-One": "primary",
-
-      "Team Meeting": "success",
-
-      Presentation: "info",
-
-      Other: "secondary",
+      "One-on-One": "primary","Team Meeting": "success",Presentation: "info",Other: "secondary",
     };
-
     return (
       <span className={`badge bg-${badgeMap[type] || "secondary"}`}>
         {type}
@@ -400,36 +275,23 @@ const MyMomsList = () => {
 
   const formatDateTime = (dateString) => {
     if (!dateString) return "-";
-
     const date = new Date(dateString);
-
     return date.toLocaleString("en-US", {
       year: "numeric",
-
       month: "short",
-
       day: "numeric",
-
       hour: "2-digit",
-
       minute: "2-digit",
     });
   };
 
   const filteredEmployees = employees.filter((emp) => {
     if (!searchTerm.trim()) return true;
-
     const firstName = emp.firstName || emp.FirstName || "";
-
     const lastName = emp.lastName || emp.LastName || "";
-
     const email = emp.email || emp.Email || "";
-
     const departmentName = emp.departmentName || emp.DepartmentName || "";
-
-    const haystack =
-      `${firstName} ${lastName} ${email} ${departmentName}`.toLowerCase();
-
+    const haystack =`${firstName} ${lastName} ${email} ${departmentName}`.toLowerCase();
     return haystack.includes(searchTerm.toLowerCase());
   });
 
@@ -438,8 +300,7 @@ const MyMomsList = () => {
       <div className="mm2-loading">
         <div
           className="spinner-border text-primary mm2-loading-spinner"
-          role="status"
-        >
+          role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
       </div>
@@ -456,14 +317,11 @@ const MyMomsList = () => {
                 <button
                   onClick={() => navigate("/employee/dashboard")}
                   className="mm2-breadcrumb-link"
-                  type="button"
-                >
+                  type="button">
                   <Home size={20} className="mm2-breadcrumb-home" />
                 </button>
               </li>
-
               <li className="mm2-breadcrumb-separator">/</li>
-
               <li className="breadcrumb-item mm2-breadcrumb-item">
                 <button
                   onClick={() =>
@@ -477,9 +335,7 @@ const MyMomsList = () => {
                   Meetings and MoM
                 </button>
               </li>
-
               <li className="mm2-breadcrumb-separator">/</li>
-
               <li className="breadcrumb-item active mm2-breadcrumb-item">
                 <span className="mm2-breadcrumb-current">My MoMs</span>
               </li>
@@ -490,7 +346,6 @@ const MyMomsList = () => {
             <div className="alert alert-info d-flex align-items-center justify-content-between gap-2 mb-4">
               <div className="d-flex align-items-center gap-2">
                 <FileText size={20} />
-
                 <span>
                   Showing <strong>{moms.length}</strong> of{" "}
                   <strong>{totalCount}</strong> MOM
@@ -499,7 +354,6 @@ const MyMomsList = () => {
                   {selectedMeetingType && ` (${selectedMeetingType})`}
                 </span>
               </div>
-
               <span className="badge bg-primary">Page {pageNumber}</span>
             </div>
           )}
@@ -520,8 +374,7 @@ const MyMomsList = () => {
                 <button
                   className="btn btn-primary d-flex align-items-center gap-2 mx-auto"
                   onClick={() => navigate("/mom/create")}
-                  type="button"
-                >
+                  type="button">
                   <Plus size={18} />
                   Create Your First MOM
                 </button>
@@ -535,7 +388,6 @@ const MyMomsList = () => {
                 </div>
 
                 <h5 className="fw-semibold mb-2">No Results Found</h5>
-
                 <p className="text-muted mb-4">
                   No MOMs match your search criteria. Try adjusting your
                   filters.
@@ -544,8 +396,7 @@ const MyMomsList = () => {
                 <button
                   className="btn btn-outline-primary"
                   onClick={handleClearSearch}
-                  type="button"
-                >
+                  type="button" >
                   Clear Filters
                 </button>
               </div>
@@ -555,27 +406,15 @@ const MyMomsList = () => {
               <div className="row g-3">
                 {moms.map((mom) => {
                   const momId = mom.MomId || mom.momId;
-
                   const meetingTitle =
                     mom.MeetingTitle || mom.meetingTitle || "Untitled";
-
                   const meetingType =
                     mom.MeetingType || mom.meetingType || "Other";
-
                   const meetingDate = mom.MeetingDate || mom.meetingDate;
-
                   const attendees = mom.Attendees || mom.attendees;
-
-                  const submittedByName =
-                    mom.SubmittedByEmployeeName ||
-                    mom.submittedByEmployeeName ||
-                    "Unknown";
-
-                  const submittedByRole =
-                    mom.SubmittedByRole || mom.submittedByRole || "Employee";
-
+                  const submittedByName = mom.SubmittedByEmployeeName ||  mom.submittedByEmployeeName || "Unknown";
+                  const submittedByRole = mom.SubmittedByRole || mom.submittedByRole || "Employee";
                   const isEditable = mom.IsEditable ?? mom.isEditable ?? false;
-
                   return (
                     <div key={momId} className="col-12">
                       <div className="card border-0 shadow-sm h-100 mm2-mom-card">
@@ -585,71 +424,56 @@ const MyMomsList = () => {
                               <div className="mm2-mom-icon">
                                 <FileText
                                   size={28}
-                                  className="mm2-mom-icon-svg"
-                                />
+                                  className="mm2-mom-icon-svg"/>
                               </div>
                             </div>
-
                             <div className="col">
                               <div className="mm2-mom-header">
                                 <h5 className="mm2-mom-title">
                                   {meetingTitle}
                                 </h5>
-
                                 {getMeetingTypeBadge(meetingType)}
                               </div>
-
                               <div className="row g-3 mb-3">
                                 <div className="col-md-4">
                                   <div className="mm2-info-row">
                                     <Calendar
                                       size={18}
-                                      className="mm2-info-icon text-primary"
-                                    />
-
+                                      className="mm2-info-icon text-primary"/>
                                     <div className="mm2-info-text">
                                       <div className="mm2-info-label">
                                         Meeting Date
                                       </div>
-
                                       <div className="mm2-info-value">
                                         {formatDateTime(meetingDate)}
                                       </div>
                                     </div>
                                   </div>
                                 </div>
-
                                 <div className="col-md-4">
                                   <div className="mm2-info-row">
                                     <Users
                                       size={18}
-                                      className="mm2-info-icon text-primary"
-                                    />
-
+                                      className="mm2-info-icon text-primary"/>
                                     <div className="mm2-info-text">
                                       <div className="mm2-info-label">
                                         Attendees
                                       </div>
-
                                       <div className="mm2-info-value">
                                         {attendees || "N/A"}
                                       </div>
                                     </div>
                                   </div>
                                 </div>
-
                                 <div className="col-md-4">
                                   <div className="mm2-info-row">
                                     <Users
                                       size={18}
-                                      className="mm2-info-icon text-primary"
-                                    />
-
+                                      className="mm2-info-icon text-primary"/>
                                     <div className="mm2-info-text">
                                       <div className="mm2-info-label">
                                         Submitted by
                                       </div>
-
                                       <div className="mm2-info-value">
                                         {submittedByName} ({submittedByRole})
                                       </div>
@@ -657,26 +481,21 @@ const MyMomsList = () => {
                                   </div>
                                 </div>
                               </div>
-
                               <div className="mm2-actions-row">
                                 <button
                                   className="btn btn-sm btn-outline-primary d-flex align-items-center gap-2"
                                   onClick={() => openMomDetails(mom)}
-                                  type="button"
-                                >
+                                  type="button">
                                   <Eye size={16} />
                                   View Details
                                 </button>
-
                                 <button
                                   className="btn btn-sm btn-info d-flex align-items-center gap-2"
                                   onClick={() => openShareModal(mom)}
-                                  type="button"
-                                >
+                                  type="button">
                                   <Share2 size={16} />
                                   Share
                                 </button>
-
                                 {isEditable && (
                                   <>
                                     <button
@@ -684,19 +503,16 @@ const MyMomsList = () => {
                                       onClick={() =>
                                         navigate(`/mom/edit/${momId}`)
                                       }
-                                      type="button"
-                                    >
+                                      type="button">
                                       <Edit size={16} />
                                       Edit
                                     </button>
-
                                     <button
                                       className="btn btn-sm btn-danger d-flex align-items-center gap-2"
                                       onClick={() =>
                                         handleDelete(momId, meetingTitle)
                                       }
-                                      type="button"
-                                    >
+                                      type="button">
                                       <Trash2 size={16} />
                                       Delete
                                     </button>
@@ -711,11 +527,8 @@ const MyMomsList = () => {
                   );
                 })}
               </div>
-
               <br></br>
-
               <br></br>
-
               <PaginationFooter
                 totalItems={totalCount}
                 currentPage={pageNumber}
@@ -723,7 +536,6 @@ const MyMomsList = () => {
                 itemsPerPage={pageSize}
                 setItemsPerPage={(size) => {
                   setPageSize(size);
-
                   setPageNumber(1);
                 }}
               />
@@ -734,55 +546,40 @@ const MyMomsList = () => {
             <div
               className="modal fade show d-block mm2-modal-backdrop"
               tabIndex="-1"
-              onClick={closeShareModal}
-            >
+              onClick={closeShareModal}>
               <div
                 className="modal-dialog modal-dialog-scrollable modal-xl modal-dialog-centered mm2-modal-dialog mm2-share-dialog"
-                onClick={(e) => e.stopPropagation()}
-              >
+                onClick={(e) => e.stopPropagation()}>
                 <div className="modal-content border-0 shadow mm2-modal-content">
                   <div className="mm2-modal-header">
                     <div className="mm2-modal-header-left">
                       <h5 className="mm2-modal-title">Share MOM</h5>
-
                       <p className="mm2-modal-subtitle">
                         {shareModalMom.MeetingTitle ||
                           shareModalMom.meetingTitle}
                       </p>
                     </div>
-
-                    <button
-                      type="button"
-                      className="btn-close btn-close-white"
-                      onClick={closeShareModal}
-                    ></button>
+                    <button type="button"  className="btn-close btn-close-white"  onClick={closeShareModal}></button>
                   </div>
-
                   <div className="modal-body mm2-modal-body">
                     <div className="mb-3">
                       <div className="mm2-search-shell">
                         <div className="mm2-search-icon">
                           <Search size={18} />
                         </div>
-
-                        <input
-                          type="text"
+                        <input type="text"
                           className="form-control mm2-search-input"
                           placeholder="Search by employee name"
                           value={searchInput}
-                          onChange={(e) => setSearchInput(e.target.value)}
-                        />
-
+                          onChange={(e) => setSearchInput(e.target.value)}/>
                         {!searchMode ? (
                           <button
                             type="button"
                             className="mm2-search-action mm2-search-btn"
                             onClick={() => {
                               setSearchTerm(searchInput.trim());
-
                               setSearchMode(true);
-                            }}
-                          >
+                            }}>
                             <Search size={16} />
                             Search
                           </button>
@@ -792,30 +589,24 @@ const MyMomsList = () => {
                             className="mm2-search-action mm2-cancel-btn"
                             onClick={() => {
                               setSearchInput("");
-
                               setSearchTerm("");
-
                               setSearchMode(false);
-                            }}
-                          >
+                            }}>
                             <X size={16} />
                             Cancel
                           </button>
                         )}
                       </div>
                     </div>
-
                     {selectedEmployees.length > 0 && (
                       <div className="alert alert-info d-flex align-items-center gap-2 mb-3">
                         <Users size={18} />
-
                         <span>
                           <strong>{selectedEmployees.length}</strong>{" "}
                           employee(s) selected
                         </span>
                       </div>
                     )}
-
                     <div className="mm2-employee-list-wrap">
                       {filteredEmployees.length === 0 ? (
                         <div className="text-center py-4 text-muted">
@@ -826,45 +617,34 @@ const MyMomsList = () => {
                           {filteredEmployees.map((employee) => {
                             const employeeId =
                               employee.employeeId || employee.EmployeeId;
-
                             const firstName =
                               employee.firstName || employee.FirstName || "";
-
                             const lastName =
                               employee.lastName || employee.LastName || "";
-
                             const email =
                               employee.email || employee.Email || "";
-
-                            const departmentName =
-                              employee.departmentName ||
-                              employee.DepartmentName ||
+                            const departmentName =  employee.departmentName || employee.DepartmentName ||
                               "";
-
                             const roleName =
                               employee.roleName || employee.RoleName || "";
 
                             return (
                               <label
                                 key={employeeId}
-                                className="list-group-item list-group-item-action mm2-employee-item"
-                              >
+                                className="list-group-item list-group-item-action mm2-employee-item" >
                                 <input
                                   type="checkbox"
                                   className="form-check-input mm2-employee-check"
                                   checked={selectedEmployees.includes(
-                                    employeeId
+                                    employeeId,
                                   )}
                                   onChange={() =>
                                     toggleEmployeeSelection(employeeId)
-                                  }
-                                />
-
+                                  }/>
                                 <div className="mm2-employee-text">
                                   <div className="fw-semibold">
                                     {firstName} {lastName}
                                   </div>
-
                                   <div className="small text-muted">
                                     {email} • {departmentName} • {roleName}
                                   </div>
@@ -881,22 +661,17 @@ const MyMomsList = () => {
                     <button
                       className="btn btn-danger px-4"
                       onClick={closeShareModal}
-                      type="button"
-                    >
+                      type="button">
                       <X size={16} className="me-2" />
                       Cancel
                     </button>
 
                     <button
                       className="btn px-4 d-flex align-items-center gap-2 mm2-share-btn"
-                      onClick={handleShareMom}
-                      disabled={
-                        selectedEmployees.length === 0 || sharingLoading
-                      }
-                      type="button"
-                    >
+                      onClick={handleShareMom}disabled={
+                        selectedEmployees.length === 0 || sharingLoading }
+                      type="button">
                       <Share2 size={16} />
-
                       {sharingLoading
                         ? "Sharing..."
                         : `Share with ${selectedEmployees.length} employee(s)`}
@@ -911,12 +686,10 @@ const MyMomsList = () => {
             <div
               className="modal fade show d-block mm2-modal-backdrop"
               tabIndex="-1"
-              onClick={closeMomDetails}
-            >
+              onClick={closeMomDetails} >
               <div
                 className="modal-dialog modal-dialog-scrollable modal-xl modal-dialog-centered mm2-modal-dialog"
-                onClick={(e) => e.stopPropagation()}
-              >
+                onClick={(e) => e.stopPropagation()}>
                 <div className="modal-content border-0 shadow mm2-modal-content">
                   <div className="mm2-detail-header">
                     <div className="mm2-modal-header-left flex-grow-1">
@@ -925,8 +698,7 @@ const MyMomsList = () => {
                       </h5>
 
                       <p className="mm2-detail-subtitle">
-                        {getMeetingTypeBadge(
-                          selectedMom.MeetingType || selectedMom.meetingType
+                        {getMeetingTypeBadge( selectedMom.MeetingType || selectedMom.meetingType,
                         )}
                       </p>
                     </div>
@@ -934,8 +706,8 @@ const MyMomsList = () => {
                     <button
                       type="button"
                       className="btn-close btn-close-white"
-                      onClick={closeMomDetails}
-                    ></button>
+                      onClick={closeMomDetails}>
+                    </button>
                   </div>
 
                   <div className="modal-body mm2-detail-body">
@@ -944,108 +716,82 @@ const MyMomsList = () => {
                         <h6 className="fw-semibold mb-3">
                           Meeting Information
                         </h6>
-
                         <div className="row g-3">
                           <div className="col-md-6">
                             <div className="mm2-detail-row">
                               <Calendar size={16} className="text-primary" />
-
                               <small className="text-muted">
                                 Meeting Date:
                               </small>
                             </div>
-
                             <div className="fw-semibold">
                               {formatDateTime(
                                 selectedMom.MeetingDate ||
-                                  selectedMom.meetingDate
+                                  selectedMom.meetingDate,
                               )}
                             </div>
                           </div>
-
                           {(selectedMom.MeetingLink ||
                             selectedMom.meetingLink) && (
                             <div className="col-md-6">
                               <div className="mm2-detail-row">
                                 <LinkIcon size={16} className="text-primary" />
-
                                 <small className="text-muted">
                                   Meeting Link:
                                 </small>
                               </div>
-
-                              <a
-                                href={
-                                  selectedMom.MeetingLink ||
-                                  selectedMom.meetingLink
-                                }
+                              <a href={   selectedMom.MeetingLink || selectedMom.meetingLink }
                                 target="_blank"
                                 rel="noreferrer"
-                                className="text-primary text-decoration-none d-flex align-items-center gap-1"
-                              >
+                                className="text-primary text-decoration-none d-flex align-items-center gap-1" >
                                 Join Meeting <LinkIcon size={14} />
                               </a>
                             </div>
                           )}
-
                           <div className="col-md-6">
                             <div className="mm2-detail-row">
                               <Users size={16} className="text-primary" />
-
                               <small className="text-muted">Attendees:</small>
                             </div>
-
                             <div className="fw-semibold">
                               {selectedMom.Attendees ||
                                 selectedMom.attendees ||
                                 "N/A"}
                             </div>
                           </div>
-
                           <div className="col-md-6">
                             <div className="mm2-detail-row">
                               <Users size={16} className="text-primary" />
-
                               <small className="text-muted">
                                 Submitted by:
                               </small>
                             </div>
-
                             <div className="fw-semibold">
-                              {selectedMom.SubmittedByEmployeeName ||
-                                selectedMom.submittedByEmployeeName}{" "}
-                              (
-                              {selectedMom.SubmittedByRole ||
-                                selectedMom.submittedByRole}
-                              )
+                              {selectedMom.SubmittedByEmployeeName ||selectedMom.submittedByEmployeeName}{" "}
+                              ({selectedMom.SubmittedByRole ||selectedMom.submittedByRole})
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
-
                     {(selectedMom.CommentsObservations ||
                       selectedMom.commentsObservations) && (
                       <div className="mb-4">
                         <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2">
                           Comments &amp; Observations
                         </h6>
-
                         <div className="alert alert-secondary mb-0">
                           {selectedMom.CommentsObservations ||
                             selectedMom.commentsObservations}
                         </div>
                       </div>
                     )}
-
                     <div className="mb-4">
                       <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2">
                         Discussion Points
                       </h6>
-
                       {(
-                        selectedMom.DiscussionPoints ||
-                        selectedMom.discussionPoints
+                        selectedMom.DiscussionPoints || selectedMom.discussionPoints
                       )?.length > 0 ? (
                         <div className="list-group">
                           {(
@@ -1054,8 +800,7 @@ const MyMomsList = () => {
                           ).map((dp) => (
                             <div
                               key={dp.PointId || dp.pointId}
-                              className="list-group-item border-0 bg-light mb-2 rounded"
-                            >
+                              className="list-group-item border-0 bg-light mb-2 rounded">
                               <div className="d-flex gap-2">
                                 <span className="flex-grow-1">
                                   {dp.PointText || dp.pointText}
@@ -1070,13 +815,11 @@ const MyMomsList = () => {
                         </div>
                       )}
                     </div>
-
                     <div className="mb-4">
                       <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2">
                         <CheckCircle size={18} />
                         Action Items
                       </h6>
-
                       {(selectedMom.ActionItems || selectedMom.actionItems)
                         ?.length > 0 ? (
                         <div className="list-group">
@@ -1085,31 +828,26 @@ const MyMomsList = () => {
                           ).map((ai) => (
                             <div
                               key={ai.ActionItemId || ai.actionItemId}
-                              className="list-group-item border-0 bg-light mb-2 rounded"
-                            >
+                              className="list-group-item border-0 bg-light mb-2 rounded">
                               <div className="d-flex justify-content-between align-items-start mb-2">
                                 <h6 className="mb-0 fw-semibold">
                                   {ai.TaskDescription || ai.taskDescription}
                                 </h6>
                               </div>
-
                               <div className="row g-2 mt-2">
                                 <div className="col-md-6">
                                   <small className="text-muted">
                                     Assigned to:
                                   </small>
-
                                   <div className="fw-semibold">
                                     {ai.AssignedToEmployeeName ||
                                       ai.assignedToEmployeeName}
                                   </div>
                                 </div>
-
                                 <div className="col-md-6">
                                   <small className="text-muted">
                                     Due Date:
                                   </small>
-
                                   <div className="fw-semibold">
                                     {ai.DueDate || ai.dueDate || "N/A"}
                                   </div>
@@ -1125,35 +863,23 @@ const MyMomsList = () => {
                       )}
                     </div>
                   </div>
-
                   <div className="modal-footer border-0 mm2-modal-footer">
                     <button
                       className="btn btn-danger px-4"
                       onClick={closeMomDetails}
-                      type="button"
-                    >
+                      type="button">
                       <X size={16} className="me-2" />
                       Close
                     </button>
-
                     {(selectedMom.IsEditable ?? selectedMom.isEditable) && (
-                      <button
-                        className="btn btn-primary d-flex align-items-center gap-2"
-                        onClick={() => {
-                          closeMomDetails();
-
-                          navigate(
-                            `/mom/edit/${
+                      <button className="btn btn-primary d-flex align-items-center gap-2"
+                        onClick={() => { closeMomDetails();
+                          navigate( `/mom/edit/${
                               selectedMom.MomId || selectedMom.momId
-                            }`
-                          );
-                        }}
-                        type="button"
-                      >
+                            }`,);}}type="button" >
                         <Edit size={16} />
                         Edit MOM
-                      </button>
-                    )}
+                      </button>)}
                   </div>
                 </div>
               </div>

@@ -76,14 +76,7 @@ const ProjectListFilterBar = ({
         </div>
 
         <div className="prj-list-actions-group">
-          <button
-            className="prj-list-btn prj-list-btn-resource"
-            type="button"
-            onClick={onNavigateResourcePool}
-          >
-            <Users size={20} />
-            <span>Resource Pool</span>
-          </button>
+         
 
           <button
             className="prj-list-btn prj-list-btn-create"
