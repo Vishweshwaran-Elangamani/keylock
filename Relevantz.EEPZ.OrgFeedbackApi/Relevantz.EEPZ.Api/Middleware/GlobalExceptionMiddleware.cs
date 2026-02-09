@@ -6,7 +6,7 @@ using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using System.Net;
 
-namespace Relevantz.EEPZ.Api.Middleare
+namespace Relevantz.EEPZ.Api.Middleware
 {
     public class GlobalExceptionMiddleware : IExceptionHandler
     {

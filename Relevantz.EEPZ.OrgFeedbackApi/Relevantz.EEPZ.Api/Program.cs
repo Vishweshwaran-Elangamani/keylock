@@ -17,12 +17,12 @@ using Relevantz.EEPZ.Core.Services.Implementations;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Common;
 using Relevantz.EEPZ.Core.Service;
-using Relevantz.EEPZ.Api.Middleare;
+using Relevantz.EEPZ.Api.Middleware;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-
-
 using Relevantz.EEPZ.Data.Repository;
+using Relevantz.EEPZ.Core.Mapping;
+
 
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
@@ -224,10 +224,14 @@ builder.Services.AddValidatorsFromAssemblyContaining<Relevantz.EEPZ.Api.Validato
         });
 
     builder.Services.AddAuthorization();
+  
+
 
     Log.Information("JWT Authentication configured");
 
     builder.Services.AddHttpContextAccessor();
+
+      MapsterConfig.RegisterMappings();
 
     builder.Services.AddScoped<IMentorFeedbackRepository, MentorFeedbackRepository>();
     builder.Services.AddScoped<IOrgGoalFeedbackRepository, OrgGoalFeedbackRepository>();

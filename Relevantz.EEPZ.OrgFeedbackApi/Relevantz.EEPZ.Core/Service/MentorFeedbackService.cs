@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Mapster;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Common.Entities;
@@ -27,20 +28,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             ArgumentNullException.ThrowIfNull(dto);
 
-
-            var feedback = new Mentorfeedbacktracking
-            {
-                SmeId = dto.SmeId,
-                MentorEmployeeId = dto.MentorEmployeeId,
-                MenteeEmployeeId = dto.MenteeEmployeeId,
-                SkillIdReference = dto.SkillIdReference,
-                Rating = dto.Rating,
-                FeedbackComments = dto.FeedbackComments,
-                SubmittedByEmployeeId = dto.SubmittedByEmployeeId,
-                FeedbackFrom = dto.FeedbackFrom,
-                IsAnonymous = dto.IsAnonymous,
-                Status = StatusSubmitted
-            };
+            var feedback = dto.Adapt<Mentorfeedbacktracking>();
+            feedback.Status = StatusSubmitted;
 
             var trackingId = await _mentorFeedbackRepo.CreateMentorFeedbackAsync(feedback);
 
@@ -51,82 +40,69 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         public async Task<MentorFeedbackResponseDto?> GetMentorFeedbackByIdAsync(int trackingId)
         {
-            if (trackingId <= 0)
-                return null;
+            if (trackingId <= 0) return null;
 
             var feedback = await _mentorFeedbackRepo.GetMentorFeedbackByIdAsync(trackingId);
-            return feedback == null ? null : MapToResponseDto(feedback);
+            return feedback?.Adapt<MentorFeedbackResponseDto>();
         }
 
         public async Task<List<MentorFeedbackResponseDto>> GetFeedbackAboutMeAsync(int mentorEmployeeId)
         {
-            if (mentorEmployeeId <= 0)
-                return new List<MentorFeedbackResponseDto>();
+            if (mentorEmployeeId <= 0) return new();
 
             var feedbacks = await _mentorFeedbackRepo.GetFeedbackByMentorAsync(mentorEmployeeId);
-            return feedbacks.Select(MapToResponseDto).ToList();
+            return feedbacks.Adapt<List<MentorFeedbackResponseDto>>();
         }
 
         public async Task<List<MentorFeedbackResponseDto>> GetMyMentorFeedbackAsync(int menteeEmployeeId)
         {
-            if (menteeEmployeeId <= 0)
-                return new List<MentorFeedbackResponseDto>();
+            if (menteeEmployeeId <= 0) return new();
 
             var feedbacks = await _mentorFeedbackRepo.GetFeedbackByMenteeAsync(menteeEmployeeId);
-            return feedbacks.Select(MapToResponseDto).ToList();
+            return feedbacks.Adapt<List<MentorFeedbackResponseDto>>();
         }
 
         public async Task<List<MentorFeedbackResponseDto>> GetAllMentorFeedbackAsync(int pageNumber = 1, int pageSize = 20)
         {
             var feedbacks = await _mentorFeedbackRepo.GetAllMentorFeedbackAsync(pageNumber, pageSize);
-            return feedbacks.Select(MapToResponseDto).ToList();
+            return feedbacks.Adapt<List<MentorFeedbackResponseDto>>();
         }
 
         public async Task<List<MentorFeedbackResponseDto>> GetFeedbackByStatusAsync(string status)
         {
-            if (string.IsNullOrWhiteSpace(status))
-                return new List<MentorFeedbackResponseDto>();
+            if (string.IsNullOrWhiteSpace(status)) return new();
 
             var feedbacks = await _mentorFeedbackRepo.GetFeedbackByStatusAsync(status);
-            return feedbacks.Select(MapToResponseDto).ToList();
+            return feedbacks.Adapt<List<MentorFeedbackResponseDto>>();
         }
 
         public async Task<List<MentorFeedbackResponseDto>> GetPendingHRReviewAsync()
         {
             var feedbacks = await _mentorFeedbackRepo.GetPendingHRReviewAsync();
-            return feedbacks.Select(MapToResponseDto).ToList();
+            return feedbacks.Adapt<List<MentorFeedbackResponseDto>>();
         }
 
         public async Task<List<MentorFeedbackResponseDto>> GetAnonymousMentorFeedbackAsync()
         {
             var feedbacks = await _mentorFeedbackRepo.GetAnonymousMentorFeedbackAsync();
-            return feedbacks.Select(MapToResponseDto).ToList();
+            return feedbacks.Adapt<List<MentorFeedbackResponseDto>>();
         }
 
         public async Task<MentorFeedbackResponseDto?> UpdateMentorFeedbackAsync(int trackingId, UpdateMentorFeedbackRequestDto dto)
         {
-            if (trackingId <= 0)
-                return null;
-
+            if (trackingId <= 0) return null;
             ArgumentNullException.ThrowIfNull(dto);
 
             var feedback = await _mentorFeedbackRepo.GetMentorFeedbackByIdAsync(trackingId);
-            if (feedback == null)
-                return null;
+            if (feedback == null) return null;
 
             if (!string.Equals(feedback.Status, StatusSubmitted, StringComparison.OrdinalIgnoreCase))
                 return null;
 
-            if (dto.Rating.HasValue)
-            {
-                if (dto.Rating.Value < 1 || dto.Rating.Value > 5)
-                    return null;
+            if (dto.Rating.HasValue && (dto.Rating.Value < 1 || dto.Rating.Value > 5))
+                return null;
 
-                feedback.Rating = dto.Rating.Value;
-            }
-
-            if (!string.IsNullOrWhiteSpace(dto.FeedbackComments))
-                feedback.FeedbackComments = dto.FeedbackComments;
+            dto.Adapt(feedback);
 
             await _mentorFeedbackRepo.UpdateMentorFeedbackAsync(feedback);
 
@@ -137,8 +113,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         public async Task<bool> AcknowledgeMentorFeedbackAsync(int trackingId)
         {
-            if (trackingId <= 0)
-                return false;
+            if (trackingId <= 0) return false;
 
             var updated = await _mentorFeedbackRepo.UpdateFeedbackStatusAsync(trackingId, StatusAcknowledged);
 
@@ -150,9 +125,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         public async Task<bool> SetHRReviewAsync(int trackingId, string hrComments, int reviewedByHRId)
         {
-            if (trackingId <= 0) return false;
-            if (string.IsNullOrWhiteSpace(hrComments)) return false;
-            if (reviewedByHRId <= 0) return false;
+            if (trackingId <= 0 || string.IsNullOrWhiteSpace(hrComments) || reviewedByHRId <= 0)
+                return false;
 
             var updated = await _mentorFeedbackRepo.SetHRReviewAsync(trackingId, hrComments, reviewedByHRId);
 
@@ -164,8 +138,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         public async Task<bool> DeleteMentorFeedbackAsync(int trackingId)
         {
-            if (trackingId <= 0)
-                return false;
+            if (trackingId <= 0) return false;
 
             var deleted = await _mentorFeedbackRepo.DeleteMentorFeedbackAsync(trackingId);
 
@@ -176,33 +149,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         public Task<bool> MentorFeedbackExistsAsync(int trackingId)
-        {
-            if (trackingId <= 0)
-                return Task.FromResult(false);
-
-            return _mentorFeedbackRepo.MentorFeedbackExistsAsync(trackingId);
-        }
-
-        private static MentorFeedbackResponseDto MapToResponseDto(Mentorfeedbacktracking feedback)
-        {
-            return new MentorFeedbackResponseDto
-            {
-                TrackingId = feedback.TrackingId,
-                SmeId = feedback.SmeId,
-                MentorEmployeeId = feedback.MentorEmployeeId,
-                MentorName = feedback.MentorEmployee?.EmployeeId.ToString() ?? "Unknown",
-                MenteeEmployeeId = feedback.MenteeEmployeeId,
-                MenteeName = feedback.MenteeEmployee?.EmployeeId.ToString() ?? "Unknown",
-                SkillIdReference = feedback.SkillIdReference,
-                SkillName = feedback.SkillIdReferenceNavigation?.SkillName ?? "Unknown",
-                Rating = feedback.Rating,
-                FeedbackComments = feedback.FeedbackComments,
-                FeedbackFrom = feedback.FeedbackFrom,
-                IsAnonymous = feedback.IsAnonymous,
-                Status = feedback.Status,
-                CreatedAt = feedback.CreatedAt,
-                ReviewedAt = feedback.ReviewedAt
-            };
-        }
+            => trackingId <= 0
+                ? Task.FromResult(false)
+                : _mentorFeedbackRepo.MentorFeedbackExistsAsync(trackingId);
     }
 }

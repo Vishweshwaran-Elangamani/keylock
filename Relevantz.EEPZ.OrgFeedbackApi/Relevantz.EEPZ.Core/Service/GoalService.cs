@@ -1,6 +1,6 @@
+using Mapster;
 using Microsoft.Extensions.Logging;
 using Relevantz.EEPZ.Common.DTOs.Response;
-using Relevantz.EEPZ.Common.DTOs.Response.Employees;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Data.IRepository;
@@ -26,13 +26,11 @@ namespace Relevantz.EEPZ.Core.Service
 
             var teamGoals = allGoals
                 .Where(g => g.Project != null)
-                .Select(MapToProjectGoalResponse)
-                .ToList();
+                .Adapt<List<ProjectGoalResponseDto>>();
 
             var orgLevelGoals = allGoals
                 .Where(g => g.Project == null)
-                .Select(MapToProjectGoalResponse)
-                .ToList();
+                .Adapt<List<ProjectGoalResponseDto>>();
 
             return new SegregatedGoalsResponseDto
             {
@@ -48,7 +46,7 @@ namespace Relevantz.EEPZ.Core.Service
             _logger.LogInformation("Retrieving goal with ID: {GoalId}", goalId);
 
             var goal = await _goalRepository.GetGoalByIdAsync(goalId);
-            return goal == null ? null : MapToProjectGoalResponse(goal);
+            return goal?.Adapt<ProjectGoalResponseDto>();
         }
 
         public async Task<List<ProjectGoalResponseDto>> GetTeamGoalsAsync()
@@ -56,7 +54,7 @@ namespace Relevantz.EEPZ.Core.Service
             _logger.LogInformation("Retrieving all team goals");
 
             var teamGoals = await _goalRepository.GetTeamGoalsAsync();
-            return teamGoals.Select(MapToProjectGoalResponse).ToList();
+            return teamGoals.Adapt<List<ProjectGoalResponseDto>>();
         }
 
         public async Task<List<ProjectGoalResponseDto>> GetOrganizationLevelGoalsAsync()
@@ -64,7 +62,7 @@ namespace Relevantz.EEPZ.Core.Service
             _logger.LogInformation("Retrieving organization level goals");
 
             var orgGoals = await _goalRepository.GetOrganizationLevelGoalsAsync();
-            return orgGoals.Select(MapToProjectGoalResponse).ToList();
+            return orgGoals.Adapt<List<ProjectGoalResponseDto>>();
         }
 
         public async Task<List<ProjectGoalResponseDto>> GetGoalsByProjectIdAsync(int projectId)
@@ -72,37 +70,7 @@ namespace Relevantz.EEPZ.Core.Service
             _logger.LogInformation("Retrieving goals for project ID: {ProjectId}", projectId);
 
             var projectGoals = await _goalRepository.GetGoalsByProjectIdAsync(projectId);
-            return projectGoals.Select(MapToProjectGoalResponse).ToList();
-        }
-
-        private static ProjectGoalResponseDto MapToProjectGoalResponse(Goal goal)
-        {
-            return new ProjectGoalResponseDto
-            {
-                GoalId = goal.GoalId,
-                GoalTitle = goal.GoalTitle,
-                GoalDescription = goal.GoalDescription,
-                ProjectId = goal.ProjectId,
-                ProjectName = goal.Project?.ProjectName,
-                CreatedBy = goal.CreatedByNavigation != null ? MapToEmployeeBasicInfo(goal.CreatedByNavigation) : null,
-                ClosedOn = goal.ClosedOn,
-                ClosureReason = goal.ClosureReason,
-            };
-        }
-
-        private static EmployeeBasicInfoDto MapToEmployeeBasicInfo(Employeedetailsmaster employee)
-        {
-            return new EmployeeBasicInfoDto
-            {
-                EmployeeMasterId = employee.EmployeeMasterId,
-                EmployeeId = employee.EmployeeId,
-                EmployeeCompanyId = employee.Employee?.EmployeeCompanyId ?? string.Empty,
-                FirstName = employee.Employee?.Userprofile?.FirstName ?? string.Empty,
-                LastName = employee.Employee?.Userprofile?.LastName ?? string.Empty,
-                Email = employee.Employee?.Userauthentication?.Email ?? string.Empty,
-                RoleName = employee.Role?.RoleName ?? string.Empty,
-                DepartmentName = employee.Department?.DepartmentName ?? string.Empty
-            };
+            return projectGoals.Adapt<List<ProjectGoalResponseDto>>();
         }
     }
 }

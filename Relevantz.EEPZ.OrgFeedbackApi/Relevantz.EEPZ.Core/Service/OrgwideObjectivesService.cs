@@ -32,42 +32,56 @@ namespace Relevantz.EEPZ.Core.Service
         public async Task<List<OrgObjectiveResponseDto>> GetAllObjectivesAsync()
         {
             _logger.LogInformation("Retrieving all organization objectives");
-            return await _repository.GetAllOrgObjectivesAsync();
+            var result = await _repository.GetAllOrgObjectivesAsync();
+            return result ?? new List<OrgObjectiveResponseDto>();
         }
 
         public async Task<List<OrgObjectiveResponseDto>> GetAllObjectivesForDropdownAsync()
         {
-            _logger.LogInformation("Retrieving all organization objectives for dropdown");
-            return await _repository.GetAllOrgObjectivesForDropdownAsync();
+            _logger.LogInformation("Retrieving organization objectives for dropdown");
+            var result = await _repository.GetAllOrgObjectivesForDropdownAsync();
+            return result ?? new List<OrgObjectiveResponseDto>();
         }
 
         public async Task<OrgObjectiveResponseDto?> GetObjectiveByIdAsync(int objectiveId)
         {
             if (objectiveId <= 0)
+            {
+                _logger.LogWarning("Invalid objective ID provided: {ObjectiveId}", objectiveId);
                 return null;
+            }
 
-            _logger.LogInformation("Retrieving organization objective by id: {ObjectiveId}", objectiveId);
+            _logger.LogInformation("Retrieving organization objective by ID: {ObjectiveId}", objectiveId);
             return await _repository.GetOrgObjectiveByIdAsync(objectiveId);
         }
 
         public async Task<List<OrgObjectiveResponseDto>> GetActiveObjectivesAsync()
         {
             _logger.LogInformation("Retrieving active organization objectives");
-            return await _repository.GetActiveOrgObjectivesAsync();
+            var result = await _repository.GetActiveOrgObjectivesAsync();
+            return result ?? new List<OrgObjectiveResponseDto>();
         }
 
         public async Task<List<OrgObjectiveResponseDto>> GetObjectivesByStatusAsync(string status)
         {
             if (string.IsNullOrWhiteSpace(status))
+            {
+                _logger.LogWarning("Empty status provided for objective search");
                 return new List<OrgObjectiveResponseDto>();
+            }
 
             var normalizedStatus = status.Trim().ToLowerInvariant();
 
             if (!ValidStatuses.Contains(normalizedStatus))
+            {
+                _logger.LogWarning("Invalid status provided: {Status}", normalizedStatus);
                 return new List<OrgObjectiveResponseDto>();
+            }
 
             _logger.LogInformation("Retrieving organization objectives by status: {Status}", normalizedStatus);
-            return await _repository.GetOrgObjectivesByStatusAsync(normalizedStatus);
+
+            var result = await _repository.GetOrgObjectivesByStatusAsync(normalizedStatus);
+            return result ?? new List<OrgObjectiveResponseDto>();
         }
     }
 }

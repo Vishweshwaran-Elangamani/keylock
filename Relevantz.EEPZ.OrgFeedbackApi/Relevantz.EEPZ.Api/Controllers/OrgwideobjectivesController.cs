@@ -3,7 +3,6 @@ using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Common.Constants;
 
-
 namespace Relevantz.EEPZ.Api.Controllers
 {
     [ApiController]
@@ -21,6 +20,12 @@ namespace Relevantz.EEPZ.Api.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Retrieves all organization-wide objectives.
+        /// </summary>
+        /// <returns>
+        /// ApiResponseDto containing a list of OrgObjectiveResponseDto representing all objectives.
+        /// </returns>
         [HttpGet]
         [ProducesResponseType(typeof(ApiResponseDto<List<OrgObjectiveResponseDto>>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllObjectives()
@@ -34,6 +39,12 @@ namespace Relevantz.EEPZ.Api.Controllers
                 MessageConstants.OrganizationObjectivesRetrieved));
         }
 
+        /// <summary>
+        /// Retrieves organization-wide objectives formatted for dropdown usage.
+        /// </summary>
+        /// <returns>
+        /// ApiResponseDto containing a list of OrgObjectiveResponseDto for dropdown display.
+        /// </returns>
         [HttpGet("dropdown")]
         [ProducesResponseType(typeof(ApiResponseDto<List<OrgObjectiveResponseDto>>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllObjectivesForDropdown()
@@ -47,6 +58,13 @@ namespace Relevantz.EEPZ.Api.Controllers
                 MessageConstants.OrganizationObjectivesRetrieved));
         }
 
+        /// <summary>
+        /// Retrieves a specific organization-wide objective by its unique identifier.
+        /// </summary>
+        /// <param name="objectiveId">Unique identifier of the objective.</param>
+        /// <returns>
+        /// ApiResponseDto containing OrgObjectiveResponseDto representing the objective details.
+        /// </returns>
         [HttpGet("{objectiveId:int}")]
         [ProducesResponseType(typeof(ApiResponseDto<OrgObjectiveResponseDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponseDto<OrgObjectiveResponseDto>), StatusCodes.Status404NotFound)]
@@ -64,9 +82,15 @@ namespace Relevantz.EEPZ.Api.Controllers
 
             return Ok(ApiResponseDto<OrgObjectiveResponseDto>.SuccessResponse(
                 objective,
-               MessageConstants.OrganizationObjectiveRetrieved));
+                MessageConstants.OrganizationObjectiveRetrieved));
         }
 
+        /// <summary>
+        /// Retrieves all active organization-wide objectives.
+        /// </summary>
+        /// <returns>
+        /// ApiResponseDto containing a list of OrgObjectiveResponseDto for active objectives.
+        /// </returns>
         [HttpGet("active")]
         [ProducesResponseType(typeof(ApiResponseDto<List<OrgObjectiveResponseDto>>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetActiveObjectives()
@@ -77,10 +101,16 @@ namespace Relevantz.EEPZ.Api.Controllers
 
             return Ok(ApiResponseDto<List<OrgObjectiveResponseDto>>.SuccessResponse(
                 objectives,
-                MessageConstants.ActiveObjectivesRetrieved
-));
+                MessageConstants.ActiveObjectivesRetrieved));
         }
 
+        /// <summary>
+        /// Retrieves organization-wide objectives filtered by status.
+        /// </summary>
+        /// <param name="status">Status value used to filter objectives.</param>
+        /// <returns>
+        /// ApiResponseDto containing a list of OrgObjectiveResponseDto matching the specified status.
+        /// </returns>
         [HttpGet("objective/{status}")]
         [ProducesResponseType(typeof(ApiResponseDto<List<OrgObjectiveResponseDto>>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetObjectivesByStatus(string status)
@@ -91,7 +121,7 @@ namespace Relevantz.EEPZ.Api.Controllers
 
             return Ok(ApiResponseDto<List<OrgObjectiveResponseDto>>.SuccessResponse(
                 objectives,
-               MessageConstants.ObjectivesByStatusRetrieved));
+                MessageConstants.ObjectivesByStatusRetrieved));
         }
     }
 }

@@ -19,9 +19,11 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Get all goals segregated by type (Team Goals and Organization Level Goals).
+        /// Retrieves all goals grouped into team and organization-level categories.
         /// </summary>
-        /// <returns>Segregated goals response.</returns>
+        /// <returns>
+        /// ApiResponseDto containing SegregatedGoalsResponseDto with categorized goals.
+        /// </returns>
         [HttpGet]
         [ProducesResponseType(typeof(ApiResponseDto<SegregatedGoalsResponseDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponseDto<SegregatedGoalsResponseDto>), StatusCodes.Status500InternalServerError)]
@@ -35,10 +37,12 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Get goal by ID.
+        /// Retrieves a specific goal using its unique identifier.
         /// </summary>
-        /// <param name="goalId">Goal identifier.</param>
-        /// <returns>Goal response.</returns>
+        /// <param name="goalId">Unique identifier of the goal.</param>
+        /// <returns>
+        /// ApiResponseDto containing ProjectGoalResponseDto representing the goal details.
+        /// </returns>
         [HttpGet("{goalId:int}")]
         [ProducesResponseType(typeof(ApiResponseDto<ProjectGoalResponseDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponseDto<ProjectGoalResponseDto>), StatusCodes.Status404NotFound)]
@@ -59,9 +63,11 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Get all team goals.
+        /// Retrieves all team-level goals.
         /// </summary>
-        /// <returns>List of team goals.</returns>
+        /// <returns>
+        /// ApiResponseDto containing a list of ProjectGoalResponseDto for team goals.
+        /// </returns>
         [HttpGet("team")]
         [ProducesResponseType(typeof(ApiResponseDto<List<ProjectGoalResponseDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponseDto<List<ProjectGoalResponseDto>>), StatusCodes.Status500InternalServerError)]
@@ -75,9 +81,11 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Get all organization level goals.
+        /// Retrieves all organization-level goals.
         /// </summary>
-        /// <returns>List of organization level goals.</returns>
+        /// <returns>
+        /// ApiResponseDto containing a list of ProjectGoalResponseDto for organization-level goals.
+        /// </returns>
         [HttpGet("organization-level")]
         [ProducesResponseType(typeof(ApiResponseDto<List<ProjectGoalResponseDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponseDto<List<ProjectGoalResponseDto>>), StatusCodes.Status500InternalServerError)]
@@ -91,10 +99,12 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Get goals by project ID.
+        /// Retrieves all goals associated with a specific project.
         /// </summary>
-        /// <param name="id">Project identifier.</param>
-        /// <returns>List of project goals.</returns>
+        /// <param name="id">Unique identifier of the project.</param>
+        /// <returns>
+        /// ApiResponseDto containing a list of ProjectGoalResponseDto for the given project.
+        /// </returns>
         [HttpGet("project/{id:int}")]
         [ProducesResponseType(typeof(ApiResponseDto<List<ProjectGoalResponseDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponseDto<List<ProjectGoalResponseDto>>), StatusCodes.Status500InternalServerError)]
