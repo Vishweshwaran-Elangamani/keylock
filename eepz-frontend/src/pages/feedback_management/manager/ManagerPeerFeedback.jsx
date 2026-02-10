@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import {
-  RefreshCw,
   AlertTriangle,
   Users,
   User,
@@ -36,8 +35,6 @@ export default function ManagerPeerFeedback() {
   const [peerFeedback, setPeerFeedback] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [employeeMap, setEmployeeMap] = useState({});
-  const [refreshing, setRefreshing] = useState(false);
 
   const formatDate = useCallback((dateInput) => {
     if (!dateInput) return "—";
@@ -68,125 +65,92 @@ export default function ManagerPeerFeedback() {
   }, []);
 
   const getSenderDisplayName = useCallback(
-    (feedback) => {
-      const isAnon = checkIsAnonymous(feedback);
-      if (isAnon) return "Anonymous Peer";
-      return (
-        feedback.submittedByName ||
-        feedback.submitterName ||
-        employeeMap[feedback.submittedByEmployeeId] ||
-        `Employee ${feedback.submittedByEmployeeId}`
+    (feedback) => feedback.submittedByName || "Anonymous Peer",
+    []
+  );
+
+  const fetchPeerFeedback = useCallback(async () => {
+    if (!user?.empId) {
+      setError("User not authenticated. Please log in.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const empId = user.empId;
+
+      const empRes = await employeeApi.getAll();
+      const employees = Array.isArray(empRes?.data)
+        ? empRes.data
+        : empRes?.data?.data || [];
+
+      const empMap = {};
+      employees.forEach((emp) => {
+        empMap[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
+      });
+
+      const peerRes = await peerQueueApi.list(1, 1000);
+
+      const feedbackData = Array.isArray(peerRes?.data?.data)
+        ? peerRes.data.data
+        : [];
+
+      const myFeedback = feedbackData
+        .filter((p) => {
+          const isDirectRecipient =
+            Number(p.recipientEmployeeId) === Number(empId);
+
+          const isManagerLinked =
+            Number(p.managerId) === Number(empId) ||
+            Number(p.reportingManagerId) === Number(empId) ||
+            Number(p.recipientManagerId) === Number(empId);
+
+          const isApproved =
+            p.status === "Approved" ||
+            p.Status === "Approved" ||
+            p.status === "Pending" ||
+            p.status === "Submitted";
+
+          return (isDirectRecipient || isManagerLinked) && isApproved;
+        })
+        .map((p) => {
+          const isAnon = checkIsAnonymous(p);
+          return {
+            ...p,
+            isAnonymous: isAnon,
+            submittedByName: isAnon
+              ? "Anonymous Peer"
+              : empMap[p.submittedByEmployeeId] ||
+                `Employee ${p.submittedByEmployeeId}`,
+            formattedDate: formatDate(
+              p.submittedDate || p.createdAt || p.CreatedAt
+            ),
+          };
+        })
+        .sort((a, b) => {
+          const dateA = new Date(a.submittedDate || a.createdAt || a.CreatedAt);
+          const dateB = new Date(b.submittedDate || b.createdAt || b.CreatedAt);
+          return dateB - dateA;
+        });
+
+      setPeerFeedback(myFeedback);
+    } catch (err) {
+      setPeerFeedback([]);
+      setError(
+        err?.response?.data?.message ||
+          err?.message ||
+          "Failed to load peer feedback."
       );
-    },
-    [employeeMap, checkIsAnonymous]
-  );
-
-  const fetchPeerFeedback = useCallback(
-    async (retryCount = 0) => {
-      if (!user?.empId) {
-        setError("User not authenticated. Please log in.");
-        return;
-      }
-
-      setLoading(true);
-      setError("");
-
-      try {
-        const empId = user.empId;
-
-        let empMap = {};
-        try {
-          const empRes = await employeeApi.getAll();
-          if (empRes?.data) {
-            const employees = Array.isArray(empRes.data)
-              ? empRes.data
-              : empRes.data.data || [];
-            employees.forEach((emp) => {
-              empMap[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
-            });
-            setEmployeeMap(empMap);
-          }
-        } catch (err) {
-          console.warn("Error fetching employee map:", err.message);
-        }
-
-        try {
-          const peerRes = await peerQueueApi.approved();
-          const feedbackData = Array.isArray(peerRes?.data)
-            ? peerRes.data
-            : peerRes?.data?.data || [];
-
-          if (Array.isArray(feedbackData)) {
-            const myFeedback = feedbackData
-              .filter((p) => Number(p.recipientEmployeeId) === Number(empId))
-              .map((p) => {
-                const isAnon = checkIsAnonymous(p);
-                return {
-                  ...p,
-                  isAnonymous: isAnon,
-                  submittedByName: isAnon
-                    ? "Anonymous Peer"
-                    : empMap[p.submittedByEmployeeId] ||
-                      `Employee ${p.submittedByEmployeeId}`,
-                  formattedDate: formatDate(
-                    p.submittedDate || p.createdAt || p.CreatedAt
-                  ),
-                };
-              })
-              .sort((a, b) => {
-                const dateA = new Date(
-                  a.submittedDate || a.createdAt || a.CreatedAt
-                );
-                const dateB = new Date(
-                  b.submittedDate || b.createdAt || b.CreatedAt
-                );
-                return dateB - dateA;
-              });
-
-            setPeerFeedback(myFeedback);
-          } else {
-            setPeerFeedback([]);
-          }
-        } catch (err) {
-          console.error("Error fetching peer feedback:", err);
-          setPeerFeedback([]);
-          let msg = "Failed to load peer feedback.";
-          if (err?.response?.status === 404) {
-            msg = "Endpoint not found. Please contact support.";
-          } else if (
-            err?.code === "ECONNABORTED" ||
-            err?.message?.includes("timeout")
-          ) {
-            msg = "Request timeout. Please try again.";
-          } else {
-            msg = err?.response?.data?.message || err?.message || msg;
-          }
-          setError(msg);
-          if (retryCount < 1 && err?.response?.status >= 500) {
-            setTimeout(() => fetchPeerFeedback(retryCount + 1), 2000);
-          }
-        }
-      } catch (err) {
-        console.error("Fetch error:", err);
-        setError(err?.message || "Failed to load peer feedback");
-      } finally {
-        setLoading(false);
-      }
-    },
-    [user?.empId, formatDate, checkIsAnonymous]
-  );
+    } finally {
+      setLoading(false);
+    }
+  }, [user?.empId, formatDate, checkIsAnonymous]);
 
   useEffect(() => {
-    if (user?.empId) {
-      fetchPeerFeedback();
-    }
+    if (user?.empId) fetchPeerFeedback();
   }, [user?.empId, fetchPeerFeedback]);
-
-  const handleRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await fetchPeerFeedback();
-    setRefreshing(false);
-  }, [fetchPeerFeedback]);
 
   const feedbackDashboardPath = user?.roleName
     ? getFeedbackDashboardPath(user.roleName)
@@ -223,7 +187,6 @@ export default function ManagerPeerFeedback() {
             onClick={() => setError("")}
             type="button"
           >
-            {" "}
             ×
           </button>
         </div>
@@ -234,15 +197,12 @@ export default function ManagerPeerFeedback() {
           <div className="mgrpeer-empty">
             <Users size={64} className="mgrpeer-empty-icon" />
             <h5 className="mgrpeer-empty-title">No Peer Feedback Yet</h5>
-            <p className="mgrpeer-empty-text">
-              You haven't received any peer feedback. Check back later for
-              feedback from your colleagues.
-            </p>
+            <p className="mgrpeer-empty-text">No feedback found.</p>
           </div>
         ) : (
           <div className="mgrpeer-cards-grid">
             {peerFeedback.map((feedback) => {
-              const isAnon = checkIsAnonymous(feedback);
+              const isAnon = feedback.isAnonymous;
               return (
                 <div
                   className="mgrpeer-card"

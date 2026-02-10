@@ -178,9 +178,7 @@ export default function ViewManagerReview() {
         <div className="vmr-header">
           <div className="vmr-header-text">
             <h2 className="vmr-header-title">Manager Review</h2>
-            <div className="vmr-header-subtitle">
-              {review.targetEmployeeName}
-            </div>
+           
           </div>
           <button
             type="button"

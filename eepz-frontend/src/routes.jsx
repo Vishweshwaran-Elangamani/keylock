@@ -93,6 +93,7 @@ import ManagerTeamSubmissions from "./pages/feedback_management/manager/ManagerT
 import AllManagerReviews from "./pages/feedback_management/head/AllManagerReviews";
 import EmployeeHome from "./pages/performancemanagement/employee/EmployeeHome";
 import EmployeeAcknowledgment from "./pages/performancemanagement/employee/EmployeeAcknowledge";
+import EmployeeReviewsReceived from "./pages/feedback_management/feedback/EmployeeReviewsReceived";
 import ManagerAcknowledgment from "./pages/performancemanagement/manager/ManagerAcknowledgment";
 import MentorFeedbackDashboard from "./pages/feedback_management/feedback/MentorFeedbackDashboard";
 import ViewManagerReview from "./pages/feedback_management/manager/ViewManagerReview";
@@ -1341,6 +1342,16 @@ const AppRoutes = () => {
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
               <MySubmissions />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employee/dashboard/feedback/reviews-received"
+        element={
+          <ProtectedRoute allowedRoles={["Employee"]}>
+            <DashboardLayout role="Employee">
+              <EmployeeReviewsReceived />
             </DashboardLayout>
           </ProtectedRoute>
         }

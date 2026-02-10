@@ -6,6 +6,12 @@
   margin-top: -15px;
 }
 
+.fm-empdb-action-card__icon-wrapper--reviews {
+  background: #fff4e6;
+  color: #f59e0b;
+}
+
+
 .fm-empdb-loading {
   display: flex;
   justify-content: center;

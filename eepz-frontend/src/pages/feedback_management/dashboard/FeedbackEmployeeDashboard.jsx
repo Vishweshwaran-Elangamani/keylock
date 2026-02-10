@@ -17,11 +17,12 @@ import { Link } from "react-router-dom";
 import {
   peerQueueApi,
   smeApi,
-  hrFormApi,
   managerReviewApi,
   employeeApi,
   mentorFeedbackApi,
 } from "../../../services/feedbackmanagement/feedbackApi";
+
+import hrFormApi from "../../../services/feedbackmanagement/hrFormApi";
 import "../../../styles/feedback/components/FeedbackEmployeeDashboard.css";
 import Breadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb";
 
@@ -66,7 +67,7 @@ export default function FeedbackEmployeeDashboard() {
         empId: 1004,
         firstName: "Dave",
         lastName: "Dev",
-      }
+      },
   );
 
   const [activeHrForms, setActiveHrForms] = useState([]);
@@ -88,7 +89,7 @@ export default function FeedbackEmployeeDashboard() {
 
       if (Array.isArray(smeData)) {
         const isSme = smeData.some(
-          (sme) => Number(sme.employeeId) === Number(empId)
+          (sme) => Number(sme.employeeId) === Number(empId),
         );
         setIsMentor(isSme);
 
@@ -138,48 +139,29 @@ export default function FeedbackEmployeeDashboard() {
       } catch (err) {
         console.warn("Error fetching employee map:", err.message);
       }
+try {
+const response = await hrFormApi.getAllForms(1, 1000);
+const formsData = response?.data?.items || [];
+setActiveHrForms(formsData);
 
-      try {
-        const activeRes = await hrFormApi.listActive();
-        const formsData = activeRes?.data || [];
-        setActiveHrForms(Array.isArray(formsData) ? formsData : []);
-      } catch (err) {
-        console.warn("Error fetching active forms:", err.message);
-        setActiveHrForms([]);
-      }
+} catch (err) {
+  console.warn("Error fetching forms:", err.message);
+  setActiveHrForms([]);
+}
 
-      try {
-        const allFormsRes = await hrFormApi.listForms();
-        const allForms = Array.isArray(allFormsRes?.data)
-          ? allFormsRes.data
-          : allFormsRes?.data?.data || [];
+try {
+  const response = await hrFormApi.getResponsesByEmployee(empId);
 
-        let allMyResponses = [];
+ const submittedData = response?.data || [];
 
-        for (const form of allForms) {
-          try {
-            const responsesRes = await hrFormApi.byForm(form.formId);
-            const responses = Array.isArray(responsesRes?.data)
-              ? responsesRes.data
-              : responsesRes?.data?.data || [];
 
-            const myResponses = responses.filter(
-              (r) => Number(r.employeeId) === Number(empId)
-            );
-            allMyResponses = [...allMyResponses, ...myResponses];
-          } catch (err) {
-            console.warn(
-              `Error fetching responses for form ${form.formId}:`,
-              err.message
-            );
-          }
-        }
+  setSubmittedForms(submittedData);
+} catch (err) {
+  console.warn("Error fetching submitted forms:", err.message);
+  setSubmittedForms([]);
+}
 
-        setSubmittedForms(allMyResponses);
-      } catch (err) {
-        console.warn("Error fetching submitted forms:", err.message);
-        setSubmittedForms([]);
-      }
+
 
       try {
         const reviewRes = await managerReviewApi.getForTarget(empId);
@@ -230,47 +212,35 @@ export default function FeedbackEmployeeDashboard() {
     await fetchDashboardData();
     setRefreshing(false);
   };
+const stats = useMemo(() => {
+  const getFormId = (obj) =>
+    Number(
+      obj.formId ??
+      obj.id ??
+      obj.formID ??
+      obj.hrFormId ??
+      0
+    );
 
-  const stats = useMemo(() => {
-    const submittedFormIds = new Set(submittedForms.map((f) => f.formId));
-    const pending = activeHrForms.filter(
-      (f) => !submittedFormIds.has(f.formId)
-    ).length;
-    const submitted = submittedForms.length;
+  const submittedFormIds = new Set(
+    submittedForms.map(getFormId)
+  );
 
-    return [
-      {
-        label: "PENDING FORMS",
-        value: pending,
-        Icon: Clock,
-        bgColor: "#fef3c7",
-        iconColor: "#E2B93B",
-      },
+  const pending = activeHrForms.filter(
+    (f) => !submittedFormIds.has(getFormId(f))
+  ).length;
 
-      {
-        label: "SUBMITTED FORMS",
-        value: submitted,
-        Icon: CheckCircle,
-        bgColor: "#dcfce7",
-        iconColor: "#24A148",
-      },
+  const submitted = submittedFormIds.size;
 
-      {
-        label: "REVIEWS RECEIVED",
-        value: myReviews.length,
-        Icon: Star,
-        bgColor: "#dbeafe",
-        iconColor: "#0F62FE",
-      },
-      {
-        label: "PEER FEEDBACK",
-        value: myPeerFeedback.length,
-        Icon: Users,
-        bgColor: "#f8f0ff",
-        iconColor: "#9D4EDD",
-      },
-    ];
-  }, [activeHrForms, submittedForms, myReviews, myPeerFeedback]);
+  return [
+    { label: "PENDING FORMS", value: pending, Icon: Clock, bgColor: "#fef3c7", iconColor: "#E2B93B" },
+    { label: "SUBMITTED FORMS", value: submitted, Icon: CheckCircle, bgColor: "#dcfce7", iconColor: "#24A148" },
+    { label: "REVIEWS RECEIVED", value: myReviews.length, Icon: Star, bgColor: "#dbeafe", iconColor: "#0F62FE" },
+    { label: "PEER FEEDBACK", value: myPeerFeedback.length, Icon: Users, bgColor: "#f8f0ff", iconColor: "#9D4EDD" }
+  ];
+}, [activeHrForms, submittedForms, myReviews, myPeerFeedback]);
+
+
 
   if (loading) {
     return (
@@ -377,6 +347,20 @@ export default function FeedbackEmployeeDashboard() {
               </div>
               <span className="fm-empdb-action-card__label">
                 Peer Feedback Received
+              </span>
+            </Link>
+          </div>
+
+          <div className="fm-empdb-actions-grid__item">
+            <Link
+              to="/employee/dashboard/feedback/reviews-received"
+              className="fm-empdb-action-card fm-empdb-action-card--reviews"
+            >
+              <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--reviews">
+                <Star size={20} className="fm-empdb-action-card__icon" />
+              </div>
+              <span className="fm-empdb-action-card__label">
+                Reviews Received
               </span>
             </Link>
           </div>
