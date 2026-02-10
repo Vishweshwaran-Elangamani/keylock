@@ -182,9 +182,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 ReviewcommentId = review.ReviewCommentId,
                 ManagerEmployeeId = review.ManagerEmployeeId,
-                ManagerName = review.ManagerEmployee != null ? $"{review.ManagerEmployee.EmployeeId}" : "Unknown",
                 TargetEmployeeId = review.TargetEmployeeId,
-                TargetEmployeeName = review.TargetEmployee != null ? $"{review.TargetEmployee.EmployeeId}" : "Unknown",
+                ManagerName = review.ManagerEmployeeId.ToString(),
+                TargetEmployeeName = review.TargetEmployeeId.ToString(),
+
+
                 TargetGoalId = review.TargetGoalId,
                 TargetGoalName = review.TargetGoal != null ? review.TargetGoal.GoalTitle : "N/A",
                 TargetOrganizationGoalId = review.TargetOrganizationGoalId,

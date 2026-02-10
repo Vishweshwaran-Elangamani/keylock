@@ -8,7 +8,7 @@ namespace EepzBackend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Policy = "ManagerOnly")]
+    [Authorize(Roles = "Manager,Employee")]
 
     public class ManagerReviewController : ControllerBase
     {

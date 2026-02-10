@@ -83,10 +83,10 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 return await _context.Managerreviewcomments
                     .AsNoTracking()
                     .AsSplitQuery()
-                    .Where(r => r.TargetEmployeeId == employeeId && r.Status == "Submitted")
+                    .Where(r => r.TargetEmployeeId == employeeId)
                     .Include(r => r.ManagerEmployee)
                     .Include(r => r.TargetGoal)
-                    .OrderByDescending(r => r.SubmittedAt)
+                    .OrderByDescending(r => r.SubmittedAt ?? r.CreatedAt)
                     .ToListAsync();
             }
             catch (Exception ex)
@@ -95,6 +95,8 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
+
+
 
         public async Task<List<Managerreviewcomment>> GetReviewsByGoalAsync(int goalId)
         {

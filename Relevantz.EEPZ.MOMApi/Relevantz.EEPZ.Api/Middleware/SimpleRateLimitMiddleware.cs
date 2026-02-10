@@ -19,7 +19,7 @@ namespace Relevantz.EEPZ.Api.Middleware
         private static readonly ConcurrentDictionary<string, (DateTime timestamp, int count)> _requestCounts = new();
         
         // Configuration
-        private const int MaxRequestsPerMinute = 100;
+        private const int MaxRequestsPerMinute = 1000;
         private const int CleanupThreshold = 10000; // Cleanup when dictionary gets too large
         private const int CleanupAgeMinutes = 5; // Remove entries older than 5 minutes
 
