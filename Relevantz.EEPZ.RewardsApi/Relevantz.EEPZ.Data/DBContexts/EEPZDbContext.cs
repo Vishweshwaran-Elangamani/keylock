@@ -217,7 +217,15 @@ public partial class EEPZDbContext : DbContext
  
  
     protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
+    {   
+        
+base.OnModelCreating(modelBuilder);
+
+    // ✅ Option A (preferred): if ApprovedAt is updated whenever the row changes
+    modelBuilder.Entity<Departmentheadapproval>()
+        .Property(d => d.ApprovedAt)
+        .IsConcurrencyToken();
+
         modelBuilder
             .UseCollation("utf8mb4_unicode_ci")
             .HasCharSet("utf8mb4");
