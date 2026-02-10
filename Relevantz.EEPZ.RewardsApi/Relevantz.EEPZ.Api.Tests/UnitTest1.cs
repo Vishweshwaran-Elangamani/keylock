@@ -36,9 +36,7 @@ namespace Relevantz.EEPZ.Api.Tests.Controllers
             _serviceMock.VerifyNoOtherCalls();
         }
 
-        // -------------------------------
-        // GET: /depthead/{id}/approved-nominations
-        // -------------------------------
+        
 
         [Test]
         public async Task GetApprovedNominationsByDeptHead_ReturnsOk_WhenSuccessTrue()
@@ -105,9 +103,6 @@ namespace Relevantz.EEPZ.Api.Tests.Controllers
             VerifyLoggerCalledWithException(_loggerMock, ex); // optional if controller logs
         }
 
-        // -------------------------------
-        // GET: /nomination-details/{nominationId}
-        // -------------------------------
 
         [Test]
         public async Task GetNominationDetails_ReturnsOk_WhenSuccessTrue()
@@ -174,9 +169,7 @@ namespace Relevantz.EEPZ.Api.Tests.Controllers
             VerifyLoggerCalledWithException(_loggerMock, ex); // optional if controller logs
         }
 
-        // -------------------------------
-        // GET: /depthead/{id}/statistics
-        // -------------------------------
+     
 
         [Test]
         public async Task GetDepartmentStatistics_ReturnsOk_WhenSuccessTrue()
@@ -240,12 +233,12 @@ namespace Relevantz.EEPZ.Api.Tests.Controllers
                 message = "Internal server error."
             });
 
-            VerifyLoggerCalledWithException(_loggerMock, ex); // optional if controller logs
+            VerifyLoggerCalledWithException(_loggerMock, ex); 
         }
 
-        // =========================================================================
+        
         //                               SECURITY TESTS
-        // =========================================================================
+      
 
         /// <summary>
         /// Security: Ensure the controller is protected by [Authorize] at the class level.
@@ -336,9 +329,7 @@ namespace Relevantz.EEPZ.Api.Tests.Controllers
             obj.Value.Should().BeEquivalentTo(serviceResult);
         }
 
-        // -------------------------------
-        // Helpers
-        // -------------------------------
+        
 
         private static void VerifyLoggerCalledWithException(
             Mock<ILogger<DepartmentHeadNominationController>> loggerMock,
