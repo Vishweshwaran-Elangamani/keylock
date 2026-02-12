@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
     public class EmployeesService : IEmployeesService
@@ -24,31 +25,17 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         public async Task<ApiResponse<List<object>>> GetAllManagersAsync()
         {
-            try
-            {
-                var managers = await _repository.GetAllManagersAsync();
-                return ApiResponse<List<object>>.SuccessResponse(managers);
-            }
-            catch (System.Exception ex)
-            {
-                _logger.LogError($"Error in GetAllManagersAsync: {ex.Message}");
-                return ApiResponse<List<object>>.ErrorResponse(ex.Message);
-            }
+            var managers = await _repository.GetAllManagersAsync();
+            return ApiResponse<List<object>>.SuccessResponse(managers);
         }
 
         public async Task<ApiResponse<object>> GetUserRoleAsync(int userId)
         {
-            try
-            {
-                var role = await _repository.GetUserRoleAsync(userId);
-                if (role == null) return ApiResponse<object>.ErrorResponse("User not found");
-                return ApiResponse<object>.SuccessResponse(role);
-            }
-            catch (System.Exception ex)
-            {
-                _logger.LogError($"Error in GetUserRoleAsync: {ex.Message}");
-                return ApiResponse<object>.ErrorResponse(ex.Message);
-            }
+            var role = await _repository.GetUserRoleAsync(userId);
+            if (role == null) 
+                return ApiResponse<object>.ErrorResponse("User not found");
+
+            return ApiResponse<object>.SuccessResponse(role);
         }
     }
 }
