@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.DTOs.Response;
@@ -233,14 +232,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(new { success = true, message = "Parameter deleted successfully" });
         }
 
-        public class ReviewMetricsDto
-        {
-            public int NominationId { get; set; }
-            public int ReviewedByEmployeeId { get; set; }
-            public decimal? MeritScore { get; set; }
-            public decimal? DiversityScore { get; set; }
-            public bool ConflictOfInterest { get; set; }
-            public string ReviewNotes { get; set; }
-        }
+
     }
 }
