@@ -1,12 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
-
-.fb-hr-dashboard,
-.fb-hr-dashboard * {
-  font-family: 'Poppins', sans-serif !important;
-}
-
-
-
 .fb-hr-dashboard {
   min-height: 100vh;
   background: #f9fafb;
@@ -89,7 +80,8 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
-  margin-bottom: 2.1rem;
+  margin-bottom: 70px;
+  
 }
 
 .fb-hr-stat-cards-row__col {

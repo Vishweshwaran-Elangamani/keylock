@@ -94,7 +94,7 @@
   cursor: pointer;
   border: 1.5px solid #1e1b4b !important;
   border-radius: 14px;
-  height: 100px;
+  height: 70px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -103,11 +103,10 @@
 }
  
  
-/* CARD CONTAINER */
 .aim-stat-card {
   border: 1.5px solid #1e1b4b !important;
   border-radius: 16px;
-  height: 120px;
+  height: 100px;
   background: #ffffff;
   display: flex;
   align-items: center;
@@ -139,11 +138,17 @@
   font-size: 1.9rem;
   flex-shrink: 0;
   margin-bottom: 10px;
-  margin-top: 40px;
+  margin-top: 25px;
   margin-left: -200px;
  
 }
- 
+.aim-stat-icon-completed{
+  background-color: rgb(182, 247, 182);
+}
+
+.aim-stat-icon-pending{
+  background-color: rgb(224, 179, 224);
+}
 .aim-stat-text {
   display: flex;
   flex-direction: column;

@@ -343,6 +343,7 @@
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin-top: 20px;
 }
  
 .emp-sla-table-responsive {
@@ -367,12 +368,13 @@
   padding: 0.875rem 1rem;
   font-weight: 700;
   font-size: 0.75rem;
-  text-align: left;
+  text-align: center;
   color: #ffffff;
   border: none;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   white-space: nowrap;
+  
 }
  
 .emp-sla-table-header th:first-child {
@@ -429,7 +431,9 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 1.25rem;
-  margin-bottom: 1.5rem;
+  margin-top: 2.5rem;
+  margin-bottom: 2rem;
+
 }
  
 .emp-sla-card {

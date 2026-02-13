@@ -2,17 +2,26 @@ import api_mom from "../../services/meeting/index_mom";
  
 const apiRequest = async (method, url, data = null, config = {}) => {
   try {
-    const defaultConfig = {
-      headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
-        ...config.headers
-      },
-      ...config
-    };
- 
-    const response = await api_mom[method](url, data, defaultConfig);
+  const token = localStorage.getItem("token");
+
+const defaultConfig = {
+  headers: {
+    Authorization: token ? `Bearer ${token}` : "",
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    'Pragma': 'no-cache',
+    'Expires': '0',
+    ...config.headers
+  },
+  ...config
+};
+
+let response;
+
+if (method.toLowerCase() === "get" || method.toLowerCase() === "delete") {
+  response = await api_mom[method](url, defaultConfig);
+} else {
+  response = await api_mom[method](url, data, defaultConfig);
+}
  
     const rateLimit = {
       limit: response.headers["x-ratelimit-limit"],
@@ -126,29 +135,15 @@ const momService = {
     return apiRequest("put", `/Mom/${momData.momId}`, momData);
   },
  
-  getMyMoms: (params = {}) => {
-    const {
-      pageNumber = 1,
-      pageSize = 20,
-      searchTerm = "",
-      meetingType = "",
-      startDate = null,
-      endDate = null,
-    } = params;
- 
-    const queryParams = new URLSearchParams({
-      pageNumber: pageNumber.toString(),
-      pageSize: pageSize.toString(),
-      _t: new Date().getTime().toString(),
-    });
- 
-    if (searchTerm) queryParams.append("searchTerm", searchTerm);
-    if (meetingType) queryParams.append("meetingType", meetingType);
-    if (startDate) queryParams.append("startDate", startDate);
-    if (endDate) queryParams.append("endDate", endDate);
- 
-    return apiRequest("get", `/Mom/my-moms?${queryParams.toString()}`);
-  },
+ getMyMoms: (params = {}) => {
+  const query = new URLSearchParams({
+    ...params,
+    _t: Date.now(), // 🔥 cache buster
+  }).toString();
+
+  return apiRequest("get", `/Mom/my-moms?${query}`);
+},
+
  
   getMomById: (momId) => {
     const timestamp = new Date().getTime();

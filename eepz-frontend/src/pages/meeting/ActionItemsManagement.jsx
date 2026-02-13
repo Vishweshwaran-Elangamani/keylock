@@ -30,7 +30,6 @@ const ActionItemsManagement = () => {
         employeeService.getAllEmployees(),
       ]);
 
-      // Handle PascalCase or camelCase employee response
       const employeeData = employeesRes.data || employeesRes.Data || [];
       const employeeSuccess = employeesRes.success || employeesRes.Success;
 
@@ -51,16 +50,14 @@ const ActionItemsManagement = () => {
         setEmployeeMap(nameMap);
       }
 
-      // Handle PascalCase or camelCase action items response
       const items = actionItemsRes.data || actionItemsRes.Data || [];
       setActionItems(items);
     } catch (err) {
       console.error("ERROR loading data:", err);
 
-      // Enhanced error handling
       if (err.retryAfter) {
         toastr.error(
-          `Rate limit exceeded. Please wait ${err.retryAfter} seconds.`
+          `Rate limit exceeded. Please wait ${err.retryAfter} seconds.`,
         );
       } else if (err.message) {
         toastr.error(`Failed to load action items: ${err.message}`);
@@ -72,13 +69,29 @@ const ActionItemsManagement = () => {
     }
   };
 
-  // Helper to get property with PascalCase/camelCase fallback
   const getProperty = (obj, camelKey, pascalKey) => {
     return obj?.[camelKey] || obj?.[pascalKey] || null;
   };
 
+  const handleMarkComplete = async (actionItemId) => {
+    try {
+      await momService.updateActionItemStatus(actionItemId, "Completed");
+
+      setActionItems((prev) =>
+        prev.map((item) =>
+          getActionItemId(item) === actionItemId
+            ? { ...item, status: "Completed", Status: "Completed" }
+            : item,
+        ),
+      );
+
+      toastr.success("Action item marked as completed");
+    } catch (error) {
+      toastr.error("Failed to update status");
+    }
+  };
+
   const getMeetingTitle = (item) => {
-    // Try multiple possible property paths
     return (
       getProperty(item, "meetingTitle", "MeetingTitle") ||
       getProperty(item.mom, "meetingTitle", "MeetingTitle") ||
@@ -110,7 +123,7 @@ const ActionItemsManagement = () => {
     return getProperty(
       item,
       "assignedByEmployeeName",
-      "AssignedByEmployeeName"
+      "AssignedByEmployeeName",
     );
   };
 
@@ -405,8 +418,8 @@ const ActionItemsManagement = () => {
                     {searchTerm
                       ? "Try adjusting your search criteria"
                       : filter !== "all"
-                      ? `No ${filter} action items`
-                      : "You have no action items assigned"}
+                        ? `No ${filter} action items`
+                        : "You have no action items assigned"}
                   </p>
                   {(searchTerm || filter !== "all") && (
                     <button
@@ -443,13 +456,14 @@ const ActionItemsManagement = () => {
                             <h6 className="aim-item-title flex-grow-1">
                               {taskDescription}
                             </h6>
+
                             <span
                               className={`badge ${
                                 status === "Completed"
                                   ? "bg-success"
                                   : overdueStatus
-                                  ? "bg-danger"
-                                  : "bg-warning text-dark"
+                                    ? "bg-danger"
+                                    : "bg-warning text-dark"
                               }`}
                             >
                               {overdueStatus ? "Overdue" : status}
@@ -478,7 +492,7 @@ const ActionItemsManagement = () => {
                                         year: "numeric",
                                         month: "short",
                                         day: "numeric",
-                                      }
+                                      },
                                     )
                                   : "No due date"}
                               </span>
@@ -501,6 +515,17 @@ const ActionItemsManagement = () => {
                               </div>
                             )}
                           </div>
+
+                          {status === "Pending" && (
+                            <div className="text-end mt-3">
+                              <button
+                                className="btn btn-sm btn-success"
+                                onClick={() => handleMarkComplete(actionItemId)}
+                              >
+                                Mark as Complete
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>

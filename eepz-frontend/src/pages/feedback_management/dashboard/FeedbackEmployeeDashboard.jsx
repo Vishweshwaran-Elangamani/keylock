@@ -1,19 +1,15 @@
-import React, { useEffect, useState, useMemo } from "react";
-import {
-  RefreshCw,
-  AlertTriangle,
-  CheckCircle,
-  Clock,
-  Send,
-  Search,
-  Eye,
-  Zap,
-  Star,
-  Users,
-  Award,
-  MessageSquare,
-} from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import {
+  Send,
+  MessageSquare,
+  Eye,
+  Users,
+  Star,
+  Search,
+  Award,
+} from "lucide-react";
+import FeedbackBreadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb";
 import {
   peerQueueApi,
   smeApi,
@@ -21,380 +17,238 @@ import {
   employeeApi,
   mentorFeedbackApi,
 } from "../../../services/feedbackmanagement/feedbackApi";
-
 import hrFormApi from "../../../services/feedbackmanagement/hrFormApi";
 import "../../../styles/feedback/components/FeedbackEmployeeDashboard.css";
-import Breadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb";
-
-const getFeedbackDashboardPath = (roleName) => {
-  const routes = {
-    Employee: "/employee/dashboard/feedback",
-    Manager: "/manager/dashboard/feedback",
-    DepartmentHead: "/depthead/dashboard/feedback",
-    "Department Head": "/depthead/dashboard/feedback",
-    HR: "/hr/dashboard/feedback",
-  };
-  return routes[roleName] || "/hr/dashboard/feedback";
-};
-
-const StatCard = ({ label, value, Icon, bgColor, iconColor }) => (
-  <div className="fm-empdb-stat-card">
-    <div
-      className="fm-empdb-stat-card__icon-wrapper"
-      data-bg={bgColor.replace("#", "")}
-    >
-      <Icon
-        size={24}
-        data-color={iconColor.replace("#", "")}
-        strokeWidth={2.5}
-      />
-    </div>
-    <div className="fm-empdb-stat-card__content">
-      <h2 className="fm-empdb-stat-card__value">{value}</h2>
-      <p className="fm-empdb-stat-card__label">{label}</p>
-    </div>
-  </div>
-);
 
 export default function FeedbackEmployeeDashboard() {
-  const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("overview");
-  const [user] = useState(
+  const [isMentor, setIsMentor] = useState(false);
+  const [pendingFormsCount, setPendingFormsCount] = useState(0);
+  const [peerCount, setPeerCount] = useState(0);
+  const [reviewsCount, setReviewsCount] = useState(0);
+  const [mentorFeedbackCount, setMentorFeedbackCount] = useState(0);
+
+  const user = useMemo(
     () =>
       JSON.parse(localStorage.getItem("user") || "{}") || {
         empId: 1004,
-        firstName: "Dave",
-        lastName: "Dev",
+        firstName: "User",
+        lastName: "",
       },
+    []
   );
 
-  const [activeHrForms, setActiveHrForms] = useState([]);
-  const [submittedForms, setSubmittedForms] = useState([]);
-  const [myReviews, setMyReviews] = useState([]);
-  const [myPeerFeedback, setMyPeerFeedback] = useState([]);
-  const [employeeMap, setEmployeeMap] = useState({});
-
-  const [isMentor, setIsMentor] = useState(false);
-  const [mentorFeedbackCount, setMentorFeedbackCount] = useState(0);
-
-  const checkIfMentor = async () => {
-    try {
-      const empId = user?.empId || user?.employeeId || 1004;
-      const smeResponse = await smeApi.getActive();
-      const smeData = Array.isArray(smeResponse?.data)
-        ? smeResponse.data
-        : smeResponse?.data?.data || [];
-
-      if (Array.isArray(smeData)) {
-        const isSme = smeData.some(
-          (sme) => Number(sme.employeeId) === Number(empId),
-        );
-        setIsMentor(isSme);
-
-        if (isSme) {
-          try {
-            const feedbackResponse = await mentorFeedbackApi.aboutMe(empId);
-            const feedbackData = Array.isArray(feedbackResponse?.data)
-              ? feedbackResponse.data
-              : feedbackResponse?.data?.data || [];
-
-            if (Array.isArray(feedbackData)) {
-              setMentorFeedbackCount(feedbackData.length);
-            }
-          } catch (err) {
-            console.warn("Error fetching mentor feedback count:", err.message);
-          }
-        }
-      }
-    } catch (err) {
-      console.warn("Error checking mentor status:", err.message);
-    }
-  };
-
-  const fetchDashboardData = async () => {
-    setLoading(true);
-    setError("");
-
-    try {
-      const empId = user?.empId || 1004;
-
-      await checkIfMentor();
-
-      let empMap = {};
-      try {
-        const empRes = await employeeApi.getAll();
-
-        if (empRes?.data) {
-          const employees = Array.isArray(empRes.data)
-            ? empRes.data
-            : empRes.data.data || [];
-
-          employees.forEach((emp) => {
-            empMap[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
-          });
-          setEmployeeMap(empMap);
-        }
-      } catch (err) {
-        console.warn("Error fetching employee map:", err.message);
-      }
-try {
-const response = await hrFormApi.getAllForms(1, 1000);
-const formsData = response?.data?.items || [];
-setActiveHrForms(formsData);
-
-} catch (err) {
-  console.warn("Error fetching forms:", err.message);
-  setActiveHrForms([]);
-}
-
-try {
-  const response = await hrFormApi.getResponsesByEmployee(empId);
-
- const submittedData = response?.data || [];
-
-
-  setSubmittedForms(submittedData);
-} catch (err) {
-  console.warn("Error fetching submitted forms:", err.message);
-  setSubmittedForms([]);
-}
-
-
-
-      try {
-        const reviewRes = await managerReviewApi.getForTarget(empId);
-        const reviewsData = Array.isArray(reviewRes?.data)
-          ? reviewRes.data
-          : reviewRes?.data?.data || [];
-        setMyReviews(reviewsData);
-      } catch (err) {
-        console.warn("Error fetching my reviews:", err.message);
-        setMyReviews([]);
-      }
-
-      try {
-        const peerRes = await peerQueueApi.list(1, 1000);
-        const peerData = Array.isArray(peerRes?.data)
-          ? peerRes.data
-          : peerRes?.data?.data || [];
-
-        if (Array.isArray(peerData)) {
-          const myFeedback = peerData
-            .filter((p) => Number(p.recipientEmployeeId) === Number(empId))
-            .map((p) => ({
-              ...p,
-              submittedByName:
-                empMap[p.submittedByEmployeeId] ||
-                `Employee ${p.submittedByEmployeeId}`,
-            }));
-          setMyPeerFeedback(myFeedback);
-        }
-      } catch (err) {
-        console.warn("Error fetching peer feedback:", err.message);
-        setMyPeerFeedback([]);
-      }
-    } catch (err) {
-      console.error("Error:", err);
-      setError("Failed to load dashboard");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const getFormId = (obj) =>
+    Number(obj?.formId ?? obj?.id ?? obj?.formID ?? obj?.hrFormId ?? 0);
 
   useEffect(() => {
-    fetchDashboardData();
-  }, [user?.empId]);
+    const fetchData = async () => {
+      setLoading(true);
+      const empId = user?.empId || user?.employeeId || 1004;
 
-  const refresh = async () => {
-    setRefreshing(true);
-    await fetchDashboardData();
-    setRefreshing(false);
-  };
-const stats = useMemo(() => {
-  const getFormId = (obj) =>
-    Number(
-      obj.formId ??
-      obj.id ??
-      obj.formID ??
-      obj.hrFormId ??
-      0
-    );
+      try {
+        try {
+          const formsRes = await hrFormApi.getAllForms(1, 1000);
+          const forms = formsRes?.data?.items || [];
+          const submittedRes = await hrFormApi.getResponsesByEmployee(empId);
+          const submitted = Array.isArray(submittedRes?.data)
+            ? submittedRes.data
+            : submittedRes?.data?.data || [];
+          const submittedIds = new Set(submitted.map(getFormId));
+          const pending = forms.filter((f) => !submittedIds.has(getFormId(f)));
+          setPendingFormsCount(pending.length);
+        } catch (e) {
+          console.warn("HR forms fetch error:", e?.message);
+          setPendingFormsCount(0);
+        }
 
-  const submittedFormIds = new Set(
-    submittedForms.map(getFormId)
-  );
+        try {
+          const reviewRes = await managerReviewApi.getForTarget(empId);
+          const reviews = Array.isArray(reviewRes?.data)
+            ? reviewRes.data
+            : reviewRes?.data?.data || [];
+          setReviewsCount(reviews.length);
+        } catch (e) {
+          console.warn("Reviews fetch error:", e?.message);
+          setReviewsCount(0);
+        }
+        try {
+          let empMap = {};
+          try {
+            const empRes = await employeeApi.getAll();
+            const employees = Array.isArray(empRes?.data)
+              ? empRes.data
+              : empRes?.data?.data || [];
+            employees.forEach((emp) => {
+              empMap[emp.employeeId] = `${emp.firstName ?? ""} ${emp.lastName ?? ""}`.trim();
+            });
+          } catch (e) {
+            console.warn("Employee map fetch error:", e?.message);
+          }
 
-  const pending = activeHrForms.filter(
-    (f) => !submittedFormIds.has(getFormId(f))
-  ).length;
+          const peerRes = await peerQueueApi.list(1, 1000);
+          const peerData = Array.isArray(peerRes?.data)
+            ? peerRes.data
+            : peerRes?.data?.data || [];
 
-  const submitted = submittedFormIds.size;
+          const myPeer = peerData?.filter(
+            (p) => Number(p?.recipientEmployeeId) === Number(empId)
+          );
+          setPeerCount(myPeer?.length || 0);
+        } catch (e) {
+          console.warn("Peer feedback fetch error:", e?.message);
+          setPeerCount(0);
+        }
 
-  return [
-    { label: "PENDING FORMS", value: pending, Icon: Clock, bgColor: "#fef3c7", iconColor: "#E2B93B" },
-    { label: "SUBMITTED FORMS", value: submitted, Icon: CheckCircle, bgColor: "#dcfce7", iconColor: "#24A148" },
-    { label: "REVIEWS RECEIVED", value: myReviews.length, Icon: Star, bgColor: "#dbeafe", iconColor: "#0F62FE" },
-    { label: "PEER FEEDBACK", value: myPeerFeedback.length, Icon: Users, bgColor: "#f8f0ff", iconColor: "#9D4EDD" }
-  ];
-}, [activeHrForms, submittedForms, myReviews, myPeerFeedback]);
+        try {
+          const smeResponse = await smeApi.getActive();
+          const smeList = Array.isArray(smeResponse?.data)
+            ? smeResponse.data
+            : smeResponse?.data?.data || [];
 
+          const mentor = smeList.some(
+            (s) => Number(s?.employeeId) === Number(empId)
+          );
+          setIsMentor(mentor);
 
+          if (mentor) {
+            try {
+              const aboutRes = await mentorFeedbackApi.aboutMe(empId);
+              const feedbackList = Array.isArray(aboutRes?.data)
+                ? aboutRes.data
+                : aboutRes?.data?.data || [];
+              setMentorFeedbackCount(feedbackList.length || 0);
+            } catch (e) {
+              console.warn("Mentor aboutMe fetch error:", e?.message);
+              setMentorFeedbackCount(0);
+            }
+          } else {
+            setMentorFeedbackCount(0);
+          }
+        } catch (e) {
+          console.warn("SME check error:", e?.message);
+          setIsMentor(false);
+          setMentorFeedbackCount(0);
+        }
+      } catch (err) {
+        console.error("Employee dashboard error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [user?.empId, user?.employeeId]);
 
   if (loading) {
     return (
-      <div className="fm-empdb-loading">
-        <div className="fm-empdb-spinner" role="status">
-          <span className="fm-empdb-spinner__text">Loading...</span>
+      <div className="fm-lnd-wrapper">
+        <div className="fm-lnd-header" style={{ marginTop: "20px" }}>
+          <p>Loading…</p>
         </div>
       </div>
     );
   }
 
-  const feedbackDashboardPath = user?.roleName
-    ? getFeedbackDashboardPath(user.roleName)
-    : "/hr/dashboard/feedback";
-
   return (
-    <div className="fm-empdb-page-wrapper">
-      <Breadcrumb
-        items={[
-          { label: "Feedback Management", path: feedbackDashboardPath },
-          { label: "Employee" },
-        ]}
-      />
-
-      {error && (
-        <div className="fm-empdb-alert" role="alert">
-          <div className="fm-empdb-alert__icon">
-            <AlertTriangle size={16} />
-          </div>
-          <div className="fm-empdb-alert__content">
-            <p className="fm-empdb-alert__text">{error}</p>
-          </div>
-          <button
-            type="button"
-            className="fm-empdb-alert__close"
-            onClick={() => setError("")}
-            aria-label="Close"
-          />
-        </div>
-      )}
-
-      <div className="fm-empdb-stats-grid">
-        {stats.map((s, idx) => (
-          <div key={idx} className="fm-empdb-stats-grid__item">
-            <StatCard {...s} />
-          </div>
-        ))}
+    <div className="fm-lnd-wrapper">
+      <div className="fm-lnd-breadcrumb">
+        <FeedbackBreadcrumb
+          items={[
+            { label: "Feedback Management", path: "/employee/dashboard/feedback" },
+            { label: "Employee Dashboard" },
+          ]}
+        />
       </div>
 
-      <div className="fm-empdb-content">
-        <div className="fm-empdb-actions-grid">
-          <div className="fm-empdb-actions-grid__item">
-            <Link
-              to="/employee/dashboard/feedback/submit-mentor"
-              className="fm-empdb-action-card"
-            >
-              <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--primary">
-                <Send size={20} className="fm-empdb-action-card__icon" />
-              </div>
-              <span className="fm-empdb-action-card__label">
-                Mentor Feedback
-              </span>
-            </Link>
-          </div>
+      <div className="fm-lnd-header">
+        <h3>Feedback Management</h3>
+        <p>Submit feedback, check assignments, and view received reviews</p>
+      </div>
 
-          <div className="fm-empdb-actions-grid__item">
-            <Link
-              to="/employee/dashboard/feedback/contextfeedback"
-              className="fm-empdb-action-card"
-            >
-              <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--primary">
-                <MessageSquare
-                  size={20}
-                  className="fm-empdb-action-card__icon"
-                />
-              </div>
-              <span className="fm-empdb-action-card__label">
-                Context Feedback
-              </span>
-            </Link>
+      <div className="fm-lnd-grid">
+        <Link to="/employee/dashboard/feedback/submit-mentor" className="fm-lnd-card">
+          <div className="fm-lnd-icon blue"><Send size={22} /></div>
+          <div>
+            <h3>Mentor Feedback</h3>
+            <p>Provide feedback to mentors</p>
           </div>
-
-          <div className="fm-empdb-actions-grid__item">
-            <Link
-              to="/employee/dashboard/feedback/assignedform"
-              className="fm-empdb-action-card"
-            >
-              <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--primary">
-                <Eye size={20} className="fm-empdb-action-card__icon" />
-              </div>
-              <span className="fm-empdb-action-card__label">
-                Assigned Forms
-              </span>
-            </Link>
-          </div>
-
-          <div className="fm-empdb-actions-grid__item">
-            <Link
-              to="/employee/dashboard/feedback/submit-peer"
-              className="fm-empdb-action-card fm-empdb-action-card--peer"
-            >
-              <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--peer">
-                <Users size={20} className="fm-empdb-action-card__icon" />
-              </div>
-              <span className="fm-empdb-action-card__label">
-                Peer Feedback Received
-              </span>
-            </Link>
-          </div>
-
-          <div className="fm-empdb-actions-grid__item">
-            <Link
-              to="/employee/dashboard/feedback/reviews-received"
-              className="fm-empdb-action-card fm-empdb-action-card--reviews"
-            >
-              <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--reviews">
-                <Star size={20} className="fm-empdb-action-card__icon" />
-              </div>
-              <span className="fm-empdb-action-card__label">
-                Reviews Received
-              </span>
-            </Link>
-          </div>
-
-          <div className="fm-empdb-actions-grid__item">
-            <Link
-              to="/employee/dashboard/feedback/submissions"
-              className="fm-empdb-action-card fm-empdb-action-card--submissions"
-            >
-              <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--submissions">
-                <Search size={20} className="fm-empdb-action-card__icon" />
-              </div>
-              <span className="fm-empdb-action-card__label">
-                My Submissions
-              </span>
-            </Link>
-          </div>
-
-          {isMentor && (
-            <div className="fm-empdb-actions-grid__item">
-              <Link
-                to="/employee/dashboard/feedback/mentor"
-                className="fm-empdb-action-card fm-empdb-action-card--sme"
-              >
-                <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--sme">
-                  <Award size={20} className="fm-empdb-action-card__icon" />
-                </div>
-                <span className="fm-empdb-action-card__label">
-                  SME Dashboard
-                </span>
-              </Link>
-            </div>
+          {mentorFeedbackCount > 0 && (
+            <span className="fm-lnd-badge" aria-label="Mentor feedback count">
+              {mentorFeedbackCount}
+            </span>
           )}
-        </div>
+        </Link>
+
+        <Link to="/employee/dashboard/feedback/contextfeedback" className="fm-lnd-card">
+          <div className="fm-lnd-icon gray"><MessageSquare size={22} /></div>
+          <div>
+            <h3>Context Feedback</h3>
+            <p>Give contextual feedback anytime</p>
+          </div>
+        </Link>
+
+        <Link to="/employee/dashboard/feedback/assignedform" className="fm-lnd-card">
+          <div className="fm-lnd-icon yellow"><Eye size={22} /></div>
+          <div>
+            <h3>Assigned Forms</h3>
+            <p>Track and complete assigned forms</p>
+          </div>
+          {pendingFormsCount > 0 && (
+            <span className="fm-lnd-badge" aria-label="Pending forms">
+              {pendingFormsCount}
+            </span>
+          )}
+        </Link>
+
+        <Link to="/employee/dashboard/feedback/submit-peer" className="fm-lnd-card">
+          <div className="fm-lnd-icon green"><Users size={22} /></div>
+          <div>
+            <h3>Peer Feedback Received</h3>
+            <p>See feedback from peers</p>
+          </div>
+          {peerCount > 0 && (
+            <span className="fm-lnd-badge" aria-label="Peer feedback received">
+              {peerCount}
+            </span>
+          )}
+        </Link>
+
+        <Link to="/employee/dashboard/feedback/reviews-received" className="fm-lnd-card">
+          <div className="fm-lnd-icon blue"><Star size={22} /></div>
+          <div>
+            <h3>Reviews Received</h3>
+            <p>View reviews you’ve received</p>
+          </div>
+          {reviewsCount > 0 && (
+            <span className="fm-lnd-badge" aria-label="Reviews received count">
+              {reviewsCount}
+            </span>
+          )}
+        </Link>
+
+        <Link to="/employee/dashboard/feedback/submissions" className="fm-lnd-card">
+          <div className="fm-lnd-icon gray"><Search size={22} /></div>
+          <div>
+            <h3>My Submissions</h3>
+            <p>View feedback you have submitted</p>
+          </div>
+        </Link>
+
+        {isMentor && (
+          <Link to="/employee/dashboard/feedback/mentor" className="fm-lnd-card">
+            <div className="fm-lnd-icon purple"><Award size={22} /></div>
+            <div>
+              <h3>SME Dashboard</h3>
+              <p>Manage SME/mentor responsibilities</p>
+            </div>
+            {mentorFeedbackCount > 0 && (
+              <span className="fm-lnd-badge" aria-label="SME items">
+                {mentorFeedbackCount}
+              </span>
+            )}
+          </Link>
+        )}
       </div>
     </div>
   );

@@ -319,7 +319,6 @@ body {
  
 .hrmom-badge {
   display: inline-flex;
-  align-items: center;
   gap: 0.3rem;
   padding: 0.28rem 0.65rem;
   border-radius: 6px;
@@ -327,6 +326,7 @@ body {
   font-weight: 600;
   line-height: 1.2;
   white-space: nowrap;
+  margin-left: -400px;
 }
  
 .hrmom-badge-icon {

@@ -363,8 +363,7 @@ const fetchMoms = async () => {
               placeholder="Search meeting title"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              className="hrmom-search-input"
-            />
+              className="hrmom-search-input"/>
  
             {activeSearchTerm ? (
               <button

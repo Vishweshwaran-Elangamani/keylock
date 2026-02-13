@@ -345,10 +345,7 @@ export default function MySubmissions() {
                             <div className="fm-mysub-card__primary-text">HR</div>
                           </div>
                         </div>
-                        <div className="d-flex align-items-center gap-2 mb-4">
-                          <Clock size={16}className="fm-mysub-card__icon-muted"/>
-                          <div className="fm-mysub-card__meta-text"> {hr.submittedAtFormatted}</div>
-                        </div>
+                       
                         <div className="fm-mysub-card__preview mb-3">
                           <p className="fm-mysub-card__preview-text"> {hr.formName || "HR Form Submission"}</p>
                         </div>

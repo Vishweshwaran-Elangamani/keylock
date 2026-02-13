@@ -1,14 +1,19 @@
 import React, { useState } from "react";
 import CreateMomModal from "./CreateMomModal";
 import "../../../styles/mom/modals/MeetingDetailsModal.css";
- 
-const MeetingDetailsModal = ({ meeting, onClose, employeeMap, onMomCreated }) => {
+
+const MeetingDetailsModal = ({
+  meeting,
+  onClose,
+  employeeMap,
+  onMomCreated,
+}) => {
   const [showCreateMom, setShowCreateMom] = useState(false);
- 
+  const hasMomAlready = meeting?.hasMomAlready;
   const toggleCreateMom = () => setShowCreateMom(!showCreateMom);
- 
+
   if (!meeting) return null;
- 
+
   const meetingTitle = meeting.meetingTitle || meeting.MeetingTitle;
   const meetingType = meeting.meetingType || meeting.MeetingType;
   const meetingDate =
@@ -16,31 +21,31 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap, onMomCreated }) =>
     meeting.MeetingDate ||
     meeting.createdAt ||
     meeting.CreatedAt;
- 
+
   const attendees =
     meeting.attendees ||
     meeting.Attendees ||
     meeting.attendeeNames ||
     "Not specified";
- 
+
   const meetingLink = meeting.meetingLink || meeting.MeetingLink;
   const commentsObservations =
     meeting.commentsObservations || meeting.CommentsObservations;
- 
+
   const discussionPoints =
     meeting.discussionPoints || meeting.DiscussionPoints || [];
- 
+
   const actionItems = meeting.actionItems || meeting.ActionItems || [];
- 
+
   const getEmployeeName = (actionItem) => {
     const existingName =
       actionItem.assignedToEmployeeName ||
       actionItem.AssignedToEmployeeName ||
       actionItem.employeeName ||
       actionItem.EmployeeName;
- 
+
     if (existingName) return existingName;
- 
+
     const assignedId =
       actionItem.assignedToEmployeeId ||
       actionItem.AssignedToEmployeeId ||
@@ -50,28 +55,35 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap, onMomCreated }) =>
       actionItem.EmployeeId ||
       actionItem.assignTo ||
       actionItem.AssignTo;
- 
+
     if (!assignedId) return "Unassigned";
- 
+
     return employeeMap?.[String(assignedId)];
   };
- 
+
   const handleMomCreated = (newMom) => {
-    const processedActionItems = (newMom.actionItems || newMom.ActionItems || []).map(item => {
+    const processedActionItems = (
+      newMom.actionItems ||
+      newMom.ActionItems ||
+      []
+    ).map((item) => {
       const assignedId =
         item.assignedToEmployeeId ||
         item.AssignedToEmployeeId ||
         item.assignedTo ||
         item.AssignedTo;
-     
+
       const existingName =
         item.assignedToEmployeeName ||
         item.AssignedToEmployeeName ||
         item.employeeName ||
         item.EmployeeName;
-     
-      const finalName = existingName || employeeMap?.[String(assignedId)] || `Employee ${assignedId}`;
-     
+
+      const finalName =
+        existingName ||
+        employeeMap?.[String(assignedId)] ||
+        `Employee ${assignedId}`;
+
       return {
         ...item,
         assignedToEmployeeId: assignedId,
@@ -86,33 +98,52 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap, onMomCreated }) =>
         Status: item.status || item.Status || "Pending",
       };
     });
- 
+
     const normalizedMom = {
-      meetingId: newMom.meetingId || newMom.MeetingId || newMom.id || Date.now(),
-      MeetingId: newMom.meetingId || newMom.MeetingId || newMom.id || Date.now(),
-      meetingTitle: newMom.meetingTitle || newMom.MeetingTitle || meetingTitle || "MOM Record",
-      MeetingTitle: newMom.meetingTitle || newMom.MeetingTitle || meetingTitle || "MOM Record",
-      meetingType: newMom.meetingType || newMom.MeetingType || meetingType || "General",
-      MeetingType: newMom.meetingType || newMom.MeetingType || meetingType || "General",
+  meetingId:
+    meeting.meetingId || meeting.MeetingId,  
+  MeetingId:
+    meeting.meetingId || meeting.MeetingId,
+
+      MeetingId:
+        newMom.meetingId || newMom.MeetingId || newMom.id || Date.now(),
+      meetingTitle:
+        newMom.meetingTitle ||
+        newMom.MeetingTitle ||
+        meetingTitle ||
+        "MOM Record",
+      MeetingTitle:
+        newMom.meetingTitle ||
+        newMom.MeetingTitle ||
+        meetingTitle ||
+        "MOM Record",
+      meetingType:
+        newMom.meetingType || newMom.MeetingType || meetingType || "General",
+      MeetingType:
+        newMom.meetingType || newMom.MeetingType || meetingType || "General",
       meetingDate: newMom.meetingDate || newMom.MeetingDate || meetingDate,
       MeetingDate: newMom.meetingDate || newMom.MeetingDate || meetingDate,
-      commentsObservations: newMom.commentsObservations || newMom.CommentsObservations || "",
-      CommentsObservations: newMom.commentsObservations || newMom.CommentsObservations || "",
+      commentsObservations:
+        newMom.commentsObservations || newMom.CommentsObservations || "",
+      CommentsObservations:
+        newMom.commentsObservations || newMom.CommentsObservations || "",
       actionItems: processedActionItems,
       ActionItems: processedActionItems,
-      discussionPoints: newMom.discussionPoints || newMom.DiscussionPoints || [],
-      DiscussionPoints: newMom.discussionPoints || newMom.DiscussionPoints || [],
+      discussionPoints:
+        newMom.discussionPoints || newMom.DiscussionPoints || [],
+      DiscussionPoints:
+        newMom.discussionPoints || newMom.DiscussionPoints || [],
       attendees: newMom.attendees || newMom.Attendees || attendees,
       Attendees: newMom.attendees || newMom.Attendees || attendees,
     };
- 
+
     if (onMomCreated) {
       onMomCreated(normalizedMom);
     }
-   
+
     setShowCreateMom(false);
   };
- 
+
   return (
     <>
       <div
@@ -140,7 +171,7 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap, onMomCreated }) =>
                 onClick={onClose}
               ></button>
             </div>
- 
+
             <div className="mdm-body modal-body">
               <div className="row g-3 mb-4">
                 <div className="col-md-6">
@@ -165,7 +196,7 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap, onMomCreated }) =>
                   </div>
                 </div>
               </div>
- 
+
               {meetingLink && (
                 <div className="mb-4">
                   <div className="mdm-link-card p-3 rounded">
@@ -187,7 +218,7 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap, onMomCreated }) =>
                   </div>
                 </div>
               )}
- 
+
               {commentsObservations && (
                 <div className="mb-4">
                   <h6 className="mdm-section-title fw-semibold mb-3">
@@ -198,20 +229,23 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap, onMomCreated }) =>
                   </div>
                 </div>
               )}
- 
+
               {discussionPoints.length > 0 && (
                 <div className="mb-4">
                   <h6 className="mdm-section-title fw-semibold mb-3">
                     Discussion Points
                   </h6>
                   {discussionPoints.map((dp, i) => (
-                    <div key={i} className="mdm-discussion-card p-3 rounded mb-2">
+                    <div
+                      key={i}
+                      className="mdm-discussion-card p-3 rounded mb-2"
+                    >
                       {dp.pointText || dp.PointText || dp.point || "No details"}
                     </div>
                   ))}
                 </div>
               )}
- 
+
               {actionItems.length > 0 && (
                 <div className="mb-4">
                   <h6 className="mdm-section-title fw-semibold mb-3">
@@ -224,16 +258,16 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap, onMomCreated }) =>
                       ai.task ||
                       ai.Task ||
                       "No description";
- 
+
                     const due =
                       ai.dueDate ||
                       ai.DueDate ||
                       ai.targetDate ||
                       ai.TargetDate ||
                       null;
- 
+
                     const employeeName = getEmployeeName(ai);
- 
+
                     return (
                       <div key={i} className="mdm-action-card p-3 rounded mb-2">
                         <div className="fw-semibold mb-2">{task}</div>
@@ -244,7 +278,10 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap, onMomCreated }) =>
                           </span>
                           <span>
                             <i className="bi bi-calendar-event me-1"></i>
-                            Due: <strong>{due ? new Date(due).toLocaleDateString() : "N/A"}</strong>
+                            Due:{" "}
+                            <strong>
+                              {due ? new Date(due).toLocaleDateString() : "N/A"}
+                            </strong>
                           </span>
                         </div>
                       </div>
@@ -252,14 +289,18 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap, onMomCreated }) =>
                   })}
                 </div>
               )}
- 
-              <button
-                className="mdm-create-mom-btn btn btn-outline-primary w-100 py-2"
-                onClick={toggleCreateMom}
-              >
-                {showCreateMom ? "Cancel MOM Creation" : "Create MOM for this Meeting"}
-              </button>
- 
+
+              {!hasMomAlready && (
+                <button
+                  className="mdm-create-mom-btn btn btn-outline-primary w-100 py-2"
+                  onClick={toggleCreateMom}
+                >
+                  {showCreateMom
+                    ? "Cancel MOM Creation"
+                    : "Create MOM for this Meeting"}
+                </button>
+              )}
+
               {showCreateMom && (
                 <CreateMomModal
                   meetingData={meeting}
@@ -269,7 +310,7 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap, onMomCreated }) =>
                 />
               )}
             </div>
- 
+
             <div className="mdm-footer modal-footer border-0">
               <button className="btn btn-secondary px-4" onClick={onClose}>
                 Close
@@ -281,7 +322,5 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap, onMomCreated }) =>
     </>
   );
 };
- 
+
 export default MeetingDetailsModal;
- 
- 

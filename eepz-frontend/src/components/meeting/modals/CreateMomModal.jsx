@@ -15,15 +15,16 @@ const CreateMomModal = ({ meetingData, onClose, onMomCreated }) => {
   const [submitting, setSubmitting] = useState(false);
  
   const [formData, setFormData] = useState({
-    meetingId: meetingData.meetingId || 0,
+    meetingId: meetingData.meetingId || meetingData.MeetingId || 0,
     meetingTitle: meetingData.meetingTitle || "",
     meetingType: meetingData.meetingType || "",
     meetingDate: meetingData.meetingDate || new Date().toISOString(),
     meetingLink: meetingData.meetingLink || "",
     attendees: meetingData.attendees || "",
     commentsObservations: meetingData.commentsObservations || "",
-    submittedByEmployeeId: userId,
     submittedByRole: userRole,
+
+
     isEditable: true,
     discussionPoints:
       meetingData.discussionPoints?.map((dp, index) => ({
@@ -164,26 +165,57 @@ const CreateMomModal = ({ meetingData, onClose, onMomCreated }) => {
  
   const handleSubmit = async (e) => {
   e.preventDefault();
+
   if (!validateForm()) {
     toastr.error("Please fix the errors before submitting");
     return;
   }
- 
+
   setSubmitting(true);
+
   try {
     const response = await momService.createMom(formData);
-   
     const momId = response?.data?.momId || response?.data?.MomId;
-   
-    if (momId && onMomCreated) {
-      const completeMom = await momService.getMomById(momId);
-      onMomCreated(completeMom?.data || completeMom);
-    } else if (onMomCreated) {
-      onMomCreated(response?.data || formData);
-    }
-   
+
+    let finalMomData;
+
+   if (momId) {
+  const completeMom = await momService.getMomById(momId);
+  finalMomData = completeMom?.data || completeMom;
+} else {
+  finalMomData = response?.data || formData;
+}
+
+finalMomData.meetingId =
+  meetingData.meetingId || meetingData.MeetingId;
+
+finalMomData.MeetingId =
+  meetingData.meetingId || meetingData.MeetingId;
+
+
+    const enrichedActionItems = (finalMomData.actionItems || finalMomData.ActionItems || []).map(item => {
+      const assignedId =
+        item.assignedToEmployeeId ||
+        item.AssignedToEmployeeId ||
+        item.assignedTo ||
+        item.AssignedTo;
+
+      const employeeName = getEmployeeName(assignedId);
+
+      return {
+        ...item,
+        assignedToEmployeeName: employeeName,
+        AssignedToEmployeeName: employeeName,
+      };
+    });
+
+    finalMomData.actionItems = enrichedActionItems;
+    finalMomData.ActionItems = enrichedActionItems;
+
+    if (onMomCreated) onMomCreated(finalMomData);
+
     toastr.success("MOM created successfully");
-    onClose();  
+    onClose();
   } catch (err) {
     toastr.error("Failed to create MOM");
     console.error(err);
@@ -191,28 +223,28 @@ const CreateMomModal = ({ meetingData, onClose, onMomCreated }) => {
     setSubmitting(false);
   }
 };
- 
+
  
   const getEmployeeName = (assignedId) => {
-    if (!assignedId || employees.length === 0) return "";
- 
-    const id = Number(assignedId);
- 
-    const employee = employees.find((e) => {
-      const empMasterId = Number(e.employeeMasterId || e.EmployeeMasterId || 0);
-      const empId = Number(e.employeeId || e.EmployeeId || 0);
-      const eId = Number(e.id || e.Id || 0);
-     
-      return empMasterId === id || empId === id || eId === id;
-    });
- 
-    if (!employee) return `Employee ${assignedId}`;
- 
-    const firstName = employee.firstName || employee.FirstName || "";
-    const lastName = employee.lastName || employee.LastName || "";
-   
-    return `${firstName} ${lastName}`.trim() || `Employee ${assignedId}`;
-  };
+  if (!assignedId || employees.length === 0) return "Unassigned";
+
+  const id = Number(assignedId);
+
+  const employee = employees.find((e) => {
+    const empMasterId = Number(e.employeeMasterId || e.EmployeeMasterId || 0);
+    const empId = Number(e.employeeId || e.EmployeeId || 0);
+    const eId = Number(e.id || e.Id || 0);
+    return empMasterId === id || empId === id || eId === id;
+  });
+
+  if (!employee) return "Unassigned";
+
+  const firstName = employee.firstName || employee.FirstName || "";
+  const lastName = employee.lastName || employee.LastName || "";
+
+  return `${firstName} ${lastName}`.trim();
+};
+
  
   const formatDisplayDate = (value) => {
     if (!value) return "";

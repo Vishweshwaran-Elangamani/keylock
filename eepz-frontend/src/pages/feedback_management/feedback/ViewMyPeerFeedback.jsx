@@ -115,10 +115,9 @@ export default function ViewMyPeerFeedback() {
               const isRecipient =
                 Number(p.recipientEmployeeId) === Number(empId);
               const isApproved =
-  p.status === "Approved" ||
-  p.status === "Pending" ||
-  p.Status === "Approved";
-
+                p.status === "Approved" ||
+                p.status === "Pending" ||
+                p.Status === "Approved";
 
               return isRecipient && isApproved;
             })
@@ -207,24 +206,6 @@ export default function ViewMyPeerFeedback() {
               className="btn-close"
               onClick={() => setError("")}
             />
-          </div>
-        )}
-
-        {peerFeedback.length > 0 && (
-          <div className="fm-viewpeer-stats">
-            <div className="fm-viewpeer-stat-card">
-              <div className="fm-viewpeer-stat-card__icon">
-                <Users size={28} />
-              </div>
-              <div className="fm-viewpeer-stat-card__content">
-                <h3 className="fm-viewpeer-stat-card__value">
-                  {peerFeedback.length}
-                </h3>
-                <p className="fm-viewpeer-stat-card__label">
-                  Peer Feedback Received
-                </p>
-              </div>
-            </div>
           </div>
         )}
 

@@ -158,6 +158,11 @@ export default function FeedbackHRDashboard() {
           ))}
         </div>
 
+         <div className="fm-lnd-header">
+        <h3>Feedback Management</h3>
+        <p> View the Feedbacks given, Design new forms , submits feedbacks for mentor </p>
+      </div>
+
         <div className="fb-hr-action-cards-row">
           <HeroActionCard title="View All Feedback" description="Browse and manage feedback submissions." icon={Search} to="/hr/dashboard/feedback/hrformlist" iconBg="#EDE9FE" iconColor="#8B5CF6" />
           <HeroActionCard title="Create New Form" description="Design new HR feedback forms." icon={Plus} to="/hr/dashboard/feedback/create-form" iconBg="#FECDD3" iconColor="#E11D48" />

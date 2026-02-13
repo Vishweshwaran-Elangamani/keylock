@@ -67,20 +67,19 @@ export default function FeedbackManagerDashboard() {
           </div>
         </Link>
 
+        <Link to="/manager/dashboard/feedback/contextfeedback" className="fm-lnd-card">
+          <div className="fm-lnd-icon gray"><MessageSquare size={22} /></div>
+          <div>
+            <h3>Context Feedback</h3>
+            <p>Give contextual feedback anytime</p>
+          </div>
+        </Link>
 
         <Link to="/manager/dashboard/feedback/assignedform" className="fm-lnd-card">
           <div className="fm-lnd-icon yellow"><Target size={22} /></div>
           <div>
             <h3>Assigned Forms</h3>
             <p>Track and complete assigned feedback forms</p>
-          </div>
-        </Link>
-
-        <Link to="/manager/dashboard/feedback/contextfeedback" className="fm-lnd-card">
-          <div className="fm-lnd-icon gray"><MessageSquare size={22} /></div>
-          <div>
-            <h3>Context Feedback</h3>
-            <p>Give contextual feedback anytime</p>
           </div>
         </Link>
 
@@ -95,3 +94,4 @@ export default function FeedbackManagerDashboard() {
     </div>
   );
 }
+
