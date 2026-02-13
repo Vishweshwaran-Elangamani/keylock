@@ -15,10 +15,6 @@ namespace Relevantz.EEPZ.Core.Services.Interfaces
 
         Task<object> GetAllAssignmentsAsync();
 
-        Task<object> GetDraftAssignmentsAsync();
-
-        Task<object> UpdateDraftAsync(int assignmentId, UpdateDraftRequestDto request);
-
         Task<object> GetAssignmentsByFormIdAsync(int formId);
 
         Task<object> DeleteAssignmentAsync(int assignmentId);

@@ -9,7 +9,6 @@ namespace Relevantz.EEPZ.Core.Services.Interfaces
         Task<ApiResponse<FormResponseDto>> GetFormByIdAsync(int formId);
         Task<ApiResponse<List<FormResponseDto>>> GetAllFormsAsync();
         Task<ApiResponse<bool>> DeleteFormAsync(int formId);
-        Task<ApiResponse<bool>> DeleteDraftAsync(int assignmentId);
         Task<ApiResponse<FormResponseDto>> UpdateFormAsync(int formId, CreateFormRequestDto request);
     }
 }

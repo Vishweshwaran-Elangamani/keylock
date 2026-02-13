@@ -316,59 +316,5 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
-        [HttpDelete("draft/{assignmentId}")]
-        [Authorize(Roles = "HR,Admin")]
-        public async Task<IActionResult> DeleteDraft(int assignmentId)
-        {
-            try
-            {
-                var userId = GetCurrentUserId();
-                var userRole = GetCurrentUserRole();
-
-                _logger.LogInformation(
-                    "Delete Draft Request | UserId: {UserId} | Role: {Role} | AssignmentId: {AssignmentId}",
-                    userId,
-                    userRole,
-                    assignmentId
-                );
-
-                if (assignmentId <= 0)
-                {
-                    return BadRequest(new { success = false, message = "Invalid assignment ID" });
-                }
-
-                var result = await _formService.DeleteDraftAsync(assignmentId);
-
-                if (result.Success)
-                {
-                    _logger.LogInformation(
-                        " Draft deleted successfully | AssignmentId: {AssignmentId}",
-                        assignmentId
-                    );
-                    return Ok(result);
-                }
-
-                _logger.LogWarning(" Draft deletion failed: {Message}", result.Message);
-                return BadRequest(result);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                _logger.LogError(" Unauthorized access: {Message}", ex.Message);
-                return Unauthorized(new { success = false, message = "Unauthorized access" });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(" Error deleting draft: {Exception}", ex);
-                return StatusCode(
-                    500,
-                    new
-                    {
-                        success = false,
-                        message = "Internal server error",
-                        details = ex.Message,
-                    }
-                );
-            }
-        }
     }
 }

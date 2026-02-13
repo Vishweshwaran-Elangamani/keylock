@@ -531,61 +531,6 @@ public class AssignmentsService : IAssignmentsService
             }
         }
 
-        public async Task<object> GetDraftAssignmentsAsync()
-{
-    try
-    {
-        var draftAssignments = await _repository.GetDraftAssignmentsAsync();
-
-        var result = new List<object>();
-        
-        foreach (var a in draftAssignments)
-        {
-           var profile = await _repository.GetUserProfileByEmployeeIdAsync(a.EmployeeId);
-
-            
-            result.Add(new
-            {
-                a.AssignmentId,
-                a.FormId,
-                FormName = a.Form?.Name,
-                a.EmployeeId,
-                EmployeeName = profile != null ? $"{profile.FirstName} {profile.LastName}".Trim() : "Unknown"
-            });
-        }
-
-        return new { success = true, data = result };
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError("[ERROR] GetDraftAssignments: {Message}", ex.Message);
-        return new { success = false, message = $"Error: {ex.Message}" };
-    }
-}
-
-
-        public async Task<object> UpdateDraftAsync(int assignmentId, UpdateDraftRequestDto request)
-        {
-            try
-            {
-                var assignment = await _repository.GetAssignmentByIdAsync(assignmentId);
-                if (assignment == null)
-                    return new { success = false, message = "Assignment not found", data = false };
-
-                assignment.Action = request.Action;
-                assignment.AssignedAt = DateTime.UtcNow;
-
-                await _repository.UpdateAssignmentAsync(assignment);
-
-                return new { success = true, message = "Assignment updated successfully", data = true };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("[ERROR] UpdateDraft: {Message}", ex.Message);
-                return new { success = false, message = $"Error updating assignment: {ex.Message}", data = false };
-            }
-        }
-
         public async Task<object> GetAssignmentsByFormIdAsync(int formId)
         {
             try

@@ -119,31 +119,9 @@ namespace PerformanceManagement.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Retrieves draft assignments.
-        /// </summary>
-        [HttpGet("drafts")]
-        public async Task<IActionResult> GetDraftAssignments()
-        {
-            var result = await _assignmentsService.GetDraftAssignmentsAsync();
-            return Ok(result);
-        }
+       
 
-        /// <summary>
-        /// Updates a draft assignment.
-        /// </summary>
-        [HttpPut("{assignmentId}")]
-        public async Task<IActionResult> UpdateDraft(int assignmentId, [FromBody] UpdateDraftRequestDto request)
-        {
-            if (assignmentId <= 0)
-                return BadRequest(new { success = false, message = "Invalid assignmentId." });
-
-            if (!ModelState.IsValid)
-                return BadRequest(new { success = false, errors = ModelState });
-
-            var result = await _assignmentsService.UpdateDraftAsync(assignmentId, request);
-            return Ok(result);
-        }
+      
 
         /// <summary>
         /// Retrieves assignments by form ID.

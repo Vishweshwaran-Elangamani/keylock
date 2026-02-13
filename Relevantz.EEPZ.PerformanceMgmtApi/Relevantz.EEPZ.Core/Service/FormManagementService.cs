@@ -209,24 +209,6 @@ if (!validation.IsValid)
                 return ApiResponse<bool>.ErrorResponse($"Error deleting form: {ex.Message}");
             }
         }
-
-        public async Task<ApiResponse<bool>> DeleteDraftAsync(int assignmentId)
-        {
-            try
-            {
-                var draft = await _repository.GetDraftByAssignmentIdAsync(assignmentId);
-                if (draft == null)
-                    return ApiResponse<bool>.ErrorResponse("Draft not found");
-
-                await _repository.DeleteDraftAsync(assignmentId);
-                return ApiResponse<bool>.SuccessResponse(true, "Draft deleted successfully");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse<bool>.ErrorResponse($"Error deleting draft: {ex.Message}");
-            }
-        }
-
         private FormResponseDto MapToFormResponse(Assessmentform form)
         {
             string creatorName = form.CreatedByNavigation?.Email ?? "Unknown";
