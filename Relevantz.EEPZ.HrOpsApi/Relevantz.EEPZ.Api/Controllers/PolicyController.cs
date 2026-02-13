@@ -60,7 +60,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
 
 
-            // ✅ DTO uses PolicyName, not Title
+            // DTO uses PolicyName, not Title
             EEPZBusinessLog.LogBusinessInformation("User {UserId} creating new policy: {PolicyTitle}",
                 createdByUserId, request.PolicyName);
 
@@ -76,7 +76,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
 
 
-            // ✅ DTO uses PolicyName, not Title
+            // DTO uses PolicyName, not Title
             EEPZBusinessLog.LogBusinessInformation("Policy '{PolicyTitle}' created successfully by user {UserId}",
                 request.PolicyName, createdByUserId);
 

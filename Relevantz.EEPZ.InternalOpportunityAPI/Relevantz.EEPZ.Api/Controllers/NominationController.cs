@@ -228,12 +228,6 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "Department Head,DepartmentHead,DEPTHEAD")]
         public async Task<IActionResult> DepartmentHeadReview(int id, [FromBody] DepartmentHeadReviewRequestDto request)
         {
-            Console.WriteLine($"[Controller] DepartmentHeadReview - NominationId: {id}");
-            Console.WriteLine($"[Controller] Request.Action: {request?.Action ?? "NULL"}");
-            Console.WriteLine($"[Controller] Request.ReviewRemarks: {request?.ReviewRemarks ?? "NULL"}");
-            Console.WriteLine($"[Controller] Request.MeritScore: {request?.MeritScore?.ToString() ?? "NULL"}");
-            Console.WriteLine($"[Controller] Request.DiversityScore: {request?.DiversityScore?.ToString() ?? "NULL"}");
-            Console.WriteLine($"[Controller] Request.ConflictOfInterest: {request?.ConflictOfInterest?.ToString() ?? "NULL"}");
 
             if (request == null)
             {
