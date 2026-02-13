@@ -54,7 +54,7 @@ namespace eepzbackend.Controllers
         }
 
         /// <summary>
-        /// Create a new project (US146)
+        /// Create a new project
         /// </summary>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -77,7 +77,7 @@ namespace eepzbackend.Controllers
         }
 
         /// <summary>
-        /// Update project details (US148)
+        /// Update project details 
         /// </summary>
         [HttpPut("{projectId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -131,7 +131,7 @@ namespace eepzbackend.Controllers
         }
 
         /// <summary>
-        /// Update reporting managers of a project (US147)
+        /// Update reporting managers of a project
         /// </summary>
         [HttpPut("{projectId}/reporting-managers")]
         [ProducesResponseType(StatusCodes.Status200OK)]

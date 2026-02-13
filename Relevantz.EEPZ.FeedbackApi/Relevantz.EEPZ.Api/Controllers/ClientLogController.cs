@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-
+using Relevantz.EEPZ.Common.DTOs.Response;
 namespace Relevantz.EEPZ.Api.Controllers
 {
     [ApiController]
@@ -24,10 +24,5 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
     }
 
-    public class ClientErrorDto
-    {
-        public string Message { get; set; }
-        public string Url { get; set; }
-        public string UserAgent { get; set; }
-    }
+   
 }
