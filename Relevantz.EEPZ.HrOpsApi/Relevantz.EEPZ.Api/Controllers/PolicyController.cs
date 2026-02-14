@@ -555,7 +555,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 len /= 1024;
             }
 
-
             return $"{len:0.##} {sizes[order]}";
         }
     }

@@ -217,7 +217,6 @@ Log.Information("FluentValidation registered successfully");
 
 // DEPENDENCY INJECTION - REPOSITORIES
 builder.Services.AddScoped<IPolicyRepository, PolicyRepository>();
-builder.Services.AddScoped<IViolationRepository, ViolationRepository>();
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<ICostMappingRepository, CostMappingRepository>();
 builder.Services.AddScoped<IBudgetPeriodAllocationRepository, BudgetPeriodAllocationRepository>();
@@ -230,8 +229,6 @@ Log.Information("Repositories registered successfully");
 
 // DEPENDENCY INJECTION - SERVICES
 builder.Services.AddScoped<IPolicyService, PolicyService>();
-builder.Services.AddScoped<IViolationService, ViolationService>();
-builder.Services.AddScoped<IComplianceService, ComplianceService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ICostMappingService, CostMappingService>();
 builder.Services.AddScoped<IPeriodAllocationService, PeriodAllocationService>();

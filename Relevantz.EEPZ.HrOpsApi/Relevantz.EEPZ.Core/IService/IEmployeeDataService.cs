@@ -7,8 +7,6 @@ namespace Relevantz.EEPZ.Core.IService
 {
     public interface IEmployeeDataService
     {
-        Task<ComplianceOverviewDto> GetComplianceOverviewAsync();
-
         Task<(List<EmployeeWithoutGoalsDto> Employees, string Message)> GetEmployeesWithoutGoalsAsync(int? currentUserId);
 
         Task<GoalSuggestionsResponseDto> SuggestGoalsAsync(int userId);

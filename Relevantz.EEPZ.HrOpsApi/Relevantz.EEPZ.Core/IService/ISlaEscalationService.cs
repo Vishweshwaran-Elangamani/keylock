@@ -9,7 +9,6 @@ namespace Relevantz.EEPZ.Core.IService
         Task<ApiResponseDto<List<SlaEscalationResponseDto>>> GetAllSlaEscalationsAsync();
         Task<ApiResponseDto<List<SlaEscalationResponseDto>>> GetSlaEscalationsByEmployeeAsync(int employeeUserId);
         Task<ApiResponseDto<SlaEscalationResponseDto>> GetSlaEscalationByIdAsync(int escalationId);
-        Task<ApiResponseDto<object>> GetCombinedViolationsAndEscalationsAsync();
         Task<ApiResponseDto<object>> GetSlaEscalationStatsAsync();
     }
 }

@@ -14,15 +14,11 @@ namespace Relevantz.EEPZ.Core.Service
     public class SlaEscalationService : ISlaEscalationService
     {
         private readonly ISlaEscalationRepository _slaEscalationRepository;
-        private readonly IViolationService _violationService;
-
 
         public SlaEscalationService(
-            ISlaEscalationRepository slaEscalationRepository,
-            IViolationService violationService)
+            ISlaEscalationRepository slaEscalationRepository)
         {
             _slaEscalationRepository = slaEscalationRepository;
-            _violationService = violationService;
         }
 
 
@@ -87,57 +83,6 @@ namespace Relevantz.EEPZ.Core.Service
             return ApiResponseDto<SlaEscalationResponseDto>.SuccessResponse(
                 response,
                 "Escalation details retrieved");
-        }
-
-
-        public async Task<ApiResponseDto<object>> GetCombinedViolationsAndEscalationsAsync()
-        {
-            EEPZBusinessLog.LogServiceInformation("Fetching combined violations and SLA escalations");
-
-
-            var violationsResult = await _violationService.GetAllViolationsAsync();
-
-
-            var escalations = await _slaEscalationRepository.GetAllAsync();
-            var escalationData = escalations.Select(e => new
-            {
-                type = "SLA Escalation",
-                id = e.EscalationId,
-                employeeUserId = e.Sla?.EmployeeId,
-                employeeName = GetEmployeeName(e.Sla?.Employee?.Userprofile),
-                violation = e.Reason,
-                severity = GetSeverityLevel(CalculateDaysOverdue(e.Sla?.Deadline)),
-                status = e.EscalationStatus,
-                reportedDate = e.SubmittedAt,
-                details = new
-                {
-                    slaType = e.Sla?.Slatype,
-                    escalationLevel = e.EscalationLevel,
-                    daysOverdue = CalculateDaysOverdue(e.Sla?.Deadline)
-                }
-            }).ToList();
-
-
-            var combinedData = new
-            {
-                violations = violationsResult.Data,
-                slaEscalations = escalationData,
-                summary = new
-                {
-                    totalViolations = violationsResult.Data?.Count() ?? 0,
-                    totalEscalations = escalationData.Count,
-                    totalCombined = (violationsResult.Data?.Count() ?? 0) + escalationData.Count
-                }
-            };
-
-
-            EEPZBusinessLog.LogServiceInformation("Combined data retrieved: {TotalViolations} violations, {TotalEscalations} escalations",
-                combinedData.summary.totalViolations, combinedData.summary.totalEscalations);
-
-
-            return ApiResponseDto<object>.SuccessResponse(
-                combinedData,
-                "Combined violations and escalations retrieved");
         }
 
 

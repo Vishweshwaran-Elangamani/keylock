@@ -40,22 +40,6 @@ namespace Relevantz.EEPZ.Api.Controllers
 
 
         /// <summary>
-        /// Retrieves a high-level compliance overview for goals across the organization.
-        /// </summary>
-        /// <returns>200 OK with compliance overview statistics.</returns>
-        [HttpGet("goal-tracking/overview")]
-        public async Task<IActionResult> GetComplianceOverview()
-        {
-            EEPZBusinessLog.LogBusinessInformation("Retrieving goal tracking compliance overview");
-            
-            var result = await _employeeDataService.GetComplianceOverviewAsync();
-            
-            EEPZBusinessLog.LogBusinessInformation("Goal tracking compliance overview retrieved successfully");
-            return Ok(result);
-        }
-
-
-        /// <summary>
         /// Retrieves employees who have not submitted or set their goals.
         /// </summary>
         /// <returns>
@@ -345,53 +329,6 @@ namespace Relevantz.EEPZ.Api.Controllers
 
             return Ok(new { success = true, data = policy });
         }
-
-        #region Test Endpoints - REMOVE BEFORE PRODUCTION
-
-[HttpGet("test-exception")]
-[AllowAnonymous]
-public IActionResult TestException()
-{
-    throw new ArgumentException("Test: ArgumentException from EmployeeDataController");
-}
-
-[HttpGet("test-invalid-operation")]
-[AllowAnonymous]
-public IActionResult TestInvalidOperation()
-{
-    throw new InvalidOperationException("Test: InvalidOperationException from EmployeeDataController");
-}
-
-[HttpGet("test-db-exception")]
-[AllowAnonymous]
-public IActionResult TestDbException()
-{
-    throw new DbUpdateException("Test: DbUpdateException (simulated database error)");
-}
-
-[HttpGet("test-generic-exception")]
-[AllowAnonymous]
-public IActionResult TestGenericException()
-{
-    throw new Exception("Test: Generic unhandled exception");
-}
-
-[HttpGet("test-unauthorized")]
-[AllowAnonymous]
-public IActionResult TestUnauthorized()
-{
-    throw new UnauthorizedAccessException("Test: Unauthorized access attempt");
-}
-
-[HttpGet("test-not-found")]
-[AllowAnonymous]
-public IActionResult TestNotFound()
-{
-    throw new KeyNotFoundException("Test: Resource not found");
-}
-
-#endregion
-
     }
     
 }

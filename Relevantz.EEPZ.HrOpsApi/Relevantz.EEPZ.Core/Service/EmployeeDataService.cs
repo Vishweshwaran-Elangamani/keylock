@@ -16,7 +16,6 @@ namespace Relevantz.EEPZ.Core.Service
 {
     public class EmployeeDataService : IEmployeeDataService
     {
-        private readonly IComplianceService _complianceService;
         private readonly IPolicyService _policyService;
         private readonly IEmailService _emailService;
         private readonly IEmployeeDataRepository _employeeDataRepository;
@@ -25,38 +24,17 @@ namespace Relevantz.EEPZ.Core.Service
 
 
         public EmployeeDataService(
-            IComplianceService complianceService,
             IPolicyService policyService,
             IEmailService emailService,
             IEmployeeDataRepository employeeDataRepository,
             ILogger<EmployeeDataService> logger,
             IConfiguration configuration)
         {
-            _complianceService = complianceService;
             _policyService = policyService;
             _emailService = emailService;
             _employeeDataRepository = employeeDataRepository;
             _logger = logger;
             _configuration = configuration;
-        }
-
-
-        public async Task<ComplianceOverviewDto> GetComplianceOverviewAsync()
-        {
-            EEPZBusinessLog.LogServiceInformation("Fetching compliance overview");
-
-
-            var complianceResponse = await _complianceService.GetComplianceOverviewAsync();
-            
-            if (complianceResponse?.Data != null)
-            {
-                EEPZBusinessLog.LogServiceInformation("Compliance overview retrieved successfully");
-                return complianceResponse.Data;
-            }
-
-
-            EEPZBusinessLog.LogServiceWarning("Compliance overview data not available");
-            throw new InvalidOperationException("Compliance overview data not available");
         }
 
 
