@@ -129,7 +129,6 @@ const MeetingInvitations = () => {
         RsvpComments: rsvpComment.trim(),
       };
 
-      console.log("Submitting RSVP with payload:", payload);
 
       const response = await rsvpService.submitRsvp(payload);
 

@@ -67,7 +67,6 @@
   }
 }
 
-/* Alerts */
 .emr-alert {
   border-radius: var(--radius-md);
   display: flex;
@@ -84,7 +83,6 @@
   flex: 1;
 }
 
-/* Main Card */
 .emr-card {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -95,7 +93,6 @@
   padding: 1.5rem;
 }
 
-/* Rating Buttons */
 .emr-rating-row {
   display: flex;
   gap: 0.5rem;
@@ -112,12 +109,10 @@
   line-height: 1;
 }
 
-/* Textareas */
 .emr-textarea {
   border-radius: var(--radius-md);
 }
 
-/* Actions */
 .emr-actions {
   display: flex;
   gap: 0.75rem;
@@ -132,7 +127,6 @@
   border-radius: var(--radius-md);
 }
 
-/* Tips Card */
 .emr-tips-card {
   margin-top: 1.5rem;
   border: 1px solid var(--border);
@@ -155,7 +149,6 @@
   text-align: left;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .emr-header {
     flex-wrap: wrap;

@@ -201,10 +201,6 @@ icon: "bi-check2-circle",
         res ||
         [];
 
-      console.log("Processed MOMs:", backendMeetings);
-
-      console.log("Processed MOMs:", backendMeetings);
-
       const processedMeetings = backendMeetings.map((mom) => {
         const actionItems = mom.ActionItems || mom.actionItems || [];
         const processedActionItems = actionItems.map((item) => {

@@ -604,13 +604,13 @@
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   border: 1px solid #e5e7eb;
-  overflow: visible !important;   /* critical */
-  position: relative;             /* create new stacking context */
+  overflow: visible !important;   
+  position: relative;             
   z-index: 1;
 }
  
 .hr-sla-table-responsive {
-  overflow: visible !important;   /* critical */
+  overflow: visible !important;  
   position: relative;
   z-index: 1;
 }

@@ -32,9 +32,9 @@ const ManagerSelectionModal = ({
   setFilterDepartment,
   paginatedManagers,
   currentPage,
-  totalPages,        
+  totalPages,
   goToPage,
-  getPageNumbers,     
+  getPageNumbers,
   uniqueRoles,
   uniqueDepartments,
   onUpdate,
@@ -93,12 +93,12 @@ const ManagerSelectionModal = ({
     label: d === "All" ? "All Departments" : d,
   }));
 
-  
   const safeTotal =
     typeof totalItems === "number" ? totalItems : paginatedManagers.length;
   const perPage = itemsPerPage || paginatedManagers.length || 1;
   const startIndex = safeTotal === 0 ? 0 : (currentPage - 1) * perPage + 1;
-  const endIndex = safeTotal === 0 ? 0 : Math.min(currentPage * perPage, safeTotal);
+  const endIndex =
+    safeTotal === 0 ? 0 : Math.min(currentPage * perPage, safeTotal);
 
   const modalContent = (
     <>
@@ -200,7 +200,9 @@ const ManagerSelectionModal = ({
             <div className="alert alert-info d-flex align-items-start gap-2 mb-3 msm-current-banner">
               <Info size={18} className="msm-info-icon" />
               <div className="msm-current-content">
-                <strong className="msm-current-label">Current Selection:</strong>
+                <strong className="msm-current-label">
+                  Current Selection:
+                </strong>
                 <div className="mt-1">
                   {getSelectedManager() ? (
                     <span className="badge msm-current-badge">
@@ -348,7 +350,6 @@ const ManagerSelectionModal = ({
               </table>
             </div>
 
-            {/* ✅ Reused PaginationFooter (replaces old inline pagination block) */}
             <PaginationFooter
               totalItems={totalItems}
               currentPage={currentPage}

@@ -26,7 +26,7 @@ export default function EditManagerReview() {
   const navigate = useNavigate();
   const user = useMemo(
     () => JSON.parse(localStorage.getItem("user") || "{}") || {},
-    []
+    [],
   );
 
   const [form, setForm] = useState({
@@ -60,7 +60,7 @@ export default function EditManagerReview() {
       }
     } catch (err) {
       setError(
-        err?.response?.data?.message || err.message || "Failed to load review"
+        err?.response?.data?.message || err.message || "Failed to load review",
       );
     } finally {
       setLoadingData(false);
@@ -92,7 +92,7 @@ export default function EditManagerReview() {
     try {
       const response = await axios.put(
         `${API_BASE}/ManagerReview/${id}`,
-        payload
+        payload,
       );
 
       if (response.data?.success) {
@@ -103,7 +103,9 @@ export default function EditManagerReview() {
       }
     } catch (err) {
       setError(
-        err?.response?.data?.message || err.message || "Failed to update review"
+        err?.response?.data?.message ||
+          err.message ||
+          "Failed to update review",
       );
     } finally {
       setLoading(false);

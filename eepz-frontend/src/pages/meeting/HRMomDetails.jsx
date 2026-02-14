@@ -41,7 +41,6 @@ const HRMomDetails = () => {
     try {
       const response = await momService.getMomById(momId);
  
-      // Extract mom data with fallback
       let momData = null;
       if (response?.success && response?.data) {
         momData = response.data;
@@ -63,7 +62,6 @@ const HRMomDetails = () => {
     } catch (err) {
       console.error("Fetch MOM details error:", err);
  
-      // Enhanced error handling
       if (err.retryAfter) {
         setError(`Rate limit exceeded. Please wait ${err.retryAfter} seconds.`);
         toastr.error(
@@ -110,6 +108,14 @@ const HRMomDetails = () => {
       return (
         <span className="hrmom-badge hrmom-badge-success hrmom-badge-icon">
           <CheckCircle size={14} /> Completed
+        </span>
+      );
+    }
+
+    if (status === "Pending") {
+      return (
+        <span className="hrmom-badge hrmom-badge-warning hrmom-badge-icon">
+          <CheckCircle size={14} /> Pending
         </span>
       );
     }
@@ -239,7 +245,6 @@ const HRMomDetails = () => {
  
   const actionStats = calculateActionItemStats();
  
-  // Extract properties with fallback
   const meetingTitle = getProperty(mom, "meetingTitle", "MeetingTitle");
   const meetingType = getProperty(mom, "meetingType", "MeetingType");
   const meetingDate = getProperty(mom, "meetingDate", "MeetingDate");
@@ -426,7 +431,6 @@ const HRMomDetails = () => {
           </div>
         </div>
  
-        {/* Comments Section */}
         {commentsObservations && commentsObservations.trim() && (
           <div className="hrmom-card">
             <div className="hrmom-card-header">
@@ -442,7 +446,6 @@ const HRMomDetails = () => {
         )}
  
         <div className="hrmom-two-column-grid">
-          {/* Discussion Points */}
           <div className="hrmom-card">
             <div className="hrmom-card-header">
               <h5 className="hrmom-card-title">

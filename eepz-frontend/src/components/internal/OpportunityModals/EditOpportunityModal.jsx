@@ -160,7 +160,6 @@ const EditOpportunityModal = ({
         deadline: formattedDeadline,
         status: formData.status,
       };
-      console.log("Sending payload:", payload);
       const response = await internalOpportunityService.updateOpportunity(
         opportunity.opportunityId,
         payload

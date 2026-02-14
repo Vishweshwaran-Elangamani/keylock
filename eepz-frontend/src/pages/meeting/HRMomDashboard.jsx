@@ -19,10 +19,10 @@ import "../../styles/mom/components/HRMomDashboard.css";
 import Breadcrumb from "../../components/feedback_management/common/FeedbackBreadcrumb";
 import PaginationFooter from "../../components/project-management/common/PaginationFooter";
 import CustomCalendar from "../../components/project-management/common/CustomCalendar";
- 
+
 const HRMomDashboard = () => {
   const navigate = useNavigate();
- 
+
   const [moms, setMoms] = useState([]);
   const [filters, setFilters] = useState({
     searchTerm: "",
@@ -33,11 +33,11 @@ const HRMomDashboard = () => {
     pageNumber: 1,
     pageSize: 5,
   });
- 
+
   const handleClearAllFilters = () => {
     setSearchInput("");
     setActiveSearchTerm("");
- 
+
     setFilters({
       searchTerm: "",
       meetingType: "",
@@ -48,10 +48,10 @@ const HRMomDashboard = () => {
       pageSize: 5,
     });
   };
- 
+
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const calendarAnchorRef = useRef(null);
- 
+
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const [displayMoms, setDisplayMoms] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -59,70 +59,69 @@ const HRMomDashboard = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
   const [searchInput, setSearchInput] = useState("");
- 
+
   const getProperty = (obj, camelKey, pascalKey) => {
     return obj?.[camelKey] ?? obj?.[pascalKey] ?? null;
   };
- 
+
   useEffect(() => {
     fetchMoms();
   }, [filters]);
- 
-const fetchMoms = async () => {
-  setLoading(true);
- 
-  try {
-    const apiFilters = {
-      ...filters,
-      meetingDate: filters.startDate || "",
-      startDate: "",
-      endDate: "",
-    };
- 
-    const response = await momService.getAllMomsForHR(apiFilters);
- 
-    const success = response?.success || response?.Success;
- 
-    if (success) {
-      const responseData = response.data || response.Data;
-      const momsData =
-        responseData?.moms ||
-        responseData?.Moms ||
-        responseData?.data ||
-        responseData?.Data ||
-        [];
- 
-      const total = responseData?.totalCount || responseData?.TotalCount || 0;
-      const pages = responseData?.totalPages || responseData?.TotalPages || 1;
- 
-      setMoms(Array.isArray(momsData) ? momsData : []);
-      setTotalMoms(total);
-      setTotalPages(pages);
-    } else {
+
+  const fetchMoms = async () => {
+    setLoading(true);
+
+    try {
+      const apiFilters = {
+        ...filters,
+        meetingDate: filters.startDate || "",
+        startDate: "",
+        endDate: "",
+      };
+
+      const response = await momService.getAllMomsForHR(apiFilters);
+
+      const success = response?.success || response?.Success;
+
+      if (success) {
+        const responseData = response.data || response.Data;
+        const momsData =
+          responseData?.moms ||
+          responseData?.Moms ||
+          responseData?.data ||
+          responseData?.Data ||
+          [];
+
+        const total = responseData?.totalCount || responseData?.TotalCount || 0;
+        const pages = responseData?.totalPages || responseData?.TotalPages || 1;
+
+        setMoms(Array.isArray(momsData) ? momsData : []);
+        setTotalMoms(total);
+        setTotalPages(pages);
+      } else {
+        setMoms([]);
+        setTotalMoms(0);
+        setTotalPages(1);
+      }
+    } catch (err) {
+      console.error("Fetch MOMs error:", err);
+      toastr.error("Failed to load MOMs");
       setMoms([]);
       setTotalMoms(0);
       setTotalPages(1);
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error("Fetch MOMs error:", err);
-    toastr.error("Failed to load MOMs");
-    setMoms([]);
-    setTotalMoms(0);
-    setTotalPages(1);
-  } finally {
-    setLoading(false);
-  }
-};
- 
- 
+  };
+
   useEffect(() => {
     if (!activeSearchTerm) {
       setDisplayMoms(moms);
       return;
     }
- 
+
     const q = activeSearchTerm.toLowerCase();
- 
+
     const filtered = moms.filter((m) => {
       const title =
         getProperty(m, "meetingTitle", "MeetingTitle")?.toLowerCase() || "";
@@ -132,45 +131,45 @@ const fetchMoms = async () => {
           "submittedByEmployeeName",
           "SubmittedByEmployeeName",
         )?.toLowerCase() || "";
- 
+
       return title.includes(q) || employee.includes(q);
     });
- 
+
     setDisplayMoms(filtered);
   }, [moms, activeSearchTerm]);
- 
+
   const handlePageChange = (newPage) => {
     setFilters((prev) => ({ ...prev, pageNumber: newPage }));
   };
- 
+
   const handlePageSizeChange = (size) => {
     setFilters((prev) => ({ ...prev, pageSize: size, pageNumber: 1 }));
   };
- 
+
   const handleSearch = () => {
     const value = searchInput.trim();
     if (!value) return;
- 
+
     setActiveSearchTerm(value);
- 
+
     setFilters((prev) => ({
       ...prev,
       searchTerm: value,
       pageNumber: 1,
     }));
   };
- 
+
   const handleClearSearch = () => {
     setSearchInput("");
     setActiveSearchTerm("");
- 
+
     setFilters((prev) => ({
       ...prev,
       searchTerm: "",
       pageNumber: 1,
     }));
   };
- 
+
   const handleDateChange = (key, value) => {
     setFilters((prev) => ({
       ...prev,
@@ -178,7 +177,7 @@ const fetchMoms = async () => {
       pageNumber: 1,
     }));
   };
- 
+
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({
       ...prev,
@@ -186,7 +185,7 @@ const fetchMoms = async () => {
       pageNumber: 1,
     }));
   };
- 
+
   const getMeetingTypeBadge = (type) => {
     const badgeMap = {
       "One-on-One": "primary",
@@ -194,14 +193,14 @@ const fetchMoms = async () => {
       Presentation: "info",
       Other: "secondary",
     };
- 
+
     return (
       <span className={`badge hrmom-badge bg-${badgeMap[type] || "secondary"}`}>
         {type || "Other"}
       </span>
     );
   };
- 
+
   const formatDateTime = (dateString) => {
     if (!dateString) return "-";
     try {
@@ -217,7 +216,7 @@ const fetchMoms = async () => {
       return "-";
     }
   };
- 
+
   const getThisMonthCount = () => {
     if (!Array.isArray(moms)) return 0;
     return moms.filter((m) => {
@@ -225,7 +224,7 @@ const fetchMoms = async () => {
         const today = new Date();
         const meetingDate = getProperty(m, "meetingDate", "MeetingDate");
         if (!meetingDate) return false;
- 
+
         const momDate = new Date(meetingDate);
         return (
           momDate.getMonth() === today.getMonth() &&
@@ -236,7 +235,7 @@ const fetchMoms = async () => {
       }
     }).length;
   };
- 
+
   const getTotalActionItems = () => {
     if (!Array.isArray(moms)) return 0;
     return moms.reduce((sum, mom) => {
@@ -244,31 +243,31 @@ const fetchMoms = async () => {
       return sum + (Array.isArray(actionItems) ? actionItems.length : 0);
     }, 0);
   };
- 
+
   const getOverdueActionItems = () => {
     if (!Array.isArray(moms)) return 0;
     return moms.reduce((sum, mom) => {
       const actionItems = getProperty(mom, "actionItems", "ActionItems");
       if (!Array.isArray(actionItems)) return sum;
- 
+
       return (
         sum +
         actionItems.filter((ai) => {
           const isOverdue = getProperty(ai, "isOverdue", "IsOverdue");
           const status = getProperty(ai, "status", "Status");
           const dueDate = getProperty(ai, "dueDate", "DueDate");
- 
+
           if (isOverdue) return true;
           if (status === "Pending" && dueDate) {
             return new Date(dueDate) < new Date();
           }
- 
+
           return false;
         }).length
       );
     }, 0);
   };
- 
+
   const hasActiveFilters = () => {
     return (
       filters.searchTerm ||
@@ -278,13 +277,13 @@ const fetchMoms = async () => {
       filters.endDate
     );
   };
- 
+
   useEffect(() => {
     if (filters.pageNumber > totalPages && totalPages > 0) {
       setFilters((prev) => ({ ...prev, pageNumber: 1 }));
     }
   }, [totalPages, filters.pageNumber]);
- 
+
   return (
     <div className="hrmom-dashboard-container">
       <div className="hrmom-dashboard-wrapper">
@@ -293,7 +292,7 @@ const fetchMoms = async () => {
             items={[{ label: "Meetings and MoM", href: "/hr/dashboard/mom" }]}
           />
         </div>
- 
+
         <div className="row g-3 mb-4">
           <div className="col-lg-3 col-md-6 col-sm-6">
             <div className="hrmom-top-card">
@@ -308,7 +307,7 @@ const fetchMoms = async () => {
               </div>
             </div>
           </div>
- 
+
           <div className="col-lg-3 col-md-6 col-sm-6">
             <div className="hrmom-top-card">
               <div className="hrmom-top-card-inner">
@@ -322,7 +321,7 @@ const fetchMoms = async () => {
               </div>
             </div>
           </div>
- 
+
           <div className="col-lg-3 col-md-6 col-sm-6">
             <div className="hrmom-top-card">
               <div className="hrmom-top-card-inner">
@@ -336,7 +335,7 @@ const fetchMoms = async () => {
               </div>
             </div>
           </div>
- 
+
           <div className="col-lg-3 col-md-6 col-sm-6">
             <div className="hrmom-top-card">
               <div className="hrmom-top-card-inner">
@@ -353,18 +352,19 @@ const fetchMoms = async () => {
             </div>
           </div>
         </div>
- 
+
         <div className="hrmom-filter-bar">
           <div className="hrmom-search-wrapper">
             <Search size={16} className="hrmom-search-icon" />
- 
+
             <input
               type="text"
               placeholder="Search meeting title"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              className="hrmom-search-input"/>
- 
+              className="hrmom-search-input"
+            />
+
             {activeSearchTerm ? (
               <button
                 className="hrmom-search-clear"
@@ -379,7 +379,7 @@ const fetchMoms = async () => {
             )}
           </div>
         </div>
- 
+
         <div className="card-body hrmom-table-card-body">
           <div className="hrmom-table-wrapper">
             <table className="table hrmom-table mb-0">
@@ -394,7 +394,7 @@ const fetchMoms = async () => {
                   <th>View</th>
                 </tr>
               </thead>
- 
+
               <tbody>
                 {loading ? (
                   <tr>
@@ -473,7 +473,7 @@ const fetchMoms = async () => {
                       "actionItems",
                       "ActionItems",
                     );
- 
+
                     return (
                       <tr key={momId}>
                         <td>
@@ -491,7 +491,7 @@ const fetchMoms = async () => {
                             </div>
                           </div>
                         </td>
- 
+
                         <td>
                           <div className="d-flex align-items-center gap-2">
                             <div>
@@ -504,7 +504,7 @@ const fetchMoms = async () => {
                             </div>
                           </div>
                         </td>
- 
+
                         <td>
                           <div className="d-flex align-items-center gap-2">
                             <Calendar
@@ -516,7 +516,7 @@ const fetchMoms = async () => {
                             </span>
                           </div>
                         </td>
- 
+
                         <td>
                           <div className="hrmom-count-badge">
                             <Users className="hrmom-count-icon hrmom-count-icon-participants" />
@@ -529,7 +529,7 @@ const fetchMoms = async () => {
                             </span>
                           </div>
                         </td>
- 
+
                         <td>
                           <div className="hrmom-count-badge">
                             <MessageSquare className="hrmom-count-icon hrmom-count-icon-topics" />
@@ -540,7 +540,7 @@ const fetchMoms = async () => {
                             </span>
                           </div>
                         </td>
- 
+
                         <td>
                           <div className="hrmom-count-badge">
                             <CheckCircle className="hrmom-count-icon hrmom-count-icon-actions" />
@@ -551,7 +551,7 @@ const fetchMoms = async () => {
                             </span>
                           </div>
                         </td>
- 
+
                         <td>
                           <button
                             className="btn btn-sm hrmom-view-btn"
@@ -570,13 +570,13 @@ const fetchMoms = async () => {
               </tbody>
             </table>
           </div>
- 
+
           {!loading &&
             Array.isArray(moms) &&
             moms.length > 0 &&
             totalPages > 0 && (
               <PaginationFooter
-                 totalItems={totalMoms}
+                totalItems={totalMoms}
                 currentPage={filters.pageNumber}
                 setCurrentPage={handlePageChange}
                 itemsPerPage={filters.pageSize}
@@ -588,7 +588,5 @@ const fetchMoms = async () => {
     </div>
   );
 };
- 
+
 export default HRMomDashboard;
- 
- 

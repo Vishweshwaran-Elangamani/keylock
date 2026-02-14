@@ -12,17 +12,17 @@ import ManagerMeetingDetailsModal from "../../components/meeting/modals/ManagerM
 import PaginationFooter from "../../components/project-management/common/PaginationFooter";
 import ManagerSharedMomsModal from "../../components/meeting/modals/ManagerSharedMomsModal";
 import "../../styles/mom/components/ManagerMomDashboard.css";
- 
+
 const ManagerMomDashboard = () => {
   const navigate = useNavigate();
- 
+
   const [stats, setStats] = useState({
     teamMomsCount: 0,
     oneOnOnesCount: 0,
     overdueActionsCount: 0,
     totalMeetingsCount: 0,
   });
- 
+
   const [showSharedMoms, setShowSharedMoms] = useState(false);
   const [upcomingMeetings, setUpcomingMeetings] = useState([]);
   const [recentTeamMoms, setRecentTeamMoms] = useState([]);
@@ -33,35 +33,34 @@ const ManagerMomDashboard = () => {
   const [viewMode, setViewMode] = useState("table");
   const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [actionItemFilter, setActionItemFilter] = useState("all");
- 
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
- 
-  // Helper to get property with PascalCase/camelCase fallback
+
   const getProperty = (obj, camelKey, pascalKey) => {
     return obj?.[camelKey] ?? obj?.[pascalKey] ?? null;
   };
- 
+
   useEffect(() => {
     loadDashboardData();
   }, []);
- 
+
   useEffect(() => {
     const interval = setInterval(() => {
       loadDashboardData(true);
-    }, 30000); // Refresh every 30 seconds
+    }, 30000);
     return () => clearInterval(interval);
   }, []);
- 
+
   useEffect(() => {
     setCurrentPage(1);
   }, [itemsPerPage, viewMode]);
- 
+
   const loadDashboardData = async (silentRefresh = false) => {
     try {
       if (!silentRefresh) setLoading(true);
       else setRefreshing(true);
- 
+
       const [myMomsRes, meetingsRes, employeesRes, actionItemsAssignedByMeRes] =
         await Promise.all([
           momService.getMyMoms({ pageNumber: 1, pageSize: 100 }),
@@ -69,11 +68,10 @@ const ManagerMomDashboard = () => {
           employeeService.getAllEmployees(),
           momService.getActionItemsAssignedByMe(),
         ]);
- 
-      // Extract employee data
+
       const employeeData = employeesRes?.data || employeesRes?.Data || [];
       const employeeSuccess = employeesRes?.success || employeesRes?.Success;
- 
+
       if (employeeSuccess && Array.isArray(employeeData)) {
         const nameMap = {};
         employeeData.forEach((emp) => {
@@ -88,19 +86,18 @@ const ManagerMomDashboard = () => {
         });
         setEmployeeMap(nameMap);
       }
- 
-      // Extract action items
+
       const allActionItems =
         actionItemsAssignedByMeRes?.data ||
         actionItemsAssignedByMeRes?.Data ||
         [];
- 
+
       const overdueCount = Array.isArray(allActionItems)
         ? allActionItems.filter((ai) => {
             const dueDate = getProperty(ai, "dueDate", "DueDate");
             const status = getProperty(ai, "status", "Status");
             const isOverdue = getProperty(ai, "isOverdue", "IsOverdue");
- 
+
             if (isOverdue) return true;
             if (status === "Pending" && dueDate) {
               return new Date(dueDate) < new Date();
@@ -108,34 +105,30 @@ const ManagerMomDashboard = () => {
             return false;
           }).length
         : 0;
- 
-let meetings = [];
- 
-if (Array.isArray(meetingsRes?.data)) {
-  meetings = meetingsRes.data;
-} else if (Array.isArray(meetingsRes?.Data)) {
-  meetings = meetingsRes.Data;
-} else if (Array.isArray(meetingsRes?.data?.meetings)) {
-  meetings = meetingsRes.data.meetings;
-} else if (Array.isArray(meetingsRes?.data?.Meetings)) {
-  meetings = meetingsRes.data.Meetings;
-} else if (Array.isArray(meetingsRes?.Data?.meetings)) {
-  meetings = meetingsRes.Data.meetings;
-} else if (Array.isArray(meetingsRes?.Data?.Meetings)) {
-  meetings = meetingsRes.Data.Meetings;
-}
- 
-console.log("ALL MEETINGS FROM API:", meetings);
- 
- 
+
+      let meetings = [];
+
+      if (Array.isArray(meetingsRes?.data)) {
+        meetings = meetingsRes.data;
+      } else if (Array.isArray(meetingsRes?.Data)) {
+        meetings = meetingsRes.Data;
+      } else if (Array.isArray(meetingsRes?.data?.meetings)) {
+        meetings = meetingsRes.data.meetings;
+      } else if (Array.isArray(meetingsRes?.data?.Meetings)) {
+        meetings = meetingsRes.data.Meetings;
+      } else if (Array.isArray(meetingsRes?.Data?.meetings)) {
+        meetings = meetingsRes.Data.meetings;
+      } else if (Array.isArray(meetingsRes?.Data?.Meetings)) {
+        meetings = meetingsRes.Data.Meetings;
+      }
+
       const totalMeetingsCount =
         meetingsRes?.data?.totalCount ||
         meetingsRes?.data?.TotalCount ||
         meetingsRes?.Data?.totalCount ||
         meetingsRes?.Data?.TotalCount ||
         meetings.length;
- 
-      // Extract MOMs data
+
       const momsData =
         myMomsRes?.data?.data ||
         myMomsRes?.data?.Data ||
@@ -143,38 +136,35 @@ console.log("ALL MEETINGS FROM API:", meetings);
         myMomsRes?.data ||
         myMomsRes?.Data ||
         [];
- 
+
       const momsArray = Array.isArray(momsData) ? momsData : [];
- 
-      // Count One-on-One meetings
+
       const oneOnOnesCount = meetings.filter((m) => {
         const meetingType = getProperty(m, "meetingType", "MeetingType");
         return meetingType === "One-on-One";
       }).length;
- 
+
       setStats({
         teamMomsCount: momsArray.length,
         oneOnOnesCount: oneOnOnesCount,
         overdueActionsCount: overdueCount,
         totalMeetingsCount: totalMeetingsCount,
       });
- 
+
       setActionItems(allActionItems);
- 
-      // Fetch RSVP data for each meeting
+
       const meetingsWithRsvp = await Promise.all(
         meetings.map(async (meeting) => {
           try {
             const meetingId = getProperty(meeting, "meetingId", "MeetingId");
-            const rsvpSummaryResponse = await rsvpService.getMeetingRsvpSummary(
-              meetingId
-            );
- 
+            const rsvpSummaryResponse =
+              await rsvpService.getMeetingRsvpSummary(meetingId);
+
             const rsvpData =
               rsvpSummaryResponse?.data ||
               rsvpSummaryResponse?.Data ||
               rsvpSummaryResponse;
- 
+
             return {
               ...meeting,
               rsvpAcceptedCount:
@@ -189,7 +179,7 @@ console.log("ALL MEETINGS FROM API:", meetings);
             const meetingId = getProperty(meeting, "meetingId", "MeetingId");
             console.error(
               `Failed to get RSVP summary for meeting ${meetingId}`,
-              error
+              error,
             );
             return {
               ...meeting,
@@ -198,19 +188,18 @@ console.log("ALL MEETINGS FROM API:", meetings);
               rsvpParticipants: [],
             };
           }
-        })
+        }),
       );
- 
+
       setUpcomingMeetings(meetingsWithRsvp);
       setRecentTeamMoms(momsArray.slice(0, 5));
     } catch (err) {
       console.error("Dashboard load error:", err);
- 
-      // Enhanced error handling
+
       if (err.retryAfter) {
         if (!silentRefresh) {
           toastr.error(
-            `Rate limit exceeded. Please wait ${err.retryAfter} seconds.`
+            `Rate limit exceeded. Please wait ${err.retryAfter} seconds.`,
           );
         }
       } else if (err.message) {
@@ -223,10 +212,10 @@ console.log("ALL MEETINGS FROM API:", meetings);
       setRefreshing(false);
     }
   };
- 
+
   const openMeetingDetails = (meeting) => setSelectedMeeting(meeting);
   const closeMeetingDetails = () => setSelectedMeeting(null);
- 
+
   const formatDateTime = (isoString) => {
     if (!isoString) return "−";
     try {
@@ -241,25 +230,25 @@ console.log("ALL MEETINGS FROM API:", meetings);
       return "−";
     }
   };
- 
+
   const safeTotal = upcomingMeetings.length;
   const perPage = itemsPerPage;
   const totalPages = Math.max(1, Math.ceil(safeTotal / perPage));
   const validCurrentPage = Math.min(currentPage, totalPages);
- 
+
   const startIndex = safeTotal === 0 ? 0 : (validCurrentPage - 1) * perPage;
   const endIndex =
     safeTotal === 0 ? 0 : Math.min(validCurrentPage * perPage, safeTotal);
- 
+
   const paginatedMeetings = upcomingMeetings.slice(startIndex, endIndex);
- 
+
   const getProgressWidthClass = (accepted, total) => {
     if (!total || total <= 0) return "mm-bar-w-0";
     const pct = Math.round((accepted / total) * 100);
     const safe = Math.max(0, Math.min(100, pct));
     return `mm-bar-w-${safe}`;
   };
- 
+
   if (loading) {
     return (
       <div className="managermom-loading">
@@ -273,7 +262,7 @@ console.log("ALL MEETINGS FROM API:", meetings);
       </div>
     );
   }
- 
+
   return (
     <div className="managermom-page">
       <div className="row justify-content-center">
@@ -293,9 +282,9 @@ console.log("ALL MEETINGS FROM API:", meetings);
                   <Home size={18} />
                 </button>
               </li>
- 
+
               <li className="breadcrumb-separator">/</li>
- 
+
               <li className="breadcrumb-item active" aria-current="page">
                 <span className="sched-breadcrumb-active">
                   Meetings and MoM
@@ -305,9 +294,8 @@ console.log("ALL MEETINGS FROM API:", meetings);
           </nav>
         </div>
       </div>
- 
+
       <div className="managermom-container">
-        {/* Stats Cards */}
         <div className="row g-3 mb-4">
           <StatCard
             icon="bi-file-text"
@@ -334,8 +322,7 @@ console.log("ALL MEETINGS FROM API:", meetings);
             label="Total Meetings"
           />
         </div>
- 
-        {/* Refresh indicator */}
+
         {refreshing && (
           <div className="alert alert-info py-2 mb-3">
             <small>
@@ -344,8 +331,7 @@ console.log("ALL MEETINGS FROM API:", meetings);
             </small>
           </div>
         )}
- 
-        {/* Toolbar */}
+
         <div className="managermom-toolbar">
           <div
             className="managermom-view-switch"
@@ -364,7 +350,7 @@ console.log("ALL MEETINGS FROM API:", meetings);
             >
               <i className="bi bi-table"></i>
             </button>
- 
+
             <button
               type="button"
               className={`mmview-btn ${viewMode === "grid" ? "active" : ""}`}
@@ -378,36 +364,33 @@ console.log("ALL MEETINGS FROM API:", meetings);
               <i className="bi bi-grid-3x3-gap-fill"></i>
             </button>
           </div>
- 
-  <div className="managermom-toolbar-right d-flex gap-2">
-  <button
-    className="btn managermom-shared-btn"
-    onClick={() => setShowSharedMoms(true)}>
-     
-    <i className="bi bi-share-fill me-1"></i>
-    Shared MOMs
-  </button>
- 
-  <button
-    className="btn managermom-schedule-btn"
-    onClick={() => navigate("/manager/dashboard/meetmom/schedule")}
-  >
-    <i className="bi bi-calendar-plus"></i>
-    Schedule Meeting
-  </button>
-</div>
- 
+
+          <div className="managermom-toolbar-right d-flex gap-2">
+            <button
+              className="btn managermom-shared-btn"
+              onClick={() => setShowSharedMoms(true)}
+            >
+              <i className="bi bi-share-fill me-1"></i>
+              Shared MOMs
+            </button>
+
+            <button
+              className="btn managermom-schedule-btn"
+              onClick={() => navigate("/manager/dashboard/meetmom/schedule")}
+            >
+              <i className="bi bi-calendar-plus"></i>
+              Schedule Meeting
+            </button>
+          </div>
         </div>
- 
-        {/* Upcoming Meetings Header */}
+
         <div className="managermom-upcoming-header">
           <h5 className="managermom-upcoming-title">Upcoming Meetings</h5>
           <span className="badge managermom-upcoming-count">
             {upcomingMeetings.length} Meetings
           </span>
         </div>
- 
-        {/* Table View */}
+
         {viewMode === "table" ? (
           <div className="managermom-table-shell">
             <div className="table-responsive">
@@ -422,7 +405,7 @@ console.log("ALL MEETINGS FROM API:", meetings);
                     <th>Actions</th>
                   </tr>
                 </thead>
- 
+
                 <tbody>
                   {paginatedMeetings.length === 0 ? (
                     <tr>
@@ -438,29 +421,29 @@ console.log("ALL MEETINGS FROM API:", meetings);
                       const meetingId = getProperty(
                         meeting,
                         "meetingId",
-                        "MeetingId"
+                        "MeetingId",
                       );
                       const meetingTitle = getProperty(
                         meeting,
                         "meetingTitle",
-                        "MeetingTitle"
+                        "MeetingTitle",
                       );
                       const meetingDate = getProperty(
                         meeting,
                         "meetingDate",
-                        "MeetingDate"
+                        "MeetingDate",
                       );
                       const meetingType = getProperty(
                         meeting,
                         "meetingType",
-                        "MeetingType"
+                        "MeetingType",
                       );
- 
+
                       const widthClass = getProgressWidthClass(
                         meeting.rsvpAcceptedCount,
-                        meeting.rsvpTotalInvitations
+                        meeting.rsvpTotalInvitations,
                       );
- 
+
                       return (
                         <tr
                           key={meetingId}
@@ -479,19 +462,19 @@ console.log("ALL MEETINGS FROM API:", meetings);
                               </span>
                             </div>
                           </td>
- 
+
                           <td>
                             <span className="text-muted">
                               {formatDateTime(meetingDate)}
                             </span>
                           </td>
- 
+
                           <td>
                             <span className="badge managermom-type-badge">
                               {meetingType || "General"}
                             </span>
                           </td>
- 
+
                           <td>
                             <div className="managermom-attendance">
                               <div className="progress managermom-progress">
@@ -509,7 +492,7 @@ console.log("ALL MEETINGS FROM API:", meetings);
                               </small>
                             </div>
                           </td>
- 
+
                           <td>
                             {meeting.rsvpAcceptedCount ===
                               meeting.rsvpTotalInvitations &&
@@ -527,7 +510,7 @@ console.log("ALL MEETINGS FROM API:", meetings);
                               </span>
                             )}
                           </td>
- 
+
                           <td>
                             <button
                               className="btn btn-sm managermom-view-btn"
@@ -548,25 +531,23 @@ console.log("ALL MEETINGS FROM API:", meetings);
                 </tbody>
               </table>
             </div>
- 
-           {safeTotal > 0 && (
-  <div className="managermom-pf-wrap">
-    <PaginationFooter
-      totalItems={safeTotal}
-      currentPage={validCurrentPage}
-      setCurrentPage={setCurrentPage}
-      itemsPerPage={itemsPerPage}
-      setItemsPerPage={(size) => {
-        setItemsPerPage(size);
-        setCurrentPage(1);
-      }}
-    />
-  </div>
-)}
- 
+
+            {safeTotal > 0 && (
+              <div className="managermom-pf-wrap">
+                <PaginationFooter
+                  totalItems={safeTotal}
+                  currentPage={validCurrentPage}
+                  setCurrentPage={setCurrentPage}
+                  itemsPerPage={itemsPerPage}
+                  setItemsPerPage={(size) => {
+                    setItemsPerPage(size);
+                    setCurrentPage(1);
+                  }}
+                />
+              </div>
+            )}
           </div>
         ) : (
-          /* Grid View */
           <>
             <div className="row g-3 mb-4">
               {paginatedMeetings.length === 0 ? (
@@ -579,29 +560,29 @@ console.log("ALL MEETINGS FROM API:", meetings);
                   const meetingId = getProperty(
                     meeting,
                     "meetingId",
-                    "MeetingId"
+                    "MeetingId",
                   );
                   const meetingTitle = getProperty(
                     meeting,
                     "meetingTitle",
-                    "MeetingTitle"
+                    "MeetingTitle",
                   );
                   const meetingDate = getProperty(
                     meeting,
                     "meetingDate",
-                    "MeetingDate"
+                    "MeetingDate",
                   );
                   const meetingType = getProperty(
                     meeting,
                     "meetingType",
-                    "MeetingType"
+                    "MeetingType",
                   );
- 
+
                   const widthClass = getProgressWidthClass(
                     meeting.rsvpAcceptedCount,
-                    meeting.rsvpTotalInvitations
+                    meeting.rsvpTotalInvitations,
                   );
- 
+
                   return (
                     <div key={meetingId} className="col-lg-4 col-md-6">
                       <div
@@ -622,16 +603,16 @@ console.log("ALL MEETINGS FROM API:", meetings);
                               {meetingType || "General"}
                             </span>
                           </div>
- 
+
                           <h6 className="card-title fw-semibold mb-2">
                             {meetingTitle || "Untitled Meeting"}
                           </h6>
- 
+
                           <p className="text-muted small mb-3">
                             <i className="bi bi-clock me-1"></i>
                             {formatDateTime(meetingDate)}
                           </p>
- 
+
                           <div className="managermom-meeting-card-footer">
                             <div>
                               <small className="text-muted">Attendance</small>
@@ -640,7 +621,7 @@ console.log("ALL MEETINGS FROM API:", meetings);
                                 {meeting.rsvpTotalInvitations}
                               </div>
                             </div>
- 
+
                             <div className="progress managermom-card-progress">
                               <div
                                 className={`progress-bar bg-success ${widthClass}`}
@@ -658,40 +639,39 @@ console.log("ALL MEETINGS FROM API:", meetings);
                 })
               )}
             </div>
- 
-           {safeTotal > 0 && viewMode === "grid" && (
-  <div className="managermom-pf-wrap">
-    <PaginationFooter
-      totalItems={safeTotal}
-      currentPage={validCurrentPage}
-      setCurrentPage={setCurrentPage}
-      itemsPerPage={itemsPerPage}
-      setItemsPerPage={(size) => {
-        setItemsPerPage(size);
-        setCurrentPage(1);
-      }}
-    />
-  </div>
-)}
- 
+
+            {safeTotal > 0 && viewMode === "grid" && (
+              <div className="managermom-pf-wrap">
+                <PaginationFooter
+                  totalItems={safeTotal}
+                  currentPage={validCurrentPage}
+                  setCurrentPage={setCurrentPage}
+                  itemsPerPage={itemsPerPage}
+                  setItemsPerPage={(size) => {
+                    setItemsPerPage(size);
+                    setCurrentPage(1);
+                  }}
+                />
+              </div>
+            )}
           </>
         )}
- 
+
         {selectedMeeting && (
           <ManagerMeetingDetailsModal
             meeting={selectedMeeting}
             onClose={closeMeetingDetails}
           />
         )}
-       
-{showSharedMoms && (
-<ManagerSharedMomsModal onClose={() => setShowSharedMoms(false)} />
-)}
+
+        {showSharedMoms && (
+          <ManagerSharedMomsModal onClose={() => setShowSharedMoms(false)} />
+        )}
       </div>
     </div>
   );
 };
- 
+
 const StatCard = ({ icon, variant, count, label }) => (
   <div className="col-lg-3 col-md-6 col-sm-6">
     <div className="managermom-stat-card">
@@ -707,7 +687,5 @@ const StatCard = ({ icon, variant, count, label }) => (
     </div>
   </div>
 );
- 
+
 export default ManagerMomDashboard;
- 
- 

@@ -150,11 +150,9 @@ const ProjectList = () => {
  
   const getFilteredManagers = () => {
     return allEmployees.filter((emp) => {
-      const searchMatch =
-        activeManagerSearchTerm === "" ||
+      const searchMatch =activeManagerSearchTerm === "" ||
         `${emp.firstName} ${emp.lastName} ${emp.roleName} ${emp.departmentName}`
-          .toLowerCase()
-          .includes(activeManagerSearchTerm.toLowerCase());
+          .toLowerCase() .includes(activeManagerSearchTerm.toLowerCase());
       const roleMatch = managerFilterRole === "All" || emp.roleName === managerFilterRole;
       const deptMatch =
         managerFilterDepartment === "All" || emp.departmentName === managerFilterDepartment;
@@ -231,10 +229,8 @@ const ProjectList = () => {
         `${emp.firstName} ${emp.lastName} ${emp.roleName} ${emp.departmentName}`.toLowerCase()
           .includes(activeEmployeeSearchTerm.toLowerCase());
       const roleMatch = employeeFilterRole === "All" || emp.roleName === employeeFilterRole;
-      const deptMatch =
-        employeeFilterDepartment === "All" || emp.departmentName === employeeFilterDepartment;
-      const statusMatch =
-        employeeFilterStatus === "All" ||
+      const deptMatch = employeeFilterDepartment === "All" || emp.departmentName === employeeFilterDepartment;
+      const statusMatch =  employeeFilterStatus === "All" ||
         (employeeFilterStatus === "Mapped" && isMapped) ||
         (employeeFilterStatus === "Unmapped" && !isMapped);
  
@@ -495,8 +491,7 @@ const ProjectList = () => {
   };
  
   const handleUnmapEmployees = async () => {
-    const employeesToUnmap = selectedEmployeeIds.filter((id) =>
-      mappedEmployees.some((m) => m.employeeMasterId === id)
+    const employeesToUnmap = selectedEmployeeIds.filter((id) => mappedEmployees.some((m) => m.employeeMasterId === id)
     );
     if (employeesToUnmap.length === 0) {
       const errorMessage = "Please select at least one mapped employee";

@@ -152,7 +152,6 @@ const MomDetailsView = ({ mom, onClose }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mdv-content modal-content border-0 shadow-lg">
-          {/* Header */}
           <div className="mdv-header modal-header border-0">
             <div className="flex-grow-1">
               <div className="d-flex align-items-center gap-2 mb-2">
@@ -185,9 +184,7 @@ const MomDetailsView = ({ mom, onClose }) => {
             ></button>
           </div>
  
-          {/* Body */}
           <div className="mdv-body modal-body">
-            {/* Meeting Information Card */}
             <div className="mdv-info-card card bg-light border-0 mb-4">
               <div className="card-body p-4">
                 <h6 className="mdv-info-title fw-semibold mb-4 d-flex align-items-center gap-2">
@@ -291,7 +288,6 @@ const MomDetailsView = ({ mom, onClose }) => {
               </div>
             </div>
  
-            {/* Comments & Observations */}
             {commentsObservations && commentsObservations.trim() && (
               <div className="mb-4">
                 <h6 className="mdv-section-title fw-semibold mb-3 d-flex align-items-center gap-2">
@@ -352,7 +348,6 @@ const MomDetailsView = ({ mom, onClose }) => {
               )}
             </div>
  
-            {/* Action Items */}
             <div className="mb-4">
               <h6 className="mdv-section-title fw-semibold mb-3 d-flex align-items-center gap-2">
                 <CheckCircle size={18} />
@@ -427,7 +422,6 @@ const MomDetailsView = ({ mom, onClose }) => {
             </div>
           </div>
  
-          {/* Footer */}
           <div className="mdv-footer modal-footer border-0">
             <button
               type="button"

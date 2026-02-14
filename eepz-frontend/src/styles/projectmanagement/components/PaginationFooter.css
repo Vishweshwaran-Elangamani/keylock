@@ -1,4 +1,3 @@
-/* MAIN CONTAINER — breaks stacking context traps */
 .pagination-footer-container {
   display: flex !important;
   justify-content: space-between;
@@ -11,18 +10,16 @@
   flex-wrap: wrap;
  
   position: relative;
-  isolation: isolate;   /* ⭐ CRITICAL FIX */
+  isolation: isolate;  
   z-index: 1;
   overflow: visible;
 }
  
-/* Ensure nothing blocks clicks */
 .pagination-footer-container,
 .pagination-footer-container * {
   pointer-events: auto;
 }
  
-/* LEFT SIDE INFO */
 .pagination-footer-info {
   display: flex;
   align-items: center;
@@ -35,12 +32,10 @@
   font-weight: 500;
 }
  
-/* DROPDOWN WRAPPER */
 .pagination-footer-dropdown-wrapper {
   position: relative;
 }
  
-/* ITEMS PER PAGE BUTTON */
 .pagination-footer-items-button {
   padding: 0.4rem 0.75rem;
   border: 1px solid #e5e7eb;
@@ -57,7 +52,6 @@
   height: 32px;
 }
  
-/* DROPDOWN MENU (OPENS UPWARD) */
 .pagination-footer-dropdown {
   position: absolute;
   bottom: calc(100% + 6px);
@@ -70,7 +64,6 @@
   z-index: 10;
 }
  
-/* DROPDOWN ITEMS */
 .pagination-footer-option {
   padding: 0.5rem 0.75rem;
   cursor: pointer;
@@ -87,13 +80,11 @@
   font-weight: 600;
 }
  
-/* STATUS TEXT */
 .pagination-footer-status {
   font-size: 0.875rem;
   color: #6c757d;
 }
  
-/* PAGE BUTTON LIST */
 .pagination-footer-pages {
   display: flex;
   list-style: none;
@@ -102,7 +93,6 @@
   padding: 0;
 }
  
-/* PAGE BUTTON */
 .pagination-footer-page-link {
   min-width: 32px;
   height: 32px;
@@ -115,13 +105,11 @@
   justify-content: center;
 }
  
-/* ACTIVE PAGE */
 .pagination-footer-page-item.active .pagination-footer-page-link {
   background: #27235c;
   color: white;
 }
  
-/* DISABLED PAGE */
 .pagination-footer-page-item.disabled .pagination-footer-page-link {
   opacity: 0.5;
   pointer-events: none;

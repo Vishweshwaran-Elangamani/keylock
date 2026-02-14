@@ -37,7 +37,6 @@ if (method.toLowerCase() === "get" || method.toLowerCase() === "delete") {
  
     const cacheStatus = response.headers["x-cache"];
     if (cacheStatus) {
-      console.log(`Cache ${cacheStatus} for ${url}`);
     }
  
     return response.data;
@@ -138,7 +137,7 @@ const momService = {
  getMyMoms: (params = {}) => {
   const query = new URLSearchParams({
     ...params,
-    _t: Date.now(), // 🔥 cache buster
+    _t: Date.now(), 
   }).toString();
 
   return apiRequest("get", `/Mom/my-moms?${query}`);

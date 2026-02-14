@@ -8,10 +8,8 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
     return () => (document.body.style.overflow = "unset");
   }, []);
  
-  // 🔍 Debug (remove later if needed)
   useEffect(() => {
-    console.log("Meeting object:", meeting);
-    console.log("Participants:", meeting?.rsvpParticipants);
+   
   }, [meeting]);
  
   if (!meeting) return null;
@@ -104,7 +102,6 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
               {meeting.rsvpParticipants.map((p) => (
                 <div key={p.employeeId} className="mmdm-participant-card">
                  
-                  {/* ✅ FIXED NAME HANDLING HERE */}
                   <div className="mmdm-participant-name">
                     {p.employeeName ||
                       p.name ||

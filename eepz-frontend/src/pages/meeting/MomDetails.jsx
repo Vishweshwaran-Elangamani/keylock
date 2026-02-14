@@ -24,7 +24,6 @@ const MomDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Helper to get property with PascalCase/camelCase fallback
   const getProperty = (obj, camelKey, pascalKey) => {
     return obj?.[camelKey] ?? obj?.[pascalKey] ?? null;
   };
@@ -41,7 +40,6 @@ const MomDetails = () => {
     try {
       const response = await momService.getMomById(id);
 
-      // Extract mom data with fallback
       let momData = null;
       if (response?.success && response?.data) {
         momData = response.data;
@@ -63,7 +61,6 @@ const MomDetails = () => {
     } catch (err) {
       console.error("Failed to fetch MOM details:", err);
 
-      // Enhanced error handling
       if (err.retryAfter) {
         setError(`Rate limit exceeded. Please wait ${err.retryAfter} seconds.`);
         toastr.error(
@@ -160,7 +157,6 @@ const MomDetails = () => {
     );
   }
 
-  // Extract properties with fallback
   const meetingTitle =
     getProperty(mom, "meetingTitle", "MeetingTitle") || "Untitled Meeting";
   const meetingType = getProperty(mom, "meetingType", "MeetingType") || "Other";
@@ -185,7 +181,6 @@ const MomDetails = () => {
   );
   const createdAt = getProperty(mom, "createdAt", "CreatedAt");
 
-  // Format attendees
   let formattedAttendees = "N/A";
   if (Array.isArray(attendees)) {
     formattedAttendees = attendees.length > 0 ? attendees.join(", ") : "N/A";
@@ -196,7 +191,6 @@ const MomDetails = () => {
   return (
     <div className="momd-page">
       <div className="momd-container">
-        {/* Back Button */}
         <button
           className="btn btn-link momd-back-btn mb-3"
           onClick={() => navigate(-1)}
@@ -206,7 +200,6 @@ const MomDetails = () => {
         </button>
 
         <div className="momd-card">
-          {/* Header */}
           <div className="momd-header" style={{ backgroundColor: PRIMARY }}>
             <div className="momd-header-text">
               <FileText size={32} className="momd-header-icon" />
@@ -217,9 +210,7 @@ const MomDetails = () => {
             </div>
           </div>
 
-          {/* Body */}
           <div className="momd-body">
-            {/* Meeting Information */}
             <div className="momd-section momd-section-top">
               <h5 className="momd-section-title">
                 <Calendar size={20} className="me-2" />
@@ -311,7 +302,6 @@ const MomDetails = () => {
               </div>
             </div>
 
-            {/* Comments & Observations */}
             {commentsObservations && commentsObservations.trim() && (
               <section className="momd-section">
                 <h5 className="momd-section-title">
@@ -322,7 +312,6 @@ const MomDetails = () => {
               </section>
             )}
 
-            {/* Discussion Points */}
             <section className="momd-section">
               <h5 className="momd-section-title">
                 <MessageSquare size={20} className="me-2" />
@@ -361,7 +350,6 @@ const MomDetails = () => {
               )}
             </section>
 
-            {/* Action Items */}
             <section className="momd-section">
               <h5 className="momd-section-title">
                 <CheckCircle size={20} className="me-2" />

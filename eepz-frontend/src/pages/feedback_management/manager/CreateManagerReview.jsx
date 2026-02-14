@@ -92,7 +92,7 @@ export default function CreateManagerReview() {
       return;
     }
     const found = employees.find(
-      (e) => String(e.employeeId) === String(form.targetEmployeeId)
+      (e) => String(e.employeeId) === String(form.targetEmployeeId),
     );
     setSelectedEmployee(found || null);
   }, [form.targetEmployeeId, employees]);

@@ -68,7 +68,6 @@ const ManagerSharedMomsModal = ({ onClose }) => {
         <div className="mgr-smm-dialog" onClick={(e) => e.stopPropagation()}>
           <div className="mgr-smm-content">
  
-            {/* HEADER */}
             <div className="mgr-smm-header">
               <div className="mgr-smm-header-top">
                 <h5 className="mgr-smm-title">Shared MOMs</h5>

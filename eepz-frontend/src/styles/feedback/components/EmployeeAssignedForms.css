@@ -9,9 +9,6 @@
   font-style: normal !important;
 }
 
-/* -----------------------------------
-   ERROR ALERT
------------------------------------ */
 .employee-forms-alert-error {
   background: #fef2f2;
   border: 1px solid #fee2e2;
@@ -49,9 +46,6 @@
   line-height: 1;
 }
 
-/* -----------------------------------
-   TOP STATS CARDS
------------------------------------ */
 .employee-forms-stats-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -91,7 +85,6 @@
   flex-shrink: 0;
 }
 
-/* Icon color blocks (replacing inline backgroundColor) */
 .employee-forms-stat-card:nth-child(1) .employee-forms-stat-icon {
   background-color: #eef2ff;
 }
@@ -121,9 +114,6 @@
   text-transform: uppercase;
 }
 
-/* -----------------------------------
-   LOADING
------------------------------------ */
 .employee-forms-loading {
   display: flex;
   flex-direction: column;
@@ -154,9 +144,6 @@
   }
 }
 
-/* -----------------------------------
-   EMPTY STATE
------------------------------------ */
 .employee-forms-empty {
   background: #ffffff;
   border: 1px solid #f3f4f6;
@@ -189,7 +176,6 @@
   margin: 0 0 1.5rem;
 }
 
-/* refresh button in empty state */
 .employee-forms-btn-refresh {
   display: inline-flex;
   align-items: center;
@@ -217,9 +203,6 @@
   cursor: not-allowed;
 }
 
-/* -----------------------------------
-   FORMS GRID
------------------------------------ */
 .employee-forms-content {
   flex: 1;
 }
@@ -230,9 +213,6 @@
   gap: 1.25rem;
 }
 
-/* -----------------------------------
-   FORM CARD
------------------------------------ */
 .employee-forms-card {
   background: #ffffff;
   border: 2px solid #27235c;
@@ -298,9 +278,6 @@
   min-width: 0;
 }
 
-/* -----------------------------------
-   CARD BADGE
------------------------------------ */
 .employee-forms-badge {
   display: inline-block;
   padding: 0.3125rem 0.75rem;
@@ -322,9 +299,6 @@
   color: #92400e;
 }
 
-/* -----------------------------------
-   CARD BODY ROWS
------------------------------------ */
 .employee-forms-card-body {
   padding: 1.125rem;
   flex: 1;
@@ -373,9 +347,6 @@
   text-align: right;
 }
 
-/* -----------------------------------
-   CARD FOOTER BUTTONS
------------------------------------ */
 .employee-forms-card-footer {
   padding: 1rem 1.125rem;
   border-top: 1px solid #f3f4f6;
@@ -422,9 +393,7 @@
   cursor: not-allowed;
 }
 
-/* -----------------------------------
-   RESPONSIVE
------------------------------------ */
+
 @media (max-width: 1024px) {
   .employee-forms-stats-grid {
     grid-template-columns: repeat(4, auto);
