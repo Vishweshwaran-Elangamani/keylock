@@ -32,7 +32,11 @@ namespace Relevantz.EEPZ.Api.Controllers
             _bulkCreateValidator = bulkCreateValidator;
             _bulkInactivateValidator = bulkInactivateValidator;
         }
-
+        /// <summary>
+        /// Adding Users in Bulk manner
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost("bulk-create-users")]
         public async Task<IActionResult> BulkCreateUsers([FromBody] BulkUserCreateRequestDto request)
         {
@@ -57,7 +61,11 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _bulkOperationService.BulkCreateUsersAsync(request.Users, performedByUserId);
             return Ok(result);
         }
-
+        /// <summary>
+        /// Deactivating the users in Bulk manner
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost("bulk-inactivate-users")]
         public async Task<IActionResult> BulkInactivateUsers([FromBody] BulkUserInactivateRequestDto request)
         {
@@ -83,6 +91,11 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Add users in Bulk manner via Excel
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
         [HttpPost("bulk-create-from-excel")]
         [Consumes("multipart/form-data")]
         [RequestSizeLimit(5 * 1024 * 1024)]
@@ -107,6 +120,10 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Download Excel Template
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("download-template")]
         public async Task<IActionResult> DownloadExcelTemplate()
         {
@@ -117,6 +134,11 @@ namespace Relevantz.EEPZ.Api.Controllers
                 $"UserImportTemplate_{DateTime.UtcNow:yyyyMMdd}.xlsx"
             );
         }
+
+        /// <summary>
+        /// Export Roles
+        /// </summary>
+        /// <returns></returns>
 
         [HttpGet("export/roles")]
         public async Task<IActionResult> ExportRoles()
@@ -134,6 +156,10 @@ namespace Relevantz.EEPZ.Api.Controllers
             );
         }
 
+        /// <summary>
+        /// Export Department
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("export/departments")]
         public async Task<IActionResult> ExportDepartments()
         {
@@ -149,7 +175,10 @@ namespace Relevantz.EEPZ.Api.Controllers
                 fileName
             );
         }
-
+        /// <summary>
+        /// Export users
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("export/users")]
         public async Task<IActionResult> ExportUsers()
         {
@@ -165,7 +194,10 @@ namespace Relevantz.EEPZ.Api.Controllers
                 fileName
             );
         }
-
+        /// <summary>
+        /// Export users, Roles and department
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("export/all-data")]
         public async Task<IActionResult> ExportAllData()
         {
