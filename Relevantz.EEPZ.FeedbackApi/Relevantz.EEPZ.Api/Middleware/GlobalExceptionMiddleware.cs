@@ -36,32 +36,33 @@ namespace Relevantz.EEPZ.Api.Middleware
             }
         }
 
-        private static Task HandleExceptionAsync(HttpContext context, Exception ex, string correlationId)
-        {
-            var statusCode = ex switch
-            {
-                ArgumentException => HttpStatusCode.BadRequest,
-                KeyNotFoundException => HttpStatusCode.NotFound,
-                InvalidOperationException => HttpStatusCode.UnprocessableEntity,
-                UnauthorizedAccessException => HttpStatusCode.Unauthorized,
-                _ => HttpStatusCode.InternalServerError
-            };
+       private static Task HandleExceptionAsync(HttpContext context, Exception ex, string correlationId)
+{
+    var statusCode = ex switch
+    {
+        ArgumentException => HttpStatusCode.BadRequest,
+        KeyNotFoundException => HttpStatusCode.NotFound,
+        InvalidOperationException => HttpStatusCode.Conflict,
+        UnauthorizedAccessException => HttpStatusCode.Forbidden,
+        _ => HttpStatusCode.InternalServerError
+    };
 
-            var problem = new ProblemDetails
-            {
-                Title = ex.GetType().Name,
-                Detail = ex.Message,
-                Status = (int)statusCode,
-                Instance = context.Request.Path
-            };
+    var problem = new ProblemDetails
+    {
+        Title = ex.GetType().Name,
+        Detail = ex.Message,
+        Status = (int)statusCode,
+        Instance = context.Request.Path
+    };
 
-            problem.Extensions["correlationId"] = correlationId;
-            problem.Extensions["traceId"] = context.TraceIdentifier;
+    problem.Extensions["correlationId"] = correlationId;
+    problem.Extensions["traceId"] = context.TraceIdentifier;
 
-            context.Response.ContentType = "application/problem+json";
-            context.Response.StatusCode = (int)statusCode;
+    context.Response.ContentType = "application/problem+json";
+    context.Response.StatusCode = (int)statusCode;
 
-            return context.Response.WriteAsync(JsonSerializer.Serialize(problem));
-        }
+    return context.Response.WriteAsync(JsonSerializer.Serialize(problem));
+}
+
     }
 }

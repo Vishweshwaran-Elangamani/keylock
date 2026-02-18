@@ -4,11 +4,13 @@ using Relevantz.EEPZ.Core.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
+
+
 namespace EepzBackend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "HR,Employee,Manager")]
+    [Authorize]
 
 
     public partial class HrFeedbackFormController : ControllerBase
@@ -20,11 +22,11 @@ namespace EepzBackend.Controllers
             _service = service;
         }
 
+        [Authorize(Roles = "HR")]
         [HttpPost("forms")]
         public async Task<IActionResult> CreateForm([FromBody] CreateHRFeedbackFormRequestDto dto, CancellationToken ct)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+           
 
             var created = await _service.CreateFormAsync(dto, ct);
             return CreatedAtAction(nameof(GetForm), new { formId = created.FormId }, created);
@@ -41,8 +43,7 @@ namespace EepzBackend.Controllers
         [HttpGet("forms")]
         public async Task<IActionResult> GetAllForms([FromQuery] PaginationRequestDto pagination, CancellationToken ct)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            
 
             var result = await _service.GetAllFormsAsync(pagination, ct);
             return Ok(result);
@@ -51,8 +52,7 @@ namespace EepzBackend.Controllers
         [HttpGet("forms/active")]
         public async Task<IActionResult> GetActiveForms([FromQuery] PaginationRequestDto pagination, CancellationToken ct)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            
 
             var result = await _service.GetActiveFormsAsync(pagination, ct);
             return Ok(result);
@@ -61,14 +61,13 @@ namespace EepzBackend.Controllers
         [HttpPut("forms/{formId:int}")]
         public async Task<IActionResult> UpdateForm(int formId, [FromBody] UpdateHRFormRequestDto dto, CancellationToken ct)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
+          
             var updated = await _service.UpdateFormAsync(formId, dto, ct);
             if (updated == null) return NotFound();
             return Ok(updated);
         }
 
+        [Authorize(Roles = "HR")]
         [HttpDelete("forms/{formId:int}")]
         public async Task<IActionResult> DeleteForm(int formId, CancellationToken ct)
         {
