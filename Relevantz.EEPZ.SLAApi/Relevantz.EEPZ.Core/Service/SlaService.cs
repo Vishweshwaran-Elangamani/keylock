@@ -16,10 +16,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         private readonly ILogger<SlaService> _logger;
 
-      public SlaService(
-        ISlaRepository slaRepository,
-        IEmailService emailService,
-        ILogger<SlaService> logger)
+        public SlaService(
+          ISlaRepository slaRepository,
+          IEmailService emailService,
+          ILogger<SlaService> logger)
 
         {
             _slaRepository = slaRepository;
@@ -171,14 +171,19 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         public async Task<DepartmentComplianceResponse> GetDepartmentCompliance(int departmentId, string? period)
         {
-            var compliance = await _slaRepository.GetComplianceByDepartmentAndPeriodAsync(departmentId, period ?? "Current");
+            var effectivePeriod = string.IsNullOrWhiteSpace(period)
+                ? "Current"
+                : period.Trim();
+
+            var compliance = await _slaRepository
+                .GetComplianceByDepartmentAndPeriodAsync(departmentId, effectivePeriod);
 
             if (compliance == null)
             {
                 return new DepartmentComplianceResponse
                 {
                     DepartmentId = departmentId,
-                    Period = period ?? "Current",
+                    Period = effectivePeriod,
                     TotalSlas = 0,
                     OnTimeSlas = 0,
                     BreachedSlas = 0,
@@ -191,13 +196,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 ComplianceId = compliance.ComplianceId,
                 DepartmentId = compliance.DepartmentId,
                 DepartmentName = compliance.Department?.DepartmentName ?? string.Empty,
-                Period = compliance.Period ?? string.Empty,
+                Period = compliance.Period ?? effectivePeriod,
                 TotalSlas = compliance.TotalSlas,
                 OnTimeSlas = compliance.OnTimeSlas,
                 BreachedSlas = compliance.BreachedSlas,
                 CompliancePercentage = compliance.CompliancePercentage ?? 0
             };
         }
+
         public async Task<ReopenSlaResponse> ReopenSla(int slaId, int extensionDays, string reason, int userId)
         {
             var sla = await _slaRepository.GetSlaByIdAsync(slaId)
@@ -607,13 +613,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         public async Task<BulkCreateSlaResponse> BulkCreateSla(List<CreateSlaRequest> requests, int userId)
         {
-            var now = DateTime.Now;
+            var nowUtc = DateTime.UtcNow; // ✅ timezone-safe
             var slas = new List<Sla>();
 
             foreach (var r in requests)
             {
                 var employee = await _slaRepository.GetEmployeeByIdAsync(r.EmployeeId)
-                    ?? throw new Exception($"Employee {r.EmployeeId} not found");
+                    ?? throw new KeyNotFoundException($"Employee {r.EmployeeId} not found");
 
                 int assigneeId = employee.ReportingManagerEmployeeId ?? userId;
 
@@ -627,7 +633,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     Status = "Open",
                     ComplianceStatus = "OnTime",
                     CreatedByEmployeeId = userId,
-                    CreatedAt = now
+                    CreatedAt = nowUtc
                 });
             }
 
@@ -638,9 +644,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 TotalRequested = requests.Count,
                 SuccessfulInserts = count,
                 FailedInserts = requests.Count - count,
-                CreatedAt = now
+                CreatedAt = nowUtc
             };
         }
+
 
 
 
