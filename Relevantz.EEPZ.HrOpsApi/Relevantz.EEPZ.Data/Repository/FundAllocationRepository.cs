@@ -37,6 +37,7 @@ namespace Relevantz.EEPZ.Data.Repository
         public async Task<List<Budgetallocation>> GetAllAsync()
         {
             return await BaseQuery()
+                .AsNoTracking()
                 .OrderByDescending(b => b.AllocatedAt)
                 .ToListAsync();
         }
@@ -49,6 +50,7 @@ namespace Relevantz.EEPZ.Data.Repository
 
 
             return await BaseQuery()
+                .AsNoTracking()
                 .Where(b => b.DepartmentId == departmentId)
                 .OrderByDescending(b => b.AllocatedAt)
                 .ToListAsync();
@@ -62,6 +64,7 @@ namespace Relevantz.EEPZ.Data.Repository
 
 
             return await BaseQuery()
+                .AsNoTracking()
                 .Where(b => b.AllocationType == allocationType)
                 .OrderByDescending(b => b.AllocatedAt)
                 .ToListAsync();
@@ -75,6 +78,7 @@ namespace Relevantz.EEPZ.Data.Repository
 
 
             return await BaseQuery()
+                .AsNoTracking()
                 .Where(b => b.EmployeeUserId == employeeUserId)
                 .OrderByDescending(b => b.AllocatedAt)
                 .ToListAsync();
