@@ -14,7 +14,9 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         Task<Sla> CreateSlaAsync(Sla sla);
 
         Task<Sla> UpdateSlaAsync(Sla sla);
-        Task DeleteSlaAsync(int slaid);
+        
+        Task<bool> DeleteSlaAsync(int slaid);
+
 
         Task<bool> CloseSlaAsync(int slaid, int? closedByEmployeeId = null, string? closureComments = null);
 

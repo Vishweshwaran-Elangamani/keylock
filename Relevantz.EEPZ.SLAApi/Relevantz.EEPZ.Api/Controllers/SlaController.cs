@@ -43,11 +43,19 @@ namespace eepzbackend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetSlas()
         {
-            _logger.LogInformation("Fetching all SLAs. UserId: {UserId}, CorrelationId: {CorrelationId}", UserId, CorrelationId);
+            _logger.LogInformation(
+                "START GetSlas | UserId: {UserId} | CorrelationId: {CorrelationId}",
+                UserId, CorrelationId);
 
             var data = await _slaService.GetAllSlas();
 
-            _logger.LogInformation("Fetched {Count} SLAs successfully. CorrelationId: {CorrelationId}", data.Count, CorrelationId);
+            _logger.LogInformation(
+                "SUCCESS GetSlas | Count: {Count} | CorrelationId: {CorrelationId}",
+                data.Count, CorrelationId);
+
+            _logger.LogInformation(
+                "END GetSlas | CorrelationId: {CorrelationId}",
+                CorrelationId);
 
             return Ok(new ApiResponse<object>
             {
@@ -58,6 +66,7 @@ namespace eepzbackend.Controllers
                 CorrelationId = CorrelationId
             });
         }
+
 
         /// <summary>
         /// Creates a new SLA for an employee.
@@ -189,17 +198,34 @@ namespace eepzbackend.Controllers
         /// <param name="slaId">SLA identifier</param>
         /// <param name="slaRequest">SLA update request payload</param>
         /// <returns>Update confirmation</returns>
-        [HttpPut("{slaId}")]
-        public async Task<IActionResult> UpdateSla(int slaId, [FromBody] UpdateSlaRequest slaRequest)
+        [HttpPut("{slaId:int}")]
+        public async Task<IActionResult> UpdateSla(
+     [FromRoute] int slaId,
+     [FromBody] UpdateSlaRequest slaRequest)
         {
-            _logger.LogInformation("Updating SLA {SlaId}. CorrelationId: {CorrelationId}", slaId, CorrelationId);
+            _logger.LogInformation(
+                "START UpdateSla | SlaId: {SlaId} | UserId: {UserId} | CorrelationId: {CorrelationId}",
+                slaId, UserId, CorrelationId);
 
             await _slaService.UpdateSla(slaId, slaRequest, UserId);
 
-            _logger.LogInformation("SLA {SlaId} updated successfully. CorrelationId: {CorrelationId}", slaId, CorrelationId);
+            _logger.LogInformation(
+                "SUCCESS UpdateSla | SlaId: {SlaId} | CorrelationId: {CorrelationId}",
+                slaId, CorrelationId);
 
-            return Ok(new ApiResponse<object> { StatusCode = 200, Success = true, Message = ApiMessages.Updated, CorrelationId = CorrelationId });
+            _logger.LogInformation(
+                "END UpdateSla | CorrelationId: {CorrelationId}",
+                CorrelationId);
+
+            return Ok(new ApiResponse<object>
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Success = true,
+                Message = ApiMessages.Updated,
+                CorrelationId = CorrelationId
+            });
         }
+
 
         /// <summary>
         /// Closes an SLA.
@@ -231,6 +257,7 @@ namespace eepzbackend.Controllers
                 CorrelationId = CorrelationId
             });
         }
+
 
         /// <summary>
         /// Reopens a closed SLA.
@@ -277,14 +304,22 @@ namespace eepzbackend.Controllers
         /// </summary>
         /// <param name="slaid">SLA identifier</param>
         /// <returns>List of SLA history changes</returns>
-        [HttpGet("{slaid}/history")]
-        public async Task<IActionResult> GetSlaHistory(int slaid)
+        [HttpGet("{slaid:int}/history")]
+        public async Task<IActionResult> GetSlaHistory([FromRoute] int slaid)
         {
-            _logger.LogInformation("START GetSlaHistory. SLA: {Slaid}, CorrelationId: {CorrelationId}", slaid, CorrelationId);
+            _logger.LogInformation(
+                "START GetSlaHistory | SlaId: {SlaId} | CorrelationId: {CorrelationId}",
+                slaid, CorrelationId);
 
             var data = await _slaService.GetSlaHistory(slaid);
 
-            _logger.LogInformation("SUCCESS GetSlaHistory. Count: {Count}, CorrelationId: {CorrelationId}", data.Count, CorrelationId);
+            _logger.LogInformation(
+                "SUCCESS GetSlaHistory | SlaId: {SlaId} | Count: {Count} | CorrelationId: {CorrelationId}",
+                slaid, data.Count, CorrelationId);
+
+            _logger.LogInformation(
+                "END GetSlaHistory | SlaId: {SlaId} | CorrelationId: {CorrelationId}",
+                slaid, CorrelationId);
 
             return Ok(new ApiResponse<List<SlaHistoryResponse>>
             {
@@ -307,18 +342,33 @@ namespace eepzbackend.Controllers
         /// </summary>
         /// <param name="employeeId">Unique identifier of the employee.</param>
         /// <returns>ApiResponse containing list of SLAs for the employee.</returns>
-        [HttpGet("employee/{employeeId}")]
-        public async Task<IActionResult> GetEmployeeSlas(int employeeId)
+        [HttpGet("employee/{employeeId:int}")]
+        public async Task<IActionResult> GetEmployeeSlas([FromRoute] int employeeId)
         {
-            _logger.LogInformation("START GetEmployeeSlas. EmployeeId: {EmployeeId}, CorrelationId: {CorrelationId}",
+            if (employeeId <= 0)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Success = false,
+                    Message = ApiMessages.ValidationFailed,
+                    CorrelationId = CorrelationId
+                });
+            }
+
+            _logger.LogInformation(
+                "START GetEmployeeSlas | EmployeeId: {EmployeeId} | CorrelationId: {CorrelationId}",
                 employeeId, CorrelationId);
 
             var data = await _slaService.GetEmployeeSlas(employeeId);
 
-            _logger.LogInformation("SUCCESS GetEmployeeSlas. Count: {Count}, CorrelationId: {CorrelationId}",
-                data?.Count ?? 0, CorrelationId);
+            _logger.LogInformation(
+                "SUCCESS GetEmployeeSlas | EmployeeId: {EmployeeId} | Count: {Count} | CorrelationId: {CorrelationId}",
+                employeeId, data?.Count ?? 0, CorrelationId);
 
-            _logger.LogInformation("END GetEmployeeSlas. CorrelationId: {CorrelationId}", CorrelationId);
+            _logger.LogInformation(
+                "END GetEmployeeSlas | EmployeeId: {EmployeeId} | CorrelationId: {CorrelationId}",
+                employeeId, CorrelationId);
 
             return Ok(new ApiResponse<List<SlaResponse>>
             {
@@ -329,6 +379,7 @@ namespace eepzbackend.Controllers
                 CorrelationId = CorrelationId
             });
         }
+
 
     }
 }

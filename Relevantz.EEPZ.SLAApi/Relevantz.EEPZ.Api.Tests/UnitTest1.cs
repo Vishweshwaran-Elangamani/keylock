@@ -788,25 +788,27 @@ namespace Relevantz.EEPZ.Tests.Controllers
         #endregion
 
         #region DeleteSla Tests (2 tests)
+       [Test]
+public async Task DeleteSla_WithValidSlaId_ReturnsOk()
+{
+    // Arrange
+    var slaId = 1;
+    _mockSlaService
+        .Setup(s => s.DeleteSla(slaId))
+        .ReturnsAsync(true);
 
-        [Test]
-        public async Task DeleteSla_WithValidSlaId_ReturnsOk()
-        {
-            // Arrange
-            var slaId = 1;
-            _mockSlaService.Setup(s => s.DeleteSla(slaId)).Returns(Task.CompletedTask);
+    // Act
+    var result = await _controller.DeleteSla(slaId);
 
-            // Act
-            var result = await _controller.DeleteSla(slaId);
+    // Assert
+    var okResult = result as OkObjectResult;
+    Assert.That(okResult, Is.Not.Null);
 
-            // Assert
-            var okResult = result as OkObjectResult;
-            Assert.That(okResult, Is.Not.Null);
+    var response = okResult!.Value as ApiResponse<object>;
+    Assert.That(response, Is.Not.Null);
+    Assert.That(response!.Message, Is.EqualTo(ApiMessages.Deleted));
+}
 
-            var response = okResult!.Value as ApiResponse<object>;
-            Assert.That(response, Is.Not.Null);
-            Assert.That(response!.Message, Is.EqualTo(ApiMessages.Deleted));
-        }
 
         [Test]
         public async Task DeleteSla_CallsServiceOnce()

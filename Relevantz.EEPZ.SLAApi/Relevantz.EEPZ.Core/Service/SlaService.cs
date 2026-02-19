@@ -312,8 +312,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
-
-
+        /// <summary>
+        /// Retrieves SLA history records and maps Slahistory entities
+        /// to SlaHistoryResponse DTOs for API consumption.
+        /// </summary>
+        /// <param name="slaid">SLA identifier</param>
+        /// <returns>List of mapped SLA history response objects</returns>
         public async Task<List<SlaHistoryResponse>> GetSlaHistory(int slaid)
         {
             var history = await _slaRepository.GetSlaHistoryAsync(slaid);
@@ -558,10 +562,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         #region Common Methods
 
-        public async Task DeleteSla(int slaId)
-        {
-            await _slaRepository.DeleteSlaAsync(slaId);
-        }
+public async Task<bool> DeleteSla(int slaId)
+{
+    return await _slaRepository.DeleteSlaAsync(slaId);
+}
+
 
 
         public async Task<SlaResponse?> GetSlaById(int slaid)
@@ -611,41 +616,54 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
 
-        public async Task<BulkCreateSlaResponse> BulkCreateSla(List<CreateSlaRequest> requests, int userId)
+        public async Task<BulkCreateSlaResponse> BulkCreateSla(
+        List<CreateSlaRequest> requests,
+        int userId)
         {
-            var nowUtc = DateTime.UtcNow; // ✅ timezone-safe
-            var slas = new List<Sla>();
-
-            foreach (var r in requests)
+            try
             {
-                var employee = await _slaRepository.GetEmployeeByIdAsync(r.EmployeeId)
-                    ?? throw new KeyNotFoundException($"Employee {r.EmployeeId} not found");
+                var nowUtc = DateTime.UtcNow;
+                var slas = new List<Sla>();
 
-                int assigneeId = employee.ReportingManagerEmployeeId ?? userId;
-
-                slas.Add(new Sla
+                foreach (var r in requests)
                 {
-                    Slatype = r.Slatype,
-                    EmployeeId = r.EmployeeId,
-                    AssignedToEmployeeId = assigneeId,
-                    DepartmentId = r.DepartmentId,
-                    Deadline = r.Deadline,
-                    Status = "Open",
-                    ComplianceStatus = "OnTime",
-                    CreatedByEmployeeId = userId,
+                    var employee = await _slaRepository.GetEmployeeByIdAsync(r.EmployeeId)
+                        ?? throw new KeyNotFoundException($"Employee {r.EmployeeId} not found");
+
+                    int assigneeId = employee.ReportingManagerEmployeeId ?? userId;
+
+                    slas.Add(new Sla
+                    {
+                        Slatype = r.Slatype,
+                        EmployeeId = r.EmployeeId,
+                        AssignedToEmployeeId = assigneeId,
+                        DepartmentId = r.DepartmentId,
+                        Deadline = r.Deadline,
+                        Status = "Open",
+                        ComplianceStatus = "OnTime",
+                        CreatedByEmployeeId = userId,
+                        CreatedAt = nowUtc
+                    });
+                }
+
+                var count = await _slaRepository.BulkInsertSlasAsync(slas);
+
+                return new BulkCreateSlaResponse
+                {
+                    TotalRequested = requests.Count,
+                    SuccessfulInserts = count,
+                    FailedInserts = requests.Count - count,
                     CreatedAt = nowUtc
-                });
+                };
             }
-
-            var count = await _slaRepository.BulkInsertSlasAsync(slas);
-
-            return new BulkCreateSlaResponse
+            catch (Exception ex)
             {
-                TotalRequested = requests.Count,
-                SuccessfulInserts = count,
-                FailedInserts = requests.Count - count,
-                CreatedAt = nowUtc
-            };
+                _logger.LogError(ex,
+                    "Error during BulkCreateSla | UserId: {UserId}",
+                    userId);
+
+                throw;
+            }
         }
 
 

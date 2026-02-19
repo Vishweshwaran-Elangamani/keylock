@@ -13,17 +13,38 @@ namespace eepzbackend.Controllers
         /// </summary>
         /// <param name="slaid">Unique identifier of the SLA to delete.</param>
         /// <returns>API response containing deletion result.</returns>
-       [Authorize(Roles = "HR")]
-[HttpDelete("{slaid}")]
-public async Task<IActionResult> DeleteSla(int slaid)
+  [Authorize(Roles = "HR")]
+[HttpDelete("{slaid:int}")]
+public async Task<IActionResult> DeleteSla([FromRoute] int slaid)
 {
-    _logger.LogInformation("START DeleteSla. SLA: {Slaid}, CorrelationId: {CorrelationId}", slaid, CorrelationId);
+    _logger.LogInformation(
+        "START DeleteSla | SlaId: {SlaId} | UserId: {UserId} | CorrelationId: {CorrelationId}",
+        slaid, UserId, CorrelationId);
 
-    await _slaService.DeleteSla(slaid);
+    var deleted = await _slaService.DeleteSla(slaid);
 
-    _logger.LogInformation("SUCCESS DeleteSla. SLA: {Slaid}, CorrelationId: {CorrelationId}", slaid, CorrelationId);
+    if (!deleted)
+    {
+        _logger.LogWarning(
+            "DeleteSla FAILED - Not Found | SlaId: {SlaId} | CorrelationId: {CorrelationId}",
+            slaid, CorrelationId);
 
-    _logger.LogInformation("END DeleteSla. SLA: {Slaid}, CorrelationId: {CorrelationId}", slaid, CorrelationId);
+        return NotFound(new ApiResponse<object>
+        {
+            StatusCode = StatusCodes.Status404NotFound,
+            Success = false,
+            Message = ApiMessages.NotFound,
+            CorrelationId = CorrelationId
+        });
+    }
+
+    _logger.LogInformation(
+        "SUCCESS DeleteSla | SlaId: {SlaId} | CorrelationId: {CorrelationId}",
+        slaid, CorrelationId);
+
+    _logger.LogInformation(
+        "END DeleteSla | SlaId: {SlaId} | CorrelationId: {CorrelationId}",
+        slaid, CorrelationId);
 
     return Ok(new ApiResponse<object>
     {
@@ -32,7 +53,9 @@ public async Task<IActionResult> DeleteSla(int slaid)
         Message = ApiMessages.Deleted,
         CorrelationId = CorrelationId
     });
-    }
+}
+
+
 
     }
 }

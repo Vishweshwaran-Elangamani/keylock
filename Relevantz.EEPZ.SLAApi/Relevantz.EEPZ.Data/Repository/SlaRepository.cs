@@ -20,56 +20,56 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
         #region Basic CRUD Operations
 
-       public async Task<List<Sla>> GetAllSlasAsync()
-{
-    try
-    {
-        return await _context.Slas
-            .AsNoTracking() // ✅ read-only optimization
-            .OrderByDescending(s => s.CreatedAt)
-            .Select(s => new Sla
+        public async Task<List<Sla>> GetAllSlasAsync()
+        {
+            try
             {
-                Slaid = s.Slaid,
-                Slatype = s.Slatype,
-                Status = s.Status,
-                EmployeeId = s.EmployeeId,
-                DepartmentId = s.DepartmentId,
-                AssignedToEmployeeId = s.AssignedToEmployeeId,
-                Deadline = s.Deadline,
-                ClosedAt = s.ClosedAt,
-                ComplianceStatus = s.ComplianceStatus,
-                CreatedAt = s.CreatedAt,
-                UpdatedAt = s.UpdatedAt,
-                Employee = new Employee
-                {
-                    EmployeeId = s.Employee.EmployeeId,
-                    Userprofile = s.Employee.Userprofile
-                },
-                Department = s.Department,
-                AssignedToEmployee = new Employee
-                {
-                    EmployeeId = s.AssignedToEmployee.EmployeeId,
-                    Userprofile = s.AssignedToEmployee.Userprofile
-                }
-            })
-            .ToListAsync();
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, "Error retrieving all SLAs");
-        throw;
-    }
-}
+                return await _context.Slas
+                    .AsNoTracking() // ✅ read-only optimization
+                    .OrderByDescending(s => s.CreatedAt)
+                    .Select(s => new Sla
+                    {
+                        Slaid = s.Slaid,
+                        Slatype = s.Slatype,
+                        Status = s.Status,
+                        EmployeeId = s.EmployeeId,
+                        DepartmentId = s.DepartmentId,
+                        AssignedToEmployeeId = s.AssignedToEmployeeId,
+                        Deadline = s.Deadline,
+                        ClosedAt = s.ClosedAt,
+                        ComplianceStatus = s.ComplianceStatus,
+                        CreatedAt = s.CreatedAt,
+                        UpdatedAt = s.UpdatedAt,
+                        Employee = new Employee
+                        {
+                            EmployeeId = s.Employee.EmployeeId,
+                            Userprofile = s.Employee.Userprofile
+                        },
+                        Department = s.Department,
+                        AssignedToEmployee = new Employee
+                        {
+                            EmployeeId = s.AssignedToEmployee.EmployeeId,
+                            Userprofile = s.AssignedToEmployee.Userprofile
+                        }
+                    })
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving all SLAs");
+                throw;
+            }
+        }
 
 
-public async Task<Employee?> GetEmployeeByIdAsync(int employeeId)
-{
-    return await _context.Employees
-        .Include(e => e.Userprofile)
-        .Include(e => e.Userauthentication)
-        .AsNoTracking()
-        .FirstOrDefaultAsync(e => e.EmployeeId == employeeId);
-}
+        public async Task<Employee?> GetEmployeeByIdAsync(int employeeId)
+        {
+            return await _context.Employees
+                .Include(e => e.Userprofile)
+                .Include(e => e.Userauthentication)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e => e.EmployeeId == employeeId);
+        }
 
 
         public async Task<Sla?> GetSlaByIdAsync(int slaid)
@@ -133,16 +133,16 @@ public async Task<Employee?> GetEmployeeByIdAsync(int employeeId)
             }
         }
 
-     public async Task<Sla> CreateSlaAsync(Sla sla)
-{
-    sla.CreatedAt = DateTime.Now;
-    sla.UpdatedAt = DateTime.Now;
+        public async Task<Sla> CreateSlaAsync(Sla sla)
+        {
+            sla.CreatedAt = DateTime.Now;
+            sla.UpdatedAt = DateTime.Now;
 
-    _context.Slas.Add(sla);
-    await _context.SaveChangesAsync();
+            _context.Slas.Add(sla);
+            await _context.SaveChangesAsync();
 
-    return sla;
-}
+            return sla;
+        }
 
         public async Task<Sla> UpdateSlaAsync(Sla sla)
         {
@@ -162,24 +162,31 @@ public async Task<Employee?> GetEmployeeByIdAsync(int employeeId)
             }
         }
 
-        public async Task DeleteSlaAsync(int slaid)
+ public async Task<bool> DeleteSlaAsync(int slaid)
+{
+    try
+    {
+        var sla = await _context.Slas.FindAsync(slaid);
+
+        if (sla == null)
         {
-            try
-            {
-                var sla = await _context.Slas.FindAsync(slaid);
-                if (sla != null)
-                {
-                    _context.Slas.Remove(sla);
-                    await _context.SaveChangesAsync();
-                    _logger.LogInformation($"SLA deleted successfully. SLA ID: {slaid}");
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error deleting SLA");
-                throw;
-            }
+            _logger.LogWarning("SLA not found for deletion. SLA ID: {SlaId}", slaid);
+            return false;
         }
+
+        _context.Slas.Remove(sla);
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation("SLA deleted successfully. SLA ID: {SlaId}", slaid);
+        return true;
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error deleting SLA");
+        throw;
+    }
+}
+
 
         #endregion
 
@@ -260,24 +267,24 @@ public async Task<Employee?> GetEmployeeByIdAsync(int employeeId)
                 throw;
             }
         }
-public async Task<List<Slaescalation>> GetEscalationsBySlaIdAsync(int slaId)
-{
-    return await _context.Slaescalations
-        .Where(e => e.Slaid == slaId)
+        public async Task<List<Slaescalation>> GetEscalationsBySlaIdAsync(int slaId)
+        {
+            return await _context.Slaescalations
+                .Where(e => e.Slaid == slaId)
 
-        .Include(e => e.SubmittedByEmployee)
-            .ThenInclude(e => e.Userprofile)
+                .Include(e => e.SubmittedByEmployee)
+                    .ThenInclude(e => e.Userprofile)
 
-        .Include(e => e.EscalatedToEmployee)
-            .ThenInclude(e => e.Userprofile)
+                .Include(e => e.EscalatedToEmployee)
+                    .ThenInclude(e => e.Userprofile)
 
-        .Include(e => e.Sla)
-            .ThenInclude(s => s.Employee)
-                .ThenInclude(e => e.Userprofile)
+                .Include(e => e.Sla)
+                    .ThenInclude(s => s.Employee)
+                        .ThenInclude(e => e.Userprofile)
 
-        .OrderByDescending(e => e.SubmittedAt)
-        .ToListAsync();
-}
+                .OrderByDescending(e => e.SubmittedAt)
+                .ToListAsync();
+        }
 
         public async Task<Slaescalation> CreateEscalationAsync(Slaescalation escalation)
         {
@@ -317,44 +324,44 @@ public async Task<List<Slaescalation>> GetEscalationsBySlaIdAsync(int slaId)
         #endregion
 
         #region History Operations
-      public async Task<List<Slahistory>> GetSlaHistoryAsync(int slaid)
-{
-    return await _context.Slahistories
-        .Where(h => h.Slaid == slaid)
+        public async Task<List<Slahistory>> GetSlaHistoryAsync(int slaid)
+        {
+            return await _context.Slahistories
+                .Where(h => h.Slaid == slaid)
 
-        .Include(h => h.ChangedByEmployee)
-            .ThenInclude(e => e.Userprofile)
+                .Include(h => h.ChangedByEmployee)
+                    .ThenInclude(e => e.Userprofile)
 
-        .Include(h => h.Sla)
-            .ThenInclude(s => s.Employee)
-                .ThenInclude(e => e.Userprofile)
+                .Include(h => h.Sla)
+                    .ThenInclude(s => s.Employee)
+                        .ThenInclude(e => e.Userprofile)
 
-        .OrderByDescending(h => h.CreatedAt)
-        .ToListAsync();
-}
+                .OrderByDescending(h => h.CreatedAt)
+                .ToListAsync();
+        }
 
 
-   public async Task<Slahistory> AddHistoryAsync(Slahistory history)
-{
-    history.CreatedAt = DateTime.Now;
+        public async Task<Slahistory> AddHistoryAsync(Slahistory history)
+        {
+            history.CreatedAt = DateTime.Now;
 
-    if (history.ChangedByEmployeeId == 0)
-        history.ChangedByEmployeeId = null;
+            if (history.ChangedByEmployeeId == 0)
+                history.ChangedByEmployeeId = null;
 
-    _context.Slahistories.Add(history);
-    await _context.SaveChangesAsync();
+            _context.Slahistories.Add(history);
+            await _context.SaveChangesAsync();
 
-    if (history.ChangedByEmployeeId.HasValue)
-    {
-        await _context.Entry(history)
-            .Reference(h => h.ChangedByEmployee)
-            .Query()
-            .Include(e => e.Userprofile)
-            .LoadAsync();
-    }
+            if (history.ChangedByEmployeeId.HasValue)
+            {
+                await _context.Entry(history)
+                    .Reference(h => h.ChangedByEmployee)
+                    .Query()
+                    .Include(e => e.Userprofile)
+                    .LoadAsync();
+            }
 
-    return history;
-}
+            return history;
+        }
 
 
         #endregion
@@ -578,35 +585,35 @@ public async Task<List<Slaescalation>> GetEscalationsBySlaIdAsync(int slaId)
 
         #region Automation Methods
 
-      public async Task<List<Sla>> GetOverdueSlas(DateTime? cutoffDate = null, int? departmentId = null)
-{
-    try
-    {
-        var targetDate = cutoffDate ?? DateTime.Now;
-
-        var query = _context.Slas
-            .Where(s => s.Status != "Closed" && s.Deadline < targetDate);
-
-        if (departmentId.HasValue)
+        public async Task<List<Sla>> GetOverdueSlas(DateTime? cutoffDate = null, int? departmentId = null)
         {
-            query = query.Where(s => s.DepartmentId == departmentId.Value);
-        }
+            try
+            {
+                var targetDate = cutoffDate ?? DateTime.Now;
 
-        return await query
-            .Include(s => s.Employee)
-                .ThenInclude(e => e.Userprofile)
-            .Include(s => s.Employee)                // ✅ ADD THIS BLOCK
-                .ThenInclude(e => e.Userauthentication)
-            .Include(s => s.Department)
-            .OrderBy(s => s.Deadline)
-            .ToListAsync();
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, "Error retrieving overdue SLAs");
-        throw;
-    }
-}
+                var query = _context.Slas
+                    .Where(s => s.Status != "Closed" && s.Deadline < targetDate);
+
+                if (departmentId.HasValue)
+                {
+                    query = query.Where(s => s.DepartmentId == departmentId.Value);
+                }
+
+                return await query
+                    .Include(s => s.Employee)
+                        .ThenInclude(e => e.Userprofile)
+                    .Include(s => s.Employee)                // ✅ ADD THIS BLOCK
+                        .ThenInclude(e => e.Userauthentication)
+                    .Include(s => s.Department)
+                    .OrderBy(s => s.Deadline)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving overdue SLAs");
+                throw;
+            }
+        }
 
 
         public async Task<List<Sla>> GetSlasWithDeadline(DateTime targetDate, int? departmentId = null)
@@ -680,44 +687,44 @@ public async Task<List<Slaescalation>> GetEscalationsBySlaIdAsync(int slaId)
         }
 
 
-      public async Task<int> BulkInsertSlasAsync(List<Sla> slas)
-{
-    if (slas == null || !slas.Any())
-    {
-        _logger.LogWarning("BulkInsertSlasAsync called with empty or null list");
-        return 0;
-    }
-
-    try
-    {
-        _logger.LogInformation("Bulk insert started. Count: {Count}", slas.Count);
-
-        _context.ChangeTracker.AutoDetectChangesEnabled = false;
-
-        try
+        public async Task<int> BulkInsertSlasAsync(List<Sla> slas)
         {
-            await _context.Slas.AddRangeAsync(slas);
-            var result = await _context.SaveChangesAsync();
+            if (slas == null || !slas.Any())
+            {
+                _logger.LogWarning("BulkInsertSlasAsync called with empty or null list");
+                return 0;
+            }
 
-            _logger.LogInformation("Bulk insert completed successfully. Inserted: {Inserted}", result);
-            return result;
+            try
+            {
+                _logger.LogInformation("Bulk insert started. Count: {Count}", slas.Count);
+
+                _context.ChangeTracker.AutoDetectChangesEnabled = false;
+
+                try
+                {
+                    await _context.Slas.AddRangeAsync(slas);
+                    var result = await _context.SaveChangesAsync();
+
+                    _logger.LogInformation("Bulk insert completed successfully. Inserted: {Inserted}", result);
+                    return result;
+                }
+                finally
+                {
+                    _context.ChangeTracker.AutoDetectChangesEnabled = true;
+                }
+            }
+            catch (DbUpdateException dbEx)
+            {
+                _logger.LogError(dbEx, "Database error during bulk insert");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error during bulk insert");
+                throw;
+            }
         }
-        finally
-        {
-            _context.ChangeTracker.AutoDetectChangesEnabled = true;
-        }
-    }
-    catch (DbUpdateException dbEx)
-    {
-        _logger.LogError(dbEx, "Database error during bulk insert");
-        throw;
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, "Unexpected error during bulk insert");
-        throw;
-    }
-}
 
         public async Task<Slanotification> CreateNotificationAsync(Slanotification notification)
         {
@@ -790,10 +797,10 @@ public async Task<List<Slaescalation>> GetEscalationsBySlaIdAsync(int slaId)
                 throw;
             }
         }
-
-    public async Task<List<Slaescalation>> GetEscalationsByEscalatedToAsync(int managerId)
+      public async Task<List<Slaescalation>> GetEscalationsByEscalatedToAsync(int managerId)
 {
     return await _context.Slaescalations
+        .AsNoTracking()   // ✅ Added for read-only optimization
         .Include(e => e.Sla)
             .ThenInclude(s => s.Employee)
                 .ThenInclude(emp => emp.Userprofile)

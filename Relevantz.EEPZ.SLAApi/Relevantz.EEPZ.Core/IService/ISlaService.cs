@@ -20,7 +20,10 @@ namespace Relevantz.EEPZ.Core.Services.Interfaces
         Task CloseSla(int slaId, int userId);
         Task UpdateSla(int slaid, UpdateSlaRequest request, int userId);
         Task<BulkCreateSlaResponse> BulkCreateSla(List<CreateSlaRequest> requests, int userId);
-        Task DeleteSla(int slaId);
+        
+        Task<bool> DeleteSla(int slaId);
+
+
         Task<EscalationResponse> EscalateToDeptHead(SubmitSlaEscalationRequest request, int userId);  
         Task<List<EscalationResponse>> GetSlaEscalations(int slaId);
         Task<string> ResolveEscalation(ResolveEscalationRequest request, int userId);

@@ -416,25 +416,24 @@ namespace Relevantz.EEPZ.Tests.Services
             _mockSlaRepository.Verify(r => r.UpdateSlaAsync(It.IsAny<Sla>()), Times.Once);
         }
 
-      
-        
         [Test]
-        public async Task DeleteSla_WithValidId_DeletesSla()
-        {
-            // Arrange
-            _mockSlaRepository.Setup(r => r.DeleteSlaAsync(1)).Returns(Task.CompletedTask);
+public async Task DeleteSla_WithValidId_DeletesSla()
+{
+    // Arrange
+    _mockSlaRepository
+        .Setup(r => r.DeleteSlaAsync(1))
+        .ReturnsAsync(true);
 
-            // Act
-            await _slaService.DeleteSla(1);
+    // Act
+    await _slaService.DeleteSla(1);
 
-            // Assert
-            _mockSlaRepository.Verify(r => r.DeleteSlaAsync(1), Times.Once);
-        }
+    // Assert
+    _mockSlaRepository.Verify(r => r.DeleteSlaAsync(1), Times.Once);
+}
 
-       
-       
       
 
+       
         [Test]
         public async Task GetSlaEscalations_WithValidSlaId_ReturnsEscalations()
         {
