@@ -59,6 +59,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             );
 
             var result = await _db.GoalApprovals
+                .AsNoTracking
                 .Where(a =>
                     a.GoalId == goalId &&
                     a.RequestedBy == employeeMasterId &&
@@ -131,6 +132,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             );
 
             var result = await _db.Goalchecklistprogresses
+                .AsNoTracking
                 .FirstOrDefaultAsync(p =>
                     p.ChecklistId == checklistId &&
                     p.UserId == userEmployeeMasterId
@@ -209,6 +211,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             );
 
             var result = await _db.GoalChecklists
+                .AsNoTracking
                 .Include(c => c.Goalchecklistprogresses)
                 .Where(c =>
                     c.GoalId == goalId &&
