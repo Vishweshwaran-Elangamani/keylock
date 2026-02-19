@@ -189,6 +189,8 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("by-department/{departmentId}")]
         public async Task<IActionResult> GetFundAllocationsByDepartment(int departmentId)
         {
+
+
             EEPZBusinessLog.LogBusinessInformation("Retrieving fund allocations for department {DepartmentId}", departmentId);
 
             var result = await _fundAllocationService.GetFundAllocationsByDepartmentAsync(departmentId);
@@ -295,6 +297,12 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("department-budgets/year/{fiscalYear}")]
         public async Task<IActionResult> GetDepartmentBudgetsByYear(int fiscalYear)
         {
+
+            if (fiscalYear <= 0 || fiscalYear > 2100)
+            {
+                EEPZBusinessLog.LogBusinessWarning("Invalid fiscal year: {FiscalYear}", fiscalYear);
+                return BadRequest("Fiscal year must be greater than 0 and not exceed 2100.");
+            }
             EEPZBusinessLog.LogBusinessInformation("Retrieving department budgets for fiscal year {FiscalYear}", fiscalYear);
 
             var result = await _departmentBudgetService.GetDepartmentBudgetsByYearAsync(fiscalYear);
@@ -503,31 +511,31 @@ namespace Relevantz.EEPZ.Api.Controllers
             EEPZBusinessLog.LogBusinessInformation("Utilization updated successfully for allocation {AllocationId}", request.AllocationId);
             return Ok(result);
         }
-        
+
         /// <summary>
-/// Retrieves all fund allocations associated with a specific department budget.
-/// </summary>
-/// <param name="budgetId">The budget identifier.</param>
-/// <returns>
-/// 200 OK with allocation list,
-/// 500 Internal Server Error on failure.
-/// </returns>
-[HttpGet("by-budget/{budgetId}")]
-public async Task<IActionResult> GetAllocationsByBudget(int budgetId)
-{
-    EEPZBusinessLog.LogBusinessInformation("Retrieving allocations for budget {BudgetId}", budgetId);
+        /// Retrieves all fund allocations associated with a specific department budget.
+        /// </summary>
+        /// <param name="budgetId">The budget identifier.</param>
+        /// <returns>
+        /// 200 OK with allocation list,
+        /// 500 Internal Server Error on failure.
+        /// </returns>
+        [HttpGet("by-budget/{budgetId}")]
+        public async Task<IActionResult> GetAllocationsByBudget(int budgetId)
+        {
+            EEPZBusinessLog.LogBusinessInformation("Retrieving allocations for budget {BudgetId}", budgetId);
 
-    var result = await _departmentBudgetService.GetAllocationsByBudgetAsync(budgetId);
+            var result = await _departmentBudgetService.GetAllocationsByBudgetAsync(budgetId);
 
-    EEPZBusinessLog.LogBusinessInformation("Retrieved {Count} allocations for budget {BudgetId}",
-        result.Data?.Count ?? 0, budgetId);
-    
-    return Ok(result);
-}
+            EEPZBusinessLog.LogBusinessInformation("Retrieved {Count} allocations for budget {BudgetId}",
+                result.Data?.Count ?? 0, budgetId);
 
-#endregion
+            return Ok(result);
+        }
+
+        #endregion
     }
 }
 
-        
+
 

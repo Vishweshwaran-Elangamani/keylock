@@ -274,6 +274,8 @@ namespace Relevantz.EEPZ.Core.Service
                     return ApiResponseDto<List<FundAllocationResponseDto>>.FailureResponse("Allocation type cannot be empty");
                 }
 
+                 allocationType = allocationType.Trim().ToLowerInvariant();
+
                 EEPZBusinessLog.LogServiceInformation("Fetching fund allocations by type: {AllocationType}", allocationType);
 
                 var allocations = await _fundAllocationRepository.GetByAllocationTypeAsync(allocationType);
