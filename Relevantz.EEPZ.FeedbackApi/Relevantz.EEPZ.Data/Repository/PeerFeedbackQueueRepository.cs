@@ -11,7 +11,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         private readonly EEPZDbContext _context;
         private readonly ILogger<PeerFeedbackQueueRepository> _logger;
 
-        public PeerFeedbackQueueRepository(EEPZDbContext context, ILogger<PeerFeedbackQueueRepository> logger)
+        public PeerFeedbackQueueRepository(
+            EEPZDbContext context,
+            ILogger<PeerFeedbackQueueRepository> logger)
         {
             _context = context;
             _logger = logger;
@@ -27,12 +29,12 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 _context.Peerfeedbackqueues.Add(feedback);
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation($"Peer feedback created in queue: {feedback.QueueId}");
+                _logger.LogInformation("Peer feedback created. QueueId: {QueueId}", feedback.QueueId);
                 return feedback.QueueId;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error creating peer feedback: {ex.Message}");
+                _logger.LogError(ex, "Error creating peer feedback.");
                 throw;
             }
         }
@@ -51,7 +53,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error getting queue item by ID: {ex.Message}");
+                _logger.LogError(ex, "Error retrieving peer feedback. QueueId: {QueueId}", queueId);
                 throw;
             }
         }
@@ -71,7 +73,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error getting pending feedback: {ex.Message}");
+                _logger.LogError(ex, "Error retrieving pending feedback.");
                 throw;
             }
         }
@@ -91,7 +93,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error getting under review feedback: {ex.Message}");
+                _logger.LogError(ex, "Error retrieving under-review feedback.");
                 throw;
             }
         }
@@ -111,7 +113,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error getting approved feedback: {ex.Message}");
+                _logger.LogError(ex, "Error retrieving approved feedback.");
                 throw;
             }
         }
@@ -131,7 +133,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error getting rejected feedback: {ex.Message}");
+                _logger.LogError(ex, "Error retrieving rejected feedback.");
                 throw;
             }
         }
@@ -149,7 +151,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error getting feedback by recipient: {ex.Message}");
+                _logger.LogError(ex, "Error retrieving feedback by recipient. EmployeeId: {EmployeeId}", employeeId);
                 throw;
             }
         }
@@ -167,7 +169,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error getting feedback by submitter: {ex.Message}");
+                _logger.LogError(ex, "Error retrieving feedback by submitter. EmployeeId: {EmployeeId}", employeeId);
                 throw;
             }
         }
@@ -176,6 +178,8 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         {
             try
             {
+                // TODO: Consider implementing caching for frequently accessed HR feedback records.
+
                 return await _context.Peerfeedbackqueues
                     .AsNoTracking()
                     .AsSplitQuery()
@@ -189,7 +193,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error getting all peer feedback: {ex.Message}");
+                _logger.LogError(ex,
+                    "Error retrieving paginated feedback. PageNumber: {PageNumber}, PageSize: {PageSize}",
+                    pageNumber, pageSize);
                 throw;
             }
         }
@@ -209,7 +215,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error getting feedback by status: {ex.Message}");
+                _logger.LogError(ex, "Error retrieving feedback by status. Status: {Status}", status);
                 throw;
             }
         }
@@ -227,7 +233,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error getting anonymous peer feedback: {ex.Message}");
+                _logger.LogError(ex, "Error retrieving anonymous feedback.");
                 throw;
             }
         }
@@ -239,62 +245,12 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 _context.Entry(feedback).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation($"Peer feedback updated: {feedback.QueueId}");
+                _logger.LogInformation("Peer feedback updated. QueueId: {QueueId}", feedback.QueueId);
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error updating peer feedback: {ex.Message}");
-                throw;
-            }
-        }
-
-        public async Task<bool> ApprovePeerFeedbackAsync(int queueId, bool isProfessional, bool isRelevant, int approvedByHRId)
-        {
-            try
-            {
-                var feedback = await _context.Peerfeedbackqueues.FindAsync(queueId);
-                if (feedback == null)
-                    return false;
-
-                feedback.IsProfessional = isProfessional;
-                feedback.IsRelevant = isRelevant;
-                feedback.ApprovedByHrid = approvedByHRId;
-                feedback.Status = "Approved";
-                feedback.ApprovedAt = DateTime.UtcNow;
-
-                await _context.SaveChangesAsync();
-
-                _logger.LogInformation($"Peer feedback approved: {queueId}");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error approving peer feedback: {ex.Message}");
-                throw;
-            }
-        }
-
-        public async Task<bool> RejectPeerFeedbackAsync(int queueId, int rejectedByHRId)
-        {
-            try
-            {
-                var feedback = await _context.Peerfeedbackqueues.FindAsync(queueId);
-                if (feedback == null)
-                    return false;
-
-                feedback.ApprovedByHrid = rejectedByHRId;
-                feedback.Status = "Rejected";
-                feedback.ApprovedAt = DateTime.UtcNow;
-
-                await _context.SaveChangesAsync();
-
-                _logger.LogInformation($"Peer feedback rejected: {queueId}");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error rejecting peer feedback: {ex.Message}");
+                _logger.LogError(ex, "Error updating peer feedback. QueueId: {QueueId}", feedback.QueueId);
                 throw;
             }
         }
@@ -310,12 +266,12 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 feedback.Status = newStatus;
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation($"Peer feedback status updated: {queueId} → {newStatus}");
+                _logger.LogInformation("Feedback status updated. QueueId: {QueueId}, Status: {Status}", queueId, newStatus);
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error updating feedback status: {ex.Message}");
+                _logger.LogError(ex, "Error updating feedback status. QueueId: {QueueId}", queueId);
                 throw;
             }
         }
@@ -329,17 +285,17 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     return false;
 
                 if (feedback.Status != "Pending")
-                    throw new InvalidOperationException($"Cannot delete feedback in {feedback.Status} status. Only Pending feedback can be deleted.");
+                    throw new InvalidOperationException("Only pending feedback can be deleted.");
 
                 _context.Peerfeedbackqueues.Remove(feedback);
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation($"Peer feedback deleted: {queueId}");
+                _logger.LogInformation("Peer feedback deleted. QueueId: {QueueId}", queueId);
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error deleting peer feedback: {ex.Message}");
+                _logger.LogError(ex, "Error deleting peer feedback. QueueId: {QueueId}", queueId);
                 throw;
             }
         }
@@ -354,9 +310,77 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error checking queue item existence: {ex.Message}");
+                _logger.LogError(ex, "Error checking queue item existence. QueueId: {QueueId}", queueId);
                 throw;
             }
         }
+
+        public async Task<bool> ApprovePeerFeedbackAsync(
+    int queueId,
+    bool isProfessional,
+    bool isRelevant,
+    int approvedByHRId)
+        {
+            try
+            {
+                var feedback = await _context.Peerfeedbackqueues.FindAsync(queueId);
+                if (feedback == null)
+                    return false;
+
+                feedback.IsProfessional = isProfessional;
+                feedback.IsRelevant = isRelevant;
+                feedback.ApprovedByHrid = approvedByHRId;
+                feedback.Status = "Approved";
+                feedback.ApprovedAt = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation(
+                    "Peer feedback approved. QueueId: {QueueId}, HRId: {HRId}",
+                    queueId,
+                    approvedByHRId);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,
+                    "Error approving peer feedback. QueueId: {QueueId}",
+                    queueId);
+                throw;
+            }
+        }
+        public async Task<bool> RejectPeerFeedbackAsync(
+            int queueId,
+            int rejectedByHRId)
+        {
+            try
+            {
+                var feedback = await _context.Peerfeedbackqueues.FindAsync(queueId);
+                if (feedback == null)
+                    return false;
+
+                feedback.ApprovedByHrid = rejectedByHRId;
+                feedback.Status = "Rejected";
+                feedback.ApprovedAt = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation(
+                    "Peer feedback rejected. QueueId: {QueueId}, HRId: {HRId}",
+                    queueId,
+                    rejectedByHRId);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,
+                    "Error rejecting peer feedback. QueueId: {QueueId}",
+                    queueId);
+                throw;
+            }
+        }
+
     }
 }
