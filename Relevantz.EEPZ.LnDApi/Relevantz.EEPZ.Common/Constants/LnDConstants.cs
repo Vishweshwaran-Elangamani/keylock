@@ -289,8 +289,9 @@ namespace Relevantz.EEPZ.Common.Constants
 
             public const string PENDING_REOPEN_REQUEST_EXISTS = "A pending reopen request already exists for this assignment";
             public const string NEW_DEADLINE_REQUIRED = "New deadline is required when approving reopen request";
-    public const string ASSIGNMENT_NOT_ELIGIBLE_FOR_REOPEN = 
-    "Only in-progress assignments with passed deadlines can be reopened";
+            public const string ASSIGNMENT_NOT_ELIGIBLE_FOR_REOPEN =
+            "Only in-progress assignments with passed deadlines can be reopened";
+            public const string ASSIGNMENT_DEADLINE_NOT_PASSED = "Assignment deadline has not passed yet. Reopen request is only available for overdue assignments.";
 
         }
     }

@@ -917,7 +917,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<int>
                 {
                     Success = false,
-                    Message = "Assignment deadline has not passed yet. Reopen request is only available for overdue assignments."
+                    Message = LnDConstants.RESPONSE_MESSAGES.ASSIGNMENT_DEADLINE_NOT_PASSED
                 };
             }
 
