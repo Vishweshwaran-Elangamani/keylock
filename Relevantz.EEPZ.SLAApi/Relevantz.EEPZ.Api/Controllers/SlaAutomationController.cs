@@ -96,19 +96,52 @@ namespace eepzbackend.Controllers
             return result;
         }
 
-        [HttpGet("status")]
+[HttpGet("status")]
 public async Task<ApiResponse<AutomationStatusResponse>> GetAutomationStatus()
 {
-    _logger.LogInformation("GetAutomationStatus endpoint triggered");
-    return await _slaAutomationService.GetAutomationStatus();
+    var correlationId = HttpContext.TraceIdentifier;
+
+    _logger.LogInformation(
+        "START GetAutomationStatus | CorrelationId: {CorrelationId}",
+        correlationId);
+
+    var result = await _slaAutomationService.GetAutomationStatus();
+
+    _logger.LogInformation(
+        "END GetAutomationStatus | Success: {Success} | HasData: {HasData} | CorrelationId: {CorrelationId}",
+        result.Success,
+        result.Data != null,
+        correlationId);
+
+    result.CorrelationId = correlationId;
+
+    return result;
 }
+
 
 [HttpGet("logs")]
 public async Task<ApiResponse<AutomationLogResponse>> GetAutomationLogs([FromQuery] int days = 7)
 {
-    _logger.LogInformation("GetAutomationLogs endpoint triggered. Days: {Days}", days);
-    return await _slaAutomationService.GetAutomationLogs(days);
+    var correlationId = HttpContext.TraceIdentifier;
+
+    _logger.LogInformation(
+        "START GetAutomationLogs | Days: {Days} | CorrelationId: {CorrelationId}",
+        days,
+        correlationId);
+
+    var result = await _slaAutomationService.GetAutomationLogs(days);
+
+    _logger.LogInformation(
+        "END GetAutomationLogs | Success: {Success} | HasData: {HasData} | CorrelationId: {CorrelationId}",
+        result.Success,
+        result.Data != null,
+        correlationId);
+
+    result.CorrelationId = correlationId;
+
+    return result;
 }
+
 
 
         #endregion

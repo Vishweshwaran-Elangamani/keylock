@@ -20,21 +20,47 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
         #region Basic CRUD Operations
 
-        public async Task<List<Sla>> GetAllSlasAsync()
-        {
-            return await _context.Slas
-                .Include(s => s.Employee)
-                    .ThenInclude(e => e.Userprofile)
-                .Include(s => s.Employee)
-                    .ThenInclude(e => e.Userauthentication)
-                .Include(s => s.Department)
-                .Include(s => s.AssignedToEmployee)
-                    .ThenInclude(e => e.Userprofile)
-                .Include(s => s.AssignedToEmployee)
-                    .ThenInclude(e => e.Userauthentication)
-                .OrderByDescending(s => s.CreatedAt)
-                .ToListAsync();
-        }
+       public async Task<List<Sla>> GetAllSlasAsync()
+{
+    try
+    {
+        return await _context.Slas
+            .AsNoTracking() // ✅ read-only optimization
+            .OrderByDescending(s => s.CreatedAt)
+            .Select(s => new Sla
+            {
+                Slaid = s.Slaid,
+                Slatype = s.Slatype,
+                Status = s.Status,
+                EmployeeId = s.EmployeeId,
+                DepartmentId = s.DepartmentId,
+                AssignedToEmployeeId = s.AssignedToEmployeeId,
+                Deadline = s.Deadline,
+                ClosedAt = s.ClosedAt,
+                ComplianceStatus = s.ComplianceStatus,
+                CreatedAt = s.CreatedAt,
+                UpdatedAt = s.UpdatedAt,
+                Employee = new Employee
+                {
+                    EmployeeId = s.Employee.EmployeeId,
+                    Userprofile = s.Employee.Userprofile
+                },
+                Department = s.Department,
+                AssignedToEmployee = new Employee
+                {
+                    EmployeeId = s.AssignedToEmployee.EmployeeId,
+                    Userprofile = s.AssignedToEmployee.Userprofile
+                }
+            })
+            .ToListAsync();
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error retrieving all SLAs");
+        throw;
+    }
+}
+
 
 public async Task<Employee?> GetEmployeeByIdAsync(int employeeId)
 {
@@ -552,33 +578,36 @@ public async Task<List<Slaescalation>> GetEscalationsBySlaIdAsync(int slaId)
 
         #region Automation Methods
 
-        public async Task<List<Sla>> GetOverdueSlas(DateTime? cutoffDate = null, int? departmentId = null)
+      public async Task<List<Sla>> GetOverdueSlas(DateTime? cutoffDate = null, int? departmentId = null)
+{
+    try
+    {
+        var targetDate = cutoffDate ?? DateTime.Now;
+
+        var query = _context.Slas
+            .Where(s => s.Status != "Closed" && s.Deadline < targetDate);
+
+        if (departmentId.HasValue)
         {
-            try
-            {
-                var targetDate = cutoffDate ?? DateTime.Now;
-
-                var query = _context.Slas
-                    .Where(s => s.Status != "Closed" && s.Deadline < targetDate);
-
-                if (departmentId.HasValue)
-                {
-                    query = query.Where(s => s.DepartmentId == departmentId.Value);
-                }
-
-                return await query
-                    .Include(s => s.Employee)
-                        .ThenInclude(e => e.Userprofile)
-                    .Include(s => s.Department)
-                    .OrderBy(s => s.Deadline)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving overdue SLAs");
-                throw;
-            }
+            query = query.Where(s => s.DepartmentId == departmentId.Value);
         }
+
+        return await query
+            .Include(s => s.Employee)
+                .ThenInclude(e => e.Userprofile)
+            .Include(s => s.Employee)                // ✅ ADD THIS BLOCK
+                .ThenInclude(e => e.Userauthentication)
+            .Include(s => s.Department)
+            .OrderBy(s => s.Deadline)
+            .ToListAsync();
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error retrieving overdue SLAs");
+        throw;
+    }
+}
+
 
         public async Task<List<Sla>> GetSlasWithDeadline(DateTime targetDate, int? departmentId = null)
         {
@@ -651,42 +680,44 @@ public async Task<List<Slaescalation>> GetEscalationsBySlaIdAsync(int slaId)
         }
 
 
-        public async Task<int> BulkInsertSlasAsync(List<Sla> slas)
+      public async Task<int> BulkInsertSlasAsync(List<Sla> slas)
+{
+    if (slas == null || !slas.Any())
+    {
+        _logger.LogWarning("BulkInsertSlasAsync called with empty or null list");
+        return 0;
+    }
+
+    try
+    {
+        _logger.LogInformation("Bulk insert started. Count: {Count}", slas.Count);
+
+        _context.ChangeTracker.AutoDetectChangesEnabled = false;
+
+        try
         {
-            try
-            {
-                if (slas == null || !slas.Any())
-                {
-                    _logger.LogWarning("BulkInsertSlasAsync called with empty or null list");
-                    return 0;
-                }
+            await _context.Slas.AddRangeAsync(slas);
+            var result = await _context.SaveChangesAsync();
 
-                _logger.LogInformation($"Starting bulk insert of {slas.Count} SLAs");
-
-
-                _context.ChangeTracker.AutoDetectChangesEnabled = false;
-
-                try
-                {
-
-                    _context.Slas.AddRange(slas);
-                    var result = await _context.SaveChangesAsync();
-
-                    _logger.LogInformation($"Bulk insert completed: {result} SLAs inserted");
-                    return result;
-                }
-                finally
-                {
-
-                    _context.ChangeTracker.AutoDetectChangesEnabled = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in BulkInsertSlasAsync");
-                throw;
-            }
+            _logger.LogInformation("Bulk insert completed successfully. Inserted: {Inserted}", result);
+            return result;
         }
+        finally
+        {
+            _context.ChangeTracker.AutoDetectChangesEnabled = true;
+        }
+    }
+    catch (DbUpdateException dbEx)
+    {
+        _logger.LogError(dbEx, "Database error during bulk insert");
+        throw;
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Unexpected error during bulk insert");
+        throw;
+    }
+}
 
         public async Task<Slanotification> CreateNotificationAsync(Slanotification notification)
         {
