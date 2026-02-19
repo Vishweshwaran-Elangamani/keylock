@@ -1,5 +1,4 @@
 import axios from "axios";
-import { Import } from "lucide-react";
 
 const API_BASE_URL = import.meta.env.VITE_PROJECT_API_URL + "/api";
 
@@ -8,6 +7,15 @@ const apiClient = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+});
+
+
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem("accessToken");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export default apiClient;
