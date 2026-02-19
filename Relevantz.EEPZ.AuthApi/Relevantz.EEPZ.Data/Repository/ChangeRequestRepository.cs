@@ -22,6 +22,7 @@ namespace Relevantz.EEPZ.Data.Repository
         public async Task<Changerequest?> GetByIdAsync(int requestId)
         {
             return await _context.Changerequests
+                .AsNoTracking()
                 .Include(cr => cr.Employee)
                     .ThenInclude(e => e.Userprofile)
                 .FirstOrDefaultAsync(cr => cr.RequestId == requestId);
@@ -30,6 +31,7 @@ namespace Relevantz.EEPZ.Data.Repository
         public async Task<List<Changerequest>> GetByEmployeeIdAsync(int employeeId)
         {
             return await _context.Changerequests
+                .AsNoTracking()
                 .Where(cr => cr.EmployeeId == employeeId)
                 .OrderByDescending(cr => cr.RequestedAt)
                 .ToListAsync();
@@ -38,6 +40,7 @@ namespace Relevantz.EEPZ.Data.Repository
         public async Task<List<Changerequest>> GetPendingRequestsAsync()
         {
             return await _context.Changerequests
+                .AsNoTracking()
                 .Include(cr => cr.Employee)
                     .ThenInclude(e => e.Userprofile)
                 .Where(cr => cr.Status == ChangeRequestConstants.RequestStatus.Pending)
@@ -48,6 +51,7 @@ namespace Relevantz.EEPZ.Data.Repository
         public async Task<List<Changerequest>> GetAllAsync()
         {
             return await _context.Changerequests
+                .AsNoTracking()
                 .Include(cr => cr.Employee)
                     .ThenInclude(e => e.Userprofile)
                 .OrderByDescending(cr => cr.RequestedAt)
@@ -82,6 +86,7 @@ namespace Relevantz.EEPZ.Data.Repository
         public async Task<List<Changerequest>> GetByStatusAsync(string status)
         {
             return await _context.Changerequests
+                .AsNoTracking()
                 .Include(cr => cr.Employee)
                     .ThenInclude(e => e.Userprofile)
                 .Where(cr => cr.Status == status)
@@ -92,7 +97,9 @@ namespace Relevantz.EEPZ.Data.Repository
         public async Task<bool> IsEmailAlreadyExistsAsync(string email, int excludeUserId)
         {
             return await _context.Userauthentications
-                .AnyAsync(u => u.Email.ToLower() == email.ToLower() && u.UserId != excludeUserId);
+                .AsNoTracking()
+                .AnyAsync(u => u.Email.ToLower() == email.ToLower() &&
+                               u.UserId != excludeUserId);
         }
 
         public async Task<bool> IsUsernameAlreadyExistsAsync(string username, int excludeUserId)
@@ -103,9 +110,12 @@ namespace Relevantz.EEPZ.Data.Repository
         public async Task<bool> IsEmployeeCompanyIdExistsAsync(string employeeCompanyId, int excludeEmployeeId)
         {
             return await _context.Employees
-                .AnyAsync(e => e.EmployeeCompanyId == employeeCompanyId &&
-                              e.EmployeeId != excludeEmployeeId &&
-                              e.IsActive == true);
+                .AsNoTracking()
+                .AnyAsync(e =>
+                    e.EmployeeCompanyId == employeeCompanyId &&
+                    e.EmployeeId != excludeEmployeeId &&
+                    e.IsActive == true
+                );
         }
     }
 }
