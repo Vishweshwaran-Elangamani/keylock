@@ -158,18 +158,30 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         /// <summary>
         /// Creates a response entry for a feedback form.
         /// </summary>
-        public async Task<HrFeedbackFormResponseResponseDto> CreateFormResponseAsync(SubmitHRFormResponseRequestDto dto, CancellationToken ct)
+        public async Task<HrFeedbackFormResponseResponseDto> CreateFormResponseAsync(
+    SubmitHRFormResponseRequestDto dto,
+    int loggedInEmployeeId,
+    CancellationToken ct)
         {
-            if (dto == null) throw new ArgumentNullException(nameof(dto));
-            if (!await _formRepo.FormExistsAsync(dto.FormId, ct))
-                throw new KeyNotFoundException($"Form {dto.FormId} not found.");
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto));
+
+            var form = await _formRepo.GetFormByIdAsync(dto.FormId, ct)
+                ?? throw new KeyNotFoundException($"Form {dto.FormId} not found.");
+
+
+            var existingResponses = await _formRepo.GetResponsesBySubmitterAsync(loggedInEmployeeId, ct);
+
+            if (existingResponses.Any(r => r.FormId == dto.FormId))
+                throw new InvalidOperationException("You have already submitted this form.");
 
             var response = new Hrfeedbackformresponse
             {
                 FormId = dto.FormId,
-                SubmittedByEmployeeId = dto.SubmittedByEmployeeId,
+                SubmittedByEmployeeId = loggedInEmployeeId,
                 FormResponse = JsonSerializer.Serialize(dto.FormResponse),
-                Status = FormStatuses.Draft
+                Status = FormStatuses.Draft,
+                CreatedAt = DateTime.UtcNow
             };
 
             var id = await _formRepo.CreateFormResponseAsync(response, ct);
@@ -177,6 +189,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             return MapResponseToResponseDto(response);
         }
+
 
         /// <summary>Retrieves a specific form response.</summary>
         public async Task<HrFeedbackFormResponseResponseDto> GetFormResponseByIdAsync(int responseId, CancellationToken ct) =>
@@ -208,12 +221,48 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             await _formRepo.SetHRReviewAsync(responseId, hrComments, reviewedByHRId, ct);
 
         /// <summary>Deletes a form response.</summary>
-        public async Task<bool> DeleteFormResponseAsync(int responseId, CancellationToken ct) =>
+        public async Task<bool> DeleteFormResponseAsync(
+     int responseId,
+     int loggedInEmployeeId,
+     CancellationToken ct)
+        {
+            var response = await _formRepo.GetFormResponseByIdAsync(responseId, ct)
+                ?? throw new KeyNotFoundException($"Response {responseId} not found.");
+
+            if (response.SubmittedByEmployeeId != loggedInEmployeeId)
+                throw new UnauthorizedAccessException("You cannot delete this response.");
+
+            if (response.Status == FormStatuses.Submitted)
+                throw new InvalidOperationException("Submitted responses cannot be deleted.");
+
             await _formRepo.DeleteFormResponseAsync(responseId, ct);
 
+            return true;
+        }
+
+
         /// <summary>Marks a form response as submitted.</summary>
-        public async Task<bool> SubmitFormResponseAsync(int responseId, CancellationToken ct) =>
-            await _formRepo.UpdateResponseStatusAsync(responseId, FormStatuses.Submitted, ct);
+        public async Task<bool> SubmitFormResponseAsync(
+     int responseId,
+     int loggedInEmployeeId,
+     CancellationToken ct)
+        {
+            var response = await _formRepo.GetFormResponseByIdAsync(responseId, ct)
+                ?? throw new KeyNotFoundException($"Response {responseId} not found.");
+
+            if (response.SubmittedByEmployeeId != loggedInEmployeeId)
+                throw new UnauthorizedAccessException("You cannot submit this response.");
+
+            if (response.Status == FormStatuses.Submitted)
+                throw new InvalidOperationException("Response already submitted.");
+
+            response.Status = FormStatuses.Submitted;
+            response.SubmittedAt = DateTime.UtcNow;
+
+            await _formRepo.UpdateFormResponseAsync(response, ct);
+
+            return true;
+        }
 
         /// <summary>Distributes a form to employees.</summary>
         public async Task<DistributeFormResponse> DistributeFormAsync(int formId, List<int> employeeIds, CancellationToken ct)
@@ -248,15 +297,30 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         /// <summary>
         /// Updates an existing form response.
         /// </summary>
-        public async Task<HrFeedbackFormResponseResponseDto> UpdateFormResponseAsync(int responseId, UpdateHRFormResponseRequestDto dto, CancellationToken ct)
+        public async Task<HrFeedbackFormResponseResponseDto> UpdateFormResponseAsync(
+     int responseId,
+     UpdateHRFormResponseRequestDto dto,
+     int loggedInEmployeeId,
+     CancellationToken ct)
         {
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto));
+
             var response = await _formRepo.GetFormResponseByIdAsync(responseId, ct)
                 ?? throw new KeyNotFoundException($"Response {responseId} not found.");
 
+            if (response.SubmittedByEmployeeId != loggedInEmployeeId)
+                throw new UnauthorizedAccessException("You cannot modify this response.");
+
+            if (response.Status == FormStatuses.Submitted)
+                throw new InvalidOperationException("Submitted responses cannot be modified.");
+
             response.FormResponse = JsonSerializer.Serialize(dto.FormResponse);
+
             await _formRepo.UpdateFormResponseAsync(response, ct);
 
             return MapResponseToResponseDto(response);
         }
+
     }
 }

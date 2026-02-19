@@ -16,18 +16,30 @@ namespace Relevantz.EEPZ.Core.Services.Interfaces
         Task<bool> UpdateFormStatusAsync(int formId, string newStatus, CancellationToken ct);
         Task<bool> DeleteFormAsync(int formId, CancellationToken ct);
 
-        Task<HrFeedbackFormResponseResponseDto> CreateFormResponseAsync(SubmitHRFormResponseRequestDto dto, CancellationToken ct);
+       Task<HrFeedbackFormResponseResponseDto> CreateFormResponseAsync(
+    SubmitHRFormResponseRequestDto dto,
+    int loggedInEmployeeId,
+    CancellationToken ct);
         Task<HrFeedbackFormResponseResponseDto> GetFormResponseByIdAsync(int responseId, CancellationToken ct);
         Task<List<HrFeedbackFormResponseResponseDto>> GetResponsesByFormAsync(int formId, CancellationToken ct);
         Task<List<HrFeedbackFormResponseResponseDto>> GetResponsesBySubmitterAsync(int employeeId, CancellationToken ct);
         Task<List<HrFeedbackFormResponseResponseDto>> GetResponsesByStatusAsync(string status, CancellationToken ct);
         Task<List<HrFeedbackFormResponseResponseDto>> GetSubmittedResponsesAsync(CancellationToken ct);
         Task<List<HrFeedbackFormResponseResponseDto>> GetPendingReviewResponsesAsync(CancellationToken ct);
-        Task<HrFeedbackFormResponseResponseDto> UpdateFormResponseAsync(int responseId, UpdateHRFormResponseRequestDto dto, CancellationToken ct);
-        Task<bool> SubmitFormResponseAsync(int responseId, CancellationToken ct);
+        Task<HrFeedbackFormResponseResponseDto> UpdateFormResponseAsync(
+    int responseId,
+    UpdateHRFormResponseRequestDto dto,
+    int loggedInEmployeeId,
+    CancellationToken ct);
+       Task<bool> SubmitFormResponseAsync(
+    int responseId,
+    int loggedInEmployeeId,
+    CancellationToken ct);
         Task<bool> SetHRReviewAsync(int responseId, string hrComments, int reviewedByHRId, CancellationToken ct);
-        Task<bool> DeleteFormResponseAsync(int responseId, CancellationToken ct);
-
+        Task<bool> DeleteFormResponseAsync(
+    int responseId,
+    int loggedInEmployeeId,
+    CancellationToken ct);
         Task<DistributeFormResponse> DistributeFormAsync(int formId, List<int> employeeIds, CancellationToken ct);
     }
 }
