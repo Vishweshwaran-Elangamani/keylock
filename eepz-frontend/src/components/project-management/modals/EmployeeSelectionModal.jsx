@@ -298,8 +298,8 @@ const EmployeeSelectionModal = ({
               currentPage={currentPage}
               totalItems={totalItems}
               itemsPerPage={itemsPerPage}
-              onPageChange={handlePageChange}
-              onItemsPerPageChange={handleItemsPerPageChange}
+              setCurrentPage={handlePageChange}
+              setItemsPerPage={handleItemsPerPageChange}
             />
           </div>
 
