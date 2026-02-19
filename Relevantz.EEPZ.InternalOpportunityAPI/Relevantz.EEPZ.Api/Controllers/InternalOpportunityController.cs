@@ -87,6 +87,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("active")]
         public async Task<IActionResult> GetActiveOpportunities()
         {
+            // Only active opportunities are returned to show candidates the roles currently open for application
             var result = await _opportunityService.GetActiveOpportunitiesSimpleAsync();
             return Ok(result);
         }
@@ -115,3 +116,5 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
     }
 }
+
+

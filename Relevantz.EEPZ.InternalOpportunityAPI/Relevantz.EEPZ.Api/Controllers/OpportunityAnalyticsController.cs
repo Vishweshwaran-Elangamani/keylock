@@ -29,6 +29,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("statistic")]
         public async Task<IActionResult> GetOpportunityStatistics()
         {
+            // Separate counts (active, closed, etc.) are retrieved to help maintainers track lifecycle stages independently
             var result = await _opportunityService.GetStatisticsAsync();
             return Ok(result);
         }

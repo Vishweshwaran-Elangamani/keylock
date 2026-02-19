@@ -165,27 +165,21 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto request)
         {
-            var validationResult = await _resetPasswordValidator.ValidateAsync(request);
-            if (!validationResult.IsValid)
-            {
+            var vr = await _resetPasswordValidator.ValidateAsync(request);
+            if (!vr.IsValid)
                 return BadRequest(new
                 {
                     success = false,
                     message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => new
-                    {
-                        property = e.PropertyName,
-                        error = e.ErrorMessage
-                    })
+                    errors = vr.Errors.Select(e => new { property = e.PropertyName, error = e.ErrorMessage })
                 });
-            }
 
-            var maskedEmail = EmailMaskingUtil.MaskEmail(request.Email);
-            _logger.LogInformation("Password reset confirmation for {MaskedEmail}", maskedEmail);
+            var masked = EmailMaskingUtil.MaskEmail(request.Email);
+            _logger.LogInformation("Password reset confirmation for {MaskedEmail}", masked);
 
             await _authenticationService.ResetPasswordAsync(request);
 
-            _logger.LogInformation("Password reset successful for {MaskedEmail}", maskedEmail);
+            _logger.LogInformation("Password reset successful for {MaskedEmail}", masked);
 
             return Ok(ApiResponseDto<object>.SuccessResponse(null, MessageConstants.PasswordResetComplete));
         }

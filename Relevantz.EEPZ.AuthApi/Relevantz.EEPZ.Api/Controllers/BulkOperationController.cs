@@ -32,6 +32,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             _bulkCreateValidator = bulkCreateValidator;
             _bulkInactivateValidator = bulkInactivateValidator;
         }
+
         /// <summary>
         /// Adding Users in Bulk manner
         /// </summary>
@@ -61,6 +62,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _bulkOperationService.BulkCreateUsersAsync(request.Users, performedByUserId);
             return Ok(result);
         }
+
         /// <summary>
         /// Deactivating the users in Bulk manner
         /// </summary>
@@ -69,6 +71,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpPost("bulk-inactivate-users")]
         public async Task<IActionResult> BulkInactivateUsers([FromBody] BulkUserInactivateRequestDto request)
         {
+            // Validate request payload (ensures user IDs and required fields are present/valid)
             var validationResult = await _bulkInactivateValidator.ValidateAsync(request);
             if (!validationResult.IsValid)
             {
@@ -84,6 +87,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
 
+            // Verify authenticated user context (used for audit: performedByUserId)
             if (!TryGetUserId(out var performedByUserId))
                 return Unauthorized(new { success = false, message = "Invalid user context" });
 
@@ -139,7 +143,6 @@ namespace Relevantz.EEPZ.Api.Controllers
         /// Export Roles
         /// </summary>
         /// <returns></returns>
-
         [HttpGet("export/roles")]
         public async Task<IActionResult> ExportRoles()
         {
@@ -175,6 +178,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 fileName
             );
         }
+
         /// <summary>
         /// Export users
         /// </summary>
@@ -194,6 +198,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 fileName
             );
         }
+
         /// <summary>
         /// Export users, Roles and department
         /// </summary>
@@ -222,3 +227,4 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
     }
 }
+

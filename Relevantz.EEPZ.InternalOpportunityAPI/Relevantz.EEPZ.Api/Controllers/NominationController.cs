@@ -31,6 +31,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize(Roles = "Employee,Manager")]
         public async Task<IActionResult> SelfNominate([FromBody] CreateSelfNominationRequestDto request)
         {
+            // Fallback lookup is used because some identity providers populate "sub" instead of NameIdentifier
             var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)
                               ?? User.FindFirst("sub");
 
