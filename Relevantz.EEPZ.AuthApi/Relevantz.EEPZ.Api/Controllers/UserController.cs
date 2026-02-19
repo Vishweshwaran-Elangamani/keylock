@@ -18,7 +18,7 @@ namespace Relevantz.EEPZ.Api.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = "Admin,HR")]
     public class UserController : ControllerBase
     {
         private readonly IProfileService _profileService;

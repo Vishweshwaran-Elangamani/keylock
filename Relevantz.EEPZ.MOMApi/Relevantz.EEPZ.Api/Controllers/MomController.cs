@@ -48,7 +48,7 @@ namespace eepzbackend.Controllers
         /// Rate Limited: 100 requests per minute per client (global middleware)
         /// Meeting date must be within past 7 days or future 30 days
         /// </remarks>
-        [HttpPost] // CHANGED: Removed "/create" - POST method implies creation
+        [HttpPost] 
         [ProducesResponseType(typeof(ApiResponse<MomResponseDto>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

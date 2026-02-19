@@ -40,7 +40,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return Unauthorized(new { message = MessageConstants.UserIdNotFoundInToken });
             }
 
-            Console.WriteLine($"[Controller] Self-Nominate - UserId: {userId}, OpportunityId: {request.OpportunityId}");
 
             var result = await _nominationService.CreateSelfNominationAsync(userId, request);
 
@@ -63,7 +62,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return Unauthorized(new { message = MessageConstants.ManagerIdNotFoundInToken });
             }
 
-            Console.WriteLine($"[Controller] Manager-Nominate - ManagerId: {managerId}, NomineeId: {request.NomineeEmployeeId}");
 
             var result = await _nominationService.CreateManagerNominationAsync(managerId, request);
 
@@ -78,7 +76,6 @@ namespace Relevantz.EEPZ.Api.Controllers
         [Authorize]
         public async Task<IActionResult> GetAllNominations([FromQuery] string? status = null)
         {
-            Console.WriteLine($"[Controller] GetAllNominations - Status Filter: {status ?? "All"}");
 
             var result = await _nominationService.GetAllNominationsAsync(status);
             return Ok(result);
@@ -100,8 +97,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return Unauthorized(new { message = MessageConstants.UserIdNotFoundInToken, availableClaims = allClaims });
             }
 
-            Console.WriteLine($"[Controller] GetMyNominations - UserId: {userId}");
-
             var result = await _nominationService.GetMyNominationsAsync(userId);
             return Ok(result);
         }
@@ -120,8 +115,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 return Unauthorized(new { message = MessageConstants.UserIdNotFoundInToken });
             }
-
-            Console.WriteLine($"[Controller] GetMyNominationHistory - UserId: {userId}, Status Filter: {status ?? "All"}");
 
             var result = await _nominationService.GetMyNominationHistoryAsync(userId, status);
             return Ok(result);
@@ -142,8 +135,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return Unauthorized(new { message = MessageConstants.ManagerIdNotFoundInToken });
             }
 
-            Console.WriteLine($"[Controller] GetManagerTeamNominations - ManagerId: {managerId}, Status: {status ?? "All"}");
-
             var result = await _nominationService.GetManagerTeamNominationsAsync(managerId, status);
             return Ok(result);
         }
@@ -163,8 +154,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return Unauthorized(new { message = MessageConstants.ManagerIdNotFoundInToken });
             }
 
-            Console.WriteLine($"[Controller] GetPendingManagerReview - ManagerId (UserId): {managerId}");
-
             var result = await _nominationService.GetPendingManagerReviewAsync(managerId);
             return Ok(result);
         }
@@ -183,8 +172,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 return Unauthorized(new { message = MessageConstants.DepartmentHeadIdNotFoundInToken });
             }
-
-            Console.WriteLine($"[Controller] GetPendingDeptHeadReview - DeptHeadId (UserId): {deptHeadId}");
 
             var result = await _nominationService.GetPendingDeptHeadReviewAsync(deptHeadId);
             return Ok(result);
@@ -215,8 +202,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 return Unauthorized(new { message = MessageConstants.ManagerIdNotFoundInToken });
             }
-
-            Console.WriteLine($"[Controller] ManagerReview - NominationId: {id}, Action: {request.ActionTaken}");
 
             var result = await _nominationService.ManagerReviewNominationAsync(id, managerId, request);
             return Ok(result);
@@ -253,8 +238,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return Unauthorized(new { message = MessageConstants.DepartmentHeadIdNotFoundInToken });
             }
 
-            Console.WriteLine($"[Controller] DeptHeadId from token: {deptHeadId}");
-
             var result = await _nominationService.DepartmentHeadReviewAsync(id, deptHeadId, request);
             return Ok(result);
         }
@@ -273,8 +256,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 return Unauthorized(new { message = MessageConstants.UserIdNotFoundInToken });
             }
-
-            Console.WriteLine($"[Controller] CheckEligibility - UserId: {userId}, OpportunityId: {request.OpportunityId}");
 
             var result = await _nominationService.CheckEligibilityAsync(userId, request.OpportunityId);
             return Ok(result);
