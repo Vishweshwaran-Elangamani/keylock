@@ -21,10 +21,12 @@ namespace Relevantz.EEPZ.Core.IService
         Task<ProjectGoalResponseDto?> GetGoalByIdAsync(int goalId);
 
         /// <summary>
-        /// Retrieves all team goals.
+        /// Retrieves team goals with pagination.
         /// </summary>
+        /// <param name="pageNumber">Page number for pagination (default 1).</param>
+        /// <param name="pageSize">Number of items per page (default 20).</param>
         /// <returns>List of team goal responses.</returns>
-        Task<List<ProjectGoalResponseDto>> GetTeamGoalsAsync();
+        Task<List<ProjectGoalResponseDto>> GetTeamGoalsAsync(int pageNumber = 1, int pageSize = 20);
 
         /// <summary>
         /// Retrieves all organization level goals.

@@ -49,11 +49,11 @@ namespace Relevantz.EEPZ.Core.Service
             return goal?.Adapt<ProjectGoalResponseDto>();
         }
 
-        public async Task<List<ProjectGoalResponseDto>> GetTeamGoalsAsync()
+        public async Task<List<ProjectGoalResponseDto>> GetTeamGoalsAsync(int pageNumber = 1, int pageSize = 20)
         {
-            _logger.LogInformation("Retrieving all team goals");
+            _logger.LogInformation("Retrieving team goals - Page: {PageNumber}, Size: {PageSize}", pageNumber, pageSize);
 
-            var teamGoals = await _goalRepository.GetTeamGoalsAsync();
+            var teamGoals = await _goalRepository.GetTeamGoalsAsync(pageNumber, pageSize);
             return teamGoals.Adapt<List<ProjectGoalResponseDto>>();
         }
 

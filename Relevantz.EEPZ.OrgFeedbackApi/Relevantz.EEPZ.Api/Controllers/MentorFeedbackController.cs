@@ -3,11 +3,14 @@ using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace Relevantz.EEPZ.Api.Controllers
 {
     [ApiController]
     [Route("api/mentor-feedback")]
+    [Authorize]
     public class MentorFeedbackController : ControllerBase
     {
         private readonly IMentorFeedbackService _service;
@@ -26,19 +29,19 @@ namespace Relevantz.EEPZ.Api.Controllers
         [ProducesResponseType(typeof(ApiResponseDto<MentorFeedbackResponseDto>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponseDto<MentorFeedbackResponseDto>), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateMentorFeedback([FromBody] CreateMentorFeedbackRequestDto dto)
-{
-    if (!ModelState.IsValid)
-    {
-        return BadRequest(ApiResponseDto<MentorFeedbackResponseDto>.ErrorResponse(
-            MessageConstants.ValidationError));
-    }
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ApiResponseDto<MentorFeedbackResponseDto>.ErrorResponse(
+                    MessageConstants.ValidationError));
+            }
 
-    var result = await _service.CreateMentorFeedbackAsync(dto);
+            var result = await _service.CreateMentorFeedbackAsync(dto);
 
-    return Ok(ApiResponseDto<MentorFeedbackResponseDto>.SuccessResponse(
-        result,
-        MessageConstants.MentorFeedbackCreated));
-}
+            return Ok(ApiResponseDto<MentorFeedbackResponseDto>.SuccessResponse(
+                result,
+                MessageConstants.MentorFeedbackCreated));
+        }
 
         [HttpGet("track/{id:int}")]
         [ProducesResponseType(typeof(ApiResponseDto<MentorFeedbackResponseDto>), StatusCodes.Status200OK)]
@@ -50,7 +53,7 @@ namespace Relevantz.EEPZ.Api.Controllers
 
             if (result == null)
             {
-                _logger.LogWarning("Mentor feedback not found. TrackingId: {TrackingId}", id);
+                _logger.LogWarning("Mentor feedback not found. MentorFeedbackId: {MentorFeedbackId}", id);
                 return NotFound(ApiResponseDto<MentorFeedbackResponseDto>.ErrorResponse(
                     MessageConstants.MentorFeedbackNotFound));
             }
@@ -72,17 +75,18 @@ namespace Relevantz.EEPZ.Api.Controllers
                 MessageConstants.FeedbackAboutMeRetrieved));
         }
 
-        [HttpGet("mentee/{menteeEmployeeId:int}")]
+        [HttpGet("mentee/{id:int}")]
         [ProducesResponseType(typeof(ApiResponseDto<List<MentorFeedbackResponseDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponseDto<List<MentorFeedbackResponseDto>>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetFeedbackByMentee(int menteeEmployeeId)
+        public async Task<IActionResult> GetFeedbackByMentee(int id)
         {
-            var result = await _service.GetMyMentorFeedbackAsync(menteeEmployeeId);
+            var result = await _service.GetMyMentorFeedbackAsync(id);
 
             return Ok(ApiResponseDto<List<MentorFeedbackResponseDto>>.SuccessResponse(
                 result,
                 MessageConstants.MyMentorFeedbackRetrieved));
         }
+
 
         [HttpGet]
         [ProducesResponseType(typeof(ApiResponseDto<List<MentorFeedbackResponseDto>>), StatusCodes.Status200OK)]
@@ -109,7 +113,7 @@ namespace Relevantz.EEPZ.Api.Controllers
 
             if (result == null)
             {
-                _logger.LogWarning("Mentor feedback not found for update. TrackingId: {TrackingId}", id);
+                _logger.LogWarning("Mentor feedback not found for update. MentorFeedbackId: {MentorFeedbackId}", id);
                 return NotFound(ApiResponseDto<MentorFeedbackResponseDto>.ErrorResponse(
                     MessageConstants.MentorFeedbackNotFound));
             }
@@ -129,7 +133,7 @@ namespace Relevantz.EEPZ.Api.Controllers
 
             if (!result)
             {
-                _logger.LogWarning("Mentor feedback not found for acknowledge. TrackingId: {TrackingId}", id);
+                _logger.LogWarning("Mentor feedback not found for acknowledge. MentorFeedbackId: {MentorFeedbackId}", id);
                 return NotFound(ApiResponseDto<bool>.ErrorResponse(
                     MessageConstants.MentorFeedbackNotFound));
             }
@@ -149,7 +153,7 @@ namespace Relevantz.EEPZ.Api.Controllers
 
             if (!result)
             {
-                _logger.LogWarning("Mentor feedback not found for delete. TrackingId: {TrackingId}", id);
+                _logger.LogWarning("Mentor feedback not found for delete. MentorFeedbackId: {MentorFeedbackId}", id);
                 return NotFound(ApiResponseDto<bool>.ErrorResponse(
                     MessageConstants.MentorFeedbackNotFound));
             }

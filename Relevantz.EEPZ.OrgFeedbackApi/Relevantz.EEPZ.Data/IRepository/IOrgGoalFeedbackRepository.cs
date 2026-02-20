@@ -18,9 +18,9 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         Task<Feedback?> GetOrgGoalFeedbackByIdAsync(int feedbackId);
 
         /// <summary>
-        /// Retrieves all feedback entries for a given organization goal.
+        /// Retrieves all feedback entries for a given organization goal with pagination.
         /// </summary>
-        Task<List<Feedback>> GetFeedbackByOrgGoalAsync(int goalId);
+        Task<List<Feedback>> GetFeedbackByOrgGoalAsync(int goalId, int pageNumber = 1, int pageSize = 20);
 
         /// <summary>
         /// Retrieves all organization goal feedback entries submitted by an employee.

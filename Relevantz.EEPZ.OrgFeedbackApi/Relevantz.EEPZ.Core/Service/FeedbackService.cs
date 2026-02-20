@@ -10,6 +10,11 @@ using Relevantz.EEPZ.Data.Repository.Interfaces;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
+    /// <summary>
+    /// Service implementation for Feedback operations.
+    /// Handles creation, retrieval, update, submission, flagging, and deletion of feedback records,
+    /// including question responses and HR review workflows.
+    /// </summary>
     public class FeedbackService : IFeedbackService
     {
         private readonly IFeedbackRepository _feedbackRepo;
@@ -26,6 +31,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        /// <summary>
+        /// Creates a new feedback entry along with its question responses.
+        /// Maps the DTO to the entity, sets the initial status to Draft,
+        /// persists the feedback and each question response, then returns the created record.
+        /// Throws <see cref="ArgumentException"/> if no question responses are provided.
+        /// </summary>
         public async Task<FeedbackResponseDto?> CreateFeedbackAsync(CreateFeedbackRequestDto dto)
         {
             ArgumentNullException.ThrowIfNull(dto);
@@ -56,6 +67,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return await GetFeedbackByIdAsync(feedbackId);
         }
 
+        /// <summary>
+        /// Retrieves a feedback entry by its unique identifier,
+        /// including all associated question responses.
+        /// Returns null if the record does not exist.
+        /// </summary>
         public async Task<FeedbackResponseDto?> GetFeedbackByIdAsync(int feedbackId)
         {
             var feedback = await _feedbackRepo.GetFeedbackByIdAsync(feedbackId);
@@ -65,33 +81,67 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return MapToFeedbackResponseDto(feedback, responses);
         }
 
+        /// <summary>
+        /// Retrieves all feedback entries submitted by a specific employee.
+        /// </summary>
         public async Task<List<FeedbackResponseDto>> GetMyFeedbackAsync(int employeeId)
             => await MapManyAsync(await _feedbackRepo.GetFeedbackBySubmitterAsync(employeeId));
 
+        /// <summary>
+        /// Retrieves all feedback entries where a specific employee is the recipient.
+        /// </summary>
         public async Task<List<FeedbackResponseDto>> GetFeedbackAsRecipientAsync(int employeeId)
             => await MapManyAsync(await _feedbackRepo.GetFeedbackByRecipientAsync(employeeId));
 
+        /// <summary>
+        /// Retrieves all feedback entries for the team managed by the given manager.
+        /// </summary>
         public async Task<List<FeedbackResponseDto>> GetTeamFeedbackAsync(int managerId)
             => await MapManyAsync(await _feedbackRepo.GetTeamFeedbackAsync(managerId));
 
+        /// <summary>
+        /// Retrieves all flagged feedback entries.
+        /// Optionally filters by bias flag or fairness flag.
+        /// </summary>
         public async Task<List<FeedbackResponseDto>> GetFlaggedFeedbackAsync(bool? isBias = null, bool? isFairness = null)
             => await MapManyAsync(await _feedbackRepo.GetFlaggedFeedbackAsync(isBias, isFairness));
 
+        /// <summary>
+        /// Retrieves all anonymous feedback entries.
+        /// </summary>
         public async Task<List<FeedbackResponseDto>> GetAnonymousFeedbackAsync()
             => await MapManyAsync(await _feedbackRepo.GetAnonymousFeedbackAsync());
 
+        /// <summary>
+        /// Retrieves all feedback entries that are pending HR review.
+        /// </summary>
         public async Task<List<FeedbackResponseDto>> GetPendingHRReviewAsync()
             => await MapManyAsync(await _feedbackRepo.GetPendingHRReviewAsync());
 
+        /// <summary>
+        /// Retrieves all feedback entries with pagination support.
+        /// Defaults to page 1 with 20 items per page.
+        /// </summary>
         public async Task<List<FeedbackResponseDto>> GetAllFeedbackAsync(int pageNumber = 1, int pageSize = 20)
             => await MapManyAsync(await _feedbackRepo.GetAllFeedbackAsync(pageNumber, pageSize));
 
+        /// <summary>
+        /// Retrieves all feedback entries associated with a specific goal.
+        /// </summary>
         public async Task<List<FeedbackResponseDto>> GetFeedbackByGoalAsync(int goalId)
             => await MapManyAsync(await _feedbackRepo.GetFeedbackByGoalAsync(goalId));
 
+        /// <summary>
+        /// Retrieves all feedback entries associated with a specific project.
+        /// </summary>
         public async Task<List<FeedbackResponseDto>> GetFeedbackByProjectAsync(int projectId)
             => await MapManyAsync(await _feedbackRepo.GetFeedbackByProjectAsync(projectId));
 
+        /// <summary>
+        /// Updates an existing feedback entry and its question responses.
+        /// Only feedback that is editable (checked via repository) can be updated.
+        /// Returns null if the feedback is not found or cannot be edited.
+        /// </summary>
         public async Task<FeedbackResponseDto?> UpdateFeedbackAsync(int feedbackId, UpdateFeedbackRequestDto dto)
         {
             ArgumentNullException.ThrowIfNull(dto);
@@ -102,7 +152,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (!await _feedbackRepo.CanEditFeedbackAsync(feedbackId))
                 return null;
 
-            dto.Adapt(feedback); // Mapster handles non-null updates
+            dto.Adapt(feedback);
             await _feedbackRepo.UpdateFeedbackAsync(feedback);
 
             if (dto.Responses?.Any() == true)
@@ -129,15 +179,32 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return await GetFeedbackByIdAsync(feedbackId);
         }
 
+        /// <summary>
+        /// Submits a feedback entry by updating its status to Submitted.
+        /// Returns true if the status was successfully updated.
+        /// </summary>
         public Task<bool> SubmitFeedbackAsync(int feedbackId)
             => _feedbackRepo.UpdateFeedbackStatusAsync(feedbackId, FeedbackConstants.Status.Submitted);
 
+        /// <summary>
+        /// Deletes a feedback entry by its unique identifier.
+        /// Returns true if the deletion was successful.
+        /// </summary>
         public Task<bool> DeleteFeedbackAsync(int feedbackId)
             => _feedbackRepo.DeleteFeedbackAsync(feedbackId);
 
+        /// <summary>
+        /// Checks whether a specific feedback entry is eligible for editing.
+        /// Returns true if the feedback can be edited.
+        /// </summary>
         public Task<bool> CanEditFeedbackAsync(int feedbackId)
             => _feedbackRepo.CanEditFeedbackAsync(feedbackId);
 
+        /// <summary>
+        /// Sets the HR review details for a specific feedback entry.
+        /// Updates HR comments and the reviewer ID.
+        /// Returns true if the update was successful.
+        /// </summary>
         public async Task<bool> SetHRReviewAsync(int feedbackId, string hrComments, int reviewedByHRId)
         {
             var result = await _feedbackRepo.SetHRReviewAsync(feedbackId, hrComments, reviewedByHRId);
@@ -149,6 +216,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return result;
         }
 
+        /// <summary>
+        /// Flags a feedback entry for bias or fairness issues.
+        /// Updates the bias and fairness flags along with the reviewing HR employee ID.
+        /// Returns true if the flag was successfully applied.
+        /// </summary>
         public async Task<bool> FlagFeedbackForBiasAsync(int feedbackId, bool isBias, bool isFairness, int reviewedByHRId)
         {
             var result = await _feedbackRepo.FlagFeedbackForBiasAsync(feedbackId, isBias, isFairness, reviewedByHRId);
@@ -160,6 +232,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return result;
         }
 
+        /// <summary>
+        /// Retrieves the feedback form structure for a given feedback type.
+        /// Returns the list of questions with their response types, options, and display order.
+        /// Throws <see cref="ArgumentException"/> if the feedback type is null or whitespace.
+        /// </summary>
         public async Task<FeedbackFormDto?> GetFeedbackFormAsync(string feedbackType)
         {
             if (string.IsNullOrWhiteSpace(feedbackType))
@@ -195,7 +272,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
+        // ─── Private Helpers ────────────────────────────────────────────────────────
 
+        /// <summary>
+        /// Maps a list of Feedback entities to a list of FeedbackResponseDto,
+        /// loading question responses for each entry.
+        /// </summary>
         private async Task<List<FeedbackResponseDto>> MapManyAsync(List<Feedback> feedbacks)
         {
             var result = new List<FeedbackResponseDto>();
@@ -209,6 +291,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return result;
         }
 
+        /// <summary>
+        /// Maps a single Feedback entity and its question responses to a FeedbackResponseDto.
+        /// Handles anonymous submitter display and parses selected options from JSON.
+        /// </summary>
         private static FeedbackResponseDto MapToFeedbackResponseDto(
             Feedback feedback,
             List<Feedbackquestionresponse> responses)
@@ -232,14 +318,26 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return dto;
         }
 
+        /// <summary>
+        /// Parses a JSON string into a list of selected option IDs.
+        /// Returns an empty list if the input is null or whitespace.
+        /// </summary>
         private static List<int> ParseSelectedOptions(string? json)
             => string.IsNullOrWhiteSpace(json)
                 ? new List<int>()
                 : JsonSerializer.Deserialize<List<int>>(json) ?? new List<int>();
 
+        /// <summary>
+        /// Parses a JSON string into a dictionary of rating scale labels.
+        /// Returns null if the input is null or whitespace.
+        /// </summary>
         private static Dictionary<string, string>? ParseRatingLabels(string? json)
             => string.IsNullOrWhiteSpace(json) ? null : JsonSerializer.Deserialize<Dictionary<string, string>>(json);
 
+        /// <summary>
+        /// Parses a JSON string into a list of choice option DTOs.
+        /// Returns null if the input is null or whitespace or cannot be parsed.
+        /// </summary>
         private static List<ChoiceOptionDto>? ParseChoiceOptions(string? json)
         {
             if (string.IsNullOrWhiteSpace(json)) return null;

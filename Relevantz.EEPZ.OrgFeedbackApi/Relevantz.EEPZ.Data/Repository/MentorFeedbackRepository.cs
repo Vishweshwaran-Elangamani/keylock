@@ -33,11 +33,13 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             _context.Mentorfeedbacktrackings.Add(feedback);
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation("Mentor feedback created: {TrackingId}", feedback.TrackingId);
+            _logger.LogInformation("Mentor feedback created: {MentorFeedbackId}", feedback.TrackingId);
 
             return feedback.TrackingId;
         }
 
+        // TODO: Consider caching frequently accessed mentor feedback records by ID
+        // to reduce repeated database hits for the same tracking ID.
         public async Task<Mentorfeedbacktracking?> GetMentorFeedbackByIdAsync(int trackingId)
         {
             if (trackingId <= 0)
@@ -54,6 +56,8 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 .FirstOrDefaultAsync(f => f.TrackingId == trackingId);
         }
 
+        // TODO: Consider caching mentor feedback list per mentorEmployeeId
+        // since this endpoint is frequently accessed for mentor dashboards.
         public async Task<List<Mentorfeedbacktracking>> GetFeedbackByMentorAsync(int mentorEmployeeId)
         {
             if (mentorEmployeeId <= 0)
@@ -68,6 +72,8 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 .ToListAsync();
         }
 
+        // TODO: Consider caching mentor feedback list per menteeEmployeeId
+        // since this endpoint is frequently accessed for mentee dashboards.
         public async Task<List<Mentorfeedbacktracking>> GetFeedbackByMenteeAsync(int menteeEmployeeId)
         {
             if (menteeEmployeeId <= 0)
@@ -110,6 +116,8 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 .ToListAsync();
         }
 
+        // TODO: Consider caching paginated mentor feedback results for high-traffic
+        // admin/HR screens where the full list is frequently requested.
         public async Task<List<Mentorfeedbacktracking>> GetAllMentorFeedbackAsync(int pageNumber = 1, int pageSize = 20)
         {
             pageNumber = pageNumber <= 0 ? 1 : pageNumber;
@@ -185,7 +193,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 var existingFeedback = await _context.Mentorfeedbacktrackings.FindAsync(feedback.TrackingId);
                 if (existingFeedback == null)
                 {
-                    _logger.LogWarning($"Mentor feedback not found: {feedback.TrackingId}");
+                    _logger.LogWarning("Mentor feedback not found: {MentorFeedbackId}", feedback.TrackingId);
                     return false;
                 }
 
@@ -194,17 +202,16 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                _logger.LogInformation($"Mentor feedback updated: {feedback.TrackingId}");
+                _logger.LogInformation("Mentor feedback updated: {MentorFeedbackId}", feedback.TrackingId);
                 return true;
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                _logger.LogError(ex, $"Error updating mentor feedback: {feedback.TrackingId}");
+                _logger.LogError(ex, "Error updating mentor feedback: {MentorFeedbackId}", feedback.TrackingId);
                 throw;
             }
         }
-
 
         public async Task<bool> UpdateFeedbackStatusAsync(int trackingId, string newStatus)
         {
@@ -223,12 +230,11 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             if (feedback == null)
                 return false;
 
-           feedback.Status = newStatus;
-
+            feedback.Status = newStatus;
 
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation("Mentor feedback status updated. TrackingId: {TrackingId}, Status: {Status}", trackingId, newStatus);
+            _logger.LogInformation("Mentor feedback status updated. MentorFeedbackId: {MentorFeedbackId}, Status: {Status}", trackingId, newStatus);
 
             return true;
         }
@@ -251,11 +257,10 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             feedback.ReviewedByHrid = reviewedByHRId;
             feedback.ReviewedAt = DateTime.UtcNow;
             feedback.Status = MentorFeedbackConstants.Status.Reviewed;
-         
 
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation("HR review set for mentor feedback: {TrackingId}", trackingId);
+            _logger.LogInformation("HR review set for mentor feedback: {MentorFeedbackId}", trackingId);
 
             return true;
         }
@@ -271,14 +276,15 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             if (feedback == null)
                 return false;
 
+            // Use MessageConstants to centralise the delete guard error message
+            // instead of a hardcoded string per repository.
             if (feedback.Status != MentorFeedbackConstants.Status.Submitted)
-                throw new InvalidOperationException(
-                    $"Cannot delete feedback in '{feedback.Status}' status. Only Submitted feedback can be deleted.");
+                throw new InvalidOperationException(MessageConstants.FeedbackNotDeletable);
 
             _context.Mentorfeedbacktrackings.Remove(feedback);
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation("Mentor feedback deleted: {TrackingId}", trackingId);
+            _logger.LogInformation("Mentor feedback deleted: {MentorFeedbackId}", trackingId);
 
             return true;
         }

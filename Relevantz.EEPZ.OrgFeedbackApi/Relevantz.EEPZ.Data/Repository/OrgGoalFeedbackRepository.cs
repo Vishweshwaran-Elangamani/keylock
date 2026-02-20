@@ -8,7 +8,7 @@ using Relevantz.EEPZ.Data.Repository.Interfaces;
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
     /// <summary>
-    /// Repository for Organization Goal Feedback
+    /// Repository for Organization Goal Feedback.
     /// Filters Feedback table by RelatedGoal.GoalType = "org"
     /// </summary>
     public class OrgGoalFeedbackRepository : IOrgGoalFeedbackRepository
@@ -16,7 +16,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         private readonly EEPZDbContext _context;
         private readonly ILogger<OrgGoalFeedbackRepository> _logger;
 
-        public OrgGoalFeedbackRepository(EEPZDbContext context, ILogger<OrgGoalFeedbackRepository> logger)
+        public OrgGoalFeedbackRepository(
+            EEPZDbContext context,
+            ILogger<OrgGoalFeedbackRepository> logger)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -63,8 +65,15 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<List<Feedback>> GetFeedbackByOrgGoalAsync(int goalId)
+        public async Task<List<Feedback>> GetFeedbackByOrgGoalAsync(
+            int goalId,
+            int pageNumber = 1,
+            int pageSize = 20)
         {
+            pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+            pageSize = pageSize <= 0 ? 20 : pageSize;
+            pageSize = pageSize > 100 ? 100 : pageSize;
+
             return await _context.Feedbacks
                 .AsNoTracking()
                 .Include(f => f.RelatedGoal)
@@ -76,6 +85,8 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     f.RelatedGoal.GoalType == GoalTypeConstants.Organization &&
                     f.Status != FeedbackConstants.Status.Archived)
                 .OrderByDescending(f => f.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
         }
 
@@ -104,7 +115,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 .Include(f => f.RelatedGoal)
                 .Include(f => f.SubmittedByEmployee)
                 .Include(f => f.RecipientEmployee)
-                .Where(f => f.RelatedGoal != null && f.RelatedGoal.GoalType == GoalTypeConstants.Organization)
+                .Where(f =>
+                    f.RelatedGoal != null &&
+                    f.RelatedGoal.GoalType == GoalTypeConstants.Organization)
                 .OrderByDescending(f => f.CreatedAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
@@ -170,8 +183,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     f.RelatedGoal != null &&
                     f.RelatedGoal.GoalType == GoalTypeConstants.Organization);
 
-            if (feedback == null)
-                return false;
+            if (feedback == null) return false;
 
             feedback.Status = newStatus;
             feedback.UpdatedAt = DateTime.UtcNow;
@@ -192,11 +204,12 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     f.RelatedGoal != null &&
                     f.RelatedGoal.GoalType == GoalTypeConstants.Organization);
 
-            if (feedback == null)
-                return false;
+            if (feedback == null) return false;
 
+            // Use MessageConstants to centralise the delete guard error message
+            // instead of a hardcoded string per repository.
             if (feedback.Status != FeedbackConstants.Status.Submitted)
-                throw new InvalidOperationException($"Cannot delete feedback in '{feedback.Status}' status.");
+                throw new InvalidOperationException(MessageConstants.FeedbackNotDeletable);
 
             _context.Feedbacks.Remove(feedback);
             await _context.SaveChangesAsync();

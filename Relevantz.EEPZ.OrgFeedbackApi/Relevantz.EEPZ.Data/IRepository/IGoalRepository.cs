@@ -11,7 +11,7 @@ namespace Relevantz.EEPZ.Data.IRepository
 
         Task<Goal?> GetGoalByIdAsync(int goalId);
 
-        Task<List<Goal>> GetTeamGoalsAsync();
+        Task<List<Goal>> GetTeamGoalsAsync(int pageNumber = 1, int pageSize = 20);
 
         Task<List<Goal>> GetOrganizationLevelGoalsAsync();
 

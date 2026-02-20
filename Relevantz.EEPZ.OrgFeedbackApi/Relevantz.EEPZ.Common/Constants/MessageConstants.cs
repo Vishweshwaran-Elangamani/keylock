@@ -63,17 +63,28 @@ namespace Relevantz.EEPZ.Common.Constants
         #region Feedback Validation Messages
         public const string FeedbackTypeRequired = "FeedbackType is required.";
         public const string QuestionResponsesRequired = "At least one question response is required.";
+
+        //Use this constant in service rating validation instead of hardcoded strings
         public const string InvalidRatingRange = "Rating must be between 1 and 5.";
         public const string FeedbackFromRequired = "FeedbackFrom is required.";
+
+        // common invalid ID message reused across all modules
+        public const string InvalidIdProvided = "Invalid ID provided.";
+
+        //common not editable message reused across feedback update guards
+        public const string FeedbackNotEditable = "Feedback cannot be edited in its current status.";
+
+        public const string FeedbackNotDeletable = "Feedback cannot be deleted in its current status. Only Submitted feedback can be deleted.";
         #endregion
 
         #region Feedback Log Messages
-        public const string FeedbackCreatedLog = "Feedback created successfully";
-        public const string FeedbackUpdatedLog = "Feedback updated successfully";
-        public const string FeedbackSubmittedLog = "Feedback submitted successfully";
-        public const string FeedbackDeletedLog = "Feedback deleted successfully";
+        
+        public const string FeedbackCreatedLog = "Feedback created";
+        public const string FeedbackUpdatedLog = "Feedback updated";
+        public const string FeedbackSubmittedLog = "Feedback submitted";
+        public const string FeedbackDeletedLog = "Feedback deleted";
         public const string FeedbackFlaggedLog = "Feedback flagged for HR review";
-        public const string FeedbackHrReviewUpdatedLog = "HR review updated successfully";
+        public const string FeedbackHrReviewUpdatedLog = "HR review updated";
         #endregion
 
         #region Peer Feedback Queue Messages
