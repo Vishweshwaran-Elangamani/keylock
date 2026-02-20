@@ -140,7 +140,7 @@ namespace eepzbackend.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ApiResponse<MomResponseDto>>> UpdateMom(
-            int Id, 
+            int momId, // CHANGED: Added momId as route parameter
             [FromBody] UpdateMomDto updateMomDto)
         {
             var correlationId = HttpContext.TraceIdentifier;
