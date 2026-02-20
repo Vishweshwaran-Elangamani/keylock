@@ -42,16 +42,17 @@ export const goalsApi = {
 
 export const mentorFeedbackApi = {
   create: (body) => org_api.post("/mentor-feedback", body),
-  list: () => org_api.get("/mentor-feedback"),
-  getById: (id) => org_api.get(`/mentor-feedback/${id}`),
+  list: (pageNumber = 1, pageSize = 20) =>
+    org_api.get("/mentor-feedback", { params: { pageNumber, pageSize } }),
+  getByTrackingId: (id) => org_api.get(`/mentor-feedback/track/${id}`),
   update: (id, body) => org_api.put(`/mentor-feedback/${id}`, body),
   remove: (id) => org_api.delete(`/mentor-feedback/${id}`),
   aboutMentor: (mentorEmployeeId) =>
     org_api.get(`/mentor-feedback/mentor/${mentorEmployeeId}`),
-  byMentee: (menteeEmployeeId) =>
-    org_api.get(`/mentor-feedback/mentee/${menteeEmployeeId}`),
+  byMentee: (id) => org_api.get(`/mentor-feedback/mentee/${id}`),
   acknowledge: (id) => org_api.post(`/mentor-feedback/${id}/acknowledge`),
 };
+
 
 export const orgGoalFeedbackApi = {
   create: (body) => org_api.post("/org-goal-feedback", body),
