@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Logging;
 using Relevantz.EEPZ.Common.DTOs.Request;
-using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
@@ -11,6 +11,7 @@ namespace PerformanceManagement.Controllers
 {
     [ApiController]
     [Authorize]
+    [Produces("application/json")]
     [Route("api/[controller]")]
     public class SelfAssessmentController : ControllerBase
     {
@@ -18,13 +19,13 @@ namespace PerformanceManagement.Controllers
         private readonly ISelfAssessmentRepository _repository;
         private readonly IFileStorageService _fileStorage;
         private readonly ILogger<SelfAssessmentController> _logger;
+        private static readonly FileExtensionContentTypeProvider _contentTypes = new();
 
         public SelfAssessmentController(
             ISelfAssessmentService assessmentService,
             ISelfAssessmentRepository repository,
             IFileStorageService fileStorage,
-            ILogger<SelfAssessmentController> logger
-        )
+            ILogger<SelfAssessmentController> logger)
         {
             _assessmentService = assessmentService;
             _repository = repository;
@@ -32,412 +33,146 @@ namespace PerformanceManagement.Controllers
             _logger = logger;
         }
 
+        // --------------------------------------------------------------------
+
         [HttpPost("submit")]
-        public async Task<IActionResult> SubmitSelfAssessment(
-            [FromBody] SubmitSelfAssessmentRequestDto request
-        )
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> SubmitSelfAssessment([FromBody] SubmitSelfAssessmentRequestDto request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(new { success = false, message = "Invalid data provided." });
 
             try
             {
-                var employeeId = request.UserId;
-                var userAuth = await _repository.GetUserByEmployeeIdAsync(employeeId);
-
+                var userAuth = await _repository.GetUserByEmployeeIdAsync(request.UserId);
                 if (userAuth == null)
-                    return BadRequest(
-                        new
-                        {
-                            success = false,
-                            message = $"No user found for employee ID {employeeId}",
-                        }
-                    );
+                    return NotFound(new { success = false, message = $"No user found for ID {request.UserId}" });
 
-                var actualUserId = userAuth.UserId;
+                // Use actual platform user id
+                request.UserId = userAuth.UserId;
 
-                var convertedRequest = new SubmitSelfAssessmentRequestDto
-                {
-                    FormId = request.FormId,
-                    UserId = actualUserId,
-                    Status = request.Status,
-                    AssessmentDetails = request.AssessmentDetails,
-                    Attachments = request.Attachments,
-                };
+                var result = await _assessmentService.SubmitSelfAssessmentAsync(request);
 
-                var result = await _assessmentService.SubmitSelfAssessmentAsync(convertedRequest);
+                if (!result.Success)
+                    return BadRequest(new { success = false, message = string.Join(", ", result.Errors) });
 
-                if (result.Success)
-                    return Ok(
-                        new
-                        {
-                            success = true,
-                            data = result.Data,
-                            message = "Assessment submitted successfully.",
-                        }
-                    );
-
-                return BadRequest(
-                    new { success = false, message = string.Join(", ", result.Errors) }
+                return CreatedAtAction(
+                    nameof(GetSelfAssessment),
+                    new { assessmentId = result.Data.AssessmentId },
+                    new { success = true, data = result.Data, message = "Assessment submitted successfully." }
                 );
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error submitting assessment");
-                return StatusCode(500, new { success = false, message = $"Error: {ex.Message}" });
-            }
-        }
+                var trace = HttpContext.TraceIdentifier;
+                _logger.LogError(ex, "Error submitting assessment. Trace={Trace}", trace);
 
-        [HttpGet("view/{formId}/user/{employeeId}")]
-        public async Task<IActionResult> GetSubmittedAssessment(int formId, int employeeId)
-        {
-            try
-            {
-                var userAuth = await _repository.GetUserByEmployeeIdAsync(employeeId);
-                if (userAuth == null)
-                    return NotFound(
-                        new
-                        {
-                            success = false,
-                            message = $"No user found for employee ID {employeeId}",
-                        }
-                    );
-
-                var userId = userAuth.UserId;
-                var assessment = await _repository.GetSelfAssessmentByFormAndUserWithDetailsAsync(
-                    formId,
-                    userId
-                );
-
-                if (assessment == null)
-                    return NotFound(
-                        new { success = false, message = "No submitted assessment found." }
-                    );
-
-                var result = new
+                return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
-                    assessmentId = assessment.AssessmentId,
-                    formName = assessment.Form.Name,
-                    status = assessment.Status,
-                    submittedAt = assessment.SubmittedAt,
-                    details = assessment
-                        .Assessmentdetails.Select(ad => new
-                        {
-                            competencyId = ad.CompetencyId,
-                            competencyName = ad.Competency.Name,
-                            competencyDescription = ad.Competency.Description,
-                            rating = ad.EmployeeRating,
-                            comments = ad.EmployeeComments,
-                        })
-                        .ToList(),
-                    attachments = assessment
-                        .Selfassessmentattachments.OrderBy(a => a.DisplayOrder)
-                        .Select(a => new
-                        {
-                            attachmentId = a.AttachmentId,
-                            fileName = a.FileName,
-                            filePath = a.FilePath,
-                            fileType = a.FileType,
-                            fileSize = a.FileSize,
-                            note = a.AttachmentNote,
-                            uploadedAt = a.UploadedAt,
-                        })
-                        .ToList(),
-                };
-
-                return Ok(new { success = true, data = result });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving assessment");
-                return StatusCode(
-                    500,
-                    new { success = false, message = $"Error retrieving assessment: {ex.Message}" }
-                );
+                    success = false,
+                    message = "An unexpected error occurred.",
+                    trace
+                });
             }
         }
+
+        // --------------------------------------------------------------------
 
         [HttpGet("{assessmentId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetSelfAssessment(int assessmentId)
         {
             var result = await _assessmentService.GetSelfAssessmentAsync(assessmentId);
 
-            if (result.Success)
-                return Ok(new { success = true, data = result.Data });
+            if (!result.Success)
+                return NotFound(new { success = false, message = string.Join(", ", result.Errors) });
 
-            return NotFound(new { success = false, message = string.Join(", ", result.Errors) });
+            return Ok(new { success = true, data = result.Data });
         }
 
-        [HttpGet("form/{formId}/user/{employeeId}")]
-        public async Task<IActionResult> GetSelfAssessmentByFormAndUser(int formId, int employeeId)
-        {
-            try
-            {
-                var userAuth = await _repository.GetUserByEmployeeIdAsync(employeeId);
-                if (userAuth == null)
-                    return NotFound(
-                        new
-                        {
-                            success = false,
-                            message = $"No user found for employee ID {employeeId}",
-                        }
-                    );
-
-                var userId = userAuth.UserId;
-                var result = await _assessmentService.GetSelfAssessmentByFormAndUserAsync(
-                    formId,
-                    userId
-                );
-
-                if (result.Success)
-                    return Ok(new { success = true, data = result.Data });
-
-                return NotFound(
-                    new { success = false, message = string.Join(", ", result.Errors) }
-                );
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error getting assessment");
-                return StatusCode(500, new { success = false, message = $"Error: {ex.Message}" });
-            }
-        }
-
-        [HttpGet("submitted")]
-        public async Task<IActionResult> GetAllSubmittedForms([FromQuery] string? status = null)
-        {
-            var result = await _assessmentService.GetAllSubmittedFormsAsync(status);
-
-            if (result.Success)
-                return Ok(new { success = true, data = result.Data });
-
-            return BadRequest(new { success = false, message = string.Join(", ", result.Errors) });
-        }
-
-        [HttpGet("user/{employeeId}/assignments")]
-        public async Task<IActionResult> GetAssessmentsByUser(int employeeId)
-        {
-            try
-            {
-                var userAuth = await _repository.GetUserByEmployeeIdAsync(employeeId);
-                if (userAuth == null)
-                    return NotFound(
-                        new
-                        {
-                            success = false,
-                            message = $"No user found for employee ID {employeeId}",
-                        }
-                    );
-
-                var userId = userAuth.UserId;
-                var result = await _assessmentService.GetAssessmentsByUserAsync(userId);
-
-                if (result.Success)
-                    return Ok(new { success = true, data = result.Data });
-
-                return NotFound(
-                    new { success = false, message = string.Join(", ", result.Errors) }
-                );
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error getting user assessments");
-                return StatusCode(500, new { success = false, message = $"Error: {ex.Message}" });
-            }
-        }
-
-        [HttpPatch("{assessmentId}/status")]
-        public async Task<IActionResult> UpdateAssessmentStatus(
-            int assessmentId,
-            [FromBody] UpdateStatusDto statusDto
-        )
-        {
-            if (string.IsNullOrEmpty(statusDto?.Status))
-                return BadRequest(new { success = false, message = "Status is required." });
-
-            var result = await _assessmentService.UpdateAssessmentStatusAsync(
-                assessmentId,
-                statusDto.Status
-            );
-
-            if (result.Success)
-                return Ok(
-                    new
-                    {
-                        success = true,
-                        data = result.Data,
-                        message = "Status updated successfully.",
-                    }
-                );
-
-            return BadRequest(new { success = false, message = string.Join(", ", result.Errors) });
-        }
-
-        [HttpGet("{assessmentId}/attachments")]
-        public async Task<IActionResult> GetAssessmentAttachments(int assessmentId)
-        {
-            try
-            {
-                var result = await _assessmentService.GetAssessmentAttachmentsAsync(assessmentId);
-
-                if (result.Success)
-                    return Ok(new { success = true, data = result.Data });
-
-                return NotFound(
-                    new { success = false, message = string.Join(", ", result.Errors) }
-                );
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error getting attachments");
-                return StatusCode(500, new { success = false, message = $"Error: {ex.Message}" });
-            }
-        }
-
-        [HttpDelete("attachments/{attachmentId}")]
-        public async Task<IActionResult> DeleteAttachment(int attachmentId)
-        {
-            try
-            {
-                var result = await _assessmentService.DeleteAttachmentAsync(attachmentId);
-
-                if (result.Success)
-                    return Ok(new { success = true, message = "Attachment deleted successfully." });
-
-                return NotFound(
-                    new { success = false, message = string.Join(", ", result.Errors) }
-                );
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error deleting attachment");
-                return StatusCode(500, new { success = false, message = $"Error: {ex.Message}" });
-            }
-        }
+        // --------------------------------------------------------------------
 
         [HttpGet("attachments/{attachmentId}/download")]
+        [Produces("application/octet-stream")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(FileContentResult))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DownloadAttachment(int attachmentId)
         {
             try
             {
-                _logger.LogInformation(
-                    "Download request for attachment {AttachmentId}",
-                    attachmentId
-                );
-
                 var attachment = await _repository.GetAttachmentByIdAsync(attachmentId);
-
                 if (attachment == null)
-                {
-                    _logger.LogWarning(
-                        "Attachment {AttachmentId} not found in database",
-                        attachmentId
-                    );
                     return NotFound(new { success = false, message = "Attachment not found." });
-                }
 
                 if (string.IsNullOrWhiteSpace(attachment.FilePath))
-                {
-                    _logger.LogWarning("Attachment {AttachmentId} has no file path", attachmentId);
                     return NotFound(new { success = false, message = "File path missing." });
-                }
 
-                _logger.LogInformation(
-                    "Fetching file from MongoDB: AttachmentId={AttachmentId}, FileId={FileId}, FileName={FileName}",
-                    attachmentId,
-                    attachment.FilePath,
-                    attachment.FileName
-                );
-
-                // Get file from MongoDB GridFS using stored ObjectId
-                byte[] fileBytes;
-                string contentType;
-                string fileName;
+                byte[] bytes;
+                string storedContentType;
+                string storedFileName;
 
                 try
                 {
-                    (fileBytes, contentType, fileName) = await _fileStorage.GetFileForPreviewAsync(
-                        attachment.FilePath
-                    );
+                    (bytes, storedContentType, storedFileName) =
+                        await _fileStorage.GetFileForPreviewAsync(attachment.FilePath);
                 }
-                catch (ArgumentException ex)
+                catch (ArgumentException)
                 {
-                    _logger.LogError(ex, "Invalid file ID format: {FileId}", attachment.FilePath);
                     return BadRequest(new { success = false, message = "Invalid file ID format." });
                 }
-                catch (FileNotFoundException ex)
+                catch (FileNotFoundException)
                 {
-                    _logger.LogError(ex, "File not found in GridFS: {FileId}", attachment.FilePath);
-                    return NotFound(
-                        new { success = false, message = "File not found in storage." }
-                    );
+                    return NotFound(new { success = false, message = "File not found in storage." });
                 }
 
-                // Use original filename from database or from GridFS
-                var downloadFileName = !string.IsNullOrEmpty(attachment.FileName)
-                    ? attachment.FileName
-                    : fileName;
+                var downloadName = attachment.FileName ?? storedFileName ?? "download";
+                downloadName = downloadName.Replace("\r", "").Replace("\n", "").Trim();
 
-                // Ensure content type is set correctly
-                if (string.IsNullOrEmpty(contentType))
-                {
-                    contentType = GetContentTypeFromFileName(downloadFileName);
-                }
+                var contentType =
+                    !string.IsNullOrEmpty(storedContentType)
+                        ? storedContentType
+                        : (_contentTypes.TryGetContentType(downloadName, out var mapped)
+                            ? mapped
+                            : "application/octet-stream");
 
-                _logger.LogInformation(
-                    "Sending file: FileName={FileName}, ContentType={ContentType}, Size={Size} bytes",
-                    downloadFileName,
-                    contentType,
-                    fileBytes.Length
-                );
+                // IMPORTANT: Append returns void; don't chain
+                Response.Headers.Append("X-Content-Type-Options", "nosniff");
 
-                // Return file with proper headers
-                Response.Headers.Add(
-                    "Content-Disposition",
-                    $"attachment; filename=\"{downloadFileName}\""
-                );
-                Response.Headers.Add("X-Content-Type-Options", "nosniff");
-
-                return File(fileBytes, contentType, downloadFileName);
+                return File(bytes, contentType, downloadName);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error downloading attachment {AttachmentId}", attachmentId);
-                return StatusCode(
-                    500,
-                    new { success = false, message = $"Error downloading file: {ex.Message}" }
-                );
+                var trace = HttpContext.TraceIdentifier;
+                _logger.LogError(ex, "Error downloading attachment {AttachmentId}. Trace={Trace}", attachmentId, trace);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "Error downloading file.",
+                    trace
+                });
             }
         }
 
-        // Helper method to determine content type from file extension
-        private string GetContentTypeFromFileName(string fileName)
+        // --------------------------------------------------------------------
+
+        [HttpDelete("attachments/{attachmentId}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteAttachment(int attachmentId)
         {
-            if (string.IsNullOrEmpty(fileName))
-                return "application/octet-stream";
+            var result = await _assessmentService.DeleteAttachmentAsync(attachmentId);
 
-            var extension = System.IO.Path.GetExtension(fileName).ToLowerInvariant();
+            if (!result.Success)
+                return NotFound(new { success = false, message = string.Join(", ", result.Errors) });
 
-            return extension switch
-            {
-                ".pdf" => "application/pdf",
-                ".csv" => "text/csv",
-                ".txt" => "text/plain",
-                ".doc" => "application/msword",
-                ".docx" =>
-                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                ".xls" => "application/vnd.ms-excel",
-                ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                ".png" => "image/png",
-                ".jpg" or ".jpeg" => "image/jpeg",
-                ".gif" => "image/gif",
-                _ => "application/octet-stream",
-            };
+            return NoContent();
         }
-    }
-
-    public class UpdateStatusDto
-    {
-        public string Status { get; set; } = string.Empty;
     }
 }

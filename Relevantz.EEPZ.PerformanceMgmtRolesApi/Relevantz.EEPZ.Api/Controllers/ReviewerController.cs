@@ -1,135 +1,118 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Relevantz.EEPZ.Common.DTOs.Request;
-using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 
-namespace eepzbackend.Controllers
+namespace Relevantz.EEPZ.Api.Controllers
 {
+    /// <summary>
+    /// Reviewer endpoints: submitted ratings/forms, assessments, attachments, and download.
+    /// </summary>
     [ApiController]
     [Authorize]
-    [Route("api/reviewer/{reviewerUserId:int}")]
+    [Route("api/reviewer")]
     public class ReviewerController : ControllerBase
     {
         private readonly IReviewerService _service;
-        private readonly IConfiguration _configuration;
+        private readonly ILogger<ReviewerController> _logger;
 
-        public ReviewerController(IReviewerService service, IConfiguration configuration)
+        public ReviewerController(IReviewerService service, ILogger<ReviewerController> logger)
         {
             _service = service;
-            _configuration = configuration;
+            _logger = logger;
         }
 
-        [HttpGet("forms")]
+        /// <summary>
+        /// Returns paginated submitted ratings for a reviewer.
+        /// </summary>
+        /// <remarks>Uses simple pagination defaults; keeps controller thin.</remarks>
+        [HttpGet("{reviewerUserId:int}/submitted-ratings")]
+        public async Task<IActionResult> GetSubmittedRatings(
+            [FromRoute] int reviewerUserId,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10)
+        {
+            if (reviewerUserId <= 0)
+                return BadRequest(new { message = "Invalid reviewerUserId" });
+
+            var result = await _service.GetSubmittedRatingsAsync(reviewerUserId, page, pageSize);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Returns paginated submitted forms for a reviewer.
+        /// </summary>
+        [HttpGet("{reviewerUserId:int}/submitted-forms")]
         public async Task<IActionResult> GetSubmittedForms(
-            int reviewerUserId,
+            [FromRoute] int reviewerUserId,
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 25
-        )
+            [FromQuery] int pageSize = 10)
         {
-            var rows = await _service.GetSubmittedFormsAsync(reviewerUserId, page, pageSize);
-            return Ok(rows);
+            if (reviewerUserId <= 0)
+                return BadRequest(new { message = "Invalid reviewerUserId" });
+
+            var result = await _service.GetSubmittedFormsAsync(reviewerUserId, page, pageSize);
+            return Ok(result);
         }
 
-        [HttpGet("submitted-ratings")]
-        public async Task<IActionResult> GetReviewerSubmittedRatings(
-            int reviewerUserId,
+        /// <summary>
+        /// Returns paginated assessments (with details) visible to a reviewer.
+        /// </summary>
+        [HttpGet("{reviewerUserId:int}/assessments")]
+        public async Task<IActionResult> GetReviewerAssessments(
+            [FromRoute] int reviewerUserId,
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 25
-        )
+            [FromQuery] int pageSize = 10)
         {
-            var rows = await _service.GetSubmittedRatingsAsync(reviewerUserId, page, pageSize);
-            return Ok(rows);
+            if (reviewerUserId <= 0)
+                return BadRequest(new { message = "Invalid reviewerUserId" });
+
+            var data = await _service.GetAssessmentsWithDetailsAsync(reviewerUserId, page, pageSize);
+            return Ok(data);
         }
 
-        [HttpGet("assessment/{assessmentId:int}")]
-        public async Task<IActionResult> GetAssessment(int reviewerUserId, int assessmentId)
+        /// <summary>
+        /// Returns a specific assessment visible to this reviewer.
+        /// </summary>
+        [HttpGet("{reviewerUserId:int}/assessment/{assessmentId:int}")]
+        public async Task<IActionResult> GetAssessment([FromRoute] int reviewerUserId, [FromRoute] int assessmentId)
         {
+            if (reviewerUserId <= 0 || assessmentId <= 0)
+                return BadRequest(new { message = "Invalid IDs" });
+
             var dto = await _service.GetAssessmentAsync(reviewerUserId, assessmentId);
-            if (dto is null)
+            if (dto == null)
                 return NotFound();
+
             return Ok(dto);
         }
 
-        [HttpGet("assessments")]
-        public async Task<IActionResult> GetAllAssessmentsWithDetails(
-            int reviewerUserId,
-            [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 25
-        )
+        /// <summary>
+        /// Returns attachments metadata for a specific assessment.
+        /// </summary>
+        [HttpGet("{reviewerUserId:int}/assessment/{assessmentId:int}/attachments")]
+        public async Task<IActionResult> GetAssessmentAttachments([FromRoute] int reviewerUserId, [FromRoute] int assessmentId)
         {
-            var list = await _service.GetAssessmentsWithDetailsAsync(
-                reviewerUserId,
-                page,
-                pageSize
-            );
-            return Ok(list);
-        }
+            if (reviewerUserId <= 0 || assessmentId <= 0)
+                return BadRequest(new { message = "Invalid IDs" });
 
-        [HttpPost("reviews")]
-        public async Task<IActionResult> PostReviewerReviews(
-            int reviewerUserId,
-            [FromBody] SubmitReviewDto body
-        )
-        {
-            if (body is null || body.Items is null || body.Items.Count == 0)
-                return BadRequest(new { success = false, message = "No review items provided." });
-
-            await _service.SaveReviewAsync(reviewerUserId, body);
-            return Ok(new { success = true, message = "Reviews submitted successfully" });
-        }
-
-        [HttpPost("decision")]
-        public async Task<IActionResult> PostDecision(
-            int reviewerUserId,
-            [FromQuery] int assessmentId,
-            [FromQuery] string decision,
-            [FromBody] string? reviewerComment = null
-        )
-        {
-            var ok = await _service.SetDecisionAsync(
-                reviewerUserId,
-                assessmentId,
-                decision,
-                reviewerComment
-            );
-            if (!ok)
-                return Forbid();
-
-            return Ok(
-                new
-                {
-                    assessmentId,
-                    decision = decision.Trim(),
-                    message = "Decision recorded successfully.",
-                }
-            );
-        }
-
-        [HttpGet("assessment/{assessmentId:int}/attachments")]
-        public async Task<IActionResult> GetAssessmentAttachments(
-            int approverUserId,
-            int assessmentId
-        )
-        {
             var attachments = await _service.GetAssessmentAttachmentsAsync(assessmentId);
-            return Ok(new { success = true, data = attachments });
+            return Ok(attachments);
         }
 
-        [HttpGet("attachments/{attachmentId:int}/download")]
-        public async Task<IActionResult> DownloadAttachment(int approverUserId, int attachmentId)
+        /// <summary>
+        /// Downloads a single assessment attachment (from GridFS).
+        /// </summary>
+        [HttpGet("attachment/{attachmentId:int}/download")]
+        public async Task<IActionResult> DownloadAttachment([FromRoute] int attachmentId)
         {
+            if (attachmentId <= 0)
+                return BadRequest(new { message = "Invalid attachmentId" });
+
             var (success, fileBytes, contentType, fileName, errors) =
                 await _service.DownloadAttachmentFromGridFSAsync(attachmentId);
 
             if (!success)
-            {
-                if (errors.Contains("ATTACHMENT_NOT_FOUND") || errors.Contains("FILE_NOT_FOUND"))
-                {
-                    return NotFound(new { success = false, message = string.Join(", ", errors) });
-                }
-                return StatusCode(500, new { success = false, message = string.Join(", ", errors) });
-            }
+                return NotFound(new { message = errors?.FirstOrDefault() ?? "Attachment not found" });
 
             return File(fileBytes, contentType, fileName);
         }
