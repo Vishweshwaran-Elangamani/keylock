@@ -133,7 +133,7 @@ namespace eepzbackend.Controllers
         /// All changes are logged for audit purposes.
         /// PUT is idempotent - multiple identical requests have the same effect as a single request.
         /// </remarks>
-        [HttpPut("{int}")] // CHANGED: Removed "/update", added momId to route
+        [HttpPut("{momId}")] // CHANGED: Removed "/update", added momId to route
         [ProducesResponseType(typeof(ApiResponse<MomResponseDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -381,7 +381,7 @@ namespace eepzbackend.Controllers
         /// SECURED: Caching, validation
         /// RESTful: GET /api/mom/{momId} (singular resource endpoint)
         /// </summary>
-        [HttpGet("{int}")]
+        [HttpGet("{momId}")]
         [ProducesResponseType(typeof(ApiResponse<MomResponseDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -444,7 +444,7 @@ namespace eepzbackend.Controllers
         /// All deletions are logged for audit and compliance purposes.
         /// DELETE is idempotent - multiple identical requests have the same effect.
         /// </remarks>
-        [HttpDelete("{int}")]
+        [HttpDelete("{momId}")]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
