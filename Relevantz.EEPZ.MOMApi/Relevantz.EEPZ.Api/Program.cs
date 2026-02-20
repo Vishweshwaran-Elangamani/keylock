@@ -292,6 +292,7 @@ try
 
     // HTTPS Redirection
     app.UseHttpsRedirection();
+    app.UseMiddleware<Relevantz.EEPZ.Api.Middleware.GlobalExceptionMiddleware>();
 
     // CORS
     app.UseCors("AllowSpecificOrigin");
