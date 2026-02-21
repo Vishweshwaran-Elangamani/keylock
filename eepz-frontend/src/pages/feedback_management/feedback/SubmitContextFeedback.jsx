@@ -55,12 +55,12 @@ export default function SubmitContextFeedback() {
 
   const user = useMemo(
     () => JSON.parse(localStorage.getItem("user") || "{}") || {},
-    []
+    [],
   );
 
   const { baseDashboard, feedbackDashboard, baseLabel } = useMemo(
     () => getRolePaths(user?.roleName),
-    [user?.roleName]
+    [user?.roleName],
   );
 
   const [activeTab, setActiveTab] = useState("goal");
@@ -104,9 +104,15 @@ export default function SubmitContextFeedback() {
           let goalsList = [];
 
           if (Array.isArray(goalsResponse.data)) goalsList = goalsResponse.data;
-          else if (goalsResponse.data?.data && Array.isArray(goalsResponse.data.data))
+          else if (
+            goalsResponse.data?.data &&
+            Array.isArray(goalsResponse.data.data)
+          )
             goalsList = goalsResponse.data.data;
-          else if (goalsResponse.data?.$values && Array.isArray(goalsResponse.data.$values))
+          else if (
+            goalsResponse.data?.$values &&
+            Array.isArray(goalsResponse.data.$values)
+          )
             goalsList = goalsResponse.data.$values;
 
           setObjectives(goalsList);
@@ -159,7 +165,9 @@ export default function SubmitContextFeedback() {
 
   const handleEmployeeChange = (selectedIdStr) => {
     const selectedId = Number(selectedIdStr);
-    const selectedEmployee = employees.find((emp) => emp.employeeId === selectedId);
+    const selectedEmployee = employees.find(
+      (emp) => emp.employeeId === selectedId,
+    );
 
     setContextForm((prev) => ({
       ...prev,
@@ -175,7 +183,10 @@ export default function SubmitContextFeedback() {
     setSuccessMsg("");
     setError("");
 
-    if (!goalForm.organizationObjectiveId || !goalForm.feedbackComments?.trim()) {
+    if (
+      !goalForm.organizationObjectiveId ||
+      !goalForm.feedbackComments?.trim()
+    ) {
       setError("Goal and comments are required.");
       return;
     }
@@ -208,7 +219,7 @@ export default function SubmitContextFeedback() {
       setError(
         err?.response?.data?.message ||
           err.message ||
-          "Failed to submit goal feedback."
+          "Failed to submit goal feedback.",
       );
     } finally {
       setLoading(false);
@@ -246,7 +257,7 @@ export default function SubmitContextFeedback() {
 
       if (createResponse?.data?.success || createResponse?.success) {
         setSuccessMsg(
-          `Context feedback submitted successfully for ${contextForm.recipientName}!`
+          `Context feedback submitted successfully for ${contextForm.recipientName}!`,
         );
 
         setContextForm({
@@ -262,7 +273,7 @@ export default function SubmitContextFeedback() {
         setError(
           createResponse?.data?.message ||
             createResponse?.message ||
-            "Failed to submit context feedback"
+            "Failed to submit context feedback",
         );
       }
     } catch (err) {
@@ -270,7 +281,7 @@ export default function SubmitContextFeedback() {
       setError(
         err?.response?.data?.message ||
           err.message ||
-          "Failed to submit context feedback."
+          "Failed to submit context feedback.",
       );
     } finally {
       setLoading(false);
@@ -283,7 +294,7 @@ export default function SubmitContextFeedback() {
   });
 
   const selectedEmployee = employees.find(
-    (emp) => emp.employeeId == contextForm.recipientEmployeeId
+    (emp) => emp.employeeId == contextForm.recipientEmployeeId,
   );
 
   const renderStars = (rating) => {
@@ -411,7 +422,8 @@ export default function SubmitContextFeedback() {
               <form onSubmit={submitGoal}>
                 <div className="scf-form-group">
                   <label className="scf-label">
-                    Select Organization Goal <span className="scf-required">*</span>
+                    Select Organization Goal{" "}
+                    <span className="scf-required">*</span>
                   </label>
 
                   <div ref={goalAnchorRef} className="scf-dd">
@@ -425,10 +437,15 @@ export default function SubmitContextFeedback() {
                           ? "No organization goals available"
                           : "Choose a goal..."
                       }
-                      options={objectives.map((obj) => {
-                        const objId = obj.goalId || obj.objectiveId || obj.id;
-                        return { value: objId, label: getGoalDisplayName(obj) };
-                      })}
+                      options={objectives
+                        .filter((obj) => obj.goalType === "org")
+                        .map((obj) => {
+                          const objId = obj.goalId || obj.objectiveId || obj.id;
+                          return {
+                            value: objId,
+                            label: getGoalDisplayName(obj),
+                          };
+                        })}
                       anchorRef={goalAnchorRef}
                       align="left"
                       offset={{ x: 0, y: 4 }}
@@ -454,8 +471,12 @@ export default function SubmitContextFeedback() {
                     Rating <span className="scf-required">*</span>
                   </label>
                   <div className="scf-rating-box">
-                    <div className="scf-stars">{renderStars(goalForm.rating)}</div>
-                    <span className="scf-rating-value">{goalForm.rating}/5</span>
+                    <div className="scf-stars">
+                      {renderStars(goalForm.rating)}
+                    </div>
+                    <span className="scf-rating-value">
+                      {goalForm.rating}/5
+                    </span>
                   </div>
                 </div>
 
@@ -572,7 +593,9 @@ export default function SubmitContextFeedback() {
                     <div className="scf-employee-name">
                       {selectedEmployee.firstName} {selectedEmployee.lastName}
                     </div>
-                    <small className="scf-employee-email">{selectedEmployee.email}</small>
+                    <small className="scf-employee-email">
+                      {selectedEmployee.email}
+                    </small>
                   </div>
                 )}
 
