@@ -11,7 +11,6 @@ using Relevantz.EEPZ.Data.Repository.Interfaces;
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
-
     internal static class FormattingConstants
     {
         public const string DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
@@ -36,6 +35,10 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         Rejected
     }
 
+    /// <summary>
+    /// Repository for L2 Reviewer operations including fetching reviewer-scoped assessments,
+    /// saving/updating review items, making final decisions, and retrieving related view DTOs and attachments.
+    /// </summary>
     public class ReviewerRepository : IReviewerRepository
     {
         private readonly EEPZDbContext _ctx;
@@ -45,6 +48,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             _ctx = ctx;
         }
 
+        /// <summary>
+        /// Gets reviewer-scoped submitted forms (assessments) that are not fully decided by L2.
+        /// </summary>
         public async Task<IEnumerable<ApproverAssignmentRowDto>> GetReviewerSubmittedFormsAsync(int reviewerUserId, int page, int pageSize)
         {
             NormalizePaging(ref page, ref pageSize, out var offset);
@@ -54,7 +60,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
             var scopeAssessmentIds = await GetScopeAssessmentIdsForReviewerAsync(l2EmployeeId);
             if (!scopeAssessmentIds.Any()) return Enumerable.Empty<ApproverAssignmentRowDto>();
-
 
             var latestL2Decisions = await GetLatestDecisionDetailIdsByReviewerAsync();
             var fullyDecidedAssessmentIds = await GetFullyDecidedAssessmentIdsAsync(scopeAssessmentIds, latestL2Decisions);
@@ -67,6 +72,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return await BuildApproverAssignmentsAsync(pagedAssessmentIds);
         }
 
+        /// <summary>
+        /// Gets reviewer-scoped submitted assessments where L2 has already taken a decision (Approved/Rejected).
+        /// </summary>
         public async Task<IEnumerable<ApproverAssignmentRowDto>> GetReviewerSubmittedRatingsAsync(int reviewerUserId, int page, int pageSize)
         {
             NormalizePaging(ref page, ref pageSize, out var offset);
@@ -76,7 +84,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
             var scopeAssessmentIds = await GetScopeAssessmentIdsForReviewerAsync(l2EmployeeId);
             if (!scopeAssessmentIds.Any()) return Enumerable.Empty<ApproverAssignmentRowDto>();
-
 
             var assessmentsWithL2Decision = await _ctx.Assessmentreviews
                 .Where(ar => ar.ReviewerRole == nameof(ReviewerRole.Reviewer)
@@ -98,6 +105,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return await BuildApproverAssignmentsAsync(pagedAssessmentIds);
         }
 
+        /// <summary>
+        /// Gets detailed reviewer assessment cards where L1 is fully complete per detail and L2 decision is not yet taken.
+        /// </summary>
         public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetReviewerAssessmentsWithDetailsAsync(int reviewerUserId, int page, int pageSize)
         {
             NormalizePaging(ref page, ref pageSize, out var offset);
@@ -108,10 +118,8 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             var scopeAssessmentIds = await GetScopeAssessmentIdsForReviewerAsync(l2EmployeeId);
             if (!scopeAssessmentIds.Any()) return Enumerable.Empty<ReviewerAssessmentViewDto>();
 
-
             var l1CompleteAssessmentIds = await GetAssessmentsWhereL1IsCompleteAsync(scopeAssessmentIds);
             if (!l1CompleteAssessmentIds.Any()) return Enumerable.Empty<ReviewerAssessmentViewDto>();
-
 
             var assessmentsWithL2Decision = await _ctx.Assessmentreviews
                 .Where(ar => ar.ReviewerRole == nameof(ReviewerRole.Reviewer)
@@ -137,6 +145,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return result;
         }
 
+        /// <summary>
+        /// Gets a single assessment view (with items and attachments) if reviewer has scope.
+        /// </summary>
         public async Task<ReviewerAssessmentViewDto?> GetAssessmentForReviewerAsync(int reviewerUserId, int assessmentId)
         {
             var l2EmployeeId = await GetL2EmployeeIdAsync(reviewerUserId);
@@ -148,6 +159,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return await BuildReviewerAssessmentViewDtoAsync(assessmentId);
         }
 
+        /// <summary>
+        /// Saves reviewer (L2) review items as Pending (initial save).
+        /// </summary>
         public async Task<int> SaveReviewerReviewAsync(int reviewerUserId, SubmitReviewDto dto)
         {
             if (dto == null || dto.Items == null || dto.Items.Count == 0) return 0;
@@ -189,6 +203,11 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return saved;
         }
 
+        /// <summary>
+        /// Sets final L2 decision (Approved/Rejected) across all details of the assessment.
+        /// When Rejected, ensures a decision note exists (Rating == 0). When Approved, removes such notes.
+        /// Also marks FormProgressTracker.ManagerCompleted = true.
+        /// </summary>
         public async Task<bool> SetReviewerDecisionAsync(int reviewerUserId, int assessmentId, string decision, string? reviewerComment)
         {
             var decisionNormalized = (decision ?? string.Empty).Trim();
@@ -214,7 +233,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
             var finalDecision = approved ? nameof(ReviewStatus.Approved) : nameof(ReviewStatus.Rejected);
 
-
             var reviewsToUpdate = await _ctx.Assessmentreviews
                 .Where(ar => ar.ReviewerRole == nameof(ReviewerRole.Reviewer)
                              && ar.ReviewerId == reviewerUserId
@@ -234,7 +252,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
             if (rejected)
             {
-
                 var note = reviewerComment ?? FormattingConstants.DefaultRejectionNote;
                 var firstDetailId = detailIds.First();
 
@@ -268,7 +285,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
             else
             {
-
                 var notesToDelete = await _ctx.Assessmentreviews
                     .Where(ar => ar.ReviewerRole == nameof(ReviewerRole.Reviewer)
                                  && ar.ReviewerId == reviewerUserId
@@ -279,7 +295,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
 
             await _ctx.SaveChangesAsync();
-
 
             var assessment = await _ctx.Selfassessments.FirstOrDefaultAsync(a => a.AssessmentId == assessmentId);
             if (assessment != null)
@@ -301,6 +316,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return true;
         }
 
+        /// <summary>
+        /// Upserts reviewer (L2) ratings/comments per detail; resets ReviewStatus to null (editable state).
+        /// </summary>
         public async Task SubmitReviewerReviewsAsync(int reviewerUserId, int assessmentId, List<ReviewItemDto> items)
         {
             using var tx = await _ctx.Database.BeginTransactionAsync();
@@ -343,9 +361,11 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             await tx.CommitAsync();
         }
 
+        /// <summary>
+        /// Gets the latest reviewer (L2) decision note (Rating == 0) for the assessment.
+        /// </summary>
         public async Task<ReviewerDecisionDto?> GetLatestReviewerDecisionAsync(int assessmentId)
         {
-
             var decision = await _ctx.Assessmentreviews
                 .Where(ar => ar.ReviewerRole == nameof(ReviewerRole.Reviewer) && ar.Rating == 0)
                 .Join(_ctx.Assessmentdetails,
@@ -367,6 +387,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             );
         }
 
+        /// <summary>
+        /// Lists attachments for an assessment ordered by display order and upload time.
+        /// </summary>
         public async Task<List<AttachmentInfoDto>> GetAssessmentAttachmentsAsync(int assessmentId)
         {
             var attachments = await _ctx.Selfassessmentattachments
@@ -387,15 +410,18 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             )).ToList();
         }
 
+        /// <summary>
+        /// Gets an attachment by its ID.
+        /// </summary>
         public async Task<Selfassessmentattachment?> GetAttachmentByIdAsync(int attachmentId)
         {
             return await _ctx.Selfassessmentattachments
                 .FirstOrDefaultAsync(a => a.AttachmentId == attachmentId);
         }
 
-
-
-
+        // ----------------------------
+        // Private helpers
+        // ----------------------------
 
         private static void NormalizePaging(ref int page, ref int pageSize, out int offset)
         {
@@ -518,7 +544,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             var approver = nameof(ReviewerRole.Approver);
             var approved = nameof(ReviewStatus.Approved);
 
-
             var perDetail = await _ctx.Assessmentdetails
                 .Where(ad => scopeAssessmentIds.Contains(ad.AssessmentId))
                 .GroupJoin(
@@ -579,7 +604,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             var employeeName = userProfile != null
                 ? $"{userProfile.FirstName} {userProfile.LastName}".Trim()
                 : (string.IsNullOrWhiteSpace(userAuth?.Email) ? employee.EmployeeCompanyId : userAuth.Email);
-
 
             var latestL1 = await _ctx.Assessmentreviews
                 .Where(ar => ar.ReviewerRole == nameof(ReviewerRole.Approver))

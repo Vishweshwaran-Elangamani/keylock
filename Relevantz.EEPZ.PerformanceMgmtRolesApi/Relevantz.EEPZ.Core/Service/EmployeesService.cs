@@ -23,19 +23,34 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _logger = logger;
         }
 
-        public async Task<ApiResponse<List<object>>> GetAllManagersAsync()
-        {
-            var managers = await _repository.GetAllManagersAsync();
-            return ApiResponse<List<object>>.SuccessResponse(managers);
-        }
+/// <summary>
+/// Retrieves the complete list of managers across the organization.
+/// </summary>
+/// <returns>
+/// A standardized <see cref="ApiResponse{T}"/> containing a list of manager records,
+/// or an error response if the retrieval fails.
+/// </returns>
+public async Task<ApiResponse<List<object>>> GetAllManagersAsync()
+{
+    var managers = await _repository.GetAllManagersAsync();
+    return ApiResponse<List<object>>.SuccessResponse(managers);
+}
 
-        public async Task<ApiResponse<object>> GetUserRoleAsync(int userId)
-        {
-            var role = await _repository.GetUserRoleAsync(userId);
-            if (role == null) 
-                return ApiResponse<object>.ErrorResponse("User not found");
+        /// <summary>
+/// Retrieves the role information for the specified user.
+/// </summary>
+/// <param name="userId">The unique identifier of the user.</param>
+/// <returns>
+/// A standardized <see cref="ApiResponse{T}"/> containing the user's role,
+/// or an error response if the user is not found.
+/// </returns>
+public async Task<ApiResponse<object>> GetUserRoleAsync(int userId)
+{
+    var role = await _repository.GetUserRoleAsync(userId);
+    if (role == null) 
+        return ApiResponse<object>.ErrorResponse("User not found");
 
-            return ApiResponse<object>.SuccessResponse(role);
-        }
+    return ApiResponse<object>.SuccessResponse(role);
+}
     }
 }

@@ -51,8 +51,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _logger.LogInformation("GridFS initialized successfully");
         }
 
-        public async Task<ApiResponse<int>> ApproveDeptHeadEmployeeAsync(ApprovalRequestDto request, int deptHeadUserId)
-        {
+/// <summary>
+/// Approves an employee's assessment at the Department Head stage.
+/// </summary>
+/// <param name="request">The approval request containing assessment, project, and employee identifiers.</param>
+/// <param name="deptHeadUserId">The user ID of the department head performing the approval.</param>
+/// <returns>An API response with the newly created approval ID on success, or errors on failure.</returns>
+public async Task<ApiResponse<int>> ApproveDeptHeadEmployeeAsync(ApprovalRequestDto request, int deptHeadUserId)        {
             var assessment = await _repository.GetAssessmentByIdAsync(request.AssessmentId);
             if (assessment == null)
             {
@@ -82,7 +87,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return ApiResponse<int>.SuccessResponse(approvalId);
         }
 
-        public async Task<ApiResponse<List<object>>> GetDeptHeadSubmittedRatingsAsync(int? deptHeadEmployeeId)
+        /// <summary>
+/// Retrieves the list of submitted ratings visible to a Department Head (optionally filtered by a specific department head employee ID).
+/// </summary>
+/// <param name="deptHeadEmployeeId">Optional Department Head employee ID; if null, will derive from the current user context.</param>
+/// <returns>An API response containing the list of ratings or errors.</returns>
+public async Task<ApiResponse<List<object>>> GetDeptHeadSubmittedRatingsAsync(int? deptHeadEmployeeId)
         {
             _logger.LogInformation($"GetDeptHeadSubmittedRatings called with departmentHeadId: {deptHeadEmployeeId}");
 
@@ -328,6 +338,16 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return ApiResponse<List<object>>.SuccessResponse(results);
         }
 
+        
+    // <summary>
+    /// Retrieves a paged list of employees that have been approved by managers, optionally scoped to a Department Head.
+    /// </summary>
+    /// <param name="page">The 1-based page index.</param>
+    /// <param name="pageSize">The number of items per page.</param>
+    /// <param name="deptHeadEmployeeId">Optional Department Head employee ID to filter results.</param>
+    /// <returns>
+    /// Tuple: success flag, data list, total records, total pages, and a list of errors (if any).
+    /// </returns>
         public async Task<(bool success, List<object> data, int totalRecords, int totalPages, List<string> errors)> GetManagerApprovedEmployeesAsync(int page, int pageSize, int? deptHeadEmployeeId)
         {
             _logger.LogInformation($"GetManagerApprovedEmployees - Department Head ID: {deptHeadEmployeeId}, Page: {page}");
@@ -455,7 +475,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return (true, results, totalRecords, totalPages, new List<string>());
         }
 
-        public async Task<ApiResponse<List<object>>> GetPendingAcknowledgmentsAsync(int employeeId, int userId)
+        /// <summary>
+/// Retrieves pending acknowledgments for the current employee context (by employeeId and/or userId).
+/// </summary>
+/// <param name="employeeId">The employee identifier (if known).</param>
+/// <param name="userId">The user identifier (if known).</param>
+/// <returns>API response containing acknowledgment items or errors.</returns>
+public async Task<ApiResponse<List<object>>> GetPendingAcknowledgmentsAsync(int employeeId, int userId)
         {
             _logger.LogWarning($"[EMPLOYEE PENDING ACK] Matching EmployeeId={employeeId} or UserId={userId}");
 
@@ -539,7 +565,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return ApiResponse<List<object>>.SuccessResponse(results);
         }
 
-        public async Task<ApiResponse<DateTime?>> AcknowledgeRatingAsync(AcknowledgeRequestDto request, int employeeId, int userId)
+        /// <summary>
+/// Records an employee's acknowledgment for a Department Head approval and optionally stores comments.
+/// </summary>
+/// <param name="request">Acknowledgment request including approval ID and optional comments.</param>
+/// <param name="employeeId">The employee ID derived from claims or input.</param>
+/// <param name="userId">The user ID derived from claims or input.</param>
+/// <returns>API response containing the acknowledgment timestamp on success, or errors.</returns>
+public async Task<ApiResponse<DateTime?>> AcknowledgeRatingAsync(AcknowledgeRequestDto request, int employeeId, int userId)
         {
             _logger.LogInformation($"[ACK POST] ApprovalId={request.ApprovalId}, EmpId={employeeId}, UserId={userId}");
 
@@ -563,17 +596,37 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return ApiResponse<DateTime?>.SuccessResponse(acknowledgedAt);
         }
 
-        public async Task<ApiResponse<List<object>>> GetEmployeeAcknowledgedCommentsAsync(int managerId)
+        /// <summary>
+/// Retrieves the list of employee comments that have been acknowledged, scoped to a manager.
+/// </summary>
+/// <param name="managerId">The manager's employee ID.</param>
+/// <returns>API response containing acknowledged comments or errors.</returns>
+public async Task<ApiResponse<List<object>>> GetEmployeeAcknowledgedCommentsAsync(int managerId)
         {
             var acknowledgments = await _repository.GetAcknowledgedCommentsByManagerAsync(managerId);
             return ApiResponse<List<object>>.SuccessResponse(acknowledgments);
         }
 
-        public async Task<ApiResponse<List<object>>> GetDeptHeadAssessmentAttachmentsAsync(int assessmentId)
+        /// <summary>
+/// Retrieves all attachment metadata for a Department Head assessment view.
+/// </summary>
+/// <param name="assessmentId">The assessment identifier from which to fetch attachments.</param>
+/// <returns>API response containing attachment metadata rows.</returns>
+public async Task<ApiResponse<List<object>>> GetDeptHeadAssessmentAttachmentsAsync(int assessmentId)
         {
             var attachments = await _repository.GetAssessmentAttachmentsAsync(assessmentId);
             return ApiResponse<List<object>>.SuccessResponse(attachments);
         }
+
+
+        
+/// <summary>
+/// Downloads a single attachment associated with a Department Head flow from GridFS storage.
+/// </summary>
+/// <param name="attachmentId">The unique identifier of the attachment to download.</param>
+/// <returns>
+/// Tuple indicating success and, when successful, the file bytes, content type, and file name; otherwise a list of error codes/messages.
+/// </returns>
 
         public async Task<(bool success, byte[] fileBytes, string contentType, string fileName, List<string> errors)> DownloadDeptHeadAttachmentAsync(int attachmentId)
         {
@@ -624,83 +677,107 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return (true, fileBytes, contentType, attachment.FileName, new List<string>());
         }
 
-        public async Task<int?> GetEmployeeIdFromUserIdAsync(int userId)
+        /// <summary>
+/// Resolves an employee ID from a given user ID when such a mapping exists.
+/// </summary>
+/// <param name="userId">The user identifier.</param>
+/// <returns>The employee ID if found; otherwise null.</returns>
+public async Task<int?> GetEmployeeIdFromUserIdAsync(int userId)
         {
             var userAuth = await _repository.GetUserAuthByUserIdAsync(userId);
             return userAuth?.EmployeeId;
         }
 
-        public async Task<ApiResponse<DeptHeadPerformanceDTO>> GetApprovedEmployeeDetailsAsync(int approvalId)
+       /// <summary>
+/// Retrieves a Department Head performance details view for a specific approval record.
+/// </summary>
+/// <param name="approvalId">The identifier of the approval to fetch details for.</param>
+/// <returns>API response containing the composed performance DTO or errors.</returns>
+public async Task<ApiResponse<DeptHeadPerformanceDTO>> GetApprovedEmployeeDetailsAsync(int approvalId)
+{
+    _logger.LogInformation("Fetching approved employee details for ApprovalId {ApprovalId}", approvalId);
+
+    var approval = await _repository.GetApprovalByIdAsync(approvalId);
+    if (approval == null)
+    {
+        _logger.LogWarning("Approval not found for ApprovalId {ApprovalId}", approvalId);
+        return ApiResponse<DeptHeadPerformanceDTO>.ErrorResponse(ServiceErrorCodes.ApprovalNotFound);
+    }
+
+    _logger.LogDebug("Approval found for ApprovalId {ApprovalId}: EmployeeId {EmployeeId}, ProjectId {ProjectId}, AssessmentId {AssessmentId}",
+        approvalId, approval.EmployeeId, approval.ProjectId, approval.AssessmentId);
+
+    var project = await _repository.GetProjectByIdAsync(approval.ProjectId);
+    var assessment = await _repository.GetAssessmentWithDetailsAsync(approval.AssessmentId);
+    if (assessment == null || project == null)
+    {
+        _logger.LogWarning("Missing related entities for ApprovalId {ApprovalId}: ProjectNull={ProjectNull}, AssessmentNull={AssessmentNull}",
+            approvalId, project == null, assessment == null);
+
+        return ApiResponse<DeptHeadPerformanceDTO>.ErrorResponse(ServiceErrorCodes.AssessmentOrProjectNotFound);
+    }
+
+    var detailIds = assessment.Assessmentdetails.Select(d => d.DetailId).ToList();
+    var reviews = await _repository.GetReviewsByDetailIdsAsync(detailIds);
+
+    var l1Auth = project.L1approverEmployeeId.HasValue
+        ? await _repository.GetUserAuthByEmployeeIdAsync(project.L1approverEmployeeId.Value)
+        : null;
+    var l2Auth = project.L2approverEmployeeId.HasValue
+        ? await _repository.GetUserAuthByEmployeeIdAsync(project.L2approverEmployeeId.Value)
+        : null;
+
+    var l1Profile = project.L1approverEmployeeId.HasValue
+        ? await _repository.GetUserProfileByEmployeeIdAsync(project.L1approverEmployeeId.Value)
+        : null;
+    var l2Profile = project.L2approverEmployeeId.HasValue
+        ? await _repository.GetUserProfileByEmployeeIdAsync(project.L2approverEmployeeId.Value)
+        : null;
+
+    var l1Name = l1Profile != null ? $"{l1Profile.FirstName} {l1Profile.LastName}".Trim() : DefaultLabels.NoL1;
+    var l2Name = l2Profile != null ? $"{l2Profile.FirstName} {l2Profile.LastName}".Trim() : DefaultLabels.NoL2;
+
+    var competencies = assessment.Assessmentdetails.Select(detail =>
+    {
+        var l1Review = l1Auth != null
+            ? reviews.FirstOrDefault(r => r.DetailId == detail.DetailId && r.ReviewerId == l1Auth.UserId)
+            : null;
+        var l2Review = l2Auth != null
+            ? reviews.FirstOrDefault(r => r.DetailId == detail.DetailId && r.ReviewerId == l2Auth.UserId)
+            : null;
+
+        return new CompetencyRatingDTO
         {
-            var approval = await _repository.GetApprovalByIdAsync(approvalId);
-            if (approval == null)
-                return ApiResponse<DeptHeadPerformanceDTO>.ErrorResponse(ServiceErrorCodes.ApprovalNotFound);
+            CompetencyName = detail.Competency?.Name ?? DefaultLabels.Unknown,
+            EmployeeRating = detail.EmployeeRating,
+            EmployeeComments = detail.EmployeeComments,
+            L1ReviewerName = l1Name,
+            L1Rating = l1Review?.Rating,
+            L1Comments = l1Review?.Comments,
+            L1ReviewStatus = l1Review?.ReviewStatus,
+            L2ReviewerName = l2Name,
+            L2Rating = l2Review?.Rating,
+            L2Comments = l2Review?.Comments,
+            L2ReviewStatus = l2Review?.ReviewStatus
+        };
+    }).ToList();
 
-            var project = await _repository.GetProjectByIdAsync(approval.ProjectId);
-            var assessment = await _repository.GetAssessmentWithDetailsAsync(approval.AssessmentId);
-            if (assessment == null || project == null)
-                return ApiResponse<DeptHeadPerformanceDTO>.ErrorResponse(ServiceErrorCodes.AssessmentOrProjectNotFound);
+    var empProfile = await _repository.GetUserProfileByEmployeeIdAsync(approval.EmployeeId);
+    var employeeName = empProfile != null
+        ? $"{empProfile.FirstName} {empProfile.LastName}".Trim()
+        : $"{DefaultLabels.Employee} {approval.EmployeeId}";
 
-            var detailIds = assessment.Assessmentdetails.Select(d => d.DetailId).ToList();
-            var reviews = await _repository.GetReviewsByDetailIdsAsync(detailIds);
+    var dto = new DeptHeadPerformanceDTO
+    {
+        EmployeeId  = approval.EmployeeId,
+        EmployeeName = employeeName,
+        ProjectName = project.ProjectName ?? DefaultLabels.Unknown,
+        AssessmentId = approval.AssessmentId,
+        Competencies = competencies
+    };
 
-            var l1Auth = project.L1approverEmployeeId.HasValue
-                ? await _repository.GetUserAuthByEmployeeIdAsync(project.L1approverEmployeeId.Value)
-                : null;
-            var l2Auth = project.L2approverEmployeeId.HasValue
-                ? await _repository.GetUserAuthByEmployeeIdAsync(project.L2approverEmployeeId.Value)
-                : null;
-
-            var l1Profile = project.L1approverEmployeeId.HasValue
-                ? await _repository.GetUserProfileByEmployeeIdAsync(project.L1approverEmployeeId.Value)
-                : null;
-            var l2Profile = project.L2approverEmployeeId.HasValue
-                ? await _repository.GetUserProfileByEmployeeIdAsync(project.L2approverEmployeeId.Value)
-                : null;
-
-            var l1Name = l1Profile != null ? $"{l1Profile.FirstName} {l1Profile.LastName}".Trim() : DefaultLabels.NoL1;
-            var l2Name = l2Profile != null ? $"{l2Profile.FirstName} {l2Profile.LastName}".Trim() : DefaultLabels.NoL2;
-
-            var competencies = assessment.Assessmentdetails.Select(detail =>
-            {
-                var l1Review = l1Auth != null
-                    ? reviews.FirstOrDefault(r => r.DetailId == detail.DetailId && r.ReviewerId == l1Auth.UserId)
-                    : null;
-                var l2Review = l2Auth != null
-                    ? reviews.FirstOrDefault(r => r.DetailId == detail.DetailId && r.ReviewerId == l2Auth.UserId)
-                    : null;
-
-                return new CompetencyRatingDTO
-                {
-                    CompetencyName = detail.Competency?.Name ?? DefaultLabels.Unknown,
-                    EmployeeRating = detail.EmployeeRating,
-                    EmployeeComments = detail.EmployeeComments,
-                    L1ReviewerName = l1Name,
-                    L1Rating = l1Review?.Rating,
-                    L1Comments = l1Review?.Comments,
-                    L1ReviewStatus = l1Review?.ReviewStatus,
-                    L2ReviewerName = l2Name,
-                    L2Rating = l2Review?.Rating,
-                    L2Comments = l2Review?.Comments,
-                    L2ReviewStatus = l2Review?.ReviewStatus
-                };
-            }).ToList();
-
-            var empProfile = await _repository.GetUserProfileByEmployeeIdAsync(approval.EmployeeId);
-            var employeeName = empProfile != null
-                ? $"{empProfile.FirstName} {empProfile.LastName}".Trim()
-                : $"{DefaultLabels.Employee} {approval.EmployeeId}";
-
-            var dto = new DeptHeadPerformanceDTO
-            {
-                EmployeeId = approval.EmployeeId,
-                EmployeeName = employeeName,
-                ProjectName = project.ProjectName ?? DefaultLabels.Unknown,
-                AssessmentId = approval.AssessmentId,
-                Competencies = competencies
-            };
-
-            return ApiResponse<DeptHeadPerformanceDTO>.SuccessResponse(dto);
-        }
+    _logger.LogInformation("Returning approved employee details for ApprovalId {ApprovalId}", approvalId);
+    return ApiResponse<DeptHeadPerformanceDTO>.SuccessResponse(dto);
+}
     }
 }

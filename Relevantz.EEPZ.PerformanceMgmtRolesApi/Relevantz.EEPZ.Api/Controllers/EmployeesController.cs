@@ -24,21 +24,23 @@ namespace PerformanceManagement.Controllers
             _logger = logger;
         }
 
-        [HttpGet("all-managers")]
-        public async Task<IActionResult> GetAllManagers()
-        {
-            var result = await _employeesService.GetAllManagersAsync();
+       [HttpGet("all-managers")]
+public async Task<IActionResult> GetAllManagers()
+{
+    // No parameters required because this endpoint returns all managers system-wide 
+    // regardless of department, role, or employee context.
+    var result = await _employeesService.GetAllManagersAsync();
 
-            if (result.Success)
-            {
-                return Ok(new { success = true, data = result.Data });
-            }
+    if (result.Success)
+    {
+        return Ok(new { success = true, data = result.Data });
+    }
 
-            return StatusCode(
-                500,
-                new { success = false, message = string.Join(", ", result.Errors) }
-            );
-        }
+    return StatusCode(
+        500,
+        new { success = false, message = string.Join(", ", result.Errors) }
+    );
+}
 
         [HttpGet("user/{userId}/role")]
         public async Task<IActionResult> GetUserRole(int userId)

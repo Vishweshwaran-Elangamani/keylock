@@ -8,10 +8,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
+
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
+    /// <summary>
+    /// EmployeesRepository provides data access methods related to employees.
+    /// It focuses on retrieving managers and user role information.
+    /// </summary>
     public class EmployeesRepository : IEmployeesRepository
     {
         private readonly EEPZDbContext _context;
@@ -21,6 +25,12 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             _context = context;
         }
 
+        /// <summary>
+        /// Retrieves all active managers from the system.
+        /// Filters employees by active status and role codes ("MGR" or "MANAGER").
+        /// Excludes HR roles.
+        /// Returns basic employee and role information.
+        /// </summary>
         public async Task<List<object>> GetAllManagersAsync()
         {
             return await (
@@ -45,6 +55,11 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             ).ToListAsync<object>();
         }
 
+        /// <summary>
+        /// Retrieves the role information for a given user.
+        /// Returns role code and whether the user is a manager.
+        /// If no role is found, defaults to "UNKNOWN".
+        /// </summary>
         public async Task<object> GetUserRoleAsync(int userId)
         {
             var userAuth = await _context.Userauthentications.FirstOrDefaultAsync(u => u.UserId == userId);

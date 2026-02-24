@@ -11,6 +11,7 @@ using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
+using MongoDB.Bson;
 using Microsoft.Extensions.Configuration;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
@@ -90,35 +91,74 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return await _repository.GetAttachmentByIdAsync(attachmentId);
         }
 
-        public async Task<(bool success, byte[] fileBytes, string contentType, string fileName, List<string> errors)> DownloadAttachmentFromGridFSAsync(int attachmentId)
+        public async Task<(bool success, byte[] fileBytes, string contentType, string fileName, List<string> errors)>
+    DownloadAttachmentFromGridFSAsync(int attachmentId)
+{
+    var errors = new List<string>();
+
+    try
+    {
+        var attachment = await _repository.GetAttachmentByIdAsync(attachmentId);
+
+        if (attachment is null)
         {
-            try
-            {
-                var attachment = await _repository.GetAttachmentByIdAsync(attachmentId);
-
-                if (attachment == null)
-                    return (false, null, null, null, new List<string> { "ATTACHMENT_NOT_FOUND" });
-
-                if (string.IsNullOrWhiteSpace(attachment.FilePath))
-                    return (false, null, null, null, new List<string> { "FILE_NOT_FOUND - File path missing." });
-
-                // FilePath contains the GridFS ObjectId
-                var fileId = MongoDB.Bson.ObjectId.Parse(attachment.FilePath);
-
-                // Download file from GridFS
-                var fileBytes = await _gridFSBucket.DownloadAsBytesAsync(fileId);
-                var contentType = attachment.FileType ?? "application/octet-stream";
-
-                return (true, fileBytes, contentType, attachment.FileName, new List<string>());
-            }
-            catch (MongoDB.Driver.GridFS.GridFSFileNotFoundException)
-            {
-                return (false, null, null, null, new List<string> { "FILE_NOT_FOUND - File not found in GridFS." });
-            }
-            catch (Exception ex)
-            {
-                return (false, null, null, null, new List<string> { $"Error: {ex.Message}" });
-            }
+            errors.Add(Relevantz.EEPZ.Common.Constants.AttachmentConstants.ATTACHMENT_NOT_FOUND);
+            return (false, null, null, null, errors);
         }
+
+        if (string.IsNullOrWhiteSpace(attachment.FilePath))
+        {
+            errors.Add(Relevantz.EEPZ.Common.Constants.AttachmentConstants.FILE_NOT_FOUND);
+            return (false, null, null, null, errors);
+        }
+
+        if (!ObjectId.TryParse(attachment.FilePath, out var fileId))
+        {
+            errors.Add("INVALID_FILE_ID"); 
+            return (false, null, null, null, errors);
+        }
+
+        byte[] fileBytes;
+        try
+        {
+            fileBytes = await _gridFSBucket.DownloadAsBytesAsync(fileId);
+        }
+        catch (GridFSFileNotFoundException)
+        {
+            errors.Add(Relevantz.EEPZ.Common.Constants.AttachmentConstants.FILE_NOT_FOUND); // 404
+            return (false, null, null, null, errors);
+        }
+        catch (MongoConnectionException)
+        {
+            errors.Add("STORAGE_UNAVAILABLE"); 
+            return (false, null, null, null, errors);
+        }
+        catch (TimeoutException)
+        {
+            errors.Add("STORAGE_TIMEOUT"); 
+            return (false, null, null, null, errors);
+        }
+        catch (GridFSException ex)
+        {
+            errors.Add($"STORAGE_ERROR: {ex.Message}"); 
+            return (false, null, null, null, errors);
+        }
+        var contentType = string.IsNullOrWhiteSpace(attachment.FileType)
+            ? "application/octet-stream"
+            : attachment.FileType;
+
+        var fileName = string.IsNullOrWhiteSpace(attachment.FileName)
+            ? $"{fileId}.bin"
+            : attachment.FileName;
+
+        return (true, fileBytes, contentType, fileName, errors);
+    }
+    catch (Exception ex)
+    {
+        errors.Add($"UNKNOWN_ERROR: {ex.Message}");
+        return (false, null, null, null, errors);
+    }
+}
+
     }
 }

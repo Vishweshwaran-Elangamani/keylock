@@ -70,32 +70,62 @@ namespace eepzbackend.Controllers
         }
 
         [HttpGet("assessments")]
-        public async Task<IActionResult> GetApproverAssessmentsWithDetails(
-            int approverUserId,
-            [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 25
-        )
-        {
-            var list = await _service.GetAssessmentsWithDetailsAsync(
-                approverUserId,
-                page,
-                pageSize
-            );
-            return Ok(list);
-        }
+public async Task<IActionResult> GetApproverAssessmentsWithDetails(
+    int approverUserId,
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 25
+)
+{
+    const int MaxPageSize = 100; 
+
+    if (page < 1)
+        ModelState.AddModelError(nameof(page), "page must be >= 1.");
+    if (pageSize < 1)
+        ModelState.AddModelError(nameof(pageSize), "pageSize must be >= 1.");
+
+    if (!ModelState.IsValid)
+        return ValidationProblem(ModelState); 
+
+    var effectivePageSize = pageSize > MaxPageSize ? MaxPageSize : pageSize;
+
+    var list = await _service.GetAssessmentsWithDetailsAsync(
+        approverUserId,
+        page,
+        effectivePageSize
+    );
+
+    return Ok(list);
+}
 
         [HttpGet("assessment/{assessmentId:int}/decision")]
-        public async Task<IActionResult> GetLatestReviewerDecision(int approverUserId, int assessmentId)
+public async Task<IActionResult> GetLatestReviewerDecision(int approverUserId, int assessmentId)
+{
+    if (assessmentId <= 0)
+    {
+        return BadRequest(new
         {
-            var decision = await _service.GetLatestReviewerDecisionAsync(assessmentId);
+            success = false,
+            message = "assessmentId must be greater than 0."
+        });
+    }
 
+    var decision = await _service.GetLatestReviewerDecisionAsync(assessmentId);
 
-            return Ok(new
-            {
-                decision = decision?.Decision ?? "",
-                note = decision?.Note ?? ""
-            });
-        }
+    if (decision is null)
+    {
+        return Ok(new
+        {
+            decision = string.Empty,
+            note = string.Empty
+        });
+    }
+
+    return Ok(new
+    {
+        decision = decision.Decision ?? string.Empty,
+        note = decision.Note ?? string.Empty
+    });
+}
 
 
         [HttpPost("approverReviews")]
@@ -141,20 +171,38 @@ namespace eepzbackend.Controllers
             );
         }
 
-        [HttpGet("assessment/{assessmentId:int}/attachments")]
-        public async Task<IActionResult> GetAssessmentAttachments(
+       [HttpGet("assessment/{assessmentId:int}/attachments")]
+public async Task<IActionResult> GetAssessmentAttachments(
     int approverUserId,
     int assessmentId
 )
+{
+    if (assessmentId <= 0)
+    {
+        return BadRequest(new
         {
-            var attachments = await _service.GetAssessmentAttachmentsAsync(assessmentId);
-            return Ok(new { success = true, data = attachments });
-        }
+            success = false,
+            message = "assessmentId must be greater than 0."
+        });
+    }
 
+    var attachments = await _service.GetAssessmentAttachmentsAsync(assessmentId);
+    return Ok(new { success = true, data = attachments });
+}
 
-        [HttpGet("attachments/{attachmentId:int}/download")]
+  [HttpGet("attachments/{attachmentId:int}/download")]
 public async Task<IActionResult> DownloadAttachment(int approverUserId, int attachmentId)
 {
+    // Input validation as per review comment
+    if (attachmentId <= 0)
+    {
+        return BadRequest(new
+        {
+            success = false,
+            message = "attachmentId must be greater than 0."
+        });
+    }
+
     var (success, fileBytes, contentType, fileName, errors) =
         await _service.DownloadAttachmentFromGridFSAsync(attachmentId);
 
@@ -165,11 +213,10 @@ public async Task<IActionResult> DownloadAttachment(int approverUserId, int atta
         {
             return NotFound(new { success = false, message = string.Join(", ", errors) });
         }
-       
+
         return StatusCode(500, new { success = false, message = string.Join(", ", errors) });
     }
 
-   
     return File(fileBytes, contentType, fileName);
 }
 

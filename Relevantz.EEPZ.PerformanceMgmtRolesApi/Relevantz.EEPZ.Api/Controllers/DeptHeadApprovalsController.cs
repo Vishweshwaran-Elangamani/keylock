@@ -27,7 +27,7 @@ namespace Relevantz.EEPZ.Common.Constants
 
         /// <summary>
         /// Approve an employee rating by department head.
-        /// NOTE: Method renamed as per review suggestion. Route preserved for backward compatibility.
+        /// Method renamed as per review suggestion. Route preserved for backward compatibility.
         /// </summary>
         [HttpPost("approve-employee")]
         public async Task<IActionResult> ApproveEmployeeByDepartmentHead([FromBody] ApprovalRequestDto request)
@@ -236,24 +236,26 @@ namespace Relevantz.EEPZ.Common.Constants
             });
         }
 
-        /// <summary>
-        /// Get attachments for a Dept Head assessment.
-        /// </summary>
-        [HttpGet("{deptHeadEmployeeId}/assessment/{assessmentId}/attachments")]
-        public async Task<IActionResult> GetDeptHeadAssessmentAttachments(int deptHeadEmployeeId, int assessmentId)
-        {
-            var result = await _deptHeadService.GetDeptHeadAssessmentAttachmentsAsync(assessmentId);
+/// <summary>
+/// Get attachments for a Dept Head assessment.
+/// </summary>
+[HttpGet("{deptHeadEmployeeId}/assessment/{assessmentId}/attachments")]
+public async Task<IActionResult> GetDeptHeadAssessmentAttachments(int deptHeadEmployeeId, int assessmentId)
+{
+    
+    var result = await _deptHeadService.GetDeptHeadAssessmentAttachmentsAsync(assessmentId);
 
-            if (result.Success)
-                return Ok(new { success = true, data = result.Data });
+    if (result.Success)
+        return Ok(new { success = true, data = result.Data });
 
-            return StatusCode(500, new
-            {
-                success = false,
-                message = ApiMessages.AttachmentsFetchFailed,
-                errors = result.Errors
-            });
-        }
+    return StatusCode(500, new
+    {
+        success = false,
+        message = ApiMessages.AttachmentsFetchFailed,
+        errors = result.Errors
+    });
+}
+
 
         /// <summary>
         /// Download specific attachment for Dept Head.
@@ -287,24 +289,26 @@ namespace Relevantz.EEPZ.Common.Constants
             return File(fileBytes, contentType, fileName);
         }
 
-        /// <summary>
-        /// Get details of an approved employee entry.
-        /// </summary>
-        [HttpGet("approved-employees/{approvalId}/details")]
-        public async Task<IActionResult> GetApprovedEmployeeDetails(int approvalId)
-        {
-            var result = await _deptHeadService.GetApprovedEmployeeDetailsAsync(approvalId);
+/// <summary>
+/// Get details of an approved employee entry.
+/// </summary>
+[HttpGet("approved-employees/{approvalId}/details")]
+public async Task<IActionResult> GetApprovedEmployeeDetails(int approvalId)
+{
+    // approvalId uniquely identifies the approval record and implicitly links to employee, project, and assessment.
+    // Hence, no additional IDs are required here to fetch the complete details.
+    var result = await _deptHeadService.GetApprovedEmployeeDetailsAsync(approvalId);
 
-            if (result.Success)
-                return Ok(new { success = true, data = result.Data });
+    if (result.Success)
+        return Ok(new { success = true, data = result.Data });
 
-            return NotFound(new
-            {
-                success = false,
-                message = ApiMessages.NotFound,
-                errors = result.Errors
-            });
-        }
+    return NotFound(new
+    {
+        success = false,
+        message = ApiMessages.NotFound,
+        errors = result.Errors
+    });
+}
 
         #region Helpers
 

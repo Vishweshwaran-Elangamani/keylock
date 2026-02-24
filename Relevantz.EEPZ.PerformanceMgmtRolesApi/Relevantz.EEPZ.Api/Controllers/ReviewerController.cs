@@ -20,6 +20,10 @@ namespace eepzbackend.Controllers
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// Retrieves all submitted forms assigned to a reviewer.
+        /// Supports pagination via query parameters.
+        /// </summary>
         [HttpGet("forms")]
         public async Task<IActionResult> GetSubmittedForms(
             int reviewerUserId,
@@ -31,6 +35,10 @@ namespace eepzbackend.Controllers
             return Ok(rows);
         }
 
+        /// <summary>
+        /// Retrieves all ratings submitted by a reviewer.
+        /// Supports pagination via query parameters.
+        /// </summary>
         [HttpGet("submitted-ratings")]
         public async Task<IActionResult> GetReviewerSubmittedRatings(
             int reviewerUserId,
@@ -42,6 +50,10 @@ namespace eepzbackend.Controllers
             return Ok(rows);
         }
 
+        /// <summary>
+        /// Retrieves a specific assessment for a reviewer by assessment ID.
+        /// Returns 404 if the assessment is not found.
+        /// </summary>
         [HttpGet("assessment/{assessmentId:int}")]
         public async Task<IActionResult> GetAssessment(int reviewerUserId, int assessmentId)
         {
@@ -51,6 +63,10 @@ namespace eepzbackend.Controllers
             return Ok(dto);
         }
 
+        /// <summary>
+        /// Retrieves all assessments with detailed information for a reviewer.
+        /// Supports pagination via query parameters.
+        /// </summary>
         [HttpGet("assessments")]
         public async Task<IActionResult> GetAllAssessmentsWithDetails(
             int reviewerUserId,
@@ -66,6 +82,11 @@ namespace eepzbackend.Controllers
             return Ok(list);
         }
 
+        /// <summary>
+        /// Submits reviews for a reviewer.
+        /// Requires a valid request body with review items.
+        /// Returns success message upon completion.
+        /// </summary>
         [HttpPost("reviews")]
         public async Task<IActionResult> PostReviewerReviews(
             int reviewerUserId,
@@ -79,6 +100,11 @@ namespace eepzbackend.Controllers
             return Ok(new { success = true, message = "Reviews submitted successfully" });
         }
 
+        /// <summary>
+        /// Records a decision (approve/reject/etc.) for a reviewer on a given assessment.
+        /// Accepts optional reviewer comments in the request body.
+        /// Returns success message if decision is recorded.
+        /// </summary>
         [HttpPost("decision")]
         public async Task<IActionResult> PostDecision(
             int reviewerUserId,
@@ -106,6 +132,10 @@ namespace eepzbackend.Controllers
             );
         }
 
+        /// <summary>
+        /// Retrieves all attachments associated with a given assessment.
+        /// Returns a list of attachment metadata.
+        /// </summary>
         [HttpGet("assessment/{assessmentId:int}/attachments")]
         public async Task<IActionResult> GetAssessmentAttachments(
             int approverUserId,
@@ -116,6 +146,10 @@ namespace eepzbackend.Controllers
             return Ok(new { success = true, data = attachments });
         }
 
+        /// <summary>
+        /// Downloads a specific attachment from GridFS by attachment ID.
+        /// Returns the file stream if found, otherwise returns appropriate error response.
+        /// </summary>
         [HttpGet("attachments/{attachmentId:int}/download")]
         public async Task<IActionResult> DownloadAttachment(int approverUserId, int attachmentId)
         {

@@ -15,6 +15,13 @@ using Microsoft.Extensions.Configuration;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
+    /// <summary>
+    /// ReviewerService provides business logic for handling reviewer-related operations.
+    /// It acts as a bridge between the repository layer and higher-level application logic.
+    /// - Fetch submitted forms, ratings, and assessments for reviewers.
+    /// - Retrieve assessment details and attachments.
+    /// - Save reviewer reviews and decisions.
+    /// </summary>
     public class ReviewerService : IReviewerService
     {
         private readonly IReviewerRepository _repository;
