@@ -30,6 +30,13 @@ namespace Relevantz.EEPZ.Api.Controllers
             _logger = logger;
         }
 
+
+        /// <summary>
+        /// fetch the reward type on manager 
+        /// </summary>
+        /// <returns></returns>
+        /// 
+
         [HttpGet("reward-types")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -40,32 +47,47 @@ namespace Relevantz.EEPZ.Api.Controllers
             return ToActionResult(res);
         }
 
-        [HttpGet("opportunities")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetOpportunities()
-        {
-            _logger.LogInformation("[GET_OPPORTUNITIES] Request received");
-            var res = await _managerNominationService.GetOpportunitiesAsync();
-            return ToActionResult(res);
-        }
 
-        [HttpGet("opportunities/{rewardTypeId:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetOpportunitiesByRewardType([FromRoute] int rewardTypeId)
-        {
-            if (rewardTypeId <= 0)
-            {
-                return BadRequest(new { success = false, message = "rewardTypeId must be greater than zero." });
-            }
+        /// <summary>
+        ///feth the opertunities 
+        /// </summary>
+        /// <returns></returns>
+        // [HttpGet("opportunities")]
+        // [ProducesResponseType(StatusCodes.Status200OK)]
+        // [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        // public async Task<IActionResult> GetOpportunities()
+        // {
+        //     _logger.LogInformation("[GET_OPPORTUNITIES] Request received");
+        //     var res = await _managerNominationService.GetOpportunitiesAsync();
+        //     return ToActionResult(res);
+        // }
+        /// <summary>
+        /// fetch oprtunity for that reward 
+        /// </summary>
+        /// <param name="rewardTypeId"></param>
+        /// <returns></returns>
+        // [HttpGet("opportunities/{rewardTypeId:int}")]
+        // [ProducesResponseType(StatusCodes.Status200OK)]
+        // [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        // [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        // public async Task<IActionResult> GetOpportunitiesByRewardType([FromRoute] int rewardTypeId)
+        // {
+        //     if (rewardTypeId <= 0)
+        //     {
+        //         return BadRequest(new { success = false, message = "rewardTypeId must be greater than zero." });
+        //     }
 
-            _logger.LogInformation("[GET_OPPORTUNITIES_BY_REWARD] Request received for RewardTypeId: {RewardTypeId}", rewardTypeId);
-            var res = await _managerNominationService.GetOpportunitiesByRewardTypeAsync(rewardTypeId);
-            return ToActionResult(res);
-        }
+        //     _logger.LogInformation("[GET_OPPORTUNITIES_BY_REWARD] Request received for RewardTypeId: {RewardTypeId}", rewardTypeId);
+        //     var res = await _managerNominationService.GetOpportunitiesByRewardTypeAsync(rewardTypeId);
+        //     return ToActionResult(res);
+        // }
 
+
+
+        ///<summary>
+        ///feteches the parameters for a reward type
+        ///</summary>
+        
         [HttpGet("parameters/{rewardTypeId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -81,7 +103,18 @@ namespace Relevantz.EEPZ.Api.Controllers
             var res = await _managerNominationService.GetNominationParametersAsync(rewardTypeId);
             return ToActionResult(res);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="managerId"></param>
+        /// <returns></returns>
 
+
+        /// <summary>
+        /// get the tem member of the manager 
+        /// </summary>
+        /// <param name="managerId"></param>
+        /// <returns></returns>
         [HttpGet("team/{managerId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -97,7 +130,11 @@ namespace Relevantz.EEPZ.Api.Controllers
             var res = await _managerNominationService.GetTeamMembersAsync(managerId);
             return ToActionResult(res);
         }
-
+        /// <summary>
+        /// nominate the employee 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost("submit")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -114,7 +151,11 @@ namespace Relevantz.EEPZ.Api.Controllers
             var res = await _managerNominationService.SubmitNominationAsync(request);
             return ToActionResult(res);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="employeeId"></param>
+        /// <returns></returns>
         [HttpGet("employee-nominations/{employeeId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -130,7 +171,11 @@ namespace Relevantz.EEPZ.Api.Controllers
             var res = await _managerNominationService.GetEmployeeNominationsAsync(employeeId);
             return ToActionResult(res);
         }
-
+        /// <summary>
+        /// view all nominations 
+        /// </summary>
+        /// <param name="managerId"></param>
+        /// <returns></returns>
         [HttpGet("my-nominations/{managerId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -146,7 +191,11 @@ namespace Relevantz.EEPZ.Api.Controllers
             var res = await _managerNominationService.GetMyNominationsAsync(managerId);
             return ToActionResult(res);
         }
-
+        /// <summary>
+        /// view detailed justfication and comment after manager submited 
+        /// </summary>
+        /// <param name="nominationId"></param>
+        /// <returns></returns>
         [HttpGet("nomination-details/{nominationId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -162,7 +211,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             var res = await _managerNominationService.GetNominationDetailsAsync(nominationId);
             return ToActionResult(res);
         }
-
+       
         private IActionResult ToActionResult(object response)
         {
             if (response == null)

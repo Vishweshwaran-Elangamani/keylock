@@ -26,6 +26,12 @@ namespace Relevantz.EEPZ.Api.Controllers
             _logger = logger;
         }
 
+
+
+        /// <summary>
+        /// Provides the list of employees along with their reward details approved by HR 
+        /// </summary>
+        /// 
         [HttpGet("depthead/{deptHeadEmployeeId:int}/approved-nominations")]
         public async Task<IActionResult> GetApprovedNominationsByDeptHead(
             [FromRoute][Range(1, int.MaxValue)] int deptHeadEmployeeId)
@@ -48,7 +54,11 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "Internal server error." });
             }
         }
-
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="nominationId"></param>
+    /// <returns></returns>
         [HttpGet("nomination-details/{nominationId:int}")]
         public async Task<IActionResult> GetNominationDetails(
             [FromRoute][Range(1, int.MaxValue)] int nominationId)
@@ -68,7 +78,11 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "Internal server error." });
             }
         }
-
+/// <summary>
+/// Endpoint is used to list the reward count (card like details)
+/// </summary>
+/// <param name="deptHeadEmployeeId"></param>
+/// <returns></returns>
         [HttpGet("depthead/{deptHeadEmployeeId:int}/statistics")]
         public async Task<IActionResult> GetDepartmentStatistics(
             [FromRoute][Range(1, int.MaxValue)] int deptHeadEmployeeId)

@@ -32,7 +32,7 @@ namespace Relevantz.EEPZ.API.Controllers
         }
 
         /// <summary>
-        /// Searches nomination notifications for the given employee.
+    /// fetch the reward recognized for the particular employee .
         /// </summary>
         /// <param name="query">Query parameters.</param>
         /// <param name="cancellationToken">Cancellation token for the request.</param>

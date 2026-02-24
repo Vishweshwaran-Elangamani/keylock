@@ -24,6 +24,16 @@ namespace Relevantz.EEPZ.Api.Controllers
             _service = service;
             _logger = logger;
         }
+        /// <summary>
+        /// List all the nominations sent by manager
+        /// </summary>
+        /// <param name="search"></param>
+        /// <param name="status"></param>
+        /// <param name="sortBy"></param>
+        /// <param name="sortDirection"></param>
+        /// <param name="page"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
 
         // GET api/HRNomination/hr/manager-nominations
         [HttpGet("hr/manager-nominations")]
@@ -80,6 +90,12 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// fetches employee data for a particular nomination ID 
+        /// </summary>
+        /// <param name="nominationId"></param>
+        /// <returns></returns>
+
         // GET api/HRNomination/nomination-details/{nominationId}
         [HttpGet("nomination-details/{nominationId}")]
         public async Task<IActionResult> GetNominationDetails(int nominationId)
@@ -94,6 +110,12 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(result);
         }
 
+
+        /// <summary>
+        /// used to approve the nomination 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         // POST api/HRNomination/hr/nominations/approve
         [HttpPost("hr/nominations/approve")]
         public async Task<IActionResult> ApproveNominations([FromBody] HRNominationApprovalDto dto)
@@ -108,6 +130,13 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(result);
         }
 
+
+
+        /// <summary>
+        /// used to reject the nomination 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         // POST api/HRNomination/hr/nominations/reject
         [HttpPost("hr/nominations/reject")]
         public async Task<IActionResult> RejectNominations([FromBody] HRNominationRejectDto dto)
@@ -122,6 +151,11 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(result);
         }
 
+
+        /// <summary>
+        /// fetch the list of approved nominations 
+        /// </summary>
+        /// <returns></returns>
         // GET api/HRNomination/approved-profiles
         [HttpGet("approved-profiles")]
         public async Task<IActionResult> GetApprovedProfiles()
@@ -130,6 +164,11 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(result);
         }
 
+
+        /// <summary>
+        /// fetches the rejected 
+        /// </summary>
+        /// <returns></returns>
         // GET api/HRNomination/rejected-profiles
         [HttpGet("rejected-profiles")]
         public async Task<IActionResult> GetRejectedProfiles()
@@ -138,6 +177,11 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(result);
         }
 
+
+        /// <summary>
+        /// display common dashboard card 
+        /// </summary>
+        /// <returns></returns>
         // GET api/HRNomination/statistics
         [HttpGet("statistics")]
         public async Task<IActionResult> GetStatistics()
@@ -146,6 +190,11 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// fetches the reward 
+        /// </summary>
+        /// <param name="activeOnly"></param>
+        /// <returns></returns>
         // GET api/HRNomination/reward-types
         [HttpGet("reward-types")]
         public async Task<IActionResult> GetAllRewardTypes([FromQuery] bool activeOnly = false)
@@ -154,6 +203,11 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// create the reward 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         // POST api/HRNomination/reward-types
         [HttpPost("reward-types")]
         public async Task<IActionResult> CreateRewardType([FromBody] CreateRewardTypeDto dto)
@@ -162,6 +216,13 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(result);
         }
 
+        
+        /// <summary>
+        /// updated rewards
+        /// </summary>
+        /// <param name="rewardTypeId"></param>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         // PUT api/HRNomination/reward-types/{rewardTypeId}
         [HttpPut("reward-types/{rewardTypeId}")]
         public async Task<IActionResult> UpdateRewardType(
@@ -178,6 +239,12 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(result);
         }
 
+
+        /// <summary>
+        /// fetched the paramether for the reward 
+        /// </summary>
+        /// <param name="rewardTypeId"></param>
+        /// <returns></returns>
         // GET api/HRNomination/reward-types/{rewardTypeId}/parameters
         [HttpGet("reward-types/{rewardTypeId}/parameters")]
         public async Task<IActionResult> GetParametersByRewardType(int rewardTypeId)
@@ -185,7 +252,11 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _service.GetParametersByRewardTypeAsync(rewardTypeId);
             return Ok(result);
         }
-
+        /// <summary>
+        /// create the parameter for the reward
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         // POST api/HRNomination/parameters
         [HttpPost("parameters")]
         public async Task<IActionResult> CreateParameter([FromBody] CreateParameterDto dto)
@@ -194,6 +265,14 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(result);
         }
 
+
+        
+        /// <summary>
+        /// update the parameter 
+        /// </summary>
+        /// <param name="parameterId"></param>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         // PUT api/HRNomination/parameters/{parameterId}
         [HttpPut("parameters/{parameterId}")]
         public async Task<IActionResult> UpdateParameter(
@@ -224,6 +303,11 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// delete the parameter forspecfic reward 
+        /// </summary>
+        /// <param name="parameterId"></param>
+        /// <returns></returns>
         // DELETE api/HRNomination/parameters/{parameterId}
         [HttpDelete("parameters/{parameterId}")]
         public async Task<IActionResult> DeleteParameter(int parameterId)
