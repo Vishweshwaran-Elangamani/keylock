@@ -21,7 +21,7 @@ import slaService, {
 } from "../../services/sla/slaService";
 import Breadcrumb from "../../components/sla/common/Breadcrumbs";
 import "../../styles/sla/components/SLADetails.css";
- 
+
 const getSLADashboardPath = (roleName) => {
   const routes = {
     Employee: "/employee/dashboard/sla",
@@ -32,7 +32,7 @@ const getSLADashboardPath = (roleName) => {
   };
   return routes[roleName] || "/employee/dashboard/sla";
 };
- 
+
 const SLADetails = () => {
   const { slaid } = useParams();
   const navigate = useNavigate();
@@ -50,7 +50,7 @@ const SLADetails = () => {
   const [escalationBlockReason, setEscalationBlockReason] = useState(null);
   const [user, setUser] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
- 
+
   useEffect(() => {
     try {
       const userData = JSON.parse(localStorage.getItem("user") || "{}");
@@ -60,14 +60,14 @@ const SLADetails = () => {
     }
     fetchSLADetails();
   }, [slaid]);
- 
+
   const fetchSLADetails = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const userData = JSON.parse(localStorage.getItem("user") || "{}");
       const slaResponse = await slaService.getSLAById(parseInt(slaid));
- 
+
       if (!slaResponse?.success || !slaResponse.data) {
         setError("SLA not found");
         setSla(null);
@@ -75,6 +75,7 @@ const SLADetails = () => {
         return;
       }
       setSla(slaResponse.data);
+
       try {
         const historyResponse = await slaService.getSLAHistory(parseInt(slaid));
         if (historyResponse?.success && Array.isArray(historyResponse.data)) {
@@ -86,7 +87,7 @@ const SLADetails = () => {
         console.warn("Could not load history:", err.message);
         setHistory([]);
       }
- 
+
       try {
         const escalationsResponse = await slaService.getSLAEscalations(
           parseInt(slaid)
@@ -114,23 +115,23 @@ const SLADetails = () => {
       setLoading(false);
     }
   }, [slaid]);
- 
+
+  // ✅ FIX 1 — canReopen now also checks reopenCount === 0
   const updateEscalationStatus = useCallback(
     (slaData, escalationsData, userData) => {
       if (!slaData || !userData) return;
- 
+
       const canEscalateL1 = escalationHelpers.canEscalateToL1(
         slaData,
         escalationsData
       );
- 
+
       const isEligibleRole =
         userData.roleName === "Employee" || userData.roleName === "Manager";
- 
+
       const canEsc = canEscalateL1 && isEligibleRole;
- 
       setCanEscalate(canEsc);
- 
+
       if (!canEsc) {
         const reason = escalationHelpers.getEscalationBlockReason(
           slaData,
@@ -141,12 +142,17 @@ const SLADetails = () => {
       } else {
         setEscalationBlockReason(null);
       }
+
+      // ✅ FIX 1 — Block reopen if already reopened once (reopenCount >= 1)
       setCanReopen(
-        userData.roleName === "Manager" && slaData.status === "Closed"
+        userData.roleName === "Manager" &&
+          slaData.status === "Closed" &&
+          (slaData.reopenCount ?? 0) === 0
       );
     },
     []
   );
+
   const handleEscalateClick = useCallback(() => {
     if (!canEscalate) {
       console.warn("Escalation blocked:", escalationBlockReason);
@@ -158,14 +164,13 @@ const SLADetails = () => {
     }
     setShowEscalationForm(true);
   }, [canEscalate, escalationBlockReason]);
- 
+
   const handleCloseSLA = useCallback(async () => {
     try {
       setRefreshing(true);
       setShowCloseConfirmation(false);
-     const res = await slaService.closeSLA(sla.slaid);
+      const res = await slaService.closeSLA(sla.slaid);
 
- 
       if (res?.success) {
         toast.success("SLA closed successfully");
         await fetchSLADetails();
@@ -180,17 +185,17 @@ const SLADetails = () => {
       setRefreshing(false);
     }
   }, [sla, user, fetchSLADetails]);
- 
+
   const handleReopenSuccess = useCallback(() => {
     setShowReopenForm(false);
     fetchSLADetails();
   }, [fetchSLADetails]);
- 
+
   const handleEscalationSuccess = useCallback(() => {
     setShowEscalationForm(false);
     fetchSLADetails();
   }, [fetchSLADetails]);
- 
+
   if (loading) {
     return (
       <div className="sla-details-loading-wrapper">
@@ -201,6 +206,7 @@ const SLADetails = () => {
       </div>
     );
   }
+
   if (error || !sla) {
     return (
       <div className="sla-details-error-wrapper">
@@ -214,35 +220,34 @@ const SLADetails = () => {
       </div>
     );
   }
- 
+
   const daysRemaining = dateHelpers.daysRemaining(sla.deadline);
   const hasEscalations = escalations.length > 0;
   const pendingEscalations = escalations.filter(
     (e) => e.escalationStatus === "Pending"
   ).length;
- 
- 
+
   const slaDashboardPath = user
     ? getSLADashboardPath(user.roleName)
     : "/dashboard/sla";
- 
+
   return (
     <div className="sla-details-container">
       <div className="sla-details-header">
- 
-  <Breadcrumb
-  items={[
-    {
-      label: "SLA Compliance",
-      onClick: () => navigate(-1),  
-    },
-    {
-      label: `${sla.slatype} - ${sla.employeeName}`,
-    },
-  ]}
-/>
- 
+        <Breadcrumb
+          items={[
+            {
+              label: "SLA Compliance",
+              onClick: () => navigate(-1),
+            },
+            {
+              label: `${sla.slatype} - ${sla.employeeName}`,
+            },
+          ]}
+        />
+
         <div className="sla-details-actions-wrapper">
+          {/* ── Escalate Button ─────────────────────────────────── */}
           {sla.status !== "Closed" &&
             (user?.roleName === "Employee" || user?.roleName === "Manager") &&
             (canEscalate ? (
@@ -263,17 +268,32 @@ const SLADetails = () => {
                 Escalated
               </button>
             ))}
- 
-          {canReopen && sla.status === "Closed" && (
-            <button
-              onClick={() => setShowReopenForm(true)}
-              className="sla-details-btn sla-details-btn-reopen"
-            >
-              <RotateCcw size={16} />
-              Reopen
-            </button>
+
+          {/* ── Reopen Button ────────────────────────────────────
+              ✅ FIX 3 — Show disabled "Cannot Reopen" when reopenCount >= 1
+          ─────────────────────────────────────────────────────── */}
+          {user?.roleName === "Manager" && sla.status === "Closed" && (
+            canReopen ? (
+              <button
+                onClick={() => setShowReopenForm(true)}
+                className="sla-details-btn sla-details-btn-reopen"
+              >
+                <RotateCcw size={16} />
+                Reopen
+              </button>
+            ) : (
+              <button
+                disabled
+                className="sla-details-btn sla-details-btn-disabled"
+                title="This SLA has already been reopened once and cannot be reopened again"
+              >
+                <RotateCcw size={16} />
+                Cannot Reopen
+              </button>
+            )
           )}
- 
+
+          {/* ── Close SLA Button ─────────────────────────────── */}
           {sla.status !== "Closed" && user?.roleName === "Manager" && (
             <button
               onClick={() => setShowCloseConfirmation(true)}
@@ -285,11 +305,13 @@ const SLADetails = () => {
           )}
         </div>
       </div>
- 
+
       <div className="sla-details-layout">
         <div className="sla-details-left">
           <div className="sla-details-card">
             <div className="sla-details-card-body">
+
+              {/* ── Status Header ──────────────────────────────── */}
               <div className="sla-details-status-header">
                 <div className="sla-details-icon-wrapper">
                   <FileText size={28} className="sla-details-icon-primary" />
@@ -317,7 +339,8 @@ const SLADetails = () => {
                   </div>
                 </div>
               </div>
- 
+
+              {/* ── Summary Grid ───────────────────────────────── */}
               <div className="sla-details-summary-section">
                 <h5 className="sla-details-summary-title">Status Summary</h5>
                 <div className="sla-details-summary-grid">
@@ -340,9 +363,7 @@ const SLADetails = () => {
                     </strong>
                   </div>
                   <div className="sla-details-summary-item">
-                    <small className="sla-details-label">
-                      Compliance Status
-                    </small>
+                    <small className="sla-details-label">Compliance Status</small>
                     <strong
                       className={`sla-details-value ${
                         sla.complianceStatus === "OnTime"
@@ -354,9 +375,7 @@ const SLADetails = () => {
                     </strong>
                   </div>
                   <div className="sla-details-summary-item">
-                    <small className="sla-details-label">
-                      Days Until Deadline
-                    </small>
+                    <small className="sla-details-label">Days Until Deadline</small>
                     <div
                       className={`sla-details-value ${
                         daysRemaining < 0
@@ -371,17 +390,13 @@ const SLADetails = () => {
                     </div>
                   </div>
                   <div className="sla-details-summary-item">
-                    <small className="sla-details-label">
-                      Total Escalations
-                    </small>
+                    <small className="sla-details-label">Total Escalations</small>
                     <div className="sla-details-value sla-details-text-primary">
                       {escalations.length}
                     </div>
                   </div>
                   <div className="sla-details-summary-item">
-                    <small className="sla-details-label">
-                      Pending Escalations
-                    </small>
+                    <small className="sla-details-label">Pending Escalations</small>
                     <div className="sla-details-value sla-details-text-warning">
                       {pendingEscalations}
                     </div>
@@ -400,9 +415,22 @@ const SLADetails = () => {
                       {sla.status}
                     </span>
                   </div>
+
+                  {/* ✅ NEW — Reopen Count indicator in summary grid */}
+                  {(sla.reopenCount ?? 0) > 0 && (
+                    <div className="sla-details-summary-item">
+                      <small className="sla-details-label">Reopen Count</small>
+                      <div className="sla-details-value sla-details-text-danger">
+                        {sla.reopenCount} / 1 used
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
- 
+
+              {/* ── Reopen Alert Block ─────────────────────────────
+                  ✅ FIX 4 — Show permanent close warning when exhausted
+              ─────────────────────────────────────────────────────── */}
               {sla.reopenedAt && (
                 <div className="sla-details-alert">
                   <RotateCcw size={20} className="sla-details-alert-icon" />
@@ -419,12 +447,30 @@ const SLADetails = () => {
                         </span>
                       )}
                     </small>
+
+                    {/* ✅ FIX 4 — Permanent close warning */}
+                    {(sla.reopenCount ?? 0) >= 1 &&
+                      sla.status === "Closed" && (
+                        <small
+                          className="sla-details-alert-text"
+                          style={{
+                            color: "#dc2626",
+                            marginTop: "6px",
+                            display: "block",
+                            fontWeight: "600",
+                          }}
+                        >
+                          ⚠️ No further reopens allowed. This SLA is
+                          permanently closed.
+                        </small>
+                      )}
                   </div>
                 </div>
               )}
             </div>
           </div>
- 
+
+          {/* ── Escalation Chain ──────────────────────────────── */}
           {hasEscalations && (
             <div className="sla-details-card">
               <div className="sla-details-card-body">
@@ -435,7 +481,7 @@ const SLADetails = () => {
                   />
                   Escalation Chain ({escalations.length})
                 </h5>
- 
+
                 {escalations.map((esc, idx) => (
                   <div
                     key={esc.escalationId}
@@ -479,8 +525,7 @@ const SLADetails = () => {
                       <div className="sla-details-escalation-row">
                         <div className="sla-details-escalation-col">
                           <small className="sla-details-label">
-                            {" "}
-                            Escalated By{" "}
+                            Escalated By
                           </small>
                           <strong className="sla-details-value">
                             {esc.submittedByName ||
@@ -522,7 +567,8 @@ const SLADetails = () => {
             </div>
           )}
         </div>
- 
+
+        {/* ── Right Panel — History Timeline ────────────────── */}
         <div className="sla-details-right">
           <div className="sla-details-card">
             <div className="sla-details-card-body">
@@ -542,7 +588,8 @@ const SLADetails = () => {
           </div>
         </div>
       </div>
- 
+
+      {/* ── Reopen Form Modal ─────────────────────────────────── */}
       {showReopenForm && (
         <ReopenSLAForm
           sla={sla}
@@ -550,7 +597,8 @@ const SLADetails = () => {
           onSuccess={handleReopenSuccess}
         />
       )}
- 
+
+      {/* ── Escalation Form Modal ─────────────────────────────── */}
       {showEscalationForm && (
         <EscalationForm
           sla={sla}
@@ -558,7 +606,8 @@ const SLADetails = () => {
           onSuccess={handleEscalationSuccess}
         />
       )}
- 
+
+      {/* ── Close Confirmation Modal ──────────────────────────── */}
       {showCloseConfirmation && (
         <>
           <div
@@ -578,7 +627,7 @@ const SLADetails = () => {
                   <X size={20} />
                 </button>
               </div>
- 
+
               <div className="sla-close-modal-body">
                 <div className="sla-close-modal-icon-wrapper">
                   <CheckCircle size={48} />
@@ -586,7 +635,7 @@ const SLADetails = () => {
                 <p className="sla-close-modal-description">
                   You're about to mark this SLA as completed and closed.
                 </p>
- 
+
                 <div className="sla-close-modal-info-box">
                   <div className="sla-close-modal-info-icon">
                     <Info size={18} />
@@ -595,14 +644,19 @@ const SLADetails = () => {
                     <p className="sla-close-modal-info-title">
                       What happens next?
                     </p>
+                    {/* ✅ FIX 2 — Correct reopen message based on reopenCount */}
                     <ul className="sla-close-modal-info-list">
                       <li>The SLA status will be changed to "Closed"</li>
                       <li>This action will be recorded in the SLA history</li>
-                      <li>You can reopen this SLA later if needed</li>
+                      <li>
+                        {(sla.reopenCount ?? 0) === 0
+                          ? "You can reopen this SLA later if needed (one extra day only)"
+                          : "⚠️ This SLA cannot be reopened again after closing"}
+                      </li>
                     </ul>
                   </div>
                 </div>
- 
+
                 <div className="sla-close-modal-summary">
                   <div className="sla-close-modal-summary-row">
                     <span className="sla-close-modal-summary-label">
@@ -628,9 +682,24 @@ const SLADetails = () => {
                       {sla.status}
                     </span>
                   </div>
+                  {/* ✅ NEW — Show reopen count in close modal summary */}
+                  <div className="sla-close-modal-summary-row">
+                    <span className="sla-close-modal-summary-label">
+                      Reopen Used:
+                    </span>
+                    <span
+                      className="sla-close-modal-summary-value"
+                      style={{
+                        color:
+                          (sla.reopenCount ?? 0) >= 1 ? "#dc2626" : "#16a34a",
+                      }}
+                    >
+                      {sla.reopenCount ?? 0} / 1
+                    </span>
+                  </div>
                 </div>
               </div>
- 
+
               <div className="sla-close-modal-actions">
                 <button
                   type="button"
@@ -666,7 +735,5 @@ const SLADetails = () => {
     </div>
   );
 };
- 
+
 export default SLADetails;
- 
- 
