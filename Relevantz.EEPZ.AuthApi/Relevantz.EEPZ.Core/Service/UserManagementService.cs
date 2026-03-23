@@ -61,13 +61,11 @@ public class UserManagementService : IUserManagementService
             ?? throw new KeyNotFoundException("Department not found.");
 
         var tempPassword = GenerateTemporaryPassword();
-
         string? keycloakId = null;
 
         try
         {
             // STEP 1: Create in Keycloak
-            // ✅ email, firstName, lastName all populated via fixed CreateUserAsync
             keycloakId = await _keycloak.CreateUserAsync(
                 request.Email,
                 request.FirstName,
@@ -123,17 +121,23 @@ public class UserManagementService : IUserManagementService
                 RoleId       = request.RoleId,
                 DepartmentId = request.DepartmentId
             };
-
             await _detailsRepo.CreateAsync(details);
 
-            // STEP 6: Push attributes to Keycloak using UUID ✅
-            // ✅ Uses keycloakId (UUID) directly — never fails due to blank email
+            // STEP 6: Push attributes to Keycloak via UUID ✅
             await _keycloak.SetUserAttributesAsync(keycloakId, new Dictionary<string, string>
             {
                 ["empId"]       = employee.EmployeeId.ToString(),
                 ["empMasterId"] = details.EmployeeMasterId.ToString(),
                 ["role"]        = role.RoleName
             });
+
+            // ✅ STEP 6b: Explicitly patch email + firstName + lastName
+            // Required — Keycloak silently ignores these fields on create in some versions
+            await _keycloak.UpdateUserProfileAsync(
+                keycloakId,
+                request.Email,
+                request.FirstName,
+                request.LastName);
 
             // STEP 7: Welcome email
             await _email.SendWelcomeEmailAsync(request.Email, request.FirstName, tempPassword);
