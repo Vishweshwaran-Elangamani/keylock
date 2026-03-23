@@ -14,7 +14,7 @@ const CLIENT_ID =
 
 const CLIENT_SECRET =
   import.meta.env.VITE_KEYCLOAK_CLIENT_SECRET ||
-  "nVKEcEhW5ppki0byRKiA1pk8vgB7ZRMb";
+  "CvbX4kQIOjnuCGADmJ2i0VPuDTWLTmQ5";
 
 // 🌐 Axios instance
 const api = axios.create({
