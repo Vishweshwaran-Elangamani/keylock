@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.Options;
-using Relevantz.EEPZ.Api.Middleware;
+using Relevantz.EEPZ.Api.Middleware;                   // ✅ fixes GlobalExceptionMiddleware
 using Relevantz.EEPZ.Common.Utils;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Core.Service;
@@ -17,7 +17,7 @@ using Serilog;
 using MongoDB.Driver;
 using MapsterMapper;
 
-// Alias to resolve ambiguity between MongoDB.Driver.ServerVersion and EF Core ServerVersion
+// ✅ Alias fixes CS0104 ambiguity between MongoDB.Driver.ServerVersion and EF Core
 using EFServerVersion = Microsoft.EntityFrameworkCore.ServerVersion;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,10 +40,10 @@ builder.Services.AddSwaggerGen(c =>
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "Enter JWT Bearer token",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.Http,
-        Scheme = "bearer"
+        Name        = "Authorization",
+        In          = ParameterLocation.Header,
+        Type        = SecuritySchemeType.Http,
+        Scheme      = "bearer"
     });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
@@ -53,7 +53,7 @@ builder.Services.AddSwaggerGen(c =>
                 Reference = new OpenApiReference
                 {
                     Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
+                    Id   = "Bearer"
                 }
             },
             Array.Empty<string>()
@@ -66,7 +66,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<EEPZDbContext>(options =>
     options.UseMySql(
         connectionString,
-        EFServerVersion.AutoDetect(connectionString),   // ✅ Alias fixes CS0104 ambiguity
+        EFServerVersion.AutoDetect(connectionString),  // ✅ alias used here
         mySqlOptions => mySqlOptions
             .EnableRetryOnFailure(
                 maxRetryCount: 3,
@@ -77,7 +77,6 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
 );
 
 // ── MongoDB ───────────────────────────────────────────────────────────────────
-// ✅ Standard Options pattern — fixes CS1061 (no custom extension needed)
 builder.Services.Configure<MongoDbSettings>(
     builder.Configuration.GetSection("MongoDbSettings"));
 
@@ -100,49 +99,49 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddMemoryCache();
 
 // ── Application Services ──────────────────────────────────────────────────────
-builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
-builder.Services.AddScoped<IUserManagementService, UserManagementService>();
-builder.Services.AddScoped<IChangeRequestService, ChangeRequestService>();
-builder.Services.AddScoped<IProfileService, ProfileService>();
-builder.Services.AddScoped<IDepartmentService, DepartmentService>();
-builder.Services.AddScoped<IRoleService, RoleService>();
-builder.Services.AddScoped<IEmailService, EmailService>();
-builder.Services.AddScoped<IBulkOperationService, BulkOperationService>();
-builder.Services.AddScoped<IExportService, ExportService>();
-builder.Services.AddScoped<ISuperAdminSeederService, SuperAdminSeederService>(); // ✅ Seeder
+builder.Services.AddScoped<ICurrentUserService,      CurrentUserService>();
+builder.Services.AddScoped<IUserManagementService,   UserManagementService>();
+builder.Services.AddScoped<IChangeRequestService,    ChangeRequestService>();
+builder.Services.AddScoped<IProfileService,          ProfileService>();
+builder.Services.AddScoped<IDepartmentService,       DepartmentService>();
+builder.Services.AddScoped<IRoleService,             RoleService>();
+builder.Services.AddScoped<IEmailService,            EmailService>();
+builder.Services.AddScoped<IBulkOperationService,    BulkOperationService>();
+builder.Services.AddScoped<IExportService,           ExportService>();
+builder.Services.AddScoped<ISuperAdminSeederService, SuperAdminSeederService>();
 
 // ── Keycloak Admin Service ────────────────────────────────────────────────────
 builder.Services.AddHttpClient<IKeycloakAdminService, KeycloakAdminService>();
 
 // ── Repositories ─────────────────────────────────────────────────────────────
-builder.Services.AddScoped<IUserAuthenticationRepository, UserAuthenticationRepository>();
-builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
-builder.Services.AddScoped<IProfileImageRepository, ProfileImageRepository>();
-builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
-builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IUserAuthenticationRepository,    UserAuthenticationRepository>();
+builder.Services.AddScoped<IEmployeeRepository,              EmployeeRepository>();
+builder.Services.AddScoped<IUserProfileRepository,           UserProfileRepository>();
+builder.Services.AddScoped<IProfileImageRepository,          ProfileImageRepository>();
+builder.Services.AddScoped<IDepartmentRepository,            DepartmentRepository>();
+builder.Services.AddScoped<IRoleRepository,                  RoleRepository>();
 builder.Services.AddScoped<IEmployeeDetailsMasterRepository, EmployeeDetailsMasterRepository>();
-builder.Services.AddScoped<IChangeRequestRepository, ChangeRequestRepository>();
-builder.Services.AddScoped<IBulkOperationLogRepository, BulkOperationLogRepository>();
-builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-builder.Services.AddScoped<ILoginAttemptRepository, LoginAttemptRepository>();
-builder.Services.AddScoped<IOtpRepository, OtpRepository>();
-builder.Services.AddScoped<IAddressRepository, AddressRepository>();
+builder.Services.AddScoped<IChangeRequestRepository,         ChangeRequestRepository>();
+builder.Services.AddScoped<IBulkOperationLogRepository,      BulkOperationLogRepository>();
+builder.Services.AddScoped<IRefreshTokenRepository,          RefreshTokenRepository>();
+builder.Services.AddScoped<ILoginAttemptRepository,          LoginAttemptRepository>();
+builder.Services.AddScoped<IOtpRepository,                   OtpRepository>();
+builder.Services.AddScoped<IAddressRepository,               AddressRepository>();
 
 // ── Keycloak JWT Authentication ───────────────────────────────────────────────
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.Authority = "http://host.docker.internal:9090/realms/eepz-realm";
+        options.Authority            = "http://host.docker.internal:9090/realms/eepz-realm";
         options.RequireHttpsMetadata = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = true,
-            ValidateAudience = false,
-            ValidateLifetime = true,
+            ValidateIssuer           = true,
+            ValidateAudience         = false,
+            ValidateLifetime         = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = "http://localhost:9090/realms/eepz-realm",
-            ClockSkew = TimeSpan.FromMinutes(5)
+            ValidIssuer              = "http://localhost:9090/realms/eepz-realm",
+            ClockSkew                = TimeSpan.FromMinutes(5)
         };
         options.Events = new JwtBearerEvents
         {
@@ -172,19 +171,18 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod());
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
 var app = builder.Build();
-// ─────────────────────────────────────────────────────────────────────────────
 
-// ── DB Migration + Super Admin Seed at Startup ────────────────────────────────
+// ── DB Ready + Keycloak Wait + Seed ──────────────────────────────────────────
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    var logger = services.GetRequiredService<ILogger<Program>>();
+    var logger   = services.GetRequiredService<ILogger<Program>>();
+    var config   = services.GetRequiredService<IConfiguration>();
 
+    // STEP 1 — Wait for MySQL
     var retries = 0;
     const int maxRetries = 10;
-
     while (retries < maxRetries)
     {
         try
@@ -192,10 +190,6 @@ using (var scope = app.Services.CreateScope())
             var db = services.GetRequiredService<EEPZDbContext>();
             await db.Database.EnsureCreatedAsync();
             logger.LogInformation("✅ Database schema ready.");
-
-            var seeder = services.GetRequiredService<ISuperAdminSeederService>();
-            await seeder.SeedAsync();
-            logger.LogInformation("✅ Super admin seeded.");
             break;
         }
         catch (Exception ex)
@@ -210,13 +204,57 @@ using (var scope = app.Services.CreateScope())
             await Task.Delay(TimeSpan.FromSeconds(5));
         }
     }
+
+    // STEP 2 — Wait for Keycloak (max 60s)
+    // ✅ Prevents seeder running before Keycloak realm is imported
+    var keycloakBaseUrl = config["Keycloak:BaseUrl"] ?? "http://host.docker.internal:9090";
+    var keycloakReady   = false;
+    using var httpClient = new HttpClient();
+    const int maxKeycloakAttempts = 12; // 12 × 5s = 60s
+
+    for (int i = 1; i <= maxKeycloakAttempts; i++)
+    {
+        try
+        {
+            var res = await httpClient.GetAsync(
+                $"{keycloakBaseUrl}/realms/eepz-realm/.well-known/openid-configuration");
+
+            if (res.IsSuccessStatusCode)
+            {
+                keycloakReady = true;
+                logger.LogInformation("✅ Keycloak is ready after {Attempt} attempt(s).", i);
+                break;
+            }
+        }
+        catch
+        {
+            // not ready yet — keep waiting
+        }
+
+        logger.LogWarning("⏳ Waiting for Keycloak... attempt {Attempt}/{Max}", i, maxKeycloakAttempts);
+        await Task.Delay(TimeSpan.FromSeconds(5));
+    }
+
+    // STEP 3 — Seed SuperAdmin
+    // ✅ If Keycloak not ready — skip seed, API still starts
+    // ✅ If already seeded — GUARD 1 skips instantly, UUID never changes
+    if (!keycloakReady)
+    {
+        logger.LogError("❌ Keycloak not reachable after 60s. Seeding skipped. Restart auth-api once Keycloak is up.");
+    }
+    else
+    {
+        var seeder = services.GetRequiredService<ISuperAdminSeederService>();
+        await seeder.SeedAsync();
+        logger.LogInformation("✅ Super admin seeded.");
+    }
 }
 
 // ── Middleware Pipeline ───────────────────────────────────────────────────────
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseMiddleware<GlobalExceptionMiddleware>(); // ✅ namespace resolved via using above
+app.UseMiddleware<GlobalExceptionMiddleware>(); // ✅ works — using added at top
 
 app.UseCors("AllowAll");
 

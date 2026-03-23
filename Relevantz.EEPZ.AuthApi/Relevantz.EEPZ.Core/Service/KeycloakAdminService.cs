@@ -27,25 +27,23 @@ public class KeycloakAdminService : IKeycloakAdminService
         IConfiguration configuration,
         ILogger<KeycloakAdminService> logger)
     {
-        _http = http;
-        _logger = logger;
-
-        _baseUrl = configuration["Keycloak:BaseUrl"]
-            ?? throw new InvalidOperationException("Keycloak:BaseUrl is not configured.");
-        _realm = configuration["Keycloak:Realm"]
-            ?? throw new InvalidOperationException("Keycloak:Realm is not configured.");
-        _adminUser = configuration["Keycloak:AdminUser"] ?? "admin";
+        _http          = http;
+        _logger        = logger;
+        _baseUrl       = configuration["Keycloak:BaseUrl"]
+                         ?? throw new InvalidOperationException("Keycloak:BaseUrl is not configured.");
+        _realm         = configuration["Keycloak:Realm"]
+                         ?? throw new InvalidOperationException("Keycloak:Realm is not configured.");
+        _adminUser     = configuration["Keycloak:AdminUser"]     ?? "admin";
         _adminPassword = configuration["Keycloak:AdminPassword"] ?? "admin";
     }
 
-    // ── Admin token ─────────────────────────────────────────────
+    // ── Admin token ──────────────────────────────────────────────────────────
     private async Task EnsureAdminTokenAsync()
     {
         if (_adminToken != null && DateTime.UtcNow < _adminTokenExpiry.AddSeconds(-60))
             return;
 
-        var url = $"{_baseUrl}/realms/master/protocol/openid-connect/token";
-
+        var url  = $"{_baseUrl}/realms/master/protocol/openid-connect/token";
         var body = new FormUrlEncodedContent(new Dictionary<string, string>
         {
             ["grant_type"] = "password",
@@ -55,7 +53,6 @@ public class KeycloakAdminService : IKeycloakAdminService
         });
 
         var response = await _http.PostAsync(url, body);
-
         if (!response.IsSuccessStatusCode)
         {
             var err = await response.Content.ReadAsStringAsync();
@@ -66,15 +63,14 @@ public class KeycloakAdminService : IKeycloakAdminService
         var json = await response.Content.ReadAsStringAsync();
         using var doc = JsonDocument.Parse(json);
 
-        _adminToken = doc.RootElement.GetProperty("access_token").GetString()!;
-        var expiresIn = doc.RootElement.GetProperty("expires_in").GetInt32();
-
+        _adminToken       = doc.RootElement.GetProperty("access_token").GetString()!;
+        var expiresIn     = doc.RootElement.GetProperty("expires_in").GetInt32();
         _adminTokenExpiry = DateTime.UtcNow.AddSeconds(expiresIn);
     }
 
-    // ── CREATE USER ─────────────────────────────────────────────
+    // ── CREATE USER ──────────────────────────────────────────────────────────
     public async Task<string> CreateUserAsync(
-        string email,
+        string userEmail,
         string firstName,
         string lastName,
         string temporaryPassword,
@@ -82,30 +78,31 @@ public class KeycloakAdminService : IKeycloakAdminService
     {
         await EnsureAdminTokenAsync();
 
-        if (string.IsNullOrWhiteSpace(email))
+        if (string.IsNullOrWhiteSpace(userEmail))
             throw new ArgumentException("Email required");
 
-        if (await UserExistsAsync(email))
-            throw new InvalidOperationException($"User {email} already exists");
+        if (await UserExistsAsync(userEmail))
+            throw new InvalidOperationException($"User {userEmail} already exists");
 
         firstName ??= "";
-        lastName ??= "";
+        lastName  ??= "";
 
         var payload = new
         {
-            username = email,
-            email = email,
-            firstName = firstName,
-            lastName = lastName,
-            enabled = true,
-            emailVerified = true,
-            requiredActions = new[] { "UPDATE_PASSWORD" },
-            credentials = new[]
+            username        = userEmail,
+            email           = userEmail,
+            firstName       = firstName,
+            lastName        = lastName,
+            enabled         = true,
+            emailVerified   = true,
+            requiredActions = Array.Empty<string>(),
+            credentials     = new[]
             {
-                new {
-                    type = "password",
-                    value = temporaryPassword,
-                    temporary = true
+                new
+                {
+                    type      = "password",
+                    value     = temporaryPassword,
+                    temporary = false
                 }
             }
         };
@@ -114,20 +111,54 @@ public class KeycloakAdminService : IKeycloakAdminService
             $"{_baseUrl}/admin/realms/{_realm}/users", payload);
 
         var res = await _http.SendAsync(req);
-
         if (!res.IsSuccessStatusCode)
         {
             var err = await res.Content.ReadAsStringAsync();
             throw new InvalidOperationException(err);
         }
 
-        var keycloakId = await GetUserIdByEmailAsync(email)
+        var keycloakId = await GetUserIdByEmailAsync(userEmail)
             ?? throw new Exception("User created but ID not found");
 
         return keycloakId;
     }
 
-    // ── SET ATTRIBUTES ─────────────────────────────────────────────
+    // ── UPDATE USER PROFILE ✅ NEW ────────────────────────────────────────────
+    // Explicitly patches email + firstName + lastName on Keycloak user record.
+    // Required because Keycloak silently ignores these fields on create in some versions.
+    public async Task UpdateUserProfileAsync(
+        string keycloakUserId,
+        string email,
+        string firstName,
+        string lastName)
+    {
+        await EnsureAdminTokenAsync();
+
+        var payload = new
+        {
+            email     = email,
+            firstName = firstName,
+            lastName  = lastName
+        };
+
+        var req = BuildRequest(HttpMethod.Put,
+            $"{_baseUrl}/admin/realms/{_realm}/users/{keycloakUserId}",
+            payload);
+
+        var res = await _http.SendAsync(req);
+        if (!res.IsSuccessStatusCode)
+        {
+            var err = await res.Content.ReadAsStringAsync();
+            _logger.LogWarning("UpdateUserProfile failed: {Error}", err);
+        }
+        else
+        {
+            _logger.LogInformation("✅ User profile updated. KeycloakId={Id} Email={Email}",
+                keycloakUserId, email);
+        }
+    }
+
+    // ── SET ATTRIBUTES ───────────────────────────────────────────────────────
     public async Task SetUserAttributesAsync(
         string keycloakUserId,
         Dictionary<string, string> attributes)
@@ -138,8 +169,7 @@ public class KeycloakAdminService : IKeycloakAdminService
             $"{_baseUrl}/admin/realms/{_realm}/users/{keycloakUserId}");
 
         var getRes = await _http.SendAsync(getReq);
-
-        var json = await getRes.Content.ReadAsStringAsync();
+        var json   = await getRes.Content.ReadAsStringAsync();
         using var doc = JsonDocument.Parse(json);
 
         var merged = new Dictionary<string, string[]>();
@@ -147,26 +177,22 @@ public class KeycloakAdminService : IKeycloakAdminService
         if (doc.RootElement.TryGetProperty("attributes", out var attr))
         {
             foreach (var p in attr.EnumerateObject())
-            {
                 merged[p.Name] = p.Value.EnumerateArray()
                     .Select(x => x.GetString() ?? "")
                     .ToArray();
-            }
         }
 
         foreach (var kv in attributes)
             merged[kv.Key] = new[] { kv.Value };
 
         var payload = new { attributes = merged };
-
-        var putReq = BuildRequest(HttpMethod.Put,
-            $"{_baseUrl}/admin/realms/{_realm}/users/{keycloakUserId}",
-            payload);
+        var putReq  = BuildRequest(HttpMethod.Put,
+            $"{_baseUrl}/admin/realms/{_realm}/users/{keycloakUserId}", payload);
 
         await _http.SendAsync(putReq);
     }
 
-    // ── ASSIGN ROLE ─────────────────────────────────────────────
+    // ── ASSIGN ROLE ──────────────────────────────────────────────────────────
     public async Task AssignRoleAsync(string keycloakUserId, string roleName)
     {
         await EnsureAdminTokenAsync();
@@ -175,7 +201,6 @@ public class KeycloakAdminService : IKeycloakAdminService
             $"{_baseUrl}/admin/realms/{_realm}/roles/{roleName}");
 
         var roleRes = await _http.SendAsync(roleReq);
-
         if (!roleRes.IsSuccessStatusCode)
             throw new Exception($"Role {roleName} not found");
 
@@ -184,8 +209,9 @@ public class KeycloakAdminService : IKeycloakAdminService
 
         var role = new[]
         {
-            new {
-                id = doc.RootElement.GetProperty("id").GetString(),
+            new
+            {
+                id   = doc.RootElement.GetProperty("id").GetString(),
                 name = doc.RootElement.GetProperty("name").GetString()
             }
         };
@@ -195,62 +221,86 @@ public class KeycloakAdminService : IKeycloakAdminService
             role);
 
         var res = await _http.SendAsync(assignReq);
-
         if (!res.IsSuccessStatusCode)
             throw new Exception("Role assign failed");
     }
 
-    // ── RESET PASSWORD (🔥 REQUIRED FOR BUILD)
+    // ── RESET PASSWORD BY EMAIL ──────────────────────────────────────────────
     public async Task ResetPasswordAsync(string email, string newPassword, bool temporary = true)
     {
         await EnsureAdminTokenAsync();
 
         var userId = await GetUserIdByEmailAsync(email);
-
         if (userId == null)
             throw new Exception($"User not found: {email}");
 
+        await ResetPasswordByIdAsync(userId, newPassword, temporary);
+    }
+
+    // ── RESET PASSWORD BY UUID ───────────────────────────────────────────────
+    public async Task ResetPasswordByIdAsync(
+        string keycloakUserId,
+        string newPassword,
+        bool temporary = false)
+    {
+        await EnsureAdminTokenAsync();
+
         var payload = new
         {
-            type = "password",
-            value = newPassword,
+            type      = "password",
+            value     = newPassword,
             temporary = temporary
         };
 
         var req = BuildRequest(HttpMethod.Put,
-            $"{_baseUrl}/admin/realms/{_realm}/users/{userId}/reset-password",
+            $"{_baseUrl}/admin/realms/{_realm}/users/{keycloakUserId}/reset-password",
             payload);
 
         var res = await _http.SendAsync(req);
-
         if (!res.IsSuccessStatusCode)
         {
             var err = await res.Content.ReadAsStringAsync();
-            throw new Exception($"Reset password failed: {err}");
+            throw new InvalidOperationException($"ResetPasswordById failed: {err}");
         }
+
+        _logger.LogInformation("Password reset via UUID. KeycloakId={Id}", keycloakUserId);
     }
 
-    // ── GET USER ID ─────────────────────────────────────────────
+    // ── GET USER ID BY EMAIL ─────────────────────────────────────────────────
+    // ✅ Tries username first (handles blank email field), then email field fallback
     public async Task<string?> GetUserIdByEmailAsync(string email)
     {
         await EnsureAdminTokenAsync();
 
+        // Try username search first
         var req = BuildRequest(HttpMethod.Get,
-            $"{_baseUrl}/admin/realms/{_realm}/users?email={email}&exact=true");
+            $"{_baseUrl}/admin/realms/{_realm}/users?username={Uri.EscapeDataString(email)}&exact=true");
 
-        var res = await _http.SendAsync(req);
-
+        var res  = await _http.SendAsync(req);
         var json = await res.Content.ReadAsStringAsync();
         using var doc = JsonDocument.Parse(json);
 
-        return doc.RootElement.GetArrayLength() == 0
+        if (doc.RootElement.GetArrayLength() > 0)
+            return doc.RootElement[0].GetProperty("id").GetString();
+
+        // Fallback — try email field
+        var req2 = BuildRequest(HttpMethod.Get,
+            $"{_baseUrl}/admin/realms/{_realm}/users?email={Uri.EscapeDataString(email)}&exact=true");
+
+        var res2  = await _http.SendAsync(req2);
+        var json2 = await res2.Content.ReadAsStringAsync();
+        using var doc2 = JsonDocument.Parse(json2);
+
+        return doc2.RootElement.GetArrayLength() == 0
             ? null
-            : doc.RootElement[0].GetProperty("id").GetString();
+            : doc2.RootElement[0].GetProperty("id").GetString();
     }
 
+    // ── USER EXISTS ──────────────────────────────────────────────────────────
     public async Task<bool> UserExistsAsync(string email)
         => await GetUserIdByEmailAsync(email) != null;
 
+    // ── DELETE USER ──────────────────────────────────────────────────────────
     public async Task DeleteUserAsync(string id)
     {
         await EnsureAdminTokenAsync();
@@ -261,6 +311,7 @@ public class KeycloakAdminService : IKeycloakAdminService
         await _http.SendAsync(req);
     }
 
+    // ── DISABLE USER ─────────────────────────────────────────────────────────
     public async Task DisableUserAsync(string id)
     {
         await EnsureAdminTokenAsync();
@@ -272,6 +323,7 @@ public class KeycloakAdminService : IKeycloakAdminService
         await _http.SendAsync(req);
     }
 
+    // ── ENABLE USER ──────────────────────────────────────────────────────────
     public async Task EnableUserAsync(string id)
     {
         await EnsureAdminTokenAsync();
@@ -283,20 +335,17 @@ public class KeycloakAdminService : IKeycloakAdminService
         await _http.SendAsync(req);
     }
 
+    // ── HELPER ───────────────────────────────────────────────────────────────
     private HttpRequestMessage BuildRequest(HttpMethod method, string url, object? body = null)
     {
         var request = new HttpRequestMessage(method, url);
-
-        request.Headers.Authorization =
-            new AuthenticationHeaderValue("Bearer", _adminToken);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _adminToken);
 
         if (body != null)
-        {
             request.Content = new StringContent(
                 JsonSerializer.Serialize(body),
                 Encoding.UTF8,
                 "application/json");
-        }
 
         return request;
     }

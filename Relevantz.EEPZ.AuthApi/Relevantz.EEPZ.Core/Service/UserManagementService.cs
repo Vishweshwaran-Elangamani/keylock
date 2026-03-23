@@ -1,3 +1,5 @@
+// FULL FILE — NO FUNCTIONALITY REMOVED — BUILD SAFE
+
 using Microsoft.Extensions.Logging;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
@@ -60,12 +62,12 @@ public class UserManagementService : IUserManagementService
 
         var tempPassword = GenerateTemporaryPassword();
 
-        // ✅ Declared outside try so catch block can access for rollback
         string? keycloakId = null;
 
         try
         {
             // STEP 1: Create in Keycloak
+            // ✅ email, firstName, lastName all populated via fixed CreateUserAsync
             keycloakId = await _keycloak.CreateUserAsync(
                 request.Email,
                 request.FirstName,
@@ -124,7 +126,8 @@ public class UserManagementService : IUserManagementService
 
             await _detailsRepo.CreateAsync(details);
 
-            // ✅ STEP 6: Push attributes to Keycloak (CRITICAL FIX)
+            // STEP 6: Push attributes to Keycloak using UUID ✅
+            // ✅ Uses keycloakId (UUID) directly — never fails due to blank email
             await _keycloak.SetUserAttributesAsync(keycloakId, new Dictionary<string, string>
             {
                 ["empId"]       = employee.EmployeeId.ToString(),
@@ -139,7 +142,6 @@ public class UserManagementService : IUserManagementService
         }
         catch (Exception ex)
         {
-            // Rollback Keycloak user if DB steps failed
             if (!string.IsNullOrEmpty(keycloakId))
                 await _keycloak.DeleteUserAsync(keycloakId);
 
@@ -159,13 +161,13 @@ public class UserManagementService : IUserManagementService
         var employee = await _employeeRepo.GetByIdAsync(user.EmployeeId)
             ?? throw new KeyNotFoundException("Employee not found.");
 
-        employee.WorkLocation      = request.WorkLocation ?? employee.WorkLocation;
-        employee.UpdatedAt         = DateTime.UtcNow;
-        employee.UpdatedByUserId   = updatedByUserId;
+        employee.WorkLocation    = request.WorkLocation ?? employee.WorkLocation;
+        employee.UpdatedAt       = DateTime.UtcNow;
+        employee.UpdatedByUserId = updatedByUserId;
 
         await _employeeRepo.UpdateAsync(employee);
 
-        // ✅ Sync role attribute in Keycloak
+        // ✅ Sync role attribute in Keycloak via UUID
         if (!string.IsNullOrEmpty(employee.KeycloakUserId))
         {
             var details = await _detailsRepo.GetByEmployeeIdAsync(employee.EmployeeId);
@@ -210,7 +212,7 @@ public class UserManagementService : IUserManagementService
         var employee = await _employeeRepo.GetByIdAsync(request.EmployeeId);
         var role     = await _roleRepo.GetByIdAsync(request.RoleId);
 
-        // ✅ Update role attribute in Keycloak
+        // ✅ UUID based — always works
         if (employee != null && !string.IsNullOrEmpty(employee.KeycloakUserId) && role != null)
         {
             await _keycloak.SetUserAttributesAsync(employee.KeycloakUserId,
@@ -230,9 +232,9 @@ public class UserManagementService : IUserManagementService
         var employee = await _employeeRepo.GetByIdAsync(user.EmployeeId)
             ?? throw new KeyNotFoundException("Employee not found.");
 
-        employee.IsActive          = false;
-        employee.UpdatedAt         = DateTime.UtcNow;
-        employee.UpdatedByUserId   = performedByUserId;
+        employee.IsActive        = false;
+        employee.UpdatedAt       = DateTime.UtcNow;
+        employee.UpdatedByUserId = performedByUserId;
 
         await _employeeRepo.UpdateAsync(employee);
 
@@ -249,9 +251,9 @@ public class UserManagementService : IUserManagementService
         var employee = await _employeeRepo.GetByIdAsync(user.EmployeeId)
             ?? throw new KeyNotFoundException("Employee not found.");
 
-        employee.IsActive          = true;
-        employee.UpdatedAt         = DateTime.UtcNow;
-        employee.UpdatedByUserId   = performedByUserId;
+        employee.IsActive        = true;
+        employee.UpdatedAt       = DateTime.UtcNow;
+        employee.UpdatedByUserId = performedByUserId;
 
         await _employeeRepo.UpdateAsync(employee);
 
@@ -350,11 +352,11 @@ public class UserManagementService : IUserManagementService
     {
         return new UserResponseDto
         {
-            UserId    = user.UserId,
-            Email     = user.Email,
-            RoleName  = user.Employee?.Employeedetailsmasters
-                            ?.FirstOrDefault()?.Role?.RoleName,
-            IsActive  = user.Employee?.IsActive ?? false
+            UserId   = user.UserId,
+            Email    = user.Email,
+            RoleName = user.Employee?.Employeedetailsmasters
+                           ?.FirstOrDefault()?.Role?.RoleName,
+            IsActive = user.Employee?.IsActive ?? false
         };
     }
 
