@@ -1,9 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+
 namespace Relevantz.EEPZ.Common.Entities;
+
 public partial class Employee
 {
     public int EmployeeId { get; set; }
+
+    // ✅ ADD THIS LINE - Keycloak User ID
+    public string? KeycloakUserId { get; set; }
+
     public string EmployeeCompanyId { get; set; } = null!;
     public string EmploymentType { get; set; } = null!;
     public string EmploymentStatus { get; set; } = null!;
@@ -19,6 +25,7 @@ public partial class Employee
     public DateTime? UpdatedAt { get; set; }
     public int? CreatedByUserId { get; set; }
     public int? UpdatedByUserId { get; set; }
+
     public virtual ICollection<Address> Addresses { get; set; } = new List<Address>();
     public virtual ICollection<Changerequest> Changerequests { get; set; } = new List<Changerequest>();
     public virtual ICollection<Department> Departments { get; set; } = new List<Department>();
@@ -76,4 +83,6 @@ public partial class Employee
     public virtual ICollection<Slareviewtracking> SlareviewtrackingReviewers { get; set; } = new List<Slareviewtracking>();
     public virtual Userauthentication? Userauthentication { get; set; }
     public virtual Userprofile? Userprofile { get; set; }
+     
+
 }

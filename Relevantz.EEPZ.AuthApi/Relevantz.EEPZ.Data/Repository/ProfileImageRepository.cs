@@ -10,15 +10,21 @@ namespace Relevantz.EEPZ.Data.Repository
     {
         private readonly IMongoCollection<ProfileImageDocument> _profileImagesCollection;
 
-        public ProfileImageRepository(IOptions<MongoDbSettings> mongoDbSettings)
+        public ProfileImageRepository(
+            IMongoClient mongoClient,
+            IOptions<MongoDbSettings> mongoDbSettings)
         {
-            var mongoClient = new MongoClient(mongoDbSettings.Value.ConnectionString);
-            var mongoDatabase = mongoClient.GetDatabase(mongoDbSettings.Value.DatabaseName);
+            var config = mongoDbSettings?.Value;
 
-            _profileImagesCollection = mongoDatabase.GetCollection<ProfileImageDocument>(
-                mongoDbSettings.Value.ProfileImagesCollectionName);
+            if (config == null || string.IsNullOrEmpty(config.ConnectionString))
+                throw new Exception("MongoDbSettings not configured properly");
 
-            // Create unique index on EmployeeId for faster lookups and prevent duplicates
+            var database = mongoClient.GetDatabase(config.DatabaseName);
+
+            _profileImagesCollection = database.GetCollection<ProfileImageDocument>(
+                config.ProfileImagesCollectionName ?? "ProfileImages");
+
+            // Create unique index
             CreateIndexes();
 
             EEPZBusinessLog.Information("MongoDB ProfileImageRepository initialized successfully");
@@ -31,9 +37,11 @@ namespace Relevantz.EEPZ.Data.Repository
                 .Ascending(x => x.EmployeeId);
 
             var indexOptions = new CreateIndexOptions { Unique = true };
-            var indexModel = new CreateIndexModel<ProfileImageDocument>(indexKeysDefinition, indexOptions);
 
-            // If index already exists, MongoDB will ignore it
+            var indexModel = new CreateIndexModel<ProfileImageDocument>(
+                indexKeysDefinition,
+                indexOptions);
+
             _profileImagesCollection.Indexes.CreateOne(indexModel);
         }
 
@@ -68,7 +76,7 @@ namespace Relevantz.EEPZ.Data.Repository
             await _profileImagesCollection.InsertOneAsync(profileImage);
 
             EEPZBusinessLog.Information(
-                $"Profile image uploaded to MongoDB for EmployeeId: {employeeId}, DocumentId: {profileImage.Id}");
+                $"Profile image uploaded for EmployeeId: {employeeId}, DocumentId: {profileImage.Id}");
 
             return profileImage.Id;
         }
@@ -86,7 +94,7 @@ namespace Relevantz.EEPZ.Data.Repository
             if (result != null)
             {
                 EEPZBusinessLog.Information(
-                    $"Profile image retrieved from MongoDB for EmployeeId: {employeeId}");
+                    $"Profile image retrieved for EmployeeId: {employeeId}");
             }
 
             return result;
@@ -103,7 +111,7 @@ namespace Relevantz.EEPZ.Data.Repository
             if (result.DeletedCount > 0)
             {
                 EEPZBusinessLog.Information(
-                    $"Profile image deleted from MongoDB for EmployeeId: {employeeId}");
+                    $"Profile image deleted for EmployeeId: {employeeId}");
                 return true;
             }
 

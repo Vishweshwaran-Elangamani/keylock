@@ -1,319 +1,385 @@
-using Relevantz.EEPZ.Common.Entities;
-using Relevantz.EEPZ.Data.IRepository;
-using Relevantz.EEPZ.Core.IService;
-using Relevantz.EEPZ.Common.Utils;
+using Microsoft.Extensions.Logging;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
-using Relevantz.EEPZ.Common.Constants;
-using MapsterMapper;
+using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Core.IService;
+using Relevantz.EEPZ.Data.IRepository;
 
-namespace Relevantz.EEPZ.Core.Service
+namespace Relevantz.EEPZ.Core.Service;
+
+public class UserManagementService : IUserManagementService
 {
-    public class UserManagementService : IUserManagementService
+    private readonly IUserAuthenticationRepository    _userAuthRepo;
+    private readonly IEmployeeRepository              _employeeRepo;
+    private readonly IUserProfileRepository           _profileRepo;
+    private readonly IEmployeeDetailsMasterRepository _detailsRepo;
+    private readonly IRoleRepository                  _roleRepo;
+    private readonly IDepartmentRepository            _deptRepo;
+    private readonly IKeycloakAdminService            _keycloak;
+    private readonly IEmailService                    _email;
+    private readonly ILogger<UserManagementService>   _logger;
+
+    public UserManagementService(
+        IUserAuthenticationRepository    userAuthRepo,
+        IEmployeeRepository              employeeRepo,
+        IUserProfileRepository           profileRepo,
+        IEmployeeDetailsMasterRepository detailsRepo,
+        IRoleRepository                  roleRepo,
+        IDepartmentRepository            deptRepo,
+        IKeycloakAdminService            keycloak,
+        IEmailService                    email,
+        ILogger<UserManagementService>   logger)
     {
-        private readonly IUserAuthenticationRepository _userAuthRepository;
-        private readonly IEmployeeRepository _employeeRepository;
-        private readonly IUserProfileRepository _userProfileRepository;
-        private readonly IEmployeeDetailsMasterRepository _employeeDetailsRepository;
-        private readonly IRoleRepository _roleRepository;
-        private readonly IDepartmentRepository _departmentRepository;
-        private readonly IPasswordService _passwordService;
-        private readonly IEmailService _emailService;
-        private readonly IMapper _mapper;
+        _userAuthRepo = userAuthRepo;
+        _employeeRepo = employeeRepo;
+        _profileRepo  = profileRepo;
+        _detailsRepo  = detailsRepo;
+        _roleRepo     = roleRepo;
+        _deptRepo     = deptRepo;
+        _keycloak     = keycloak;
+        _email        = email;
+        _logger       = logger;
+    }
 
-        public UserManagementService(
-            IUserAuthenticationRepository userAuthRepository,
-            IEmployeeRepository employeeRepository,
-            IUserProfileRepository userProfileRepository,
-            IEmployeeDetailsMasterRepository employeeDetailsRepository,
-            IRoleRepository roleRepository,
-            IDepartmentRepository departmentRepository,
-            IPasswordService passwordService,
-            IEmailService emailService,
-            IMapper mapper)
+    // ── CREATE USER ───────────────────────────────────────────────────────
+    public async Task<UserResponseDto> CreateUserAsync(
+        CreateUserRequestDto request,
+        int createdByUserId)
+    {
+        if (string.IsNullOrWhiteSpace(request.Email))
+            throw new ArgumentException("Email is required.");
+
+        if (await _userAuthRepo.EmailExistsAsync(request.Email))
+            throw new InvalidOperationException("Email already exists.");
+
+        var role = await _roleRepo.GetByIdAsync(request.RoleId)
+            ?? throw new KeyNotFoundException("Role not found.");
+
+        var department = await _deptRepo.GetByIdAsync(request.DepartmentId)
+            ?? throw new KeyNotFoundException("Department not found.");
+
+        var tempPassword = GenerateTemporaryPassword();
+
+        // ✅ Declared outside try so catch block can access for rollback
+        string? keycloakId = null;
+
+        try
         {
-            _userAuthRepository = userAuthRepository;
-            _employeeRepository = employeeRepository;
-            _userProfileRepository = userProfileRepository;
-            _employeeDetailsRepository = employeeDetailsRepository;
-            _roleRepository = roleRepository;
-            _departmentRepository = departmentRepository;
-            _passwordService = passwordService;
-            _emailService = emailService;
-            _mapper = mapper;
-        }
+            // STEP 1: Create in Keycloak
+            keycloakId = await _keycloak.CreateUserAsync(
+                request.Email,
+                request.FirstName,
+                request.LastName,
+                tempPassword,
+                role.RoleName);
 
-        public async Task<UserResponseDto> CreateUserAsync(CreateUserRequestDto request, int createdByUserId)
-        {
-            // Validate email uniqueness
-            var existingUser = await _userAuthRepository.GetByEmailAsync(request.Email);
-            if (existingUser != null)
+            await _keycloak.AssignRoleAsync(keycloakId, role.RoleName);
+
+            // STEP 2: Employee
+            var employee = new Employee
             {
-                throw new InvalidOperationException(UserManagementConstants.Messages.EmailAlreadyExists);
-            }
-
-            // Validate EmployeeCompanyId uniqueness
-            var existingEmployee = await _employeeRepository.GetByEmployeeCompanyIdAsync(request.EmployeeCompanyId);
-            if (existingEmployee != null)
-            {
-                throw new InvalidOperationException(UserManagementConstants.Messages.EmployeeCompanyIdExists);
-            }
-
-            // Validate Role exists
-            var role = await _roleRepository.GetByIdAsync(request.RoleId);
-            if (role == null)
-            {
-                throw new KeyNotFoundException(UserManagementConstants.Messages.RoleNotFound);
-            }
-
-            // Validate Department exists
-            var department = await _departmentRepository.GetByIdAsync(request.DepartmentId);
-            if (department == null)
-            {
-                throw new KeyNotFoundException(UserManagementConstants.Messages.DepartmentNotFound);
-            }
-
-            // Use Mapster to create Employee from Request
-            var employee = _mapper.Map<Employee>(request);
-            employee.CreatedByUserId = createdByUserId;
-            await _employeeRepository.CreateAsync(employee);
-
-            // Create UserProfile using Mapster
-            var userProfile = _mapper.Map<Userprofile>(request);
-            userProfile.EmployeeId = employee.EmployeeId;
-            await _userProfileRepository.CreateAsync(userProfile);
-
-            // Create UserAuthentication
-            var temporaryPassword = _passwordService.GenerateTemporaryPassword();
-            var userAuth = new Userauthentication
-            {
-                EmployeeId = employee.EmployeeId,
-                Email = request.Email,
-                PasswordHash = _passwordService.HashPassword(temporaryPassword),
-                Status = Constants.UserStatuses.Active,
-                IsFirstLogin = true,
-                CreatedAt = DateTime.UtcNow
+                EmployeeCompanyId          = request.EmployeeCompanyId,
+                EmploymentType             = request.EmploymentType    ?? "Permanent",
+                EmploymentStatus           = request.EmploymentStatus  ?? "Active",
+                EmployeeType               = request.EmployeeType      ?? "FullTime",
+                JoiningDate                = DateOnly.FromDateTime(DateTime.UtcNow),
+                WorkLocation               = request.WorkLocation      ?? "Head Office",
+                NoticePeriodDays           = request.NoticePeriodDays > 0 ? request.NoticePeriodDays : 30,
+                IsActive                   = true,
+                CreatedAt                  = DateTime.UtcNow,
+                CreatedByUserId            = createdByUserId,
+                ReportingManagerEmployeeId = request.ReportingManagerEmployeeId,
+                KeycloakUserId             = keycloakId
             };
-            await _userAuthRepository.CreateAsync(userAuth);
 
-            // Create EmployeeDetailsMaster
-            var employeeDetails = new Employeedetailsmaster
+            await _employeeRepo.CreateAsync(employee);
+
+            // STEP 3: Profile
+            await _profileRepo.CreateAsync(new Userprofile
             {
-                EmployeeId = employee.EmployeeId,
-                RoleId = request.RoleId,
+                EmployeeId   = employee.EmployeeId,
+                FirstName    = request.FirstName,
+                LastName     = request.LastName,
+                MobileNumber = request.MobileNumber
+            });
+
+            // STEP 4: Auth
+            await _userAuthRepo.CreateAsync(new Userauthentication
+            {
+                EmployeeId   = employee.EmployeeId,
+                Email        = request.Email,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(tempPassword),
+                Status       = "Active",
+                IsFirstLogin = true,
+                CreatedAt    = DateTime.UtcNow
+            });
+
+            // STEP 5: Employee Details
+            var details = new Employeedetailsmaster
+            {
+                EmployeeId   = employee.EmployeeId,
+                RoleId       = request.RoleId,
                 DepartmentId = request.DepartmentId
             };
-            await _employeeDetailsRepository.CreateAsync(employeeDetails);
 
-            // Send welcome email
-            await _emailService.SendWelcomeEmailAsync(request.Email, request.FirstName, temporaryPassword);
+            await _detailsRepo.CreateAsync(details);
 
-            EEPZBusinessLog.Information($"User created successfully: {request.Email} (EmployeeCompanyId: {request.EmployeeCompanyId})");
+            // ✅ STEP 6: Push attributes to Keycloak (CRITICAL FIX)
+            await _keycloak.SetUserAttributesAsync(keycloakId, new Dictionary<string, string>
+            {
+                ["empId"]       = employee.EmployeeId.ToString(),
+                ["empMasterId"] = details.EmployeeMasterId.ToString(),
+                ["role"]        = role.RoleName
+            });
 
-            // Get the complete user data for response using Mapster
-            var createdUser = await _userAuthRepository.GetByIdAsync(userAuth.UserId);
-            return _mapper.Map<UserResponseDto>(createdUser);
+            // STEP 7: Welcome email
+            await _email.SendWelcomeEmailAsync(request.Email, request.FirstName, tempPassword);
+
+            return await GetUserByIdAsync(employee.EmployeeId);
         }
-
-        public async Task<UserResponseDto> UpdateUserAsync(UpdateUserRequestDto request, int updatedByUserId)
+        catch (Exception ex)
         {
-            var user = await _userAuthRepository.GetByIdAsync(request.UserId);
-            if (user == null)
-            {
-                throw new KeyNotFoundException(UserManagementConstants.Messages.UserNotFound);
-            }
+            // Rollback Keycloak user if DB steps failed
+            if (!string.IsNullOrEmpty(keycloakId))
+                await _keycloak.DeleteUserAsync(keycloakId);
 
-            var employee = await _employeeRepository.GetByIdAsync(user.EmployeeId);
-            if (employee == null)
-            {
-                throw new KeyNotFoundException(UserManagementConstants.Messages.EmployeeNotFound);
-            }
-
-            // Update employee fields
-            if (!string.IsNullOrWhiteSpace(request.EmploymentType))
-                employee.EmploymentType = request.EmploymentType;
-
-            if (!string.IsNullOrWhiteSpace(request.EmploymentStatus))
-                employee.EmploymentStatus = request.EmploymentStatus;
-
-            if (request.ConfirmationDate.HasValue)
-                employee.ConfirmationDate = DateOnly.FromDateTime(request.ConfirmationDate.Value);
-
-            if (request.ExitDate.HasValue)
-                employee.ExitDate = DateOnly.FromDateTime(request.ExitDate.Value);
-
-            if (request.ReportingManagerEmployeeId.HasValue)
-                employee.ReportingManagerEmployeeId = request.ReportingManagerEmployeeId.Value;
-
-            if (!string.IsNullOrWhiteSpace(request.WorkLocation))
-                employee.WorkLocation = request.WorkLocation;
-
-            if (!string.IsNullOrWhiteSpace(request.EmployeeType))
-                employee.EmployeeType = request.EmployeeType;
-
-            if (request.NoticePeriodDays.HasValue)
-                employee.NoticePeriodDays = request.NoticePeriodDays.Value;
-
-            if (request.IsActive.HasValue)
-                employee.IsActive = request.IsActive.Value;
-
-            employee.UpdatedAt = DateTime.UtcNow;
-            employee.UpdatedByUserId = updatedByUserId;
-            await _employeeRepository.UpdateAsync(employee);
-
-            // Update user authentication status
-            if (!string.IsNullOrWhiteSpace(request.Status))
-            {
-                user.Status = request.Status;
-                user.UpdatedAt = DateTime.UtcNow;
-                await _userAuthRepository.UpdateAsync(user);
-            }
-
-            EEPZBusinessLog.Information($"User updated successfully: UserId {request.UserId}");
-
-            // Get updated user data using Mapster
-            var updatedUser = await _userAuthRepository.GetByIdAsync(request.UserId);
-            return _mapper.Map<UserResponseDto>(updatedUser);
-        }
-
-        public async Task<UserResponseDto> GetUserByIdAsync(int userId)
-        {
-            var user = await _userAuthRepository.GetByIdAsync(userId);
-            if (user == null)
-            {
-                throw new KeyNotFoundException(UserManagementConstants.Messages.UserNotFound);
-            }
-
-            // Use Mapster for mapping
-            return _mapper.Map<UserResponseDto>(user);
-        }
-
-        public async Task<List<UserResponseDto>> GetAllUsersAsync()
-        {
-            var users = await _userAuthRepository.GetAllAsync();
-            // Use Mapster for mapping list
-            return _mapper.Map<List<UserResponseDto>>(users);
-        }
-
-        public async Task DeactivateUserAsync(int userId)
-        {
-            var user = await _userAuthRepository.GetByIdAsync(userId);
-            if (user == null)
-            {
-                throw new KeyNotFoundException(UserManagementConstants.Messages.UserNotFound);
-            }
-
-            // Prevent deactivation of protected employee (1000)
-            var employeeCompanyId = user.Employee?.EmployeeCompanyId;
-            if (!string.IsNullOrEmpty(employeeCompanyId) && employeeCompanyId == "1000")
-            {
-                throw new InvalidOperationException(UserManagementConstants.Messages.CannotDeactivateProtectedUser);
-            }
-
-            user.Status = Constants.UserStatuses.Inactive;
-            user.UpdatedAt = DateTime.UtcNow;
-            await _userAuthRepository.UpdateAsync(user);
-
-            var employee = await _employeeRepository.GetByIdAsync(user.EmployeeId);
-            if (employee != null)
-            {
-                employee.IsActive = false;
-                employee.UpdatedAt = DateTime.UtcNow;
-                await _employeeRepository.UpdateAsync(employee);
-            }
-
-            EEPZBusinessLog.Information($"User deactivated: UserId {userId}");
-        }
-
-        public async Task ActivateUserAsync(int userId)
-        {
-            var user = await _userAuthRepository.GetByIdAsync(userId);
-            if (user == null)
-            {
-                throw new KeyNotFoundException(UserManagementConstants.Messages.UserNotFound);
-            }
-
-            user.Status = Constants.UserStatuses.Active;
-            user.UpdatedAt = DateTime.UtcNow;
-            await _userAuthRepository.UpdateAsync(user);
-
-            var employee = await _employeeRepository.GetByIdAsync(user.EmployeeId);
-            if (employee != null)
-            {
-                employee.IsActive = true;
-                employee.UpdatedAt = DateTime.UtcNow;
-                await _employeeRepository.UpdateAsync(employee);
-            }
-
-            EEPZBusinessLog.Information($"User activated: UserId {userId}");
-        }
-
-        public async Task AssignRoleAndDepartmentAsync(AssignRoleDepartmentRequestDto request)
-        {
-            var employee = await _employeeRepository.GetByIdAsync(request.EmployeeId);
-            if (employee == null)
-            {
-                throw new KeyNotFoundException(UserManagementConstants.Messages.EmployeeNotFound);
-            }
-
-            var role = await _roleRepository.GetByIdAsync(request.RoleId);
-            if (role == null)
-            {
-                throw new KeyNotFoundException(UserManagementConstants.Messages.RoleNotFound);
-            }
-
-            var department = await _departmentRepository.GetByIdAsync(request.DepartmentId);
-            if (department == null)
-            {
-                throw new KeyNotFoundException(UserManagementConstants.Messages.DepartmentNotFound);
-            }
-
-            var employeeDetails = await _employeeDetailsRepository.GetByEmployeeIdAsync(request.EmployeeId);
-
-            if (employeeDetails != null)
-            {
-                employeeDetails.RoleId = request.RoleId;
-                employeeDetails.DepartmentId = request.DepartmentId;
-                await _employeeDetailsRepository.UpdateAsync(employeeDetails);
-            }
-            else
-            {
-                var newDetails = new Employeedetailsmaster
-                {
-                    EmployeeId = request.EmployeeId,
-                    RoleId = request.RoleId,
-                    DepartmentId = request.DepartmentId
-                };
-                await _employeeDetailsRepository.CreateAsync(newDetails);
-            }
-
-            EEPZBusinessLog.Information($"Role and Department assigned: EmployeeId {request.EmployeeId}, RoleId {request.RoleId}, DepartmentId {request.DepartmentId}");
-        }
-
-        public async Task<List<UserResponseDto>> GetEmployeesByManagerAsync(int managerId)
-{
-    var employees = await _employeeRepository.GetByReportingManagerAsync(managerId);
-
-    var userIds = employees.Select(e => e.EmployeeId).ToList();
-    var users = new List<Userauthentication>();
-
-    foreach (var employeeId in userIds)
-    {
-        var user = await _userAuthRepository.GetByEmployeeIdWithDetailsAsync(employeeId);
-        if (user != null)
-        {
-            users.Add(user);
+            _logger.LogError(ex, "CreateUser failed — rollback executed for {Email}", request.Email);
+            throw;
         }
     }
 
-    // Use Mapster for mapping list
-    return _mapper.Map<List<UserResponseDto>>(users);
-}
+    // ── UPDATE USER ───────────────────────────────────────────────────────
+    public async Task<UserResponseDto> UpdateUserAsync(
+        UpdateUserRequestDto request,
+        int updatedByUserId)
+    {
+        var user = await _userAuthRepo.GetByIdAsync(request.UserId)
+            ?? throw new KeyNotFoundException("User not found.");
 
+        var employee = await _employeeRepo.GetByIdAsync(user.EmployeeId)
+            ?? throw new KeyNotFoundException("Employee not found.");
 
-        public async Task<string> GetNextEmployeeCompanyIdAsync()
+        employee.WorkLocation      = request.WorkLocation ?? employee.WorkLocation;
+        employee.UpdatedAt         = DateTime.UtcNow;
+        employee.UpdatedByUserId   = updatedByUserId;
+
+        await _employeeRepo.UpdateAsync(employee);
+
+        // ✅ Sync role attribute in Keycloak
+        if (!string.IsNullOrEmpty(employee.KeycloakUserId))
         {
-            return await _employeeRepository.GetNextEmployeeCompanyIdAsync();
+            var details = await _detailsRepo.GetByEmployeeIdAsync(employee.EmployeeId);
+            if (details != null)
+            {
+                var role = await _roleRepo.GetByIdAsync(details.RoleId);
+                if (role != null)
+                {
+                    await _keycloak.SetUserAttributesAsync(employee.KeycloakUserId,
+                        new Dictionary<string, string>
+                        {
+                            ["role"] = role.RoleName
+                        });
+                }
+            }
         }
+
+        return await GetUserByIdAsync(user.UserId);
+    }
+
+    // ── ASSIGN ROLE & DEPARTMENT ──────────────────────────────────────────
+    public async Task AssignRoleAndDepartmentAsync(AssignRoleDepartmentRequestDto request)
+    {
+        var details = await _detailsRepo.GetByEmployeeIdAsync(request.EmployeeId);
+
+        if (details != null)
+        {
+            details.RoleId       = request.RoleId;
+            details.DepartmentId = request.DepartmentId;
+            await _detailsRepo.UpdateAsync(details);
+        }
+        else
+        {
+            await _detailsRepo.CreateAsync(new Employeedetailsmaster
+            {
+                EmployeeId   = request.EmployeeId,
+                RoleId       = request.RoleId,
+                DepartmentId = request.DepartmentId
+            });
+        }
+
+        var employee = await _employeeRepo.GetByIdAsync(request.EmployeeId);
+        var role     = await _roleRepo.GetByIdAsync(request.RoleId);
+
+        // ✅ Update role attribute in Keycloak
+        if (employee != null && !string.IsNullOrEmpty(employee.KeycloakUserId) && role != null)
+        {
+            await _keycloak.SetUserAttributesAsync(employee.KeycloakUserId,
+                new Dictionary<string, string>
+                {
+                    ["role"] = role.RoleName
+                });
+        }
+    }
+
+    // ── DEACTIVATE USER ───────────────────────────────────────────────────
+    public async Task DeactivateUserAsync(int userId, int performedByUserId)
+    {
+        var user = await _userAuthRepo.GetByIdAsync(userId)
+            ?? throw new KeyNotFoundException("User not found.");
+
+        var employee = await _employeeRepo.GetByIdAsync(user.EmployeeId)
+            ?? throw new KeyNotFoundException("Employee not found.");
+
+        employee.IsActive          = false;
+        employee.UpdatedAt         = DateTime.UtcNow;
+        employee.UpdatedByUserId   = performedByUserId;
+
+        await _employeeRepo.UpdateAsync(employee);
+
+        if (!string.IsNullOrEmpty(employee.KeycloakUserId))
+            await _keycloak.DisableUserAsync(employee.KeycloakUserId);
+    }
+
+    // ── ACTIVATE USER ─────────────────────────────────────────────────────
+    public async Task ActivateUserAsync(int userId, int performedByUserId)
+    {
+        var user = await _userAuthRepo.GetByIdAsync(userId)
+            ?? throw new KeyNotFoundException("User not found.");
+
+        var employee = await _employeeRepo.GetByIdAsync(user.EmployeeId)
+            ?? throw new KeyNotFoundException("Employee not found.");
+
+        employee.IsActive          = true;
+        employee.UpdatedAt         = DateTime.UtcNow;
+        employee.UpdatedByUserId   = performedByUserId;
+
+        await _employeeRepo.UpdateAsync(employee);
+
+        if (!string.IsNullOrEmpty(employee.KeycloakUserId))
+            await _keycloak.EnableUserAsync(employee.KeycloakUserId);
+    }
+
+    // ── GET USER BY ID ────────────────────────────────────────────────────
+    public async Task<UserResponseDto> GetUserByIdAsync(int userId)
+    {
+        var user = await _userAuthRepo.GetByIdAsync(userId)
+            ?? throw new KeyNotFoundException("User not found.");
+
+        return MapToDto(user);
+    }
+
+    // ── GET ALL USERS ─────────────────────────────────────────────────────
+    public async Task<List<UserResponseDto>> GetAllUsersAsync()
+    {
+        var users  = await _userAuthRepo.GetAllAsync();
+        var result = new List<UserResponseDto>();
+
+        foreach (var user in users)
+        {
+            var employee = await _employeeRepo.GetByIdAsync(user.EmployeeId);
+            var profile  = await _profileRepo.GetByEmployeeIdAsync(user.EmployeeId);
+            var details  = await _detailsRepo.GetByEmployeeIdAsync(user.EmployeeId);
+
+            var role = details != null ? await _roleRepo.GetByIdAsync(details.RoleId) : null;
+            var dept = details != null ? await _deptRepo.GetByIdAsync(details.DepartmentId) : null;
+
+            result.Add(new UserResponseDto
+            {
+                UserId            = user.UserId,
+                Email             = user.Email,
+                FirstName         = profile?.FirstName,
+                LastName          = profile?.LastName,
+                EmployeeCompanyId = employee?.EmployeeCompanyId,
+                RoleName          = role?.RoleName,
+                DepartmentName    = dept?.DepartmentName,
+                IsActive          = employee?.IsActive ?? false
+            });
+        }
+
+        return result;
+    }
+
+    // ── GET EMPLOYEES BY MANAGER ──────────────────────────────────────────
+    public async Task<List<UserResponseDto>> GetEmployeesByManagerAsync(int managerId)
+    {
+        var employees = await _employeeRepo.GetByManagerIdAsync(managerId);
+        var result    = new List<UserResponseDto>();
+
+        foreach (var employee in employees)
+        {
+            var user    = await _userAuthRepo.GetByEmployeeIdAsync(employee.EmployeeId);
+            var profile = await _profileRepo.GetByEmployeeIdAsync(employee.EmployeeId);
+            var details = await _detailsRepo.GetByEmployeeIdAsync(employee.EmployeeId);
+
+            var role = details != null ? await _roleRepo.GetByIdAsync(details.RoleId) : null;
+            var dept = details != null ? await _deptRepo.GetByIdAsync(details.DepartmentId) : null;
+
+            result.Add(new UserResponseDto
+            {
+                UserId            = user?.UserId ?? 0,
+                Email             = user?.Email,
+                FirstName         = profile?.FirstName,
+                LastName          = profile?.LastName,
+                EmployeeCompanyId = employee.EmployeeCompanyId,
+                RoleName          = role?.RoleName,
+                DepartmentName    = dept?.DepartmentName,
+                IsActive          = employee.IsActive ?? false
+            });
+        }
+
+        return result;
+    }
+
+    // ── GET NEXT EMPLOYEE COMPANY ID ──────────────────────────────────────
+    public async Task<string> GetNextEmployeeCompanyIdAsync()
+    {
+        var employees = await _employeeRepo.GetAllAsync();
+
+        if (!employees.Any())
+            return "1";
+
+        var maxId = employees
+            .Select(e => int.TryParse(e.EmployeeCompanyId, out var val) ? val : 0)
+            .Max();
+
+        return (maxId + 1).ToString();
+    }
+
+    // ── PRIVATE HELPERS ───────────────────────────────────────────────────
+    private static UserResponseDto MapToDto(Userauthentication user)
+    {
+        return new UserResponseDto
+        {
+            UserId    = user.UserId,
+            Email     = user.Email,
+            RoleName  = user.Employee?.Employeedetailsmasters
+                            ?.FirstOrDefault()?.Role?.RoleName,
+            IsActive  = user.Employee?.IsActive ?? false
+        };
+    }
+
+    private static string GenerateTemporaryPassword()
+    {
+        var upper   = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        var lower   = "abcdefghijklmnopqrstuvwxyz";
+        var digits  = "0123456789";
+        var special = "@#$!";
+        var rng     = new Random();
+
+        var password = new[]
+        {
+            upper[rng.Next(upper.Length)],
+            lower[rng.Next(lower.Length)],
+            digits[rng.Next(digits.Length)],
+            special[rng.Next(special.Length)]
+        };
+
+        var all  = upper + lower + digits + special;
+        var rest = Enumerable.Range(0, 8)
+                             .Select(_ => all[rng.Next(all.Length)]);
+
+        return new string(password.Concat(rest)
+                                  .OrderBy(_ => rng.Next())
+                                  .ToArray());
     }
 }

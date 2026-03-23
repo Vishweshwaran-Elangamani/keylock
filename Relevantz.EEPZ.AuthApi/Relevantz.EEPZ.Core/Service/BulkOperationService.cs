@@ -202,7 +202,9 @@ namespace Relevantz.EEPZ.Core.Service
             {
                 try
                 {
-                    await _userManagementService.DeactivateUserAsync(userId);
+                   // ✅ FIXED — pass performedByUserId (use 0 as system/bulk operation actor)
+await _userManagementService.DeactivateUserAsync(userId, performedByUserId);
+
                     successCount++;
                 }
                 catch (Exception ex)

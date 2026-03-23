@@ -40,6 +40,48 @@ namespace Relevantz.EEPZ.Data.Repository
                 .FirstOrDefaultAsync(e => e.EmployeeCompanyId == employeeCompanyId);
         }
 
+        // ✅ FIXED METHOD (CRITICAL)
+        public async Task<List<Employee>> GetByManagerIdAsync(int managerId)
+        {
+            return await _context.Employees
+                .Where(e => e.ReportingManagerEmployeeId == managerId)
+                .Include(e => e.Userauthentication)
+                .Include(e => e.Userprofile)
+                .Include(e => e.Employeedetailsmasters)
+                    .ThenInclude(edm => edm.Role)
+                .Include(e => e.Employeedetailsmasters)
+                    .ThenInclude(edm => edm.Department)
+                .ToListAsync();
+        }
+
+        // ✅ Lookup by email
+        public async Task<Employee?> GetByEmailAsync(string email)
+        {
+            return await _context.Employees
+                .Include(e => e.Userauthentication)
+                .Include(e => e.Userprofile)
+                .Include(e => e.Employeedetailsmasters)
+                    .ThenInclude(edm => edm.Role)
+                .Include(e => e.Employeedetailsmasters)
+                    .ThenInclude(edm => edm.Department)
+                .FirstOrDefaultAsync(e =>
+                    e.Userauthentication != null &&
+                    e.Userauthentication.Email.ToLower() == email.ToLower());
+        }
+
+        // ✅ Lookup by Keycloak UUID
+        public async Task<Employee?> GetByKeycloakUserIdAsync(string keycloakUserId)
+        {
+            return await _context.Employees
+                .Include(e => e.Userauthentication)
+                .Include(e => e.Userprofile)
+                .Include(e => e.Employeedetailsmasters)
+                    .ThenInclude(edm => edm.Role)
+                .Include(e => e.Employeedetailsmasters)
+                    .ThenInclude(edm => edm.Department)
+                .FirstOrDefaultAsync(e => e.KeycloakUserId == keycloakUserId);
+        }
+
         public async Task<List<Employee>> GetAllAsync()
         {
             return await _context.Employees
@@ -102,26 +144,22 @@ namespace Relevantz.EEPZ.Data.Repository
 
         public async Task<string> GetNextEmployeeCompanyIdAsync()
         {
-            // Get all Employee Company IDs from database
             var employeeIds = await _context.Employees
                 .Where(e => !string.IsNullOrEmpty(e.EmployeeCompanyId))
                 .Select(e => e.EmployeeCompanyId)
                 .ToListAsync();
 
-            // If no employees exist, start from 1000
             if (employeeIds == null || !employeeIds.Any())
             {
                 EEPZBusinessLog.Information("No existing employees. Starting Employee ID from 1000");
                 return "1000";
             }
 
-            // Convert to integers and find the maximum
             var numericIds = employeeIds
                 .Where(id => int.TryParse(id, out _))
                 .Select(id => int.Parse(id))
                 .ToList();
 
-            // If no valid numeric IDs found, start from 1000
             if (!numericIds.Any())
             {
                 EEPZBusinessLog.Information("No valid numeric Employee IDs found. Starting from 1000");
