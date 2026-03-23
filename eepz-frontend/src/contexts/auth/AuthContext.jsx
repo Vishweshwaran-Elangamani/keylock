@@ -4,70 +4,114 @@ import authService from "../../services/auth/authService";
 
 const AuthContext = createContext(null);
 
+const KEYS = {
+  user: "user",
+  accessToken: "accessToken",
+  token: "token",
+  refreshToken: "refreshToken",
+  userId: "userId",
+  userName: "userName",
+  userRole: "userRole",
+  email: "email",
+  empId: "empId",
+};
+
+const readToken = () =>
+  localStorage.getItem(KEYS.accessToken) || localStorage.getItem(KEYS.token);
+
+const removeAllAuthKeys = () => {
+  Object.values(KEYS).forEach((k) => localStorage.removeItem(k));
+};
+
+const syncIndividualFields = (userData) => {
+  localStorage.setItem(KEYS.userId, userData?.userId || "");
+  localStorage.setItem(KEYS.userName, userData?.name || "");
+  localStorage.setItem(KEYS.userRole, userData?.roleName || userData?.role || "");
+  localStorage.setItem(KEYS.email, userData?.email || "");
+  localStorage.setItem(KEYS.empId, userData?.empId || "");
+};
+
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(true);
+
+  const [user, setUser] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // 🔥 INIT AUTH STATE (IMPORTANT FIX)
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    const token = localStorage.getItem("token");
+    try {
+      const token = readToken();
+      const storedUser = localStorage.getItem(KEYS.user);
 
-    if (storedUser && token) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-      setIsAuthenticated(true);
+      if (token && storedUser) {
+        const parsedUser = JSON.parse(storedUser);
 
-      //  SET INDIVIDUAL FIELDS IN LOCALSTORAGE
-      localStorage.setItem("userId", parsedUser.userId);
-      localStorage.setItem("userName", parsedUser.userName);
-      localStorage.setItem(
-        "userRole",
-        parsedUser.roleType || parsedUser.role || parsedUser.userRole
-      );
-      localStorage.setItem("email", parsedUser.email);
+        setUser(parsedUser);
+        setIsAuthenticated(true);
+      } else {
+        removeAllAuthKeys();
+      }
+    } catch {
+      removeAllAuthKeys();
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
-  const login = (userData, token) => {
+  // 🔥 FORCE LOGOUT LISTENER
+  useEffect(() => {
+    const handleForceLogout = () => {
+      removeAllAuthKeys();
+      setUser(null);
+      setIsAuthenticated(false);
+      navigate("/login", { replace: true });
+    };
+
+    window.addEventListener("auth:force-logout", handleForceLogout);
+    return () => window.removeEventListener("auth:force-logout", handleForceLogout);
+  }, [navigate]);
+
+  // 🔐 LOGIN
+  const login = (userData, accessToken, refreshToken) => {
+    localStorage.setItem(KEYS.user, JSON.stringify(userData));
+    localStorage.setItem(KEYS.accessToken, accessToken);
+    localStorage.setItem(KEYS.token, accessToken);
+
+    if (refreshToken) {
+      localStorage.setItem(KEYS.refreshToken, refreshToken);
+    }
+
+    syncIndividualFields(userData);
+
     setUser(userData);
     setIsAuthenticated(true);
-    localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("token", token);
-
-    //  ALSO SET INDIVIDUAL FIELDS
-    localStorage.setItem("userId", userData.userId);
-    localStorage.setItem("userName", userData.userName);
-    localStorage.setItem(
-      "userRole",
-      userData.roleType || userData.role || userData.userRole
-    );
-    localStorage.setItem("email", userData.email);
   };
 
+  // 🔓 LOGOUT
   const logout = async () => {
     try {
       await authService.logout();
-    } catch (error) {
-      console.error("Logout error:", error);
+    } catch (err) {
+      console.warn("Logout API failed:", err);
     } finally {
+      removeAllAuthKeys();
       setUser(null);
       setIsAuthenticated(false);
-      localStorage.removeItem("user");
-      localStorage.removeItem("token");
-      localStorage.removeItem("userId");
-      localStorage.removeItem("userName");
-      localStorage.removeItem("userRole");
-      localStorage.removeItem("email");
-      navigate("/login");
+      navigate("/login", { replace: true });
     }
   };
 
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated, loading, login, logout }}
+      value={{
+        user,
+        isAuthenticated,
+        loading,
+        login,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>
@@ -76,8 +120,8 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within AuthProvider");
-  }
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
   return context;
 };
+
+export default AuthContext;

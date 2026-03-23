@@ -5,6 +5,7 @@ import authService from "../../../services/auth/authService";
 import { toast } from "sonner";
 import "../../../styles/auth/common/VerifyCode.css";
 import logo from "../../../assets/logodarkbarred.png";
+
 const VerifyCode = () => {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [error, setError] = useState("");
@@ -15,38 +16,51 @@ const VerifyCode = () => {
   const [isLocked, setIsLocked] = useState(false);
   const [lockoutEndTime, setLockoutEndTime] = useState(null);
   const [remainingTime, setRemainingTime] = useState(0);
+
   const inputRefs = useRef([]);
   const navigate = useNavigate();
   const { login } = useAuth();
+
+  // ── Load tempUser + existing lockout on mount ────────────────────────────
   useEffect(() => {
     const tempUserStr = localStorage.getItem("tempUser");
     if (!tempUserStr) {
       navigate("/login");
       return;
     }
-    const tempUser = JSON.parse(tempUserStr);
-    setUserInfo(tempUser);
-    // Check if there's an existing lockout from localStorage
+
+    try {
+      const tempUser = JSON.parse(tempUserStr);
+      setUserInfo(tempUser);
+    } catch {
+      navigate("/login");
+      return;
+    }
+
     const lockoutData = localStorage.getItem("otpLockout");
     if (lockoutData) {
-      const { endTime, attempts } = JSON.parse(lockoutData);
-      const now = Date.now();
-      if (now < endTime) {
-        setIsLocked(true);
-        setLockoutEndTime(endTime);
-        setFailedAttempts(attempts);
-      } else {
-        // Lockout expired, clear it
+      try {
+        const { endTime, attempts } = JSON.parse(lockoutData);
+        if (Date.now() < endTime) {
+          setIsLocked(true);
+          setLockoutEndTime(endTime);
+          setFailedAttempts(attempts);
+        } else {
+          localStorage.removeItem("otpLockout");
+        }
+      } catch {
         localStorage.removeItem("otpLockout");
       }
     }
+
     inputRefs.current[0]?.focus();
   }, [navigate]);
+
+  // ── Lockout countdown timer ───────────────────────────────────────────────
   useEffect(() => {
     if (!isLocked || !lockoutEndTime) return;
     const interval = setInterval(() => {
-      const now = Date.now();
-      const remaining = Math.max(0, lockoutEndTime - now);
+      const remaining = Math.max(0, lockoutEndTime - Date.now());
       setRemainingTime(remaining);
       if (remaining === 0) {
         setIsLocked(false);
@@ -59,29 +73,26 @@ const VerifyCode = () => {
     }, 1000);
     return () => clearInterval(interval);
   }, [isLocked, lockoutEndTime]);
+
+  // ── Input handlers ────────────────────────────────────────────────────────
   const handleChange = (index, value) => {
-    // Only allow single digit numbers
-    if (!/^[0-9]?$/.test(value)) {
-      return;
-    }
+    if (!/^[0-9]?$/.test(value)) return;
     if (value.length > 1) return;
     const newCode = [...code];
     newCode[index] = value;
     setCode(newCode);
-    // Auto-focus next input
-    if (value && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
+    if (value && index < 5) inputRefs.current[index + 1]?.focus();
   };
+
   const handleKeyDown = (index, e) => {
     if (e.key === "Backspace" && !code[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
   };
+
   const handlePaste = (e) => {
     e.preventDefault();
     const pastedData = e.clipboardData.getData("text").trim();
-    // Only allow numeric characters in paste
     if (!/^\d+$/.test(pastedData)) {
       setError("Please paste numbers only");
       toast.error("Please paste numbers only");
@@ -91,19 +102,19 @@ const VerifyCode = () => {
     const pastedDigits = pastedData.slice(0, 6);
     const newCode = pastedDigits.split("");
     setCode([...newCode, ...Array(6 - newCode.length).fill("")]);
-    if (newCode.length === 6) {
-      inputRefs.current[5]?.focus();
-    }
+    if (newCode.length === 6) inputRefs.current[5]?.focus();
   };
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
   const formatRemainingTime = (milliseconds) => {
     const totalSeconds = Math.ceil(milliseconds / 1000);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
-  const toggleOtpVisibility = () => {
-    setShowOtp(!showOtp);
-  };
+
+  const toggleOtpVisibility = () => setShowOtp((prev) => !prev);
+
   const getDashboardRoute = (roleName) => {
     const normalizedRole = roleName?.toUpperCase().replace(/\s+/g, "");
     const routes = {
@@ -122,98 +133,125 @@ const VerifyCode = () => {
     };
     return routes[normalizedRole] || "/employee/dashboard";
   };
-  /**
-   * @param {Event} e - Form submit event
-   */
+
+  // ✅ Centralized lockout handler — avoids duplicate code in try/catch
+  const handleLockout = (newFailedAttempts, errorMsg) => {
+    if (newFailedAttempts >= 3) {
+      const lockoutEnd = Date.now() + 3 * 60 * 1000;
+      setIsLocked(true);
+      setLockoutEndTime(lockoutEnd);
+      localStorage.setItem(
+        "otpLockout",
+        JSON.stringify({ endTime: lockoutEnd, attempts: newFailedAttempts })
+      );
+      const lockoutMsg =
+        "Too many failed attempts. Please wait 3 minutes before trying again.";
+      setError(lockoutMsg);
+      toast.error(lockoutMsg);
+    } else {
+      const attemptsMsg = `${errorMsg}. ${3 - newFailedAttempts} attempts remaining.`;
+      setError(attemptsMsg);
+      toast.error(attemptsMsg);
+    }
+    setCode(["", "", "", "", "", ""]);
+    inputRefs.current[0]?.focus();
+  };
+
+  // ── Submit ─────────────────────────────────────────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
     const verificationCode = code.join("");
+
     if (verificationCode.length !== 6) {
       setError("Please enter all 6 digits");
       toast.error("Please enter all 6 digits");
       return;
     }
+
     if (!userInfo) {
       setError("User information not found. Please login again.");
       toast.error("User information not found. Please login again.");
       navigate("/login");
       return;
     }
+
     setLoading(true);
     setError("");
+
     try {
-      // Show loading toast
       toast.loading("Verifying OTP...");
-      // -------- API Call --------
+
       const response = await authService.verifyOtp(
         userInfo.email,
         verificationCode
       );
+
+      // ── API returned success: false ──────────────────────────────────────
       if (!response || response.success === false) {
         const errorMsg = response?.message || "Invalid verification code";
-        console.error("Verification failed:", errorMsg);
         toast.dismiss();
-        // Handle failed attempt
         const newFailedAttempts = failedAttempts + 1;
         setFailedAttempts(newFailedAttempts);
-        if (newFailedAttempts >= 3) {
-          // Lock for 3 minutes
-          const lockoutEnd = Date.now() + 3 * 60 * 1000;
-          setIsLocked(true);
-          setLockoutEndTime(lockoutEnd);
-          localStorage.setItem(
-            "otpLockout",
-            JSON.stringify({
-              endTime: lockoutEnd,
-              attempts: newFailedAttempts,
-            })
-          );
-          const lockoutMsg =
-            "Too many failed attempts. Please wait 3 minutes before trying again.";
-          setError(lockoutMsg);
-          toast.error(lockoutMsg);
-        } else {
-          const attemptsMsg = `${errorMsg}. ${
-            3 - newFailedAttempts
-          } attempts remaining.`;
-          setError(attemptsMsg);
-          toast.error(attemptsMsg);
-        }
-        setCode(["", "", "", "", "", ""]);
-        inputRefs.current[0]?.focus();
+        handleLockout(newFailedAttempts, errorMsg);
         return;
       }
+
       const data = response.data;
-      const user = data.user;
+      const user = data?.user;
+
       if (!user) {
-        console.error("User object not found in response");
         setError("Invalid response from server");
         toast.dismiss();
         toast.error("Invalid response from server");
-        setLoading(false);
         return;
       }
+
       const userRole = user.roleName;
+
+      // ✅ FIX: Decode empMasterId directly from the new token
+      const tokenClaims = authService.decodeToken(data.accessToken);
+
+      // ✅ FIX: Complete userData — all role fields present for ProtectedRoute
       const userData = {
         userId: user.userId,
         email: user.email,
-        name: user.fullName || `${user.firstName} ${user.lastName}`,
-        empId: user.employeeCompanyId,
+        name:
+          user.fullName ||
+          `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
+          user.email?.split("@")[0] ||
+          "User",
+        fullName: user.fullName,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        empId: user.employeeCompanyId || user.empId,
+        employeeCompanyId: user.employeeCompanyId,
+        empMasterId: tokenClaims?.empMasterId,
         role: userRole,
+        roleName: userRole,       // ✅ ProtectedRoute checks this first
+        roleType: user.roleType,
+        userRole: user.userRole,
+        departmentId: user.departmentId,
+        departmentName: user.departmentName,
       };
+
       localStorage.removeItem("tempUser");
       localStorage.removeItem("otpLockout");
+
       toast.dismiss();
       toast.success("OTP verified successfully!");
-      login(userData, data.accessToken);
+
+      // ✅ FIX: Pass refreshToken — AuthContext.login now accepts & saves it
+      login(userData, data.accessToken, data.refreshToken);
+
       const dashboardRoute = getDashboardRoute(userRole);
       setTimeout(() => {
         navigate(dashboardRoute, { replace: true });
       }, 100);
+
     } catch (err) {
       console.error("OTP verification error:", err);
-      console.error("Error response:", err.response);
-      console.error("Error data:", err.response?.data);
+      toast.dismiss();
+
       let errorMessage = "Invalid verification code. Please try again.";
       if (err.response?.data) {
         if (typeof err.response.data === "string") {
@@ -223,60 +261,40 @@ const VerifyCode = () => {
         } else if (err.response.data.Message) {
           errorMessage = err.response.data.Message;
         } else if (err.response.data.errors) {
-          const errors = err.response.data.errors;
-          errorMessage = Object.values(errors).flat().join(", ");
+          errorMessage = Object.values(err.response.data.errors)
+            .flat()
+            .join(", ");
         }
+      } else if (err.message) {
+        errorMessage = err.message;
       }
-      console.error("Error message:", errorMessage);
-      toast.dismiss();
+
       const newFailedAttempts = failedAttempts + 1;
       setFailedAttempts(newFailedAttempts);
-      if (newFailedAttempts >= 3) {
-        const lockoutEnd = Date.now() + 3 * 60 * 1000;
-        setIsLocked(true);
-        setLockoutEndTime(lockoutEnd);
-        localStorage.setItem(
-          "otpLockout",
-          JSON.stringify({
-            endTime: lockoutEnd,
-            attempts: newFailedAttempts,
-          })
-        );
-        const lockoutMsg =
-          "Too many failed attempts. Please wait 3 minutes before trying again.";
-        setError(lockoutMsg);
-        toast.error(lockoutMsg);
-      } else {
-        const attemptsMsg = `${errorMessage}. ${
-          3 - newFailedAttempts
-        } attempts remaining.`;
-        setError(attemptsMsg);
-        toast.error(attemptsMsg);
-      }
-      setCode(["", "", "", "", "", ""]);
-      inputRefs.current[0]?.focus();
+      handleLockout(newFailedAttempts, errorMessage);
     } finally {
       setLoading(false);
     }
   };
+
   const isCodeComplete = code.every((digit) => digit !== "");
+
+  // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className="verify-code-container">
       <div className="verify-code-card">
+        {/* ── Header ── */}
         <div className="verify-code-header">
           <div className="logo-section-verify">
             <img
               src={logo}
               alt="EEPZ Logo"
               className="logo-img-verify"
-              style={{
-                width: "200px",
-              }}
+              style={{ width: "200px" }}
             />
           </div>
           <h2 className="verify-title">
-            <i className="bi bi-shield-check"></i>
-            Verify Code
+            <i className="bi bi-shield-check"></i> Verify Code
           </h2>
           <p className="verify-subtitle">
             Enter the 6-digit verification code sent to your email
@@ -285,15 +303,18 @@ const VerifyCode = () => {
             <small className="email-display">({userInfo.email})</small>
           )}
         </div>
+
+        {/* ── Body ── */}
         <div className="verify-code-body">
-          {/* -------- Error Alert -------- */}
+          {/* Error Alert */}
           {error && (
             <div className="alert-danger-verify">
               <i className="bi bi-exclamation-triangle-fill"></i>
               <div>{error}</div>
             </div>
           )}
-          {/* -------- Lockout Timer Alert -------- */}
+
+          {/* Lockout Timer Alert */}
           {isLocked && lockoutEndTime && (
             <div className="alert-warning-verify">
               <i className="bi bi-clock-fill"></i>
@@ -303,8 +324,9 @@ const VerifyCode = () => {
               </div>
             </div>
           )}
+
           <form onSubmit={handleSubmit}>
-            {/* -------- OTP Input Fields -------- */}
+            {/* OTP Input Fields */}
             <div className="otp-wrapper">
               <div className="code-inputs-verify" onPaste={handlePaste}>
                 {code.map((digit, index) => (
@@ -327,7 +349,8 @@ const VerifyCode = () => {
                   />
                 ))}
               </div>
-              {/* -------- Show/Hide OTP Toggle Button -------- */}
+
+              {/* Show/Hide OTP Toggle */}
               <button
                 type="button"
                 onClick={toggleOtpVisibility}
@@ -343,7 +366,8 @@ const VerifyCode = () => {
                 ></i>
               </button>
             </div>
-            {/* -------- Submit Button -------- */}
+
+            {/* Submit Button */}
             <button
               type="submit"
               className="btn-submit-verify"
@@ -361,7 +385,8 @@ const VerifyCode = () => {
                 </>
               )}
             </button>
-            {/* -------- Back to Login -------- */}
+
+            {/* Back to Login */}
             <div className="back-to-login-verify">
               <button
                 type="button"
@@ -378,4 +403,5 @@ const VerifyCode = () => {
     </div>
   );
 };
+
 export default VerifyCode;

@@ -4,6 +4,7 @@ import { useAuth } from "../../contexts/auth/AuthContext";
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { isAuthenticated, loading, user } = useAuth();
 
+  // 🔄 Loading state
   if (loading) {
     return (
       <div
@@ -17,17 +18,28 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     );
   }
 
+  // 🔒 Not logged in
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
+  // 🔥 Extract role (clean & reliable)
+  const userRole =
+    user?.roleName ||
+    user?.role ||
+    user?.userRole ||
+    "Employee";
+
+  const normalizedUserRole = userRole.toUpperCase().replace(/\s+/g, "");
+
+  // 🔐 Role-based access check
   if (allowedRoles && allowedRoles.length > 0) {
-    const normalizedUserRole = user?.role?.toUpperCase().replace(/\s+/g, "");
     const normalizedAllowedRoles = allowedRoles.map((role) =>
       role.toUpperCase().replace(/\s+/g, "")
     );
 
     if (!normalizedAllowedRoles.includes(normalizedUserRole)) {
+      // 🔁 Redirect based on role
       const dashboardRoutes = {
         ADMIN: "/admin/dashboard",
         HR: "/hr/dashboard",
@@ -46,6 +58,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     }
   }
 
+  // ✅ Access granted
   return children;
 };
 
