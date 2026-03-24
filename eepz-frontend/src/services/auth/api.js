@@ -12,10 +12,6 @@ const KEYCLOAK_URL =
 const CLIENT_ID =
   import.meta.env.VITE_KEYCLOAK_CLIENT_ID || "eepz-client";
 
-const CLIENT_SECRET =
-  import.meta.env.VITE_KEYCLOAK_CLIENT_SECRET ||
-  "CvbX4kQIOjnuCGADmJ2i0VPuDTWLTmQ5";
-
 // 🌐 Axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -23,16 +19,14 @@ const api = axios.create({
   timeout: 30000,
 });
 
-// 🔒 Refresh state (prevents multiple refresh calls)
+// 🔒 Refresh state
 let isRefreshing = false;
 let refreshSubscribers = [];
 
-// 🔁 Subscribe requests while refreshing
 const subscribeTokenRefresh = (callback) => {
   refreshSubscribers.push(callback);
 };
 
-// 🔁 Notify all subscribers after refresh
 const onRefreshed = (token) => {
   refreshSubscribers.forEach((cb) => cb(token));
   refreshSubscribers = [];
@@ -92,7 +86,6 @@ api.interceptors.response.use(
         const params = new URLSearchParams();
         params.append("grant_type", "refresh_token");
         params.append("client_id", CLIENT_ID);
-        params.append("client_secret", CLIENT_SECRET);
         params.append("refresh_token", refreshToken);
 
         const res = await axios.post(KEYCLOAK_URL, params, {
@@ -119,7 +112,6 @@ api.interceptors.response.use(
       } catch (refreshError) {
         console.error("🔴 Refresh token failed:", refreshError);
 
-        // 🔥 Logout if refresh fails
         localStorage.clear();
         window.dispatchEvent(new Event("auth:force-logout"));
 

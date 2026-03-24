@@ -10,20 +10,15 @@ const KEYCLOAK_URL =
 const KEYCLOAK_CLIENT_ID =
   import.meta.env.VITE_KEYCLOAK_CLIENT_ID || "eepz-client";
 
-const KEYCLOAK_CLIENT_SECRET =
-  import.meta.env.VITE_KEYCLOAK_CLIENT_SECRET ||
-  "CvbX4kQIOjnuCGADmJ2i0VPuDTWLTmQ5";
-
 const authService = {
   // 🔐 LOGIN
   keycloakLogin: async (email, password) => {
     try {
-      console.log("🚀 LOGIN STARTED");
+      console.log(" LOGIN STARTED");
 
       const params = new URLSearchParams();
       params.append("grant_type", "password");
       params.append("client_id", KEYCLOAK_CLIENT_ID);
-      params.append("client_secret", KEYCLOAK_CLIENT_SECRET);
       params.append("username", email);
       params.append("password", password);
 
