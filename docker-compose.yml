@@ -1,10 +1,38 @@
 services:
+
+  # ── KEYCLOAK ──────────────────────────────────────────────────────────────
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.5.6
+    container_name: eepz-keycloak
+    restart: always
+    command: start-dev --import-realm --health-enabled=true
+    environment:
+      KC_DB: dev-mem
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HTTP_PORT: 9090
+      KC_HOSTNAME_STRICT: "false"
+      JAVA_OPTS_APPEND: "-Xms256m -Xmx512m"
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import
+    healthcheck:
+      test: ["CMD-SHELL", "cat /proc/net/tcp6 | grep -q '2382' || cat /proc/net/tcp | grep -q '2382'"]
+      interval: 15s
+      timeout: 10s
+      retries: 20
+      start_period: 90s
+    networks:
+      - eepz-network
+
+  # ── MYSQL ─────────────────────────────────────────────────────────────────
   mysql:
     image: mysql:8.0
     container_name: eepz-mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root 
+      MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: eepzdb
     ports:
       - "3307:3306"
@@ -12,7 +40,7 @@ services:
       - mysql_data:/var/lib/mysql
       - ./mysql-init:/docker-entrypoint-initdb.d
     healthcheck:
-      test: [ "CMD-SHELL", "mysqladmin ping --silent --protocol=TCP -h mysql -uroot -proot" ]
+      test: ["CMD-SHELL", "mysqladmin ping --silent --protocol=TCP -h mysql -uroot -proot"]
       interval: 10s
       timeout: 20s
       retries: 10
@@ -20,6 +48,7 @@ services:
     networks:
       - eepz-network
 
+  # ── MONGODB ───────────────────────────────────────────────────────────────
   mongodb:
     image: mongo:7
     container_name: eepz-mongodb
@@ -37,6 +66,38 @@ services:
     networks:
       - eepz-network
 
+  # ── AUTH API ──────────────────────────────────────────────────────────────
+  auth-api:
+    build: ./Relevantz.EEPZ.AuthApi
+    container_name: eepz-auth-api
+    restart: always
+    ports:
+      - "5101:5101"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
+      - ASPNETCORE_URLS=http://+:5101
+      - MongoDbSettings__ConnectionString=mongodb://mongodb:27017
+      - MongoDbSettings__DatabaseName=EEPZFileStorage
+      - MongoDbSettings__ProfileImagesCollectionName=ProfileImages
+      - Keycloak__BaseUrl=http://keycloak:9090
+      - Keycloak__Realm=eepz-realm
+      - Keycloak__ClientId=eepz-client
+      - Keycloak__AdminUser=admin
+      - Keycloak__AdminPassword=admin
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/Logs
+    networks:
+      - eepz-network
+
+  # ── ANALYSIS API ──────────────────────────────────────────────────────────
   analysis-api:
     build: ./Relevantz.EEPZ.AnalysisApi
     container_name: eepz-analysis-api
@@ -55,29 +116,7 @@ services:
     networks:
       - eepz-network
 
-  auth-api:
-    build: ./Relevantz.EEPZ.AuthApi
-    container_name: eepz-auth-api
-    restart: always
-    ports:
-      - "5101:5101"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
-      - ASPNETCORE_URLS=http://+:5101
-      - MongoDbSettings__ConnectionString=mongodb://mongodb:27017
-      - MongoDbSettings__DatabaseName=EEPZFileStorage
-      - MongoDbSettings__ProfileImagesCollectionName=ProfileImages
-    depends_on:
-      mysql:
-        condition: service_healthy
-      mongodb:
-        condition: service_healthy
-    volumes:
-      - ./logs:/app/Logs
-    networks:
-      - eepz-network
-
+  # ── FEEDBACK API ──────────────────────────────────────────────────────────
   feedback-api:
     build: ./Relevantz.EEPZ.FeedbackApi
     container_name: eepz-feedback-api
@@ -96,6 +135,7 @@ services:
     networks:
       - eepz-network
 
+  # ── GOAL API ──────────────────────────────────────────────────────────────
   goal-api:
     build: ./Relevantz.EEPZ.GoalApi
     container_name: eepz-goal-api
@@ -114,6 +154,7 @@ services:
     networks:
       - eepz-network
 
+  # ── HR OPERATIONS API ─────────────────────────────────────────────────────
   hr-operations-api:
     build: ./Relevantz.EEPZ.HrOpsApi
     container_name: eepz-hr-operations-api
@@ -137,6 +178,7 @@ services:
     networks:
       - eepz-network
 
+  # ── INTERNAL OPPORTUNITY API ──────────────────────────────────────────────
   internal-opportunity-api:
     build: ./Relevantz.EEPZ.InternalOpportunityAPI
     container_name: eepz-internal-opportunity-api
@@ -155,6 +197,7 @@ services:
     networks:
       - eepz-network
 
+  # ── L&D API ───────────────────────────────────────────────────────────────
   lnd-api:
     build: ./Relevantz.EEPZ.LnDApi
     container_name: eepz-lnd-api
@@ -171,14 +214,15 @@ services:
     volumes:
       - ./logs:/app/Logs
     networks:
-      - eepz-network    
+      - eepz-network
 
+  # ── MEETING API ───────────────────────────────────────────────────────────
   meeting-api:
     build: ./Relevantz.EEPZ.MeetingsApi
     container_name: eepz-meeting-api
     restart: always
     ports:
-      - "5107:5107" 
+      - "5107:5107"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
@@ -191,6 +235,7 @@ services:
     networks:
       - eepz-network
 
+  # ── MOM API ───────────────────────────────────────────────────────────────
   mom-api:
     build: ./Relevantz.EEPZ.MoMApi
     container_name: eepz-mom-api
@@ -209,6 +254,7 @@ services:
     networks:
       - eepz-network
 
+  # ── PERFORMANCE API ───────────────────────────────────────────────────────
   performance-api:
     build: ./Relevantz.EEPZ.PerformanceMgmtApi
     container_name: eepz-performance-api
@@ -227,6 +273,7 @@ services:
     networks:
       - eepz-network
 
+  # ── ROLES API ─────────────────────────────────────────────────────────────
   roles-api:
     build: ./Relevantz.EEPZ.PerformanceMgmtRolesApi
     container_name: eepz-roles-api
@@ -245,6 +292,7 @@ services:
     networks:
       - eepz-network
 
+  # ── PROJECT MANAGEMENT API ────────────────────────────────────────────────
   proj-management-api:
     build: ./Relevantz.EEPZ.ProjMgmtApi
     container_name: eepz-proj-management-api
@@ -263,6 +311,7 @@ services:
     networks:
       - eepz-network
 
+  # ── REWARDS API ───────────────────────────────────────────────────────────
   rewards-api:
     build: ./Relevantz.EEPZ.RewardsApi
     container_name: eepz-rewards-api
@@ -282,6 +331,7 @@ services:
     networks:
       - eepz-network
 
+  # ── ORG FEEDBACK API ──────────────────────────────────────────────────────
   org-feedback-api:
     build: ./Relevantz.EEPZ.OrgFeedbackApi
     container_name: eepz-org-feedback-api
@@ -300,6 +350,7 @@ services:
     networks:
       - eepz-network
 
+  # ── SLA API ───────────────────────────────────────────────────────────────
   sla-api:
     build: ./Relevantz.EEPZ.SLAApi
     container_name: eepz-sla-api
@@ -325,4 +376,3 @@ volumes:
 networks:
   eepz-network:
     driver: bridge
-   
