@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.Options;
-using Relevantz.EEPZ.Api.Middleware;                   // ✅ fixes GlobalExceptionMiddleware
+using Relevantz.EEPZ.Api.Middleware;
 using Relevantz.EEPZ.Common.Utils;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Core.Service;
@@ -17,7 +17,6 @@ using Serilog;
 using MongoDB.Driver;
 using MapsterMapper;
 
-// ✅ Alias fixes CS0104 ambiguity between MongoDB.Driver.ServerVersion and EF Core
 using EFServerVersion = Microsoft.EntityFrameworkCore.ServerVersion;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -66,7 +65,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<EEPZDbContext>(options =>
     options.UseMySql(
         connectionString,
-        EFServerVersion.AutoDetect(connectionString),  // ✅ alias used here
+        EFServerVersion.AutoDetect(connectionString),
         mySqlOptions => mySqlOptions
             .EnableRetryOnFailure(
                 maxRetryCount: 3,
@@ -129,6 +128,20 @@ builder.Services.AddScoped<IOtpRepository,                   OtpRepository>();
 builder.Services.AddScoped<IAddressRepository,               AddressRepository>();
 
 // ── Keycloak JWT Authentication ───────────────────────────────────────────────
+// ✅ FIX: Read ValidIssuers from env → supports both localhost + IP (for mobile email links)
+var keycloakBaseUrlForAuth = builder.Configuration["Keycloak:BaseUrl"]
+                             ?? "http://host.docker.internal:9090";
+
+var validIssuersRaw = builder.Configuration["Keycloak:ValidIssuers"];
+var validIssuers = validIssuersRaw?
+    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+    .ToArray()
+    ?? new[]
+    {
+        "http://localhost:9090/realms/eepz-realm",
+        $"{keycloakBaseUrlForAuth}/realms/eepz-realm"
+    };
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -140,7 +153,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience         = false,
             ValidateLifetime         = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer              = "http://localhost:9090/realms/eepz-realm",
+            ValidIssuers             = validIssuers,  // ✅ CHANGED: ValidIssuer → ValidIssuers
             ClockSkew                = TimeSpan.FromMinutes(5)
         };
         options.Events = new JwtBearerEvents
@@ -206,11 +219,10 @@ using (var scope = app.Services.CreateScope())
     }
 
     // STEP 2 — Wait for Keycloak (max 60s)
-    // ✅ Prevents seeder running before Keycloak realm is imported
     var keycloakBaseUrl = config["Keycloak:BaseUrl"] ?? "http://host.docker.internal:9090";
     var keycloakReady   = false;
     using var httpClient = new HttpClient();
-    const int maxKeycloakAttempts = 12; // 12 × 5s = 60s
+    const int maxKeycloakAttempts = 12;
 
     for (int i = 1; i <= maxKeycloakAttempts; i++)
     {
@@ -226,18 +238,13 @@ using (var scope = app.Services.CreateScope())
                 break;
             }
         }
-        catch
-        {
-            // not ready yet — keep waiting
-        }
+        catch { }
 
         logger.LogWarning("⏳ Waiting for Keycloak... attempt {Attempt}/{Max}", i, maxKeycloakAttempts);
         await Task.Delay(TimeSpan.FromSeconds(5));
     }
 
     // STEP 3 — Seed SuperAdmin
-    // ✅ If Keycloak not ready — skip seed, API still starts
-    // ✅ If already seeded — GUARD 1 skips instantly, UUID never changes
     if (!keycloakReady)
     {
         logger.LogError("❌ Keycloak not reachable after 60s. Seeding skipped. Restart auth-api once Keycloak is up.");
@@ -254,7 +261,7 @@ using (var scope = app.Services.CreateScope())
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseMiddleware<GlobalExceptionMiddleware>(); // ✅ works — using added at top
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.UseCors("AllowAll");
 

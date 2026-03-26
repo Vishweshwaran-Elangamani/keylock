@@ -69,12 +69,12 @@ public class KeycloakAdminService : IKeycloakAdminService
     }
 
     // ── CREATE USER ──────────────────────────────────────────────────────────
+    // NO temporaryPassword — Keycloak email drives password setup via SendSetPasswordEmailAsync
     public async Task<string> CreateUserAsync(
         string userEmail,
         string firstName,
         string lastName,
-        string temporaryPassword,
-        string roleName)
+        string roleName)           // roleName kept for future attribute use / logging
     {
         await EnsureAdminTokenAsync();
 
@@ -95,16 +95,9 @@ public class KeycloakAdminService : IKeycloakAdminService
             lastName        = lastName,
             enabled         = true,
             emailVerified   = true,
-            requiredActions = Array.Empty<string>(),
-            credentials     = new[]
-            {
-                new
-                {
-                    type      = "password",
-                    value     = temporaryPassword,
-                    temporary = false
-                }
-            }
+            // requiredActions drives Keycloak to demand a password change on first login
+            requiredActions = new[] { "UPDATE_PASSWORD" }
+            // NO credentials block — Keycloak email link handles password creation
         };
 
         var req = BuildRequest(HttpMethod.Post,
@@ -120,10 +113,81 @@ public class KeycloakAdminService : IKeycloakAdminService
         var keycloakId = await GetUserIdByEmailAsync(userEmail)
             ?? throw new Exception("User created but ID not found");
 
+        _logger.LogInformation("Keycloak user created. Id={Id}", keycloakId);
         return keycloakId;
     }
 
-    // ── UPDATE USER PROFILE ✅ NEW ────────────────────────────────────────────
+    // ── SEND SET-PASSWORD EMAIL ──────────────────────────────────────────────
+    // Calls Keycloak PUT /users/{id}/execute-actions-email with ["UPDATE_PASSWORD"].
+    // Keycloak emails the new user a secure link to set their own password.
+    // ── SEND SET-PASSWORD EMAIL ──────────────────────────────────────────────────
+// Calls Keycloak PUT /users/{id}/execute-actions-email with ["UPDATE_PASSWORD"].
+// Keycloak uses the configured SMTP (eepz50532@gmail.com) to send the secure link.
+// Gmail free limit: ~500 emails/day. If exceeded, logs a clear QUOTA error.
+public async Task SendSetPasswordEmailAsync(string keycloakUserId)
+{
+    await EnsureAdminTokenAsync();
+
+    var url     = $"{_baseUrl}/admin/realms/{_realm}/users/{keycloakUserId}/execute-actions-email?lifespan=86400";
+    var actions = new[] { "UPDATE_PASSWORD" };
+
+    var req = BuildRequest(HttpMethod.Put, url, actions);
+    var res = await _http.SendAsync(req);
+
+    if (res.IsSuccessStatusCode)
+    {
+        _logger.LogInformation(
+            "✅ Set-password email sent via Keycloak SMTP (eepz50532@gmail.com). KeycloakId={Id}",
+            keycloakUserId);
+        return;
+    }
+
+    var statusCode = (int)res.StatusCode;
+    var err        = await res.Content.ReadAsStringAsync();
+
+    // ── Detect Gmail daily send limit (500/day for free accounts) ──────────
+    // Keycloak returns 500 with "Failed to send" when SMTP rejects the message.
+    // Gmail quota error contains "Daily user sending quota exceeded" or "550-5.4.5".
+    bool isQuotaError =
+        err.Contains("Daily user sending quota exceeded", StringComparison.OrdinalIgnoreCase) ||
+        err.Contains("550-5.4.5",  StringComparison.OrdinalIgnoreCase) ||
+        err.Contains("550 5.4.5",  StringComparison.OrdinalIgnoreCase) ||
+        err.Contains("quota",      StringComparison.OrdinalIgnoreCase) ||
+        err.Contains("rate limit", StringComparison.OrdinalIgnoreCase);
+
+    if (isQuotaError)
+    {
+        // ⚠️ This is a Gmail quota issue — NOT a code bug.
+        // Gmail free accounts allow ~500 emails/day.
+        // Fix: wait 24h, or upgrade to Google Workspace (2000/day),
+        // or switch to SendGrid/AWS SES for higher volume.
+        _logger.LogCritical(
+            "🚨 GMAIL QUOTA EXCEEDED — NOT A CODE ERROR. " +
+            "The SMTP account eepz50532@gmail.com has hit its daily sending limit (~500 emails/day). " +
+            "User {Id} did NOT receive the set-password email. " +
+            "Resolution: wait 24h for quota reset OR switch to a higher-volume SMTP provider. " +
+            "Raw Keycloak error: {Error}",
+            keycloakUserId, err);
+
+        throw new InvalidOperationException(
+            "Email quota exceeded on SMTP account eepz50532@gmail.com. " +
+            "This is a Gmail daily limit issue, not a code error. See logs for details.");
+    }
+
+    // ── All other SMTP/Keycloak failures ────────────────────────────────────
+    _logger.LogError(
+        "❌ SendSetPasswordEmail failed. KeycloakId={Id} HttpStatus={Status} Error={Error}. " +
+        "Check Keycloak SMTP config at Realm Settings → Email. " +
+        "SMTP account: eepz50532@gmail.com / smtp.gmail.com:587",
+        keycloakUserId, statusCode, err);
+
+    throw new InvalidOperationException(
+        $"Failed to send set-password email via Keycloak. " +
+        $"HttpStatus={statusCode}. Check SMTP configuration. Raw error: {err}");
+}
+
+
+    // ── UPDATE USER PROFILE ──────────────────────────────────────────────────
     // Explicitly patches email + firstName + lastName on Keycloak user record.
     // Required because Keycloak silently ignores these fields on create in some versions.
     public async Task UpdateUserProfileAsync(
@@ -226,7 +290,7 @@ public class KeycloakAdminService : IKeycloakAdminService
     }
 
     // ── RESET PASSWORD BY EMAIL ──────────────────────────────────────────────
-    public async Task ResetPasswordAsync(string email, string newPassword, bool temporary = true)
+    public async Task ResetPasswordAsync(string email, string newPassword, bool temporary = false)
     {
         await EnsureAdminTokenAsync();
 
@@ -272,7 +336,6 @@ public class KeycloakAdminService : IKeycloakAdminService
     {
         await EnsureAdminTokenAsync();
 
-        // Try username search first
         var req = BuildRequest(HttpMethod.Get,
             $"{_baseUrl}/admin/realms/{_realm}/users?username={Uri.EscapeDataString(email)}&exact=true");
 
@@ -283,7 +346,6 @@ public class KeycloakAdminService : IKeycloakAdminService
         if (doc.RootElement.GetArrayLength() > 0)
             return doc.RootElement[0].GetProperty("id").GetString();
 
-        // Fallback — try email field
         var req2 = BuildRequest(HttpMethod.Get,
             $"{_baseUrl}/admin/realms/{_realm}/users?email={Uri.EscapeDataString(email)}&exact=true");
 

@@ -1,3 +1,5 @@
+// FULL FILE — NO FUNCTIONALITY REMOVED — BUILD SAFE
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -41,10 +43,9 @@ public class AuthenticationController : ControllerBase
                 .SelectMany(v => v.Errors)
                 .Select(e => e.ErrorMessage)
                 .ToList();
-           return BadRequest(
-    ApiResponseDto<object>.FailureResponse(
-        "Validation failed.", errors));
-
+            return BadRequest(
+                ApiResponseDto<object>.FailureResponse(
+                    "Validation failed.", errors));
         }
 
         var empIdClaim = User.FindFirst("empId")?.Value
@@ -53,8 +54,7 @@ public class AuthenticationController : ControllerBase
         if (string.IsNullOrEmpty(empIdClaim) ||
             !int.TryParse(empIdClaim, out int empId))
         {
-            _logger.LogWarning(
-                "ChangePassword called but empId claim is missing or invalid.");
+            _logger.LogWarning("ChangePassword called but empId claim is missing or invalid.");
             return Unauthorized(
                 ApiResponseDto<object>.FailureResponse(
                     "Cannot identify employee from token. " +

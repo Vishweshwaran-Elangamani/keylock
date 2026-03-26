@@ -1,0 +1,121 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
+TRUNCATE TABLE __EFMigrationsHistory;
+TRUNCATE TABLE address;
+TRUNCATE TABLE assessmentdetail;
+TRUNCATE TABLE assessmentform;
+TRUNCATE TABLE assessmentreview;
+TRUNCATE TABLE assignment;
+TRUNCATE TABLE auditlogs;
+TRUNCATE TABLE budgetallocations;
+TRUNCATE TABLE budgetperiodallocations;
+TRUNCATE TABLE bulkoperationlogs;
+TRUNCATE TABLE changerequests;
+TRUNCATE TABLE competency;
+TRUNCATE TABLE department;
+TRUNCATE TABLE departmentbudgets;
+TRUNCATE TABLE departmentheadapprovals;
+TRUNCATE TABLE employee;
+TRUNCATE TABLE employeedetailsmaster;
+TRUNCATE TABLE engagement;
+TRUNCATE TABLE feedback;
+TRUNCATE TABLE feedbackedithistory;
+TRUNCATE TABLE feedbackquestion;
+TRUNCATE TABLE feedbackquestionresponse;
+TRUNCATE TABLE formprogresstracker;
+TRUNCATE TABLE goal_approvals;
+TRUNCATE TABLE goal_assignment;
+TRUNCATE TABLE goal_attachments;
+TRUNCATE TABLE goal_checklist;
+TRUNCATE TABLE goal_comments;
+TRUNCATE TABLE goalchecklistprogress;
+TRUNCATE TABLE goalprogresslog;
+TRUNCATE TABLE goals;
+TRUNCATE TABLE hrfeedbackformresponses;
+TRUNCATE TABLE hrfeedbackforms;
+TRUNCATE TABLE internalopportunities;
+TRUNCATE TABLE leadershipauditlog;
+TRUNCATE TABLE lndapprovals;
+TRUNCATE TABLE lndassignments;
+TRUNCATE TABLE lndattachments;
+TRUNCATE TABLE lndemployeeskillmapper;
+TRUNCATE TABLE lndsme;
+TRUNCATE TABLE loginattempts;
+TRUNCATE TABLE managernominationtracking;
+TRUNCATE TABLE managerreviewcomments;
+TRUNCATE TABLE master_skill;
+TRUNCATE TABLE meetingmom;
+TRUNCATE TABLE meetingparticipants;
+TRUNCATE TABLE meetings;
+TRUNCATE TABLE mentorfeedback;
+TRUNCATE TABLE mentorfeedbacktracking;
+TRUNCATE TABLE mom;
+TRUNCATE TABLE momactionitems;
+TRUNCATE TABLE momdiscussionpoints;
+TRUNCATE TABLE momsharing;
+TRUNCATE TABLE nominationparameter;
+TRUNCATE TABLE nominationparametervalues;
+TRUNCATE TABLE nominationreviewmetrics;
+TRUNCATE TABLE nominations;
+TRUNCATE TABLE nominationvisibilitytracking;
+TRUNCATE TABLE oneononediscussion;
+TRUNCATE TABLE organizationalpolicies;
+TRUNCATE TABLE organizationgoalfeedback;
+TRUNCATE TABLE organizationwideobjective;
+TRUNCATE TABLE otp;
+TRUNCATE TABLE payroll;
+TRUNCATE TABLE peerfeedback;
+TRUNCATE TABLE peerfeedbackqueue;
+TRUNCATE TABLE policyviolations;
+TRUNCATE TABLE profilechangerequests;
+TRUNCATE TABLE project;
+TRUNCATE TABLE projectemployees;
+TRUNCATE TABLE projectgoalfeedback;
+TRUNCATE TABLE promotionhistory;
+TRUNCATE TABLE promotions;
+TRUNCATE TABLE recognitiondetails;
+TRUNCATE TABLE recognitionrewards;
+TRUNCATE TABLE recognitionstatus;
+TRUNCATE TABLE refreshtokens;
+TRUNCATE TABLE reports;
+TRUNCATE TABLE review;
+TRUNCATE TABLE rewardtype;
+TRUNCATE TABLE risk;
+TRUNCATE TABLE role;
+TRUNCATE TABLE selfassessment;
+TRUNCATE TABLE selfassessmentattachment;
+TRUNCATE TABLE sla;
+TRUNCATE TABLE slacompliance;
+TRUNCATE TABLE slaescalation;
+TRUNCATE TABLE slahistory;
+TRUNCATE TABLE slanotifications;
+TRUNCATE TABLE slareviewtracking;
+TRUNCATE TABLE teamworkload;
+TRUNCATE TABLE userauthentication;
+TRUNCATE TABLE userprofile;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+
+INSERT IGNORE INTO role (RoleName, RoleCode, Description, IsSystemRole)
+VALUES
+('Admin','ADMIN','Administrative access',1),
+('HR','HR','Human Resources management',1),
+('Manager','MANAGER','Team and department management',0),
+('Employee','EMPLOYEE','Standard employee access',0),
+('Finance','FINANCE','Finance and payroll access',0),
+('ITSupport','IT_SUPPORT','IT support and system maintenance',0),
+('Auditor','AUDITOR','Read-only audit access',0);
+
+INSERT IGNORE INTO department (DepartmentName, DepartmentCode, Description, Status)
+VALUES
+('Human Resources', 'HR', 'HR and talent management', 'Active'),
+('Information Technology', 'IT', 'IT infrastructure and development', 'Active'),
+('Finance', 'FINANCE', 'Finance and accounting', 'Active'),
+('Operations', 'OPERATIONS', 'Day-to-day operations', 'Active'),
+('Sales', 'SALES', 'Sales and business development', 'Active'),
+('Marketing', 'MARKETING', 'Marketing and communications', 'Active'),
+('Legal', 'LEGAL', 'Legal and compliance', 'Active'),
+('Administration', 'ADMIN', 'General administration', 'Active'),
+('Engineering', 'ENGINEERING', 'Software engineering and R&D', 'Active'),
+('Customer Support', 'SUPPORT', 'Customer service and support', 'Active');

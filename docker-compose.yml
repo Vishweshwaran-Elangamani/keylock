@@ -12,6 +12,7 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: admin
       KC_HTTP_PORT: 9090
       KC_HOSTNAME_STRICT: "false"
+      KEYCLOAK_FRONTEND_URL: ""
       JAVA_OPTS_APPEND: "-Xms256m -Xmx512m"
     ports:
       - "9090:9090"
@@ -85,6 +86,7 @@ services:
       - Keycloak__ClientId=eepz-client
       - Keycloak__AdminUser=admin
       - Keycloak__AdminPassword=admin
+      - Keycloak__ValidIssuers=http://host.docker.internal:9090/realms/eepz-realm,http://localhost:9090/realms/eepz-realm,https://unprotractive-elmo-estipulate.ngrok-free.dev/realms/eepz-realm
     depends_on:
       mysql:
         condition: service_healthy
@@ -369,9 +371,30 @@ services:
     networks:
       - eepz-network
 
+  # ── NGROK (Public URL Forever) ────────────────────────────────────────────
+  ngrok:
+    image: ngrok/ngrok:alpine
+    container_name: eepz-ngrok
+    restart: always
+    command:
+      - http
+      - keycloak:9090
+      - --domain=unprotractive-elmo-estipulate.ngrok-free.dev
+    environment:
+      - NGROK_AUTHTOKEN=3BRsvvgMewOacdeIdv76yJ2hWKI_47feqD8J2JeDkzERwadtj
+    ports:
+      - "4040:4040"
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    networks:
+      - eepz-network
+
+
 volumes:
   mysql_data:
   mongodb_data:
+
 
 networks:
   eepz-network:

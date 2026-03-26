@@ -1,5 +1,3 @@
-// FULL FILE — NO FUNCTIONALITY REMOVED — BUILD SAFE
-
 using Microsoft.Extensions.Logging;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
@@ -18,7 +16,6 @@ public class UserManagementService : IUserManagementService
     private readonly IRoleRepository                  _roleRepo;
     private readonly IDepartmentRepository            _deptRepo;
     private readonly IKeycloakAdminService            _keycloak;
-    private readonly IEmailService                    _email;
     private readonly ILogger<UserManagementService>   _logger;
 
     public UserManagementService(
@@ -29,7 +26,6 @@ public class UserManagementService : IUserManagementService
         IRoleRepository                  roleRepo,
         IDepartmentRepository            deptRepo,
         IKeycloakAdminService            keycloak,
-        IEmailService                    email,
         ILogger<UserManagementService>   logger)
     {
         _userAuthRepo = userAuthRepo;
@@ -39,11 +35,10 @@ public class UserManagementService : IUserManagementService
         _roleRepo     = roleRepo;
         _deptRepo     = deptRepo;
         _keycloak     = keycloak;
-        _email        = email;
         _logger       = logger;
     }
 
-    // ── CREATE USER ───────────────────────────────────────────────────────
+    // ── CREATE USER ───────────────────────────────────────────────────────────
     public async Task<UserResponseDto> CreateUserAsync(
         CreateUserRequestDto request,
         int createdByUserId)
@@ -60,30 +55,39 @@ public class UserManagementService : IUserManagementService
         var department = await _deptRepo.GetByIdAsync(request.DepartmentId)
             ?? throw new KeyNotFoundException("Department not found.");
 
-        var tempPassword = GenerateTemporaryPassword();
         string? keycloakId = null;
 
         try
         {
-            // STEP 1: Create in Keycloak
+            // STEP 1 — Create user in Keycloak (4 args, no temp password)
             keycloakId = await _keycloak.CreateUserAsync(
                 request.Email,
                 request.FirstName,
                 request.LastName,
-                tempPassword,
                 role.RoleName);
 
+            // STEP 2 — Assign Keycloak realm role
             await _keycloak.AssignRoleAsync(keycloakId, role.RoleName);
 
-            // STEP 2: Employee
+            // STEP 3 — Create Employee row
+            var joiningDate = request.JoiningDate == default
+                ? DateOnly.FromDateTime(DateTime.UtcNow)
+                : request.JoiningDate;
+
+            // CreateUserRequestDto.ConfirmationDate is DateOnly? — direct assignment is safe
+            var confirmationDate = request.ConfirmationDate.HasValue
+                ? request.ConfirmationDate.Value
+                : DateOnly.FromDateTime(DateTime.UtcNow);
+
             var employee = new Employee
             {
                 EmployeeCompanyId          = request.EmployeeCompanyId,
-                EmploymentType             = request.EmploymentType    ?? "Permanent",
-                EmploymentStatus           = request.EmploymentStatus  ?? "Active",
-                EmployeeType               = request.EmployeeType      ?? "FullTime",
-                JoiningDate                = DateOnly.FromDateTime(DateTime.UtcNow),
-                WorkLocation               = request.WorkLocation      ?? "Head Office",
+                EmploymentType             = request.EmploymentType   ?? "Permanent",
+                EmploymentStatus           = request.EmploymentStatus ?? "Active",
+                EmployeeType               = request.EmployeeType     ?? "FullTime",
+                JoiningDate                = joiningDate,
+                ConfirmationDate           = confirmationDate,
+                WorkLocation               = request.WorkLocation     ?? "Head Office",
                 NoticePeriodDays           = request.NoticePeriodDays > 0 ? request.NoticePeriodDays : 30,
                 IsActive                   = true,
                 CreatedAt                  = DateTime.UtcNow,
@@ -91,30 +95,37 @@ public class UserManagementService : IUserManagementService
                 ReportingManagerEmployeeId = request.ReportingManagerEmployeeId,
                 KeycloakUserId             = keycloakId
             };
-
             await _employeeRepo.CreateAsync(employee);
 
-            // STEP 3: Profile
+            // STEP 4 — Create UserProfile
             await _profileRepo.CreateAsync(new Userprofile
             {
-                EmployeeId   = employee.EmployeeId,
-                FirstName    = request.FirstName,
-                LastName     = request.LastName,
-                MobileNumber = request.MobileNumber
+                EmployeeId          = employee.EmployeeId,
+                FirstName           = request.FirstName,
+                LastName            = request.LastName,
+                MiddleName          = request.MiddleName,
+                CallingName         = request.CallingName,
+                Gender              = request.Gender,
+                MobileNumber        = request.MobileNumber,
+                AlternateNumber     = request.AlternateNumber,
+                PersonalEmail       = request.PersonalEmail,
+                DateOfBirthOfficial = request.DateOfBirthOfficial,
+                DateOfBirthActual   = request.DateOfBirthActual,
+                ReferredBy          = request.ReferredBy
             });
 
-            // STEP 4: Auth
+            // STEP 5 — Create UserAuthentication (Keycloak owns the credential)
             await _userAuthRepo.CreateAsync(new Userauthentication
             {
                 EmployeeId   = employee.EmployeeId,
                 Email        = request.Email,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(tempPassword),
+                PasswordHash = string.Empty,
                 Status       = "Active",
                 IsFirstLogin = true,
                 CreatedAt    = DateTime.UtcNow
             });
 
-            // STEP 5: Employee Details
+            // STEP 6 — Create EmployeeDetailsMaster
             var details = new Employeedetailsmaster
             {
                 EmployeeId   = employee.EmployeeId,
@@ -123,7 +134,7 @@ public class UserManagementService : IUserManagementService
             };
             await _detailsRepo.CreateAsync(details);
 
-            // STEP 6: Push attributes to Keycloak via UUID ✅
+            // STEP 7 — Push JWT custom claims to Keycloak
             await _keycloak.SetUserAttributesAsync(keycloakId, new Dictionary<string, string>
             {
                 ["empId"]       = employee.EmployeeId.ToString(),
@@ -131,16 +142,15 @@ public class UserManagementService : IUserManagementService
                 ["role"]        = role.RoleName
             });
 
-            // ✅ STEP 6b: Explicitly patch email + firstName + lastName
-            // Required — Keycloak silently ignores these fields on create in some versions
+            // STEP 8 — Sync name/email on Keycloak user object
             await _keycloak.UpdateUserProfileAsync(
-                keycloakId,
-                request.Email,
-                request.FirstName,
-                request.LastName);
+                keycloakId, request.Email, request.FirstName, request.LastName);
 
-            // STEP 7: Welcome email
-            await _email.SendWelcomeEmailAsync(request.Email, request.FirstName, tempPassword);
+            // STEP 9 — Keycloak emails new user a "Set your password" link
+            await _keycloak.SendSetPasswordEmailAsync(keycloakId);
+
+            _logger.LogInformation(
+                "✅ User created. Set-password email sent via Keycloak. Email={Email}", request.Email);
 
             return await GetUserByIdAsync(employee.EmployeeId);
         }
@@ -149,12 +159,12 @@ public class UserManagementService : IUserManagementService
             if (!string.IsNullOrEmpty(keycloakId))
                 await _keycloak.DeleteUserAsync(keycloakId);
 
-            _logger.LogError(ex, "CreateUser failed — rollback executed for {Email}", request.Email);
+            _logger.LogError(ex, "CreateUser failed — Keycloak rollback for {Email}", request.Email);
             throw;
         }
     }
 
-    // ── UPDATE USER ───────────────────────────────────────────────────────
+    // ── UPDATE USER ───────────────────────────────────────────────────────────
     public async Task<UserResponseDto> UpdateUserAsync(
         UpdateUserRequestDto request,
         int updatedByUserId)
@@ -165,13 +175,35 @@ public class UserManagementService : IUserManagementService
         var employee = await _employeeRepo.GetByIdAsync(user.EmployeeId)
             ?? throw new KeyNotFoundException("Employee not found.");
 
-        employee.WorkLocation    = request.WorkLocation ?? employee.WorkLocation;
+        if (!string.IsNullOrWhiteSpace(request.WorkLocation))
+            employee.WorkLocation = request.WorkLocation;
+
+        if (!string.IsNullOrWhiteSpace(request.EmploymentType))
+            employee.EmploymentType = request.EmploymentType;
+
+        if (!string.IsNullOrWhiteSpace(request.EmploymentStatus))
+            employee.EmploymentStatus = request.EmploymentStatus;
+
+        if (!string.IsNullOrWhiteSpace(request.EmployeeType))
+            employee.EmployeeType = request.EmployeeType;
+
+        if (request.NoticePeriodDays.HasValue)
+            employee.NoticePeriodDays = request.NoticePeriodDays.Value;
+
+        if (request.ReportingManagerEmployeeId.HasValue)
+            employee.ReportingManagerEmployeeId = request.ReportingManagerEmployeeId.Value;
+
+        // ✅ FIX: UpdateUserRequestDto.ConfirmationDate is DateTime? — convert to DateOnly
+        // Entity Employee.ConfirmationDate is DateOnly? — cannot assign DateTime directly
+        if (request.ConfirmationDate.HasValue)
+            employee.ConfirmationDate = DateOnly.FromDateTime(request.ConfirmationDate.Value);
+
         employee.UpdatedAt       = DateTime.UtcNow;
         employee.UpdatedByUserId = updatedByUserId;
 
         await _employeeRepo.UpdateAsync(employee);
 
-        // ✅ Sync role attribute in Keycloak via UUID
+        // Sync role attribute in Keycloak after update
         if (!string.IsNullOrEmpty(employee.KeycloakUserId))
         {
             var details = await _detailsRepo.GetByEmployeeIdAsync(employee.EmployeeId);
@@ -179,20 +211,15 @@ public class UserManagementService : IUserManagementService
             {
                 var role = await _roleRepo.GetByIdAsync(details.RoleId);
                 if (role != null)
-                {
                     await _keycloak.SetUserAttributesAsync(employee.KeycloakUserId,
-                        new Dictionary<string, string>
-                        {
-                            ["role"] = role.RoleName
-                        });
-                }
+                        new Dictionary<string, string> { ["role"] = role.RoleName });
             }
         }
 
         return await GetUserByIdAsync(user.UserId);
     }
 
-    // ── ASSIGN ROLE & DEPARTMENT ──────────────────────────────────────────
+    // ── ASSIGN ROLE & DEPARTMENT ──────────────────────────────────────────────
     public async Task AssignRoleAndDepartmentAsync(AssignRoleDepartmentRequestDto request)
     {
         var details = await _detailsRepo.GetByEmployeeIdAsync(request.EmployeeId);
@@ -216,18 +243,12 @@ public class UserManagementService : IUserManagementService
         var employee = await _employeeRepo.GetByIdAsync(request.EmployeeId);
         var role     = await _roleRepo.GetByIdAsync(request.RoleId);
 
-        // ✅ UUID based — always works
         if (employee != null && !string.IsNullOrEmpty(employee.KeycloakUserId) && role != null)
-        {
             await _keycloak.SetUserAttributesAsync(employee.KeycloakUserId,
-                new Dictionary<string, string>
-                {
-                    ["role"] = role.RoleName
-                });
-        }
+                new Dictionary<string, string> { ["role"] = role.RoleName });
     }
 
-    // ── DEACTIVATE USER ───────────────────────────────────────────────────
+    // ── DEACTIVATE USER ───────────────────────────────────────────────────────
     public async Task DeactivateUserAsync(int userId, int performedByUserId)
     {
         var user = await _userAuthRepo.GetByIdAsync(userId)
@@ -246,7 +267,7 @@ public class UserManagementService : IUserManagementService
             await _keycloak.DisableUserAsync(employee.KeycloakUserId);
     }
 
-    // ── ACTIVATE USER ─────────────────────────────────────────────────────
+    // ── ACTIVATE USER ─────────────────────────────────────────────────────────
     public async Task ActivateUserAsync(int userId, int performedByUserId)
     {
         var user = await _userAuthRepo.GetByIdAsync(userId)
@@ -265,47 +286,53 @@ public class UserManagementService : IUserManagementService
             await _keycloak.EnableUserAsync(employee.KeycloakUserId);
     }
 
-    // ── GET USER BY ID ────────────────────────────────────────────────────
+    // ── GET USER BY ID ────────────────────────────────────────────────────────
     public async Task<UserResponseDto> GetUserByIdAsync(int userId)
     {
         var user = await _userAuthRepo.GetByIdAsync(userId)
             ?? throw new KeyNotFoundException("User not found.");
 
-        return MapToDto(user);
+        var employee = await _employeeRepo.GetByIdAsync(user.EmployeeId);
+        var profile  = await _profileRepo.GetByEmployeeIdAsync(user.EmployeeId);
+        var details  = await _detailsRepo.GetByEmployeeIdAsync(user.EmployeeId);
+        var role     = details != null ? await _roleRepo.GetByIdAsync(details.RoleId) : null;
+        var dept     = details != null ? await _deptRepo.GetByIdAsync(details.DepartmentId) : null;
+
+        return new UserResponseDto
+        {
+            UserId            = user.UserId,
+            EmployeeId        = user.EmployeeId,
+            Email             = user.Email,
+            FirstName         = profile?.FirstName,
+            LastName          = profile?.LastName,
+            EmployeeCompanyId = employee?.EmployeeCompanyId,
+            RoleName          = role?.RoleName,
+            DepartmentName    = dept?.DepartmentName,
+            IsActive          = employee?.IsActive ?? false,
+            Status            = user.Status,
+            IsFirstLogin      = user.IsFirstLogin ?? true,
+            EmploymentType    = employee?.EmploymentType,
+            EmploymentStatus  = employee?.EmploymentStatus,
+            JoiningDate       = employee?.JoiningDate ?? DateOnly.MinValue,
+            WorkLocation      = employee?.WorkLocation,
+            EmployeeType      = employee?.EmployeeType,
+            NoticePeriodDays  = employee?.NoticePeriodDays ?? 0
+        };
     }
 
-    // ── GET ALL USERS ─────────────────────────────────────────────────────
+    // ── GET ALL USERS ─────────────────────────────────────────────────────────
     public async Task<List<UserResponseDto>> GetAllUsersAsync()
     {
         var users  = await _userAuthRepo.GetAllAsync();
         var result = new List<UserResponseDto>();
 
         foreach (var user in users)
-        {
-            var employee = await _employeeRepo.GetByIdAsync(user.EmployeeId);
-            var profile  = await _profileRepo.GetByEmployeeIdAsync(user.EmployeeId);
-            var details  = await _detailsRepo.GetByEmployeeIdAsync(user.EmployeeId);
-
-            var role = details != null ? await _roleRepo.GetByIdAsync(details.RoleId) : null;
-            var dept = details != null ? await _deptRepo.GetByIdAsync(details.DepartmentId) : null;
-
-            result.Add(new UserResponseDto
-            {
-                UserId            = user.UserId,
-                Email             = user.Email,
-                FirstName         = profile?.FirstName,
-                LastName          = profile?.LastName,
-                EmployeeCompanyId = employee?.EmployeeCompanyId,
-                RoleName          = role?.RoleName,
-                DepartmentName    = dept?.DepartmentName,
-                IsActive          = employee?.IsActive ?? false
-            });
-        }
+            result.Add(await GetUserByIdAsync(user.UserId));
 
         return result;
     }
 
-    // ── GET EMPLOYEES BY MANAGER ──────────────────────────────────────────
+    // ── GET EMPLOYEES BY MANAGER ──────────────────────────────────────────────
     public async Task<List<UserResponseDto>> GetEmployeesByManagerAsync(int managerId)
     {
         var employees = await _employeeRepo.GetByManagerIdAsync(managerId);
@@ -316,13 +343,13 @@ public class UserManagementService : IUserManagementService
             var user    = await _userAuthRepo.GetByEmployeeIdAsync(employee.EmployeeId);
             var profile = await _profileRepo.GetByEmployeeIdAsync(employee.EmployeeId);
             var details = await _detailsRepo.GetByEmployeeIdAsync(employee.EmployeeId);
-
-            var role = details != null ? await _roleRepo.GetByIdAsync(details.RoleId) : null;
-            var dept = details != null ? await _deptRepo.GetByIdAsync(details.DepartmentId) : null;
+            var role    = details != null ? await _roleRepo.GetByIdAsync(details.RoleId) : null;
+            var dept    = details != null ? await _deptRepo.GetByIdAsync(details.DepartmentId) : null;
 
             result.Add(new UserResponseDto
             {
                 UserId            = user?.UserId ?? 0,
+                EmployeeId        = employee.EmployeeId,
                 Email             = user?.Email,
                 FirstName         = profile?.FirstName,
                 LastName          = profile?.LastName,
@@ -336,56 +363,17 @@ public class UserManagementService : IUserManagementService
         return result;
     }
 
-    // ── GET NEXT EMPLOYEE COMPANY ID ──────────────────────────────────────
+    // ── GET NEXT EMPLOYEE COMPANY ID ──────────────────────────────────────────
     public async Task<string> GetNextEmployeeCompanyIdAsync()
     {
         var employees = await _employeeRepo.GetAllAsync();
 
-        if (!employees.Any())
-            return "1";
+        if (!employees.Any()) return "1";
 
         var maxId = employees
             .Select(e => int.TryParse(e.EmployeeCompanyId, out var val) ? val : 0)
             .Max();
 
         return (maxId + 1).ToString();
-    }
-
-    // ── PRIVATE HELPERS ───────────────────────────────────────────────────
-    private static UserResponseDto MapToDto(Userauthentication user)
-    {
-        return new UserResponseDto
-        {
-            UserId   = user.UserId,
-            Email    = user.Email,
-            RoleName = user.Employee?.Employeedetailsmasters
-                           ?.FirstOrDefault()?.Role?.RoleName,
-            IsActive = user.Employee?.IsActive ?? false
-        };
-    }
-
-    private static string GenerateTemporaryPassword()
-    {
-        var upper   = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        var lower   = "abcdefghijklmnopqrstuvwxyz";
-        var digits  = "0123456789";
-        var special = "@#$!";
-        var rng     = new Random();
-
-        var password = new[]
-        {
-            upper[rng.Next(upper.Length)],
-            lower[rng.Next(lower.Length)],
-            digits[rng.Next(digits.Length)],
-            special[rng.Next(special.Length)]
-        };
-
-        var all  = upper + lower + digits + special;
-        var rest = Enumerable.Range(0, 8)
-                             .Select(_ => all[rng.Next(all.Length)]);
-
-        return new string(password.Concat(rest)
-                                  .OrderBy(_ => rng.Next())
-                                  .ToArray());
     }
 }
