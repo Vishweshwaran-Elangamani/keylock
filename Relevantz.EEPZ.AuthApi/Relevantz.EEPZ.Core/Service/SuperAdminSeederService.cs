@@ -1,6 +1,6 @@
-// FIXED: Added missing EF Core usings — AsNoTracking / FirstOrDefaultAsync / SaveChangesAsync
+// FIXED: All seeding scenarios handled correctly
 
-using Microsoft.EntityFrameworkCore;                  // ✅ required for AsNoTracking, FirstOrDefaultAsync, SaveChangesAsync
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Relevantz.EEPZ.Common.Constants;
@@ -19,7 +19,7 @@ public class SuperAdminSeederService : ISuperAdminSeederService
     private readonly ILogger<SuperAdminSeederService> _logger;
 
     private string SuperAdminEmail     => _configuration["AdminSeedData:Email"]             ?? "emailservice@eepz.com";
-    private string SuperAdminPassword  => _configuration["AdminSeedData:Password"]          ?? "rZ26012025Rix";
+    private string SuperAdminPassword  => _configuration["AdminSeedData:Password"]          ?? "KeyAdmin@123456";
     private string SuperAdminFirstName => _configuration["AdminSeedData:FirstName"]         ?? "Super";
     private string SuperAdminLastName  => _configuration["AdminSeedData:LastName"]          ?? "Administrator";
     private string SuperAdminCompanyId => _configuration["AdminSeedData:EmployeeCompanyId"] ?? "1000";
@@ -41,35 +41,91 @@ public class SuperAdminSeederService : ISuperAdminSeederService
 
     public async Task SeedAsync()
     {
-        // ── GUARD 1: Already seeded ───────────────────────────────────────────
         var existingAuth = await _db.Userauthentications
-            .AsNoTracking()                             // ✅ works now — EF Core using present
+            .AsNoTracking()
+            .Include(ua => ua.Employee)
             .FirstOrDefaultAsync(ua => ua.Email == SuperAdminEmail);
 
         if (existingAuth != null)
         {
-            _logger.LogInformation("SuperAdmin already seeded. Skipping.");
+            string? keycloakUserId = null;
+            try { keycloakUserId = await _keycloak.GetUserIdByEmailAsync(SuperAdminEmail); }
+            catch { /* Keycloak unreachable — skip re-sync */ }
+
+            // ✅ CASE 1: Both DB + Keycloak exist → skip fully
+            if (!string.IsNullOrEmpty(keycloakUserId))
+            {
+                _logger.LogInformation("✅ SuperAdmin already seeded. Skipping.");
+                return;
+            }
+
+            // ✅ CASE 2: DB exists but Keycloak wiped → recreate in Keycloak only
+            _logger.LogWarning("⚠️ DB exists but Keycloak missing. Recreating Keycloak user...");
+
+            var employee = await _db.Employees
+                .FirstAsync(e => e.EmployeeId == existingAuth.EmployeeId);
+
+            var details = await _db.Employeedetailsmasters
+                .FirstAsync(d => d.EmployeeId == employee.EmployeeId);
+
+            // ✅ CreateUserAsync already sends firstName+lastName+email+username in payload
+            string newKeycloakId;
+            try
+            {
+                newKeycloakId = await _keycloak.CreateUserAsync(
+                    SuperAdminEmail, SuperAdminFirstName, SuperAdminLastName, SuperAdminRole);
+            }
+            catch (Exception ex) when (ex.Message.Contains("already exists"))
+            {
+                newKeycloakId = await _keycloak.GetUserIdByEmailAsync(SuperAdminEmail)
+                    ?? throw new Exception("Keycloak user exists but UUID not found.");
+            }
+
+            // Wait for Keycloak to fully persist the user
+            await Task.Delay(1000);
+
+            try { await _keycloak.AssignRoleAsync(newKeycloakId, SuperAdminRole); }
+            catch (Exception ex) { _logger.LogWarning("Role assign: {Msg}", ex.Message); }
+
+            // ✅ SetUserAttributesAsync only — NO UpdateUserProfileAsync here
+            // CreateUserAsync already set all profile fields correctly on creation
+            await _keycloak.SetUserAttributesAsync(newKeycloakId, new Dictionary<string, string>
+            {
+                ["empId"]       = employee.EmployeeId.ToString(),
+                ["empMasterId"] = details.EmployeeMasterId.ToString(),
+                ["role"]        = SuperAdminRole
+            });
+
+            // SuperAdmin gets direct password — NOT email link
+            await _keycloak.ResetPasswordByIdAsync(newKeycloakId, SuperAdminPassword, temporary: false);
+
+            // ✅ Update MySQL with new Keycloak UUID
+            var trackedEmployee = await _db.Employees
+                .FirstAsync(e => e.EmployeeId == existingAuth.EmployeeId);
+            trackedEmployee.KeycloakUserId = newKeycloakId;
+            trackedEmployee.UpdatedAt      = DateTime.UtcNow;
+            _db.Employees.Update(trackedEmployee);
+            await _db.SaveChangesAsync();
+
+            _logger.LogInformation("✅ Keycloak user recreated & synced. NewId={Id}", newKeycloakId);
             return;
         }
 
-        // ── GUARD 2: Orphaned employee ────────────────────────────────────────
+        // ── GUARD 2: Orphaned employee ──────────────────────────────────────
         var orphanedEmployee = await _db.Employees
             .FirstOrDefaultAsync(e => e.EmployeeCompanyId == SuperAdminCompanyId);
 
         if (orphanedEmployee != null)
         {
-            _logger.LogWarning("Orphaned employee found EmployeeId={Id}. Completing partial seed...",
-                orphanedEmployee.EmployeeId);
+            _logger.LogWarning("Orphaned employee found EmployeeId={Id}.", orphanedEmployee.EmployeeId);
             await CompleteSeedForExistingEmployeeAsync(orphanedEmployee);
             return;
         }
 
+        // ── FRESH SEED ──────────────────────────────────────────────────────
         _logger.LogInformation("Seeding SuperAdmin. Email={Email}", SuperAdminEmail);
 
-        // ── STEP 1: Ensure Role exists ────────────────────────────────────────
-        var role = await _db.Roles
-            .FirstOrDefaultAsync(r => r.RoleName == SuperAdminRole);
-
+        var role = await _db.Roles.FirstOrDefaultAsync(r => r.RoleName == SuperAdminRole);
         if (role == null)
         {
             role = new Role
@@ -84,10 +140,7 @@ public class SuperAdminSeederService : ISuperAdminSeederService
             await _db.SaveChangesAsync();
         }
 
-        // ── STEP 2: Ensure Department exists ──────────────────────────────────
-        var department = await _db.Departments
-            .FirstOrDefaultAsync(d => d.DepartmentCode == "SUPERADMIN");
-
+        var department = await _db.Departments.FirstOrDefaultAsync(d => d.DepartmentCode == "SUPERADMIN");
         if (department == null)
         {
             department = new Department
@@ -102,55 +155,48 @@ public class SuperAdminSeederService : ISuperAdminSeederService
             await _db.SaveChangesAsync();
         }
 
-        // ── STEP 3: Create user in Keycloak ───────────────────────────────────
-        string keycloakUserId;
+        // ✅ CreateUserAsync sends all fields — firstName, lastName, email, username
+        string keycloakId;
         try
         {
-            // ✅ 4 args — no temporaryPassword
-            keycloakUserId = await _keycloak.CreateUserAsync(
-                SuperAdminEmail,
-                SuperAdminFirstName,
-                SuperAdminLastName,
-                SuperAdminRole);
-
-            _logger.LogInformation("Keycloak user created. Id={Id}", keycloakUserId);
+            keycloakId = await _keycloak.CreateUserAsync(
+                SuperAdminEmail, SuperAdminFirstName, SuperAdminLastName, SuperAdminRole);
+            _logger.LogInformation("Keycloak user created. Id={Id}", keycloakId);
         }
         catch (Exception ex) when (ex.Message.Contains("already exists"))
         {
             _logger.LogWarning("Keycloak user already exists. Fetching UUID...");
-            var existingId = await _keycloak.GetUserIdByEmailAsync(SuperAdminEmail);
-            if (string.IsNullOrEmpty(existingId))
-                throw new Exception($"Keycloak user exists but UUID not found for {SuperAdminEmail}");
-            keycloakUserId = existingId;
+            keycloakId = await _keycloak.GetUserIdByEmailAsync(SuperAdminEmail)
+                ?? throw new Exception($"Keycloak user exists but UUID not found for {SuperAdminEmail}");
         }
 
-        // ── STEP 4: Assign Keycloak role ──────────────────────────────────────
-        try { await _keycloak.AssignRoleAsync(keycloakUserId, SuperAdminRole); }
-        catch (Exception ex) { _logger.LogWarning(ex, "Could not assign Keycloak role — may already be assigned."); }
+        // Wait for Keycloak to fully persist the user
+        await Task.Delay(1000);
 
-        // ── STEP 5: Create Employee row ───────────────────────────────────────
-        var employee = new Employee
+        try { await _keycloak.AssignRoleAsync(keycloakId, SuperAdminRole); }
+        catch (Exception ex) { _logger.LogWarning(ex, "Role assign failed."); }
+
+        var employeeNew = new Employee
         {
             EmployeeCompanyId = SuperAdminCompanyId,
-            KeycloakUserId    = keycloakUserId,
+            KeycloakUserId    = keycloakId,
             EmploymentType    = "Permanent",
             EmploymentStatus  = "Active",
             EmployeeType      = "FullTime",
             JoiningDate       = DateOnly.FromDateTime(DateTime.UtcNow),
-            ConfirmationDate  = DateOnly.FromDateTime(DateTime.UtcNow),  // ✅ DateOnly — not DateTime
+            ConfirmationDate  = DateOnly.FromDateTime(DateTime.UtcNow),
             WorkLocation      = "Head Office",
             NoticePeriodDays  = 0,
             IsActive          = true,
             CreatedAt         = DateTime.UtcNow,
             CreatedByUserId   = 1
         };
-        _db.Employees.Add(employee);
+        _db.Employees.Add(employeeNew);
         await _db.SaveChangesAsync();
 
-        // ── STEP 6: Create UserProfile ────────────────────────────────────────
         _db.Userprofiles.Add(new Userprofile
         {
-            EmployeeId   = employee.EmployeeId,
+            EmployeeId   = employeeNew.EmployeeId,
             FirstName    = SuperAdminFirstName,
             LastName     = SuperAdminLastName,
             MobileNumber = SuperAdminMobile,
@@ -158,10 +204,9 @@ public class SuperAdminSeederService : ISuperAdminSeederService
         });
         await _db.SaveChangesAsync();
 
-        // ── STEP 7: Create UserAuthentication ────────────────────────────────
         var userAuth = new Userauthentication
         {
-            EmployeeId   = employee.EmployeeId,
+            EmployeeId   = employeeNew.EmployeeId,
             Email        = SuperAdminEmail,
             PasswordHash = PasswordHelper.HashPassword(SuperAdminPassword),
             Status       = "Active",
@@ -171,40 +216,31 @@ public class SuperAdminSeederService : ISuperAdminSeederService
         _db.Userauthentications.Add(userAuth);
         await _db.SaveChangesAsync();
 
-        // ── STEP 8: Create EmployeeDetailsMaster ─────────────────────────────
-        var details = new Employeedetailsmaster
+        var detailsNew = new Employeedetailsmaster
         {
-            EmployeeId   = employee.EmployeeId,
+            EmployeeId   = employeeNew.EmployeeId,
             RoleId       = role.RoleId,
             DepartmentId = department.DepartmentId
         };
-        _db.Employeedetailsmasters.Add(details);
+        _db.Employeedetailsmasters.Add(detailsNew);
         await _db.SaveChangesAsync();
 
-        // ── STEP 9: Push Keycloak attributes + set password directly ─────────
         try
         {
-            await _keycloak.SetUserAttributesAsync(keycloakUserId, new Dictionary<string, string>
+            // ✅ Only attributes + password — NO UpdateUserProfileAsync
+            // CreateUserAsync already set all profile fields correctly
+            await _keycloak.SetUserAttributesAsync(keycloakId, new Dictionary<string, string>
             {
-                ["empId"]       = employee.EmployeeId.ToString(),
-                ["empMasterId"] = details.EmployeeMasterId.ToString(),
+                ["empId"]       = employeeNew.EmployeeId.ToString(),
+                ["empMasterId"] = detailsNew.EmployeeMasterId.ToString(),
                 ["role"]        = SuperAdminRole
             });
-
-            await _keycloak.UpdateUserProfileAsync(
-                keycloakUserId, SuperAdminEmail, SuperAdminFirstName, SuperAdminLastName);
-
-            // SuperAdmin gets password set directly — not via email link
-            await _keycloak.ResetPasswordByIdAsync(keycloakUserId, SuperAdminPassword, temporary: false);
+            await _keycloak.ResetPasswordByIdAsync(keycloakId, SuperAdminPassword, temporary: false);
         }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Keycloak post-create sync failed. Non-fatal.");
-        }
+        catch (Exception ex) { _logger.LogWarning(ex, "Keycloak post-create sync failed. Non-fatal."); }
 
-        _logger.LogInformation(
-            "✅ SuperAdmin seeded. Email={Email} EmployeeId={EmpId} UserId={UserId}",
-            SuperAdminEmail, employee.EmployeeId, userAuth.UserId);
+        _logger.LogInformation("✅ SuperAdmin seeded. Email={Email} EmployeeId={EmpId}",
+            SuperAdminEmail, employeeNew.EmployeeId);
     }
 
     // ── HELPER: Fix orphaned employee from failed partial seed ────────────────

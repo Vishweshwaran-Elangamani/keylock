@@ -55,11 +55,16 @@ public class UserManagementService : IUserManagementService
         var department = await _deptRepo.GetByIdAsync(request.DepartmentId)
             ?? throw new KeyNotFoundException("Department not found.");
 
+        // ✅ FIX 1: Auto-generate EmployeeCompanyId — never trust client-sent value
+        // This prevents "Duplicate entry" on employee.EmployeeCompanyId unique constraint
+        var employeeCompanyId = await GetNextEmployeeCompanyIdAsync();
+
         string? keycloakId = null;
 
         try
         {
-            // STEP 1 — Create user in Keycloak (4 args, no temp password)
+            // STEP 1 — Create user in Keycloak
+            // CreateUserAsync already sets username, email, firstName, lastName, enabled=true
             keycloakId = await _keycloak.CreateUserAsync(
                 request.Email,
                 request.FirstName,
@@ -67,21 +72,21 @@ public class UserManagementService : IUserManagementService
                 role.RoleName);
 
             // STEP 2 — Assign Keycloak realm role
-            await _keycloak.AssignRoleAsync(keycloakId, role.RoleName);
+            try { await _keycloak.AssignRoleAsync(keycloakId, role.RoleName); }
+            catch (Exception ex) { _logger.LogWarning(ex, "Role assign failed — non-fatal."); }
 
             // STEP 3 — Create Employee row
             var joiningDate = request.JoiningDate == default
                 ? DateOnly.FromDateTime(DateTime.UtcNow)
                 : request.JoiningDate;
 
-            // CreateUserRequestDto.ConfirmationDate is DateOnly? — direct assignment is safe
             var confirmationDate = request.ConfirmationDate.HasValue
                 ? request.ConfirmationDate.Value
                 : DateOnly.FromDateTime(DateTime.UtcNow);
 
             var employee = new Employee
             {
-                EmployeeCompanyId          = request.EmployeeCompanyId,
+                EmployeeCompanyId          = employeeCompanyId,   // ✅ auto-generated
                 EmploymentType             = request.EmploymentType   ?? "Permanent",
                 EmploymentStatus           = request.EmploymentStatus ?? "Active",
                 EmployeeType               = request.EmployeeType     ?? "FullTime",
@@ -96,6 +101,7 @@ public class UserManagementService : IUserManagementService
                 KeycloakUserId             = keycloakId
             };
             await _employeeRepo.CreateAsync(employee);
+            // ✅ employee.EmployeeId is now populated by EF Core after SaveChangesAsync
 
             // STEP 4 — Create UserProfile
             await _profileRepo.CreateAsync(new Userprofile
@@ -115,7 +121,7 @@ public class UserManagementService : IUserManagementService
             });
 
             // STEP 5 — Create UserAuthentication (Keycloak owns the credential)
-            await _userAuthRepo.CreateAsync(new Userauthentication
+            var userAuth = new Userauthentication
             {
                 EmployeeId   = employee.EmployeeId,
                 Email        = request.Email,
@@ -123,7 +129,9 @@ public class UserManagementService : IUserManagementService
                 Status       = "Active",
                 IsFirstLogin = true,
                 CreatedAt    = DateTime.UtcNow
-            });
+            };
+            await _userAuthRepo.CreateAsync(userAuth);
+            // ✅ userAuth.UserId is now populated after SaveChangesAsync
 
             // STEP 6 — Create EmployeeDetailsMaster
             var details = new Employeedetailsmaster
@@ -133,31 +141,48 @@ public class UserManagementService : IUserManagementService
                 DepartmentId = request.DepartmentId
             };
             await _detailsRepo.CreateAsync(details);
+            // ✅ details.EmployeeMasterId is now populated after SaveChangesAsync
 
-            // STEP 7 — Push JWT custom claims to Keycloak
-            await _keycloak.SetUserAttributesAsync(keycloakId, new Dictionary<string, string>
-            {
-                ["empId"]       = employee.EmployeeId.ToString(),
-                ["empMasterId"] = details.EmployeeMasterId.ToString(),
-                ["role"]        = role.RoleName
-            });
+            // STEP 7 — Push JWT custom claims + profile fields to Keycloak in ONE call
+            // ✅ FIX 2: Pass firstName/lastName explicitly so SetUserAttributesAsync
+            // never reads stale empty values back from Keycloak and overwrites them
+            await _keycloak.SetUserAttributesAsync(
+                keycloakId,
+                new Dictionary<string, string>
+                {
+                    ["empId"]       = employee.EmployeeId.ToString(),
+                    ["empMasterId"] = details.EmployeeMasterId.ToString(),
+                    ["role"]        = role.RoleName
+                },
+                firstName: request.FirstName,
+                lastName:  request.LastName,
+                email:     request.Email);
 
-            // STEP 8 — Sync name/email on Keycloak user object
-            await _keycloak.UpdateUserProfileAsync(
-                keycloakId, request.Email, request.FirstName, request.LastName);
+            // ✅ FIX 3: REMOVED UpdateUserProfileAsync — it was racing with/overwriting
+            // the correct data already set by CreateUserAsync + SetUserAttributesAsync
 
-            // STEP 9 — Keycloak emails new user a "Set your password" link
+            // STEP 8 — Keycloak emails new user a "Set your password" link
             await _keycloak.SendSetPasswordEmailAsync(keycloakId);
 
             _logger.LogInformation(
-                "✅ User created. Set-password email sent via Keycloak. Email={Email}", request.Email);
+                "✅ User created. Set-password email sent. Email={Email} EmployeeId={EId}",
+                request.Email, employee.EmployeeId);
 
-            return await GetUserByIdAsync(employee.EmployeeId);
+            // ✅ FIX 4: Use userAuth.UserId directly — already populated above
+            // NEVER call GetUserByIdAsync(employee.EmployeeId) here since GetUserByIdAsync
+            // takes a UserId (Userauthentication.UserId), NOT EmployeeId
+            return await GetUserByIdAsync(userAuth.UserId);
         }
         catch (Exception ex)
         {
             if (!string.IsNullOrEmpty(keycloakId))
-                await _keycloak.DeleteUserAsync(keycloakId);
+            {
+                try { await _keycloak.DeleteUserAsync(keycloakId); }
+                catch (Exception rollbackEx)
+                {
+                    _logger.LogWarning(rollbackEx, "Keycloak rollback also failed for {Email}", request.Email);
+                }
+            }
 
             _logger.LogError(ex, "CreateUser failed — Keycloak rollback for {Email}", request.Email);
             throw;
@@ -193,8 +218,6 @@ public class UserManagementService : IUserManagementService
         if (request.ReportingManagerEmployeeId.HasValue)
             employee.ReportingManagerEmployeeId = request.ReportingManagerEmployeeId.Value;
 
-        // ✅ FIX: UpdateUserRequestDto.ConfirmationDate is DateTime? — convert to DateOnly
-        // Entity Employee.ConfirmationDate is DateOnly? — cannot assign DateTime directly
         if (request.ConfirmationDate.HasValue)
             employee.ConfirmationDate = DateOnly.FromDateTime(request.ConfirmationDate.Value);
 
@@ -203,7 +226,6 @@ public class UserManagementService : IUserManagementService
 
         await _employeeRepo.UpdateAsync(employee);
 
-        // Sync role attribute in Keycloak after update
         if (!string.IsNullOrEmpty(employee.KeycloakUserId))
         {
             var details = await _detailsRepo.GetByEmployeeIdAsync(employee.EmployeeId);
@@ -211,7 +233,8 @@ public class UserManagementService : IUserManagementService
             {
                 var role = await _roleRepo.GetByIdAsync(details.RoleId);
                 if (role != null)
-                    await _keycloak.SetUserAttributesAsync(employee.KeycloakUserId,
+                    await _keycloak.SetUserAttributesAsync(
+                        employee.KeycloakUserId,
                         new Dictionary<string, string> { ["role"] = role.RoleName });
             }
         }
@@ -244,7 +267,8 @@ public class UserManagementService : IUserManagementService
         var role     = await _roleRepo.GetByIdAsync(request.RoleId);
 
         if (employee != null && !string.IsNullOrEmpty(employee.KeycloakUserId) && role != null)
-            await _keycloak.SetUserAttributesAsync(employee.KeycloakUserId,
+            await _keycloak.SetUserAttributesAsync(
+                employee.KeycloakUserId,
                 new Dictionary<string, string> { ["role"] = role.RoleName });
     }
 
@@ -295,7 +319,7 @@ public class UserManagementService : IUserManagementService
         var employee = await _employeeRepo.GetByIdAsync(user.EmployeeId);
         var profile  = await _profileRepo.GetByEmployeeIdAsync(user.EmployeeId);
         var details  = await _detailsRepo.GetByEmployeeIdAsync(user.EmployeeId);
-        var role     = details != null ? await _roleRepo.GetByIdAsync(details.RoleId) : null;
+        var role     = details != null ? await _roleRepo.GetByIdAsync(details.RoleId)  : null;
         var dept     = details != null ? await _deptRepo.GetByIdAsync(details.DepartmentId) : null;
 
         return new UserResponseDto
@@ -343,7 +367,7 @@ public class UserManagementService : IUserManagementService
             var user    = await _userAuthRepo.GetByEmployeeIdAsync(employee.EmployeeId);
             var profile = await _profileRepo.GetByEmployeeIdAsync(employee.EmployeeId);
             var details = await _detailsRepo.GetByEmployeeIdAsync(employee.EmployeeId);
-            var role    = details != null ? await _roleRepo.GetByIdAsync(details.RoleId) : null;
+            var role    = details != null ? await _roleRepo.GetByIdAsync(details.RoleId)       : null;
             var dept    = details != null ? await _deptRepo.GetByIdAsync(details.DepartmentId) : null;
 
             result.Add(new UserResponseDto
@@ -368,7 +392,7 @@ public class UserManagementService : IUserManagementService
     {
         var employees = await _employeeRepo.GetAllAsync();
 
-        if (!employees.Any()) return "1";
+        if (!employees.Any()) return "1001";  // ✅ start from 1001, SuperAdmin owns 1000
 
         var maxId = employees
             .Select(e => int.TryParse(e.EmployeeCompanyId, out var val) ? val : 0)

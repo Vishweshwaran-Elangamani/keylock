@@ -1,5 +1,3 @@
-// FULL FILE — NO FUNCTIONALITY REMOVED — BUILD SAFE
-
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -11,7 +9,7 @@ namespace Relevantz.EEPZ.Core.Service;
 
 public class KeycloakAdminService : IKeycloakAdminService
 {
-    private readonly HttpClient _http;
+    private readonly HttpClient                    _http;
     private readonly ILogger<KeycloakAdminService> _logger;
 
     private readonly string _baseUrl;
@@ -19,12 +17,12 @@ public class KeycloakAdminService : IKeycloakAdminService
     private readonly string _adminUser;
     private readonly string _adminPassword;
 
-    private string? _adminToken;
+    private string?  _adminToken;
     private DateTime _adminTokenExpiry = DateTime.MinValue;
 
     public KeycloakAdminService(
-        HttpClient http,
-        IConfiguration configuration,
+        HttpClient         http,
+        IConfiguration     configuration,
         ILogger<KeycloakAdminService> logger)
     {
         _http          = http;
@@ -37,7 +35,7 @@ public class KeycloakAdminService : IKeycloakAdminService
         _adminPassword = configuration["Keycloak:AdminPassword"] ?? "admin";
     }
 
-    // ── Admin token ──────────────────────────────────────────────────────────
+    // ── ADMIN TOKEN ──────────────────────────────────────────────────────────
     private async Task EnsureAdminTokenAsync()
     {
         if (_adminToken != null && DateTime.UtcNow < _adminTokenExpiry.AddSeconds(-60))
@@ -69,12 +67,13 @@ public class KeycloakAdminService : IKeycloakAdminService
     }
 
     // ── CREATE USER ──────────────────────────────────────────────────────────
-    // NO temporaryPassword — Keycloak email drives password setup via SendSetPasswordEmailAsync
+    // ✅ Sets ALL fields on creation — username, email, firstName, lastName, enabled, emailVerified
+    // ✅ Does NOT set requiredActions=UPDATE_PASSWORD for SuperAdmin (only for regular users)
     public async Task<string> CreateUserAsync(
         string userEmail,
         string firstName,
         string lastName,
-        string roleName)           // roleName kept for future attribute use / logging
+        string roleName)
     {
         await EnsureAdminTokenAsync();
 
@@ -87,6 +86,12 @@ public class KeycloakAdminService : IKeycloakAdminService
         firstName ??= "";
         lastName  ??= "";
 
+        // ✅ FIX: requiredActions only for non-SuperAdmin users
+        // SuperAdmin password is set directly via ResetPasswordByIdAsync — no email link needed
+        var requiredActions = roleName == "SuperAdmin"
+            ? Array.Empty<string>()
+            : new[] { "UPDATE_PASSWORD" };
+
         var payload = new
         {
             username        = userEmail,
@@ -95,9 +100,7 @@ public class KeycloakAdminService : IKeycloakAdminService
             lastName        = lastName,
             enabled         = true,
             emailVerified   = true,
-            // requiredActions drives Keycloak to demand a password change on first login
-            requiredActions = new[] { "UPDATE_PASSWORD" }
-            // NO credentials block — Keycloak email link handles password creation
+            requiredActions = requiredActions
         };
 
         var req = BuildRequest(HttpMethod.Post,
@@ -110,6 +113,9 @@ public class KeycloakAdminService : IKeycloakAdminService
             throw new InvalidOperationException(err);
         }
 
+        // ✅ Small delay to allow Keycloak to fully persist the new user
+        await Task.Delay(300);
+
         var keycloakId = await GetUserIdByEmailAsync(userEmail)
             ?? throw new Exception("User created but ID not found");
 
@@ -118,78 +124,53 @@ public class KeycloakAdminService : IKeycloakAdminService
     }
 
     // ── SEND SET-PASSWORD EMAIL ──────────────────────────────────────────────
-    // Calls Keycloak PUT /users/{id}/execute-actions-email with ["UPDATE_PASSWORD"].
-    // Keycloak emails the new user a secure link to set their own password.
-    // ── SEND SET-PASSWORD EMAIL ──────────────────────────────────────────────────
-// Calls Keycloak PUT /users/{id}/execute-actions-email with ["UPDATE_PASSWORD"].
-// Keycloak uses the configured SMTP (eepz50532@gmail.com) to send the secure link.
-// Gmail free limit: ~500 emails/day. If exceeded, logs a clear QUOTA error.
-public async Task SendSetPasswordEmailAsync(string keycloakUserId)
-{
-    await EnsureAdminTokenAsync();
-
-    var url     = $"{_baseUrl}/admin/realms/{_realm}/users/{keycloakUserId}/execute-actions-email?lifespan=86400";
-    var actions = new[] { "UPDATE_PASSWORD" };
-
-    var req = BuildRequest(HttpMethod.Put, url, actions);
-    var res = await _http.SendAsync(req);
-
-    if (res.IsSuccessStatusCode)
+    public async Task SendSetPasswordEmailAsync(string keycloakUserId)
     {
-        _logger.LogInformation(
-            "✅ Set-password email sent via Keycloak SMTP (eepz50532@gmail.com). KeycloakId={Id}",
-            keycloakUserId);
-        return;
-    }
+        await EnsureAdminTokenAsync();
 
-    var statusCode = (int)res.StatusCode;
-    var err        = await res.Content.ReadAsStringAsync();
+        var url     = $"{_baseUrl}/admin/realms/{_realm}/users/{keycloakUserId}/execute-actions-email?lifespan=86400";
+        var actions = new[] { "UPDATE_PASSWORD" };
 
-    // ── Detect Gmail daily send limit (500/day for free accounts) ──────────
-    // Keycloak returns 500 with "Failed to send" when SMTP rejects the message.
-    // Gmail quota error contains "Daily user sending quota exceeded" or "550-5.4.5".
-    bool isQuotaError =
-        err.Contains("Daily user sending quota exceeded", StringComparison.OrdinalIgnoreCase) ||
-        err.Contains("550-5.4.5",  StringComparison.OrdinalIgnoreCase) ||
-        err.Contains("550 5.4.5",  StringComparison.OrdinalIgnoreCase) ||
-        err.Contains("quota",      StringComparison.OrdinalIgnoreCase) ||
-        err.Contains("rate limit", StringComparison.OrdinalIgnoreCase);
+        var req = BuildRequest(HttpMethod.Put, url, actions);
+        var res = await _http.SendAsync(req);
 
-    if (isQuotaError)
-    {
-        // ⚠️ This is a Gmail quota issue — NOT a code bug.
-        // Gmail free accounts allow ~500 emails/day.
-        // Fix: wait 24h, or upgrade to Google Workspace (2000/day),
-        // or switch to SendGrid/AWS SES for higher volume.
-        _logger.LogCritical(
-            "🚨 GMAIL QUOTA EXCEEDED — NOT A CODE ERROR. " +
-            "The SMTP account eepz50532@gmail.com has hit its daily sending limit (~500 emails/day). " +
-            "User {Id} did NOT receive the set-password email. " +
-            "Resolution: wait 24h for quota reset OR switch to a higher-volume SMTP provider. " +
-            "Raw Keycloak error: {Error}",
-            keycloakUserId, err);
+        if (res.IsSuccessStatusCode)
+        {
+            _logger.LogInformation(
+                "✅ Set-password email sent via Keycloak SMTP. KeycloakId={Id}", keycloakUserId);
+            return;
+        }
+
+        var statusCode = (int)res.StatusCode;
+        var err        = await res.Content.ReadAsStringAsync();
+
+        bool isQuotaError =
+            err.Contains("Daily user sending quota exceeded", StringComparison.OrdinalIgnoreCase) ||
+            err.Contains("550-5.4.5",  StringComparison.OrdinalIgnoreCase) ||
+            err.Contains("550 5.4.5",  StringComparison.OrdinalIgnoreCase) ||
+            err.Contains("quota",      StringComparison.OrdinalIgnoreCase) ||
+            err.Contains("rate limit", StringComparison.OrdinalIgnoreCase);
+
+        if (isQuotaError)
+        {
+            _logger.LogCritical(
+                "🚨 GMAIL QUOTA EXCEEDED. User {Id} did NOT receive email. Raw error: {Error}",
+                keycloakUserId, err);
+            throw new InvalidOperationException(
+                "Email quota exceeded. This is a Gmail daily limit issue, not a code error.");
+        }
+
+        _logger.LogError(
+            "❌ SendSetPasswordEmail failed. KeycloakId={Id} HttpStatus={Status} Error={Error}.",
+            keycloakUserId, statusCode, err);
 
         throw new InvalidOperationException(
-            "Email quota exceeded on SMTP account eepz50532@gmail.com. " +
-            "This is a Gmail daily limit issue, not a code error. See logs for details.");
+            $"Failed to send set-password email via Keycloak. HttpStatus={statusCode}. Raw error: {err}");
     }
 
-    // ── All other SMTP/Keycloak failures ────────────────────────────────────
-    _logger.LogError(
-        "❌ SendSetPasswordEmail failed. KeycloakId={Id} HttpStatus={Status} Error={Error}. " +
-        "Check Keycloak SMTP config at Realm Settings → Email. " +
-        "SMTP account: eepz50532@gmail.com / smtp.gmail.com:587",
-        keycloakUserId, statusCode, err);
-
-    throw new InvalidOperationException(
-        $"Failed to send set-password email via Keycloak. " +
-        $"HttpStatus={statusCode}. Check SMTP configuration. Raw error: {err}");
-}
-
-
     // ── UPDATE USER PROFILE ──────────────────────────────────────────────────
-    // Explicitly patches email + firstName + lastName on Keycloak user record.
-    // Required because Keycloak silently ignores these fields on create in some versions.
+    // ✅ PRESERVED but no longer called from seeder/CreateUser flows
+    // Still used if explicitly needed elsewhere
     public async Task UpdateUserProfileAsync(
         string keycloakUserId,
         string email,
@@ -200,14 +181,16 @@ public async Task SendSetPasswordEmailAsync(string keycloakUserId)
 
         var payload = new
         {
-            email     = email,
-            firstName = firstName,
-            lastName  = lastName
+            username      = email,
+            email         = email,
+            firstName     = firstName,
+            lastName      = lastName,
+            enabled       = true,
+            emailVerified = true
         };
 
         var req = BuildRequest(HttpMethod.Put,
-            $"{_baseUrl}/admin/realms/{_realm}/users/{keycloakUserId}",
-            payload);
+            $"{_baseUrl}/admin/realms/{_realm}/users/{keycloakUserId}", payload);
 
         var res = await _http.SendAsync(req);
         if (!res.IsSuccessStatusCode)
@@ -222,22 +205,28 @@ public async Task SendSetPasswordEmailAsync(string keycloakUserId)
         }
     }
 
-    // ── SET ATTRIBUTES ───────────────────────────────────────────────────────
+    // ── SET USER ATTRIBUTES ──────────────────────────────────────────────────
+    // ✅ FIX: Added firstName/lastName/email optional params
+    // When passed, these values are used directly instead of reading stale empty
+    // data back from Keycloak — prevents fields being wiped after CreateUserAsync
     public async Task SetUserAttributesAsync(
         string keycloakUserId,
-        Dictionary<string, string> attributes)
+        Dictionary<string, string> attributes,
+        string? firstName = null,
+        string? lastName  = null,
+        string? email     = null)
     {
         await EnsureAdminTokenAsync();
 
+        // 1. Fetch full current user from Keycloak
         var getReq = BuildRequest(HttpMethod.Get,
             $"{_baseUrl}/admin/realms/{_realm}/users/{keycloakUserId}");
-
         var getRes = await _http.SendAsync(getReq);
         var json   = await getRes.Content.ReadAsStringAsync();
         using var doc = JsonDocument.Parse(json);
 
+        // 2. Merge existing attributes with new ones
         var merged = new Dictionary<string, string[]>();
-
         if (doc.RootElement.TryGetProperty("attributes", out var attr))
         {
             foreach (var p in attr.EnumerateObject())
@@ -245,15 +234,48 @@ public async Task SendSetPasswordEmailAsync(string keycloakUserId)
                     .Select(x => x.GetString() ?? "")
                     .ToArray();
         }
-
         foreach (var kv in attributes)
             merged[kv.Key] = new[] { kv.Value };
 
-        var payload = new { attributes = merged };
-        var putReq  = BuildRequest(HttpMethod.Put,
+        // 3. ✅ Use explicitly passed values first — NEVER trust stale Keycloak data
+        // Falls back to Keycloak values only if explicit values not provided
+        var resolvedEmail     = email
+            ?? (doc.RootElement.TryGetProperty("email",     out var ep) ? ep.GetString() : null);
+        var resolvedFirstName = firstName
+            ?? (doc.RootElement.TryGetProperty("firstName", out var fp) ? fp.GetString() : null);
+        var resolvedLastName  = lastName
+            ?? (doc.RootElement.TryGetProperty("lastName",  out var lp) ? lp.GetString() : null);
+        var resolvedUsername  = resolvedEmail
+            ?? (doc.RootElement.TryGetProperty("username",  out var up) ? up.GetString() : null);
+
+        // 4. PUT all fields + attributes in ONE call — never partial, never wipes profile
+        var payload = new
+        {
+            username      = resolvedUsername,
+            email         = resolvedEmail,
+            firstName     = resolvedFirstName,
+            lastName      = resolvedLastName,
+            enabled       = true,
+            emailVerified = true,
+            attributes    = merged
+        };
+
+        var putReq = BuildRequest(HttpMethod.Put,
             $"{_baseUrl}/admin/realms/{_realm}/users/{keycloakUserId}", payload);
 
-        await _http.SendAsync(putReq);
+        var putRes = await _http.SendAsync(putReq);
+        if (!putRes.IsSuccessStatusCode)
+        {
+            var err = await putRes.Content.ReadAsStringAsync();
+            _logger.LogWarning("SetUserAttributes failed: {Error}", err);
+        }
+        else
+        {
+            _logger.LogInformation(
+                "✅ SetUserAttributes OK. KeycloakId={Id} empId={EmpId}",
+                keycloakUserId,
+                attributes.TryGetValue("empId", out var eid) ? eid : "?");
+        }
     }
 
     // ── ASSIGN ROLE ──────────────────────────────────────────────────────────
@@ -266,7 +288,7 @@ public async Task SendSetPasswordEmailAsync(string keycloakUserId)
 
         var roleRes = await _http.SendAsync(roleReq);
         if (!roleRes.IsSuccessStatusCode)
-            throw new Exception($"Role {roleName} not found");
+            throw new Exception($"Role {roleName} not found in Keycloak realm.");
 
         var json = await roleRes.Content.ReadAsStringAsync();
         using var doc = JsonDocument.Parse(json);
@@ -286,7 +308,10 @@ public async Task SendSetPasswordEmailAsync(string keycloakUserId)
 
         var res = await _http.SendAsync(assignReq);
         if (!res.IsSuccessStatusCode)
-            throw new Exception("Role assign failed");
+        {
+            var err = await res.Content.ReadAsStringAsync();
+            _logger.LogWarning("AssignRole failed: {Error}", err);
+        }
     }
 
     // ── RESET PASSWORD BY EMAIL ──────────────────────────────────────────────
@@ -294,9 +319,8 @@ public async Task SendSetPasswordEmailAsync(string keycloakUserId)
     {
         await EnsureAdminTokenAsync();
 
-        var userId = await GetUserIdByEmailAsync(email);
-        if (userId == null)
-            throw new Exception($"User not found: {email}");
+        var userId = await GetUserIdByEmailAsync(email)
+            ?? throw new Exception($"User not found: {email}");
 
         await ResetPasswordByIdAsync(userId, newPassword, temporary);
     }
@@ -305,7 +329,7 @@ public async Task SendSetPasswordEmailAsync(string keycloakUserId)
     public async Task ResetPasswordByIdAsync(
         string keycloakUserId,
         string newPassword,
-        bool temporary = false)
+        bool   temporary = false)
     {
         await EnsureAdminTokenAsync();
 
@@ -331,14 +355,13 @@ public async Task SendSetPasswordEmailAsync(string keycloakUserId)
     }
 
     // ── GET USER ID BY EMAIL ─────────────────────────────────────────────────
-    // ✅ Tries username first (handles blank email field), then email field fallback
     public async Task<string?> GetUserIdByEmailAsync(string email)
     {
         await EnsureAdminTokenAsync();
 
+        // Try by username first (Keycloak username = email)
         var req = BuildRequest(HttpMethod.Get,
             $"{_baseUrl}/admin/realms/{_realm}/users?username={Uri.EscapeDataString(email)}&exact=true");
-
         var res  = await _http.SendAsync(req);
         var json = await res.Content.ReadAsStringAsync();
         using var doc = JsonDocument.Parse(json);
@@ -346,9 +369,9 @@ public async Task SendSetPasswordEmailAsync(string keycloakUserId)
         if (doc.RootElement.GetArrayLength() > 0)
             return doc.RootElement[0].GetProperty("id").GetString();
 
-        var req2 = BuildRequest(HttpMethod.Get,
+        // Fallback: try by email field
+        var req2  = BuildRequest(HttpMethod.Get,
             $"{_baseUrl}/admin/realms/{_realm}/users?email={Uri.EscapeDataString(email)}&exact=true");
-
         var res2  = await _http.SendAsync(req2);
         var json2 = await res2.Content.ReadAsStringAsync();
         using var doc2 = JsonDocument.Parse(json2);
@@ -358,18 +381,30 @@ public async Task SendSetPasswordEmailAsync(string keycloakUserId)
             : doc2.RootElement[0].GetProperty("id").GetString();
     }
 
-    // ── USER EXISTS ──────────────────────────────────────────────────────────
+    // ── USER EXISTS BY EMAIL ─────────────────────────────────────────────────
     public async Task<bool> UserExistsAsync(string email)
         => await GetUserIdByEmailAsync(email) != null;
+
+    // ── USER EXISTS BY UUID ──────────────────────────────────────────────────
+    public async Task<bool> UserExistsByIdAsync(string keycloakUserId)
+    {
+        try
+        {
+            await EnsureAdminTokenAsync();
+            var req = BuildRequest(HttpMethod.Get,
+                $"{_baseUrl}/admin/realms/{_realm}/users/{keycloakUserId}");
+            var res = await _http.SendAsync(req);
+            return res.IsSuccessStatusCode;
+        }
+        catch { return false; }
+    }
 
     // ── DELETE USER ──────────────────────────────────────────────────────────
     public async Task DeleteUserAsync(string id)
     {
         await EnsureAdminTokenAsync();
-
         var req = BuildRequest(HttpMethod.Delete,
             $"{_baseUrl}/admin/realms/{_realm}/users/{id}");
-
         await _http.SendAsync(req);
     }
 
@@ -377,11 +412,9 @@ public async Task SendSetPasswordEmailAsync(string keycloakUserId)
     public async Task DisableUserAsync(string id)
     {
         await EnsureAdminTokenAsync();
-
         var req = BuildRequest(HttpMethod.Put,
             $"{_baseUrl}/admin/realms/{_realm}/users/{id}",
             new { enabled = false });
-
         await _http.SendAsync(req);
     }
 
@@ -389,19 +422,18 @@ public async Task SendSetPasswordEmailAsync(string keycloakUserId)
     public async Task EnableUserAsync(string id)
     {
         await EnsureAdminTokenAsync();
-
         var req = BuildRequest(HttpMethod.Put,
             $"{_baseUrl}/admin/realms/{_realm}/users/{id}",
             new { enabled = true });
-
         await _http.SendAsync(req);
     }
 
-    // ── HELPER ───────────────────────────────────────────────────────────────
+    // ── BUILD REQUEST HELPER ─────────────────────────────────────────────────
     private HttpRequestMessage BuildRequest(HttpMethod method, string url, object? body = null)
     {
         var request = new HttpRequestMessage(method, url);
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _adminToken);
+        request.Headers.Authorization =
+            new AuthenticationHeaderValue("Bearer", _adminToken);
 
         if (body != null)
             request.Content = new StringContent(

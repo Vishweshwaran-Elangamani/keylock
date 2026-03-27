@@ -464,6 +464,7 @@
   "requiredCredentials": [
     "password"
   ],
+  "passwordPolicy": "length(8) and upperCase(1) and digits(1) and specialChars(1)",
   "otpPolicyType": "totp",
   "otpPolicyAlgorithm": "HmacSHA1",
   "otpPolicyInitialCounter": 0,
@@ -1672,23 +1673,23 @@
   },
   "smtpServer": {
     "allowutf8": "true",
-    "replyToDisplayName": "EEPZ System",
+    "replyToDisplayName": "EEPZ KEY System",
     "debug": "false",
     "starttls": "true",
     "auth": "true",
     "writeTimeout": "30000",
-    "envelopeFrom": "eepz50532@gmail.com",
+    "envelopeFrom": "eepzkeyclockemailservice@gmail.com",
     "ssl": "false",
     "timeout": "30000",
     "password": "**********",
     "port": "587",
-    "replyTo": "eepz50532@gmail.com",
+    "replyTo": "eepzkeyclockemailservice@gmail.com",
     "host": "smtp.gmail.com",
     "from": "noreply@eepz.com",
-    "fromDisplayName": "EEPZ System",
+    "fromDisplayName": "EEPZ KEY System",
     "authType": "basic",
     "connectionTimeout": "30000",
-    "user": "eepz50532@gmail.com"
+    "user": "eepzkeyclockemailservice@gmail.com"
   },
   "eventsEnabled": false,
   "eventsListeners": [
@@ -1765,13 +1766,13 @@
         "config": {
           "allowed-protocol-mapper-types": [
             "saml-user-property-mapper",
-            "oidc-usermodel-property-mapper",
-            "oidc-sha256-pairwise-sub-mapper",
-            "oidc-usermodel-attribute-mapper",
-            "saml-role-list-mapper",
-            "oidc-full-name-mapper",
             "saml-user-attribute-mapper",
-            "oidc-address-mapper"
+            "oidc-full-name-mapper",
+            "saml-role-list-mapper",
+            "oidc-sha256-pairwise-sub-mapper",
+            "oidc-usermodel-property-mapper",
+            "oidc-address-mapper",
+            "oidc-usermodel-attribute-mapper"
           ]
         }
       },
@@ -1791,13 +1792,13 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "saml-role-list-mapper",
-            "oidc-usermodel-attribute-mapper",
-            "saml-user-property-mapper",
             "oidc-address-mapper",
-            "oidc-full-name-mapper",
-            "oidc-usermodel-property-mapper",
+            "saml-user-property-mapper",
             "saml-user-attribute-mapper",
+            "saml-role-list-mapper",
+            "oidc-usermodel-property-mapper",
+            "oidc-full-name-mapper",
+            "oidc-usermodel-attribute-mapper",
             "oidc-sha256-pairwise-sub-mapper"
           ]
         }
@@ -2724,7 +2725,7 @@
     "saml.signature.algorithm": "",
     "parRequestUriLifespan": "60",
     "clientSessionMaxLifespan": "0",
-    "frontendUrl": "",
+    "frontendUrl": "https://unprotractive-elmo-estipulate.ngrok-free.dev",
     "acr.loa.map": "{}"
   },
   "keycloakVersion": "26.5.6",

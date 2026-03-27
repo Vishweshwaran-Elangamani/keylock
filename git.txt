@@ -1,0 +1,3 @@
+git remote set-url origin https://github.com/Vishweshwaran-Elangamani/keylock.git
+
+git push https://github.com/Vishweshwaran-Elangamani/keylock.git frontend
