@@ -181,13 +181,13 @@ const ScheduleMeeting = () => {
 
   const canSuggest = formData.participantEmployeeIds.length > 0 && formData.duration;
 
-  const suggestHint = conflictError
-    ? "Conflict detected — try suggesting a better time"
-    : !formData.participantEmployeeIds.length
-    ? "Select a participant first"
-    : !formData.duration
-    ? "Select a duration first"
-    : "Get AI-recommended slots based on participant availability";
+const suggestHint = conflictError
+  ? "Conflict detected — try suggesting a better time"
+  : !formData.participantEmployeeIds.length
+  ? "Select a participant first"
+  : !formData.duration
+  ? "Select a duration first"
+  : ""; // ← empty when all good
 
   const handleSuggest = async () => {
     if (!canSuggest) return;
@@ -588,11 +588,7 @@ const ScheduleMeeting = () => {
                       <div className="col-md-3">
                         <label className="form-label fw-semibold d-flex align-items-center gap-2 sched-label-top">
                           <Clock size={20} /> Meeting Time <span className="text-danger">*</span>
-                          {aiSuggested && (
-                            <span className="sched-ai-badge">
-                              <Sparkles size={11} /> AI
-                            </span>
-                          )}
+                          
                         </label>
                         <div className={`sched-time-picker${conflictError ? " sched-time-picker-error" : ""}`}>
                           <CustomDropdown label={null} name="hour" value={timeHour} options={hourOptions} placeholder="HH" onChange={handleTimeChange(setTimeHour)} className="sched-time-dd sched-dd-no-mb" />
@@ -612,10 +608,6 @@ const ScheduleMeeting = () => {
 
                     </div>
                   </div>
-
-                  {/* ═══════════════════════════════════
-                      Row 3 — Suggest + Heatmap
-                  ═══════════════════════════════════ */}
                   <div className="col-12">
 
                     {/* Suggest Button Row */}
