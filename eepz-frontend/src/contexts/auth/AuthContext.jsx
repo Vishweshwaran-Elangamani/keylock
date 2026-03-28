@@ -11,40 +11,65 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    const token = localStorage.getItem("token");
+    try {
+      const storedUser = localStorage.getItem("user");
 
-    if (storedUser && token) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-      setIsAuthenticated(true);
+      // 🔥 FIX: SUPPORT BOTH TOKENS
+      const token =
+        localStorage.getItem("accessToken") ||
+        localStorage.getItem("token");
 
-      //  SET INDIVIDUAL FIELDS IN LOCALSTORAGE
-      localStorage.setItem("userId", parsedUser.userId);
-      localStorage.setItem("userName", parsedUser.userName);
-      localStorage.setItem(
-        "userRole",
-        parsedUser.roleType || parsedUser.role || parsedUser.userRole
-      );
-      localStorage.setItem("email", parsedUser.email);
+      if (storedUser && token) {
+        const parsedUser = JSON.parse(storedUser);
+
+        setUser(parsedUser);
+        setIsAuthenticated(true);
+
+        // ✅ KEEP OLD SYSTEM COMPATIBLE
+        localStorage.setItem("userId", parsedUser.userId || "");
+        localStorage.setItem("userName", parsedUser.name || "");
+        localStorage.setItem(
+          "userRole",
+          parsedUser.roleType ||
+            parsedUser.role ||
+            parsedUser.userRole ||
+            ""
+        );
+        localStorage.setItem("email", parsedUser.email || "");
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
+      }
+    } catch (error) {
+      console.error("Auth init error:", error);
+      setUser(null);
+      setIsAuthenticated(false);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   const login = (userData, token) => {
     setUser(userData);
     setIsAuthenticated(true);
-    localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("token", token);
 
-    //  ALSO SET INDIVIDUAL FIELDS
-    localStorage.setItem("userId", userData.userId);
-    localStorage.setItem("userName", userData.userName);
+    localStorage.setItem("user", JSON.stringify(userData));
+
+    // 🔥 CRITICAL FIX
+    localStorage.setItem("accessToken", token);
+    localStorage.setItem("token", token); // backward compatibility
+
+    // ✅ OLD SYSTEM SUPPORT
+    localStorage.setItem("userId", userData.userId || "");
+    localStorage.setItem("userName", userData.name || "");
     localStorage.setItem(
       "userRole",
-      userData.roleType || userData.role || userData.userRole
+      userData.roleType ||
+        userData.role ||
+        userData.userRole ||
+        ""
     );
-    localStorage.setItem("email", userData.email);
+    localStorage.setItem("email", userData.email || "");
   };
 
   const logout = async () => {
@@ -55,13 +80,18 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setUser(null);
       setIsAuthenticated(false);
+
       localStorage.removeItem("user");
+      localStorage.removeItem("accessToken");
       localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+
       localStorage.removeItem("userId");
       localStorage.removeItem("userName");
       localStorage.removeItem("userRole");
       localStorage.removeItem("email");
-      navigate("/login");
+
+      navigate("/login", { replace: true });
     }
   };
 
@@ -69,7 +99,7 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{ user, isAuthenticated, loading, login, logout }}
     >
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 };

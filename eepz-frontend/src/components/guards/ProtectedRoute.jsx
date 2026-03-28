@@ -4,25 +4,27 @@ import { useAuth } from "../../contexts/auth/AuthContext";
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { isAuthenticated, loading, user } = useAuth();
 
+  // ✅ WAIT PROPERLY
   if (loading) {
-    return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ height: "100vh" }}
-      >
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    );
+    return null;
   }
 
+  // ✅ NOT LOGGED IN
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
+  // ✅ EXTRA SAFETY (VERY IMPORTANT)
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // ✅ ROLE CHECK
   if (allowedRoles && allowedRoles.length > 0) {
-    const normalizedUserRole = user?.role?.toUpperCase().replace(/\s+/g, "");
+    const userRole = user.role;
+
+    const normalizedUserRole = userRole.toUpperCase().replace(/\s+/g, "");
+
     const normalizedAllowedRoles = allowedRoles.map((role) =>
       role.toUpperCase().replace(/\s+/g, "")
     );
