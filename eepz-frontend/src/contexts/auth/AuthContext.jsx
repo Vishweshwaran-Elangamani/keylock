@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import authService from "../../services/auth/authService";
 
 const AuthContext = createContext(null);
@@ -10,38 +11,45 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // 🔹 REHYDRATE USER FROM JWT ON APP LOAD / REFRESH
   useEffect(() => {
     try {
-      const storedUser = localStorage.getItem("user");
-
-      // 🔥 FIX: SUPPORT BOTH TOKENS
       const token =
         localStorage.getItem("accessToken") ||
         localStorage.getItem("token");
 
-      if (storedUser && token) {
-        const parsedUser = JSON.parse(storedUser);
-
-        setUser(parsedUser);
-        setIsAuthenticated(true);
-
-        // ✅ KEEP OLD SYSTEM COMPATIBLE
-        localStorage.setItem("userId", parsedUser.userId || "");
-        localStorage.setItem("userName", parsedUser.name || "");
-        localStorage.setItem(
-          "userRole",
-          parsedUser.roleType ||
-            parsedUser.role ||
-            parsedUser.userRole ||
-            ""
-        );
-        localStorage.setItem("email", parsedUser.email || "");
-      } else {
+      if (!token) {
         setUser(null);
         setIsAuthenticated(false);
+        return;
       }
+
+      const decoded = jwtDecode(token);
+
+      const rebuiltUser = {
+        userId: decoded.empMasterId || decoded.empId,
+        name: decoded.name,
+        email: decoded.email,
+        username: decoded.preferred_username,
+        role: decoded.role
+      };
+
+      setUser(rebuiltUser);
+      setIsAuthenticated(true);
+
+      // 🔹 BACKWARD COMPATIBILITY (DON’T REMOVE)
+      localStorage.setItem("user", JSON.stringify(rebuiltUser));
+      localStorage.setItem("userId", rebuiltUser.userId ?? "");
+      localStorage.setItem("userName", rebuiltUser.name ?? "");
+      localStorage.setItem("userRole", rebuiltUser.role ?? "");
+      localStorage.setItem("email", rebuiltUser.email ?? "");
     } catch (error) {
       console.error("Auth init error:", error);
+
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
       setUser(null);
       setIsAuthenticated(false);
     } finally {
@@ -49,48 +57,31 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  // 🔹 LOGIN HANDLER (CUSTOM LOGIN PAGE)
   const login = (userData, token) => {
     setUser(userData);
     setIsAuthenticated(true);
 
-    localStorage.setItem("user", JSON.stringify(userData));
-
-    // 🔥 CRITICAL FIX
     localStorage.setItem("accessToken", token);
-    localStorage.setItem("token", token); // backward compatibility
+    localStorage.setItem("token", token); // backward support
 
-    // ✅ OLD SYSTEM SUPPORT
-    localStorage.setItem("userId", userData.userId || "");
-    localStorage.setItem("userName", userData.name || "");
-    localStorage.setItem(
-      "userRole",
-      userData.roleType ||
-        userData.role ||
-        userData.userRole ||
-        ""
-    );
-    localStorage.setItem("email", userData.email || "");
+    localStorage.setItem("user", JSON.stringify(userData));
+    localStorage.setItem("userId", userData.userId ?? "");
+    localStorage.setItem("userName", userData.name ?? "");
+    localStorage.setItem("userRole", userData.role ?? "");
+    localStorage.setItem("email", userData.email ?? "");
   };
 
+  // 🔹 LOGOUT HANDLER
   const logout = async () => {
     try {
       await authService.logout();
     } catch (error) {
-      console.error("Logout error:", error);
+      console.warn("Logout error:", error);
     } finally {
       setUser(null);
       setIsAuthenticated(false);
-
-      localStorage.removeItem("user");
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("token");
-      localStorage.removeItem("refreshToken");
-
-      localStorage.removeItem("userId");
-      localStorage.removeItem("userName");
-      localStorage.removeItem("userRole");
-      localStorage.removeItem("email");
-
+      localStorage.clear();
       navigate("/login", { replace: true });
     }
   };
@@ -107,7 +98,7 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within AuthProvider");
+    throw new Error("useAuth must be used inside AuthProvider");
   }
   return context;
 };
