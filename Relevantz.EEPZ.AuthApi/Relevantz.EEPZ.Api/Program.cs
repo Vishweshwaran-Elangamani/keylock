@@ -19,7 +19,9 @@ using MapsterMapper;
 
 using EFServerVersion = Microsoft.EntityFrameworkCore.ServerVersion;
 
+
 var builder = WebApplication.CreateBuilder(args);
+
 
 // ── Serilog ───────────────────────────────────────────────────────────────────
 Log.Logger = new LoggerConfiguration()
@@ -27,10 +29,12 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 builder.Host.UseSerilog();
 
+
 // ── Basic Services ────────────────────────────────────────────────────────────
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHttpClient();
+
 
 // ── Swagger ───────────────────────────────────────────────────────────────────
 builder.Services.AddSwaggerGen(c =>
@@ -60,6 +64,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+
 // ── MySQL Database ────────────────────────────────────────────────────────────
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
 builder.Services.AddDbContext<EEPZDbContext>(options =>
@@ -75,6 +80,7 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
     )
 );
 
+
 // ── MongoDB ───────────────────────────────────────────────────────────────────
 builder.Services.Configure<MongoDbSettings>(
     builder.Configuration.GetSection("MongoDbSettings"));
@@ -85,17 +91,21 @@ builder.Services.AddSingleton<IMongoClient>(sp =>
     return new MongoClient(mongoConfig.ConnectionString);
 });
 
+
 // ── Mapster ───────────────────────────────────────────────────────────────────
 builder.Services.AddSingleton<IMapper, Mapper>();
+
 
 // ── FluentValidation ──────────────────────────────────────────────────────────
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddValidatorsFromAssemblyContaining<UpdateProfileRequestDto>();
 builder.Services.AddFluentValidationAutoValidation();
 
+
 // ── Memory Cache & HttpContextAccessor ───────────────────────────────────────
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddMemoryCache();
+
 
 // ── Application Services ──────────────────────────────────────────────────────
 builder.Services.AddScoped<ICurrentUserService,      CurrentUserService>();
@@ -109,8 +119,10 @@ builder.Services.AddScoped<IBulkOperationService,    BulkOperationService>();
 builder.Services.AddScoped<IExportService,           ExportService>();
 builder.Services.AddScoped<ISuperAdminSeederService, SuperAdminSeederService>();
 
+
 // ── Keycloak Admin Service ────────────────────────────────────────────────────
 builder.Services.AddHttpClient<IKeycloakAdminService, KeycloakAdminService>();
+
 
 // ── Repositories ─────────────────────────────────────────────────────────────
 builder.Services.AddScoped<IUserAuthenticationRepository,    UserAuthenticationRepository>();
@@ -127,8 +139,8 @@ builder.Services.AddScoped<ILoginAttemptRepository,          LoginAttemptReposit
 builder.Services.AddScoped<IOtpRepository,                   OtpRepository>();
 builder.Services.AddScoped<IAddressRepository,               AddressRepository>();
 
+
 // ── Keycloak JWT Authentication ───────────────────────────────────────────────
-// ✅ FIX: Read ValidIssuers from env → supports both localhost + IP (for mobile email links)
 var keycloakBaseUrlForAuth = builder.Configuration["Keycloak:BaseUrl"]
                              ?? "http://host.docker.internal:9090";
 
@@ -153,8 +165,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience         = false,
             ValidateLifetime         = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuers             = validIssuers,  // ✅ CHANGED: ValidIssuer → ValidIssuers
-            ClockSkew                = TimeSpan.FromMinutes(5)
+            ValidIssuers             = validIssuers,
+            ClockSkew                = TimeSpan.FromMinutes(5),
+
+            // ✅ CRITICAL FIX: Maps Keycloak "role" claim → ASP.NET Core Role system
+            RoleClaimType            = "role",
+            NameClaimType            = "preferred_username"
         };
         options.Events = new JwtBearerEvents
         {
@@ -175,6 +191,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
+
 // ── CORS ──────────────────────────────────────────────────────────────────────
 builder.Services.AddCors(options =>
 {
@@ -184,7 +201,9 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod());
 });
 
+
 var app = builder.Build();
+
 
 // ── DB Ready + Keycloak Wait + Seed ──────────────────────────────────────────
 using (var scope = app.Services.CreateScope())
@@ -256,6 +275,7 @@ using (var scope = app.Services.CreateScope())
         logger.LogInformation("✅ Super admin seeded.");
     }
 }
+
 
 // ── Middleware Pipeline ───────────────────────────────────────────────────────
 app.UseSwagger();
