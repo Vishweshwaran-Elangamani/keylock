@@ -15,7 +15,7 @@ namespace Relevantz.EEPZ.Api.Controllers
     [Route("api/[controller]")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [Authorize]
-    [Authorize(Roles = "Manager")]
+    // [Authorize(Roles = "Manager")]
     [Produces("application/json")]
     public class ManagerNominationController : ControllerBase
     {

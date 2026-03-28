@@ -63,38 +63,30 @@ builder.Services.AddSwaggerGen(options =>
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<EEPZDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
-
-var jwtSection = builder.Configuration.GetSection("Jwt");
-var secretKey = jwtSection["SecretKey"];
-var issuer = jwtSection["Issuer"];
-var audience = jwtSection["Audience"];
-
-if (string.IsNullOrEmpty(secretKey))
-    throw new InvalidOperationException("JWT SecretKey missing.");
-if (string.IsNullOrEmpty(issuer))
-    throw new InvalidOperationException("JWT Issuer missing.");
-if (string.IsNullOrEmpty(audience))
-    throw new InvalidOperationException("JWT Audience missing.");
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(options =>
 {
+    // ✅ Keycloak realm (JWKS auto-loaded)
+    options.Authority =
+        "https://unprotractive-elmo-estipulate.ngrok-free.dev/realms/eepz-realm";
+
+    options.RequireHttpsMetadata = true;
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
+        // ✅ KEEP SIMPLE (same as your working services)
+        ValidateIssuer = false,
+        ValidateAudience = false,
+
         ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = issuer,
-        ValidAudience = audience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
-        ClockSkew = TimeSpan.Zero
+        ClockSkew = TimeSpan.Zero,
+
+        // ✅ MUST match Keycloak access token
+        NameClaimType = "preferred_username",
+        RoleClaimType = "role"
     };
 });
+builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<IMeetingRepository, MeetingRepository>();
 builder.Services.AddScoped<IMeetingService, MeetingService>();
@@ -160,8 +152,7 @@ using (var scope = app.Services.CreateScope())
 
 Log.Information("Application Configuration:");
 Log.Information("   Environment: {Environment}", app.Environment.EnvironmentName);
-Log.Information("   JWT Issuer: {Issuer}", issuer);
-Log.Information("   JWT Audience: {Audience}", audience);
+
 Log.Information(
     "   Database: {Database}",
     connectionString?.Split(';').FirstOrDefault(x => x.Contains("Database"))

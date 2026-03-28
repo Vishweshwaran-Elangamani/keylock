@@ -10,7 +10,7 @@ namespace Relevantz.EEPZ.Api.Controllers
 {
     [ApiController]
     [ApiVersion("1.0")]
-    [Authorize(Roles = "Department Head,Employee")]
+    // [Authorize(Roles = "Department Head,Employee")]
     [Route("api/[controller]")]
     [Route("api/v{version:apiVersion}/[controller]")]
     public class DepartmentHeadNominationController : ControllerBase

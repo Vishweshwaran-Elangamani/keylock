@@ -116,112 +116,31 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
 // -----------------------------------------------
 // JWT Authentication
 // -----------------------------------------------
-var jwtSettings = builder.Configuration.GetSection("Jwt");
-var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey not configured");
-
-Log.Information("JWT Issuer: {Issuer}", jwtSettings["Issuer"]);
-Log.Information("JWT Audience: {Audience}", jwtSettings["Audience"]);
-Log.Information("JWT SecretKey Length: {Length} characters", secretKey.Length);
-
-JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(options =>
 {
+    // ✅ Keycloak realm (JWKS auto-loaded)
+    options.Authority =
+        "https://unprotractive-elmo-estipulate.ngrok-free.dev/realms/eepz-realm";
+
+    options.RequireHttpsMetadata = true;
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
+        // ✅ same setup used in all your other services
+        ValidateIssuer = false,
+        ValidateAudience = false,
+
         ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidAudience = jwtSettings["Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
         ClockSkew = TimeSpan.Zero,
 
-        RoleClaimType = ClaimTypes.Role,
-        NameClaimType = ClaimTypes.NameIdentifier
-    };
-
-    options.Events = new JwtBearerEvents
-    {
-        OnMessageReceived = context =>
-        {
-            var authHeader = context.Request.Headers["Authorization"].ToString();
-            if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
-            {
-                var token = authHeader.Substring("Bearer ".Length).Trim();
-                Log.Debug("Token received (length): {Length}", token.Length);
-            }
-            else
-            {
-                Log.Warning("No Authorization header found");
-            }
-            return Task.CompletedTask;
-        },
-
-        OnAuthenticationFailed = context =>
-        {
-            Log.Error("Authentication failed: {Message}", context.Exception.Message);
-
-            if (context.Exception is SecurityTokenExpiredException)
-            {
-                Log.Warning("Token expired");
-                context.Response.Headers.Add("Token-Expired", "true");
-            }
-            else if (context.Exception.Message.Contains("signature", StringComparison.OrdinalIgnoreCase))
-            {
-                Log.Error("Signature validation failed - Check JWT SecretKey!");
-            }
-
-            return Task.CompletedTask;
-        },
-
-        OnTokenValidated = context =>
-        {
-            Log.Information("Token validated successfully");
-
-            var principal = context.Principal;
-            if (principal is not null)
-            {
-                var nameId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var sub = principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-
-                if (string.IsNullOrEmpty(nameId) && !string.IsNullOrEmpty(sub))
-                {
-                    var identity = principal.Identity as ClaimsIdentity;
-                    identity?.AddClaim(new Claim(ClaimTypes.NameIdentifier, sub));
-                    Log.Debug("Added NameIdentifier claim from 'sub'");
-                }
-
-                var roleClaim = principal.FindFirst(ClaimTypes.Role);
-                if (roleClaim != null)
-                {
-                    Log.Information("Role found: {Role}", roleClaim.Value);
-                }
-                else
-                {
-                    Log.Warning("No role claim found in token");
-                }
-            }
-
-            return Task.CompletedTask;
-        },
-
-        OnChallenge = context =>
-        {
-            Log.Warning("Authentication Challenge: {Error} - {ErrorDescription}", context.Error, context.ErrorDescription);
-            return Task.CompletedTask;
-        }
+        // ✅ Must match Keycloak access token
+        NameClaimType = "preferred_username",
+        RoleClaimType = "role"
     };
 });
 
 builder.Services.AddAuthorization();
-
 // -----------------------------------------------
 // DI Registrations (deduplicated)
 // -----------------------------------------------

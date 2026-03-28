@@ -96,27 +96,29 @@ try
     });
 
     // JWT AUTH
-    var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-    var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey missing");
+    // ✅ KEYCLOAK JWT AUTHENTICATION
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+.AddJwtBearer(options =>
+{
+    options.Authority =
+        "https://unprotractive-elmo-estipulate.ngrok-free.dev/realms/eepz-realm";
 
-    builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        .AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = jwtSettings["Issuer"],
-                ValidAudience = jwtSettings["Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
-                ClockSkew = TimeSpan.Zero,
+    options.RequireHttpsMetadata = true;
 
-                NameClaimType = "sub",
-                RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
-            };
-        });
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        // ✅ Standard across all EEPZ services
+        ValidateIssuer = false,
+        ValidateAudience = false,
+
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero,
+
+        // ✅ Match Keycloak token claims
+        NameClaimType = "preferred_username",
+        RoleClaimType = "role"
+    };
+});
 
     builder.Services.AddAuthorization(options =>
     {

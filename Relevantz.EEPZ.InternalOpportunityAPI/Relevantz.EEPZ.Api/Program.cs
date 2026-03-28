@@ -123,73 +123,30 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
 
 
 // Configure JWT Authentication with enhanced security
-var jwtSettings = builder.Configuration.GetSection("Jwt");
-var secretKey = jwtSettings["SecretKey"] 
-    ?? throw new InvalidOperationException("JWT Secret Key not configured");
-var issuer = jwtSettings["Issuer"] 
-    ?? throw new InvalidOperationException("JWT Issuer not configured");
-var audience = jwtSettings["Audience"] 
-    ?? throw new InvalidOperationException("JWT Audience not configured");
-
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(options =>
 {
+    // ✅ Keycloak realm (JWKS auto-loaded)
+    options.Authority =
+        "https://unprotractive-elmo-estipulate.ngrok-free.dev/realms/eepz-realm";
+
+    options.RequireHttpsMetadata = true;
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
+        // ✅ Keep simple (same everywhere)
+        ValidateIssuer = false,
+        ValidateAudience = false,
+
         ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = issuer,
-        ValidAudience = audience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
         ClockSkew = TimeSpan.Zero,
-        RequireExpirationTime = true,
-        RequireSignedTokens = true
-    };
 
-
-    options.Events = new JwtBearerEvents
-    {
-        OnAuthenticationFailed = context =>
-        {
-            Log.Warning("JWT Authentication Failed: {ExceptionType}", 
-                context.Exception.GetType().Name);
-            return Task.CompletedTask;
-        },
-        OnTokenValidated = context =>
-        {
-            var userId = context.Principal?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            var correlationId = context.HttpContext.TraceIdentifier;
-            Log.Information("JWT Token Validated - UserId: {UserId}, CorrelationId: {CorrelationId}", 
-                userId, correlationId);
-            return Task.CompletedTask;
-        },
-        OnChallenge = context =>
-        {
-            Log.Warning("JWT Challenge - Path: {Path}, CorrelationId: {CorrelationId}",
-                context.Request.Path, context.HttpContext.TraceIdentifier);
-            return Task.CompletedTask;
-        }
+        // ✅ Matches Keycloak token
+        NameClaimType = "preferred_username",
+        RoleClaimType = "role"
     };
 });
-
-
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("AdminOnly", policy => 
-        policy.RequireRole("Admin"));
-    options.AddPolicy("HROnly", policy => 
-        policy.RequireRole("HR"));
-    options.AddPolicy("EmployeeAccess", policy => 
-        policy.RequireRole("Employee", "HR", "Admin"));
-});
-
+builder.Services.AddAuthorization();
 
 // Register Repositories (Internal Opportunities Module)
 builder.Services.AddScoped<IInternalOpportunityRepository, InternalOpportunityRepository>();

@@ -37,7 +37,7 @@ namespace Relevantz.EEPZ.API.Controllers
         /// <param name="query">Query parameters.</param>
         /// <param name="cancellationToken">Cancellation token for the request.</param>
         /// <returns>Notification search result.</returns>
-        [Authorize(Roles = "Manager,HR,Department Head,Employee")]
+        // [Authorize(Roles = "Manager,HR,Department Head,Employee")]
         [HttpGet("search")]
         [ProducesResponseType(typeof(EmployeeNotificationSearchResultDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]

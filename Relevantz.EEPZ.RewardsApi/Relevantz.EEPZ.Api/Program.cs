@@ -213,55 +213,30 @@ builder.Services.AddScoped<DbContext>(sp => sp.GetRequiredService<EEPZDbContext>
 // -------------------------------------------------
 // JWT (values overridden by env variables loaded from .env)
 // -------------------------------------------------
-var jwtSettings = builder.Configuration.GetSection("Jwt");
-var secretKey = jwtSettings["SecretKey"];
-if (string.IsNullOrWhiteSpace(secretKey))
-{
-    throw new InvalidOperationException("Jwt:SecretKey not configured. Provide JWT__SECRETKEY via environment variables or appsettings.");
-}
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(options =>
 {
+    // ✅ Keycloak Realm (public JWKS)
+    options.Authority =
+        "https://unprotractive-elmo-estipulate.ngrok-free.dev/realms/eepz-realm";
+
+    options.RequireHttpsMetadata = true;
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidAudience = jwtSettings["Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
-        ClockSkew = TimeSpan.Zero,
-        RoleClaimType = ClaimTypes.Role,
-        NameClaimType = JwtRegisteredClaimNames.Sub
-    };
+        // ✅ Keep it simple (same as your working services)
+        ValidateIssuer = false,
+        ValidateAudience = false,
 
-    options.Events = new JwtBearerEvents
-    {
-        OnMessageReceived = ctx =>
-        {
-            Log.Debug("JWT OnMessageReceived Path={Path}", ctx.Request.Path);
-            return Task.CompletedTask;
-        },
-        OnTokenValidated = ctx =>
-        {
-            Log.Information("JWT Validated Sub={Sub} CID={CID}",
-                ctx.Principal?.FindFirstValue(JwtRegisteredClaimNames.Sub),
-                ctx.HttpContext.TraceIdentifier);
-            return Task.CompletedTask;
-        },
-        OnAuthenticationFailed = ctx =>
-        {
-            Log.Warning(ctx.Exception, "JWT Authentication Failed Path={Path}", ctx.Request.Path);
-            return Task.CompletedTask;
-        }
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero,
+
+        // ✅ MUST match your Keycloak token
+        NameClaimType = "preferred_username",
+        RoleClaimType = "role"
     };
 });
+
 builder.Services.AddAuthorization();
 
 // -------------------------------------------------

@@ -8,7 +8,7 @@ namespace Relevantz.EEPZ.Api.Controllers
     [ApiController]
     [ApiVersion("1.0")]
     [Authorize]
-    [Authorize(Roles = "HR")]
+    // [Authorize(Roles = "HR")]
     [Route("api/[controller]")]
     [Route("api/v{version:apiVersion}/[controller]")]
     public class HRNominationController : ControllerBase

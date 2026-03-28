@@ -4,9 +4,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using Serilog;
 
 using Relevantz.EEPZ.Common.Configuration;
@@ -115,68 +112,47 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
 // ==========================================================================
 // JWT AUTHENTICATION SETUP
 // ==========================================================================
-var jwtSettings = builder.Configuration.GetSection("Jwt");
-var secretKey = jwtSettings["SecretKey"] ?? throw new Exception("JWT SecretKey missing");
-
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(options =>
 {
+    // Point to Keycloak so .NET can read signing keys (JWKS)
+    options.Authority =
+        "https://unprotractive-elmo-estipulate.ngrok-free.dev/realms/eepz-realm";
+
+    options.RequireHttpsMetadata = true;
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
+        // ✅ KEEP IT SIMPLE
+        ValidateIssuer = false,
+        ValidateAudience = false,
+
         ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidAudience = jwtSettings["Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
         ClockSkew = TimeSpan.Zero,
-        RoleClaimType = ClaimTypes.Role,
-        NameClaimType = JwtRegisteredClaimNames.Sub
+
+        // ✅ MATCH YOUR TOKEN
+        NameClaimType = "preferred_username",
+        RoleClaimType = "role"
     };
 
     options.Events = new JwtBearerEvents
     {
-        OnMessageReceived = context =>
-        {
-            var authHeader = context.Request.Headers["Authorization"].ToString();
-
-            if (!string.IsNullOrEmpty(authHeader))
-            {
-                var token = authHeader.Replace("Bearer ", "");
-
-                if (token.Length >= 4)
-                    Log.Debug("Token received (...{Last4})", token[^4..]);
-                else
-                    Log.Debug("Token received (too short to log)");
-            }
-            else
-            {
-                Log.Warning("No Authorization header found");
-            }
-
-            return Task.CompletedTask;
-        },
-
         OnAuthenticationFailed = context =>
         {
-            Log.Error("Authentication failed: {Message}", context.Exception.Message);
-
-            if (context.Exception is SecurityTokenExpiredException)
-                context.Response.Headers.Add("Token-Expired", "true");
-
+            Log.Error("JWT FAILED: {Message}", context.Exception.Message);
             return Task.CompletedTask;
         },
 
         OnTokenValidated = context =>
         {
-            Log.Information("Token validated successfully");
+            var email = context.Principal?.FindFirst("email")?.Value;
+            var empId = context.Principal?.FindFirst("empId")?.Value;
+            var role  = context.Principal?.FindFirst("role")?.Value;
 
-            var roleClaim = context.Principal?.FindFirst(ClaimTypes.Role);
-            if (roleClaim != null)
-                Log.Information("Role found: {Role}", roleClaim.Value);
-            else
-                Log.Warning("No role claim found");
+            Log.Information(
+                "JWT OK → Email={Email}, empId={EmpId}, role={Role}",
+                email, empId, role
+            );
 
             return Task.CompletedTask;
         }

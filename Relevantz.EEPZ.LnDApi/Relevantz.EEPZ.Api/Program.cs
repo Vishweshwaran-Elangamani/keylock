@@ -203,59 +203,31 @@ else
 
 // Configure JWT Authentication
 
-var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var secretKey = jwtSettings["SecretKey"];
-
-if (string.IsNullOrEmpty(secretKey))
+// ✅ KEYCLOAK JWT AUTHENTICATION
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+.AddJwtBearer(options =>
 {
-    Log.Fatal("JWT SecretKey is not configured!");
-    throw new InvalidOperationException("JWT SecretKey not found in configuration.");
-}
+    options.Authority =
+        "https://unprotractive-elmo-estipulate.ngrok-free.dev/realms/eepz-realm";
 
-builder
-    .Services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtSettings["Issuer"],
-            ValidAudience = jwtSettings["Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
-            ClockSkew = TimeSpan.Zero,
-        };
+    options.RequireHttpsMetadata = true;
 
-        options.Events = new JwtBearerEvents
-        {
-            OnAuthenticationFailed = context =>
-            {
-                Log.Warning($"JWT Authentication failed: {context.Exception.Message}");
-                return Task.CompletedTask;
-            },
-            OnTokenValidated = context =>
-            {
-                var empId = context.Principal?.FindFirst("empId")?.Value;
-                Log.Information($"JWT Token validated for EmployeeId: {empId}");
-                return Task.CompletedTask;
-            },
-            OnChallenge = context =>
-            {
-                Log.Warning($"JWT Challenge: {context.Error}, {context.ErrorDescription}");
-                return Task.CompletedTask;
-            },
-        };
-    });
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        // ✅ Standard across all EEPZ services
+        ValidateIssuer = false,
+        ValidateAudience = false,
+
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero,
+
+        // ✅ Match Keycloak access token
+        NameClaimType = "preferred_username",
+        RoleClaimType = "role"
+    };
+});
 
 builder.Services.AddAuthorization();
-
-// Register Application Services (DI)
 // File Storage Service - MongoDB GridFS
 
 builder.Services.AddSingleton<IFileStorageService, FileStorageService>();
@@ -462,7 +434,12 @@ app.MapGet(
                 {
                     enabled = true,
                     type = "JWT Bearer",
-                    issuerConfigured = !string.IsNullOrEmpty(config["JwtSettings:Issuer"]),
+                   authentication = new
+{
+    enabled = true,
+    type = "JWT Bearer (Keycloak)",
+    authority = "eepz-realm"
+},
                 },
 
                 cors = "AllowAll Enabled",

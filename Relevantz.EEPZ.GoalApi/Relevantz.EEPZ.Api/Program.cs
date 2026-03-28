@@ -89,122 +89,29 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
 );
 
 // Configure JWT Authentication with debugging
-var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var secretKey = jwtSettings["SecretKey"];
-
-if (string.IsNullOrEmpty(secretKey))
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+.AddJwtBearer(options =>
 {
-    throw new InvalidOperationException("JWT SecretKey is not configured in appsettings.json");
-}
+    // ✅ Keycloak realm (JWKS auto-discovered)
+    options.Authority =
+        "https://unprotractive-elmo-estipulate.ngrok-free.dev/realms/eepz-realm";
 
-builder
-    .Services.AddAuthentication(options =>
+    options.RequireHttpsMetadata = true;
+
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        var keyBytes = Encoding.UTF8.GetBytes(secretKey);
+        // ✅ same pattern as your working services
+        ValidateIssuer = false,
+        ValidateAudience = false,
 
-        options.SaveToken = true;
-        options.RequireHttpsMetadata = false; // Set to true in production
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero,
 
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-
-            ValidIssuer = jwtSettings["Issuer"],
-            ValidAudience = jwtSettings["Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
-
-            ClockSkew = TimeSpan.Zero,
-
-            // FIX: Use the full claim type
-            RoleClaimType = ClaimTypes.Role, // Instead of "role"
-            NameClaimType = "sub",
-        };
-
-        //  Event handlers for debugging
-        options.Events = new JwtBearerEvents
-        {
-            OnAuthenticationFailed = context =>
-            {
-                Log.Error(" JWT Authentication Failed: {Message}", context.Exception.Message);
-                if (context.Exception.InnerException != null)
-                {
-                    Log.Error(
-                        "   Inner Exception: {Message}",
-                        context.Exception.InnerException.Message
-                    );
-                }
-                return Task.CompletedTask;
-            },
-            OnTokenValidated = context =>
-            {
-                var claims =
-                    context.Principal?.Claims.Select(c => $"{c.Type}={c.Value}").ToList()
-                    ?? new List<string>();
-
-                Log.Information("JWT Token Validated Successfully");
-                Log.Information("   Claims: {Claims}", string.Join(", ", claims));
-
-                var empMasterIdClaim = context.Principal?.FindFirst("empMasterId");
-
-                var roleClaim = context.Principal?.FindFirst(ClaimTypes.Role);
-
-                if (empMasterIdClaim == null)
-                {
-                    Log.Warning("⚠ WARNING: empMasterId claim not found!");
-                }
-                else
-                {
-                    Log.Information("   empMasterId: {EmpMasterId}", empMasterIdClaim.Value);
-                }
-
-                if (roleClaim == null)
-                {
-                    Log.Warning("⚠ WARNING: role claim not found!");
-                }
-                else
-                {
-                    Log.Information("   role: {Role}", roleClaim.Value);
-                }
-
-                return Task.CompletedTask;
-            },
-
-            OnChallenge = context =>
-            {
-                Log.Warning(
-                    "JWT Challenge: {Error}, {ErrorDescription}",
-                    context.Error,
-                    context.ErrorDescription
-                );
-                return Task.CompletedTask;
-            },
-            OnMessageReceived = context =>
-            {
-                var token = context
-                    .Request.Headers["Authorization"]
-                    .FirstOrDefault()
-                    ?.Split(" ")
-                    .Last();
-                if (!string.IsNullOrEmpty(token))
-                {
-                    Log.Information(
-                        " JWT Token Received (first 20 chars): {Token}...",
-                        token.Substring(0, Math.Min(20, token.Length))
-                    );
-                }
-                return Task.CompletedTask;
-            },
-        };
-    });
+        // ✅ must match Keycloak token
+        NameClaimType = "preferred_username",
+        RoleClaimType = "role"
+    };
+});
 
 builder.Services.AddAuthorization();
 
@@ -363,8 +270,7 @@ app.MapGet(
 // Log configuration details
 Log.Information("   Application Configuration:");
 Log.Information("   Environment: {Environment}", app.Environment.EnvironmentName);
-Log.Information("   JWT Issuer: {Issuer}", jwtSettings["Issuer"]);
-Log.Information("   JWT Audience: {Audience}", jwtSettings["Audience"]);
+
 Log.Information(
     "   Database: {Database}",
     connectionString?.Split(';').FirstOrDefault(x => x.Contains("Database"))

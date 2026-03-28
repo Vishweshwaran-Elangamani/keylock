@@ -15,8 +15,6 @@ using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Core.Services;
 
 
-JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -80,91 +78,32 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
 Log.Information("Database connection configured");
-
-var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var secretKey = jwtSettings["SecretKey"];
-
-
-if (string.IsNullOrEmpty(secretKey))
-{
-    throw new InvalidOperationException("JWT SecretKey is not configured in appsettings.json");
-}
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-})
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(options =>
 {
-    var keyBytes = Encoding.UTF8.GetBytes(secretKey);
+    // ✅ Keycloak realm (JWKS auto-discovered)
+    options.Authority =
+        "https://unprotractive-elmo-estipulate.ngrok-free.dev/realms/eepz-realm";
 
-    options.SaveToken = true;
-    options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
-
+    options.RequireHttpsMetadata = true;
 
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
+        // ✅ Same simple setup as all your other services
+        ValidateIssuer = false,
+        ValidateAudience = false,
+
         ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidAudience = jwtSettings["Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
-
         ClockSkew = TimeSpan.Zero,
 
-        RoleClaimType = ClaimTypes.Role,
-        NameClaimType = "sub",
-    };
-
-    options.Events = new JwtBearerEvents
-    {
-        OnAuthenticationFailed = context =>
-        {
-            Log.Error("JWT Authentication Failed: {Message}", context.Exception.Message);
-            if (context.Exception.InnerException != null)
-            {
-                Log.Error("   Inner Exception: {Message}", context.Exception.InnerException.Message);
-            }
-            return Task.CompletedTask;
-        },
-        OnTokenValidated = context =>
-{
-    Log.Information("JWT Token validated successfully");
-
-    var empMasterIdClaim = context.Principal?.FindFirst("empMasterId");
-    var roleClaim = context.Principal?.FindFirst(ClaimTypes.Role);
-
-    Log.Information("User Authenticated - empMasterId present: {HasEmpId}, role present: {HasRole}",
-        empMasterIdClaim != null,
-        roleClaim != null);
-
-    return Task.CompletedTask;
-},
-
-
-        OnChallenge = context =>
-        {
-            Log.Warning("JWT Challenge: {Error}, {ErrorDescription}", context.Error, context.ErrorDescription);
-            return Task.CompletedTask;
-        },
-        OnMessageReceived = context =>
- {
-     if (context.Request.Headers.ContainsKey("Authorization"))
-     {
-         Log.Information("JWT token received in request header");
-     }
-     return Task.CompletedTask;
- },
-
+        // ✅ Must match Keycloak token
+        NameClaimType = "preferred_username",
+        RoleClaimType = "role"
     };
 });
 
 builder.Services.AddAuthorization();
+
 
 Log.Information("JWT Authentication configured");
 
@@ -230,8 +169,7 @@ app.MapControllers();
 
 Log.Information("Application Configuration:");
 Log.Information("   Environment: {Environment}", app.Environment.EnvironmentName);
-Log.Information("   JWT Issuer: {Issuer}", jwtSettings["Issuer"]);
-Log.Information("   JWT Audience: {Audience}", jwtSettings["Audience"]);
+
 Log.Information(
     "   Database: {Database}",
     connectionString?.Split(';').FirstOrDefault(x => x.Contains("Database"))

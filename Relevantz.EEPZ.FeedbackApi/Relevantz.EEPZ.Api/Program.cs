@@ -1,12 +1,11 @@
 global using Serilog;
 global using Serilog.Events;
 using Relevantz.EEPZ.Api.Middleware;
-
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
@@ -137,46 +136,46 @@ try
     });
 
     // JWT AUTH
-    var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-    var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey missing");
-
    builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtSettings["Issuer"],
-            ValidAudience = jwtSettings["Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
-            ClockSkew = TimeSpan.Zero,
-
-            NameClaimType = "sub",
-            RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
-        };
-    });
-
-
-    builder.Services.AddAuthorization(options =>
+.AddJwtBearer(options =>
 {
-    options.AddPolicy("HROnly", policy =>
-        policy.RequireRole("HR"));
+    // ✅ Point to Keycloak (for JWKS / signing keys)
+    options.Authority =
+        "https://unprotractive-elmo-estipulate.ngrok-free.dev/realms/eepz-realm";
 
-    options.AddPolicy("ManagerOnly", policy =>
-        policy.RequireRole("Manager"));
+    options.RequireHttpsMetadata = true;
 
-    options.AddPolicy("EmployeeOnly", policy =>
-        policy.RequireRole("Employee"));
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        // ✅ SIMPLE & DEV‑FRIENDLY
+        ValidateIssuer = false,
+        ValidateAudience = false,
 
-    options.AddPolicy("HRorManager", policy =>
-        policy.RequireRole("HR", "Manager"));
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero,
 
-    options.AddPolicy("HRorEmployee", policy =>
-    policy.RequireRole("HR", "Employee"));
+        // ✅ MATCH YOUR KEYCLOAK TOKEN
+        NameClaimType = "preferred_username",
+        RoleClaimType = "role"
+    };
+});
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("HROnly",
+        policy => policy.RequireRole("HR"));
+
+    options.AddPolicy("ManagerOnly",
+        policy => policy.RequireRole("Manager"));
+
+    options.AddPolicy("EmployeeOnly",
+        policy => policy.RequireRole("Employee"));
+
+    options.AddPolicy("HRorManager",
+        policy => policy.RequireRole("HR", "Manager"));
+
+    options.AddPolicy("HRorEmployee",
+        policy => policy.RequireRole("HR", "Employee"));
 });
 
     builder.Services.AddHttpContextAccessor();

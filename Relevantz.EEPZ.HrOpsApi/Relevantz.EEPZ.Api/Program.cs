@@ -140,57 +140,27 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
 }, ServiceLifetime.Scoped);
 
 // JWT AUTHENTICATION
-var jwtSettings = builder.Configuration.GetSection("Jwt");
-var secretKey = jwtSettings["SecretKey"]
-    ?? throw new InvalidOperationException("JWT Secret Key not configured");
-var issuer = jwtSettings["Issuer"]
-    ?? throw new InvalidOperationException("JWT Issuer not configured");
-var audience = jwtSettings["Audience"]
-    ?? throw new InvalidOperationException("JWT Audience not configured");
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(options =>
 {
+    // ✅ Keycloak realm (JWKS will be fetched automatically)
+    options.Authority =
+        "https://unprotractive-elmo-estipulate.ngrok-free.dev/realms/eepz-realm";
+
+    options.RequireHttpsMetadata = true;
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = issuer,
-        ValidAudience = audience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
-        ClockSkew = TimeSpan.Zero,
-        RequireExpirationTime = true,
-        RequireSignedTokens = true
-    };
+        // ✅ KEEP SIMPLE – exactly like other working services
+        ValidateIssuer = false,
+        ValidateAudience = false,
 
-    options.Events = new JwtBearerEvents
-    {
-        OnAuthenticationFailed = context =>
-        {
-            EEPZBusinessLog.LogWarning("JWT Authentication Failed: {ExceptionType}",
-                context.Exception.GetType().Name);
-            return Task.CompletedTask;
-        },
-        OnTokenValidated = context =>
-        {
-            var userId = context.Principal?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            var correlationId = context.HttpContext.TraceIdentifier;
-            EEPZBusinessLog.LogInformation("JWT Token Validated - UserId: {UserId}, CorrelationId: {CorrelationId}",
-                userId, correlationId);
-            return Task.CompletedTask;
-        },
-        OnChallenge = context =>
-        {
-            EEPZBusinessLog.LogWarning("JWT Challenge - Path: {Path}, CorrelationId: {CorrelationId}",
-                context.Request.Path, context.HttpContext.TraceIdentifier);
-            return Task.CompletedTask;
-        }
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero,
+
+        // ✅ MUST match your Keycloak token
+        NameClaimType = "preferred_username",
+        RoleClaimType = "role"
     };
 });
 

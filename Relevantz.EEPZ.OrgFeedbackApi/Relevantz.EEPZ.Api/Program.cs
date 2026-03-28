@@ -109,121 +109,33 @@ builder.Services.AddValidatorsFromAssemblyContaining<Relevantz.EEPZ.Api.Validato
 
     Log.Information("Database connection configured");
 
-    var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-    var secretKey = jwtSettings["SecretKey"];
+   builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+.AddJwtBearer(options =>
+{
+    // ✅ Keycloak realm (JWKS auto-discovered)
+    options.Authority =
+        "https://unprotractive-elmo-estipulate.ngrok-free.dev/realms/eepz-realm";
 
-    if (string.IsNullOrEmpty(secretKey))
+    options.RequireHttpsMetadata = true;
+
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        throw new InvalidOperationException("JWT SecretKey is not configured in appsettings.json");
-    }
+        // ✅ Keep it simple (same as your working services)
+        ValidateIssuer = false,
+        ValidateAudience = false,
 
-    builder
-        .Services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-        .AddJwtBearer(options =>
-        {
-            var keyBytes = Encoding.UTF8.GetBytes(secretKey);
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero,
 
-            options.SaveToken = true;
-            options.RequireHttpsMetadata = false;
+        // ✅ Match Keycloak access token exactly
+        NameClaimType = "preferred_username",
+        RoleClaimType = "role"
+    };
+});
 
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
+builder.Services.AddAuthorization();
 
-                ValidIssuer = jwtSettings["Issuer"],
-                ValidAudience = jwtSettings["Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
 
-                ClockSkew = TimeSpan.Zero,
-
-                RoleClaimType = ClaimTypes.Role,
-                NameClaimType = "sub",
-            };
-
-            options.Events = new JwtBearerEvents
-            {
-                OnAuthenticationFailed = context =>
-                {
-                    Log.Error("JWT Authentication Failed: {Message}", context.Exception.Message);
-                    if (context.Exception.InnerException != null)
-                    {
-                        Log.Error(
-                            "   Inner Exception: {Message}",
-                            context.Exception.InnerException.Message
-                        );
-                    }
-                    return Task.CompletedTask;
-                },
-                OnTokenValidated = context =>
-                {
-                    var claims =
-                        context.Principal?.Claims.Select(c => $"{c.Type}={c.Value}").ToList()
-                        ?? new List<string>();
-
-                    Log.Information("JWT Token Validated Successfully");
-                    Log.Information("   Claims: {Claims}", string.Join(", ", claims));
-
-                    var empMasterIdClaim = context.Principal?.FindFirst("empMasterId");
-                    var roleClaim = context.Principal?.FindFirst(ClaimTypes.Role);
-
-                    if (empMasterIdClaim == null)
-                    {
-                        Log.Warning("⚠ WARNING: empMasterId claim not found!");
-                    }
-                    else
-                    {
-                        Log.Information("   empMasterId: {EmpMasterId}", empMasterIdClaim.Value);
-                    }
-
-                    if (roleClaim == null)
-                    {
-                        Log.Warning("WARNING: role claim not found!");
-                    }
-                    else
-                    {
-                        Log.Information("   role: {Role}", roleClaim.Value);
-                    }
-
-                    return Task.CompletedTask;
-                },
-
-                OnChallenge = context =>
-                {
-                    Log.Warning(
-                        "JWT Challenge: {Error}, {ErrorDescription}",
-                        context.Error,
-                        context.ErrorDescription
-                    );
-                    return Task.CompletedTask;
-                },
-                OnMessageReceived = context =>
-                {
-                    var token = context
-                        .Request.Headers["Authorization"]
-                        .FirstOrDefault()
-                        ?.Split(" ")
-                        .Last();
-                    if (!string.IsNullOrEmpty(token))
-                    {
-                        Log.Information(
-                            "JWT Token Received (first 20 chars): {Token}...",
-                            token.Substring(0, Math.Min(20, token.Length))
-                        );
-                    }
-                    return Task.CompletedTask;
-                },
-            };
-        });
-
-    builder.Services.AddAuthorization();
   
 
 
@@ -298,8 +210,7 @@ Log.Information("Global Exception Handler configured");
     Log.Information("Feedback Application Configuration:");
     Log.Information("========================================");
     Log.Information("   Environment: {Environment}", app.Environment.EnvironmentName);
-    Log.Information("   JWT Issuer: {Issuer}", jwtSettings["Issuer"]);
-    Log.Information("   JWT Audience: {Audience}", jwtSettings["Audience"]);
+    
     Log.Information(
         "   Database: {Database}",
         connectionString?.Split(';').FirstOrDefault(x => x.Contains("Database"))

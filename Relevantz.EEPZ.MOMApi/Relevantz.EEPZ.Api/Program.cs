@@ -157,60 +157,31 @@ try
     Log.Information("Database context configured successfully");
 
     // Configure JWT Authentication
-    var jwtSection = builder.Configuration.GetSection("Jwt");
-    var secretKey = jwtSection["SecretKey"];
-    var issuer = jwtSection["Issuer"];
-    var audience = jwtSection["Audience"];
+   builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+.AddJwtBearer(options =>
+{
+    // ✅ Keycloak realm (JWKS auto-discovered)
+    options.Authority =
+        "https://unprotractive-elmo-estipulate.ngrok-free.dev/realms/eepz-realm";
 
-    // Validate JWT Configuration
-    if (string.IsNullOrEmpty(secretKey))
-    {
-        throw new InvalidOperationException("JWT SecretKey is not configured. Add 'Jwt:SecretKey' to appsettings.json");
-    }
-    if (string.IsNullOrEmpty(issuer))
-    {
-        throw new InvalidOperationException("JWT Issuer is not configured. Add 'Jwt:Issuer' to appsettings.json");
-    }
-    if (string.IsNullOrEmpty(audience))
-    {
-        throw new InvalidOperationException("JWT Audience is not configured. Add 'Jwt:Audience' to appsettings.json");
-    }
+    options.RequireHttpsMetadata = true;
 
-    // Add JWT Authentication
-    builder.Services.AddAuthentication(options =>
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = issuer,
-            ValidAudience = audience,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
-            ClockSkew = TimeSpan.Zero
-        };
+        // ✅ Keep consistent across all APIs
+        ValidateIssuer = false,
+        ValidateAudience = false,
 
-        options.Events = new JwtBearerEvents
-        {
-            OnAuthenticationFailed = context =>
-            {
-                Log.Warning("JWT Authentication failed: {Error}", context.Exception.Message);
-                return Task.CompletedTask;
-            },
-            OnTokenValidated = context =>
-            {
-                Log.Debug("JWT token validated successfully for user: {User}", 
-                    context.Principal?.Identity?.Name ?? "Unknown");
-                return Task.CompletedTask;
-            }
-        };
-    });
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero,
+
+        // ✅ Must match Keycloak token
+        NameClaimType = "preferred_username",
+        RoleClaimType = "role"
+    };
+});
+
+builder.Services.AddAuthorization();
     Log.Information("JWT authentication configured successfully");
 
     // Register Application Services
@@ -379,8 +350,7 @@ try
     Log.Information("Version:               1.0");
     Log.Information("--------------------------------------------------------------------------------");
     Log.Information("Security:");
-    Log.Information("  JWT Issuer:          {Issuer}", issuer);
-    Log.Information("  JWT Audience:        {Audience}", audience);
+
     Log.Information("  Authentication:      Enabled (JWT Bearer)");
     Log.Information("  Rate Limiting:       Enabled (100 requests/minute per client)");
     Log.Information("  Input Sanitization:  Enabled (XSS/Injection protection)");
