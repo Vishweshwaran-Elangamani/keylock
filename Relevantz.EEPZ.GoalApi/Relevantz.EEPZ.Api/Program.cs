@@ -1,10 +1,7 @@
 global using Serilog;
 global using Serilog.Events;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using FluentValidation;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Relevantz.EEPZ.Shared.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -19,9 +16,6 @@ using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repository.Implementations;
 using Relevantz.EEPZ.Data.Repository.Interface;
 using Relevantz.EEPZ.Core.Configuration;
-
-JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
 
 var builder = WebApplication.CreateBuilder(args);
 Console.WriteLine("Building........");
@@ -89,31 +83,8 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
 );
 
 // Configure JWT Authentication with debugging
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-.AddJwtBearer(options =>
-{
-    // ✅ Keycloak realm (JWKS auto-discovered)
-    options.Authority =
-        "https://unprotractive-elmo-estipulate.ngrok-free.dev/realms/eepz-realm";
-
-    options.RequireHttpsMetadata = true;
-
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        // ✅ same pattern as your working services
-        ValidateIssuer = false,
-        ValidateAudience = false,
-
-        ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero,
-
-        // ✅ must match Keycloak token
-        NameClaimType = "preferred_username",
-        RoleClaimType = "role"
-    };
-});
-
-builder.Services.AddAuthorization();
+// AUTHENTICATION & AUTHORIZATION (Shared)
+builder.Services.AddEepzAuthentication(builder.Configuration);
 
 // Register module DI (Goal Management)
 builder.Services.AddHttpContextAccessor();

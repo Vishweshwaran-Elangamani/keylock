@@ -1,7 +1,7 @@
 global using Serilog;
 global using Serilog.Events;
 using Relevantz.EEPZ.Api.Middleware;
-
+using Relevantz.EEPZ.Shared.Auth;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -14,8 +14,6 @@ using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Core.Services.Implementations;
 using Relevantz.EEPZ.Data.DBContexts;
 
-JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
@@ -97,46 +95,9 @@ try
 
     // JWT AUTH
     // ✅ KEYCLOAK JWT AUTHENTICATION
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-.AddJwtBearer(options =>
-{
-    options.Authority =
-        "https://unprotractive-elmo-estipulate.ngrok-free.dev/realms/eepz-realm";
 
-    options.RequireHttpsMetadata = true;
+    builder.Services.AddEepzAuthentication(builder.Configuration);
 
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        // ✅ Standard across all EEPZ services
-        ValidateIssuer = false,
-        ValidateAudience = false,
-
-        ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero,
-
-        // ✅ Match Keycloak token claims
-        NameClaimType = "preferred_username",
-        RoleClaimType = "role"
-    };
-});
-
-    builder.Services.AddAuthorization(options =>
-    {
-        options.AddPolicy("HROnly", policy =>
-            policy.RequireRole("HR"));
-
-        options.AddPolicy("ManagerOnly", policy =>
-            policy.RequireRole("Manager"));
-
-        options.AddPolicy("EmployeeOnly", policy =>
-            policy.RequireRole("Employee"));
-
-        options.AddPolicy("HRorManager", policy =>
-            policy.RequireRole("HR", "Manager"));
-
-        options.AddPolicy("HRorEmployee", policy =>
-            policy.RequireRole("HR", "Employee"));
-    });
 
     builder.Services.AddHttpContextAccessor();
 

@@ -13,6 +13,7 @@ using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Core.Services.Implementations;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Core.Services;
+using Relevantz.EEPZ.Shared.Auth;
 
 
 
@@ -78,31 +79,13 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
 Log.Information("Database connection configured");
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-.AddJwtBearer(options =>
-{
-    // ✅ Keycloak realm (JWKS auto-discovered)
-    options.Authority =
-        "https://unprotractive-elmo-estipulate.ngrok-free.dev/realms/eepz-realm";
 
-    options.RequireHttpsMetadata = true;
 
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        // ✅ Same simple setup as all your other services
-        ValidateIssuer = false,
-        ValidateAudience = false,
 
-        ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero,
 
-        // ✅ Must match Keycloak token
-        NameClaimType = "preferred_username",
-        RoleClaimType = "role"
-    };
-});
 
-builder.Services.AddAuthorization();
+// AUTHENTICATION & AUTHORIZATION (SHARED)
+builder.Services.AddEepzAuthentication(builder.Configuration);
 
 
 Log.Information("JWT Authentication configured");

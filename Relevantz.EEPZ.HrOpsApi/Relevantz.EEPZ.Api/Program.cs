@@ -3,6 +3,7 @@ using Relevantz.EEPZ.Data.Repository;
 using Relevantz.EEPZ.Data.IRepository;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Core.Service;
+using Relevantz.EEPZ.Shared.Auth;
 using Relevantz.EEPZ.Common.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -140,39 +141,7 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
 }, ServiceLifetime.Scoped);
 
 // JWT AUTHENTICATION
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-.AddJwtBearer(options =>
-{
-    // ✅ Keycloak realm (JWKS will be fetched automatically)
-    options.Authority =
-        "https://unprotractive-elmo-estipulate.ngrok-free.dev/realms/eepz-realm";
-
-    options.RequireHttpsMetadata = true;
-
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        // ✅ KEEP SIMPLE – exactly like other working services
-        ValidateIssuer = false,
-        ValidateAudience = false,
-
-        ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero,
-
-        // ✅ MUST match your Keycloak token
-        NameClaimType = "preferred_username",
-        RoleClaimType = "role"
-    };
-});
-
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("AdminOnly", policy =>
-        policy.RequireRole("Admin"));
-    options.AddPolicy("HROnly", policy =>
-        policy.RequireRole("HR"));
-    options.AddPolicy("EmployeeAccess", policy =>
-        policy.RequireRole("Employee", "HR", "Admin"));
-});
+builder.Services.AddEepzAuthentication(builder.Configuration);
 
 // MAPSTER CONFIGURATION
 builder.Services.RegisterMapsterConfiguration();

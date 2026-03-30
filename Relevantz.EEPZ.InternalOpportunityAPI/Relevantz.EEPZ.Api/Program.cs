@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Relevantz.EEPZ.Shared.Auth;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -123,30 +124,8 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
 
 
 // Configure JWT Authentication with enhanced security
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-.AddJwtBearer(options =>
-{
-    // ✅ Keycloak realm (JWKS auto-loaded)
-    options.Authority =
-        "https://unprotractive-elmo-estipulate.ngrok-free.dev/realms/eepz-realm";
 
-    options.RequireHttpsMetadata = true;
-
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        // ✅ Keep simple (same everywhere)
-        ValidateIssuer = false,
-        ValidateAudience = false,
-
-        ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero,
-
-        // ✅ Matches Keycloak token
-        NameClaimType = "preferred_username",
-        RoleClaimType = "role"
-    };
-});
-builder.Services.AddAuthorization();
+builder.Services.AddEepzAuthentication(builder.Configuration);
 
 // Register Repositories (Internal Opportunities Module)
 builder.Services.AddScoped<IInternalOpportunityRepository, InternalOpportunityRepository>();

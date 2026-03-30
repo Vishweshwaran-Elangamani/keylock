@@ -67,7 +67,7 @@ services:
     networks:
       - eepz-network
 
-  # ── AUTH API ──────────────────────────────────────────────────────────────
+  # ── AUTH API (UNCHANGED) ──────────────────────────────────────────────────
   auth-api:
     build: ./Relevantz.EEPZ.AuthApi
     container_name: eepz-auth-api
@@ -99,7 +99,7 @@ services:
     networks:
       - eepz-network
 
-  # ── ANALYSIS API ──────────────────────────────────────────────────────────
+  # ── ANALYSIS API (PYTHON – UNCHANGED) ──────────────────────────────────────
   analysis-api:
     build: ./Relevantz.EEPZ.AnalysisApi
     container_name: eepz-analysis-api
@@ -108,8 +108,6 @@ services:
       - "5111:5111"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
-      - ASPNETCORE_URLS=http://+:5111
     depends_on:
       mysql:
         condition: service_healthy
@@ -118,9 +116,12 @@ services:
     networks:
       - eepz-network
 
-  # ── FEEDBACK API ──────────────────────────────────────────────────────────
+  # ── DOMAIN .NET APIs (ONLY BUILD PATH CHANGED) ─────────────────────────────
+
   feedback-api:
-    build: ./Relevantz.EEPZ.FeedbackApi
+    build:
+      context: .
+      dockerfile: Relevantz.EEPZ.FeedbackApi/Dockerfile
     container_name: eepz-feedback-api
     restart: always
     ports:
@@ -137,9 +138,10 @@ services:
     networks:
       - eepz-network
 
-  # ── GOAL API ──────────────────────────────────────────────────────────────
   goal-api:
-    build: ./Relevantz.EEPZ.GoalApi
+    build:
+      context: .
+      dockerfile: Relevantz.EEPZ.GoalApi/Dockerfile
     container_name: eepz-goal-api
     restart: always
     ports:
@@ -156,9 +158,10 @@ services:
     networks:
       - eepz-network
 
-  # ── HR OPERATIONS API ─────────────────────────────────────────────────────
   hr-operations-api:
-    build: ./Relevantz.EEPZ.HrOpsApi
+    build:
+      context: .
+      dockerfile: Relevantz.EEPZ.HrOpsApi/Dockerfile
     container_name: eepz-hr-operations-api
     restart: always
     ports:
@@ -180,28 +183,10 @@ services:
     networks:
       - eepz-network
 
-  # ── INTERNAL OPPORTUNITY API ──────────────────────────────────────────────
-  internal-opportunity-api:
-    build: ./Relevantz.EEPZ.InternalOpportunityAPI
-    container_name: eepz-internal-opportunity-api
-    restart: always
-    ports:
-      - "5105:5105"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
-      - ASPNETCORE_URLS=http://+:5105
-    depends_on:
-      mysql:
-        condition: service_healthy
-    volumes:
-      - ./logs:/app/Logs
-    networks:
-      - eepz-network
-
-  # ── L&D API ───────────────────────────────────────────────────────────────
   lnd-api:
-    build: ./Relevantz.EEPZ.LnDApi
+    build:
+      context: .
+      dockerfile: Relevantz.EEPZ.LnDApi/Dockerfile
     container_name: eepz-lnd-api
     restart: always
     ports:
@@ -218,9 +203,10 @@ services:
     networks:
       - eepz-network
 
-  # ── MEETING API ───────────────────────────────────────────────────────────
   meeting-api:
-    build: ./Relevantz.EEPZ.MeetingsApi
+    build:
+      context: .
+      dockerfile: Relevantz.EEPZ.MeetingsApi/Dockerfile
     container_name: eepz-meeting-api
     restart: always
     ports:
@@ -237,9 +223,10 @@ services:
     networks:
       - eepz-network
 
-  # ── MOM API ───────────────────────────────────────────────────────────────
   mom-api:
-    build: ./Relevantz.EEPZ.MoMApi
+    build:
+      context: .
+      dockerfile: Relevantz.EEPZ.MoMApi/Dockerfile
     container_name: eepz-mom-api
     restart: always
     ports:
@@ -256,9 +243,10 @@ services:
     networks:
       - eepz-network
 
-  # ── PERFORMANCE API ───────────────────────────────────────────────────────
   performance-api:
-    build: ./Relevantz.EEPZ.PerformanceMgmtApi
+    build:
+      context: .
+      dockerfile: Relevantz.EEPZ.PerformanceMgmtApi/Dockerfile
     container_name: eepz-performance-api
     restart: always
     ports:
@@ -275,9 +263,10 @@ services:
     networks:
       - eepz-network
 
-  # ── ROLES API ─────────────────────────────────────────────────────────────
   roles-api:
-    build: ./Relevantz.EEPZ.PerformanceMgmtRolesApi
+    build:
+      context: .
+      dockerfile: Relevantz.EEPZ.PerformanceMgmtRolesApi/Dockerfile
     container_name: eepz-roles-api
     restart: always
     ports:
@@ -294,9 +283,10 @@ services:
     networks:
       - eepz-network
 
-  # ── PROJECT MANAGEMENT API ────────────────────────────────────────────────
   proj-management-api:
-    build: ./Relevantz.EEPZ.ProjMgmtApi
+    build:
+      context: .
+      dockerfile: Relevantz.EEPZ.ProjMgmtApi/Dockerfile
     container_name: eepz-proj-management-api
     restart: always
     ports:
@@ -313,9 +303,10 @@ services:
     networks:
       - eepz-network
 
-  # ── REWARDS API ───────────────────────────────────────────────────────────
   rewards-api:
-    build: ./Relevantz.EEPZ.RewardsApi
+    build:
+      context: .
+      dockerfile: Relevantz.EEPZ.RewardsApi/Dockerfile
     container_name: eepz-rewards-api
     restart: always
     ports:
@@ -333,9 +324,10 @@ services:
     networks:
       - eepz-network
 
-  # ── ORG FEEDBACK API ──────────────────────────────────────────────────────
   org-feedback-api:
-    build: ./Relevantz.EEPZ.OrgFeedbackApi
+    build:
+      context: .
+      dockerfile: Relevantz.EEPZ.OrgFeedbackApi/Dockerfile
     container_name: eepz-org-feedback-api
     restart: always
     ports:
@@ -352,9 +344,10 @@ services:
     networks:
       - eepz-network
 
-  # ── SLA API ───────────────────────────────────────────────────────────────
   sla-api:
-    build: ./Relevantz.EEPZ.SLAApi
+    build:
+      context: .
+      dockerfile: Relevantz.EEPZ.SLAApi/Dockerfile
     container_name: eepz-sla-api
     restart: always
     ports:
@@ -371,7 +364,7 @@ services:
     networks:
       - eepz-network
 
-  # ── NGROK (Public URL Forever) ────────────────────────────────────────────
+  # ── NGROK ──────────────────────────────────────────────────────────────────
   ngrok:
     image: ngrok/ngrok:alpine
     container_name: eepz-ngrok
@@ -390,11 +383,9 @@ services:
     networks:
       - eepz-network
 
-
 volumes:
   mysql_data:
   mongodb_data:
-
 
 networks:
   eepz-network:

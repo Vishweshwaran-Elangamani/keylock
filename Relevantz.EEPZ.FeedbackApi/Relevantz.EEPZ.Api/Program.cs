@@ -1,11 +1,11 @@
 global using Serilog;
 global using Serilog.Events;
 using Relevantz.EEPZ.Api.Middleware;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Relevantz.EEPZ.Shared.Auth;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
@@ -22,8 +22,6 @@ using Polly;
 using Polly.Extensions.Http;
 
 
-JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
@@ -136,47 +134,8 @@ try
     });
 
     // JWT AUTH
-   builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-.AddJwtBearer(options =>
-{
-    // ✅ Point to Keycloak (for JWKS / signing keys)
-    options.Authority =
-        "https://unprotractive-elmo-estipulate.ngrok-free.dev/realms/eepz-realm";
-
-    options.RequireHttpsMetadata = true;
-
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        // ✅ SIMPLE & DEV‑FRIENDLY
-        ValidateIssuer = false,
-        ValidateAudience = false,
-
-        ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero,
-
-        // ✅ MATCH YOUR KEYCLOAK TOKEN
-        NameClaimType = "preferred_username",
-        RoleClaimType = "role"
-    };
-});
-
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("HROnly",
-        policy => policy.RequireRole("HR"));
-
-    options.AddPolicy("ManagerOnly",
-        policy => policy.RequireRole("Manager"));
-
-    options.AddPolicy("EmployeeOnly",
-        policy => policy.RequireRole("Employee"));
-
-    options.AddPolicy("HRorManager",
-        policy => policy.RequireRole("HR", "Manager"));
-
-    options.AddPolicy("HRorEmployee",
-        policy => policy.RequireRole("HR", "Employee"));
-});
+  // AUTHENTICATION & AUTHORIZATION (Shared)
+builder.Services.AddEepzAuthentication(builder.Configuration);
 
     builder.Services.AddHttpContextAccessor();
 

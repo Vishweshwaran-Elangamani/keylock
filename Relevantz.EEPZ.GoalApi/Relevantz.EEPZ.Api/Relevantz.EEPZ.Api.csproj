@@ -33,5 +33,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Relevantz.EEPZ.Core\Relevantz.EEPZ.Core.csproj" />
+    <ProjectReference Include="..\..\Relevantz.EEPZ.Shared.Auth\Relevantz.EEPZ.Shared.Auth.csproj" />
   </ItemGroup>
 </Project>

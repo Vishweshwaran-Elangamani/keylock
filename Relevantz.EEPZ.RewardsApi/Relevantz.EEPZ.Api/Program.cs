@@ -2,6 +2,7 @@ using FluentValidation.AspNetCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Relevantz.EEPZ.Shared.Auth;
 using System.Threading.RateLimiting;
 using Relevantz.EEPZ.Common.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -213,31 +214,7 @@ builder.Services.AddScoped<DbContext>(sp => sp.GetRequiredService<EEPZDbContext>
 // -------------------------------------------------
 // JWT (values overridden by env variables loaded from .env)
 // -------------------------------------------------
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-.AddJwtBearer(options =>
-{
-    // ✅ Keycloak Realm (public JWKS)
-    options.Authority =
-        "https://unprotractive-elmo-estipulate.ngrok-free.dev/realms/eepz-realm";
-
-    options.RequireHttpsMetadata = true;
-
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        // ✅ Keep it simple (same as your working services)
-        ValidateIssuer = false,
-        ValidateAudience = false,
-
-        ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero,
-
-        // ✅ MUST match your Keycloak token
-        NameClaimType = "preferred_username",
-        RoleClaimType = "role"
-    };
-});
-
-builder.Services.AddAuthorization();
+builder.Services.AddEepzAuthentication(builder.Configuration);
 
 // -------------------------------------------------
 // DI registrations (explicit)

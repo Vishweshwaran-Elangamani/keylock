@@ -6,6 +6,15 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Relevantz.EEPZ.Shared.Auth;
+
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+
 using Relevantz.EEPZ.Common.Configuration;
 using Relevantz.EEPZ.Data.DBContexts;
 
@@ -112,55 +121,7 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
 // ==========================================================================
 // JWT AUTHENTICATION SETUP
 // ==========================================================================
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-.AddJwtBearer(options =>
-{
-    // Point to Keycloak so .NET can read signing keys (JWKS)
-    options.Authority =
-        "https://unprotractive-elmo-estipulate.ngrok-free.dev/realms/eepz-realm";
-
-    options.RequireHttpsMetadata = true;
-
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        // ✅ KEEP IT SIMPLE
-        ValidateIssuer = false,
-        ValidateAudience = false,
-
-        ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero,
-
-        // ✅ MATCH YOUR TOKEN
-        NameClaimType = "preferred_username",
-        RoleClaimType = "role"
-    };
-
-    options.Events = new JwtBearerEvents
-    {
-        OnAuthenticationFailed = context =>
-        {
-            Log.Error("JWT FAILED: {Message}", context.Exception.Message);
-            return Task.CompletedTask;
-        },
-
-        OnTokenValidated = context =>
-        {
-            var email = context.Principal?.FindFirst("email")?.Value;
-            var empId = context.Principal?.FindFirst("empId")?.Value;
-            var role  = context.Principal?.FindFirst("role")?.Value;
-
-            Log.Information(
-                "JWT OK → Email={Email}, empId={EmpId}, role={Role}",
-                email, empId, role
-            );
-
-            return Task.CompletedTask;
-        }
-    };
-});
-
-builder.Services.AddAuthorization();
-
+builder.Services.AddEepzAuthentication(builder.Configuration);
 // ==========================================================================
 // DEPENDENCY INJECTION
 // ==========================================================================

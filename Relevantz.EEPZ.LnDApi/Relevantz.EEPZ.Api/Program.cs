@@ -16,6 +16,7 @@ using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repositories.Implementations;
 using Relevantz.EEPZ.Data.Repositories.Interface;
 using Mapster;
+using Relevantz.EEPZ.Shared.Auth;
 using MapsterMapper;
 using System.Reflection;
 using Serilog;
@@ -204,30 +205,7 @@ else
 // Configure JWT Authentication
 
 // ✅ KEYCLOAK JWT AUTHENTICATION
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-.AddJwtBearer(options =>
-{
-    options.Authority =
-        "https://unprotractive-elmo-estipulate.ngrok-free.dev/realms/eepz-realm";
-
-    options.RequireHttpsMetadata = true;
-
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        // ✅ Standard across all EEPZ services
-        ValidateIssuer = false,
-        ValidateAudience = false,
-
-        ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero,
-
-        // ✅ Match Keycloak access token
-        NameClaimType = "preferred_username",
-        RoleClaimType = "role"
-    };
-});
-
-builder.Services.AddAuthorization();
+builder.Services.AddEepzAuthentication(builder.Configuration);
 // File Storage Service - MongoDB GridFS
 
 builder.Services.AddSingleton<IFileStorageService, FileStorageService>();

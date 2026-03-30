@@ -1,57 +1,45 @@
-# syntax=docker/dockerfile:1.6
 
-#############################
-# Stage 1: Build
-#############################
-FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine3.19 AS build
-# (Optional) You don't need curl in the build stage; removing it is fine.
-RUN apk add --no-cache icu-libs
+# =========================
+# BUILD STAGE
+# =========================
+FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
 WORKDIR /src
 
-ENV DOTNET_CLI_TELEMETRY_OPTOUT=1 \
-    DOTNET_NOLOGO=1
+# --- API project ---
+COPY Relevantz.EEPZ.RewardsApi/Relevantz.EEPZ.Api/Relevantz.EEPZ.Api.csproj \
+     Relevantz.EEPZ.RewardsApi/Relevantz.EEPZ.Api/
 
-# Copy entire solution (multi-project safe)
+# --- Module dependencies ---
+COPY Relevantz.EEPZ.RewardsApi/Relevantz.EEPZ.Common/Relevantz.EEPZ.Common.csproj \
+     Relevantz.EEPZ.RewardsApi/Relevantz.EEPZ.Common/
+
+COPY Relevantz.EEPZ.RewardsApi/Relevantz.EEPZ.Core/Relevantz.EEPZ.Core.csproj \
+     Relevantz.EEPZ.RewardsApi/Relevantz.EEPZ.Core/
+
+COPY Relevantz.EEPZ.RewardsApi/Relevantz.EEPZ.Data/Relevantz.EEPZ.Data.csproj \
+     Relevantz.EEPZ.RewardsApi/Relevantz.EEPZ.Data/
+
+# --- Shared Auth (GLOBAL) ---
+COPY Relevantz.EEPZ.Shared.Auth/Relevantz.EEPZ.Shared.Auth.csproj \
+     Relevantz.EEPZ.Shared.Auth/
+
+# Restore
+RUN dotnet restore Relevantz.EEPZ.RewardsApi/Relevantz.EEPZ.Api/Relevantz.EEPZ.Api.csproj
+
+# Copy everything
 COPY . .
-RUN dotnet restore
 
-# Publish the API project (adjust path if your .csproj lives elsewhere)
-WORKDIR /src/Relevantz.EEPZ.Api
+# Publish
+WORKDIR /src/Relevantz.EEPZ.RewardsApi/Relevantz.EEPZ.Api
 RUN dotnet publish -c Release -o /app/publish
 
-#############################
-# Stage 2: Runtime
-#############################
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine3.19
-
-# Globalization libs + curl for HEALTHCHECK
-RUN apk add --no-cache icu-libs curl
-
-# Create non-root user
-RUN addgroup -S app || true \
-    && adduser -S app -G app || true
-
-# Create writable dirs and set ownership
-RUN mkdir -p /SharedUploads \
-    && mkdir -p /home/app/.aspnet/DataProtection-Keys \
-    && chown -R app:app /SharedUploads /home/app
-
+# =========================
+# RUNTIME STAGE
+# =========================
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS runtime
 WORKDIR /app
-COPY --from=build /app/publish ./
-RUN chown -R app:app /app
 
-USER app
-
-# Bind to 5114 and set runtime flags
-ENV ASPNETCORE_URLS=http://0.0.0.0:5114 \
-    ASPNETCORE_DATA_PROTECTION__KEYS_DIR=/home/app/.aspnet/DataProtection-Keys \
-    DOTNET_RUNNING_IN_CONTAINER=true \
-    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
-
-EXPOSE 5114
-
-# Container health check (requires /healthz endpoint)
-HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD wget -qO- http://localhost:5114/healthz || exit 1
-
+COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "Relevantz.EEPZ.Api.dll"]
+
+
