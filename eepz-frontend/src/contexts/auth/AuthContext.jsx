@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // 🔹 REHYDRATE USER FROM JWT ON APP LOAD / REFRESH
+  // ✅ REHYDRATE AUTH ON APP LOAD
   useEffect(() => {
     try {
       const token =
@@ -37,51 +37,41 @@ export const AuthProvider = ({ children }) => {
       setUser(rebuiltUser);
       setIsAuthenticated(true);
 
-      // 🔹 BACKWARD COMPATIBILITY (DON’T REMOVE)
+      // ✅ Backward compatibility
       localStorage.setItem("user", JSON.stringify(rebuiltUser));
       localStorage.setItem("userId", rebuiltUser.userId ?? "");
       localStorage.setItem("userName", rebuiltUser.name ?? "");
       localStorage.setItem("userRole", rebuiltUser.role ?? "");
       localStorage.setItem("email", rebuiltUser.email ?? "");
-    } catch (error) {
-      console.error("Auth init error:", error);
-
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-
+    } catch (err) {
+      console.error("Auth bootstrap failed:", err);
+      localStorage.clear();
       setUser(null);
       setIsAuthenticated(false);
     } finally {
-      setLoading(false);
+      setLoading(false); // ✅ CRITICAL
     }
   }, []);
 
-  // 🔹 LOGIN HANDLER (CUSTOM LOGIN PAGE)
+  // ✅ LOGIN
   const login = (userData, token) => {
     setUser(userData);
     setIsAuthenticated(true);
 
     localStorage.setItem("accessToken", token);
-    localStorage.setItem("token", token); // backward support
-
+    localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("userId", userData.userId ?? "");
-    localStorage.setItem("userName", userData.name ?? "");
-    localStorage.setItem("userRole", userData.role ?? "");
-    localStorage.setItem("email", userData.email ?? "");
   };
 
-  // 🔹 LOGOUT HANDLER
+  // ✅ LOGOUT
   const logout = async () => {
     try {
       await authService.logout();
-    } catch (error) {
-      console.warn("Logout error:", error);
-    } finally {
+    } catch {}
+    finally {
+      localStorage.clear();
       setUser(null);
       setIsAuthenticated(false);
-      localStorage.clear();
       navigate("/login", { replace: true });
     }
   };
@@ -90,15 +80,13 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{ user, isAuthenticated, loading, login, logout }}
     >
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used inside AuthProvider");
-  }
-  return context;
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
+  return ctx;
 };

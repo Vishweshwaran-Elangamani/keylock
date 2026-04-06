@@ -1,53 +1,47 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../contexts/auth/AuthContext";
 
+const normalizeRole = (role = "") =>
+  role.toUpperCase().replace(/\s+/g, "");
+
+const ROLE_DASHBOARD_MAP = {
+  ADMIN: "/admin/dashboard",
+  HR: "/hr/dashboard",
+  DEPARTMENTHEAD: "/department-head/dashboard",
+  LEADERSHIP: "/leadership/dashboard",
+  MANAGER: "/manager/dashboard",
+  EMPLOYEE: "/employee/dashboard",
+};
+
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { isAuthenticated, loading, user } = useAuth();
 
-  // ✅ WAIT PROPERLY
+  /* ✅ 1. Wait until auth is fully resolved */
   if (loading) {
-    return null;
+    return null; // or <FullPageLoader />
   }
 
-  // ✅ NOT LOGGED IN
-  if (!isAuthenticated) {
+  /* ✅ 2. Not authenticated */
+  if (!isAuthenticated || !user) {
     return <Navigate to="/login" replace />;
   }
 
-  // ✅ EXTRA SAFETY (VERY IMPORTANT)
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
+  /* ✅ 3. Role-based authorization (if specified) */
+  if (Array.isArray(allowedRoles) && allowedRoles.length > 0) {
+    const userRole = normalizeRole(user.role);
+    const allowed = allowedRoles.map(normalizeRole);
 
-  // ✅ ROLE CHECK
-  if (allowedRoles && allowedRoles.length > 0) {
-    const userRole = user.role;
-
-    const normalizedUserRole = userRole.toUpperCase().replace(/\s+/g, "");
-
-    const normalizedAllowedRoles = allowedRoles.map((role) =>
-      role.toUpperCase().replace(/\s+/g, "")
-    );
-
-    if (!normalizedAllowedRoles.includes(normalizedUserRole)) {
-      const dashboardRoutes = {
-        ADMIN: "/admin/dashboard",
-        HR: "/hr/dashboard",
-        DEPARTMENTHEAD: "/department-head/dashboard",
-        LEADERSHIP: "/leadership/dashboard",
-        MANAGER: "/manager/dashboard",
-        EMPLOYEE: "/employee/dashboard",
-      };
-
+    if (!allowed.includes(userRole)) {
       return (
         <Navigate
-          to={dashboardRoutes[normalizedUserRole] || "/employee/dashboard"}
+          to={ROLE_DASHBOARD_MAP[userRole] || "/employee/dashboard"}
           replace
         />
       );
     }
   }
 
+  /* ✅ 4. Authorized */
   return children;
 };
 

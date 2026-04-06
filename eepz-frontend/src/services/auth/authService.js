@@ -41,7 +41,6 @@ const decodeJwt = (token) => {
 const getClaimsFromToken = (token) => {
   const decoded = decodeJwt(token);
   if (!decoded) return null;
-
   return {
     userId: decoded.sub,
     email: decoded.email,
@@ -100,7 +99,7 @@ const authService = {
       const response = await axios.post(KEYCLOAK_URL, params, {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       });
-
+      
       const data = response.data;
 
       const accessToken = data.access_token;
@@ -174,6 +173,10 @@ const authService = {
       throw new Error("Session expired");
     }
   },
+  forgotPassword: async (email) => {
+      return api.post("/authentication/forgot-password", { email });
+    },
+  
 
   /* 🔓 LOGOUT (UNCHANGED) */
   logout: async () => {

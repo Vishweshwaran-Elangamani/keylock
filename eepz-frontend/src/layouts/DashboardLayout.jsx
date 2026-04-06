@@ -5,7 +5,7 @@ import Navbar from "./Navbar";
 import "../styles/layout_styles/DashboardLayout.css";
 
 const DashboardLayout = ({ children, role, allowedRoles = [] }) => {
-  const { user } = useAuth();
+  const { user } = useAuth(); // ✅ SAFE: ProtectedRoute already guarantees this
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const currentRole = user?.role || role;

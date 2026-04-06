@@ -113,13 +113,65 @@ import HRMomDetails from "./pages/meeting/HRMomDetails";
 import ManagerPeerFeedback from "./pages/feedback_management/manager/ManagerPeerFeedback";
 import MomDetailsView from "./components/meeting/modals/MomDetailsView";
 
+const ROLE_DASHBOARD_MAP = {
+  ADMIN: "/admin/dashboard",
+  HR: "/hr/dashboard",
+  DEPARTMENTHEAD: "/department-head/dashboard",
+  MANAGER: "/manager/dashboard",
+  EMPLOYEE: "/employee/dashboard",
+  LEADERSHIP: "/leadership/dashboard",
+};
+
+const normalizeRole = (role = "") =>
+  role.toUpperCase().replace(/\s+/g, "");
+
 const AppRoutes = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+
+  // ✅ IMPORTANT: wait for auth before routing
+if (loading) {
+  return (
+    <div
+      className="d-flex justify-content-center align-items-center"
+      style={{ height: "100vh" }}
+    >
+      <div className="spinner-border text-primary" role="status" />
+    </div>
+  );
+}
+
   return (
     <Routes>
       //region DEFAULT/FALLBACK ROUTES
-      <Route path="/" element={<Navigate to="/login" replace />} />
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      //region DEFAULT/FALLBACK ROUTES
+<Route
+  path="/"
+  element={
+    user
+      ? <Navigate
+  to={
+    ROLE_DASHBOARD_MAP[normalizeRole(user.role)] ||
+    "/employee/dashboard"
+  }
+  replace
+/>      : <Navigate to="/login" replace />
+  }
+/>
+
+<Route
+  path="*"
+  element={
+    user
+      ? <Navigate
+  to={
+    ROLE_DASHBOARD_MAP[normalizeRole(user.role)] ||
+    "/employee/dashboard"
+  }
+  replace
+/>      : <Navigate to="/login" replace />
+  }
+/>
+//endregion DEFAULT/FALLBACK ROUTES
       //endregion DEFAULT/FALLBACK ROUTES //region PUBLIC ROUTES
       <Route
         path="/login"

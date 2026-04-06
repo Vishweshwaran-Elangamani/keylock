@@ -260,10 +260,6 @@ export const useFormLogic = (formId, user, navigate, loading) => {
       toast.error("Authentication loading. Please wait.");
       return;
     }
-    if (!user || !user.userId || !model.createdBy) {
-      toast.error("User not loaded. Please login again.");
-      return;
-    }
     if (!validateForm()) {
       return;
     }

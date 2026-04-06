@@ -91,11 +91,7 @@ function FormCreate() {
   const [busy, setBusy] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
 
-  useEffect(() => {
-    if (user?.userId) {
-      setModel((m) => ({ ...m, createdBy: user.userId }));
-    }
-  }, [user]);
+  if (loading) return;
 
   useEffect(() => {
     if (!isEditMode) return;
@@ -323,13 +319,10 @@ function FormCreate() {
   const onSubmit = async (e) => {
     e.preventDefault();
     if (loading) {
-      toast.error("Authentication loading. Please wait.");
+      toast.error("Please wait, user context is loading.");
       return;
     }
-    if (!user || !user.userId || !model.createdBy) {
-      toast.error("User not loaded. Please login again.");
-      return;
-    }
+    
     if (!validateForm()) {
       return;
     }
@@ -402,17 +395,6 @@ function FormCreate() {
     );
   }
 
-  if (!user || !user.userId) {
-    return (
-      <div className="pmhr-fc-error-container">
-        <div className="pmhr-fc-error-icon">
-          <i className="bi bi-exclamation-triangle"></i>
-        </div>
-        <h4>Authentication Required</h4>
-        <p>User not loaded. Please login again.</p>
-      </div>
-    );
-  }
 
   return (
     <div className="pmhr-fc-layout">

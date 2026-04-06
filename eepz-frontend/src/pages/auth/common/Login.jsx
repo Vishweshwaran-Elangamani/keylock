@@ -380,17 +380,28 @@ const Login = () => {
                   )}
                 </div>
                 <div className="d-flex justify-content-between align-items-center mb-4">
-                  <a
-                    href="/reset-password"
-                    className="text-decoration-none fw-semibold eepz-forgot-link"
-                    style={{ color: "#27235c" }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigate("/reset-password");
-                    }}
-                  >
-                    Forgot Password?
-                  </a>
+                 <a
+  href="#"
+  className="eepz-forgot-link"
+  onClick={async (e) => {
+    e.preventDefault();
+
+    if (!formData.email) {
+      toast.error("Please enter your email address");
+      return;
+    }
+
+    try {
+      await authService.forgotPassword(formData.email);
+      toast.success("Password reset email sent. Check your inbox.");
+    } catch {
+      toast.success("Password reset email sent. Check your inbox.");
+      // Intentionally same message to avoid user enumeration
+    }
+  }}
+>
+  Forgot Password?
+</a>
                 </div>
                 <button
                   type="submit"
