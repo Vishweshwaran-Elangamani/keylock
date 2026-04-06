@@ -88,7 +88,7 @@ public class KeycloakAdminService : IKeycloakAdminService
 
         // ✅ FIX: requiredActions only for non-SuperAdmin users
         // SuperAdmin password is set directly via ResetPasswordByIdAsync — no email link needed
-        var requiredActions = roleName == "SuperAdmin"
+        var requiredActions = roleName == "Admin"
             ? Array.Empty<string>()
             : new[] { "UPDATE_PASSWORD" };
 
@@ -124,49 +124,42 @@ public class KeycloakAdminService : IKeycloakAdminService
     }
 
     // ── SEND SET-PASSWORD EMAIL ──────────────────────────────────────────────
-    public async Task SendSetPasswordEmailAsync(string keycloakUserId)
+   public async Task SendSetPasswordEmailAsync(string keycloakUserId)
+{
+    await EnsureAdminTokenAsync();
+
+    var redirectUri = Uri.EscapeDataString(
+        "https://unprotractive-elmo-estipulate.ngrok-free.dev");
+
+    var url =
+        $"{_baseUrl}/admin/realms/{_realm}/users/{keycloakUserId}/execute-actions-email" +
+        $"?lifespan=86400" +
+        $"&client_id=eepz-client-public" +
+        $"&redirect_uri={redirectUri}";
+
+    var actions = new[] { "UPDATE_PASSWORD" };
+
+    var req = BuildRequest(HttpMethod.Put, url, actions);
+    var res = await _http.SendAsync(req);
+
+    if (res.IsSuccessStatusCode)
     {
-        await EnsureAdminTokenAsync();
-
-        var url     = $"{_baseUrl}/admin/realms/{_realm}/users/{keycloakUserId}/execute-actions-email?lifespan=86400";
-        var actions = new[] { "UPDATE_PASSWORD" };
-
-        var req = BuildRequest(HttpMethod.Put, url, actions);
-        var res = await _http.SendAsync(req);
-
-        if (res.IsSuccessStatusCode)
-        {
-            _logger.LogInformation(
-                "✅ Set-password email sent via Keycloak SMTP. KeycloakId={Id}", keycloakUserId);
-            return;
-        }
-
-        var statusCode = (int)res.StatusCode;
-        var err        = await res.Content.ReadAsStringAsync();
-
-        bool isQuotaError =
-            err.Contains("Daily user sending quota exceeded", StringComparison.OrdinalIgnoreCase) ||
-            err.Contains("550-5.4.5",  StringComparison.OrdinalIgnoreCase) ||
-            err.Contains("550 5.4.5",  StringComparison.OrdinalIgnoreCase) ||
-            err.Contains("quota",      StringComparison.OrdinalIgnoreCase) ||
-            err.Contains("rate limit", StringComparison.OrdinalIgnoreCase);
-
-        if (isQuotaError)
-        {
-            _logger.LogCritical(
-                "🚨 GMAIL QUOTA EXCEEDED. User {Id} did NOT receive email. Raw error: {Error}",
-                keycloakUserId, err);
-            throw new InvalidOperationException(
-                "Email quota exceeded. This is a Gmail daily limit issue, not a code error.");
-        }
-
-        _logger.LogError(
-            "❌ SendSetPasswordEmail failed. KeycloakId={Id} HttpStatus={Status} Error={Error}.",
-            keycloakUserId, statusCode, err);
-
-        throw new InvalidOperationException(
-            $"Failed to send set-password email via Keycloak. HttpStatus={statusCode}. Raw error: {err}");
+        _logger.LogInformation(
+            "✅ Set-password email sent via Keycloak SMTP. KeycloakId={Id}", keycloakUserId);
+        return;
     }
+
+    var statusCode = (int)res.StatusCode;
+    var err = await res.Content.ReadAsStringAsync();
+
+    _logger.LogError(
+        "❌ SendSetPasswordEmail failed. KeycloakId={Id} HttpStatus={Status} Error={Error}.",
+        keycloakUserId, statusCode, err);
+
+    throw new InvalidOperationException(
+        $"Failed to send set-password email via Keycloak. HttpStatus={statusCode}. Raw error: {err}");
+}
+
 
     // ── UPDATE USER PROFILE ──────────────────────────────────────────────────
     // ✅ PRESERVED but no longer called from seeder/CreateUser flows

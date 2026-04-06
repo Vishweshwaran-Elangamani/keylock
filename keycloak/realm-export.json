@@ -30,12 +30,12 @@
   "enabled": true,
   "sslRequired": "external",
   "registrationAllowed": false,
-  "registrationEmailAsUsername": false,
+  "registrationEmailAsUsername": true,
   "rememberMe": false,
-  "verifyEmail": false,
+  "verifyEmail": true,
   "loginWithEmailAllowed": true,
   "duplicateEmailsAllowed": false,
-  "resetPasswordAllowed": false,
+  "resetPasswordAllowed": true,
   "editUsernameAllowed": false,
   "bruteForceProtected": false,
   "permanentLockout": false,
@@ -53,15 +53,6 @@
         "id": "63eea629-e7b0-4228-8649-0775406562e8",
         "name": "Department Head",
         "description": "Department Head role\n",
-        "composite": false,
-        "clientRole": false,
-        "containerId": "0f2c7a2d-0457-4918-a3af-35e46039376b",
-        "attributes": {}
-      },
-      {
-        "id": "d113c852-b358-4af1-89bb-9db033998026",
-        "name": "SuperAdmin",
-        "description": "Full system access",
         "composite": false,
         "clientRole": false,
         "containerId": "0f2c7a2d-0457-4918-a3af-35e46039376b",
@@ -89,6 +80,15 @@
         "id": "94bde207-88fd-4f55-a2e1-2196f8dbfcf8",
         "name": "uma_authorization",
         "description": "${role_uma_authorization}",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "0f2c7a2d-0457-4918-a3af-35e46039376b",
+        "attributes": {}
+      },
+      {
+        "id": "0525acfb-ab54-485a-94ac-8e8e7c79bd2e",
+        "name": "Admin",
+        "description": "SuperAdmin",
         "composite": false,
         "clientRole": false,
         "containerId": "0f2c7a2d-0457-4918-a3af-35e46039376b",
@@ -1681,7 +1681,7 @@
     "envelopeFrom": "eepzkeyclockemailservice@gmail.com",
     "ssl": "false",
     "timeout": "30000",
-    "password": "**********",
+    "password": "cjpr gpap hbej lfyb",
     "port": "587",
     "replyTo": "eepzkeyclockemailservice@gmail.com",
     "host": "smtp.gmail.com",
@@ -1691,6 +1691,10 @@
     "connectionTimeout": "30000",
     "user": "eepzkeyclockemailservice@gmail.com"
   },
+  "loginTheme": "eepz",
+  "accountTheme": "",
+  "adminTheme": "",
+  "emailTheme": "",
   "eventsEnabled": false,
   "eventsListeners": [
     "jboss-logging"
@@ -1765,14 +1769,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "saml-user-property-mapper",
-            "saml-user-attribute-mapper",
-            "oidc-full-name-mapper",
             "saml-role-list-mapper",
-            "oidc-sha256-pairwise-sub-mapper",
-            "oidc-usermodel-property-mapper",
+            "oidc-full-name-mapper",
             "oidc-address-mapper",
-            "oidc-usermodel-attribute-mapper"
+            "saml-user-property-mapper",
+            "oidc-usermodel-attribute-mapper",
+            "saml-user-attribute-mapper",
+            "oidc-sha256-pairwise-sub-mapper",
+            "oidc-usermodel-property-mapper"
           ]
         }
       },
@@ -1793,13 +1797,13 @@
         "config": {
           "allowed-protocol-mapper-types": [
             "oidc-address-mapper",
-            "saml-user-property-mapper",
+            "oidc-sha256-pairwise-sub-mapper",
             "saml-user-attribute-mapper",
-            "saml-role-list-mapper",
-            "oidc-usermodel-property-mapper",
             "oidc-full-name-mapper",
+            "oidc-usermodel-property-mapper",
+            "saml-user-property-mapper",
             "oidc-usermodel-attribute-mapper",
-            "oidc-sha256-pairwise-sub-mapper"
+            "saml-role-list-mapper"
           ]
         }
       },
@@ -2726,7 +2730,8 @@
     "parRequestUriLifespan": "60",
     "clientSessionMaxLifespan": "0",
     "frontendUrl": "https://unprotractive-elmo-estipulate.ngrok-free.dev",
-    "acr.loa.map": "{}"
+    "acr.loa.map": "{}",
+    "darkMode": "true"
   },
   "keycloakVersion": "26.5.6",
   "userManagedAccessAllowed": false,

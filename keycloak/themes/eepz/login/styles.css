@@ -1,0 +1,38 @@
+body {
+    background: linear-gradient(135deg, #1f295b, #2d3565);
+    font-family: "Segoe UI", sans-serif;
+  }
+  
+  .kc-form-card {
+    border-radius: 12px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+  }
+  
+  .kc-label {
+    color: #2d3565;
+    font-weight: 600;
+  }
+  
+  .kc-button-primary {
+    background: #27235c !important;
+    border-radius: 6px;
+  }
+  
+  .kc-button-primary:hover {
+    background: #1f1b4c !important;
+  }
+  
+  .eepz-back-link {
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  .eepz-back-link a {
+    color: #2d3565;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  
+  .eepz-back-link a:hover {
+    text-decoration: underline;
+  }

@@ -1,9 +1,9 @@
-// FIXED: All seeding scenarios handled correctly
+// FIXED: All seeding scenarios handled correctly (NULL‑SAFE + Idempotent + Retry‑Safe)
+// ROLE USED: Admin
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Utils;
 using Relevantz.EEPZ.Core.IService;
@@ -18,14 +18,15 @@ public class SuperAdminSeederService : ISuperAdminSeederService
     private readonly IConfiguration                   _configuration;
     private readonly ILogger<SuperAdminSeederService> _logger;
 
-    private string SuperAdminEmail     => _configuration["AdminSeedData:Email"]             ?? "emailservice@eepz.com";
-    private string SuperAdminPassword  => _configuration["AdminSeedData:Password"]          ?? "KeyAdmin@123456";
-    private string SuperAdminFirstName => _configuration["AdminSeedData:FirstName"]         ?? "Super";
-    private string SuperAdminLastName  => _configuration["AdminSeedData:LastName"]          ?? "Administrator";
-    private string SuperAdminCompanyId => _configuration["AdminSeedData:EmployeeCompanyId"] ?? "1000";
-    private string SuperAdminMobile    => _configuration["AdminSeedData:MobileNumber"]      ?? "9894076107";
+    private string AdminEmail     => _configuration["AdminSeedData:Email"]             ?? "emailservice@eepz.com";
+    private string AdminPassword  => _configuration["AdminSeedData:Password"]          ?? "KeyAdmin@123456";
+    private string AdminFirstName => _configuration["AdminSeedData:FirstName"]         ?? "Super";
+    private string AdminLastName  => _configuration["AdminSeedData:LastName"]          ?? "Administrator";
+    private string AdminCompanyId => _configuration["AdminSeedData:EmployeeCompanyId"] ?? "1000";
+    private string AdminMobile    => _configuration["AdminSeedData:MobileNumber"]      ?? "9894076107";
 
-    private const string SuperAdminRole = "SuperAdmin";
+    // ✅ ROLE IS ADMIN (NOT SuperAdmin)
+    private const string AdminRole = "Admin";
 
     public SuperAdminSeederService(
         EEPZDbContext                    db,
@@ -39,287 +40,269 @@ public class SuperAdminSeederService : ISuperAdminSeederService
         _logger        = logger;
     }
 
+    // ─────────────────────────────────────────────────────────────
+    // ENTRY POINT
+    // ─────────────────────────────────────────────────────────────
     public async Task SeedAsync()
     {
+        // CASE 1 — Auth record exists
         var existingAuth = await _db.Userauthentications
             .AsNoTracking()
-            .Include(ua => ua.Employee)
-            .FirstOrDefaultAsync(ua => ua.Email == SuperAdminEmail);
+            .FirstOrDefaultAsync(u => u.Email == AdminEmail);
 
         if (existingAuth != null)
         {
             string? keycloakUserId = null;
-            try { keycloakUserId = await _keycloak.GetUserIdByEmailAsync(SuperAdminEmail); }
-            catch { /* Keycloak unreachable — skip re-sync */ }
+            try { keycloakUserId = await _keycloak.GetUserIdByEmailAsync(AdminEmail); }
+            catch { }
 
-            // ✅ CASE 1: Both DB + Keycloak exist → skip fully
             if (!string.IsNullOrEmpty(keycloakUserId))
             {
-                _logger.LogInformation("✅ SuperAdmin already seeded. Skipping.");
+                _logger.LogInformation("✅ Admin already seeded. Skipping.");
                 return;
             }
 
-            // ✅ CASE 2: DB exists but Keycloak wiped → recreate in Keycloak only
-            _logger.LogWarning("⚠️ DB exists but Keycloak missing. Recreating Keycloak user...");
+            _logger.LogWarning("⚠️ DB exists but Keycloak missing. Recreating Admin user...");
 
             var employee = await _db.Employees
-                .FirstAsync(e => e.EmployeeId == existingAuth.EmployeeId);
+                .FirstOrDefaultAsync(e => e.EmployeeId == existingAuth.EmployeeId);
+
+            if (employee == null)
+            {
+                await CreateFreshSeedAsync();
+                return;
+            }
 
             var details = await _db.Employeedetailsmasters
-                .FirstAsync(d => d.EmployeeId == employee.EmployeeId);
+                .FirstOrDefaultAsync(d => d.EmployeeId == employee.EmployeeId);
 
-            // ✅ CreateUserAsync already sends firstName+lastName+email+username in payload
-            string newKeycloakId;
-            try
+            if (details == null)
             {
-                newKeycloakId = await _keycloak.CreateUserAsync(
-                    SuperAdminEmail, SuperAdminFirstName, SuperAdminLastName, SuperAdminRole);
-            }
-            catch (Exception ex) when (ex.Message.Contains("already exists"))
-            {
-                newKeycloakId = await _keycloak.GetUserIdByEmailAsync(SuperAdminEmail)
-                    ?? throw new Exception("Keycloak user exists but UUID not found.");
+                await CompleteSeedForExistingEmployeeAsync(employee);
+                return;
             }
 
-            // Wait for Keycloak to fully persist the user
-            await Task.Delay(1000);
+            var newKeycloakId = await CreateOrGetKeycloakUserAsync();
+            await _keycloak.AssignRoleAsync(newKeycloakId, AdminRole);
 
-            try { await _keycloak.AssignRoleAsync(newKeycloakId, SuperAdminRole); }
-            catch (Exception ex) { _logger.LogWarning("Role assign: {Msg}", ex.Message); }
-
-            // ✅ SetUserAttributesAsync only — NO UpdateUserProfileAsync here
-            // CreateUserAsync already set all profile fields correctly on creation
             await _keycloak.SetUserAttributesAsync(newKeycloakId, new Dictionary<string, string>
             {
                 ["empId"]       = employee.EmployeeId.ToString(),
                 ["empMasterId"] = details.EmployeeMasterId.ToString(),
-                ["role"]        = SuperAdminRole
+                ["role"]        = AdminRole
             });
 
-            // SuperAdmin gets direct password — NOT email link
-            await _keycloak.ResetPasswordByIdAsync(newKeycloakId, SuperAdminPassword, temporary: false);
+            await _keycloak.ResetPasswordByIdAsync(newKeycloakId, AdminPassword, false);
 
-            // ✅ Update MySQL with new Keycloak UUID
-            var trackedEmployee = await _db.Employees
-                .FirstAsync(e => e.EmployeeId == existingAuth.EmployeeId);
-            trackedEmployee.KeycloakUserId = newKeycloakId;
-            trackedEmployee.UpdatedAt      = DateTime.UtcNow;
-            _db.Employees.Update(trackedEmployee);
+            employee.KeycloakUserId = newKeycloakId;
+            employee.UpdatedAt      = DateTime.UtcNow;
+            _db.Employees.Update(employee);
             await _db.SaveChangesAsync();
 
-            _logger.LogInformation("✅ Keycloak user recreated & synced. NewId={Id}", newKeycloakId);
+            _logger.LogInformation("✅ Admin Keycloak user recreated & synced.");
             return;
         }
 
-        // ── GUARD 2: Orphaned employee ──────────────────────────────────────
-        var orphanedEmployee = await _db.Employees
-            .FirstOrDefaultAsync(e => e.EmployeeCompanyId == SuperAdminCompanyId);
+        // CASE 2 — Orphaned employee
+        var orphan = await _db.Employees
+            .FirstOrDefaultAsync(e => e.EmployeeCompanyId == AdminCompanyId);
 
-        if (orphanedEmployee != null)
+        if (orphan != null)
         {
-            _logger.LogWarning("Orphaned employee found EmployeeId={Id}.", orphanedEmployee.EmployeeId);
-            await CompleteSeedForExistingEmployeeAsync(orphanedEmployee);
+            await CompleteSeedForExistingEmployeeAsync(orphan);
             return;
         }
 
-        // ── FRESH SEED ──────────────────────────────────────────────────────
-        _logger.LogInformation("Seeding SuperAdmin. Email={Email}", SuperAdminEmail);
+        // CASE 3 — Fresh seed
+        await CreateFreshSeedAsync();
+    }
 
-        var role = await _db.Roles.FirstOrDefaultAsync(r => r.RoleName == SuperAdminRole);
-        if (role == null)
+    // ─────────────────────────────────────────────────────────────
+    // FRESH SEED (RETRY‑SAFE)
+    // ─────────────────────────────────────────────────────────────
+    private async Task CreateFreshSeedAsync()
+    {
+        _logger.LogInformation("🌱 Seeding Admin from scratch.");
+
+        var role = await _db.Roles.FirstOrDefaultAsync(r => r.RoleName == AdminRole)
+                   ?? new Role
+                   {
+                       RoleName     = AdminRole,
+                       RoleCode     = "ADMIN",
+                       Description  = "System administrator",
+                       IsSystemRole = true,
+                       CreatedAt    = DateTime.UtcNow
+                   };
+
+        if (role.RoleId == 0)
         {
-            role = new Role
-            {
-                RoleName     = SuperAdminRole,
-                RoleCode     = "SUPERADMIN",
-                Description  = "Full system access",
-                IsSystemRole = true,
-                CreatedAt    = DateTime.UtcNow
-            };
             _db.Roles.Add(role);
             await _db.SaveChangesAsync();
         }
 
-        var department = await _db.Departments.FirstOrDefaultAsync(d => d.DepartmentCode == "SUPERADMIN");
-        if (department == null)
+        var department = await _db.Departments.FirstOrDefaultAsync(d => d.DepartmentCode == "ADMIN")
+                          ?? new Department
+                          {
+                              DepartmentName = "Administration",
+                              DepartmentCode = "ADMIN",
+                              Status         = "Active",
+                              CreatedAt      = DateTime.UtcNow
+                          };
+
+        if (department.DepartmentId == 0)
         {
-            department = new Department
-            {
-                DepartmentName = "Super Administration",
-                DepartmentCode = "SUPERADMIN",
-                Description    = "Super Admin department",
-                Status         = "Active",
-                CreatedAt      = DateTime.UtcNow
-            };
             _db.Departments.Add(department);
             await _db.SaveChangesAsync();
         }
 
-        // ✅ CreateUserAsync sends all fields — firstName, lastName, email, username
-        string keycloakId;
-        try
-        {
-            keycloakId = await _keycloak.CreateUserAsync(
-                SuperAdminEmail, SuperAdminFirstName, SuperAdminLastName, SuperAdminRole);
-            _logger.LogInformation("Keycloak user created. Id={Id}", keycloakId);
-        }
-        catch (Exception ex) when (ex.Message.Contains("already exists"))
-        {
-            _logger.LogWarning("Keycloak user already exists. Fetching UUID...");
-            keycloakId = await _keycloak.GetUserIdByEmailAsync(SuperAdminEmail)
-                ?? throw new Exception($"Keycloak user exists but UUID not found for {SuperAdminEmail}");
-        }
+        var keycloakId = await CreateOrGetKeycloakUserAsync();
+        await _keycloak.AssignRoleAsync(keycloakId, AdminRole);
 
-        // Wait for Keycloak to fully persist the user
-        await Task.Delay(1000);
+        var strategy = _db.Database.CreateExecutionStrategy();
 
-        try { await _keycloak.AssignRoleAsync(keycloakId, SuperAdminRole); }
-        catch (Exception ex) { _logger.LogWarning(ex, "Role assign failed."); }
-
-        var employeeNew = new Employee
+        await strategy.ExecuteAsync(async () =>
         {
-            EmployeeCompanyId = SuperAdminCompanyId,
-            KeycloakUserId    = keycloakId,
-            EmploymentType    = "Permanent",
-            EmploymentStatus  = "Active",
-            EmployeeType      = "FullTime",
-            JoiningDate       = DateOnly.FromDateTime(DateTime.UtcNow),
-            ConfirmationDate  = DateOnly.FromDateTime(DateTime.UtcNow),
-            WorkLocation      = "Head Office",
-            NoticePeriodDays  = 0,
-            IsActive          = true,
-            CreatedAt         = DateTime.UtcNow,
-            CreatedByUserId   = 1
-        };
-        _db.Employees.Add(employeeNew);
-        await _db.SaveChangesAsync();
+            using var tx = await _db.Database.BeginTransactionAsync();
 
-        _db.Userprofiles.Add(new Userprofile
-        {
-            EmployeeId   = employeeNew.EmployeeId,
-            FirstName    = SuperAdminFirstName,
-            LastName     = SuperAdminLastName,
-            MobileNumber = SuperAdminMobile,
-            Gender       = "PreferNotToSay"
-        });
-        await _db.SaveChangesAsync();
-
-        var userAuth = new Userauthentication
-        {
-            EmployeeId   = employeeNew.EmployeeId,
-            Email        = SuperAdminEmail,
-            PasswordHash = PasswordHelper.HashPassword(SuperAdminPassword),
-            Status       = "Active",
-            IsFirstLogin = false,
-            CreatedAt    = DateTime.UtcNow
-        };
-        _db.Userauthentications.Add(userAuth);
-        await _db.SaveChangesAsync();
-
-        var detailsNew = new Employeedetailsmaster
-        {
-            EmployeeId   = employeeNew.EmployeeId,
-            RoleId       = role.RoleId,
-            DepartmentId = department.DepartmentId
-        };
-        _db.Employeedetailsmasters.Add(detailsNew);
-        await _db.SaveChangesAsync();
-
-        try
-        {
-            // ✅ Only attributes + password — NO UpdateUserProfileAsync
-            // CreateUserAsync already set all profile fields correctly
-            await _keycloak.SetUserAttributesAsync(keycloakId, new Dictionary<string, string>
+            var employee = new Employee
             {
-                ["empId"]       = employeeNew.EmployeeId.ToString(),
-                ["empMasterId"] = detailsNew.EmployeeMasterId.ToString(),
-                ["role"]        = SuperAdminRole
-            });
-            await _keycloak.ResetPasswordByIdAsync(keycloakId, SuperAdminPassword, temporary: false);
-        }
-        catch (Exception ex) { _logger.LogWarning(ex, "Keycloak post-create sync failed. Non-fatal."); }
+                EmployeeCompanyId = AdminCompanyId,
+                KeycloakUserId    = keycloakId,
+                EmploymentType    = "Permanent",
+                EmploymentStatus  = "Active",
+                EmployeeType      = "FullTime",
+                JoiningDate       = DateOnly.FromDateTime(DateTime.UtcNow),
+                ConfirmationDate  = DateOnly.FromDateTime(DateTime.UtcNow),
+                WorkLocation      = "Head Office",
+                IsActive          = true,
+                CreatedAt         = DateTime.UtcNow,
+                CreatedByUserId   = 1
+            };
+            _db.Employees.Add(employee);
+            await _db.SaveChangesAsync();
 
-        _logger.LogInformation("✅ SuperAdmin seeded. Email={Email} EmployeeId={EmpId}",
-            SuperAdminEmail, employeeNew.EmployeeId);
-    }
-
-    // ── HELPER: Fix orphaned employee from failed partial seed ────────────────
-    private async Task CompleteSeedForExistingEmployeeAsync(Employee employee)
-    {
-        var role = await _db.Roles.FirstOrDefaultAsync(r => r.RoleName == SuperAdminRole)
-            ?? throw new Exception("SuperAdmin role missing.");
-
-        var department = await _db.Departments.FirstOrDefaultAsync(d => d.DepartmentCode == "SUPERADMIN")
-            ?? throw new Exception("SuperAdmin department missing.");
-
-        var existingProfile = await _db.Userprofiles
-            .FirstOrDefaultAsync(p => p.EmployeeId == employee.EmployeeId);
-
-        if (existingProfile == null)
-        {
             _db.Userprofiles.Add(new Userprofile
             {
                 EmployeeId   = employee.EmployeeId,
-                FirstName    = SuperAdminFirstName,
-                LastName     = SuperAdminLastName,
-                MobileNumber = SuperAdminMobile,
+                FirstName    = AdminFirstName,
+                LastName     = AdminLastName,
+                MobileNumber = AdminMobile,
                 Gender       = "PreferNotToSay"
             });
-            await _db.SaveChangesAsync();
-        }
 
-        var existingAuth = await _db.Userauthentications
-            .FirstOrDefaultAsync(ua => ua.Email == SuperAdminEmail);
-
-        if (existingAuth == null)
-        {
             _db.Userauthentications.Add(new Userauthentication
             {
                 EmployeeId   = employee.EmployeeId,
-                Email        = SuperAdminEmail,
-                PasswordHash = PasswordHelper.HashPassword(SuperAdminPassword),
+                Email        = AdminEmail,
+                PasswordHash = PasswordHelper.HashPassword(AdminPassword),
                 Status       = "Active",
                 IsFirstLogin = false,
                 CreatedAt    = DateTime.UtcNow
             });
-            await _db.SaveChangesAsync();
-        }
 
-        var existingDetails = await _db.Employeedetailsmasters
-            .FirstOrDefaultAsync(d => d.EmployeeId == employee.EmployeeId);
-
-        if (existingDetails == null)
-        {
-            existingDetails = new Employeedetailsmaster
+            var details = new Employeedetailsmaster
             {
                 EmployeeId   = employee.EmployeeId,
                 RoleId       = role.RoleId,
                 DepartmentId = department.DepartmentId
             };
-            _db.Employeedetailsmasters.Add(existingDetails);
+            _db.Employeedetailsmasters.Add(details);
+
             await _db.SaveChangesAsync();
+            await tx.CommitAsync();
+
+            await _keycloak.SetUserAttributesAsync(keycloakId, new Dictionary<string, string>
+            {
+                ["empId"]       = employee.EmployeeId.ToString(),
+                ["empMasterId"] = details.EmployeeMasterId.ToString(),
+                ["role"]        = AdminRole
+            });
+
+            await _keycloak.ResetPasswordByIdAsync(keycloakId, AdminPassword, false);
+        });
+
+        _logger.LogInformation("✅ Admin seeded successfully.");
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // PARTIAL SEED COMPLETION
+    // ─────────────────────────────────────────────────────────────
+    private async Task CompleteSeedForExistingEmployeeAsync(Employee employee)
+    {
+        var role = await _db.Roles.FirstAsync(r => r.RoleName == AdminRole);
+        var dept = await _db.Departments.FirstAsync(d => d.DepartmentCode == "ADMIN");
+
+        if (!await _db.Userprofiles.AnyAsync(p => p.EmployeeId == employee.EmployeeId))
+        {
+            _db.Userprofiles.Add(new Userprofile
+            {
+                EmployeeId   = employee.EmployeeId,
+                FirstName    = AdminFirstName,
+                LastName     = AdminLastName,
+                MobileNumber = AdminMobile,
+                Gender       = "PreferNotToSay"
+            });
         }
+
+        if (!await _db.Userauthentications.AnyAsync(u => u.Email == AdminEmail))
+        {
+            _db.Userauthentications.Add(new Userauthentication
+            {
+                EmployeeId   = employee.EmployeeId,
+                Email        = AdminEmail,
+                PasswordHash = PasswordHelper.HashPassword(AdminPassword),
+                Status       = "Active",
+                IsFirstLogin = false,
+                CreatedAt    = DateTime.UtcNow
+            });
+        }
+
+        var details = await _db.Employeedetailsmasters
+            .FirstOrDefaultAsync(d => d.EmployeeId == employee.EmployeeId);
+
+        if (details == null)
+        {
+            details = new Employeedetailsmaster
+            {
+                EmployeeId   = employee.EmployeeId,
+                RoleId       = role.RoleId,
+                DepartmentId = dept.DepartmentId
+            };
+            _db.Employeedetailsmasters.Add(details);
+        }
+
+        await _db.SaveChangesAsync();
 
         if (!string.IsNullOrEmpty(employee.KeycloakUserId))
         {
-            try
-            {
-                await _keycloak.SetUserAttributesAsync(employee.KeycloakUserId,
-                    new Dictionary<string, string>
-                    {
-                        ["empId"]       = employee.EmployeeId.ToString(),
-                        ["empMasterId"] = existingDetails.EmployeeMasterId.ToString(),
-                        ["role"]        = SuperAdminRole
-                    });
-                await _keycloak.ResetPasswordByIdAsync(employee.KeycloakUserId, SuperAdminPassword, temporary: false);
-                await _keycloak.EnableUserAsync(employee.KeycloakUserId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "CompleteSeed: Keycloak sync failed. Non-fatal.");
-            }
+            await _keycloak.SetUserAttributesAsync(employee.KeycloakUserId,
+                new Dictionary<string, string>
+                {
+                    ["empId"]       = employee.EmployeeId.ToString(),
+                    ["empMasterId"] = details.EmployeeMasterId.ToString(),
+                    ["role"]        = AdminRole
+                });
+
+            await _keycloak.ResetPasswordByIdAsync(employee.KeycloakUserId, AdminPassword, false);
         }
 
-        _logger.LogInformation("✅ Partial seed completed for EmployeeId={Id}", employee.EmployeeId);
+        _logger.LogInformation("✅ Partial Admin seed completed.");
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // KEYCLOAK HELPER
+    // ─────────────────────────────────────────────────────────────
+    private async Task<string> CreateOrGetKeycloakUserAsync()
+    {
+        try
+        {
+            return await _keycloak.CreateUserAsync(
+                AdminEmail, AdminFirstName, AdminLastName, AdminRole);
+        }
+        catch
+        {
+            return await _keycloak.GetUserIdByEmailAsync(AdminEmail)
+                ?? throw new Exception("Admin Keycloak user exists but UUID not found.");
+        }
     }
 }

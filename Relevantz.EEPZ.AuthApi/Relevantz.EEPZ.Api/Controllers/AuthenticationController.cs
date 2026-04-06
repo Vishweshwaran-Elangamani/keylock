@@ -30,6 +30,24 @@ public class AuthenticationController : ControllerBase
         _db       = db;
         _logger   = logger;
     }
+    [HttpPost("forgot-password")]
+[AllowAnonymous]
+public async Task<IActionResult> ForgotPassword(ForgotPasswordRequestDto request)
+{
+    _logger.LogInformation("ForgotPassword called for {Email}", request.Email);
+
+    var userId = await _keycloak.GetUserIdByEmailAsync(request.Email);
+
+    _logger.LogInformation("Keycloak userId resolved = {UserId}", userId);
+
+    if (userId != null)
+    {
+        _logger.LogInformation("Sending reset email for {UserId}", userId);
+        await _keycloak.SendSetPasswordEmailAsync(userId);
+    }
+
+    return Ok();
+}
 
     // ── POST /api/authentication/change-password ──────────────────────────
     [HttpPost("change-password")]
